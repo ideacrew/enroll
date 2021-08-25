@@ -205,15 +205,6 @@ class ApplicationController < ActionController::Base
           redirect_to main_app.new_user_registration_path
         end
       end
-    rescue Exception => e
-      message = {}
-      message[:message] = "Application Exception - #{e.message}"
-      message[:session_person_id] = session[:person_id] if session[:person_id]
-      message[:user_id] = current_user.id if current_user
-      message[:oim_id] = current_user.oim_id if current_user
-      message[:url] = request.original_url
-      message[:params] = params if params
-      log(message, :severity=>'error')
     end
 
     def confirm_last_portal(request, resource)

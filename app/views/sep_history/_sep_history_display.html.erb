@@ -1,0 +1,102 @@
+<% @family.special_enrollment_periods.sort_by(&:created_at).reverse_each do |f| %>
+  <div class="add-default-class-<%= f.id.to_s %>">
+    <div class="panel-heading sep-heading-<%= f.id.to_s %>" role="tab">
+      <div class="row">
+        <div class="col-md-6">
+          <a role="button" class='btn-nav-accordion collapsed' data-toggle="collapse" data-target="#viewSepPanel_<%= f.id.to_s %>" aria-expanded="false" style="color: black;" onclick='addStyleToPanel("<%= f.id.to_s %>")' >
+             <span style="margin-left: 75px">
+                <i class="fas fa-chevron-down"></i>
+              <%= f.title %>
+             </span>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <%= f.start_on %>
+        </div>
+        <div class="col-md-3">
+          <%= f.end_on %>
+        </div>
+      </div>
+    </div>
+    <div id="viewSepPanel_<%= f.id.to_s %>" class="panel-collapse collapse" aria-expanded="false">
+      <div class="panel-body">
+        <div class="row mt-1">
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_effective_date_rule") %></div>
+            <div class="col-md-6">
+              <% if f.effective_on_kind.present? %>
+                <% if f.effective_on_kind == 'first_of_month' %>
+                  15th of month
+                <% elsif f.effective_on_kind == 'first_of_next_month' %>
+                  End of Month
+                <% else %>
+                  <%=f.effective_on_kind.humanize %>
+                <% end %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_event_date") %></div>
+            <div class="col-md-6"><%= f.qle_on %></div>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_creator") %></div>
+            <div class="col-md-6"><%= f.user.present? ? f.user&.person&.full_name : 'N/A' %></div>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_next_possible_start_date") %></div>
+            <div class="col-md-6">
+              <% if f.next_poss_effective_date.present? %>
+                <%= f.next_poss_effective_date %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_creation_date") %></div>
+            <div class="col-md-6"><%= f.created_at.to_s(:db)  %></div>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_optional_dates") %></div>
+            <div class="col-md-6">
+              <% if f.optional_effective_on.length > 0 %>
+                <%= f.optional_effective_on.join(", ") %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_admin_comment") %></div>
+            <div class="col-md-6">
+              <% if f.comments.present? %>
+                <%= f.comments.first.content %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.csl_number") %></div>
+            <div class="col-md-6">
+              <% if f.csl_num.present? %>
+                <%= f.csl_num %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

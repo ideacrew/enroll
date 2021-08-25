@@ -409,6 +409,62 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  describe "#assign_prior_plan_benefit_packages", dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup expired, and active benefit applications"
+
+    context 'new hire hired on falls under prior plan year and prior year shop functionality is enabled' do
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+      let(:hired_on) { expired_benefit_package.start_on + 10.days }
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id, hired_on:  hired_on) }
+      let(:person) { FactoryBot.create(:person) }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      end
+
+      it 'on save should create a benefit group assignment' do
+        benefit_group_assignment = census_employee.benefit_package_assignment_on(expired_benefit_package.start_on)
+        expect(benefit_group_assignment.present?).to eq true
+      end
+    end
+
+    context 'new hire hired on does not fall under prior plan year and prior year shop functionality is enabled' do
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+      let(:hired_on) { active_benefit_package.start_on + 10.days }
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id, hired_on:  hired_on) }
+      let(:person) { FactoryBot.create(:person) }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      end
+
+      it 'on save should create a benefit group assignment' do
+        benefit_group_assignment = census_employee.benefit_package_assignment_on(expired_benefit_package.start_on)
+        expect(benefit_group_assignment.benefit_package_id.to_s).not_to eq expired_benefit_package.id.to_s
+      end
+    end
+
+    context 'prior year shop functionality is disabled' do
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+      let(:hired_on) { active_benefit_package.start_on + 10.days }
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id, hired_on:  hired_on) }
+      let(:person) { FactoryBot.create(:person) }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      end
+
+      it 'on save should create a benefit group assignment' do
+        benefit_group_assignment = census_employee.benefit_package_assignment_on(expired_benefit_package.start_on)
+        expect(benefit_group_assignment.benefit_package_id.to_s).not_to eq expired_benefit_package.id.to_s
+      end
+    end
+  end
+
   describe "When plan year is published" do
     let(:params) {valid_params}
     let(:initial_census_employee) {CensusEmployee.new(**params)}

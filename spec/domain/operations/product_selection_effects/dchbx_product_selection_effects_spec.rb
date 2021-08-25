@@ -131,6 +131,213 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
 end
 
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is no current coverage
+- there is no prior coverage
+- there is no open enrollment
+- the selection is IVL and sep is added for prior coverage year
+", dbclean: :after_each do
+
+  include_context 'family has no current year coverage and not in open enrollment and purchased coverage in prior year via SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it "does creates a continuous enrollment for future coverage period after purchase" do
+    subject
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 2
+    renewal_enrollment = enrollments.last
+    renewal_start_date = renewal_enrollment.effective_on
+    expect(current_benefit_coverage_period.start_on).to eq renewal_start_date
+    expect(renewal_enrollment.product_id).to eq current_product.id
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is no current coverage
+- there is no prior coverage
+- there is no open enrollment
+- the selection is IVL and admin sep is added for prior coverage year with renewal flag set to false
+", dbclean: :after_each do
+
+  include_context 'family has no current year coverage and not in open enrollment and purchased coverage in prior year via admin SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it "does not create a continuous enrollment for future coverage period after purchase" do
+    subject
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 1
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is current coverage
+- there is no prior coverage
+- there is no open enrollment
+- the selection is IVL and sep is added for prior coverage year
+", dbclean: :after_each do
+
+  include_context 'family has current year coverage and not in open enrollment and purchased coverage in prior year via SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    current_ivl_enrollment
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it 'the current coverage gets canceled and new enrollment gets generated for current coverage year' do
+    subject
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 3
+    expect(enrollments.pluck(:aasm_state)).to include('coverage_canceled')
+    current_enrollment = enrollments.sort_by(&:created_at).select{|enr| enr.aasm_state == 'coverage_selected'}.last
+    renewal_start_date = current_enrollment.effective_on
+    expect(current_benefit_coverage_period.start_on).to eq renewal_start_date
+    expect(current_enrollment.product_id).to eq current_product.id
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is current coverage in active state
+- there is prior coverage in expired state
+- there is no open enrollment
+- the selection is IVL and sep is added for prior coverage year
+", dbclean: :after_each do
+
+  include_context 'family has current year and prior year coverage and not in open enrollment and purchased new coverage in prior year via SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    prior_ivl_enrollment_2
+    current_ivl_enrollment
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it 'prior coverage gets terminated and current coverage gets canceled and new enrollment gets generated for current and prior coverage year' do
+    subject
+    prior_ivl_enrollment.generate_hbx_signature
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 4
+    expect(enrollments.pluck(:aasm_state)).to include('coverage_terminated')
+    terminated_enrollment = enrollments.select{|enr| enr.aasm_state == 'coverage_terminated'}.last
+    expect(terminated_enrollment.terminated_on).to eq(prior_ivl_enrollment.effective_on - 1.day)
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is current coverage in active state
+- there is prior coverage in expired state
+- there is a renewal coverage
+- there is open enrollment
+- the selection is IVL and sep is added for prior coverage year
+", dbclean: :after_each do
+
+  include_context 'family has prior, current and renewal year coverage and in open enrollment and purchased new coverage in prior year via SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    prior_ivl_enrollment_2
+    current_ivl_enrollment
+    renewal_ivl_enrollment
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it 'prior coverage gets terminated and current coverage gets canceled and new enrollment gets generated for renewal, current and prior coverage year' do
+    sep.update_attributes(end_on: Date.new(current_coverage_year, 11, 15))
+    subject
+    prior_ivl_enrollment.generate_hbx_signature
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_coverage_year, 11, 15))
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 6
+    expect(enrollments.pluck(:aasm_state)).to include('auto_renewing')
+    renewal_enrollment = enrollments.select{|enr| enr.aasm_state == 'auto_renewing'}.last
+    renewal_start_date = renewal_enrollment.effective_on
+    expect(renewal_benefit_coverage_period.start_on).to eq renewal_start_date
+  end
+end
+
+RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, type: :model do
+  let(:current_year) { TimeKeeper.date_of_record.year }
+
+  before do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+  end
+
+  include_context 'family with one member and one enrollment'
+
+  before do
+    enrollment.update_attributes(effective_on: Date.new(current_year - 3))
+    product_selection = Entities::ProductSelection.new({:enrollment => enrollment, :product => enrollment.product, :family => family})
+    @result = subject.call(product_selection)
+  end
+
+  it 'should not create a renewal enrollment' do
+    expect(family.hbx_enrollments.count).to eq(1)
+  end
+end
+
 RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, type: :model do
   before { DatabaseCleaner.clean }
 
