@@ -137,13 +137,13 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "POST step" do
     before do
-      FinancialAssistanceRegistry[:haven_determination].feature.stub(:is_enabled).and_return(true)
-      setup_faa_data
-      allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
-      allow(obj).to receive(:build_event).and_return(event)
-      allow(event.success).to receive(:publish).and_return(true)
-      controller.instance_variable_set(:@modal, application.reload)
-    end
+    allow(controller).to receive(:haven_determination_is_enabled?).and_return(true)
+    setup_faa_data
+    allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
+    allow(obj).to receive(:build_event).and_return(event)
+    allow(event.success).to receive(:publish).and_return(true)
+    controller.instance_variable_set(:@modal, application.reload)
+  end
 
     it "should render step if no key present in params with modal_name" do
       post :step, params: { id: application.id }
