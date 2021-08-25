@@ -2,11 +2,9 @@
 
 require 'rails_helper'
 
-# require "#{Rails.root.to_s.gsub('/components/financial_assistance/spec/dummy', '')}/components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers"
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
-  # let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
