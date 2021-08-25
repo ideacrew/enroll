@@ -96,7 +96,7 @@ And(/^the person has an active resident role$/) do
 end
 
 And(/^the person goes plan shopping in the individual for a new plan$/) do
-  sleep 5
+  sleep 10
   wait_for_ajax
   find('.btn', text: 'CONTINUE').click
   click_link "Continue"
