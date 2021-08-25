@@ -391,9 +391,6 @@ class Person
   delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
   delegate :all_types_verified?, :to => :consumer_role
 
-  def rating_address
-    home_address || mailing_address
-  end
 
   def notify_created
     # TODO: Possibly add

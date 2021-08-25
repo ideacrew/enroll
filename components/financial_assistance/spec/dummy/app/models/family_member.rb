@@ -49,7 +49,6 @@ class FamilyMember
   delegate :dob, to: :person, allow_nil: true
   delegate :ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
-  delegate :rating_address, to: :person, allow_nil: true
   # consumer fields
   delegate :race, to: :person, allow_nil: true
   delegate :ethnicity, to: :person, allow_nil: true
