@@ -54,8 +54,7 @@ module FinancialAssistance
                     "is_primary_applicant" => true,
                     "person_id" => BSON::ObjectId.from_string(person.id.to_s)
                   }
-                },
-                "is_active" => true
+                }, "is_active" => true
               )
             else
               []
@@ -96,7 +95,6 @@ module FinancialAssistance
               @family_member = create_or_update_family_member(@person, @family, family_member_hash)
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
-              # create_or_update_vlp_document(applicant_params, @person)
             else
               @person
             end
@@ -137,10 +135,9 @@ module FinancialAssistance
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
-            primary_person = family.primary_person
-            exiting_relationship = primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
+            exiting_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
             return if exiting_relationship && exiting_relationship.kind == relationship_kind
-            primary_person.ensure_relationship_with(person, relationship_kind)
+            family.primary_person.ensure_relationship_with(person, relationship_kind)
           end
 
           def same_address_with_primary(family_member, primary)
@@ -154,7 +151,7 @@ module FinancialAssistance
                                                                                          end
           end
 
-          def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+          def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
             applicants_hash = iap_hash['applicants']
             sanitize_params = []
             applicants_hash.each do |applicant_hash|
@@ -314,61 +311,60 @@ module FinancialAssistance
             applicants_hash.each do |applicant|
               persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
-              unless persisted_applicant.nil?
-                persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
-                persisted_applicant.is_self_attested_blind = applicant[:is_self_attested_blind]
-                persisted_applicant.is_self_attested_disabled = applicant[:is_self_attested_disabled]
-                persisted_applicant.is_required_to_file_taxes = applicant[:is_required_to_file_taxes]
-                persisted_applicant.tax_filer_kind = applicant[:tax_filer_kind]
-                persisted_applicant.is_joint_tax_filing = applicant[:is_joint_tax_filing]
-                persisted_applicant.is_claimed_as_tax_dependent = applicant[:is_claimed_as_tax_dependent]
-                persisted_applicant.claimed_as_tax_dependent_by = claimed_by ? claimed_by.id : nil
+              next if persisted_applicant.nil?
+              persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
+              persisted_applicant.is_self_attested_blind = applicant[:is_self_attested_blind]
+              persisted_applicant.is_self_attested_disabled = applicant[:is_self_attested_disabled]
+              persisted_applicant.is_required_to_file_taxes = applicant[:is_required_to_file_taxes]
+              persisted_applicant.tax_filer_kind = applicant[:tax_filer_kind]
+              persisted_applicant.is_joint_tax_filing = applicant[:is_joint_tax_filing]
+              persisted_applicant.is_claimed_as_tax_dependent = applicant[:is_claimed_as_tax_dependent]
+              persisted_applicant.claimed_as_tax_dependent_by = claimed_by ? claimed_by.id : nil
 
-                persisted_applicant.is_student = applicant[:is_student]
-                persisted_applicant.student_kind = applicant[:student_kind]
-                persisted_applicant.student_school_kind = applicant[:student_school_kind]
-                persisted_applicant.student_status_end_on = applicant[:student_status_end_on]
+              persisted_applicant.is_student = applicant[:is_student]
+              persisted_applicant.student_kind = applicant[:student_kind]
+              persisted_applicant.student_school_kind = applicant[:student_school_kind]
+              persisted_applicant.student_status_end_on = applicant[:student_status_end_on]
 
-                persisted_applicant.is_refugee = applicant[:is_refugee]
-                persisted_applicant.is_trafficking_victim = applicant[:is_trafficking_victim]
+              persisted_applicant.is_refugee = applicant[:is_refugee]
+              persisted_applicant.is_trafficking_victim = applicant[:is_trafficking_victim]
 
-                persisted_applicant.is_former_foster_care = applicant[:is_former_foster_care]
-                persisted_applicant.age_left_foster_care = applicant[:age_left_foster_care]
-                persisted_applicant.foster_care_us_state = applicant[:foster_care_us_state]
-                persisted_applicant.had_medicaid_during_foster_care = applicant[:had_medicaid_during_foster_care]
+              persisted_applicant.is_former_foster_care = applicant[:is_former_foster_care]
+              persisted_applicant.age_left_foster_care = applicant[:age_left_foster_care]
+              persisted_applicant.foster_care_us_state = applicant[:foster_care_us_state]
+              persisted_applicant.had_medicaid_during_foster_care = applicant[:had_medicaid_during_foster_care]
 
-                persisted_applicant.is_pregnant = applicant[:is_pregnant]
-                persisted_applicant.is_enrolled_on_medicaid = applicant[:is_enrolled_on_medicaid]
-                persisted_applicant.is_post_partum_period = applicant[:is_post_partum_period]
-                persisted_applicant.children_expected_count = applicant[:children_expected_count]
-                persisted_applicant.pregnancy_due_on = applicant[:pregnancy_due_on]
-                persisted_applicant.pregnancy_end_on = applicant[:pregnancy_end_on]
+              persisted_applicant.is_pregnant = applicant[:is_pregnant]
+              persisted_applicant.is_enrolled_on_medicaid = applicant[:is_enrolled_on_medicaid]
+              persisted_applicant.is_post_partum_period = applicant[:is_post_partum_period]
+              persisted_applicant.children_expected_count = applicant[:children_expected_count]
+              persisted_applicant.pregnancy_due_on = applicant[:pregnancy_due_on]
+              persisted_applicant.pregnancy_end_on = applicant[:pregnancy_end_on]
 
-                persisted_applicant.is_subject_to_five_year_bar = applicant[:is_subject_to_five_year_bar]
-                persisted_applicant.is_five_year_bar_met = applicant[:is_five_year_bar_met]
-                persisted_applicant.is_forty_quarters = applicant[:is_forty_quarters]
-                persisted_applicant.is_ssn_applied = applicant[:is_ssn_applied]
-                persisted_applicant.non_ssn_apply_reason = applicant[:non_ssn_apply_reason]
-                persisted_applicant.moved_on_or_after_welfare_reformed_law = applicant[:moved_on_or_after_welfare_reformed_law]
-                persisted_applicant.is_currently_enrolled_in_health_plan = applicant[:is_currently_enrolled_in_health_plan]
-                persisted_applicant.has_daily_living_help = applicant[:has_daily_living_help]
-                persisted_applicant.need_help_paying_bills = applicant[:need_help_paying_bills]
-                persisted_applicant.has_job_income = applicant[:has_job_income]
-                persisted_applicant.has_self_employment_income = applicant[:has_self_employment_income]
-                persisted_applicant.has_unemployment_income = applicant[:has_unemployment_income]
-                persisted_applicant.has_other_income = applicant[:has_other_income]
-                persisted_applicant.has_deductions = applicant[:has_deductions]
-                persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
-                persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
+              persisted_applicant.is_subject_to_five_year_bar = applicant[:is_subject_to_five_year_bar]
+              persisted_applicant.is_five_year_bar_met = applicant[:is_five_year_bar_met]
+              persisted_applicant.is_forty_quarters = applicant[:is_forty_quarters]
+              persisted_applicant.is_ssn_applied = applicant[:is_ssn_applied]
+              persisted_applicant.non_ssn_apply_reason = applicant[:non_ssn_apply_reason]
+              persisted_applicant.moved_on_or_after_welfare_reformed_law = applicant[:moved_on_or_after_welfare_reformed_law]
+              persisted_applicant.is_currently_enrolled_in_health_plan = applicant[:is_currently_enrolled_in_health_plan]
+              persisted_applicant.has_daily_living_help = applicant[:has_daily_living_help]
+              persisted_applicant.need_help_paying_bills = applicant[:need_help_paying_bills]
+              persisted_applicant.has_job_income = applicant[:has_job_income]
+              persisted_applicant.has_self_employment_income = applicant[:has_self_employment_income]
+              persisted_applicant.has_unemployment_income = applicant[:has_unemployment_income]
+              persisted_applicant.has_other_income = applicant[:has_other_income]
+              persisted_applicant.has_deductions = applicant[:has_deductions]
+              persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
+              persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
 
-                persisted_applicant.incomes = applicant[:incomes]
-                persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
-                persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
-                persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
-                ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
-                persisted_applicant.save!
-                ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
-              end
+              persisted_applicant.incomes = applicant[:incomes]
+              persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
+              persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
+              persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
+              ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
+              persisted_applicant.save!
+              ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
             end
             Success("Successfully transferred in account")
           end

@@ -24,8 +24,7 @@ module FinancialAssistance
           def build_event(payload)
             service = FinancialAssistanceRegistry.feature_enabled?(:batch_transfer) ? "aces" : "curam"
             payload[:service] = service
-            result = event('events.iap.transfers.transfer_account', attributes: payload)
-            result
+            event('events.iap.transfers.transfer_account', attributes: payload)
           end
 
           def publish(event)
