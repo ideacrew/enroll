@@ -76,7 +76,16 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
   let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
 
+  let(:obj)  { FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount.new }
+  let(:event) { Success(double) }
+
   before do
+    stub_const('::Operations::Products::Fetch', fetch_double)
+    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
+    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount).to receive(:new).and_return(obj)
+    allow(obj).to receive(:build_event).and_return(event)
+    allow(event.success).to receive(:publish).and_return(true)
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
@@ -89,17 +98,13 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call({application_id: application})
       end
 
-      it "fails when the request fails" do
-        expect(@result.success?).not_to be_truthy
+      it 'should return success' do
+        expect(@result).to be_success
       end
 
-      # it 'should return success' do
-        # expect(@result).to be_success
-      # end
-
-      # it 'should return success with message' do
-        # expect(@result.success).to eq('Successfully published the payload to medicaid_gateway to be transferred out to ACES')
-      # end
+      it 'should return success with message' do
+        expect(@result.success).to eq('Successfully published the payload to medicaid_gateway to be transferred out to ACES')
+      end
     end
   end
 

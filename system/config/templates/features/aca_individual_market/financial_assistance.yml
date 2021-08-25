@@ -84,6 +84,9 @@ registry:
       is_enabled: false
     - key: :batch_transfer
       is_enabled: false
+    - key: :transfer_service
+      is_enabled: true
+      item: "aces"
   - namespace:
     - :documents
     features:

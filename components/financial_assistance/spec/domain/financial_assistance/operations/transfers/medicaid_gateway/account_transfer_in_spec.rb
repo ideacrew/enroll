@@ -13,7 +13,6 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
   let(:transformed) { ::AcaEntities::Atp::Transformers::Cv::Family.transform(record.to_hash(identifier: true)) }
 
-
   context 'success' do
     context 'with valid application' do
       before do

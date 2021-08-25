@@ -68,14 +68,17 @@ class Person
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
+  field :no_dc_address_reason, type: String, default: ""
   field :is_homeless, type: Boolean, default: false
   field :is_temporarily_out_of_state, type: Boolean, default: false
   field :is_moving_to_state, type: Boolean, default: false
 
   field :is_active, type: Boolean, default: true
+  field :age_off_excluded, type: Boolean, default: false
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
+  field :is_applying_for_assistance, type: Boolean
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true

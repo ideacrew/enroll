@@ -50,7 +50,7 @@ module FinancialAssistance
           end
 
           def construct_payload(family, application)
-            family_hash = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).value!
+            family_hash = FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).value!
             family_hash[:magi_medicaid_applications] = family_hash[:magi_medicaid_applications].select{ |a| a[:hbx_id] == application.hbx_id }
             fam = {family: family_hash}
             Success(fam)
