@@ -30,7 +30,6 @@ Feature: User should be able to pay for plan
     Then I should see the Kaiser pop up text
 
   Scenario: User cannot see pay now button and pop up for Kaiser enrollment when feature is turned off
-    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     Given the kaiser paynow feature configuration is disabled
     And that a person exists in EA
@@ -40,8 +39,13 @@ Feature: User should be able to pay for plan
     And the person selects a plan
     And I click on purchase confirm button for matched person
     Then I should see not pay now button
+    Then user continues to their account
+    When consumer should be able to see Actions dropdown
+    Then consumer clicks on the Actions button
+    Then consumer should not see the Make Payments button
 
-  Scenario: User can see pay now pop up for non-Kaiser enrollment
+  @flaky
+  Scenario: User should not see pay now pop up for non-Kaiser enrollment
     Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     And that a person exists in EA
@@ -55,10 +59,7 @@ Feature: User should be able to pay for plan
     Then user continues to their account
     When consumer should be able to see Actions dropdown
     Then consumer clicks on the Actions button
-    Then consumer should the the Make Payments button
-    And the make payments glossary tooltip should be present
-    And user clicks on the make payments button
-    Then I should see the non-Kaiser pop up text
+    Then consumer should not see the Make Payments button
 
   @flaky
   Scenario Outline: Hbx Admin uploads and verifies application document
