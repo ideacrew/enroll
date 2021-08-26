@@ -59,8 +59,16 @@ module FinancialAssistance
         end
 
         def determination_request_class
-          return FinancialAssistance::Operations::Application::RequestDetermination if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
-          return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+          return FinancialAssistance::Operations::Application::RequestDetermination if haven_determination_is_enabled
+          return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if medicaid_gateway_determination_is_enabled?
+        end
+
+        def haven_determination_is_enabled
+          FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        end
+      
+        def medicaid_gateway_determination_is_enabled?
+          FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
         end
       end
     end
