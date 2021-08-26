@@ -78,6 +78,16 @@ registry:
     - key: :medicaid_gateway_determination
       is_enabled: false
   - namespace:
+    - :account_transfer
+    features:
+    - key: :real_time_transfer
+      is_enabled: false
+    - key: :batch_transfer
+      is_enabled: false
+    - key: :transfer_service
+      is_enabled: true
+      item: "aces"
+  - namespace:
     - :documents
     features:
       - key: :consumer_validations
