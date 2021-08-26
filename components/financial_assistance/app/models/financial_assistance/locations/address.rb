@@ -34,7 +34,7 @@ module FinancialAssistance
       # The name of the quadrant where this address is located
       field :quadrant, type: String, default: ""
 
-      # TODO undo after migration
+      # TODO: undo after migration
 
       # validates :zip, presence: true
       # validates :kind, presence: true

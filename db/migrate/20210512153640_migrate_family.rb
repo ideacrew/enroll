@@ -30,6 +30,7 @@ class MigrateFamily < Mongoid::Migration
 
   class << self
     attr_accessor :extract_klass, :transform_klass, :ext_input_hash, :cv3_family_hash, :path_name
+    attr_reader :file_path
 
     def migrate_for_mcr
       ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, { transform_mode: :batch }) do |payload|
@@ -104,16 +105,6 @@ class MigrateFamily < Mongoid::Migration
       # end
       # @application.save!(validate: false)
       @application.save!
-    end
-
-    def file_path
-      @file_path
-      # case Rails.env
-      # when 'development'
-      #   "spec/test_data/transform_example_payloads/mcr_applications.json"
-      # when 'test'
-      #   "spec/test_data/transform_example_payloads/application.json"
-      # end
     end
 
     def build_iap(iap_hash)
@@ -385,7 +376,7 @@ class MigrateFamily < Mongoid::Migration
         is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
         is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
         is_applying_for_assistance: person_hash['is_applying_for_assistance'],
-        is_homeless: person_hash['is_homeless'] || false, # TODO update match with primary
+        is_homeless: person_hash['is_homeless'] || false, # TODO: update match with primary
         is_temporarily_out_of_state: person_hash['is_temporarily_out_of_state'],
         age_off_excluded: person_hash['age_off_excluded'],
         is_active: person_hash['is_active'],
@@ -467,11 +458,7 @@ class MigrateFamily < Mongoid::Migration
 
     def read_directory(directory_name, &block)
       Dir.foreach(directory_name) do |filename|
-        case File.extname(filename)
-        when ".xml"
-          @filepath = "#{directory_name}/#{filename}"
-          instance_eval(&block) if block_given?
-        when ".json"
+        if File.extname(filename) == '.xml' || File.extname(filename) == ".json"
           @filepath = "#{directory_name}/#{filename}"
           instance_eval(&block) if block_given?
         end

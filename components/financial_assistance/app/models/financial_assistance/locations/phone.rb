@@ -21,7 +21,7 @@ module FinancialAssistance
       field :primary, type: Boolean
       field :full_phone_number, type: String, default: ''
 
-      # TODO undo after migration
+      # TODO: undo after migration
 
       # validates :area_code,
       #           numericality: true,
