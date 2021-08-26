@@ -26,12 +26,13 @@
         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
       <![endif]-->
-      <style>
-        * {
-          font-family: <%= EnrollRegistry.feature_enabled?(:application_font) ? EnrollRegistry[:application_font].settings(:font_family).item : 'Open Sans' %>, sans-serif;
-        }
-      </style>
-
+      <% if EnrollRegistry.feature_enabled?(:application_font) %>
+        <style>
+          * {
+            font-family: 'Barlow', sans-serif;
+          }
+        </style>
+      <% end %>
         <script>
                 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
