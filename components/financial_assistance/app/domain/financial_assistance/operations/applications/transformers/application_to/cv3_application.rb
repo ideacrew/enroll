@@ -68,6 +68,7 @@ module FinancialAssistance
             # rubocop:disable Metrics/MethodLength
             def applicants(application)
               application.applicants.inject([]) do |result, applicant|
+                prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn,
                                                      encrypted_ssn: applicant.encrypted_ssn},
@@ -132,8 +133,8 @@ module FinancialAssistance
                            is_self_attested_long_term_care: applicant.has_daily_living_help.present?,
                            has_insurance: applicant.is_enrolled_in_insurance?,
                            has_state_health_benefit: applicant.has_state_health_benefit?,
-                           had_prior_insurance: had_prior_insurance?(applicant),
-                           prior_insurance_end_date: applicant.prior_insurance_end_date,
+                           had_prior_insurance: prior_insurance_benefit.present?,
+                           prior_insurance_end_date: prior_insurance_benefit&.end_on,
                            age_of_applicant: applicant.age_of_the_applicant,
                            hours_worked_per_week: applicant.total_hours_worked_per_week,
                            is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
@@ -467,9 +468,9 @@ module FinancialAssistance
             end
 
             # Was the applicant receiving coverage that has expired?
-            # Any benefits of type is_enrolled and end dated.
-            def had_prior_insurance?(applicant)
-              applicant.benefits.any?{ |b| b.is_enrolled? && b.end_on.present? }
+            # Benefit of type is_enrolled and end dated.
+            def prior_insurance(applicant)
+              applicant.benefits.detect{ |b| b.is_enrolled? && b.end_on.present? }
             end
 
             def vlp_document(applicant)
