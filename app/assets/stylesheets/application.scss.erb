@@ -21,7 +21,7 @@
 @import "barlow";
 
 * {
-  font-family: $application-font, sans-serif;
+  font-family: <%= EnrollRegistry.feature_enabled?(:application_font) ? EnrollRegistry[:application_font].settings(:font_family).item : "Open Sans" %>, sans-serif;
 }
 
 .content {

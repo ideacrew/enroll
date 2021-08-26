@@ -1,8 +1,8 @@
-@import './_variables';
+@import "./_variables";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700');
 
 * {
-  font-family: $application-font, sans-serif;
+    font-family: <%= EnrollRegistry.feature_enabled?(:application_font) ? EnrollRegistry[:application_font].settings(:font_family).item : "Open Sans" %>, sans-serif;
 }
 
 a {
@@ -13,11 +13,11 @@ a {
 }
 
 a:visited {
-  text-decoration: none;
+  text-decoration:none;
 }
 
 a:active {
-  text-decoration: none;
+  text-decoration:none;
 }
 
 html {
@@ -35,12 +35,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1,h2,h3,h4,h5,h6 {
   font-weight: 300;
   line-height: 1.6em;
 }
@@ -54,7 +49,7 @@ h6 {
 #welcome-nav-options {
   text-align: center;
   .btn {
-    margin-right: 10px;
+    margin-right:10px;
   }
 }
 #header-uic {
@@ -97,8 +92,7 @@ h6 {
           text-align: right;
         }
         a.call-customer-service {
-          span:first-of-type {
-          }
+          span:first-of-type {}
           span:last-of-type {
             .fa {
               color: $brand-primary;
@@ -125,7 +119,7 @@ h6 {
 }
 
 #uic-primary-nav {
-  background: $dark-blue;
+  background:$dark-blue;
 
   ul {
     margin: 20px 0;
@@ -133,40 +127,41 @@ h6 {
   }
 
   ul li {
+
   }
 
   ul li a {
-    color: $primary-white;
+    color:$primary-white;
     font-size: 16px;
     font-weight: 500;
     line-height: 16px;
   }
   ul li a:hover {
-    text-decoration: none;
-    cursor: pointer;
+    text-decoration:none;
+    cursor:pointer;
     transition: all 0.3s ease 0s;
     color: #e72b2d;
   }
 
   a:visited {
-    text-decoration: none;
+    text-decoration:none;
   }
 
   a:active {
-    text-decoration: none;
+    text-decoration:none;
   }
   .fa-caret-down {
-    color: $primary-white;
+    color:$primary-white;
   }
 
   ul.dropdown-menu li a {
-    color: $primary-black;
+    color:$primary-black;
     padding: 3px 20px;
-    margin-bottom: 5px;
+    margin-bottom:5px;
   }
 
   ul.dropdown-menu li a:hover {
-    color: $orange;
+    color:$orange;
     transition: all 0.3s ease 0s;
   }
 
@@ -175,9 +170,8 @@ h6 {
   }
 }
 
-#uic-families-right-menu,
-#uic-employers-right-menu {
-  background-color: $dark-blue;
+#uic-families-right-menu, #uic-employers-right-menu {
+  background-color:$dark-blue;
   padding: 20px 0;
   list-style-type: none;
 
@@ -198,7 +192,7 @@ h6 {
     background-color: transparent;
   }
   .badge {
-    background-color: $primary-orange;
+    background-color:$primary-orange;
   }
   .panel {
     border-radius: 0;
@@ -206,7 +200,7 @@ h6 {
     border-bottom: none;
     padding: 0 20px;
     font-size: 14px;
-    margin-top: 0;
+    margin-top:0;
     padding: 0 10px;
   }
 }
@@ -214,7 +208,7 @@ h6 {
 #footer-uic {
   font-size: 14px;
   color: #ffffff;
-  background-color: #3d5d6f;
+  background-color:#3d5d6f;
   padding: 15px;
   position: absolute;
   bottom: 0;
@@ -222,11 +216,11 @@ h6 {
   width: 100%;
 
   a {
-    color: $primary-white;
+    color:$primary-white;
   }
 
   .fa-envelope {
-    color: $primary-white;
+    color:$primary-white;
   }
 }
 
@@ -259,8 +253,8 @@ h6 {
 .btn.active {
   background-image: none;
   outline: 0;
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
 }
 .btn.disabled,
 .btn[disabled],
@@ -269,8 +263,8 @@ fieldset[disabled] .btn {
   cursor: not-allowed;
   filter: alpha(opacity=65);
   -webkit-box-shadow: none;
-  box-shadow: none;
-  opacity: 0.65;
+          box-shadow: none;
+  opacity: .65;
 }
 
 .btn-default {
@@ -324,10 +318,10 @@ fieldset[disabled] .btn-default.active {
   background-color: $secondary-button-background;
 }
 .fa-trash {
-  color: $dark-blue;
+  color:$dark-blue;
 }
 .fa-trash:hover {
-  cursor: pointer;
+  cursor:pointer;
 }
 
 thead {
@@ -337,9 +331,10 @@ thead {
 
 .pdf-image {
   img {
-    width: 45px;
-    height: 60px;
+    width:45px;
+    height:60px;
   }
+
 }
 
 .right-section {
@@ -348,13 +343,13 @@ thead {
     color: #414141;
   }
   ul.list-right-section {
-    margin-top: 20px;
+      margin-top: 20px;
   }
   ul.list-right-section li {
-    float: left;
-    width: 100%;
-    list-style-type: none;
-    padding: 5px 0px;
+      float: left;
+      width: 100%;
+      list-style-type: none;
+      padding: 5px 0px;
   }
   li a {
     text-decoration: none;
@@ -428,157 +423,151 @@ thead {
   padding: 3.75% 0 1.25%;
 
   .arrow {
-    padding-top: 1.25%;
+      padding-top: 1.25%;
   }
   .arrow img {
-    width: 100%;
-    max-width: 100%;
+      width: 100%;
+      max-width: 100%;
   }
   img {
-    vertical-align: middle;
+      vertical-align: middle;
   }
 }
 
 .top-view-details {
-  margin-top: 30px;
+  margin-top: 30px
 }
 
 .rp-plan-info {
-  font-size: 10px;
+  font-size:10px;
   text-transform: uppercase;
   font-weight: normal;
 }
 
 #uic-wrapper {
-  width: 97%;
-  margin-left: 20px;
+  width:97%;
+  margin-left:20px;
 
   input {
     height: 48px;
-    border: none;
+    border:none;
   }
 }
 
 .employer-invoices {
-  max-width: 660px;
-  thead th {
-    height: 34px;
-  }
-  tbody {
-    height: 220px;
-    overflow-y: auto;
-    tr {
-      a {
-        color: $primary-black;
+    max-width: 660px;
+    thead th {
+      height: 34px;
+    }
+    tbody {
+      height: 220px;
+      overflow-y: auto;
+      tr {
+        a {
+          color: $primary-black;
+          &:hover {
+            text-decoration: none;
+          }
+        }
         &:hover {
-          text-decoration: none;
+          .fa {
+            color: $brand-primary;
+          }
+        }
+        .fa {
+          color: $primary-gray;
         }
       }
+    }
+    thead {
+        /* fallback */
+    }
+    tbody td, thead th {
+      width: 50%;
+      float: left;
+    }
+    table {
+      width: 100%;
+    }
+    thead, tbody, tr { display: block; }
+    tr {
+      width: 100%;
+    }
+    tr:after {
+      content: ' ';
+      display: block;
+      visibility: hidden;
+      clear: both;
+    }
+    .sorter {
+      a {
+        color: $primary-white;
+
+      }
       &:hover {
-        .fa {
+        .fa-stack-1x {
           color: $brand-primary;
         }
       }
       .fa {
         color: $primary-gray;
       }
-    }
-  }
-  thead {
-    /* fallback */
-  }
-  tbody td,
-  thead th {
-    width: 50%;
-    float: left;
-  }
-  table {
-    width: 100%;
-  }
-  thead,
-  tbody,
-  tr {
-    display: block;
-  }
-  tr {
-    width: 100%;
-  }
-  tr:after {
-    content: ' ';
-    display: block;
-    visibility: hidden;
-    clear: both;
-  }
-  .sorter {
-    a {
-      color: $primary-white;
-    }
-    &:hover {
-      .fa-stack-1x {
-        color: $brand-primary;
+      .fa-stack {
+        position: relative;
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        line-height: 1em;
+        vertical-align: middle;
+        font-size: 1.15em;
+      }
+      .fa-stack-1x:first-of-type {
+        margin-top: -6px;
+      }
+      .fa-stack-1x:last-of-type {
+        padding-top: 3px;
       }
     }
-    .fa {
-      color: $primary-gray;
-    }
-    .fa-stack {
-      position: relative;
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      line-height: 1em;
-      vertical-align: middle;
-      font-size: 1.15em;
-    }
-    .fa-stack-1x:first-of-type {
-      margin-top: -6px;
-    }
-    .fa-stack-1x:last-of-type {
-      padding-top: 3px;
-    }
   }
-}
 
-.broker-information {
-  word-wrap: break-word;
-}
+  .broker-information {
+    word-wrap: break-word;
+  }
 
-.eeTableHeader {
-  font-size: 12px;
-  padding: 8px;
-}
+  .eeTableHeader {
+    font-size: 12px;
+    padding: 8px;
+  }
 
-.module {
-  &.broker {
-    .panel-body,
-    .panel-footer {
-      .fa {
-        color: $brand-primary;
-      }
-      .vertically-aligned-row {
-        table-layout: fixed;
-        > * {
-          vertical-align: top;
+  .module {
+    &.broker {
+      .panel-body, .panel-footer {
+        .fa {
+          color: $brand-primary;
+        }
+        .vertically-aligned-row {
+          table-layout: fixed;
+          > * {
+            vertical-align: top;
+          }
         }
       }
     }
   }
-}
 
 .pagination > .active > a {
-  background: $blue;
+  background:$blue;
 }
 
-.Summary-of-Benefits-and-Coverage {
+.Summary-of-Benefits-and-Coverage{
   padding-left: 0.5em;
 }
 
+
 #datatable_filter_source_kind {
-  width: 75px;
+    width: 75px;
 }
 
-#fteEmployee,
-#pteEmployee,
-#medSecPayers {
-  padding: 0;
+#fteEmployee, #pteEmployee, #medSecPayers {
+  padding:0;
 }
