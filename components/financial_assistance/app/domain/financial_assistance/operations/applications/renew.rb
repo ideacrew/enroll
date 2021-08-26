@@ -66,7 +66,7 @@ module FinancialAssistance
         def haven_determination_is_enabled
           FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
         end
-      
+
         def medicaid_gateway_determination_is_enabled?
           FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
         end

@@ -69,6 +69,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
   context 'success' do
     context 'is_renewal_authorized set to true i.e. renewal authorized for next 5 years' do
       before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
@@ -95,6 +97,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
     context 'is_renewal_authorized set to false with remaining years_to_renew' do
       before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
         application10.update_attributes!({ is_renewal_authorized: false, years_to_renew: [1, 2, 3, 4, 5].sample })
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
