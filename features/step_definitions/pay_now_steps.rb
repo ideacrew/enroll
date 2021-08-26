@@ -279,11 +279,11 @@ Then(/user clicks on the first payment button/) do
 end
 
 Then(/^\w+ should the the Make Payments button/) do
-  expect(page).to have_content('Make Payments')
+  expect(page).to have_content('Make payments')
 end
 
 Then(/^\w+ should not see the Make Payments button/) do
-  expect(page).not_to have_content('Make Payments')
+  expect(page).not_to have_content('Make payments')
 end
 
 Then(/user clicks on the make payments button/) do
