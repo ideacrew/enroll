@@ -4,9 +4,14 @@
 html {
   height: 100%;
 }
-* {
-  font-family: <%= EnrollRegistry.feature_enabled?(:application_font) ? EnrollRegistry[:application_font].settings(:font_family).item : "Open Sans" %>, sans-serif;
-}
+<% if EnrollRegistry.feature_enabled?(:application_font) && EnrollRegistry[:application_font].settings(:font_family).item.present? %>
+   *{
+    font-family: <%= EnrollRegistry[:application_font].settings(:font_family).item %>;
+  }
+
+<% end %>
+
+
 
 body {
     background-color: #f2f2f2;
@@ -17,7 +22,6 @@ body {
 
 h1, h2, h3, h4, h5, h6
   {
-    font-family: <%= EnrollRegistry.feature_enabled?(:application_font) ? EnrollRegistry[:application_font].settings(:font_family).item : "Open Sans" %>;
     font-weight: 300;
     line-height: 1.6em;
     }
