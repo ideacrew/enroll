@@ -34,14 +34,14 @@ class Household
   # after_build :build_irs_group
 
   def active_hbx_enrollments
-    actives = hbx_enrollments.collect() do |list, enrollment|
+    actives = []
+    hbx_enrollments.each do |enrollment|
       if enrollment.plan.present? &&
          (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
          (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
 
-        list << enrollment
+        actives << enrollment
       end
-      list
     end
     actives.sort! { |a,b| a.submitted_at <=> b.submitted_at }
   end
@@ -252,7 +252,7 @@ class Household
 
   def irs_group
     return @irs_group if defined? @irs_group
-    @irs_group = parent.irs_groups.find(self.irs_group_id)
+    @irs_group = parent.irs_groups.where(self.irs_group_id).first
   end
 
   def is_active?

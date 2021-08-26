@@ -25,7 +25,7 @@ module Operations
 
         def construct_payload(person)
           payload = {
-            hbx_id: person.hbx_id,
+            hbx_id: person.hbx_id.to_s,
             person_name: construct_person_name(person),
             person_demographics: construct_person_demographics(person),
             person_health: {is_tobacco_user: person.is_tobacco_user,
