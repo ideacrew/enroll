@@ -224,7 +224,7 @@
                 </span>
               <% end %>
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-                <% if EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item %>
+                <% if EnrollRegistry.feature_enabled?(:kaiser_pay_now) %>
                   <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
                     <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
                       <%= render partial:"shared/glossary_hover", locals: {key: "make_a_first_payment", title: "Make a first Payment for my new plan", term: sanitize(l10n("plans.kaiser.pay_now.first_payment")) } %>

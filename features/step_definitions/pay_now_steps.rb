@@ -75,7 +75,7 @@ And(/the person fills in all personal info/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
+  find(IvlPersonalInformation.tobacco_user_no_radiobtn).click unless !tobacco_user_field_enabled?
   fill_in "person_addresses_attributes_0_address_1", with: "123 fake st"
   fill_in "person_addresses_attributes_0_city", with: "DC"
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
@@ -118,7 +118,7 @@ And(/the person continues to plan selection/) do
 end
 
 And(/the person selects a plan/) do
-  find_all(IvlChoosePlan.select_plan_btn, wait: 20)[0].click
+  find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
 
 When(/^the person enrolls in a Kaiser plan$/) do

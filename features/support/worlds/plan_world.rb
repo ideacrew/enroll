@@ -8,6 +8,16 @@ module PlanWorld
     issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
     FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile, metal_level_kind: :catastrophic)
   end
+
+  def create_kaiser_product
+    issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile)
+    FactoryBot.create(
+      :benefit_markets_products_health_products_health_product,
+      benefit_market_kind: 'aca_individual',
+      issuer_profile: issuer_profile,
+      metal_level_kind: :catastrophic
+    )
+  end
 end
 
 World(PlanWorld)

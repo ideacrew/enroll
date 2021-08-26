@@ -20,9 +20,10 @@ module Insured
       def show_pay_now?(source, hbx_enrollment)
         @issuer_key = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
         return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
-        rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
-        return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping" && rr_feature.setting(:plan_shopping).item
-        return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile" && rr_feature.setting(:enrollment_tile).item
+        rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
+        return false unless rr_feature_enabled == true
+        return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
+        return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile"
         false
       end
       # rubocop:enable Metrics/CyclomaticComplexity
