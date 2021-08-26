@@ -29,7 +29,7 @@ Feature: Create Primary Broker and Broker Agency
   Scenario: Broker purchase insurance for a family
     Given the shop market configuration is enabled
     And a CCA site exists with a benefit market
-    Given benefit market catalog exists for active initial employer with health benefits
+    And benefit market catalog exists for active initial employer with health benefits
     And there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
     And there is an employer Acme Inc.
@@ -37,15 +37,11 @@ Feature: Create Primary Broker and Broker Agency
     And initial employer Acme Inc. has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer Acme Inc.
     And employer Acme Inc. is listed under the account for broker District Brokers Inc
-    #And there is a Broker Agency exists for District Brokers Inc
-    #And the broker Max Planck is primary broker for District Brokers Inc
-    #And there is an employer ABC Widgets
-    #And employer ABC Widgets has a active benefit application with offering health and dental
-    #And there exists Patrick Doe employee for employer ABC Widgets
-    #And there exists Patrick Doe employee for employer Acme Inc.
-    #And employer Acme Inc. hired broker Max Planck from District Brokers Inc
     When Max Planck logs on to the Broker Agency Portal
     And Primary Broker clicks on the Families tab
-    Then Primary Broker should see Patrick Doe as family and click on name
-    Then Primary Broker should see Patrick Doe account
-    Then Primary Broker clicks shop for plans
+    And Primary Broker should see Patrick Doe as family and click on name
+    And Primary Broker clicks on shop for plans
+    And Primary Broker selects a plan on the plan shopping page
+    And Primary Broker clicks on confirm Confirm button on the coverage summary page
+    And Primary Broker sees Enrollment Submitted and clicks Continue
+    Then Primary Broker should see Coverage Selected
