@@ -19,6 +19,11 @@
  */
 @import "variables";
 @import "barlow";
+<% if EnrollRegistry.feature_enabled?(:application_font) %>
+* {
+  font-family: "Barlow", sans-serif;
+}
+<% end %>
 
 .content {
   .container {
