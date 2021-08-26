@@ -20,9 +20,15 @@
 @import "variables";
 @import "barlow";
 
-* {
-  font_family: $application-font
+<%  if EnrollRegistry.feature_enabled?(:application_font) && EnrollRegistry[:application_font].settings(:font_family).item.present? %>
+  * {
+    font-family: $application-font, sans-serif;
+  }
+<% else %>
+  * {
+  font-family: 'Open Sans', sans-serif;
 }
+<% end %>
 
 .content {
   .container {

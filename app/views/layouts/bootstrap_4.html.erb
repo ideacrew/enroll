@@ -35,6 +35,14 @@
                 ga('create', '<%= Rails.application.config.ga_tracking_id %>', 'auto');
                 ga('send', 'pageview');
         </script>
+        
+        <% if EnrollRegistry.feature_enabled?(:application_font) %>
+        <style>
+          * {
+            font-family: 'Barlow', sans-serif;
+          }
+        </style>
+      <% end %>
   </head>
   <body class="font">
     <!-- Google Tag Manager (noscript) -->
