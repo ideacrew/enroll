@@ -57,7 +57,7 @@ module Operations
         end
 
         Success(person)
-      rescue StandardError => e
+      rescue StandardError => e  # rubocop:disable Lint/UselessAssignment
         Failure(person.errors.messages)
       end
 

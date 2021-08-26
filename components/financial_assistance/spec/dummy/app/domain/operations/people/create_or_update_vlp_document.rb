@@ -50,7 +50,7 @@ module Operations
         person.save!
 
         Success(vlp_document)
-      rescue StandardError => e
+      rescue StandardError => e   # rubocop:disable Lint/UselessAssignment
         Failure(person.errors.messages)
       end
 
