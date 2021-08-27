@@ -40,6 +40,24 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
     prod.save
     prod
   end
+
+  let!(:renewal_product_73) do
+    prod =
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        service_area: renewal_service_area,
+        csr_variant_id: '01',
+        metal_level_kind: 'silver',
+        application_period: next_year_date.beginning_of_year..next_year_date.end_of_year
+      )
+    prod.premium_tables = [renewal_premium_table]
+    prod.save
+    prod
+  end
+
   let(:renewal_premium_table)        { build(:benefit_markets_products_premium_table, effective_period: next_year_date.beginning_of_year..next_year_date.end_of_year, rating_area: renewal_rating_area) }
   let(:current_application_period)   { TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year }
 
@@ -201,6 +219,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
           tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
           tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
+          tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_87")
           @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
         end
 
