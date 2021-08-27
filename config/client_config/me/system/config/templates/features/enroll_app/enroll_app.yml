@@ -540,3 +540,9 @@ registry:
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
         is_enabled: false
+      - key: :tobacco_user_field
+        item: :tobacco_user_field
+        is_enabled: true 
+      - key: :crm_update_family_save
+        item: :crm_update_family_save
+        is_enabled: true
