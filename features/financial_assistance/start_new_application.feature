@@ -13,8 +13,6 @@ Feature: Cost Savings -  Start New Application
     And the Cost Savings link is visible
     And the consumer clicks on Cost Savings link
     Then consumer should see 'Start New Application' button
-    When consumer click 'Start New Application' button
-    Then the consumer should see a modal popup
 
     Examples:
       | application_state |
@@ -22,7 +20,21 @@ Feature: Cost Savings -  Start New Application
       | submitted |
       | determined |
 
-  Scenario: FAA is enabled - and consumer has a no existing FAA applications
+  Scenario: FAA is enabled - year selection enabled - and consumer has a no existing FAA applications
+    Given the iap year selection feature is enabled
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has successful ridp
+    And the FAA feature configuration is enabled
+    When consumer visits home page
+    And the Cost Savings link is visible
+    And the consumer clicks on Cost Savings link
+    Then consumer should see 'Start New Application' button
+    When consumer click 'Start New Application' button
+    Then the user will navigate to the assistance year selection page
+
+  Scenario: FAA is enabled - year selection disabled - and consumer has a no existing FAA applications
+    Given the iap year selection feature is disabled
     Given a consumer exists
     And the consumer is logged in
     And consumer has successful ridp
