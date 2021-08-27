@@ -101,6 +101,9 @@ module FinancialAssistance
     # predecessor_id is the application preceding this current application
     field :predecessor_id, type: BSON::ObjectId
 
+    # Flag for user requested ATP transfer
+    field :requested_transfer, type: Boolean, default: false
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
