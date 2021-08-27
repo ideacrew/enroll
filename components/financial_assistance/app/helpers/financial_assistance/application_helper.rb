@@ -166,9 +166,9 @@ module FinancialAssistance
       start_date = embedded_document.start_on
       end_date = embedded_document.end_on
 
-      if end_date.nil? || end_date > TimeKeeper.date_of_record
+      if end_date.nil?
         "#{start_date} - Present"
-      elsif end_date <= TimeKeeper.date_of_record
+      else
         "#{start_date} - #{end_date}"
       end
     end
