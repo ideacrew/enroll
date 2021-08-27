@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 02a8cad65abe992bf7a2f82309bf9b58e757c79c
+  revision: e545c95d891e930421b0058e98c323998db42506
   branch: mcr_cv_mapping
   specs:
     aca_entities (0.3.0)
@@ -1101,6 +1101,7 @@ GEM
       yard (>= 0.8.4)
 
 PLATFORMS
+  x86_64-darwin-16
   x86_64-darwin-19
 
 DEPENDENCIES

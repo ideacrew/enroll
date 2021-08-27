@@ -8,7 +8,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
@@ -135,7 +135,7 @@ class MigrateFamily < Mongoid::Migration
         @family_member = create_or_update_family_member(@person, @family, family_member_hash)
         consumer_role_params = family_member_hash['person']['consumer_role']
         create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
-        # create_or_update_vlp_document(applicant_params, @person)
+        create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
       else
         @person
       end
@@ -184,8 +184,12 @@ class MigrateFamily < Mongoid::Migration
       family_member
     end
 
-    def create_or_update_vlp_document(applicant_params, person)
-      Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: applicant_params, person: person })
+    def create_or_update_vlp_document(vlp_params, person)
+      return unless vlp_params.present?
+
+      vlp_params.each do |vlp|
+        Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp, person: person })
+      end
     end
 
     def create_or_update_relationship(person, family, relationship_kind)
@@ -544,6 +548,24 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
         persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
         persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
+
+        if applicant[:vlp_document].present?
+          persisted_applicant.vlp_subject = applicant[:vlp_document]["subject"]
+          persisted_applicant.alien_number = applicant[:vlp_document]["alien_number"]
+          persisted_applicant.i94_number = applicant[:vlp_document]["i94_number"]
+          persisted_applicant.visa_number = applicant[:vlp_document]["visa_number"]
+          persisted_applicant.passport_number = applicant[:vlp_document]["passport_number"]
+          persisted_applicant.sevis_id = applicant[:vlp_document]["sevis_id"]
+          persisted_applicant.naturalization_number = applicant[:vlp_document]["naturalization_number"]
+          persisted_applicant.receipt_number = applicant[:vlp_document]["receipt_number"]
+          persisted_applicant.citizenship_number = applicant[:vlp_document]["citizenship_number"]
+          persisted_applicant.card_number = applicant[:vlp_document]["card_number"]
+          persisted_applicant.country_of_citizenship = applicant[:vlp_document]["country_of_citizenship"]
+          persisted_applicant.vlp_description = applicant[:vlp_document]["vlp_description"]
+          persisted_applicant.expiration_date = applicant[:vlp_document]["expiration_date"]
+          persisted_applicant.issuing_country = applicant[:vlp_document]["issuing_country"]
+        end
+
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
         # unless persisted_applicant.valid?
@@ -622,4 +644,4 @@ class MigrateFamily < Mongoid::Migration
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
