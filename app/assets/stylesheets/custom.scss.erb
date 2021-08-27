@@ -1,18 +1,12 @@
 /* Layout Specifics */
 @import "variables";
-@import "barlow";
+@import 'barlow';
 html {
   height: 100%
 }
-<% if EnrollRegistry.feature_enabled?(:application_font) && EnrollRegistry[:application_font].settings(:font_family).item.present? %>
   * {
     font-family: $application-font, sans-serif;
   }
-<% else %>
-  * {
-  font-family: 'Open Sans', sans-serif;
-}
-<% end %>
 
 body {
     background-color: #f2f2f2;
