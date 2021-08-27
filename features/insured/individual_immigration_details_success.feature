@@ -2,6 +2,7 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
 
   Background: Singing up a consumer account and landing on the Personal information page
     Given Individual has not signed up as an HBX user
+    And EnrollRegistry tobacco_cost feature is disabled
     When the user visits the Consumer portal during open enrollment
     Then Individual creates a new HBX account
     Then Individual should see a successful sign up message

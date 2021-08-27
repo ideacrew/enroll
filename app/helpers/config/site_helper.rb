@@ -319,6 +319,10 @@ module Config
     def broker_course_administering_organization_link
       EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_link).item
     end
+
+    def tobacco_user_field_enabled?
+      EnrollRegistry.feature_enabled?(:tobacco_user_field)
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

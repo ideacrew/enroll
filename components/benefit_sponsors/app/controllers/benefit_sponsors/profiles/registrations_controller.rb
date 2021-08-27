@@ -20,7 +20,7 @@ module BenefitSponsors
         respond_to do |format|
           format.html
           format.js
-          format.json { head :not_acceptable }
+          format.json { head :ok }
         end
       end
 
