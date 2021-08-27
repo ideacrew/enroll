@@ -18,17 +18,11 @@
  *= require_self
  */
 @import "variables";
-@import "barlow";
+@import "Barlow";
 
-<%  if EnrollRegistry.feature_enabled?(:application_font) && EnrollRegistry[:application_font].settings(:font_family).item.present? %>
   * {
     font-family: $application-font, sans-serif;
   }
-<% else %>
-  * {
-  font-family: 'Open Sans', sans-serif;
-}
-<% end %>
 
 .content {
   .container {
