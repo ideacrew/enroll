@@ -25,7 +25,7 @@ module BenefitSponsors
         end
 
         def edit?
-          return false unless user.person
+          return false unless user&.person
           return true if admin?
           return true if can_edit?
           false
