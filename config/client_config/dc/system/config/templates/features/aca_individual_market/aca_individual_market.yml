@@ -53,3 +53,5 @@ registry:
                     "Other (With Alien Number)", "Other (With I-94 Number)" ]
       - key: :indian_alaskan_tribe_details
         is_enabled: false
+      - key: :prior_plan_year_ivl_sep
+        is_enabled: :false

@@ -525,7 +525,7 @@ class HbxEnrollment
     enrollments = family.active_household.hbx_enrollments.where(
       {:coverage_kind => coverage_kind,
        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing', 'renewing_coverage_selected']),
-       :effective_on.gte => new_effective_on,
+       :effective_on => { "$gte" => new_effective_on, "$lte" => new_effective_on.end_of_year },
        :kind => kind}
     )
     return true if enrollments.empty?
@@ -1004,6 +1004,12 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def generate_prior_py_shop_renewals
+    return unless EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
+
+    Operations::GeneratePriorPlanYearShopRenewals.new.call(enrollment: self)
+  end
+
   def update_renewal_coverage(options = nil)  # rubocop:disable Metrics/CyclomaticComplexity
     return if options.is_a?(Hash) && options[:skip_renewal_coverage_update]
     return unless is_shop?
@@ -1055,6 +1061,14 @@ class HbxEnrollment
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     end
     ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: self, options: {benefit_package: reinstated_package, notify: true}})
+  end
+
+  def enrollments_for(benefit_application)
+    family.hbx_enrollments.where({ :sponsored_benefit_package_id.in => benefit_application.benefit_packages.pluck(:_id),
+                                   :coverage_kind => coverage_kind,
+                                   :kind => kind,
+                                   :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive', 'coverage_terminated'],
+                                   :effective_on.gte => benefit_application.start_on })
   end
 
   def non_inactive_transition?
@@ -1359,7 +1373,7 @@ class HbxEnrollment
   def special_enrollment_period_available?
     shop_sep = family.earliest_effective_shop_sep || family.earliest_effective_fehb_sep
     return false unless shop_sep
-    sponsored_benefit_package.effective_period.cover?(shop_sep.effective_on)
+    sponsored_benefit_package.effective_period.cover?(shop_sep.end_on)
   end
 
   def new_hire_enrollment_period_available?
@@ -1889,7 +1903,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :trigger_enrollment_notice] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :trigger_enrollment_notice] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -1947,6 +1961,8 @@ class HbxEnrollment
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
                   to: :coverage_canceled, after: :propogate_cancel
       transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
+      transitions from: [:coverage_terminated, :coverage_expired], to: :coverage_canceled,
+                  guard: :prior_plan_year_coverage?
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
@@ -2015,6 +2031,28 @@ class HbxEnrollment
 
   def can_be_expired?
     benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
+  end
+
+  def prior_plan_year_coverage?
+    is_shop? ? prior_year_shop_coverage? : prior_year_ivl_coverage?
+  end
+
+  def prior_year_shop_coverage?
+    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
+    application = sponsored_benefit_package&.benefit_application
+    return false if application.blank?
+
+    application_status = application.terminated? || application.expired?
+    enrollment_valid_for_application = (application.start_on..application.end_on).cover?(effective_on)
+    application_status && enrollment_valid_for_application
+  end
+
+  def prior_year_ivl_coverage?
+    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
+    return false if special_enrollment_period.blank?
+    prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
+    return false unless prior_bcp
+    prior_bcp.contains?(effective_on)
   end
 
   def can_select_coverage?(qle: false)
