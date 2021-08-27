@@ -542,3 +542,9 @@ registry:
         is_enabled: false
       - key: :disable_form_phone_and_paper_dropdown
         is_enabled: true
+      - key: :tobacco_user_field
+        item: :tobacco_user_field
+        is_enabled: true 
+      - key: :crm_update_family_save
+        item: :crm_update_family_save
+        is_enabled: true
