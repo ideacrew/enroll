@@ -14,10 +14,12 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp dir="directory_path" VERSION="20210512153640"
 class MigrateFamily < Mongoid::Migration
+  include EventSource::Command
+
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
     # @file_path = "/Users/saidineshmekala/Downloads/app.json"
-    @file_path = "db/app1.json"
+    @file_path = ENV["dir"]
     # @file_path = "/Users/saidineshmekala/IDEACREW/aca_entities/spec/support/transform_example_payloads/test.json"
     # @file_path = "/Users/saidineshmekala/Downloads/app_migration/app1.json"
     # @file_path = "/Users/saidineshmekala/Downloads/app_migration/test.json
@@ -29,32 +31,35 @@ class MigrateFamily < Mongoid::Migration
   def self.down; end
 
   class << self
+    include EventSource::Command
+
     attr_accessor :extract_klass, :transform_klass, :ext_input_hash, :cv3_family_hash, :path_name
     attr_reader :file_path
 
     def migrate_for_mcr
-      ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, { transform_mode: :batch }) do |payload|
-        transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
+      ::AcaEntities::Ffe::Transformers::McrTo::Family.call(@filepath, { transform_mode: :batch }) do |payload|
+        event("events.json.stream", attributes: payload).success.publish
+        # transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
 
-        if transform_payload.success?
-          family_hash = transform_payload.success.to_h.deep_stringify_keys!
-        else
-          puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
-          next
-        end
+        # if transform_payload.success?
+        #   family_hash = transform_payload.success.to_h.deep_stringify_keys!
+        # else
+        #   puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
+        #   next
+        # end
 
-        if family_hash.empty?
-          puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}"
-          next
-        end
+        # if family_hash.empty?
+        #   puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}"
+        #   next
+        # end
 
-        build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
+        # build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
-        if @family.primary_applicant.person.is_applying_for_assistance
-          app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-          fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-          fix_iap_relationship(app_id, family_hash)
-        end
+        # if @family.primary_applicant.person.is_applying_for_assistance
+        #   app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+        #   fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+        #   fix_iap_relationship(app_id, family_hash)
+        # end
         print "."
       rescue StandardError => e
         # binding.pry
@@ -448,11 +453,11 @@ class MigrateFamily < Mongoid::Migration
           end
         end
       when 'mcr'
-        migrate_for_mcr
+        # migrate_for_mcr
         # TODO: refactor and enable accordingly
-        # read_directory @dir_name do
-        #   migrate_for_mcr
-        # end
+        read_directory @dir_name do
+          migrate_for_mcr
+        end
       end
     end
 
@@ -645,3 +650,4 @@ class MigrateFamily < Mongoid::Migration
   end
 end
 # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+
