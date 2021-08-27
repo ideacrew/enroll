@@ -26,7 +26,6 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 gem 'database_cleaner',       '~> 1.7'
-gem 'pry'
 
 #######################################################
 
@@ -34,7 +33,6 @@ gem 'pry'
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'mcr_cv_mapping'
 # gem 'aca_entities',       path: '/Users/saidineshmekala/IDEACREW/aca_entities'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
