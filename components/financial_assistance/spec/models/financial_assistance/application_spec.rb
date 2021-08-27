@@ -1142,4 +1142,51 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
   end
+
+  describe 'build_relationship_matrix' do
+    let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+    let!(:applicant11) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application10,
+                        family_member_id: BSON::ObjectId.new,
+                        is_primary_applicant: true,
+                        first_name: 'Primary')
+    end
+    let!(:applicant12) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application10,
+                        family_member_id: BSON::ObjectId.new,
+                        first_name: 'Wife')
+    end
+    let!(:applicant13) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application10,
+                        family_member_id: BSON::ObjectId.new,
+                        first_name: 'PrimaryFather')
+    end
+
+    context 'with valid case for FatherOrMotherInLaw/DaughterOrSonInLaw' do
+      before do
+        application10.ensure_relationship_with_primary(applicant12, 'spouse')
+        application10.ensure_relationship_with_primary(applicant13, 'parent')
+        application10.build_relationship_matrix
+      end
+
+      it 'should populate all the relationships' do
+        expect(application10.reload.relationships_complete?).to be_truthy
+      end
+
+      it 'should create a relationship i.e., applicant12 is daughter_or_son_in_law to applicant13' do
+        expect(
+          application10.relationships.where(applicant_id: applicant12.id, relative_id: applicant13.id).first.kind
+        ).to eq('daughter_or_son_in_law')
+      end
+
+      it 'should create a relationship i.e., applicant13 is father_or_mother_in_law to applicant12' do
+        expect(
+          application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant12.id).first.kind
+        ).to eq('father_or_mother_in_law')
+      end
+    end
+  end
 end

@@ -435,6 +435,50 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@entity_init).to be_success
     end
 
+    context 'with father_or_mother_in_law' do
+      before do
+        application.relationships.destroy_all
+        application.add_relationship(applicant, applicant2, 'father_or_mother_in_law')
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+      end
+
+      it 'should populate mitc_relationships' do
+        expect(@mitc_relationships).not_to be_empty
+      end
+
+      it 'should populate correct relationship_code' do
+        expect(@mitc_relationships.first[:relationship_code]).to eq('30')
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
+
+    context 'with daughter_or_son_in_law' do
+      before do
+        application.relationships.destroy_all
+        application.add_relationship(applicant, applicant2, 'daughter_or_son_in_law')
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+      end
+
+      it 'should populate mitc_relationships' do
+        expect(@mitc_relationships).not_to be_empty
+      end
+
+      it 'should populate correct relationship_code' do
+        expect(@mitc_relationships.first[:relationship_code]).to eq('26')
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
+
     context 'mitc_relationships' do
       before do
         result = subject.call(application.reload)

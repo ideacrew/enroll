@@ -313,10 +313,11 @@ module FinancialAssistance
     end
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
-      missing_relationship = find_missing_relationships(matrix)
+      missing_relationships = find_missing_relationships(matrix)
 
       # Sibling rule
-      missing_relationship.each do |rel|
+      # If MemberA and MemberB are children of MemberC, then both MemberA and MemberB are Siblings
+      missing_relationships.each do |rel|
         first_rel = rel.to_a.flatten.first
         second_rel = rel.to_a.flatten.second
         relation1 = relationships.where(applicant_id: first_rel, kind: 'child').to_a
@@ -330,11 +331,16 @@ module FinancialAssistance
 
         update_or_build_relationship(members.first, members.second, 'sibling')
         update_or_build_relationship(members.second, members.first, 'sibling')
-        missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
+        missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
-      #GrandParent/GrandChild
-      missing_relationship.each do |rel|
+      # GrandParent/GrandChild
+      # If MemberA is parent to MemberB and MemberB is parent to MemberC, then MemberA is GrandParent to MemberC
+      # If MemberA is child to MemberB and MemberB is child to MemberC, then MemberA is GrandChild to MemberC
+
+      # TODO: Need code refactor for all the rules
+      # rubocop:disable Style/CombinableLoops
+      missing_relationships.each do |rel|
         first_rel = rel.to_a.flatten.first
         second_rel = rel.to_a.flatten.second
 
@@ -355,21 +361,23 @@ module FinancialAssistance
             grandparent = applicants.where(id: first_rel).first
             update_or_build_relationship(grandparent, grandchild, 'grandparent')
             update_or_build_relationship(grandchild, grandparent, 'grandchild')
-            missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
+            missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
             break
           elsif child_rel1.present? && parent_rel2.present?
             grandchild = applicants.where(id: first_rel).first
             grandparent = applicants.where(id: second_rel).first
             update_or_build_relationship(grandparent, grandchild, 'grandparent')
             update_or_build_relationship(grandchild, grandparent, 'grandchild')
-            missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
+            missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
             break
           end
         end
       end
 
       # Spouse Rule
-      missing_relationship.each do |rel|
+      # When MemberA is child of MemberB, And MemberC is child to MemberD,
+      # And MemberB, MemberD are spouse to eachother, Then MemberA, MemberC are Siblings
+      missing_relationships.each do |rel|
         first_rel = rel.to_a.flatten.first
         second_rel = rel.to_a.flatten.second
 
@@ -382,12 +390,37 @@ module FinancialAssistance
         members = applicants.where(:id.in => rel.to_a.flatten)
         update_or_build_relationship(members.first, members.second, 'sibling')
         update_or_build_relationship(members.second, members.first, 'sibling')
-        missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
+        missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
       end
+      # rubocop:enable Style/CombinableLoops
+
+      # FatherOrMotherInLaw/DaughterOrSonInLaw Rule: father_or_mother_in_law, daughter_or_son_in_law
+      missing_relationships = execute_father_or_mother_in_law_rule(missing_relationships)
 
       matrix
     end
     #TODO: end of work progress
+
+    # If MemberA is parent to MemberB,
+    # and MemberB is Spouse to MemberC,
+    # then MemberA is father_or_mother_in_law to MemberC
+    def execute_father_or_mother_in_law_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'parent')
+        applicant_relations.each do |each_relation|
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          spouse_relation = relationships.where(applicant_id: other_applicant_id, kind: 'spouse').first
+          next if spouse_relation.relative_id != each_relation.relative_id
+          parent_in_law = applicants.where(id: each_relation.applicant_id).first
+          child_in_law = applicants.where(id: other_applicant_id).first
+          update_or_build_relationship(parent_in_law, child_in_law, 'father_or_mother_in_law')
+          update_or_build_relationship(child_in_law, parent_in_law, 'daughter_or_son_in_law')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
 
     # Set the benchmark product for this financial assistance application.
     # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
