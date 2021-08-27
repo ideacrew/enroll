@@ -12,6 +12,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
 module Operations
   module Ffe
     # operation to transform mcr data to enroll format
@@ -43,16 +44,15 @@ module Operations
         end
 
         # puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}" if family_hash.empty?
-        if family_hash.present?
-          build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
+        return Failure("error in MigrateApplication -> family_hash is empty/nil") unless family_hash.present?
+        build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
-          if @family.primary_applicant.person.is_applying_for_assistance
-            app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-            fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-            fix_iap_relationship(app_id, family_hash)
-          end
-          print "."
+        if @family.primary_applicant.person.is_applying_for_assistance
+          app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+          fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+          fix_iap_relationship(app_id, family_hash)
         end
+        print "."
       end
 
       def fix_iap_relationship(app_id, family_hash)
@@ -532,3 +532,4 @@ module Operations
     end
   end
 end
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
