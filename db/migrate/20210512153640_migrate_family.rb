@@ -38,31 +38,33 @@ class MigrateFamily < Mongoid::Migration
 
     def migrate_for_mcr
       ::AcaEntities::Ffe::Transformers::McrTo::Family.call(@filepath, { transform_mode: :batch }) do |payload|
-        event("events.json.stream", attributes: payload).success.publish
-        # transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
+        unless  Rails.env.development?
+          event("events.json.stream", attributes: payload).success.publish
+        else
+          transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
 
-        # if transform_payload.success?
-        #   family_hash = transform_payload.success.to_h.deep_stringify_keys!
-        # else
-        #   puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
-        #   next
-        # end
+          if transform_payload.success?
+            family_hash = transform_payload.success.to_h.deep_stringify_keys!
+          else
+            puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
+            next
+          end
 
-        # if family_hash.empty?
-        #   puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}"
-        #   next
-        # end
+          if family_hash.empty?
+            puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}"
+            next
+          end
 
-        # build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
+          build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
-        # if @family.primary_applicant.person.is_applying_for_assistance
-        #   app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-        #   fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-        #   fix_iap_relationship(app_id, family_hash)
-        # end
+          if @family.primary_applicant.person.is_applying_for_assistance
+            app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+            fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+            fix_iap_relationship(app_id, family_hash)
+          end
+        end
         print "."
       rescue StandardError => e
-        # binding.pry
         puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
       end
     end
