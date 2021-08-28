@@ -129,32 +129,12 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:params) { { is_applying_for_assistance: true } }
       let(:result) { ::Dry::Monads::Result::Success.new(1) }
 
-      context "iap year selection is enabled" do
-        before do
-          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(true)
+      it "redirects to financial assistance's checklist" do
+        expect(Operations::FinancialAssistance::Apply).to receive(:new) do
+          double(call: result)
         end
 
-        it "redirects to financial assistance's year selection page" do
-          expect(Operations::FinancialAssistance::Apply).to receive(:new) do
-            double(call: result)
-          end
-
-          expect(subject).to redirect_to('/financial_assistance/applications/1/application_year_selection')
-        end
-      end
-
-      context "iap year selection is disabled" do
-        before do
-          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(false)
-        end
-
-        it "redirects to financial assistance's year selection page" do
-          expect(Operations::FinancialAssistance::Apply).to receive(:new) do
-            double(call: result)
-          end
-
-          expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')
-        end
+        expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')
       end
     end
   end

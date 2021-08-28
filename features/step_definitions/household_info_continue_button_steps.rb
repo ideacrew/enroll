@@ -16,12 +16,6 @@ Given(/^that the user is on FAA Household Info: Family Members page$/) do
   click_link "Continue Application"
   page.all('label').detect { |l| l.text == 'Yes' }.click
   click_button 'CONTINUE'
-  # should be on application year select page
-  # TODO: Will need to be updated when year select logic implemented
-  if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    click_link 'Continue'
-    sleep 2
-  end
   click_link 'Continue'
 end
 
