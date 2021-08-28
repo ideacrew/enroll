@@ -33,7 +33,8 @@
         - if @plan.try(:is_standard_plan)
           .col-md-12
             i.fa.fa-bookmark
-              | STANDARD PLAN
+              | &nbsp;
+              = @plan.standard_plan_label.upcase
       .col-xs-12
         .row
           .col-xs-7

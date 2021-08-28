@@ -4,7 +4,7 @@
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
-          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>" > <%= l10n("standard_plan").to_s.upcase %> </i></div>
+          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>" > <%= plan.standard_plan_label.to_s.upcase %> </i></div>
       <% end %>
     </div>
     <div class="row">

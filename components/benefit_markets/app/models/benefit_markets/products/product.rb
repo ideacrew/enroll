@@ -399,6 +399,17 @@ module BenefitMarkets
         ((self.hios_id.split("-")[0] == product.hios_id.split("-")[0]) && self.active_year == product.active_year)
       end
 
+      def standard_plan_label
+        return if !is_standard_plan?
+        Rails.cache.fetch("standard_plan_label_#{id}", expires_in: 1.week) do
+          if EnrollRegistry.feature_enabled?(:import_network_data)
+            'Clear Choice Plan'
+          else
+            'Standard Plan'
+          end.upcase
+        end
+      end
+
     # private
     # self.class.new(attrs_without_tuples)
     # def attrs_without_tuples
