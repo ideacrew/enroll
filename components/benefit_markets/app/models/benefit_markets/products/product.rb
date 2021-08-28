@@ -268,7 +268,7 @@ module BenefitMarkets
     end
 
     def product_kind
-      kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
+      kind_string = self.class.to_s.demodulize.sub!('Product','').downcase
       kind_string.present? ? kind_string.to_sym : :product_base_class
     end
 
@@ -371,6 +371,16 @@ module BenefitMarkets
       self.class.new(self.attributes.except(:premium_tables)).tap do |new_product|
         new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
       end
+    end
+
+    def child_only_offering
+      Rails.cache.fetch("product_deductibles_#{id}_#{kind}", expires_in: 1.week) do
+        qhp_cost_share_variance.child_only_offering
+      end
+    end
+
+    def qhp_cost_share_variance
+      ::Products::QhpCostShareVariance.find_qhp_cost_share_variance(hios_id, active_year, kind.to_s).first
     end
 
     def health?
