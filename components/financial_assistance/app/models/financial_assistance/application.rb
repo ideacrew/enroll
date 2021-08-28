@@ -130,6 +130,11 @@ module FinancialAssistance
                                   }
 
     index({ 'family_id' => 1 })
+    index({ "relationships._id" => 1 })
+    index({ "applicants._id" => 1 })
+    index({"relationships.applicant_id" => 1})
+    index({"relationships.relative_id" => 1})
+    index({"relationships.kind" => 1})
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }

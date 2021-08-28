@@ -48,7 +48,9 @@ module Operations
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
         if @family.primary_applicant.person.is_applying_for_assistance
+          Family.create_indexes
           app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+          ::FinancialAssistance::Application.create_indexes
           fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
           fix_iap_relationship(app_id, family_hash)
         end
@@ -60,43 +62,51 @@ module Operations
         @matrix = @application.build_relationship_matrix
         @missing_relationships = @application.find_missing_relationships(@matrix)
         @all_relationships = @application.find_all_relationships(@matrix)
-
         missing_relationships = []
+        all_relationships = []
         @missing_relationships.each do |rel|
           from_relation = rel.first[0]
           to_relation = rel.first[1]
+          next if @application.relationships.where(applicant_id: from_relation, relative_id: to_relation).present?
           from_applicant = @application.applicants.where(id: from_relation).first
           to_applicant = @application.applicants.where(id: to_relation).first
           from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
           to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
           member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
           relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
-          relation_kind = relationship["kind"]
+          relation_kind = relationship.present? ? relationship["kind"] : "unrelated"
           missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation_kind, applicant_id: from_applicant.id, relative_id: to_applicant.id})
-          # @application.update_or_build_relationship(from_applicant, to_applicant, relation_kind)
         end
+        @application.relationships << missing_relationships
 
         @all_relationships.each do |all_rel|
           next if all_rel[:relation].present?
+          relationships = @application.relationships
           from_relation = all_rel[:applicant]
           to_relation = all_rel[:relative]
+          found_relationship = relationships.where(applicant_id: from_relation,relative_id: to_relation).first
+          next if found_relationship.present? && found_relationship.kind.present?
+          inverse_relationship = relationships.where(applicant_id: to_relation,relative_id: from_relation).first
+          if inverse_relationship.present?
+            relation = ::FinancialAssistance::Relationship::INVERSE_MAP[inverse_relationship.kind]
+            all_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_relation, relative_id: to_relation})
+            next
+          end
           from_applicant = @application.applicants.find(from_relation)
           to_applicant = @application.applicants.find(to_relation)
           from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
           to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
           member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
           relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
-          relation_kind = relationship["kind"]
+          relation_kind = relationship.present? ? relationship["kind"] : "unrelated"
           relation = ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind]
-          missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_applicant.id, relative_id: to_applicant.id})
-          # @application.update_or_build_relationship(from_applicant, to_applicant, relation)
+          if found_relationship.present?
+            found_relationship.update_attributes(kind: relation)
+          else
+            all_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_applicant.id, relative_id: to_applicant.id})
+          end
         end
-
-        @application.relationships << missing_relationships
-        # unless @application.valid?
-        #
-        # end
-        # @application.save!(validate: false)
+        @application.relationships << all_relationships
         @application.save!
       end
 
