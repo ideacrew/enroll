@@ -497,14 +497,14 @@ registry:
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
         is_enabled: true
-      - key: :show_upload_notices
-        item: :show_upload_notices
-        is_enabled: true
       - key: :tobacco_user_field
         item: :tobacco_user_field
         is_enabled: false
       - key: :in_person_application_enabled
         item: :in_person_application_enabled
+        is_enabled: true
+      - key: :show_upload_notices
+        item: :show_upload_notices
         is_enabled: true
       - key: :contact_email_header_footer_feature
         item: :contact_email_header_footer_feature
