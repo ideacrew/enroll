@@ -94,7 +94,7 @@ module Operations
 
         @application.relationships << missing_relationships
         # unless @application.valid?
-        #   binding.pry
+        #
         # end
         # @application.save!(validate: false)
         @application.save!
@@ -388,7 +388,7 @@ module Operations
 
       def fill_applicants_form(app_id, applications)
         applicants_hash = applications[:applicants]
-        application = FinancialAssistance::Application.where(id: app_id).first
+        application = ::FinancialAssistance::Application.where(id: app_id).first
 
         applicants_hash.each do |applicant|
           persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
@@ -464,7 +464,7 @@ module Operations
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
           # unless persisted_applicant.valid?
-          #   binding.pry
+          #
           # end
           # persisted_applicant.save!(validate: false)
 

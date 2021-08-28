@@ -19,7 +19,7 @@ class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
     # @file_path = "/Users/saidineshmekala/Downloads/app.json"
-    @file_path = ENV["dir"]
+    # @file_path = ENV["dir"]
     # @file_path = "/Users/saidineshmekala/IDEACREW/aca_entities/spec/support/transform_example_payloads/test.json"
     # @file_path = "/Users/saidineshmekala/Downloads/app_migration/app1.json"
     # @file_path = "/Users/saidineshmekala/Downloads/app_migration/test.json
