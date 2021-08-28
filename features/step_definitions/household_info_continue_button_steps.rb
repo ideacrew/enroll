@@ -27,8 +27,7 @@ Given(/^that the user is on FAA Household Info: Family Members page$/) do
 end
 
 When(/^at least one applicant is in the Info Needed state$/) do
-  click_link 'Continue'
-  sleep 2
+  sleep 5
   expect(application.incomplete_applicants?).to be true
   expect(page).to have_content('Info Needed')
 end
@@ -54,7 +53,6 @@ Then(/^Family Relationships left section will NOT display$/) do
 end
 
 Given(/^at least one other household members exist$/) do
-  click_link 'Continue'
   sleep 2
   click_link "Add New Person"
   sleep 2
