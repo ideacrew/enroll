@@ -503,3 +503,6 @@ registry:
       - key: :tobacco_user_field
         item: :tobacco_user_field
         is_enabled: false
+      - key: :in_person_application_enabled
+        item: :in_person_application_enabled
+        is_enabled: true
