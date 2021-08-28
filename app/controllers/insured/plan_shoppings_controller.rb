@@ -406,6 +406,8 @@ class Insured::PlanShoppingsController < ApplicationController
       build_same_plan_premiums
     end
 
+    @plans = @plans.select { |a| a.premium_tables.present? }
+
     # for carrier search options
     carrier_profile_ids = @plans.map(&:issuer_profile_id).map(&:to_s).uniq
     @carrier_names_map = BenefitSponsors::Organizations::Organization.valid_issuer_names_filters.select{|k, _v| carrier_profile_ids.include?(k)}
