@@ -196,7 +196,7 @@ module BenefitMarkets
 
       def network
         return 'Nationwide' if nationwide
-        return 'DC-Metro' if dc_in_network
+        return EnrollRegistry[:enroll_app].setting(:statewide_area).item if dc_in_network
       end
 
       def can_use_aptc?

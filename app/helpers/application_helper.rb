@@ -675,7 +675,7 @@ module ApplicationHelper
   end
 
   def ivl_metal_network(plan)
-    (plan.nationwide ? 'nationwide' : EnrollRegistry[:enroll_app].setting(:statewide_area).item) if plan.benefit_market_kind == :aca_individual
+    (plan.nationwide ? 'nationwide' : EnrollRegistry[:enroll_app].setting(:statewide_area).item.downcase) if plan.benefit_market_kind == :aca_individual
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)

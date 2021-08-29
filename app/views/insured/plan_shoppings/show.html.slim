@@ -347,7 +347,7 @@ javascript:
 
         networkTypes.forEach(function (networkType) {
           dataArray.forEach(function (enrollment) {
-            if (networkType.toLowerCase() == 'dc-metro') {
+            if (networkType.toLowerCase() == 'dc-metro' || networkType.toLowerCase() == 'maine') {
               if (enrollment.product.dc_in_network) {
                 resultsData.push(enrollment);
               }
@@ -448,13 +448,12 @@ javascript:
         }
 
         var network = "";
-
         if (result.product.dc_in_network) {
-          network = 'DC-Metro';
+          network = result.product.network;
         }
 
         if (result.product.nationwide) {
-          network = 'Nationwide';
+          network = result.product.network;
         }
 
         var div = document.createElement('div')
