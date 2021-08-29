@@ -347,7 +347,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @metal_levels = %w[high low]
       @plan_types = %w[ppo hmo epo]
     end
-    @networks = %w[Nationwide DC-Metro]
+    @networks = @plans.map(&:network).uniq.compact
   end
 
   # no dental as of now
