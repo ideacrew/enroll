@@ -94,11 +94,11 @@ class ProductBuilder
 
     # Dont import for DC as it comes from master excel
     if EnrollRegistry.feature_enabled?(:import_network_data)
-      nationwide, dc_in_network = @qhp.national_network.downcase.strip == "yes" ? ["true", "false"] : ["false", "true"]
+      nationwide, in_state_network = @qhp.national_network.downcase.strip == "yes" ? ["true", "false"] : ["false", "true"]
 
       shared_attributes.merge!(
         nationwide: nationwide,
-        dc_in_network: dc_in_network
+        dc_in_network: in_state_network
       )
     end
 
