@@ -51,14 +51,15 @@
                     | Metal Level
                   br/
                   span.ttu.dg.fourteen style=("margin-left: -10px")
-                    = display_dental_metal_level @plan
+                    - plan_level = @plan.metal_level.titleize
+                    = plan_level != 'Dental' ? plan_level : display_dental_metal_level(@plan).titleize
                 td
                   span.ttu.lg.twelve style=("margin-left: -10px")
                     | Network
                   br/
                   span.ttu.dg.fourteen style=("margin-left: -10px")
                     - if offers_nationwide_plans?
-                      = @plan.nationwide ? "Nationwide" : "DC-Metro"
+                      = @plan.network
                     - else
                       - if @plan.network_information.present?
                         | Network Notes

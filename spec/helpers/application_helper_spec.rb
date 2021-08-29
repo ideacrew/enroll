@@ -141,15 +141,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:no_products) {[]}
 
     it 'should display Nationwide if product is nationwide' do
-      expect(network_type(nationwide_product)).to eq 'Nationwide'
+      expect(nationwide_product.network).to eq 'Nationwide'
     end
 
     it "should display the statewide area according to the enroll registry" do
-      expect(network_type(dcmetro_product)).to eq ::EnrollRegistry[:enroll_app].setting(:statewide_area).item
+      expect(dcmetro_product.network).to eq ::EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
 
     it 'should display empty if metal level if its a 2016 plan' do
-      expect(network_type(product)).to eq nil
+      expect(product.network).to eq nil
     end
 
     it 'should display Nationwide if product is nationwide' do
