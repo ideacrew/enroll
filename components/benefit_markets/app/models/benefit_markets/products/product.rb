@@ -165,9 +165,7 @@ module BenefitMarkets
       alias name title
 
     # TODO: Value is hardcoded for Maine, figure out how to update this
-      def in_state_network
-        self.dc_in_network
-      end
+      alias in_state_network dc_in_network
 
     # Highly nested scopes don't behave in a way I entirely understand with
     # respect to the $elemMatch operator.  Since we are only invoking this
@@ -193,10 +191,8 @@ module BenefitMarkets
       end
 
       def network
-        Rails.cache.fetch("product-network_#{id}_#{kind}", expires_in: 1.week) do
-          return 'Nationwide' if nationwide
-          return EnrollRegistry[:enroll_app].setting(:statewide_area).item if dc_in_network
-        end
+        return 'Nationwide' if nationwide
+        return EnrollRegistry[:enroll_app].setting(:statewide_area).item if in_state_network
       end
 
       def can_use_aptc?
@@ -396,9 +392,7 @@ module BenefitMarkets
       end
 
       def standard_plan_label
-        Rails.cache.fetch("standard_plan_label_#{id}", expires_in: 1.week) do
-          EnrollRegistry[:enroll_app].setting(:standard_plan_label).item if is_standard_plan?
-        end
+        EnrollRegistry[:enroll_app].setting(:standard_plan_label).item if is_standard_plan?
       end
 
     # private
