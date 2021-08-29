@@ -102,7 +102,7 @@ class ProductBuilder
       )
     end
 
-    if EnrollRegistry.feature_enabled?(:import_network_data)
+    if EnrollRegistry.feature_enabled?(:import_standard_plan)
       shared_attributes.merge!(
         is_standard_plan: ['Clear Choice', 'CC'].select { |a| plan_marketing_name.include?(a) }.present?
       )

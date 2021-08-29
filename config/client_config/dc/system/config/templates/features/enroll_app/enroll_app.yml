@@ -161,6 +161,8 @@ registry:
             item: "https://staging.dchealthlink.com/individuals/tax-documents"
           - key: :statewide_area
             item: "DC-Metro"
+          - key: :standard_plan_label
+            item: "STANDARD PLAN"
           - key: :exchange_name
             item: "Washington DC Health Benefit Exchange"
           - key: :social_media
