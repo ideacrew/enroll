@@ -162,6 +162,8 @@ module BenefitMarkets
       scope :health_products,            ->{ where(:_type => /.*HealthProduct$/) }
       scope :dental_products,            ->{ where(:_type => /.*DentalProduct$/)}
 
+      alias name title
+
     # TODO: Value is hardcoded for Maine, figure out how to update this
       def in_state_network
         self.dc_in_network
@@ -187,16 +189,14 @@ module BenefitMarkets
 
       def service_area=(val)
         @service_area = val
-        if val.nil?
-          write_attribute(:service_area_id, nil)
-        else
-          write_attribute(:service_area_id, val.id)
-        end
+        write_attribute(:service_area_id, val.present? ? val.id : nil)
       end
 
       def network
-        return 'Nationwide' if nationwide
-        return EnrollRegistry[:enroll_app].setting(:statewide_area).item if dc_in_network
+        Rails.cache.fetch("product-network_#{id}_#{kind}", expires_in: 1.week) do
+          return 'Nationwide' if nationwide
+          return EnrollRegistry[:enroll_app].setting(:statewide_area).item if dc_in_network
+        end
       end
 
       def can_use_aptc?
@@ -216,10 +216,6 @@ module BenefitMarkets
       def service_area
         return nil if service_area_id.blank?
         @service_area ||= ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
-      end
-
-      def name
-        title
       end
 
       def carrier_profile
