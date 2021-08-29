@@ -715,7 +715,7 @@ class ConsumerRole
   def ensure_verification_types
     if person
       live_types = []
-      live_types << LOCATION_RESIDENCY
+      live_types << LOCATION_RESIDENCY if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
       live_types << 'Social Security Number' if ssn
       if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
         live_types << 'American Indian Status' if !(tribal_state.nil? || tribal_state.empty?) && !(tribal_name.nil? || tribal_name.empty?)

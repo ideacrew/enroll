@@ -101,6 +101,7 @@ And(/^the person goes plan shopping in the individual for a new plan$/) do
   wait_for_ajax
   find('.btn', text: 'CONTINUE').click
   click_link "Continue"
+  sleep 5
   expect(page).to have_content('Verify Identity')
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click

@@ -80,9 +80,10 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
         sign_in user
       end
 
@@ -97,9 +98,10 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
         EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
         sign_in user
       end
 
@@ -129,12 +131,32 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:params) { { is_applying_for_assistance: true } }
       let(:result) { ::Dry::Monads::Result::Success.new(1) }
 
-      it "redirects to financial assistance's checklist" do
-        expect(Operations::FinancialAssistance::Apply).to receive(:new) do
-          double(call: result)
+      context "iap year selection is enabled" do
+        before do
+          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(true)
         end
 
-        expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')
+        it "redirects to financial assistance's year selection page" do
+          expect(Operations::FinancialAssistance::Apply).to receive(:new) do
+            double(call: result)
+          end
+
+          expect(subject).to redirect_to('/financial_assistance/applications/1/application_year_selection')
+        end
+      end
+
+      context "iap year selection is disabled" do
+        before do
+          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(false)
+        end
+
+        it "redirects to financial assistance's year selection page" do
+          expect(Operations::FinancialAssistance::Apply).to receive(:new) do
+            double(call: result)
+          end
+
+          expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')
+        end
       end
     end
   end

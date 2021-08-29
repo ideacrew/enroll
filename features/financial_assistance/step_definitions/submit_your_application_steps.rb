@@ -13,6 +13,13 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   choose('radio1', allow_label_click: true)
   find('button.interaction-click-control-continue').click
 
+  # should be on application year select page
+  # TODO: Will need to be updated when year select logic implemented
+  if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    find('a.interaction-click-control-continue').click
+    sleep 2
+  end
+
   # should be on checklist page now
   find('a.interaction-click-control-continue').click
 end
@@ -42,6 +49,12 @@ And(/^the user is on the FAA Household Info page$/) do
 
   person = Person.all.last
   person.user.update_attributes(identity_response_code: "acc", identity_final_decision_code: "acc")
+  # should be on application year select page
+  # TODO: Will need to be updated when year select logic implemented
+  if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    find('a.interaction-click-control-continue').click
+    sleep 2
+  end
   # should be on checklist page now
   find('a.interaction-click-control-continue').click
 
