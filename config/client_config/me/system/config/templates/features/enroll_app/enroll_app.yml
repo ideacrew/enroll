@@ -176,6 +176,8 @@ registry:
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :statewide_area
             item: "Maine"
+          - key: :standard_plan_label
+            item: "CLEAR CHOICE PLAN"
           - key: :exchange_name
             item: "CoverME.gov Health Benefit Exchange"
           - key: :social_media

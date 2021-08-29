@@ -400,13 +400,8 @@ module BenefitMarkets
       end
 
       def standard_plan_label
-        return if !is_standard_plan?
         Rails.cache.fetch("standard_plan_label_#{id}", expires_in: 1.week) do
-          if EnrollRegistry.feature_enabled?(:import_network_data)
-            'Clear Choice Plan'
-          else
-            'Standard Plan'
-          end.upcase
+          EnrollRegistry[:enroll_app].setting(:standard_plan_label).item if is_standard_plan?
         end
       end
 
