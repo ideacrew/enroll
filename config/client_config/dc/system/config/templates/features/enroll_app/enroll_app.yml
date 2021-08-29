@@ -474,6 +474,8 @@ registry:
         is_enabled: true
       - key: :import_network_data
         is_enabled: false
+      - key: :import_standard_plan
+        is_enabled: false
       - key: :validate_quadrant
         item: :validate_quadrant
         is_enabled: false
