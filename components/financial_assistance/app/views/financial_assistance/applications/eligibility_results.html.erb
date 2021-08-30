@@ -203,7 +203,7 @@
       <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
         @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
         @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? &&
-        !@application.is_transferable? %>
+        !@application.is_transferrable? %>
         <div class="er-medicaid mt-20">
           <div class="er-title">
             <h3>
