@@ -60,7 +60,7 @@ class TaxHousehold
       'csr_100' => 100,
       "csr_94" => 94,
       "csr_87" => 87,
-      "csr_73" => 73,
+      "csr_73" => 73
     }.stringify_keys[csr_kind] || 0
   end
 
