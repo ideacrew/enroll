@@ -1,16 +1,18 @@
-require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "define_permissions")
+# frozen_string_literal: true
 
-describe DefinePermissions, dbclean: :around_each do
-  subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
-  let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
+require "rails_helper"
+require File.join(Rails.root, "app", "data_migrations", "permissions", "dc_define_permissions")
+
+describe DcDefinePermissions, dbclean: :around_each do
+  subject { DcDefinePermissions.new(given_task_name, double(:current_scope => nil))}
+  let(:roles) {%w[hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin] }
   describe 'create permissions' do
     let(:given_task_name) {':initial_hbx'}
 
     before do
       Person.delete_all
       person = FactoryBot.create(:person)
-      role = FactoryBot.create(:hbx_staff_role, person: person)
+      _role = FactoryBot.create(:hbx_staff_role, person: person)
       subject.initial_hbx
     end
     it "creates permissions" do
@@ -27,7 +29,7 @@ describe DefinePermissions, dbclean: :around_each do
         Person.delete_all
         person = FactoryBot.create(:person)
         permission = FactoryBot.create(:permission, :hbx_staff)
-        role = FactoryBot.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)
+        _role = FactoryBot.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)
         subject.hbx_admin_can_complete_resident_application
       end
 
@@ -51,13 +53,13 @@ describe DefinePermissions, dbclean: :around_each do
         @hbx_csr_supervisor_person = FactoryBot.create(:person)
         @hbx_csr_tier1_person = FactoryBot.create(:person)
         @hbx_csr_tier2_person = FactoryBot.create(:person)
-        hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
-        hbx_read_only_role = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
-        hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
-        hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
-        hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
-        super_admin = FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
-        hbx_tier3 = FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
+        _hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        _hbx_read_only_role = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
+        _hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        _hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
+        _hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        _super_admin = FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        _hbx_tier3 = FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
         subject.hbx_admin_can_view_username_and_email
       end
 
@@ -590,10 +592,10 @@ describe DefinePermissions, dbclean: :around_each do
         @hbx_csr_supervisor_person = FactoryBot.create(:person)
         @hbx_csr_tier1_person = FactoryBot.create(:person)
         @hbx_csr_tier2_person = FactoryBot.create(:person)
-        hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
-        hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
-        hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
-        hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        _hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        _hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        _hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
+        _hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
         subject.hbx_admin_can_view_application_types
       end
 
@@ -620,11 +622,11 @@ describe DefinePermissions, dbclean: :around_each do
         @hbx_tier3 = FactoryBot.create(:person)
         @hbx_read_only_person = FactoryBot.create(:person)
         @hbx_csr_supervisor_person = FactoryBot.create(:person)
-        hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
-        hbx_read_only_role = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
-        hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
-        super_admin = FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
-        hbx_tier3 = FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
+        _hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        _hbx_read_only_role = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
+        _hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        _super_admin = FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        _hbx_tier3 = FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
         subject.hbx_admin_can_add_sep
       end
 
@@ -1331,16 +1333,16 @@ describe DefinePermissions, dbclean: :around_each do
       @hbx_csr_tier3_person = FactoryBot.create(:person)
       permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
       permission_super_admin = FactoryBot.create(:permission, :super_admin)
-      permission_hbx_read_only = FactoryBot.create(:permission, :hbx_read_only)
+      _permission_hbx_read_only = FactoryBot.create(:permission, :hbx_read_only)
       permission_hbx_csr_supervisor = FactoryBot.create(:permission, :hbx_csr_supervisor)
       permission_hbx_csr_tier3 = FactoryBot.create(:permission, :hbx_tier3)
       permission_hbx_csr_tier2 = FactoryBot.create(:permission, :hbx_csr_tier2)
       permission_hbx_csr_tier1 = FactoryBot.create(:permission, :hbx_csr_tier1)
-      hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
-      hbx_read_only = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
-      hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
-      hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
-      hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+      _hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
+      _hbx_read_only = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
+      _hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
+      _hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
+      _hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
       FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier3_person, subrole: "hbx_tier3", permission_id: permission_hbx_csr_tier3.id)
       FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: permission_super_admin.id)
     end
@@ -1406,12 +1408,103 @@ describe DefinePermissions, dbclean: :around_each do
       allow(Permission).to receive_message_chain('developer.id'){FactoryBot.create(:permission,  :developer).id}
       allow(Permission).to receive_message_chain('hbx_tier3.id'){FactoryBot.create(:permission,  :hbx_tier3).id}
       allow(Permission).to receive_message_chain('super_admin.id'){FactoryBot.create(:permission,  :super_admin).id}
+      FactoryBot.create(:hbx_profile).id
       subject.build_test_roles
     end
     it "creates permissions" do
       expect(User.all.to_a.count).to eq(8)
       expect(Person.all.to_a.count).to eq(8)
       expect(Person.all.to_a.map{|p| p.hbx_staff_role.subrole}).to match_array roles
+    end
+
+    context "user and their permission attributes" do
+      it "user with 'hbx_staff' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_staff'}.permission
+        expect(permission.name).to eq 'hbx_staff'
+        expect(permission.can_edit_aptc).to eq true
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'hbx_read_only' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_read_only'}.permission
+        expect(permission.name).to eq 'hbx_read_only'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'hbx_csr_supervisor' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_csr_supervisor'}.permission
+        expect(permission.name).to eq 'hbx_csr_supervisor'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'hbx_csr_tier2' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_csr_tier2'}.permission
+        expect(permission.name).to eq 'hbx_csr_tier2'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'hbx_csr_tier1' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_csr_tier1'}.permission
+        expect(permission.name).to eq 'hbx_csr_tier1'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'developer' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'developer'}.permission
+        expect(permission.name).to eq 'developer'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'hbx_tier3' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_tier3'}.permission
+        expect(permission.name).to eq 'hbx_tier3'
+        expect(permission.can_edit_aptc).to eq true
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'super_admin' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'super_admin'}.permission
+        expect(permission.name).to eq 'super_admin'
+        expect(permission.can_edit_aptc).to eq true
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
     end
   end
 end

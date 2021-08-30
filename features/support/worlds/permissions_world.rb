@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Refactor everything here for environment specific.
 module PermissionsWorld
   def define_permissions
     Permission.create!(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
