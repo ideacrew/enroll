@@ -9,7 +9,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:family_id) { family.id}
-
+  let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
   describe "GET index" do
 
@@ -136,6 +137,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "POST step" do
     before do
+      allow(controller).to receive(:haven_determination_is_enabled?).and_return(true)
       setup_faa_data
       allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
       allow(obj).to receive(:build_event).and_return(event)
@@ -154,15 +156,33 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let!(:create_home_address) do
         [application, application2].each do |applin|
           applin.applicants.first.update_attributes!(is_primary_applicant: true)
-          add = ::FinancialAssistance::Locations::Address.new({ kind: 'home',
-                                                                address_1: '3 Awesome Street',
-                                                                address_2: '#300',
-                                                                city: 'Washington',
-                                                                state: 'DC',
-                                                                zip: '20001' })
-          primary_appli = applin.reload.primary_applicant
-          primary_appli.addresses << add
-          primary_appli.save!
+          address_attributes = {
+            kind: 'home',
+            address_1: '3 Awesome Street',
+            address_2: '#300',
+            city: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_city).item,
+            state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+            zip: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_zip_code).item
+          }
+          if EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item == 'county'
+            address_attributes.merge!(
+              county: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_county).item
+            )
+          end
+          financial_assistance_address = ::FinancialAssistance::Locations::Address.new(address_attributes)
+          applin.reload
+          applin.applicants.each do |applicant|
+            applicant.addresses << financial_assistance_address
+            applicant.save!
+          end
+          family_id = applin.family_id
+          family = Family.find(family_id) if family_id.present?
+          next unless family
+          family.family_members.each do |fm|
+            main_app_address = Address.new(address_attributes)
+            fm.person.addresses << main_app_address
+            fm.person.save!
+          end
         end
       end
 

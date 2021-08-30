@@ -58,7 +58,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.kaiser.pay_now.exchange_disclaimer' => "By linking to this private business, DC Health Link is not endorsing its products, services, or privacy and security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by Kaiser Permanente.",
 
   'en.plans.other.pay_now.redirection_message' => "You are leaving the %{site_short_name} website and entering a privately-owned website created, operated, and maintained by %{carrier_name}.",
-  'en.plans.other.pay_now.link_info' => 'Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.',
+  'en.plans.other.pay_now.link_info' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>',
   'en.plans.other.pay_now.processing' => 'It may take 3-5 business days for %{carrier_name} to process your enrollment information, or to reflect your coverage once you’ve made your first month’s premium payment.',
   'en.plans.other.pay_now.collecting_info' => 'The information that %{carrier_name} collects and maintains as a result of your visit to its website is different from the information that DC Health Link collects and maintains.',
   'en.plans.other.pay_now.exchange_disclaimer_for_auth' => 'DC Health Link cannot help you with any information regarding this website, including your username or password or other technical issues.',

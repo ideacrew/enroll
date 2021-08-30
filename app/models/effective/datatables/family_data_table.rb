@@ -41,7 +41,7 @@ module Effective
            ["<div class='#{pundit_class(Family, :can_update_ssn?)}'> Edit DOB / SSN </div>".html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
-           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),'ajax']
+           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), disable_form_phone_and_paper_dropdown? ? 'disabled' : 'ajax']
            ]
 
           if ::EnrollRegistry.feature_enabled?(:send_secure_message_family)

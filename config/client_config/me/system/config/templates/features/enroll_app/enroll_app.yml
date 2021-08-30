@@ -513,9 +513,26 @@ registry:
         is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: true
+      - key: :tobacco_user_field
+        item: :tobacco_user_field
+        is_enabled: true 
+      - key: :in_person_application_enabled
+        item: :in_person_application_enabled
+        is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
         is_enabled: false
       - key: :show_upload_notices
         item: :show_upload_notices
         is_enabled: false
+      - key: :contact_email_header_footer_feature
+        item: :contact_email_header_footer_feature
+        is_enabled: false
+      - key: :contact_customer_service_representative
+        item: :contact_customer_service_representative
+        is_enabled: false
+      - key: :location_residency_verification_type
+        item: :location_residency_verification_type
+        is_enabled: false
+      - key: :disable_form_phone_and_paper_dropdown
+        is_enabled: true

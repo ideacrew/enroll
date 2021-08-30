@@ -117,7 +117,7 @@ class PlanSelection
   def existing_enrollment_for_covered_individuals
     previous_active_coverages.detect do |en|
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? &&
-        en.id != hbx_enrollment.id && plan.id == en.product_id
+        en.id != hbx_enrollment.id && (plan.present? ? plan.id == en.product_id : true)
     end
   end
 

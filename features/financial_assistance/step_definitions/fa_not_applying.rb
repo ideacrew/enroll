@@ -191,6 +191,12 @@ Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
   find(:xpath, '//label[@for="radio1"]').click
   create_plan
   find('.btn', text: 'CONTINUE').click
+
+  # TODO: Will need to be updated when year select logic implemented
+  if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    sleep 2
+    find('.btn', text: 'CONTINUE').click
+  end
 end
 
 And(/^the .+ is navigated to Application checklist page/) do

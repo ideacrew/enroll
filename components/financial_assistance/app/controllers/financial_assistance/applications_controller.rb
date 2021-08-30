@@ -94,6 +94,13 @@ module FinancialAssistance
       redirect_to render_message_applications_path(message: @message)
     end
 
+    def application_year_selection
+      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      render layout: 'financial_assistance'
+    end
+
     def application_checklist
       @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
@@ -196,10 +203,18 @@ module FinancialAssistance
 
     private
 
+    def haven_determination_is_enabled?
+      FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+    end
+
+    def medicaid_gateway_determination_is_enabled?
+      FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+    end
+
     def determination_request_class
-      return FinancialAssistance::Operations::Application::RequestDetermination if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      return FinancialAssistance::Operations::Application::RequestDetermination if haven_determination_is_enabled?
       # TODO: This beelow line will cause failures
-      return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+      return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if medicaid_gateway_determination_is_enabled?
     end
 
     def init_cfl_service

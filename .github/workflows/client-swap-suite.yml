@@ -21,6 +21,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -74,6 +81,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -132,6 +146,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -187,6 +208,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -233,6 +261,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'

@@ -14,6 +14,8 @@ registry:
         settings:
           - key: :file_location
             item: 'db/documents/ivl_checklist.pdf'
+      - key: :iap_year_selection
+        is_enabled: false
       - key: :enrollment_dates
         item: :enrollment_dates
         is_enabled: true
@@ -77,6 +79,16 @@ registry:
       is_enabled: false
     - key: :medicaid_gateway_determination
       is_enabled: true
+  - namespace:
+    - :account_transfer
+    features:
+    - key: :real_time_transfer
+      is_enabled: false
+    - key: :batch_transfer
+      is_enabled: false
+    - key: :transfer_service
+      is_enabled: false
+      service: "aces"
   - namespace:
     - :documents
     features:

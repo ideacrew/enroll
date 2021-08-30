@@ -75,6 +75,7 @@ And(/the person fills in all personal info/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(IvlPersonalInformation.tobacco_user_no_radiobtn).click unless !tobacco_user_field_enabled?
   fill_in "person_addresses_attributes_0_address_1", with: "123 fake st"
   fill_in "person_addresses_attributes_0_city", with: "DC"
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
@@ -96,10 +97,11 @@ And(/^the person has an active resident role$/) do
 end
 
 And(/^the person goes plan shopping in the individual for a new plan$/) do
-  sleep 5
+  sleep 10
   wait_for_ajax
   find('.btn', text: 'CONTINUE').click
   click_link "Continue"
+  sleep 5
   expect(page).to have_content('Verify Identity')
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
@@ -271,15 +273,19 @@ And(/^creates a consumer with SEP$/) do
 end
 
 Then(/^\w+ should the the First Payment button/) do
-  expect(page).to have_content('Make a first Payment')
+  expect(page).to have_content('Make a first payment')
 end
 
 Then(/user clicks on the first payment button/) do
   find(IvlHomepage.first_payment).click
 end
 
-Then(/consumer should the the Make Payments button/) do
-  expect(page).to have_content('Make Payments')
+Then(/^\w+ should the the Make Payments button/) do
+  expect(page).to have_content('Make payments')
+end
+
+Then(/^\w+ should not see the Make Payments button/) do
+  expect(page).not_to have_content('Make payments')
 end
 
 Then(/user clicks on the make payments button/) do
