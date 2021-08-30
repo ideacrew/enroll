@@ -3166,6 +3166,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return true
     end
 
     context "for Individual market" do
@@ -3263,6 +3264,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return true
     end
     context "for Individual market" do
       let(:person)   { FactoryBot.create(:person, :with_consumer_role, :with_family) }
@@ -3645,6 +3647,28 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
   end
 
+  describe "#term_or_expire_enrollment" do
+    let!(:person)          { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family)          { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:hbx_enrollment)  do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.latest_household,
+                        coverage_kind: "health",
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        aasm_state: "coverage_selected",
+                        effective_on: TimeKeeper.date_of_record.beginning_of_month)
+    end
+    let!(:hbx_profile)       { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+
+    it 'should terminate an enrollment if term date is passed' do
+      hbx_enrollment.term_or_expire_enrollment(TimeKeeper.date_of_record.end_of_month)
+      hbx_enrollment.reload
+      expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
+    end
+  end
+
   describe "#has_active_term_or_expired_exists_for_reinstated_date?" do
 
     before do
@@ -3859,7 +3883,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       it "should return true if terminated enrollment exists for reinstated date" do
-        enrollment2.update_attributes(effective_on:effective_on.end_of_month + 1.day, aasm_state: "coverage_terminated")
+        enrollment2.update_attributes(effective_on: effective_on.end_of_month + 1.day, aasm_state: "coverage_terminated")
         enrollment2.reload
         expect(enrollment.has_active_term_or_expired_exists_for_reinstated_date?).to be_truthy
       end
@@ -3935,7 +3959,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
 
         it "should return false when reinstated date enrollment exits with different employer " do
-          expect(enrollment3.has_active_or_term_exists_for_reinstated_date?).to be_falsey
+          expect(enrollment3.has_active_term_or_expired_exists_for_reinstated_date?).to be_falsey
         end
       end
     end
