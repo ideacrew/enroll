@@ -171,9 +171,10 @@ Then(/I should see the Kaiser pop up text/) do
   expect(page).to have_content(l10n("plans.kaiser.pay_now.redirection_message", site_short_name: Settings.site.short_name))
 end
 
-And(/the Kaiser user form should be active/) do
-  person = Person.where(first_name: /John/i, last_name: /Smith/i).to_a.first
-  enrollment = person.primary_family.hbx_enrollments.first
+And(/the Kaiser HBX Enrollment form for (.*?) should be active/) do |named_person|
+  person = people[named_person]
+  person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  enrollment = person_rec.primary_family.hbx_enrollments.detect { |enrollment| enrollment&.product&.issuer_profile&.legal_name == 'Kaiser'}
   expect(page).to have_selector("#sp-#{enrollment.hbx_id}", visible: false)
 end
 
@@ -201,17 +202,20 @@ And(/^I should see model pop up$/) do
   expect(page).to have_css('.modal-open')
 end
 
-And(/^I should see Leave DC Health LINK buttton$/) do
-  expect(page).to have_content('LEAVE DC HEALTH LINK')
+And(/^I should see Leave DC Health LINK button$/) do
+  binding.irb
+  expect(page).to have_content("LEAVE #{EnrollRegistry[:enroll_app].setting(:short_name).item.upcase}")
 end
 
-And(/^I should be able to click  Leave DC Health LINK buttton$/) do
+And(/^I should be able to click Leave DC Health LINK buttton$/) do
   find('.interaction-click-control-leave-dc-health-link').click
   sleep 5
 end
 
 Then(/^I should be able to view DC Health LINK text$/) do
-  expect(page).to have_content("You are leaving the DC Health Link website and entering a privately-owned website created, operated and maintained by Kaiser Permanente.")
+  expect(page).to have_content(
+    "You are leaving the #{EnrollRegistry[:enroll_app].setting(:site_short_name).item.upcase} website and entering a privately-owned website created, operated and maintained by Kaiser Permanente."
+  )
 end
 
 And(/^I should see an alert with error message$/) do

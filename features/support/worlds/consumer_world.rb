@@ -13,6 +13,20 @@ module ConsumerWorld
     @person_rec
   end
 
+  def create_and_return_resident_with_verified_identity(named_person)
+    person = people[named_person]
+    @person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first ||
+    FactoryBot.create(
+      :person,
+      :with_family,
+      first_name: person[:first_name],
+      last_name: person[:last_name]
+    )
+    FactoryBot.create(:resident_role, person: @person_rec) unless @person_rec.resident_role.present?
+    FactoryBot.create(:user, :resident, person: @person_rec) unless User.all.detect { |person_user| person_user.person == @person_rec }
+    @person_rec
+  end
+
   def consumer_with_verified_identity(named_person)
     person_rec = create_or_return_named_consumer(named_person)
     return person_rec if person_rec && person_rec&.consumer_role&.identity_verified?
@@ -159,10 +173,25 @@ end
 
 World(ConsumerWorld)
 
+Given(/(.*) has active verified (.*) role and Kaiser IVL enrollment$/) do |named_person, role|
+  case role
+  when 'consumer'
+    consumer_with_verified_identity(named_person)
+    create_consumer_ivl_enrollment(named_person, 'Kaiser')
+  when 'resident'
+    create_and_return_resident_with_verified_identity(named_person)
+  end
+end
+
 And(/(.*) has active individual market role and verified identity and IVL enrollment$/) do |named_person|
   # Using Kaiser as a specific case for pay_now
   consumer_with_verified_identity(named_person)
   create_consumer_ivl_enrollment(named_person, 'Kaiser')
+end
+
+And(/(.*) has active individual market role and verified identity and non Kaiser IVL enrollment$/) do |named_person|
+  consumer_with_verified_identity(named_person)
+  create_consumer_ivl_enrollment(named_person)
 end
 
 And(/(.*) has HBX enrollment with future effective on date$/) do |named_person|
