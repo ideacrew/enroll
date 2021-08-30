@@ -11,8 +11,7 @@ module CrmGateway
     end
 
     def trigger_crm_family_update_publish
-      params = self.attributes
-      ::Operations::Families::CrmGateway::UpdateFamily.new.call(params) unless Rails.env.test?
+      ::Operations::Families::CrmGateway::UpdateFamily.new.call(self) unless Rails.env.test?
     end
   end
 end

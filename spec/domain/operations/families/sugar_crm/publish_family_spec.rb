@@ -17,13 +17,12 @@ RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :afte
   end
 
   context 'publish payload to CRM' do
-    before :each do
+    before do
       family.family_members << dependent_family_member
-      @result = subject.call(family)
     end
 
     it 'should return success with correct family information' do
-      expect(@result).to be_a(Dry::Monads::Result::Success)
+      expect(subject.call(family)).to be_a(Dry::Monads::Result::Success)
     end
   end
 end
