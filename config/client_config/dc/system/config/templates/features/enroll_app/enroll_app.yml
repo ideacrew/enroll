@@ -523,4 +523,4 @@ registry:
         is_enabled: true
       - key: :crm_update_family_save
         item: :crm_update_family_save
-        is_enabled: true
+        is_enabled: false
