@@ -1793,13 +1793,6 @@ class HbxEnrollment
     eligible_states.include?(aasm_state)
   end
 
-  def benefit_applications_for_reinstated_date?
-    reinstate_date = fetch_reinstatement_date
-    return true if benefit_sponsorship.benefit_applications.approved_and_term_benefit_applications_by_date(reinstate_date).present?
-
-    ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes) ? benefit_sponsorship&.prior_py_benefit_application&.benefit_sponsor_catalog&.effective_period&.cover?(reinstate_date) : false
-  end
-
   def has_active_term_or_expired_exists_for_reinstated_date?
     reinstate_date = fetch_reinstatement_date
     is_shop? ? shop_active_term_or_expired_for_reinstated_date(reinstate_date) : ivl_active_term_or_expired_for_reinstated_date(reinstate_date)
@@ -1831,16 +1824,6 @@ class HbxEnrollment
                                                                :coverage_kind => self.coverage_kind,
                                                                :consumer_role_id => consumer_role_id,
                                                                :aasm_state.in => eligible_states}).any?
-  end
-
-  def has_active_or_term_exists_for_reinstated_date?
-    enrollment_kind = is_shop? ? ['employer_sponsored', 'employer_sponsored_cobra'] : (Kinds - ["employer_sponsored", "employer_sponsored_cobra"])
-    HbxEnrollment.where({:family_id => self.family_id,
-                         :kind.in => enrollment_kind,
-                         :effective_on.gte => self.terminated_on.next_day,
-                         :coverage_kind => self.coverage_kind,
-                         :employee_role_id => self.employee_role_id,
-                         :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_AND_UPDATE_END_DATE)}).any?
   end
 
   def notify_of_coverage_start(publish_to_carrier)
