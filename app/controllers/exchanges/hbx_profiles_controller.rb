@@ -489,7 +489,7 @@ def employer_poc
     begin
       @row = params[:family_actions_id]
       @element_to_replace_id = params[:family_actions_id]
-      result = ::EnrollRegistry[:change_end_date]{ {params: params} }
+      result = Operations::HbxEnrollments::EndDateChange.new.call(params: params)
       if result.success?
         respond_to do |format|
           format.js

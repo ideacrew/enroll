@@ -55,7 +55,7 @@ module Operations
         prior_or_current_py_enr = @enrollment.prior_plan_year_coverage? || @enrollment.active_plan_year_coverage?
 
         if prior_or_current_py_enr
-          term_or_expiration_date = @enrollment.is_shop? ? @enrollment.sponsored_benefit_package.end_on : @enrollment.effective_on.end_of_year
+          term_or_expiration_date = @enrollment.is_shop? ? @enrollment&.sponsored_benefit_package&.end_on : @enrollment&.effective_on&.end_of_year
           @termination_date > term_or_expiration_date
         else
           @termination_date > @enrollment.terminated_on
@@ -65,7 +65,7 @@ module Operations
       def terminate_enrollment(params)
         return Success('Enrollment updated') if @enrollment.cancel_terminated_enrollment(@termination_date, params['edi_required'].present?)
 
-        enrollment = if !@enrollment.coverage_expired? && @termination_date > @enrollment.terminated_on
+        enrollment = if !@enrollment.coverage_expired? && (@termination_date > @enrollment.terminated_on)
                        reinstate_enrollment
                      else
                        update_end_date
