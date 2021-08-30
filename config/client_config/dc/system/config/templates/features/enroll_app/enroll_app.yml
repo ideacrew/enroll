@@ -463,7 +463,7 @@ registry:
       - key: :display_county
         is_enabled: false
       - key: :moving_to_state
-        is_enabled: true
+        is_enabled: false
       - key: :living_outside_state
         is_enabled: true
       - key: :import_network_data
