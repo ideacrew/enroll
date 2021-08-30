@@ -151,8 +151,12 @@ class MigrateFamily < Mongoid::Migration
         @person.update_attributes(is_applying_for_assistance: person_params[:is_applying_for_assistance])
         @family_member = create_or_update_family_member(@person, @family, family_member_hash)
         consumer_role_params = family_member_hash['person']['consumer_role']
-        create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
-        create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
+        consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
+        consumer_role = consumer_role_result.success
+        consumer_role.import!
+        vlp_document_result = create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
+        vlp_document = vlp_document_result.success
+        vlp_document.update_all(status: "verified")
       else
         @person
       end
@@ -282,6 +286,7 @@ class MigrateFamily < Mongoid::Migration
           is_required_to_file_taxes: applicant_hash['is_required_to_file_taxes'],
           tax_filer_kind: applicant_hash['tax_filer_kind'],
           is_joint_tax_filing: applicant_hash['is_joint_tax_filing'],
+          is_filing_as_head_of_household: applicant_hash['is_filing_as_head_of_household'],
           is_claimed_as_tax_dependent: applicant_hash['is_claimed_as_tax_dependent'],
           claimed_as_tax_dependent_by: sanitize_claimed_as_tax_dependent_by_params(applicant_hash),
 
@@ -521,6 +526,7 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.is_required_to_file_taxes = applicant[:is_required_to_file_taxes]
         persisted_applicant.tax_filer_kind = applicant[:tax_filer_kind]
         persisted_applicant.is_joint_tax_filing = applicant[:is_joint_tax_filing]
+        persisted_applicant.is_filing_as_head_of_household = applicant[:is_filing_as_head_of_household]
         persisted_applicant.is_claimed_as_tax_dependent = applicant[:is_claimed_as_tax_dependent]
         persisted_applicant.claimed_as_tax_dependent_by = claimed_by.try(:id)
 
@@ -578,7 +584,7 @@ class MigrateFamily < Mongoid::Migration
           persisted_applicant.citizenship_number = applicant[:vlp_document]["citizenship_number"]
           persisted_applicant.card_number = applicant[:vlp_document]["card_number"]
           persisted_applicant.country_of_citizenship = applicant[:vlp_document]["country_of_citizenship"]
-          persisted_applicant.vlp_description = applicant[:vlp_document]["vlp_description"]
+          persisted_applicant.vlp_description = applicant[:vlp_document]["description"]
           persisted_applicant.expiration_date = applicant[:vlp_document]["expiration_date"]
           persisted_applicant.issuing_country = applicant[:vlp_document]["issuing_country"]
         end
