@@ -41,7 +41,7 @@ module Effective
            ["<div class='#{pundit_class(Family, :can_update_ssn?)}'> Edit DOB / SSN </div>".html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
-           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), disable_form_phone_and_paper_dropdown? ? 'disabled' : 'ajax']
+           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), no_transition_families_is_enabled? ? 'ajax' : '']
            ]
 
           if ::EnrollRegistry.feature_enabled?(:send_secure_message_family)
@@ -60,9 +60,9 @@ module Effective
           dropdown += if individual_market_is_enabled?
                         [
                           ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
-                           aptc_csr_link_type(row, pundit_allow(Family, :can_edit_aptc?))],
-                          ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
-                          ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static']
+                           aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
+                          ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), no_transition_families_is_enabled? ? 'static' : ''],
+                          ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), no_transition_families_is_enabled? ? 'static' : '']
                         ]
                       end
 
