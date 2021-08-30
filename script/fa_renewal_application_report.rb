@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # This script generates a CSV report with list of all the
-# FinancialApplication::Applications that are created yesterday.
+# FinancialApplication::Applications with predecessor_id populated
+# and has same assistance_year as input.
 # rails runner script/fa_renewal_application_report.rb '2022' -e production
 require 'csv'
 
