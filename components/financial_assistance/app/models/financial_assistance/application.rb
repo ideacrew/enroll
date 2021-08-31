@@ -102,11 +102,7 @@ module FinancialAssistance
     field :predecessor_id, type: BSON::ObjectId
 
     # Flag for user requested ATP transfer
-<<<<<<< HEAD
     field :transfer_requested, type: Boolean, default: false
-=======
-    field :requested_transfer, type: Boolean, default: false
->>>>>>> eebbc248c3 (add requested transfer flag to FA application and update associated rake and view)
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'

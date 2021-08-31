@@ -329,5 +329,11 @@ module FinancialAssistance
         value
       end
     end
+
+    def update_transfer_requested
+      @application = Application.find(params[:id])
+      @application.update_attributes(transfer_requested: true)
+      redirect_to applications_path
+    end
   end
 end
