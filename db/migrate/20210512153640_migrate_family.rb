@@ -67,7 +67,7 @@ class MigrateFamily < Mongoid::Migration
         end
         print "."
       rescue StandardError => e
-        puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
+        puts "E: #{payload[:insuranceApplicationIdentifier]}, f: #{@family.hbx_id}  error: #{e.message.split('.').first}"
       end
     end
 
@@ -616,6 +616,8 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.has_eligibility_changed = applicant[:ended_as_change_in_eligibility]
         persisted_applicant.has_household_income_changed = applicant[:hh_income_or_size_changed]
         persisted_applicant.person_coverage_end_on = applicant[:medicaid_or_chip_coverage_end_date]
+        persisted_applicant.medicaid_chip_ineligible = applicant[:ineligible_due_to_immigration_in_last_5_years]
+        persisted_applicant.immigration_status_changed_since_ineligibility = applicant[:immigration_status_changed_since_ineligibility]
 
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 

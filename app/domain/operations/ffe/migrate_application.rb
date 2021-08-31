@@ -47,6 +47,22 @@ module Operations
         return Failure("error in MigrateApplication -> family_hash is empty/nil") unless family_hash.present?
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
+      #   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
+      #   binding.pry
+      #   family = Family.where(id: result.success).first
+      #   if family.primary_applicant.person.is_applying_for_assistance
+      #     Family.create_indexes
+      #     family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
+      #     binding.pry
+      #     Operations::CvMigration::CreateMagiMedicaidApplication.new.call(family_hash)
+      #     binding.pry
+      #     # app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+      #     ::FinancialAssistance::Application.create_indexes
+      #     # fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+      #     # fix_iap_relationship(app_id, family_hash)
+      #   end
+      #  end
+
         if @family.primary_applicant.person.is_applying_for_assistance
           Family.create_indexes
           app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
@@ -142,9 +158,7 @@ module Operations
           consumer_role = consumer_role_result.success
           consumer_role.import!
           if consumer_role_params["vlp_documents"].present?
-            vlp_document_result = create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
-            vlp_document = vlp_document_result.success
-            vlp_document.update_all(status: "verified")
+            create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
           end
         else
           @person
@@ -209,7 +223,9 @@ module Operations
         return unless vlp_params.present?
 
         vlp_params.each do |vlp|
-          Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp, person: person })
+          result = Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp, person: person })
+          vlp_document = result.success
+          vlp_document.update_attributes!(status: "verified")
         end
       end
 
@@ -327,13 +343,13 @@ module Operations
             has_enrolled_health_coverage: applicant_hash['has_enrolled_health_coverage'],
             has_eligible_health_coverage: applicant_hash['has_eligible_health_coverage'],
 
-            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip','not_eligible_in_last_90_days'),
-            denied_on: applicant_hash.dig('medicaid_and_chip','denied_on'),
-            ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip','ended_as_change_in_eligibility'),
-            hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip','hh_income_or_size_changed'),
-            medicaid_or_chip_coverage_end_date: applicant_hash.dig('medicaid_and_chip','medicaid_or_chip_coverage_end_date'),
-            ineligible_due_to_immigration_in_last_5_years: applicant_hash.dig('medicaid_and_chip','ineligible_due_to_immigration_in_last_5_years'),
-            immigration_status_changed_since_ineligibility: applicant_hash.dig('medicaid_and_chip','immigration_status_changed_since_ineligibility'),
+            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip', 'not_eligible_in_last_90_days'),
+            denied_on: applicant_hash.dig('medicaid_and_chip', 'denied_on'),
+            ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip', 'ended_as_change_in_eligibility'),
+            hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip', 'hh_income_or_size_changed'),
+            medicaid_or_chip_coverage_end_date: applicant_hash.dig('medicaid_and_chip', 'medicaid_or_chip_coverage_end_date'),
+            ineligible_due_to_immigration_in_last_5_years: applicant_hash.dig('medicaid_and_chip', 'ineligible_due_to_immigration_in_last_5_years'),
+            immigration_status_changed_since_ineligibility: applicant_hash.dig('medicaid_and_chip', 'immigration_status_changed_since_ineligibility'),
 
             addresses: applicant_hash['addresses'],
             emails: applicant_hash['emails'],
@@ -504,6 +520,8 @@ module Operations
           persisted_applicant.has_eligibility_changed = applicant[:ended_as_change_in_eligibility]
           persisted_applicant.has_household_income_changed = applicant[:hh_income_or_size_changed]
           persisted_applicant.person_coverage_end_on = applicant[:medicaid_or_chip_coverage_end_date]
+          persisted_applicant.medicaid_chip_ineligible = applicant[:ineligible_due_to_immigration_in_last_5_years]
+          persisted_applicant.immigration_status_changed = applicant[:immigration_status_changed_since_ineligibility]
 
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
