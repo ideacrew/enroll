@@ -17,6 +17,17 @@ describe 'Pay Now Click Tracking Report', :dbclean => :after_each do
 
     let!(:issuer_profile) {FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, abbrev: "KFMASI", id: '5d63154793c4e727f1ff888b')}
 
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        id: '123456789',
+        family: family,
+        enrollment_kind: 'special_enrollment',
+        kind: 'individual',
+        hbx_id: '123456789'
+      )
+    end
+
     before do
       payment_transaction1.reload
       payment_transaction2.reload
@@ -32,7 +43,7 @@ describe 'Pay Now Click Tracking Report', :dbclean => :after_each do
     end
 
     it "should generate the click tracking data" do
-      result = [["source", "enrollment_id", "datetime_of_click"], ["plan_shopping","123456789","02/01/2021 00:00"], ["enrollment_tile","123456789","02/01/2021 00:00"]]
+      result = [["source", "enrollment_id", "datetime_of_click", "hbx_id"], ["plan_shopping","123456789","02/01/2021 00:00", "123456789"], ["enrollment_tile","123456789","02/01/2021 00:00", "123456789"]]
       data = CSV.read "#{Rails.root}/public/pay_now_click_tracking.csv"
       expect(data).to eq result
     end
