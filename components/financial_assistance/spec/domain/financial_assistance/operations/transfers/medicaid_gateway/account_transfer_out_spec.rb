@@ -119,15 +119,5 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
     end
 
-    context 'invalid application aasm_state' do
-      before do
-        application.update_attributes!(aasm_state: 'draft')
-        @result = subject.call({application_id: application.id})
-      end
-
-      it 'should return a failure with error message' do
-        expect(@result.failure).to eq('Application is in draft state. Please submit application.')
-      end
-    end
   end
 end
