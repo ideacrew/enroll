@@ -126,6 +126,7 @@ module Operations
           create_member(family_member_hash)
         end
 
+        add_broker_accounts(@family, family_hash)
         @family.save!
       end
 
@@ -140,9 +141,11 @@ module Operations
           consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
           consumer_role = consumer_role_result.success
           consumer_role.import!
-          vlp_document_result = create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
-          vlp_document = vlp_document_result.success
-          vlp_document.update_all(status: "verified")
+          if consumer_role_params["vlp_documents"].present?
+            vlp_document_result = create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
+            vlp_document = vlp_document_result.success
+            vlp_document.update_all(status: "verified")
+          end
         else
           @person
         end
@@ -189,6 +192,17 @@ module Operations
         family.save!
 
         family_member
+        end
+
+      def add_broker_accounts(family, family_hash)
+        return unless family_hash['broker_accounts'].present?
+        family_hash['broker_accounts'].each do |account|
+          start_on = account['start_on']
+          npn = account['broker_role_reference']['npn']
+          broker_role = BrokerRole.find_by_npn(npn)
+          next unless broker_role
+          family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_role.broker_agency_profile.id, writing_agent_id: broker_role.id, start_on: start_on, is_active: true)
+        end
       end
 
       def create_or_update_vlp_document(vlp_params, person)
