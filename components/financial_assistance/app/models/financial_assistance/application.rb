@@ -102,7 +102,7 @@ module FinancialAssistance
     field :predecessor_id, type: BSON::ObjectId
 
     # Flag for user requested ATP transfer
-    field :requested_transfer, type: Boolean, default: false
+    field :transfer_requested, type: Boolean, default: false
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
