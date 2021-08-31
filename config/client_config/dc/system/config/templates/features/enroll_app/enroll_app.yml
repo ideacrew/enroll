@@ -293,7 +293,7 @@ registry:
         item: Operations::HbxEnrollments::EndDateChange.new
         settings:
           - key: :expired_enrollments
-            item: true
+            item: false
   - namespace:
       - :pay_now_feature
     features:
