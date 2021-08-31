@@ -128,6 +128,11 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     end
 
     context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do
+
+      before do
+        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+      end
+
       let(:prior_coverage_year) { Date.today.year - 1}
       let!(:prior_hbx_profile) do
         FactoryBot.create(:hbx_profile,
@@ -150,6 +155,11 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
 
     context 'prior year expired, current active enrollment and IVL OE renewing enrollment' do
       include_context 'prior, current and next year benefit coverage periods and products'
+
+      before do
+        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+      end
+
       context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do
         let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
         let(:termination_date) { start_date + 2.months }
@@ -294,6 +304,11 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     end
 
     context 'prior year SHOP expired enrollment where termination date is less than than enrollment expiration date' do
+
+      before do
+        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+      end
+
       include_context "setup expired, and active benefit applications"
 
       let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -327,6 +342,11 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
 
     context 'prior year expired, current active enrollment and SHOP OE renewing enrollment' do
       include_context 'setup expired, active and renewing benefit applications'
+
+      before do
+        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+      end
+
       context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do
         let!(:current_benefit_market_catalog) do
           ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_and_previous_catalog(
