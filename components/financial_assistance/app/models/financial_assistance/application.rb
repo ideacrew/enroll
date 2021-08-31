@@ -531,7 +531,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => :record_transition do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdsh_hub_calls] do
         transitions from: :submitted, to: :determined
       end
 
@@ -667,6 +667,12 @@ module FinancialAssistance
       return unless FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
 
       Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
+    end
+
+    def publish_ifsv_request
+      return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
+
+      Operations::Applications::Ifsv::H9t::IfsvRequest.new.call(application_id: id)
     end
 
     def total_incomes_by_year
@@ -1148,13 +1154,13 @@ module FinancialAssistance
       set_assistance_year
       set_effective_date
       create_eligibility_determinations
-      create_evidences
       set_renewal_base_year
     end
 
     def trigger_fdsh_hub_calls
       publish_esi_mec_request
       publish_non_esi_mec_request
+      publish_ifsv_request
     end
 
     def unset_submit
@@ -1204,6 +1210,7 @@ module FinancialAssistance
       types = []
       types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
       types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+      types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
       active_applicants.each do |applicant|
         applicant.evidences =
           types.collect do |type|
