@@ -313,6 +313,14 @@ module Operations
             has_enrolled_health_coverage: applicant_hash['has_enrolled_health_coverage'],
             has_eligible_health_coverage: applicant_hash['has_eligible_health_coverage'],
 
+            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip','not_eligible_in_last_90_days'),
+            denied_on: applicant_hash.dig('medicaid_and_chip','denied_on'),
+            ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip','ended_as_change_in_eligibility'),
+            hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip','hh_income_or_size_changed'),
+            medicaid_or_chip_coverage_end_date: applicant_hash.dig('medicaid_and_chip','medicaid_or_chip_coverage_end_date'),
+            ineligible_due_to_immigration_in_last_5_years: applicant_hash.dig('medicaid_and_chip','ineligible_due_to_immigration_in_last_5_years'),
+            immigration_status_changed_since_ineligibility: applicant_hash.dig('medicaid_and_chip','immigration_status_changed_since_ineligibility'),
+
             addresses: applicant_hash['addresses'],
             emails: applicant_hash['emails'],
             phones: applicant_hash['phones'],
@@ -476,6 +484,12 @@ module Operations
             persisted_applicant.expiration_date = applicant[:vlp_document]["expiration_date"]
             persisted_applicant.issuing_country = applicant[:vlp_document]["issuing_country"]
           end
+
+          persisted_applicant.has_eligible_medicaid_cubcare = applicant[:not_eligible_in_last_90_days]
+          persisted_applicant.medicaid_cubcare_due_on = applicant[:denied_on]
+          persisted_applicant.has_eligibility_changed = applicant[:ended_as_change_in_eligibility]
+          persisted_applicant.has_household_income_changed = applicant[:hh_income_or_size_changed]
+          persisted_applicant.person_coverage_end_on = applicant[:medicaid_or_chip_coverage_end_date]
 
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
