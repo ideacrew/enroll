@@ -87,6 +87,8 @@ registry:
       is_enabled: true
     - key: :non_esi_mec_determination
       is_enabled: true
+    - key: :ifsv_determination
+      is_enabled: true
   - namespace:
     - :account_transfer
     features:
