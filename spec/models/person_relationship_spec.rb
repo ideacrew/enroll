@@ -186,5 +186,22 @@ describe PersonRelationship, dbclean: :after_each do
         expect(person.person_relationships.first.kind).to eq('daughter_or_son_in_law')
       end
     end
+
+    context 'valid params with brother_or_sister_in_law' do
+      let(:relative_kind) { 'brother_or_sister_in_law' }
+
+      before do
+        person.person_relationships << described_class.new(valid_params)
+        person.save!
+      end
+
+      it 'should return valid person' do
+        expect(person.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of person' do
+        expect(person.person_relationships.first.kind).to eq('brother_or_sister_in_law')
+      end
+    end
   end
 end
