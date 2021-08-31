@@ -673,10 +673,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.ensure_relationship_with_primary(applicant1, 'spouse')
       application.ensure_relationship_with_primary(applicant2, 'child')
       application.ensure_relationship_with_primary(applicant3, 'child')
-      application.update_or_build_relationship(applicant1, applicant2, 'parent')
-      application.update_or_build_relationship(applicant2, applicant1, 'child')
-      application.update_or_build_relationship(applicant1, applicant3, 'parent')
-      application.update_or_build_relationship(applicant3, applicant1, 'child')
+      application.add_or_update_relationships(applicant1, applicant2, 'parent')
+      application.add_or_update_relationships(applicant1, applicant3, 'parent')
       application.build_relationship_matrix
       application.save!
     end
@@ -1040,8 +1038,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.applicants.first.update_attributes!(is_primary_applicant: true)
       application.ensure_relationship_with_primary(applicant2, 'spouse')
       application.ensure_relationship_with_primary(applicant3, 'child')
-      application.update_or_build_relationship(applicant2, applicant3, 'parent')
-      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.add_or_update_relationships(applicant2, applicant3, 'parent')
       application.save!
     end
 
@@ -1114,8 +1111,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       primary_appli.save!
       application.ensure_relationship_with_primary(applicant2, 'spouse')
       application.ensure_relationship_with_primary(applicant3, 'child')
-      application.update_or_build_relationship(applicant2, applicant3, 'parent')
-      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.add_or_update_relationships(applicant2, applicant3, 'parent')
       application.save!
     end
 
@@ -1186,6 +1182,32 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         expect(
           application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant12.id).first.kind
         ).to eq('father_or_mother_in_law')
+      end
+    end
+
+    context 'with valid case for BrotherOrSisterInLaw' do
+      context 'applicant13 is sibling to applicant12' do
+        before do
+          application10.ensure_relationship_with_primary(applicant12, 'spouse')
+          application10.add_or_update_relationships(applicant12, applicant13, 'sibling')
+          application10.build_relationship_matrix
+        end
+
+        it 'should populate all the relationships' do
+          expect(application10.reload.relationships_complete?).to be_truthy
+        end
+
+        it 'should create a relationship i.e., applicant11 is brother_or_sister_in_law to applicant13' do
+          expect(
+            application10.relationships.where(applicant_id: applicant11.id, relative_id: applicant13.id).first.kind
+          ).to eq('brother_or_sister_in_law')
+        end
+
+        it 'should create a relationship i.e., applicant13 is brother_or_sister_in_law to applicant11' do
+          expect(
+            application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant11.id).first.kind
+          ).to eq('brother_or_sister_in_law')
+        end
       end
     end
   end

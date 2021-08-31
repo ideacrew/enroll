@@ -144,8 +144,15 @@ module FinancialAssistance
     alias is_renewal_authorized? is_renewal_authorized
 
     def ensure_relationship_with_primary(applicant, relation_kind)
-      update_or_build_relationship(applicant, primary_applicant, relation_kind)
-      update_or_build_relationship(primary_applicant, applicant, ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind])
+      add_or_update_relationships(applicant, primary_applicant, relation_kind)
+    end
+
+    # Created both relationships A to B, and B to A.
+    # This way we do not have to call two methods to create relationships
+    def add_or_update_relationships(applicant, applicant2, relation_kind)
+      update_or_build_relationship(applicant, applicant2, relation_kind)
+      inverse_relationship_kind = ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind]
+      update_or_build_relationship(applicant2, applicant, inverse_relationship_kind) if inverse_relationship_kind.present?
     end
 
     def update_or_build_relationship(applicant, relative, relation_kind)
@@ -153,7 +160,8 @@ module FinancialAssistance
 
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?
-        relationship.update(kind: relation_kind)
+        # Update relationship object only if the existing RelationshipKind is different some the incoming RelationshipKind.
+        relationship.update(kind: relation_kind) if relationship.kind != relation_kind
         return relationship
       end
 
@@ -329,8 +337,7 @@ module FinancialAssistance
         next unless s_ids.count > s_ids.uniq.count
         members = applicants.where(:id.in => rel.to_a.flatten)
 
-        update_or_build_relationship(members.first, members.second, 'sibling')
-        update_or_build_relationship(members.second, members.first, 'sibling')
+        add_or_update_relationships(members.first, members.second, 'sibling')
         missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
@@ -359,15 +366,13 @@ module FinancialAssistance
           if parent_rel1.present? && child_rel2.present?
             grandchild = applicants.where(id: second_rel).first
             grandparent = applicants.where(id: first_rel).first
-            update_or_build_relationship(grandparent, grandchild, 'grandparent')
-            update_or_build_relationship(grandchild, grandparent, 'grandchild')
+            add_or_update_relationships(grandparent, grandchild, 'grandparent')
             missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
             break
           elsif child_rel1.present? && parent_rel2.present?
             grandchild = applicants.where(id: first_rel).first
             grandparent = applicants.where(id: second_rel).first
-            update_or_build_relationship(grandparent, grandchild, 'grandparent')
-            update_or_build_relationship(grandchild, grandparent, 'grandchild')
+            add_or_update_relationships(grandparent, grandchild, 'grandparent')
             missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
             break
           end
@@ -388,14 +393,16 @@ module FinancialAssistance
         spouse_relation = relationships.where(applicant_id: parent_rel1.relative_id, relative_id: parent_rel2.relative_id, kind: "spouse").first
         next unless spouse_relation.present?
         members = applicants.where(:id.in => rel.to_a.flatten)
-        update_or_build_relationship(members.first, members.second, 'sibling')
-        update_or_build_relationship(members.second, members.first, 'sibling')
+        add_or_update_relationships(members.first, members.second, 'sibling')
         missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
       end
       # rubocop:enable Style/CombinableLoops
 
       # FatherOrMotherInLaw/DaughterOrSonInLaw Rule: father_or_mother_in_law, daughter_or_son_in_law
       missing_relationships = execute_father_or_mother_in_law_rule(missing_relationships)
+
+      # BrotherOrSisterInLaw Rule: brother_or_sister_in_law
+      missing_relationships = execute_brother_or_sister_in_law_rule(missing_relationships)
 
       matrix
     end
@@ -414,8 +421,29 @@ module FinancialAssistance
           next if spouse_relation.relative_id != each_relation.relative_id
           parent_in_law = applicants.where(id: each_relation.applicant_id).first
           child_in_law = applicants.where(id: other_applicant_id).first
-          update_or_build_relationship(parent_in_law, child_in_law, 'father_or_mother_in_law')
-          update_or_build_relationship(child_in_law, parent_in_law, 'daughter_or_son_in_law')
+          add_or_update_relationships(parent_in_law, child_in_law, 'father_or_mother_in_law')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
+
+    # If MemberA is spouse to MemberB,
+    # and MemberB is sibling to MemberC,
+    # then MemberA is brother_or_sister_in_law to MemberC
+    def execute_brother_or_sister_in_law_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'spouse')
+        applicant_relations.each do |each_relation|
+          # Do not continue if there are no missing relationships.
+          return missing_relationships if missing_relationships.blank?
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          sibling_relation = relationships.where(applicant_id: other_applicant_id, kind: 'sibling').first
+          next if sibling_relation.relative_id != each_relation.relative_id
+          sibling1_in_law = applicants.where(id: each_relation.applicant_id).first
+          sibling2_in_law = applicants.where(id: other_applicant_id).first
+          add_or_update_relationships(sibling1_in_law, sibling2_in_law, 'brother_or_sister_in_law')
           missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
         end
       end
