@@ -320,7 +320,7 @@ class Household
         family_member: family.primary_family_member,
         is_subscriber: true,
         is_ia_eligible: true,
-        csr_percent_as_integer: csr
+        csr_percent_as_integer: (csr == 'limited' ? '-1' : csr)
     )
 
     deter = th.eligibility_determinations.build(
@@ -342,7 +342,8 @@ class Household
       ath.tax_household_members.build(
           family_member: fm,
           is_subscriber: false,
-          is_ia_eligible: true
+          is_ia_eligible: true,
+          csr_percent_as_integer: (csr == 'limited' ? '-1' : csr)
       )
       ath.save!
     end

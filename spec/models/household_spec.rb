@@ -272,6 +272,10 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     it 'should create ED with source Renewals' do
       expect(active_household.tax_households.first.latest_eligibility_determination.source).to eq('Renewals')
     end
+
+    it 'should add csr integer to tax household member' do
+      expect(active_household.latest_active_thh.tax_household_members.first.csr_percent_as_integer).to eq(94)
+    end
   end
 
   context 'create one ED' do
@@ -286,6 +290,10 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
 
     it 'should create ED with source Admin' do
       expect(@eligibility_determination.source).to eq('Admin')
+    end
+
+    it 'should add csr integer to tax household member' do
+      expect(active_household.latest_active_thh.tax_household_members.first.csr_percent_as_integer).to eq(73)
     end
   end
 
@@ -302,6 +310,10 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     it 'should have Renewals as source' do
       expect(@ed.source).to eq('Renewals')
     end
+
+    it 'should add csr integer to tax household member' do
+      expect(active_household.latest_active_thh.tax_household_members.first.csr_percent_as_integer).to eq(73)
+    end
   end
 
   context 'for limited csr determination' do
@@ -316,6 +328,10 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
 
     it 'should create determination with csr_percent_as_integer as -1' do
       expect(@eligibility_determination.csr_percent_as_integer).to eq(-1)
+    end
+
+    it 'should add csr integer to tax household member' do
+      expect(active_household.latest_active_thh.tax_household_members.first.csr_percent_as_integer).to eq(-1)
     end
   end
 end

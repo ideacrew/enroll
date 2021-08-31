@@ -96,14 +96,11 @@ def check_and_run
       active_thh = active_household.latest_active_thh_with_year(effective_date.year)
       deter = active_thh.try(:latest_eligibility_determination)
 
-      family_member_ids = person.primary_family.family_members.map(&:id)
-      eligibile_csr_kind = active_thh.eligible_csr_percent_as_integer(family_member_ids)
-
-      if active_thh && deter.present? && deter.csr_percent_as_integer.to_s == eligibile_csr_kind && active_thh.effective_starting_on.to_date == effective_date && deter.max_aptc.to_f == aptc.to_f
+      if active_thh && deter.present? && deter.csr_percent_as_integer.to_s == csr && active_thh.effective_starting_on.to_date == effective_date && deter.max_aptc.to_f == aptc.to_f
         not_run << [hbx_id: person.hbx_id, error: 'active THH with eligibility having same aptc, csr & thh_effective_date is already present']
         puts "Skipped Creation of Eligibility for person with person_hbx_id: #{person.hbx_id} as this household already has one"
       else
-        active_household.build_thh_and_eligibility(aptc, eligibile_csr_kind, effective_date, @slcsp, 'Renewals')
+        active_household.build_thh_and_eligibility(aptc, csr, effective_date, @slcsp, 'Renewals')
         created_eligibility << [hbx_id: person.hbx_id]
         puts "Created Eligibility for person with person_hbx_id: #{person.hbx_id}"
       end
