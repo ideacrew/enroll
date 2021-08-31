@@ -189,3 +189,9 @@ And(/Individual Market with open enrollment period exists$/) do
   HbxProfile.any_instance.stub(:under_open_enrollment?).and_return(true)
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 end
+
+And(/(.*) has HBX enrollment with past effective on date$/) do |named_person|
+  person = consumer_with_ivl_enrollment(named_person)
+  family = person.primary_family
+  family.hbx_enrollments.last.update_attributes(effective_on: TimeKeeper.date_of_record)
+end
