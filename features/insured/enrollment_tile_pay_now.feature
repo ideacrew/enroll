@@ -8,6 +8,7 @@ Feature: User should be able to pay for plan
 
   Scenario: User can see pay now button and pop up for gap between Kaiser enrollment
     Given EnrollRegistry kaiser_pay_now feature is enabled
+    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     Given individual Qualifying life events are present
     Given Patrick Doe has active individual market role and verified identity and IVL enrollment
