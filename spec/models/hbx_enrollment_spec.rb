@@ -1872,10 +1872,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(enrollment.terminated_on).to be_nil
         new_enrollment.select_coverage!
         enrollment.reload
-        if terminated_date <= TimeKeeper.date_of_record
-          expect(enrollment.coverage_terminated?).to be_truthy
-        else
+        if terminated_date.to_date >= TimeKeeper.date_of_record
           expect(enrollment.coverage_termination_pending?).to be_truthy
+        else
+          expect(enrollment.coverage_terminated?).to be_truthy
         end
         expect(enrollment.terminated_on).to eq(terminated_date)
       end
