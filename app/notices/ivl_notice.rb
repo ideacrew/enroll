@@ -125,13 +125,14 @@ class IvlNotice < Notice
     pdf.save path_to_save
   end
 
-  def attach_blank_page(template_path = nil)
+  def attach_blank_page(template_path = nil, person_id = nil)
     path = template_path.nil? ? notice_path : template_path
     blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
     page_count = Prawn::Document.new(:template => path).page_count
     join_pdfs_with_path([path, blank_page], path) if page_count.odd?
   rescue StandardError => e
     message = "Error Attaching IVL Notice PDF with Prawn: #{e.message}; "
+    message += "Person ID: #{person_id}; "
     message += "PDF Path: #{path}, "
     message += "stacktrace: #{e.backtrace}"
     log(message, {:severity => "error"})
