@@ -28,7 +28,7 @@ module Operations
 
         Success(family_params)
       rescue StandardError => e
-        puts e
+        puts "exception :#{payload[:insuranceApplicationIdentifier]} -- #{e}"
       end
 
       private
@@ -39,12 +39,16 @@ module Operations
         if transform_payload.success?
           family_hash = transform_payload.success.to_h.deep_stringify_keys!
         else
-          puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
+          puts "aca entities failure app_identifier: #{payload[:insuranceApplicationIdentifier]}"
+        end
 
+        if family_hash.empty?
+          puts "family hash empty: #{payload[:insuranceApplicationIdentifier]}"
+          return
         end
 
         # puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}" if family_hash.empty?
-        return Failure("error in MigrateApplication -> family_hash is empty/nil") unless family_hash.present?
+        # return Failure("error in MigrateApplication -> family_hash is empty/nil") unless family_hash.present?
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
       #   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
@@ -70,6 +74,7 @@ module Operations
           fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
           fix_iap_relationship(app_id, family_hash)
         end
+        puts "success #{payload[:insuranceApplicationIdentifier]}"
         print "."
       end
 
@@ -138,7 +143,7 @@ module Operations
                                                 'households'))
 
         family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
-          puts "sorting member primary: #{family_member_hash['is_primary_applicant']}"
+          # puts "sorting member primary: #{family_member_hash['is_primary_applicant']}"
           create_member(family_member_hash)
         end
 
