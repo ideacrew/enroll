@@ -12,228 +12,53 @@ module Operations
       include EventSource::Command
       include EventSource::Logging
 
-
-      # Update this constant with new events that are added/registered in ::Publishers::FamilyPublisher
-      REGISTERED_EVENTS = %w[family_update].freeze
-
       # @param [ Family] instance fo family
-      # @return Success rersult
+      # @return Success result
       def call(family)
-        family = yield validate(family)
-        fm_hash = yield build_family_member_hash(family)
-        household_hash = yield build_household_hash(family)
-        payload = yield build_payload(fm_hash, household_hash, family, is_documents_needed(family))
-        validated_payload = yield validate_payload(payload)
-        entity_result = yield thorough_entity(validated_payload)
-        event = yield build_event(entity_result)
-        result = yield publish_response(event)
-
+        transformed_family = yield construct_payload_hash(family)
+        payload_value = yield validate_payload(transformed_family)
+        payload_entity = yield create_payload_entity(payload_value)
+        event = yield build_event(payload_entity)
+        result = yield publish(event)
         Success(result)
       end
 
       private
 
-      def validate(family)
-        family.is_a?(::Family) ? Success(family) : Failure("Invalid Family Object #{family}")
-      end
-
-      def build_addresses(person)
-        address = person.mailing_address
-        [
-          {
-            :kind => address.kind,
-            :address_1 => address.address_1,
-            :address_2 => address.address_2,
-            :address_3 => address.address_3,
-            :state => address.state,
-            :city => address.city,
-            :zip => address.zip
-          }
-        ]
-      end
-
-      def update_and_build_verification_types(person)
-        date = TimeKeeper.date_of_record
-        person.consumer_role.types_include_to_notices.collect do |verification_type|
-          unless verification_type.due_date && verification_type.due_date_type
-            verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
-            person.consumer_role.save!
-          end
-          {
-            type_name: verification_type.type_name,
-            validation_status: verification_type.validation_status,
-            due_date: verification_type.due_date
-          }
+      def construct_payload_hash(family)
+        if family.is_a?(::Family)
+          Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        else
+          Failure("Invalid Family Object. Family class is: #{family.class}")
         end
       end
 
-      def build_family_member_hash(family)
-        members = family.family_members
-        family_members_hash = members.collect do |fm|
-          person = fm.person
-          outstanding_verification_types = person&.consumer_role&.types_include_to_notices
-          member_hash = {
-            is_primary_applicant: fm.is_primary_applicant,
-            person: {
-              hbx_id: person.hbx_id,
-              person_name: { first_name: person.first_name, last_name: person.last_name },
-              person_demographics: { ssn: person.ssn, gender: person.gender, dob: person.dob, is_incarcerated: person.is_incarcerated },
-              person_health: { is_tobacco_user: person.is_tobacco_user },
-              is_active: person.is_active,
-              is_disabled: person.is_disabled,
-              addresses: build_addresses(person)
-            }
-          }
-          member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
-          member_hash
-        end
-        Success(family_members_hash)
-      end
-
-      # TODO: need to figure this out
-      def build_household_hash(family, year = TimeKeeper.date_of_record.year)
-        household_hash = family.households.collect do |household|
-          enrollments = household.hbx_enrollments.enrolled.with_product.by_year(year)
-          {
-            start_date: household.effective_starting_on,
-            is_active: household.is_active,
-            coverage_households: household.coverage_households.collect { |ch| {is_immediate_family: ch.is_immediate_family, coverage_household_members: ch.coverage_household_members.collect {|chm| {is_subscriber: chm.is_subscriber}}} },
-            hbx_enrollments: build_enrollments_hash(enrollments)
-          }
-        end
-        Success(household_hash)
-      end
-
-      def build_enrollments_hash(enrollments)
-        enrollments.collect do |enr|
-          product = enr.product
-          issuer = product.issuer_profile
-          consumer_role = enr.consumer_role
-          enrollment_hash = {
-            effective_on: enr.effective_on,
-            aasm_state: enr.aasm_state,
-            market_place_kind: enr.kind,
-            enrollment_period_kind: enr.enrollment_kind,
-            product_kind: enr.coverage_kind,
-            total_premium: enr.total_premium,
-            applied_aptc_amount: { cents: enr.applied_aptc_amount.cents, currency_iso: enr.applied_aptc_amount.currency.iso_code },
-            hbx_enrollment_members: enrollment_member_hash(enr),
-            product_reference: product_reference(product, issuer),
-            issuer_profile_reference: issuer_profile_reference(issuer),
-            consumer_role_reference: consumer_role_reference(consumer_role),
-            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
-          }
-          enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
-          enrollment_hash
+      def validate_payload(transformed_family)
+        # Operations::Families::PublishFamily publish payload to CRM should return success with correct family information
+        # Failure/Error: result = AcaEntities::Contracts::Families::FamilyContract.new.call(transformed_family)
+        #  NoMethodError:
+        # undefined method `key?' for #<Money fractional:0 currency:USD>
+        binding.irb
+        result = AcaEntities::Contracts::Families::FamilyContract.new.call(transformed_family)
+        if result.success?
+          result
+        else
+          hbx_id = transformed_family[:family_members].detect { |fm| fm[:is_primary_applicant] }[:hbx_id]
+          Failure("Person with hbx_id #{hbx_id} is not valid due to #{result.errors.to_h}.")
         end
       end
 
-      def qualifying_life_event_kind_reference(qle)
-        qle_hash = {
-          start_on: qle.start_on,
-          title: qle.title,
-          reason: qle.reason,
-          market_kind: qle.market_kind
-        }
-        qle_hash.merge!(end_on: qle.end_on) if qle.end_on
-        qle_hash
-      end
-
-      def special_enrollment_period_reference(enrollment)
-        sep = enrollment.family.latest_active_sep
-        qle = sep.qualifying_life_event_kind
-        {
-          qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle),
-          qle_on: sep.qle_on,
-          start_on: sep.start_on,
-          end_on: sep.end_on,
-          effective_on: sep.effective_on,
-          submitted_at: sep.submitted_at
-        }
-      end
-
-      def consumer_role_reference(consumer_role)
-        {
-          is_active: consumer_role.is_active,
-          is_applying_coverage: consumer_role.is_applying_coverage,
-          is_applicant: consumer_role.is_applicant,
-          is_state_resident: consumer_role.is_state_resident || false,
-          lawful_presence_determination: {},
-          citizen_status: consumer_role.citizen_status
-        }
-      end
-
-      def issuer_profile_reference(issuer)
-        {
-          hbx_id: issuer.hbx_id,
-          name: issuer.legal_name,
-          abbrev: issuer.abbrev,
-          phone: issuer.office_locations.where(is_primary: true).first&.phone&.full_phone_number
-        }
-      end
-
-      def product_reference(product, issuer)
-        {
-          hios_id: product.hios_id,
-          name: product.title,
-          active_year: product.active_year,
-          is_dental_only: product.dental?,
-          metal_level: product.metal_level,
-          benefit_market_kind: product.benefit_market_kind.to_s,
-          csr_variant_id: product.csr_variant_id,
-          is_csr: product.is_csr?,
-          family_deductible: product.family_deductible,
-          individual_deductible: product.deductible,
-          product_kind: product.product_kind.to_s,
-          issuer_profile_reference: { hbx_id: issuer.hbx_id, name: issuer.legal_name, abbrev: issuer.abbrev }
-        }
-      end
-
-      def enrollment_member_hash(enrollment)
-        enrollment.hbx_enrollment_members.collect do |hem|
-          person = hem.person
-          {
-            family_member_reference: {family_member_hbx_id: hem.hbx_id, age: hem.age_on_effective_date, first_name: person.first_name, last_name: person.last_name, person_hbx_id: person.hbx_id,
-                                      is_primary_family_member: (hem.primary_relationship == 'self')}, is_subscriber: hem.is_subscriber, eligibility_date: hem.eligibility_date, coverage_start_on: hem.coverage_start_on
-          }
-        end
-      end
-
-      def is_documents_needed(family)
-        members = family.family_members
-        members.any? { |member| member&.person&.consumer_role&.types_include_to_notices&.present? }
-      end
-
-      def build_payload(family_members_hash, households_hash, family, documents_needed)
-        Success({family_members: family_members_hash, households: households_hash, hbx_id: family.hbx_assigned_id.to_s, documents_needed: documents_needed})
-      end
-
-      def validate_payload(payload)
-        result = AcaEntities::Contracts::Families::FamilyContract.new.call(payload)
-
-        return Failure('invalid payload') unless result.success?
-        Success(result.to_h)
-      end
-
-      def thorough_entity(payload)
-        Success(AcaEntities::Families::Family.new(payload).to_h)
+      def create_payload_entity(payload_value)
+        Success(AcaEntities::Families::Family.new(payload_value.to_h))
       end
 
       def build_event(payload)
-        event = event('events.crm_gateway.families.family_update', attributes: payload)
-        unless Rails.env.test?
-          logger.info('-' * 100)
-          logger.info(
-            "Enroll Reponse Publisher to external systems(crm_gateway),
-            event_key: events.crm_gateway.families.family_update, attributes: #{payload.to_h}, result: #{payload}"
-          )
-          logger.info('-' * 100)
-        end
-        event
+        event('events.crm_gateway.families.family_update', attributes: payload.to_h)
       end
 
-      def publish_response(event)
-        Success(event.publish)
+      def publish(event)
+        event.publish
+        Success("Successfully published payload to CRM Gateway.")
       end
     end
   end
