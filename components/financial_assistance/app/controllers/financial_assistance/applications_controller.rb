@@ -320,6 +320,7 @@ module FinancialAssistance
       @application = Application.find(params[:id])
       @application.update_attributes(transfer_requested: true)
       redirect_to applications_path
+      # redirect_to request.referrer
     end
   end
 end

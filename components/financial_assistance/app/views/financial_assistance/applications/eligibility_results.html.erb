@@ -222,10 +222,11 @@
                   program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
                   ) %><br/>
                 <br/>
-              <div>
-                <%= link_to l10n("faa.send_to_external_verification"), update_transfer_requested, class: "btn btn-small btn-primary" %>
-                </div>
-              </div>
+              <div>              
+                <%= link_to l10n("faa.send_to_external_verification"), applications_path, class: "btn btn-small btn-primary" %>
+                <%# </div> %>
+              <%# </div> %>
+              <%# <button class="btn btn-small btn-primary"> %>
             </div>
           </div>
         </div>
