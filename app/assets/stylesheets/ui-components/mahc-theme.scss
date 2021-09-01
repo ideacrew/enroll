@@ -30,7 +30,7 @@ body {
   padding-bottom: 70px;
   font-size: 14px;
   line-height: 1.42857143;
-  color: #005e81;
+  color: $application-text-color;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -41,7 +41,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .heading-text {
-  color: $dark-blue;
+  color: $application-text-color;
 }
 .sub-text {
   color: $darker-blue;
