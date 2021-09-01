@@ -153,7 +153,7 @@ module BenefitMarkets
                       {:metal_level_kind => :silver, :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind]}])
     }
 
-    #If the shopping household is eligible for -02 or -03, 
+    #If the shopping household is eligible for -02 or -03,
     #then -02 or -03 variants should display for all metal levels.
     scope :by_csr_kind, lambda {|csr_kind|
       where(:metal_level_kind.in => [:silver, :platinum, :gold, :bronze, :catastrophic], :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind])
