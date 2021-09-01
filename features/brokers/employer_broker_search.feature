@@ -35,4 +35,3 @@ Feature: Employer terminates borker and hires new broker
     When Employer searches primary broker Jane Goodall
     Then Employer should see broker agency Browns Inc
 
-    And Employer logs out

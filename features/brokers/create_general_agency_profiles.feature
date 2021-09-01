@@ -37,7 +37,7 @@ Feature: Create General Agency and General Agency Staff Role
     When they complete the account creation form and hit the 'Submit' button
     Then they should see a welcome message
     And they see the General Agency homepage
-    And General Agency Staff logs out
+   
   
   Scenario: Broker assigns general agency to an employer
     Given a CCA site exists with a benefit market
