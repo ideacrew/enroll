@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 desc "Batch transfer accounts to Medicaid gateway"
+
 task :transfer_accounts => :environment do
   # rake transfer_accounts
   # get the applications submitted daily that are able to be batch transferred or have requested a transfer. 
