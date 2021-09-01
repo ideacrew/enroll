@@ -76,11 +76,11 @@ module BenefitMarkets
         end
 
         it 'should return all product along with product having csr 100' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100").count).to eq 7
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100").count).to eq 4
         end
 
         it 'should return all product along with product having csr limited' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited").count).to eq 7
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited").count).to eq 4
         end
       end
 
