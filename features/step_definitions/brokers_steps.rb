@@ -451,3 +451,20 @@ end
 Then(/Primary Broker should see Employer and click on legal name$/) do
   click_link(employer.legal_name)
 end
+
+Then(/Primary Broker clicks on shop for plans$/) do
+  find('.interaction-click-control-shop-for-plans').click
+  find("#btn-continue").click
+end
+
+Then(/Primary Broker clicks on confirm Confirm button on the coverage summary page$/) do
+  find(EmployeeConfirmYourPlanSelection.confirm_btn).click
+end
+
+Then(/Primary Broker sees Enrollment Submitted and clicks Continue$/) do
+  find(EmployeeEnrollmentSubmitted.continue_btn).click
+end
+
+Then(/Primary Broker should see Coverage Selected$/) do
+  expect(page).to have_content('Coverage Selected')
+end
