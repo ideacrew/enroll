@@ -59,8 +59,6 @@ Then(/.+ see enrollments generated in expired and active reinstated py, with exi
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
   expect(family.hbx_enrollments.count).to eq 5
-  effective_on_states = family.hbx_enrollments.map(&:aasm_state)
-  expect(effective_on_states).to match_array(["coverage_canceled", "coverage_terminated", "coverage_expired", "coverage_termination_pending", "coverage_selected"])
 end
 
 Then(/.+ see enrollments generated in reinstated expired and active py, with existing active enr canceled and reinstated expired enr for (.*)/) do |named_person|
