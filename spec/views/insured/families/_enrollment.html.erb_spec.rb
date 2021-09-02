@@ -325,6 +325,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      issuer_profile.update_attributes(legal_name: "Anthem Blue Cross and Blue Shield")
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
@@ -356,6 +357,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      issuer_profile.update_attributes(legal_name: "Anthem Blue Cross and Blue Shield")
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
