@@ -1,6 +1,6 @@
 import {
   FileWithRuntime,
-  FileGroup,
+  // FileGroup,
   SplitConfig,
   FilesWithRunTime,
 } from '../models';
@@ -10,12 +10,10 @@ export function splitFilesIntoGroups(
   files: FileWithRuntime[],
   groupCount: number
 ): SplitConfig {
-  const {
-    longestTest,
-    longestTestName,
-    totalRuntime,
-    suggestedGroupCount,
-  } = runtimeDetails(files);
+  // console.log(files);
+
+  const { longestTest, longestTestName, totalRuntime, suggestedGroupCount } =
+    runtimeDetails(files);
 
   const bucketMaxRunTime = Math.floor(totalRuntime / groupCount);
 
@@ -25,6 +23,7 @@ export function splitFilesIntoGroups(
     totalRuntime: inMinutes(totalRuntime),
     bucketMaxRunTime: inMinutes(bucketMaxRunTime),
     groupCount,
+    suggestedGroupCount,
   });
 
   const groupRunTimes: FilesWithRunTime[] = Array.from(
@@ -36,7 +35,7 @@ export function splitFilesIntoGroups(
 
   // The magic happens here
   for (const group of groupRunTimes) {
-    console.log('Files left to process', files.length);
+    console.log('Files left to process', files.length, group);
 
     while (getGroupRunTime(group) <= bucketMaxRunTime && files.length) {
       // start with file at front of array

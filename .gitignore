@@ -107,3 +107,6 @@ coverage
 # Ignore HUGO output dirs
 hugo/public
 hugo/static
+
+# Intermediary Cucumber Reports
+/ci/cucumber/*.json

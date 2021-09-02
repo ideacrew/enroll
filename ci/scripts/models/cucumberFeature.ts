@@ -12,7 +12,7 @@ export interface BaseElement {
   name: string;
   description: string;
   line: number;
-  steps: ElementStep[];
+  steps: ElementStep[] | undefined;
 }
 
 export interface BackgroundElement extends BaseElement {
@@ -41,6 +41,6 @@ export interface BaseStep {
   };
   result: {
     status: string;
-    duration: number; // in nanoseconds
+    duration?: number; // in nanoseconds
   };
 }
