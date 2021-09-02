@@ -4,11 +4,10 @@ registry:
       - :css_components
     features:
       - key: :application_font
-        item: 'Open Sans'
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :font_family
-            item: ''
+            item: 'Open Sans'
       - key: :selectric_hover
         is_enabled: true
         settings:

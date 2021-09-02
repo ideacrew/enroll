@@ -1,13 +1,13 @@
-/* Layout Specifics */
 @import "variables";
 @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* Layout Specifics */
 
 html {
   height: 100%
 }
 
 * {
-  font-family: $font-family;
+  font-family: <%= EnrollRegistry[:application_font].settings(:font_family).item %>;
 }
 
 body {
@@ -1505,14 +1505,12 @@ a.all-filter:hover{
 
 /* Select Plan Page */
 .select-plan p, .select-plan a, .select-plan h1, .select-plan h3, .select-plan h2 {
-    <%# font-family: "Open Sans",sans-serif; %>
 }
 .select-plan p.detail span {
   color: #0079c5;
 }
 .select-plan-details {
   margin-top: 20px;
-  <%# font-family: "Open Sans",sans-serif; %>
 }
 .select-plan-details h3 {
     color: #00b0f0;
@@ -3723,7 +3721,6 @@ ul.list-right-section li a img {
     padding-top: 2px;
     padding-bottom: 2px;
     color: #909090;
-    <%# font-family: Open Sans; %>
     font-size: 9pt;
 }
 

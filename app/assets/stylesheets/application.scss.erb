@@ -17,7 +17,9 @@
  *= require_self
  */
 
-@import "variables";
+ * {
+   font-family: <%= EnrollRegistry[:application_font].settings(:font_family).item %>;
+ }
 
 .content {
   .container {
