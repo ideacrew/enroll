@@ -675,6 +675,10 @@ module FinancialAssistance
       Operations::Applications::Ifsv::H9t::IfsvRequest.new.call(application_id: id)
     end
 
+    def trigger_fdhs_calls
+      Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+    end
+
     def total_incomes_by_year
       incomes_by_year = compute_yearwise(incomes)
       deductions_by_year = compute_yearwise(deductions)
