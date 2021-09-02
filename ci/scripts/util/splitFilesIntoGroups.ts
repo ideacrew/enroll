@@ -10,8 +10,6 @@ export function splitFilesIntoGroups(
   files: FileWithRuntime[],
   groupCount: number
 ): SplitConfig {
-  // console.log(files);
-
   const { longestTest, longestTestName, totalRuntime, suggestedGroupCount } =
     runtimeDetails(files);
 

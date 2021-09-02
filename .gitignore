@@ -110,3 +110,4 @@ hugo/static
 
 # Intermediary Cucumber Reports
 /ci/cucumber/*.json
+/ci/rspec/gha/*.json
