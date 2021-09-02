@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   get 'unsupported_browser' => 'users#unsupported_browser'
 
   match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
+  match "hbx_admin/registry" => "hbx_admin#registry", as: :registry, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get

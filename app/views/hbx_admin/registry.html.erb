@@ -1,0 +1,25 @@
+<style type="text/css">
+	.registry div {width: 100%; padding: .25em; margin-top: .5em; border-left: 1em solid #ddd; }
+	div.enabled-feature {border-left-color: green;}
+	div.enabled-feature span {color: green;}
+</style>
+<div class="container registry">
+	<h1>EnrollRegistry Settings</h1>
+	Updated At: <%= EnrollRegistry.configurations[:created_at] %>
+	<% EnrollRegistry.features.each do |f| %>
+		<div class="<%= 'enabled-feature' if EnrollRegistry[f].enabled? %>">
+			<%= EnrollRegistry[f].namespace %>
+			<span style="font-size: 1.25em"><br><b><%= f %><%= raw("&check;") if EnrollRegistry[f].enabled? %></b>
+			</span>
+			<% if EnrollRegistry[f].item && EnrollRegistry[f].item != f %><br>Item: <%= EnrollRegistry[f].item if EnrollRegistry[f].item != f %><% end %>
+			<% if EnrollRegistry[f].settings.any? %>
+				<br>Settings:
+				<ul>
+					<% EnrollRegistry[f].settings.each do |s| %>
+						<li><b><%= s.key %></b>: <%= s.item %></li>
+					<% end %>
+				</ul>
+			<% end %>
+		</div>
+	<% end %>
+</div>
