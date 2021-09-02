@@ -39,6 +39,7 @@ Feature: Cost Savings
 
   Scenario: FAA Feature Is Enabled - Consumer can access the Cost Savings Page
     Given the FAA feature configuration is enabled
+    Given the iap year selection feature is enabled
     And a family with financial application in <application_state> state exists
     And the user with consumer role is logged in
     When consumer visits home page
