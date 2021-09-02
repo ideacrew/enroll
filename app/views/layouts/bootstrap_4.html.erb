@@ -36,13 +36,11 @@
                 ga('send', 'pageview');
         </script>
         
-        <% if EnrollRegistry.feature_enabled?(:application_font) %>
           <style>
             body {
-              font-family: 'Barlow', sans-serif;
+              font-family: <%= EnrollRegistry[:application_font].item %>; 
             }
           </style>
-        <% end %>
   </head>
   <body class="font">
     <!-- Google Tag Manager (noscript) -->

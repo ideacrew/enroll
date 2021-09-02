@@ -4,6 +4,7 @@ registry:
       - :css_components
     features:
       - key: :application_font
+        item: 'Open Sans'
         is_enabled: false
         settings:
           - key: :font_family

@@ -4,6 +4,7 @@ registry:
       - :css_components
     features:
       - key: :application_font
+        item: 'Barlow'
         is_enabled: true
         settings:
           - key: :font_family

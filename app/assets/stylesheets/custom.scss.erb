@@ -1,6 +1,5 @@
 /* Layout Specifics */
 @import "variables";
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700');
 @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 html {
@@ -8,7 +7,7 @@ html {
 }
 
 * {
-  font-family: $application-font, sans-serif;
+  font-family: $font-family;
 }
 
 body {
@@ -520,7 +519,7 @@ p.abs{
 .panel-body.edi{
   padding-bottom: 0;
 }
-a.family{
+a.family {
   position: absolute;
   top: 13px;
   right: 15px;
@@ -1506,14 +1505,14 @@ a.all-filter:hover{
 
 /* Select Plan Page */
 .select-plan p, .select-plan a, .select-plan h1, .select-plan h3, .select-plan h2 {
-    font-family: "Open Sans",sans-serif;
+    <%# font-family: "Open Sans",sans-serif; %>
 }
 .select-plan p.detail span {
   color: #0079c5;
 }
 .select-plan-details {
   margin-top: 20px;
-  font-family: "Open Sans",sans-serif;
+  <%# font-family: "Open Sans",sans-serif; %>
 }
 .select-plan-details h3 {
     color: #00b0f0;
@@ -3724,7 +3723,7 @@ ul.list-right-section li a img {
     padding-top: 2px;
     padding-bottom: 2px;
     color: #909090;
-    font-family: Open Sans;
+    <%# font-family: Open Sans; %>
     font-size: 9pt;
 }
 

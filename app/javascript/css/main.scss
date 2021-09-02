@@ -1,13 +1,13 @@
 @import 'variables';
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
 
-.special-cover-header, #special-cover-header {
+.special-cover-header,
+#special-cover-header {
   display: block;
-  max-width:100%;
-  max-height:100%;
-  margin-top:30px;
-  margin-left:auto;
-  margin-right:auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid #487ba2;
 }
 
@@ -15,17 +15,17 @@ body {
   background-color: $medium-gray;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: 'Open Sans', sans-serif;
 }
 
 .card-body {
-    flex: 1 1 auto;
-    min-height: 1px;
-    padding: 0.25rem;
+  flex: 1 1 auto;
+  min-height: 1px;
+  padding: 0.25rem;
 }
 
-.manage_sep_types .mb-4, .my-4 {
-    margin-bottom: 0.50rem !important;
+.manage_sep_types .mb-4,
+.my-4 {
+  margin-bottom: 0.5rem !important;
 }
 
 .nm-content {
@@ -43,9 +43,10 @@ footer {
   background-color: $dark-blue;
   position: absolute;
   left: 0;
-  bottom:0;
+  bottom: 0;
   width: 100%;
-  a, a:hover {
+  a,
+  a:hover {
     color: $white;
     text-decoration: none;
   }
@@ -63,22 +64,22 @@ footer {
   margin-left: 295px;
 }
 
-#sort_notification_msg.success{
+#sort_notification_msg.success {
   background-color: #d4edda;
 }
 
-#sort_notification_msg .success{
+#sort_notification_msg .success {
   background-color: #d4edda;
 }
 
-#sort_notification_msg.error{
+#sort_notification_msg.error {
   background-color: #ecb4b4;
 }
 
-#sort_notification_msg .error{
+#sort_notification_msg .error {
   background-color: #ecb4b4;
 }
 
-.right-align{
+.right-align {
   margin-left: 690px;
 }
