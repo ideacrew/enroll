@@ -13,6 +13,7 @@ Feature: Employee while terminating active enrollment should able to see and pic
     And there is a census employee record for Patrick Doe for employer Acme Inc.
     And employee Patrick Doe has past hired on date
 
+   @nightly
   Scenario Outline: Employee should able to purchase through covid QLE using first_of_this_month effective date and terminates the active enrollment with termination on kinds date
     Given Employee has not signed up as an HBX user
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
@@ -38,7 +39,7 @@ Feature: Employee while terminating active enrollment should able to see and pic
     When Patrick Doe submits termination reason in modal
     Then Patrick Doe should see termination confirmation
     Then Patrick Doe should see a confirmation message of Waive Coverage Successful
-    And Patrick Doe logs out
+    #And Patrick Doe logs out
 
     Examples:
       | shopping_button |
@@ -71,4 +72,4 @@ Feature: Employee while terminating active enrollment should able to see and pic
     When Patrick Doe submits termination reason in modal
     Then Patrick Doe should see termination confirmation
     Then Patrick Doe should see a confirmation message of Waive Coverage Successful
-    And Patrick Doe logs out
+    #And Patrick Doe logs out
