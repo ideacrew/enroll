@@ -45,12 +45,19 @@ class TaxHousehold
   def eligibile_csr_kind(family_member_ids)
     # send shopping family members ids as input
     thh_members = tax_household_members.where(:applicant_id.in => family_member_ids)
-    thh_m_eligibility_kinds = thh_members&.pluck(:csr_eligibility_kind)&.uniq
+    thhm_appid_csr_hash = thh_members.inject({}) do |result, thhm|
+      result[thhm.applicant_id] = thhm.csr_eligibility_kind
+      result
+    end
+
     if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+      thh_members.map(&:family_member).each do |family_member|
+        thhm_appid_csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member
+      end
       family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
-      thh_m_eligibility_kinds += ['csr_limited'] if family_members_with_ai_an.present?
       thh_members = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
     end
+    thh_m_eligibility_kinds = thhm_appid_csr_hash.values.uniq
     (thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kinds)
   end
 
