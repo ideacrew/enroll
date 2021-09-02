@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pry'
 
 # TODO: This needs refactoring for Maine.
 # Seems like there were some deprecated mocks for "service area".
@@ -351,7 +350,28 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
     context 'When tax_household members have different csr_kind 100 and one of member is AI/AN' do
       before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
         tax_household_member1.update_attributes(csr_percent_as_integer: 100)
+        tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
+        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+      end
+
+      it 'should return plans with csr_kind for limited' do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+        expect(elected_plans_by_enrollment_members).to include(plan1)
+        expect(elected_plans_by_enrollment_members).not_to include(plan2)
+      end
+    end
+
+    context 'When all tax_household members are AI/AN' do
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+        tax_household_member1.update_attributes(csr_percent_as_integer: 0) # default value
+        tax_household_member2.update_attributes(csr_percent_as_integer: 0) # default value
+        tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
@@ -360,13 +380,13 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it 'should return plans with csr_kind for limited' do
         allow(rule).to receive(:satisfied?).and_return [true, 'ok']
         elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
+        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).to include('03')
       end
     end
 
     context 'When tax_household members have different csr_kind 87 and one of member is AI/AN' do
       before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
         tax_household_member1.update_attributes(csr_percent_as_integer: 87)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
