@@ -46,10 +46,12 @@ class TaxHousehold
     # send shopping family members ids as input
     thh_members = tax_household_members.where(:applicant_id.in => family_member_ids)
     thh_m_eligibility_kinds = thh_members&.pluck(:csr_eligibility_kind)&.uniq
-    family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
-    thh_m_eligibility_kinds += ['csr_limited'] if family_members_with_ai_an.present?
-    non_ai_an_thhms = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
-    (non_ai_an_thhms.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kinds)
+    if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+      family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
+      thh_m_eligibility_kinds += ['csr_limited'] if family_members_with_ai_an.present?
+      thh_members = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
+    end
+    (thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kinds)
   end
 
   def eligible_csr_percent_as_integer(family_member_ids)
