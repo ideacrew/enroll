@@ -224,8 +224,9 @@
                 </span>
               <% end %>
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-                <% if carrier.present? %>
-                  <% if EnrollRegistry.feature_enabled?("#{carrier.downcase}_pay_now".to_sym) && EnrollRegistry["#{carrier.downcase}_pay_now".to_sym].setting(:enrollment_tile).item %>
+                <% if hbx_enrollment.product.present? %>
+                  <% carrier = hbx_enrollment.product.carrier_profile&.legal_name&.downcase&.gsub(' ', '_') %>
+                  <% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:enrollment_tile).item %>
                     <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
                       <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
                         <%= render partial:"shared/glossary_hover", locals: {key: "make_a_first_payment", title: "Make a first Payment for my new plan", term: sanitize(l10n("plans.kaiser.pay_now.first_payment")) } %>
