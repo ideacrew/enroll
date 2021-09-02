@@ -262,7 +262,7 @@ module FinancialAssistance
     end
 
     def find_missing_relationships(matrix)
-      return [] if matrix.flatten.all? { |ele| ele.present? }
+      return [] if matrix.flatten.all?(&:present?)
       id_map = {}
       applicant_ids = active_applicants.map(&:id)
       applicant_ids.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
