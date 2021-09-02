@@ -25,6 +25,8 @@ async function createCucumberSplitConfig(): Promise<void> {
     .map(featureRuntime)
     .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
 
+  // console.log('arrayOfSlowFiles', arrayOfSlowFiles.length, arrayOfSlowFiles);
+
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     arrayOfSlowFiles,
     +manualGroupCount

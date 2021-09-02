@@ -8,6 +8,7 @@ import { FileWithRuntime } from '../models';
 export function runtimeDetails(files: FileWithRuntime[]): any {
   const [longestTest] = files.sort((a, b) => (a.runTime > b.runTime ? -1 : 1));
   const totalRuntime = files.reduce((runtime, file) => {
+    // console.log(runtime);
     return runtime + file.runTime;
   }, 0);
 
