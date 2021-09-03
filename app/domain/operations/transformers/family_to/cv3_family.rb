@@ -25,10 +25,9 @@ module Operations
 
         def construct_payload(family)
           payload = {
-            hbx_id: family.id,
+            hbx_id: family.hbx_assigned_id.to_s,
             family_members: transform_family_members(family.family_members),
             households: transform_households(family.households), # TO DO
-            irs_groups: transform_irs_groups(family.irs_groups),
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
@@ -40,12 +39,13 @@ module Operations
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
+          payload.merge(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           Success(payload)
         end
 
         def transform_applications(primary_id)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
-          applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(aasm_state: 'submitted')
+          applications = ::FinancialAssistance::Application.for_verifications.where(family_id: primary_id)
           applications.collect do |application|
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
           end
@@ -180,7 +180,7 @@ module Operations
               end_date: household.effective_ending_on,
               is_active: household.is_active,
               irs_groups: construct_irs_group(household.irs_group),
-              tax_households: transform_tax_households(household.tax_households), # TO DO
+              tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households) # TO DO
               # hbx_enrollments: hbx_enrollments
             }
@@ -194,7 +194,7 @@ module Operations
               is_determination_split_household: household.is_determination_split_household,
               submitted_at: household.submitted_at,
               aasm_state: household.aasm_state
-              # coverage_household_members: household.coverage_household_members,
+              # coverage_household_members: transform_coverage_household_members(household.coverage_household_members)
               # broker_agency_reference: household.broker_agency_reference,
               # broker_role_reference: household.broker_role_reference
             }
@@ -205,10 +205,10 @@ module Operations
           households.collect do |household|
             {
               hbx_id: household.hbx_assigned_id,
-              allocated_aptc: household.allocated_aptc,
+              allocated_aptc: household.allocated_aptc.to_hash,
               is_eligibility_determined: household.is_eligibility_determined,
-              effective_starting_on: household.start_date,
-              effective_ending_on: household.end_date,
+              effective_starting_on: household.effective_starting_on,
+              effective_ending_on: household.effective_ending_on,
               tax_household_members: transform_tax_household_members(household.tax_household_members),
               eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations)
             }
@@ -220,13 +220,13 @@ module Operations
             {
               e_pdc_id: determination.e_pdc_id,
               # benchmark_plan: determination.benchmark_plan,
-              max_aptc: determination.max_aptc,
+              max_aptc: determination.max_aptc.to_hash,
               premium_credit_strategy_kind: determination.premium_credit_strategy_kind,
               csr_percent_as_integer: determination.csr_percent_as_integer,
               csr_eligibility_kind: determination.csr_eligibility_kind,
-              aptc_csr_annual_household_income: determination.aptc_csr_annual_household_income,
-              aptc_annual_income_limit: determination.aptc_annual_income_limit,
-              csr_annual_income_limit: determination.csr_annual_income_limit,
+              aptc_csr_annual_household_income: determination.aptc_csr_annual_household_income.to_hash,
+              aptc_annual_income_limit: determination.aptc_annual_income_limit.to_hash,
+              csr_annual_income_limit: determination.csr_annual_income_limit.to_hash,
               determined_at: determination.determined_at,
               source: determination.source
             }
