@@ -212,14 +212,14 @@ registry:
     - :renewals
     features:
     - key: :generate_draft_renewals
-      is_enabled: true
+      is_enabled: false
       settings:
         - key: :draft_renewal_generation_month
           item: 8
         - key: :draft_renewal_generation_day
           item: 25
     - key: :submit_renewal_drafts
-      is_enabled: true
+      is_enabled: false
       settings:
         - key: :renewal_draft_submission_month
           item: 8
