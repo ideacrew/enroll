@@ -24,11 +24,9 @@ module Operations
       # @return [ Hash ] family_hash
       # api public
       def call(app_payload)
-        family_params = yield load(app_payload)
+        payload_id = yield load(app_payload)
 
-        Success(family_params)
-      rescue StandardError => e
-        puts "exception :#{payload[:insuranceApplicationIdentifier]} -- #{e}"
+        Success("successfully migrated payload id: #{payload_id}")
       end
 
       private
@@ -40,11 +38,12 @@ module Operations
           family_hash = transform_payload.success.to_h.deep_stringify_keys!
         else
           puts "aca entities failure app_identifier: #{payload[:insuranceApplicationIdentifier]}"
+          return Failure("aca entities failure app_identifier: #{payload[:insuranceApplicationIdentifier]}")
         end
 
         if family_hash.empty?
           puts "family hash empty: #{payload[:insuranceApplicationIdentifier]}"
-          return
+          return Failure("family hash empty: #{payload[:insuranceApplicationIdentifier]}")
         end
 
         # puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}" if family_hash.empty?
@@ -52,14 +51,14 @@ module Operations
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
       #   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
-      #   binding.pry
+      #   
       #   family = Family.where(id: result.success).first
       #   if family.primary_applicant.person.is_applying_for_assistance
       #     Family.create_indexes
       #     family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
-      #     binding.pry
+      #     
       #     Operations::CvMigration::CreateMagiMedicaidApplication.new.call(family_hash)
-      #     binding.pry
+      #     
       #     # app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
       #     ::FinancialAssistance::Application.create_indexes
       #     # fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
@@ -69,17 +68,22 @@ module Operations
 
         if @family.primary_applicant.person.is_applying_for_assistance
           Family.create_indexes
-          app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+          app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: @family.benchmark_product_id))
+
           ::FinancialAssistance::Application.create_indexes
           fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
           fix_iap_relationship(app_id, family_hash)
         end
         puts "success #{payload[:insuranceApplicationIdentifier]}"
         print "."
+        Success(payload[:insuranceApplicationIdentifier])
+      rescue StandardError => e
+        puts "exception :#{payload[:insuranceApplicationIdentifier]} -- #{e}"
+        Failure("exception: #{payload[:insuranceApplicationIdentifier]} -- #{e}")
       end
 
       def fix_iap_relationship(app_id, family_hash)
-        @application = FinancialAssistance::Application.where(id: app_id).first
+        @application = ::FinancialAssistance::Application.where(id: app_id).first
         @matrix = @application.build_relationship_matrix
         @missing_relationships = @application.find_missing_relationships(@matrix)
         @all_relationships = @application.find_all_relationships(@matrix)
@@ -447,6 +451,11 @@ module Operations
       def fill_applicants_form(app_id, applications)
         applicants_hash = applications[:applicants]
         application = ::FinancialAssistance::Application.where(id: app_id).first
+
+        application.parent_living_out_of_home_terms= applications["parent_living_out_of_home_terms"]
+        application.report_change_terms = applications['report_change_terms']
+        application.medicaid_terms = applications['medicaid_terms']
+        application.save!
 
         applicants_hash.each do |applicant|
           persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
