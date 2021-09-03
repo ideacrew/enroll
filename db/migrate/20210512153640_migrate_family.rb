@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 require 'aca_entities'
 require 'aca_entities/ffe/operations/process_mcr_application'
 require 'aca_entities/ffe/transformers/mcr_to/family'
@@ -8,7 +7,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
@@ -17,7 +16,7 @@ class MigrateFamily < Mongoid::Migration
   include EventSource::Command
 
   def self.up
-    @source =  ENV["source"].to_s.downcase # MCR or ATP
+    @source = ENV["source"].to_s.downcase # MCR or ATP
     # @file_path = "/Users/saidineshmekala/Downloads/app.json"
     # @file_path = ENV["dir"]
     # @file_path = "/Users/saidineshmekala/IDEACREW/aca_entities/spec/support/transform_example_payloads/test.json"
@@ -38,37 +37,14 @@ class MigrateFamily < Mongoid::Migration
 
     def migrate_for_mcr
       ::AcaEntities::Ffe::Transformers::McrTo::Family.call(@filepath, { transform_mode: :batch }) do |payload|
-        unless  Rails.env.development?
-          event("events.json.stream", attributes: payload).success.publish
+        if  Rails.env.development?
+          Operations::Ffe::MigrateApplication.new.call(payload)
         else
-          puts "running #{payload[:insuranceApplicationIdentifier]}"
-          transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
-
-          if transform_payload.success?
-            family_hash = transform_payload.success.to_h.deep_stringify_keys!
-          else
-            puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
-            next
-          end
-
-          if family_hash.empty?
-            puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}"
-            next
-          end
-
-          build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
-
-          if @family.primary_applicant.person.is_applying_for_assistance
-            Family.create_indexes
-            app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-            ::FinancialAssistance::Application.create_indexes
-            fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-            fix_iap_relationship(app_id, family_hash)
-          end
+          event("events.json.stream", attributes: payload).success.publish
         end
         print "."
-      rescue StandardError => e
-        puts "E: #{payload[:insuranceApplicationIdentifier]}"#, f: #{@family.hbx_id}  error: #{e.message.split('.').first}"
+      rescue StandardError => _e
+        puts "E: #{payload[:insuranceApplicationIdentifier]}" # , f: #{@family.hbx_id}  error: #{e.message.split('.').first}"
       end
     end
 
@@ -88,9 +64,12 @@ class MigrateFamily < Mongoid::Migration
         from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
         to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
         member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
-        relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
+        relationship = member_hash["person"]["person_relationships"].select do |p_rel|
+          p_rel["relative"]["hbx_id"] == to_family_member.external_member_id
+        end.first
         relation_kind = relationship.present? ? relationship["kind"] : "unrelated"
-        missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation_kind, applicant_id: from_applicant.id, relative_id: to_applicant.id})
+        missing_relationships << ::FinancialAssistance::Relationship.new({ kind: relation_kind, applicant_id: from_applicant.id,
+                                                                           relative_id: to_applicant.id })
       end
       @application.relationships << missing_relationships
 
@@ -99,12 +78,12 @@ class MigrateFamily < Mongoid::Migration
         relationships = @application.relationships
         from_relation = all_rel[:applicant]
         to_relation = all_rel[:relative]
-        found_relationship = relationships.where(applicant_id: from_relation,relative_id: to_relation).first
+        found_relationship = relationships.where(applicant_id: from_relation, relative_id: to_relation).first
         next if found_relationship.present? && found_relationship.kind.present?
-        inverse_relationship = relationships.where(applicant_id: to_relation,relative_id: from_relation).first
+        inverse_relationship = relationships.where(applicant_id: to_relation, relative_id: from_relation).first
         if inverse_relationship.present?
           relation = ::FinancialAssistance::Relationship::INVERSE_MAP[inverse_relationship.kind]
-          all_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_relation, relative_id: to_relation})
+          all_relationships << ::FinancialAssistance::Relationship.new({ kind: relation, applicant_id: from_relation, relative_id: to_relation })
           next
         end
         from_applicant = @application.applicants.find(from_relation)
@@ -112,13 +91,16 @@ class MigrateFamily < Mongoid::Migration
         from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
         to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
         member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
-        relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
+        relationship = member_hash["person"]["person_relationships"].select do |p_rel|
+          p_rel["relative"]["hbx_id"] == to_family_member.external_member_id
+        end.first
         relation_kind = relationship.present? ? relationship["kind"] : "unrelated"
         relation = ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind]
         if found_relationship.present?
           found_relationship.update_attributes(kind: relation)
         else
-          all_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_applicant.id, relative_id: to_applicant.id})
+          all_relationships << ::FinancialAssistance::Relationship.new({ kind: relation, applicant_id: from_applicant.id,
+                                                                         relative_id: to_applicant.id })
         end
       end
       @application.relationships << all_relationships
@@ -190,7 +172,7 @@ class MigrateFamily < Mongoid::Migration
       fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
                   is_consent_applicant: family_member_hash['is_consent_applicant'],
                   is_coverage_applicant: family_member_hash['is_coverage_applicant'],
-                  is_active: family_member_hash['is_active']}
+                  is_active: family_member_hash['is_active'] }
 
       external_member_id = family_member_hash['hbx_id']
 
@@ -216,7 +198,8 @@ class MigrateFamily < Mongoid::Migration
         npn = account['broker_role_reference']['npn']
         broker_role = BrokerRole.find_by_npn(npn)
         next unless broker_role
-        family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_role.broker_agency_profile.id, writing_agent_id: broker_role.id, start_on: start_on, is_active: true)
+        family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_role.broker_agency_profile.id,
+                                          writing_agent_id: broker_role.id, start_on: start_on, is_active: true)
       end
     end
 
@@ -342,13 +325,13 @@ class MigrateFamily < Mongoid::Migration
           has_enrolled_health_coverage: applicant_hash['has_enrolled_health_coverage'],
           has_eligible_health_coverage: applicant_hash['has_eligible_health_coverage'],
 
-          not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip','not_eligible_in_last_90_days'),
-          denied_on: applicant_hash.dig('medicaid_and_chip','denied_on'),
-          ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip','ended_as_change_in_eligibility'),
-          hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip','hh_income_or_size_changed'),
-          medicaid_or_chip_coverage_end_date: applicant_hash.dig('medicaid_and_chip','medicaid_or_chip_coverage_end_date'),
-          ineligible_due_to_immigration_in_last_5_years: applicant_hash.dig('medicaid_and_chip','ineligible_due_to_immigration_in_last_5_years'),
-          immigration_status_changed_since_ineligibility: applicant_hash.dig('medicaid_and_chip','immigration_status_changed_since_ineligibility'),
+          not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip', 'not_eligible_in_last_90_days'),
+          denied_on: applicant_hash.dig('medicaid_and_chip', 'denied_on'),
+          ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip', 'ended_as_change_in_eligibility'),
+          hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip', 'hh_income_or_size_changed'),
+          medicaid_or_chip_coverage_end_date: applicant_hash.dig('medicaid_and_chip', 'medicaid_or_chip_coverage_end_date'),
+          ineligible_due_to_immigration_in_last_5_years: applicant_hash.dig('medicaid_and_chip', 'ineligible_due_to_immigration_in_last_5_years'),
+          immigration_status_changed_since_ineligibility: applicant_hash.dig('medicaid_and_chip', 'immigration_status_changed_since_ineligibility'),
 
           addresses: applicant_hash['addresses'],
           emails: applicant_hash['emails'],
@@ -476,9 +459,9 @@ class MigrateFamily < Mongoid::Migration
             transform ext_input_hash
             # result = validate cv3_family_hash
             # puts "CV validation failed: #{result.errors.to_h}" if result.errors.present?
-            load_data cv3_family_hash #unless result.errors.present?
+            load_data cv3_family_hash # unless result.errors.present?
             puts "Ended processing file: #{@filepath}"
-          # rescue StandardError => e
+            # rescue StandardError => e
             # puts "Error processing file: #{@filepath} , error: #{e.backtrace}"
           end
         elsif !path_name&.empty?
@@ -698,5 +681,5 @@ class MigrateFamily < Mongoid::Migration
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
