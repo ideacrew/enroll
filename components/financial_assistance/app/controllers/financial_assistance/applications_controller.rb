@@ -201,6 +201,20 @@ module FinancialAssistance
       )
     end
 
+    def update_transfer_requested
+      @application = Application.find(params[:id])
+      @button_sent_text = l10n("faa.sent_to_external_verification")
+
+      respond_to do |format|
+        if @application.update_attributes(transfer_requested: true)
+          format.js
+        else
+          # TODO: respond with HTML on failure???
+          format.html
+        end
+      end
+    end
+
     private
 
     def haven_determination_is_enabled?
@@ -314,13 +328,6 @@ module FinancialAssistance
       else
         value
       end
-    end
-
-    def update_transfer_requested
-      @application = Application.find(params[:id])
-      @application.update_attributes(transfer_requested: true)
-      redirect_to applications_path
-      # redirect_to request.referrer
     end
   end
 end

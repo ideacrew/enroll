@@ -71,5 +71,7 @@ Feature: A dedicated page that visit the eligibility determination page
     And clicks the "Action" dropdown corresponding to the "determined" application
     And all applicants are not medicaid chip eligible and are non magi medicaid eligible
     And clicks the "View Eligibility Determination" link
-    Then the user should see the external verification link
+	And expands the "Other Options" panel
+	And clicks the "Send To OFI" button
+	Then the "Send To OFI" button will be disabled and the user will see the button text changed to "Sent To OFI"
 

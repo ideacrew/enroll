@@ -428,7 +428,7 @@ Given(/the iap year selection feature is disabled/) do
   disable_feature :iap_year_selection
 end
 
-Then(/^the user should see the external verification link$/) do
+Given(/^expands the "Other Options" panel/) do
   # TODO: Maybe figure out how to do this with something other than glyphicon
   other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
   other_actions_link.click
@@ -437,6 +437,43 @@ Then(/^the user should see the external verification link$/) do
       "faa.full_long_name_determination",
       program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
       program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+    )
+  )
+  find_link(
+    l10n(
+      "faa.send_to_external_verification"
+    )
+  ).disabled?.should eql(false)
+end
+
+Given(/clicks the "Send To OFI" button/) do
+  find_link(l10n("faa.send_to_external_verification"))
+  click_link(l10n("faa.send_to_external_verification"))
+end
+
+Then(/^the user should see the external verification link$/) do
+  # TODO: Maybe figure out how to do this with something other than glyphicon
+  # other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
+  # other_actions_link.click
+  expect(page).to have_content(
+    l10n(
+      "faa.full_long_name_determination",
+      program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+      program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+    )
+  )
+end
+
+Then(/the "Send To OFI" button will be disabled and the user will see the button text changed to "Sent To OFI"/) do
+  find_link(
+    l10n(
+      "faa.sent_to_external_verification"
+    )
+  )['disabled'].should eql('true')
+
+  expect(page).to have_link(
+    l10n(
+      "faa.sent_to_external_verification"
     )
   )
 end
