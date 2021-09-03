@@ -41,7 +41,7 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
       end
     end
 
-    context "with enabled IVL market" do
+    xcontext "with enabled IVL market" do
       before do
         # TODO: We need to refactor Settings.aca.market_kinds stuff
         allow(Settings.aca).to receive(:market_kinds).and_return(%w[individual shop])

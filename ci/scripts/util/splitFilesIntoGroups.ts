@@ -10,18 +10,13 @@ export function splitFilesIntoGroups(
   files: FileWithRuntime[],
   groupCount: number
 ): SplitConfig {
-  // console.log(files);
-
   const { longestTest, longestTestName, totalRuntime, suggestedGroupCount } =
     runtimeDetails(files);
-
-  const bucketMaxRunTime = Math.floor(totalRuntime / groupCount);
 
   console.log({
     longestTest: inMinutes(longestTest),
     longestTestName,
     totalRuntime: inMinutes(totalRuntime),
-    bucketMaxRunTime: inMinutes(bucketMaxRunTime),
     groupCount,
     suggestedGroupCount,
   });
@@ -37,13 +32,13 @@ export function splitFilesIntoGroups(
   for (const group of groupRunTimes) {
     console.log('Files left to process', files.length, group);
 
-    while (getGroupRunTime(group) <= bucketMaxRunTime && files.length) {
+    while (getGroupRunTime(group) <= longestTest && files.length) {
       // start with file at front of array
       const frontFile = files[0];
 
       // test whether that file can be added to current group
       const fileIsAddable =
-        frontFile.runTime + getGroupRunTime(group) <= bucketMaxRunTime;
+        frontFile.runTime + getGroupRunTime(group) <= longestTest;
 
       // if that file can be added, add it
       if (fileIsAddable) {

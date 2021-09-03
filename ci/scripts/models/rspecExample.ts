@@ -9,11 +9,11 @@ export interface RspecExample {
   id: string;
   description: string;
   full_description: string;
-  status: string;
+  status: 'pending' | 'passed';
   file_path: string;
   line_number: string;
   run_time: number;
-  pending_message: any;
+  pending_message: string | null;
 }
 
 export interface RspecSummary {

@@ -20,14 +20,12 @@ async function createSplitConfig(): Promise<void> {
   // Create a dictionary of
   const filesByRuntime: FileWithRuntimeDictionary = await runtimeDictionary();
 
-  const arrayOfSlowFiles: FileWithRuntime[] = createFilesWithRuntime(
-    filesByRuntime
-  );
+  const arrayOfSlowFiles: FileWithRuntime[] =
+    createFilesWithRuntime(filesByRuntime);
 
-  console.log('Creating split config');
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     arrayOfSlowFiles,
-    +manualGroupCount
+    parseInt(manualGroupCount, 10)
   );
 
   try {

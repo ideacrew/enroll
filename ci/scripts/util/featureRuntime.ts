@@ -79,10 +79,7 @@ const calculateScenarioRuntime = (elements: ScenarioElement[]): number => {
         stepsRuntime = calculateElementStepRuntime(steps);
       }
 
-      console.log({ afterRuntime, stepsRuntime });
-
       const totalBackgroundRuntime = afterRuntime + stepsRuntime;
-      console.log({ totalBackgroundRuntime });
       return totalBackgroundRuntime;
     })
     .reduce((total, runtime) => {
