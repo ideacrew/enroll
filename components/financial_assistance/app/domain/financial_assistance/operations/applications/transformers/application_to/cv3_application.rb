@@ -45,7 +45,7 @@ module FinancialAssistance
             private
 
             def validate(application)
-              return Success(application) if application.submitted?
+              return Success(application) if application.submitted? || application.is_determined?
               Failure("Application is in #{application.aasm_state} state. Please submit application.")
             end
 
