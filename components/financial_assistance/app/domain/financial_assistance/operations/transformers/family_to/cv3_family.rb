@@ -46,7 +46,7 @@ module FinancialAssistance
 
           def transform_applications(primary_id)
             return unless EnrollRegistry.feature_enabled?(:financial_assistance)
-            applications = ::FinancialAssistance::Application.for_verifications.where(family_id: primary_id)
+            applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(:aasm_state.in => ["submitted", "determined"])
             applications.collect do |application|
               ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
             end
