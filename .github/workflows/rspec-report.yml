@@ -13,11 +13,13 @@ jobs:
             'controllers',
             'data_migrations',
             'domain',
+            'event_source',
             'helpers',
             'interactors',
             'invoices',
             'lib',
             'mailers',
+            'migrations',
             'models',
             'notices',
             'policies',
@@ -33,12 +35,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 5672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - name: Restore project gems
         uses: actions/cache@v2
         with:
@@ -56,9 +65,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -87,9 +96,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '10'
+          node-version: '14'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 5672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -110,9 +126,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
