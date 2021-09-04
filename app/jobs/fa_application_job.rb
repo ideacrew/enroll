@@ -6,7 +6,7 @@ class FaApplicationJob < ActiveJob::Base
   queue_as :default
 
   def perform(operation_class_name, input_payload)
-    result = operation_class_name.constantize.new.call(input_payload)
+    operation_class_name.constantize.new.call(input_payload)
   rescue StandardError => e
     Rails.logger.error { "FaApplicationJob process error: #{e.backtrace}" }
   end
