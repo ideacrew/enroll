@@ -8,19 +8,15 @@ module Subscribers
     subscribe(:on_generate_renewal_draft) do |delivery_info, _metadata, response|
       logger.info '-' * 100
       payload = JSON.parse(response, :symbolize_names => true)
-      logger.info "on_generate_renewal_draft payload: #{payload}"
-      result = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(payload)
+      logger.info "ApplicationGenerateRenewalDraftSubscriber: on_generate_renewal_draft payload: #{payload}"
+      FaApplicationJob.perform_later('::FinancialAssistance::Operations::Applications::CreateRenewalDraft',
+                                     payload)
 
-      if result.success?
-        logger.info "application_generate_renewal_draft_subscriber_message; acked"
-        ack(delivery_info.delivery_tag)
-      else
-        logger.info "application_generate_renewal_draft_subscriber_message; nacked due to: #{result.failure}"
-        nack(delivery_info.delivery_tag)
-      end
+      logger.info 'ApplicationGenerateRenewalDraftSubscriber: triggered FaApplicationJob & acked'
+      ack(delivery_info.delivery_tag)
     rescue StandardError => e
-      logger.info "application_generate_renewal_draft_subscriber_error: backtrace: #{e.backtrace}; nacked"
-      nack(delivery_info.delivery_tag)
+      logger.info "ApplicationGenerateRenewalDraftSubscriber: errored & acked. Backtrace: #{e.backtrace}"
+      ack(delivery_info.delivery_tag)
     end
   end
 end
