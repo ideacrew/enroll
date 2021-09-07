@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module CrmGateway
-  # Family concern to handle post save sugar CRM publish events
-  # included if EnrollRegistry.feature_enabled?(:crm_update_family_save)
+  # Module for keeping extra family methods related to crm gateway
   module FamilyConcern
     extend ActiveSupport::Concern
 

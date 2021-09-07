@@ -556,3 +556,6 @@ registry:
       - key: :crm_update_family_save
         item: :crm_update_family_save
         is_enabled: true
+      - key: :crm_publish_primary_subscriber
+        item: :crm_publish_primary_subscriber
+        is_enabled: true
