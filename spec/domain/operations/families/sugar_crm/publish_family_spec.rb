@@ -53,7 +53,7 @@ RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :afte
         applicant_id: family.family_members.last.id
       )
       family.family_members.each do |fm|
-                  family.households.first.coverage_households.first.coverage_household_members.build(family_member_id: fm.id).save! if family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: fm.id).blank?
+        family.households.first.coverage_households.first.coverage_household_members.build(family_member_id: fm.id).save! if family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: fm.id).blank?
       end
     end
 

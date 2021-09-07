@@ -4,7 +4,6 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/magi_medicaid/libraries/iap_library'
 
-# rubocop:disable Metrics/ClassLength
 module Operations
   module Transformers
     module HbxEnrollmentTo
@@ -42,7 +41,7 @@ module Operations
             is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
           }
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
-          
+
           Success(payload)
         end
 
@@ -96,4 +95,3 @@ module Operations
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
