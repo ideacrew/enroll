@@ -97,10 +97,11 @@ And(/^the person has an active resident role$/) do
 end
 
 And(/^the person goes plan shopping in the individual for a new plan$/) do
-  sleep 5
+  sleep 10
   wait_for_ajax
   find('.btn', text: 'CONTINUE').click
   click_link "Continue"
+  sleep 5
   expect(page).to have_content('Verify Identity')
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
@@ -272,15 +273,19 @@ And(/^creates a consumer with SEP$/) do
 end
 
 Then(/^\w+ should the the First Payment button/) do
-  expect(page).to have_content('Make a first Payment')
+  expect(page).to have_content('Make a first payment')
 end
 
 Then(/user clicks on the first payment button/) do
   find(IvlHomepage.first_payment).click
 end
 
-Then(/consumer should the the Make Payments button/) do
-  expect(page).to have_content('Make Payments')
+Then(/^\w+ should the the Make Payments button/) do
+  expect(page).to have_content('Make payments')
+end
+
+Then(/^\w+ should not see the Make Payments button/) do
+  expect(page).not_to have_content('Make payments')
 end
 
 Then(/user clicks on the make payments button/) do

@@ -8,7 +8,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
@@ -151,7 +151,7 @@ class MigrateFamily < Mongoid::Migration
     def sanitize_applicant_params(iap_hash)
       applicants_hash = iap_hash['applicants']
       sanitize_params = []
-      applicants_hash.each do |applicant_hash|
+      applicants_hash.sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |applicant_hash|
         family_member = @family.family_members.select do |fm|
           fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
         end.first
@@ -523,4 +523,4 @@ class MigrateFamily < Mongoid::Migration
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :permission do
     modify_family { true }
@@ -13,6 +15,11 @@ FactoryBot.define do
     can_reset_password { false }
     can_add_pdc { false }
     can_transition_family_members { true }
+    can_view_sep_history {true}
+    can_reinstate_enrollment {false}
+    can_cancel_enrollment {false}
+    can_terminate_enrollment {false}
+    change_enrollment_end_date {false}
 
     trait :hbx_staff do
       name { 'hbx_staff' }
@@ -24,6 +31,11 @@ FactoryBot.define do
       can_access_identity_verification_sub_tab { true }
       can_access_outstanding_verification_sub_tab { true }
       can_access_age_off_excluded {true}
+      can_edit_aptc {true}
+      can_reinstate_enrollment {true}
+      can_cancel_enrollment {true}
+      can_terminate_enrollment {true}
+      change_enrollment_end_date {true}
     end
 
     trait :hbx_update_ssn do
@@ -62,6 +74,12 @@ FactoryBot.define do
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
       can_access_age_off_excluded {true}
+      if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
+        can_reinstate_enrollment {true}
+        can_cancel_enrollment {true}
+        can_terminate_enrollment {true}
+        change_enrollment_end_date {true}
+      end
     end
 
     trait :hbx_csr_tier2 do
@@ -79,6 +97,12 @@ FactoryBot.define do
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
       can_access_age_off_excluded {true}
+      if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
+        can_reinstate_enrollment {true}
+        can_cancel_enrollment {true}
+        can_terminate_enrollment {true}
+        change_enrollment_end_date {true}
+      end
     end
 
     trait :hbx_csr_tier1 do
@@ -129,6 +153,11 @@ FactoryBot.define do
       can_submit_time_travel_request { false }
       can_access_age_off_excluded {true}
       can_send_secure_message { true }
+      can_edit_aptc {true}
+      can_reinstate_enrollment {true}
+      can_cancel_enrollment {true}
+      can_terminate_enrollment {true}
+      change_enrollment_end_date {true}
     end
 
     trait :super_admin do
@@ -144,6 +173,11 @@ FactoryBot.define do
       view_the_configuration_tab { true }
       can_submit_time_travel_request { false }
       can_access_age_off_excluded {true}
+      can_edit_aptc {true}
+      can_reinstate_enrollment {true}
+      can_cancel_enrollment {true}
+      can_terminate_enrollment {true}
+      change_enrollment_end_date {true}
     end
   end
 end

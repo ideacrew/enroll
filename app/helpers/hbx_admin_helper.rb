@@ -64,4 +64,15 @@ module HbxAdminHelper
   def active_eligibility?(family)
     family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
   end
+
+  def prior_py_sep?(family, effective_date, market)
+    return false if effective_date.blank?
+    person = family.primary_person
+    ivl_prior_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
+    if market == 'individual'
+      ivl_prior_coverage_period&.contains?(effective_date)
+    else
+      person.active_employee_roles.any?{|e| e.census_employee&.benefit_sponsorship&.prior_py_benefit_application&.benefit_sponsor_catalog&.effective_period&.cover?(effective_date)}
+    end
+  end
 end

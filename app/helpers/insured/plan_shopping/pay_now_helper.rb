@@ -95,6 +95,14 @@ module Insured
           "https://"
         end
       end
+
+      def enable_pay_now(hbx_enrollment)
+        issuer = issuer_key(hbx_enrollment)
+        return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("feature_index.#{issuer}_pay_now")
+        rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
+        return false unless rr_feature&.enabled?
+        rr_feature.setting(:enrollment_tile)&.item
+      end
     end
   end
 end

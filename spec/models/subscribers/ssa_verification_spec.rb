@@ -25,6 +25,7 @@ describe Subscribers::SsaVerification do
     let(:payload) { {:individual_id => individual_id, :body => xml} }
 
     before :each do
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
       consumer_role.aasm_state="ssa_pending"
     end
 

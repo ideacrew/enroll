@@ -112,6 +112,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
   after_save :assign_benefit_packages
+  after_save :assign_prior_plan_benefit_packages, only: [:create]
   after_save :notify_on_save
 
   before_save :allow_nil_ssn_updates_dependents
@@ -646,6 +647,10 @@ class CensusEmployee < CensusMember
     benefit_package_ids.include?(assignment&.benefit_package&.id) ? assignment : nil
   end
 
+  def most_recent_expired_benefit_application
+    benefit_sponsorship.most_recent_expired_benefit_application
+  end
+
   # DEPRECATE IF POSSIBLE
   def published_benefit_group_assignment
     assignments = benefit_group_assignments.select do |benefit_group_assignment|
@@ -872,6 +877,31 @@ class CensusEmployee < CensusMember
     # These will assign deafult benefit packages if not present
     self.active_benefit_group_assignment = nil
     self.renewal_benefit_group_assignment = nil
+  end
+
+  def assign_prior_plan_benefit_packages
+    return unless ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
+    return if benefit_sponsorship.blank?
+
+    prior_py = benefit_sponsorship.prior_py_benefit_application
+    return  unless prior_py.present?
+    status = hired_on <= prior_py.end_on
+    return unless status
+    benefit_group_assignment = benefit_package_assignment_on(prior_py.end_on)
+    return  if benefit_group_assignment&.is_active?(prior_py.end_on)
+    benefit_package = fetch_benefit_package(prior_py)
+    return unless benefit_package
+
+    add_benefit_group_assignment(benefit_package, benefit_package.start_on, benefit_package.end_on)
+  end
+
+  def fetch_benefit_package(prior_py)
+    if active_benefit_application.predecessor == prior_py && active_benefit_group_assignment.present?
+      active_plan_hios_id = active_benefit_group_assignment.benefit_package.reference_plan.hios_id
+      prior_py.benefit_packages.select {|bg| bg&.reference_plan&.renewal_product&.hios_id == active_plan_hios_id }.first
+    else
+      prior_py.benefit_packages.first
+    end
   end
 
   def active_benefit_group_assignment=(benefit_package_id)

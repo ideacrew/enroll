@@ -37,5 +37,11 @@ permission.update_attributes!({
   can_access_accept_reject_identity_documents: true,
   can_access_accept_reject_paper_application_documents: true,
   can_delete_identity_application_documents: true,
-  can_access_pay_now: true
+  can_access_pay_now: true,
+  can_edit_aptc: true,
+  can_view_sep_history: true,
+  can_reinstate_enrollment: true,
+  can_cancel_enrollment: true,
+  can_terminate_enrollment: true,
+  change_enrollment_end_date: true
 })

@@ -435,6 +435,72 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@entity_init).to be_success
     end
 
+    context 'with father_or_mother_in_law' do
+      before do
+        application.relationships.destroy_all
+        application.add_relationship(applicant, applicant2, 'father_or_mother_in_law')
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+      end
+
+      it 'should populate mitc_relationships' do
+        expect(@mitc_relationships).not_to be_empty
+      end
+
+      it 'should populate correct relationship_code' do
+        expect(@mitc_relationships.first[:relationship_code]).to eq('30')
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
+
+    context 'with daughter_or_son_in_law' do
+      before do
+        application.relationships.destroy_all
+        application.add_relationship(applicant, applicant2, 'daughter_or_son_in_law')
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+      end
+
+      it 'should populate mitc_relationships' do
+        expect(@mitc_relationships).not_to be_empty
+      end
+
+      it 'should populate correct relationship_code' do
+        expect(@mitc_relationships.first[:relationship_code]).to eq('26')
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
+
+    context 'with brother_or_sister_in_law' do
+      before do
+        application.relationships.destroy_all
+        application.add_relationship(applicant, applicant2, 'brother_or_sister_in_law')
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+      end
+
+      it 'should populate mitc_relationships' do
+        expect(@mitc_relationships).not_to be_empty
+      end
+
+      it 'should populate correct relationship_code' do
+        expect(@mitc_relationships.first[:relationship_code]).to eq('23')
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
+
     context 'mitc_relationships' do
       before do
         result = subject.call(application.reload)
@@ -1181,6 +1247,40 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should return zero for applicant hours_worked_per_week' do
         expect(@applicant.hours_worked_per_week).to be_zero
+      end
+    end
+  end
+
+  describe 'had_prior_insurance & prior_insurance_end_date' do
+    context 'success' do
+      let!(:create_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({
+                                                       kind: 'is_enrolled',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year,
+                                                       end_on: TimeKeeper.date_of_record.prev_month
+                                                     })
+        applicant.benefits = [benefit]
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @applicant = @entity_init.success.applicants.first
+      end
+
+      it 'should populate had_prior_insurance' do
+        puts '-' * 50
+        puts @applicant.to_h
+        puts '-' * 50
+        expect(@applicant.had_prior_insurance).to be_truthy
+        expect(@applicant.prior_insurance_end_date).to eq(applicant.benefits.first.end_on)
+      end
+
+      it 'should not return nil for prior_insurance_end_date' do
+        expect(@applicant.prior_insurance_end_date).not_to be_nil
+        expect(@applicant.prior_insurance_end_date).to eq(applicant.benefits.first.end_on)
       end
     end
   end

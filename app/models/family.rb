@@ -331,6 +331,13 @@ class Family
     hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending"])
   end
 
+  def terminated_and_expired_enrollments
+    eligible_states = %w[coverage_terminated coverage_termination_pending]
+    eligible_states << 'coverage_expired' if EnrollRegistry[:change_end_date].settings(:expired_enrollments).item
+    eligible_enrs = hbx_enrollments.where(:aasm_state.in => eligible_states)
+    eligible_enrs.reject {|enr| enr.coverage_expired? && !enr.prior_plan_year_coverage?}
+  end
+
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 

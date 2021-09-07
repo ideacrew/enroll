@@ -11,7 +11,10 @@
               <% if @person.primary_family.e_case_id.present? && !(@person.primary_family.e_case_id.include? "curam_landing") %>
                   <%= f.select(:application_type, options_for_select(["Curam"], selected: @person.primary_family.application_type), required: true, id:'application_type_id' ) %>
               <% elsif pundit_allow(ConsumerRole, :can_view_application_types?) %>
-                  <%= f.select(:application_type, options_for_select(["Phone", "In Person", "Paper", "Curam", "Mobile"], selected: @person.primary_family.application_type), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
+                  <% application_type_options = ["Phone", "Paper", "Curam", "Mobile"].tap do |options_array|
+                    options_array << "In Person" if EnrollRegistry.feature_enabled?(:in_person_application_enabled)
+                  end %>
+                  <%= f.select(:application_type, options_for_select(application_type_options, selected: @person.primary_family.application_type), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
               <% else %>
                   <%= f.select(:application_type, options_for_select(["Phone", "Paper"], selected: @person.primary_family.application_type ), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
               <% end %>

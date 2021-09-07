@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   get 'unsupported_browser' => 'users#unsupported_browser'
 
   match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
+  match "hbx_admin/registry" => "hbx_admin#registry", as: :registry, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
@@ -163,12 +164,13 @@ Rails.application.routes.draw do
         post :add_new_sep
         get :update_effective_date
         get :calculate_sep_dates
+        get :check_for_renewal_flag
         get :add_sep_form
         get :hide_form
         get :show_sep_history
         get :view_terminated_hbx_enrollments
         get :view_enrollment_to_update_end_date
-        post :update_enrollment_termianted_on_date
+        post :update_enrollment_terminated_on_date
         get :calendar_index
         get :user_account_index
         get :get_user_info

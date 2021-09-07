@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class FamilyPolicy < ApplicationPolicy
   def show?
     user_person = @user.person
     if user_person
       primary_applicant = @record.primary_applicant
-      return true if (@record.primary_applicant.person_id == user_person.id)
+      return true if @record.primary_applicant.person_id == user_person.id
       return true if can_modify_family?(user_person)
       broker_staff_roles = user_person.active_broker_staff_roles
       broker_role = user_person.broker_role
@@ -56,28 +58,63 @@ class FamilyPolicy < ApplicationPolicy
     end
   end
 
+  def role
+    user.person&.hbx_staff_role
+  end
+
   def updateable?
-    return true unless role = user.person && user.person.hbx_staff_role
+    return true unless role
     role.permission.modify_family
   end
 
   def can_update_ssn?
-    return false unless role = user.person && user.person.hbx_staff_role
+    return false unless role
     role.permission.can_update_ssn
   end
 
+  def can_edit_aptc?
+    return false unless role
+    role.permission.can_edit_aptc
+  end
+
+  def can_view_sep_history?
+    return false unless role
+    role.permission.can_view_sep_history
+  end
+
+  def can_reinstate_enrollment?
+    return false unless role
+    role.permission.can_reinstate_enrollment
+  end
+
+  def can_cancel_enrollment?
+    return false unless role
+    role.permission.can_cancel_enrollment
+  end
+
+  def can_terminate_enrollment?
+    return false unless role
+    role.permission.can_terminate_enrollment
+  end
+
+  def change_enrollment_end_date?
+    return false unless role
+    role.permission.change_enrollment_end_date
+  end
+
   def can_view_username_and_email?
-    return false unless role = (user.person && user.person.hbx_staff_role) || (user.person.csr_role)
-    role.permission.can_view_username_and_email || user.person.csr_role.present?
+    role ||= user.person.csr_role
+    return false unless role
+    role.permission.can_view_username_and_email || role.present?
   end
 
   def hbx_super_admin_visible?
-    return false unless role = user.person && user.person.hbx_staff_role
+    return false unless role
     role.permission.can_update_ssn
   end
 
   def can_transition_family_members?
-    return false unless role = user.person && user.person.hbx_staff_role
+    return false unless role
     role.permission.can_transition_family_members
   end
 

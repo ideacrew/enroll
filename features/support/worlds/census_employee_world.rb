@@ -210,10 +210,10 @@ Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |nam
 end
 
 And(/employee (.*?) has (.*?) hired on date/) do |named_person, ee_hire_date|
-  date = ee_hire_date == "current" ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 1.year
+  date = ee_hire_date == "current" ? TimeKeeper.date_of_record : (TimeKeeper.date_of_record - 1.year).beginning_of_year
   person = people[named_person]
   CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
-                       :last_name => /#{person[:last_name]}/i).first.update_attributes(:hired_on => date, :created_at => date)
+                       :last_name => /#{person[:last_name]}/i).first.update_attributes(:hired_on => date.beginning_of_month, :created_at => date)
 end
 
 And(/employee (.*) has earliest eligible date under current active plan year/) do |named_person|
