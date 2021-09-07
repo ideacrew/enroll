@@ -15,7 +15,7 @@
 
       <div class="v-type-due-date col-md-3">
         <% if FinancialAssistance::VerificationType::DUE_DATE_STATES.include? verif_type.eligibility_status %>
-          <span class="text-danger"><%= l10n('due_date') %></span>
+          <span class="text-danger"><%#= l10n('due_date') %></span>
           <%= verif_type.due_on %>
         <% end %>
       </div>
