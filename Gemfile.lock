@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 347f71110e984bb7d2ade1caccd621c64e532024
-  branch: release_0.5.0
+  revision: 3d3985fc09f3f183d3c8b89e9687c9c7949760f8
+  branch: trunk
   specs:
     aca_entities (0.4.0)
       deep_merge
@@ -33,7 +33,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7f261d5a8f985b8434572390b50065b02b6bcfcd
+  revision: f2e41bee53939bb069668b314c904c43e52bdc57
   branch: trunk
   specs:
     event_source (0.5.3)
@@ -570,7 +570,7 @@ GEM
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
     forgery (0.7.0)
-    fugit (1.5.0)
+    fugit (1.5.1)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gherkin (5.1.0)
@@ -733,7 +733,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.2)
+    oj (3.13.4)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
@@ -754,7 +754,7 @@ GEM
     puma (3.12.4)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
-    queue-bus (0.11.0)
+    queue-bus (0.12.0)
       multi_json
       redis
     raabro (1.4.0)
@@ -847,7 +847,7 @@ GEM
       resque (>= 1.10.0, < 2.0)
       resque-retry
       resque-scheduler (>= 2.0.1)
-    resque-retry (1.7.4)
+    resque-retry (1.7.6)
       resque (>= 1.25, < 3.0)
       resque-scheduler (~> 4.0)
     resque-scheduler (4.4.0)
