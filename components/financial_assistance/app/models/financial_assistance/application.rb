@@ -493,7 +493,7 @@ module FinancialAssistance
       state :determined
       state :imported
 
-      event :submit, :after => [:record_transition, :set_submit, :trigger_fdsh_hub_calls] do
+      event :submit, :after => [:record_transition, :set_submit] do
         transitions from: [:draft, :renewal_draft], to: :submitted do
           guard do
             is_application_valid?
@@ -531,7 +531,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdsh_hub_calls] do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls] do
         transitions from: :submitted, to: :determined
       end
 
@@ -667,12 +667,6 @@ module FinancialAssistance
       return unless FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
 
       Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
-    end
-
-    def publish_ifsv_request
-      return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
-
-      Operations::Applications::Ifsv::H9t::IfsvRequest.new.call(application_id: id)
     end
 
     def trigger_fdhs_calls
@@ -1164,7 +1158,6 @@ module FinancialAssistance
     def trigger_fdsh_hub_calls
       publish_esi_mec_request
       publish_non_esi_mec_request
-      publish_ifsv_request
     end
 
     def unset_submit
@@ -1219,7 +1212,6 @@ module FinancialAssistance
         applicant.evidences =
           types.collect do |type|
             key, title = type
-            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
             FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
 
