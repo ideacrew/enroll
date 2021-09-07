@@ -42,7 +42,6 @@ class Household
 
         actives << enrollment
       end
-      actives
     end
     actives.sort! { |a,b| a.submitted_at <=> b.submitted_at }
   end

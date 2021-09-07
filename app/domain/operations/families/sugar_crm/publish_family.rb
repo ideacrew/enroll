@@ -38,7 +38,6 @@ module Operations
         # Failure/Error: result = AcaEntities::Contracts::Families::FamilyContract.new.call(transformed_family)
         #  NoMethodError:
         # undefined method `key?' for #<Money fractional:0 currency:USD>
-        binding.irb
         result = AcaEntities::Contracts::Families::FamilyContract.new.call(transformed_family)
         if result.success?
           result

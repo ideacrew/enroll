@@ -42,7 +42,6 @@ module Operations
             is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
           }
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
-          payload
           
           Success(payload)
         end

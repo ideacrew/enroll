@@ -194,7 +194,7 @@ module Operations
               is_determination_split_household: household.is_determination_split_household,
               submitted_at: household.submitted_at,
               aasm_state: household.aasm_state,
-              coverage_household_members: transform_coverage_household_members(household.coverage_household_members),
+              coverage_household_members: transform_coverage_household_members(household.coverage_household_members)
             }
           end
         end
@@ -246,7 +246,7 @@ module Operations
             first_name: member.family_member.person.first_name,
             last_name: member.family_member.person.last_name,
             is_primary_family_member: member.family_member.is_primary_applicant,
-            age: member.family_member.person.age_on(TimeKeeper.date_of_record) 
+            age: member.family_member.person.age_on(TimeKeeper.date_of_record)
           }
         end
 

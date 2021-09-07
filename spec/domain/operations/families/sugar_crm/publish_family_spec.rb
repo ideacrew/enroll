@@ -14,8 +14,10 @@ RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :afte
   let(:hbx_enrollment) do
     FactoryBot.create(
       :hbx_enrollment,
-      :individual_assisted, consumer_role_id: person.consumer_role.id,
-      family: family, household: family.active_household,
+      :individual_assisted,
+      consumer_role_id: person.consumer_role.id,
+      family: family,
+      household: family.active_household,
       product: FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
     )
   end
@@ -44,14 +46,14 @@ RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :afte
       family.save!
       hbx_enrollment
       FactoryBot.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment, applicant_id: family.family_members.first.id)
-      FactoryBot.create(:hbx_enrollment_member,
-                                            :id => "111",
-                                            :hbx_enrollment => hbx_enrollment,
-                                            applicant_id: family.family_members.last.id)
+      FactoryBot.create(
+        :hbx_enrollment_member,
+        :id => "111",
+        :hbx_enrollment => hbx_enrollment,
+        applicant_id: family.family_members.last.id
+      )
       family.family_members.each do |fm|
-        if family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: fm.id).blank?
-          family.households.first.coverage_households.first.coverage_household_members.build(family_member_id: fm.id).save!
-        end
+                  family.households.first.coverage_households.first.coverage_household_members.build(family_member_id: fm.id).save! if family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: fm.id).blank?
       end
     end
 
