@@ -20,7 +20,7 @@ class Family
   include Mongoid::Autoinc
   include DocumentsVerificationStatus
   include RemoveFamilyMember
-  include CrmGateway::FamilyConcern if EnrollRegistry.feature_enabled?(:crm_update_family_save)
+  include CrmGateway::FamilyConcern
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
