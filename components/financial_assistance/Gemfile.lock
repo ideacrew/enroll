@@ -351,7 +351,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.13.3)
+    oj (3.13.4)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
