@@ -137,6 +137,49 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
+  context '#eligible_csr_percent_as_integer' do
+    let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
+    let!(:person) { family.primary_person }
+    let(:household) {create(:household, family: family)}
+    let!(:tax_household) {create(:tax_household, household: household)}
+    let!(:tax_household_member) {tax_household.tax_household_members.create!(is_ia_eligible: true, csr_eligibility_kind: "csr_100")}
+    let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: person.primary_family.family_members[0].id) }
+    let(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        family: family,
+                        household: household,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        coverage_kind: "health")
+    end
+
+    before do
+      tax_household.tax_household_members.first.update_attributes!(applicant_id: family.family_members[0].id)
+    end
+
+    context 'when all csr percent is csr_100 for tax household members' do
+      it 'should return correct csr value' do
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(100)
+      end
+    end
+
+    context 'when all csr percent is csr_94 for tax household members' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(csr_eligibility_kind: "csr_94")
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(94)
+      end
+    end
+
+    context 'when all dafault csr percent when thhm is not ia_eligible' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(is_ia_eligible: false)
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(0)
+      end
+    end
+  end
+
   context 'total_aptc_available_amount_for_enrollment' do
     let!(:rating_area) do
       ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
