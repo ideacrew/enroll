@@ -37,7 +37,8 @@ module FinancialAssistance
       "trustee", # no inverse
       "unrelated",
       "ward",
-      "stepson_or_stepdaughter"
+      'stepson_or_stepdaughter',
+      'cousin'
     ].freeze
 
     RELATIONSHIPS_UI = [

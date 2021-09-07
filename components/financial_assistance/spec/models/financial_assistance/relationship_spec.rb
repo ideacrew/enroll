@@ -50,5 +50,21 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
         expect(application.valid?).to be_truthy
       end
     end
+
+    context 'with valid params for cousin' do
+      let(:relationship_kind) { 'cousin' }
+
+      before do
+        application.relationships << described_class.new(valid_params)
+      end
+
+      it 'should create a valid relationship' do
+        expect(application.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of applicant' do
+        expect(application.relationships.first.kind).to eq('cousin')
+      end
+    end
   end
 end

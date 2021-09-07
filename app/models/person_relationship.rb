@@ -43,7 +43,8 @@ class PersonRelationship
     "stepparent",
     "trustee", # no inverse
     "unrelated",
-    "ward"
+    'ward',
+    'cousin'
   ]
 
   Relationships_UI = [
