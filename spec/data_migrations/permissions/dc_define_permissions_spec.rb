@@ -2,8 +2,7 @@
 
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "permissions", "dc_define_permissions")
-
-describe DcDefinePermissions, dbclean: :around_each do
+describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc' do
   subject { DcDefinePermissions.new(given_task_name, double(:current_scope => nil))}
   let(:roles) {%w[hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin] }
   describe 'create permissions' do
@@ -1417,11 +1416,8 @@ describe DcDefinePermissions, dbclean: :around_each do
       expect(Person.all.to_a.map{|p| p.hbx_staff_role.subrole}).to match_array roles
     end
 
-    context "user and their permission attributes" do
+    context "user and their permission attributes for DC" do
 
-      before do
-        EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return('DC')
-      end
       it "user with 'hbx_staff' as permission" do
         permission = User.all.detect { |u| u.permission.name == 'hbx_staff'}.permission
         expect(permission.name).to eq 'hbx_staff'
@@ -1438,7 +1434,7 @@ describe DcDefinePermissions, dbclean: :around_each do
         expect(permission.name).to eq 'hbx_read_only'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_reinstate_enrollment).to eq false 
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
@@ -1449,7 +1445,12 @@ describe DcDefinePermissions, dbclean: :around_each do
         expect(permission.name).to eq 'hbx_csr_supervisor'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        expect(permission.can_reinstate_enrollment).to eq false
+        value = if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'me'
+                  true
+                elsif EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc'
+                  false
+                end
+        expect(permission.can_reinstate_enrollment).to eq value
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
