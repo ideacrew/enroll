@@ -69,7 +69,7 @@ class TaxHousehold
   def fetch_csr_percent(csr_kind)
     {
       "csr_0" => 0,
-      "csr_limited" => -1,
+      "csr_limited" => 'limited',
       'csr_100' => 100,
       "csr_94" => 94,
       "csr_87" => 87,
