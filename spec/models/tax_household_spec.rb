@@ -178,6 +178,14 @@ RSpec.describe TaxHousehold, type: :model do
         expect(result).to eq(0)
       end
     end
+
+    context 'when all csr percent is csr_94 for tax household members' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(csr_eligibility_kind: "csr_limited")
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(-1)
+      end
+    end
   end
 
   context 'total_aptc_available_amount_for_enrollment' do

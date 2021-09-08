@@ -222,6 +222,30 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
           expect(@result.success.product_id).to eq(renewal_product_87.id)
         end
       end
+
+      context 'renewal enrollment with csr product limited variant' do
+        let!(:renewal_product_limited) do
+          FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                            :ivl_product,
+                            :silver,
+                            application_period: next_year_date.beginning_of_year..next_year_date.end_of_year,
+                            hios_base_id: renewal_product.hios_base_id,
+                            csr_variant_id: '03',
+                            hios_id: "#{renewal_product.hios_base_id}-03")
+        end
+
+        before do
+          BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+          tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
+          tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
+          tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_limited")
+          @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+        end
+
+        it 'should renew enrollment with silver product of 01 variant' do
+          expect(@result.success.product_id).to eq(renewal_product_limited.id)
+        end
+      end
     end
 
     context 'unassisted enrollment renewal' do
