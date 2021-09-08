@@ -1463,7 +1463,6 @@ module FinancialAssistance
             key, title = type
             FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
-<<<<<<< HEAD
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
           family_member_record = family.family_members.where(id: applicant.family_member_id).first
@@ -1480,20 +1479,6 @@ module FinancialAssistance
           to_state: 'verification_pending',
           event: 'move_to_pending!'
         )
-=======
-
-        #TODO: Not sure why we are doing this
-        # family_record = Family.where(id: family_id.to_s).first
-        # if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-        #    family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-        #   family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
-        #   next if family_member_record.blank?
-        #   person_record = family_member_record.person
-        #   next if person_record.blank?
-        #   person_record.add_new_verification_type('Income')
-        # end
-        applicant.move_to_pending! if applicant.evidences.present?
->>>>>>> a5e7940bb2 (Update aca entities and add evidence models)
       end
     end
 
