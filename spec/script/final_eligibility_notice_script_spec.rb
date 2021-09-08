@@ -129,6 +129,7 @@ def invoke_script(with_params = true)
     ARGV[0] = nil
     ARGV[1] = nil
     ARGV[2] = nil
+    ARGV[3] = nil
   end
   final_eligibility_notice = File.join(Rails.root, "script/final_eligibility_notice_script.rb")
   load final_eligibility_notice
