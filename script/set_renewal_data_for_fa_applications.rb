@@ -13,7 +13,7 @@ report_file_name = "#{Rails.root}/set_renewal_data_for_fa_applications_#{TimeKee
 
 CSV.open(report_file_name, 'w', force_quotes: true) do |report_csv|
   report_csv << csv_headers
-  applications = ::FinancialAssistance::Application.where(:is_renewal_authorized.ne => nil)
+  applications = ::FinancialAssistance::Application.submitted_and_after.where(:is_renewal_authorized.ne => nil)
   @logger.info "Total number of applications to be verified and processed: #{applications.count}"
   applications.inject([]) do |_arr, application|
     primary = application&.primary_applicant

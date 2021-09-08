@@ -9,8 +9,10 @@ describe 'set_renewal_data_for_fa_applications' do
 
   let!(:person) { FactoryBot.create(:person, :with_consumer_role, first_name: 'First', last_name: 'Last') }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, years_to_renew: 5, is_renewal_authorized: true) }
+  let!(:application2) do
+    FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: ['draft', 'renewal_draft', 'submission_pending'].sample)
+  end
   let!(:applicant) do
     FactoryBot.create(:applicant,
                       application: application,
@@ -58,6 +60,11 @@ describe 'set_renewal_data_for_fa_applications' do
 
   it "should match with the application's years_to_renew" do
     expect(@csv_file_content[1][6]).to eq(application.years_to_renew.to_s)
+  end
+
+  # Checks to confirm that application2 is not included in the output CSV.
+  it 'should not include application2 in the report as it is a wip application' do
+    expect(@csv_file_content.flatten).not_to include(application2.hbx_id.to_s)
   end
 
   after :each do
