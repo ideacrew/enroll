@@ -74,23 +74,23 @@ module BenefitMarkets
 
       context 'by_coverage_kind_year_and_csr' do
         it 'should return all default csr products' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: nil).count).to eq 3
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: nil)).to eq [product1,product2,product3]
         end
 
         it 'should return all product along with product having csr 87' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_87").count).to eq 4
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_87")).to eq [product1,product2,product3,product4]
         end
 
-        it 'should return all product along with product having csr 73' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_94").count).to eq 4
+        it 'should return all product along with product having csr 94' do
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_94")).to eq [product1,product2,product3,product15]
         end
 
         it 'should return all product along with product having csr 100' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100").count).to eq 4
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100")).to eq [product5,product6,product7,product8]
         end
 
         it 'should return all product along with product having csr limited' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited").count).to eq 4
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited")).to eq [product9,product10,product11,product12]
         end
       end
 
