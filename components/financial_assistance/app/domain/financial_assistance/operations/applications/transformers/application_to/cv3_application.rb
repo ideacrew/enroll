@@ -10,7 +10,7 @@ module FinancialAssistance
       module Transformers
         module ApplicationTo
           # Params of an instance(persistance object) of ::FinancialAssistance::Application to be transformed.
-          classCv3Application # rubocop:disable Metrics/ClassLength
+          class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
             include Dry::Monads[:result, :do]
