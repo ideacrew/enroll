@@ -94,12 +94,13 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     before do
+      FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(false)
       allow(tax_household).to receive(:eligibility_determinations).and_return([eligibility_determination])
     end
 
-    it "should equal to the csr_kind of latest_eligibility_determination" do
+    it "should equal to the available csr_kind of tax household members" do
       tax_household.eligibility_determinations = [eligibility_determination]
-      expect(tax_household.valid_csr_kind(hbx_enrollment)).to eq eligibility_determination.csr_eligibility_kind
+      expect(tax_household.valid_csr_kind(hbx_enrollment)).to eq tax_household.tax_household_members.first.csr_eligibility_kind
     end
   end
 
