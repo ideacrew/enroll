@@ -28,7 +28,8 @@ module FinancialAssistance
               'grandparent' => :grandparent,
               'father_or_mother_in_law' => :mother_in_law_or_father_in_law,
               'daughter_or_son_in_law' => :son_in_law_or_daughter_in_law,
-              'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law
+              'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law,
+              'cousin' => :first_cousin
             }.freeze
 
             # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract

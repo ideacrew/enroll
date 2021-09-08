@@ -80,7 +80,8 @@ describe PersonRelationship, dbclean: :after_each do
       "stepparent",
       "trustee",
       "unrelated",
-      "ward"
+      "ward",
+      'cousin'
     ] }
 
     context "consumer relationship dropdown list(family member page)" do
@@ -201,6 +202,23 @@ describe PersonRelationship, dbclean: :after_each do
 
       it 'should return relationship kind of person' do
         expect(person.person_relationships.first.kind).to eq('brother_or_sister_in_law')
+      end
+    end
+
+    context 'valid params with cousin' do
+      let(:relative_kind) { 'cousin' }
+
+      before do
+        person.person_relationships << described_class.new(valid_params)
+        person.save!
+      end
+
+      it 'should return valid person' do
+        expect(person.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of person' do
+        expect(person.person_relationships.first.kind).to eq('cousin')
       end
     end
   end
