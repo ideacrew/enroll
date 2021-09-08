@@ -5,7 +5,7 @@ module Subscribers
     # Subscriber will receive response payload from FDSH gateway and determine IFSV response for FAA applicants
     class IfsvDeterminationSubscriber
       include EventSource::Logging
-      include ::EventSource::Subscriber[amqp: 'fti.eligibilities.ifsv']
+      include ::EventSource::Subscriber[amqp: 'fti.eligibilities']
 
       subscribe(:on_fdsh_eligibilities_ifsv_determined) do |delivery_info, _metadata, response|
         logger.info "FTIGateway::IfsvDeterminationSubscriber: invoked on_ifsv_eligibility_determined with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
