@@ -6,7 +6,6 @@ Feature: Employee while terminating active enrollment should able to see and pic
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
-    Given Qualifying life events are present
     Given Covid QLE present with top ordinal position
     And there is an employer Acme Inc.
     And initial employer Acme Inc. has active benefit application
