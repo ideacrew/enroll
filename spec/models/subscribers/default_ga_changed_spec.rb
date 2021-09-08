@@ -2,6 +2,10 @@ require "rails_helper"
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 describe Subscribers::DefaultGaChanged do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   include_context "set up broker agency profile for BQT, by using configuration settings"
   it "should subscribe to the correct event" do
     expect(Subscribers::DefaultGaChanged.subscription_details).to eq ["acapi.info.events.broker.default_ga_changed"]
