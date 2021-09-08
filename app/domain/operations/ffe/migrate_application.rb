@@ -12,7 +12,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 module Operations
   module Ffe
     # operation to transform mcr data to enroll format
@@ -51,14 +51,14 @@ module Operations
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
 
       #   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
-      #   
+      #
       #   family = Family.where(id: result.success).first
       #   if family.primary_applicant.person.is_applying_for_assistance
       #     Family.create_indexes
       #     family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
-      #     
+      #
       #     Operations::CvMigration::CreateMagiMedicaidApplication.new.call(family_hash)
-      #     
+      #
       #     # app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
       #     ::FinancialAssistance::Application.create_indexes
       #     # fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
@@ -68,10 +68,12 @@ module Operations
 
         if @family.primary_applicant.person.is_applying_for_assistance
           Family.create_indexes
+
           app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: @family.benchmark_product_id))
 
           ::FinancialAssistance::Application.create_indexes
           fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+
           fix_iap_relationship(app_id, family_hash)
         end
         puts "success #{payload[:insuranceApplicationIdentifier]}"
@@ -161,14 +163,12 @@ module Operations
         if person_result.success?
           @person = person_result.success
           @person.update_attributes(is_applying_for_assistance: person_params[:is_applying_for_assistance])
-          @family_member = create_or_update_family_member(@person, @family, family_member_hash)
+          @family_member = create_or_update_family_member(@person, family_member_hash)
           consumer_role_params = family_member_hash['person']['consumer_role']
           consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
           consumer_role = consumer_role_result.success
           consumer_role.import!
-          if consumer_role_params["vlp_documents"].present?
-            create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person)
-          end
+          create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person) if consumer_role_params["vlp_documents"].present?
         else
           @person
         end
@@ -191,8 +191,8 @@ module Operations
         Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: merge_params, family_member: family_member })
       end
 
-      def create_or_update_family_member(person, family, family_member_hash)
-        family_member = family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+      def create_or_update_family_member(person, family_member_hash)
+        family_member = @family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
         return family_member if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
 
         fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
@@ -203,19 +203,19 @@ module Operations
         external_member_id = family_member_hash['hbx_id']
 
         if family_member_hash['is_primary_applicant']
-          family_member = family.add_family_member(person, fm_attr)
-          create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+          family_member = @family.add_family_member(person, fm_attr)
+          create_or_update_relationship(person, family_member_hash['person']['person_relationships'][0]['kind'])
         else
-          create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
-          family_member = family.add_family_member(person, fm_attr)
+          create_or_update_relationship(person, family_member_hash['person']['person_relationships'][0]['kind'])
+          family_member = @family.add_family_member(person, fm_attr)
         end
 
         family_member.external_member_id = external_member_id
         family_member.save!
-        family.save!
+        @family.save!
 
         family_member
-        end
+      end
 
       def add_broker_accounts(family, family_hash)
         return unless family_hash['broker_accounts'].present?
@@ -238,8 +238,8 @@ module Operations
         end
       end
 
-      def create_or_update_relationship(person, family, relationship_kind)
-        @primary_person = family.primary_person
+      def create_or_update_relationship(person, relationship_kind)
+        @primary_person = @family.primary_person
         exiting_relationship = @primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
         return if exiting_relationship && exiting_relationship.kind == relationship_kind
 
@@ -452,7 +452,7 @@ module Operations
         applicants_hash = applications[:applicants]
         application = ::FinancialAssistance::Application.where(id: app_id).first
 
-        application.parent_living_out_of_home_terms= applications["parent_living_out_of_home_terms"]
+        application.parent_living_out_of_home_terms = applications["parent_living_out_of_home_terms"]
         application.report_change_terms = applications['report_change_terms']
         application.medicaid_terms = applications['medicaid_terms']
         application.save!
@@ -608,4 +608,4 @@ module Operations
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
