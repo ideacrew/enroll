@@ -129,7 +129,6 @@ module BenefitMarkets
     # ex: application_period --> [2018-02-01 00:00:00 UTC..2019-01-31 00:00:00 UTC]
     #     BenefitProduct avilable for both 2018 and 2019
     # output: might pull multiple records
-<<<<<<< HEAD
       scope :by_application_period,       lambda { |application_period|
         where(
           "$or" => [
