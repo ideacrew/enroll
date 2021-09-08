@@ -11,7 +11,7 @@ Feature: State Residency Document Type
      When the consumer visits the Documents page
      Then they should see the state residency tile 
 
-   Given EnrollRegistry location_residency_verification_type feature is disabled
+    Scenario: location_residency_verification_type feature is disabled
      Given EnrollRegistry location_residency_verification_type feature is disabled
      And consumer visits home page
      When the consumer visits the Documents page
