@@ -27,7 +27,6 @@ describe 'set_renewal_data_for_fa_applications' do
   before :each do
     invoke_script
     @csv_file_content = CSV.read("#{Rails.root}/set_renewal_data_for_fa_applications_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
-    @logger_file = CSV.read("#{Rails.root}/log/set_renewal_data_for_fa_applications_logger.log")
   end
 
   it 'should add data to the file' do
