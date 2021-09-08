@@ -1418,6 +1418,10 @@ describe DcDefinePermissions, dbclean: :around_each do
     end
 
     context "user and their permission attributes" do
+
+      before do
+        EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return('DC')
+      end
       it "user with 'hbx_staff' as permission" do
         permission = User.all.detect { |u| u.permission.name == 'hbx_staff'}.permission
         expect(permission.name).to eq 'hbx_staff'
