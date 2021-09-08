@@ -14,7 +14,7 @@ def check_duplicated
   stranges = []
 
   CSV.foreach("pids/#{start_date_of_next_year.year}_THHEligibility.csv") do |row_with_ssn|
-    ssn, family_hbx_id, person_hbx_id, aptc, csr, date = row_with_ssn
+    ssn, primary_hbx_id, person_hbx_id, aptc, csr, date = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
@@ -61,53 +61,55 @@ def check_and_run
   created_eligibility = []
 
   CSV.foreach("pids/#{start_date_of_next_year.year}_THHEligibility.csv") do |row_with_ssn|
-    ssn, family_hbx_id, person_hbx_id, aptc, csr, date = row_with_ssn
+    ssn, primary_hbx_id, person_hbx_id, aptc, csr, date = row_with_ssn
     date ||= start_date_of_next_year.to_s
     effective_date = date.to_date
 
     if aptc.blank? || csr.blank?
-      not_run << {ssn: ssn, family_hbx_id: family_hbx_id, person_hbx_id: person_hbx_id, error: "Bad CSV data(csr/aptc)"}
+      not_run << {ssn: ssn, primary_hbx_id: primary_hbx_id, person_hbx_id: person_hbx_id, error: "Bad CSV data(csr/aptc)"}
       puts "Either aptc or csr are not valid"
       next
     end
 
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
-      person = Person.by_ssn(ssn).first rescue nil
+      primary_person = Person.by_ssn(ssn).first rescue nil
     end
 
+    primary_person_by_hbx = Person.by_hbx_id(primary_hbx_id).first rescue nil
     person_by_hbx = Person.by_hbx_id(person_hbx_id).first rescue nil
 
-    if ssn && person_hbx_id && person && person_by_hbx && person.id != person_by_hbx.id
-      not_run << {ssn: ssn, hbx_id: person_hbx_id, error: "Bad CSV data(ssn/hbx_id)"}
-      puts "Person with ssn: #{ssn} and person with hbx_id: #{person_hbx_id} are not same"
+    if ssn && primary_hbx_id && primary_person && primary_person_by_hbx && primary_person.id != primary_person_by_hbx.id
+      not_run << {ssn: ssn, hbx_id: primary_hbx_id, error: "Bad CSV data(ssn/hbx_id)"}
+      puts "Person with ssn: #{ssn} and person with hbx_id: #{primary_hbx_id} are not same"
       next
     end
 
+    primary_person = primary_person_by_hbx unless primary_person
     person = person_by_hbx unless person
 
-    if person
-      unless person.primary_family
-        not_run << {no_family: ssn, hbx_id: person_hbx_id}
+    if primary_person
+      unless primary_person.primary_family
+        not_run << {no_family: ssn, hbx_id: primary_person_hbx_id}
         puts "Person with ssn: #{ssn} has no family"
         next
       end
 
-      active_household = person.primary_family.active_household
+      active_household = primary_person.primary_family.active_household
       active_thh = active_household.latest_active_thh_with_year(effective_date.year)
       deter = active_thh.try(:latest_eligibility_determination)
 
       if active_thh && deter.present? && active_thh.effective_starting_on.to_date == effective_date && deter.max_aptc.to_f == aptc.to_f
         csr_int = (csr == 'limited' ? '-1' : csr)
-        active_thh.tax_household_members.each do |thm|
-          thm.update_attributes!(csr_percent_as_integer: csr_int)
-        end
+        person_fm_id = primary_person.primary_family.family_members.where(person_id: person.id).first.id
+        person_thhm = active_thh.tax_household_members.where(applicant_id: person_fm_id).first
+        person_thhm.update_attributes!(csr_percent_as_integer: csr_int)
         not_run << [hbx_id: person.hbx_id, error: 'active THH with eligibility having same aptc, csr & thh_effective_date is already present']
-        puts "Skipped Creation of Eligibility for person with person_hbx_id: #{person.hbx_id} as this household already has one"
+        puts "Skipped Creation of Eligibility for person with person_hbx_id: #{primary_person.hbx_id} as this household already has one"
       else
         active_household.build_thh_and_eligibility(aptc, csr, effective_date, @slcsp, 'Renewals') #update attrs here?
-        created_eligibility << [hbx_id: person.hbx_id]
-        puts "Created Eligibility for person with person_hbx_id: #{person.hbx_id}"
+        created_eligibility << [hbx_id: primary_person.hbx_id]
+        puts "Created Eligibility for person with person_hbx_id: #{primary_person.hbx_id}"
       end
 
     else

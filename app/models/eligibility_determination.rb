@@ -68,6 +68,8 @@ class EligibilityDetermination
       message: "%{value} is not a valid premium credit strategy kind"
     }
 
+  # Validation of csr kind removed as we move csr to tax household member level
+
   def csr_percent_as_integer=(new_csr_percent)
     super
     self.csr_eligibility_kind = case csr_percent_as_integer

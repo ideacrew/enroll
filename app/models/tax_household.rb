@@ -86,10 +86,8 @@ class TaxHousehold
   end
 
   def valid_csr_kind(hbx_enrollment)
-    csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
-    ia_eligible = tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible)
-    ia_eligible.empty? || ia_eligible.include?(false) ? 'csr_0' : csr_kind
+    csr_kind = eligibile_csr_kind(shopping_family_member_ids)
   end
 
   def current_csr_percent
@@ -353,4 +351,3 @@ class TaxHousehold
     ::BenefitMarkets::Products::ProductFactory
   end
 end
-
