@@ -499,7 +499,7 @@ And(/I should see the individual home page/) do
   # click_link "My #{Settings.site.short_name}"
 end
 
-Then(/^Individual edits a dependents address$/) do
+Then(/^Individual clicks on Add New Person$/) do
   click_link 'Add New Person'
 end
 
@@ -527,7 +527,7 @@ Then(/Individual should see three dependents on the page/) do
   expect(find_all('.dependent_list').count).to eq 3
 end
 
-Then(/^Individual ads address for dependent$/) do
+Then(/^Individual adds address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
   fill_in 'dependent[addresses][0][city]', :with => 'Washington'
