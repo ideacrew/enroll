@@ -25,7 +25,7 @@ describe 'set_renewal_data_for_fa_applications' do
   end
 
   before :each do
-    invoke_script
+    invoke_set_renewal_data_for_fa_applications_script
     @csv_file_content = CSV.read("#{Rails.root}/set_renewal_data_for_fa_applications_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
   end
 
@@ -72,7 +72,7 @@ describe 'set_renewal_data_for_fa_applications' do
   end
 end
 
-def invoke_script
+def invoke_set_renewal_data_for_fa_applications_script
   script_file = File.join(Rails.root, '/script/set_renewal_data_for_fa_applications.rb')
   load script_file
 end
