@@ -62,31 +62,41 @@ module BenefitMarkets
       let!(:product11) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '03')}
       let!(:product12) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '03')}
 
+      let!(:product13) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '04')}
+      let!(:product14) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '04')}
+
+      let!(:product15) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '06')}
+      let!(:product16) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '06')}
+
       before do
         @products = product_factory.new({market_kind: "individual"})
       end
 
       context 'by_coverage_kind_year_and_csr' do
         it 'should return all default csr products' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: nil).count).to eq 3
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: nil)).to eq [product1,product2,product3]
         end
 
         it 'should return all product along with product having csr 87' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_87").count).to eq 4
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_87")).to eq [product1,product2,product3,product4]
+        end
+
+        it 'should return all product along with product having csr 94' do
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_94")).to eq [product1,product2,product3,product15]
         end
 
         it 'should return all product along with product having csr 100' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100").count).to eq 7
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100")).to eq [product5,product6,product7,product8]
         end
 
         it 'should return all product along with product having csr limited' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited").count).to eq 7
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited")).to eq [product9,product10,product11,product12]
         end
       end
 
       context 'by_coverage_kind_and_year' do
         it 'should return health products' do
-          expect(@products.by_coverage_kind_and_year('health', TimeKeeper.date_of_record.year).count).to eq 12
+          expect(@products.by_coverage_kind_and_year('health', TimeKeeper.date_of_record.year).count).to eq 16
         end
 
         it 'should return deltal products' do
