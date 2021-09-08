@@ -5,9 +5,7 @@ When(/^the consumer visits the Documents page$/) do
 end
 
 Then(/^they should see the state residency tile$/) do
-  if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc' 
-    expect(page).to have_content(EnrollRegistry[:enroll_app].setting(:state_residency).item)
-  end
+  expect(page).to have_content(EnrollRegistry[:enroll_app].setting(:state_residency).item) if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc'
 end
 
 Then(/^they should not see the state residency tile$/) do

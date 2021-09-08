@@ -1434,7 +1434,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.name).to eq 'hbx_read_only'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        expect(permission.can_reinstate_enrollment).to eq false 
+        expect(permission.can_reinstate_enrollment).to eq false
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
@@ -1445,12 +1445,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.name).to eq 'hbx_csr_supervisor'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        value = if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'me'
-                  true
-                elsif EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc'
-                  false
-                end
-        expect(permission.can_reinstate_enrollment).to eq value
+        expect(permission.can_reinstate_enrollment).to eq false
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
