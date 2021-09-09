@@ -16,6 +16,10 @@ shared_examples "an invitation with invalid source kind and role" do |sk, role|
 end
 
 describe Invitation do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   describe "basic model" do
     subject { Invitation.new }
 

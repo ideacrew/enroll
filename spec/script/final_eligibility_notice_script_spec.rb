@@ -4,6 +4,10 @@ require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 RSpec.describe "FinalEligibilityNoticeScript", :dbclean => :after_each do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   include_context 'setup benefit market with market catalogs and product packages'
 
   let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141892", first_name: "John", last_name: "Smith") }

@@ -4,6 +4,10 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers.rb"
 
 RSpec.describe TaxHouseholdMember, type: :model do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let!(:person) {FactoryBot.create(:person, :with_family, dob: Date.new(TimeKeeper.date_of_record.year, 0o1, 0o1))}
   let!(:household) {FactoryBot.create(:household, family: person.primary_family)}
   let!(:tax_household) {FactoryBot.create(:tax_household, household: household)}
