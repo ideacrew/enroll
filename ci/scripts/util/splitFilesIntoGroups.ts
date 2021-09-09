@@ -4,7 +4,7 @@ import {
   SplitConfig,
   FilesWithRunTime,
 } from '../models';
-import { createGroupOverview } from './createGroupRunTimes';
+// import { createGroupOverview } from './createGroupRunTimes';
 import { createSplitConfig } from './createSplitConfig';
 import { runtimeDetails } from './numberOfGroups';
 
@@ -31,14 +31,14 @@ export function splitFilesIntoGroups(
   );
 
   // The magic happens here
-  groupRunTimes.forEach(async (group, index) => {
-    console.log(
-      'Processing group',
-      index + 1,
-      'with',
-      files.length,
-      'files left to process.'
-    );
+  groupRunTimes.forEach(async (group) => {
+    // console.log(
+    //   'Processing group',
+    //   index + 1,
+    //   'with',
+    //   files.length,
+    //   'files left to process.'
+    // );
 
     while (getGroupRunTime(group) < longestTest && files.length) {
       // start with file at front of array
@@ -77,8 +77,8 @@ export function splitFilesIntoGroups(
 
   // console.log('Files left', files.length);
 
-  const overview = createGroupOverview(groupRunTimes);
-  console.log(overview);
+  // const overview = createGroupOverview(groupRunTimes);
+  // console.log(overview);
 
   const a: SplitConfig = createSplitConfig(groupRunTimes);
 
