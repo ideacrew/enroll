@@ -7,19 +7,20 @@ jobs:
   cucumber-report:
     strategy:
       matrix:
-        feature: [
-            # 'admin',
-            # 'brokers',
+        feature:
+          [
+            'admin',
+            'brokers',
             'cover_all',
-            # 'employee',
-            # 'employers',
-            # 'financial_assistance',
+            'employee',
+            'employers',
+            'financial_assistance',
             'general_agencies',
-            # 'group_selection',
+            'group_selection',
             'hbx',
-            # 'hbx_admin',
-            # 'insured',
-            # 'permissions',
+            'hbx_admin',
+            'insured',
+            'permissions',
             'plan_shopping',
           ]
     runs-on: ubuntu-latest
@@ -75,6 +76,10 @@ jobs:
     needs: [cucumber-report]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v2
@@ -89,6 +94,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: ci/cucumber/compressed-reports
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: ci/cucumber/compressed-reports
+      - run: npm run cucumber:move-reports
+      - run: npm run cucumber:concat-reports
+      - run: npm run cucumber:split-config
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cucumber-split-config
+          path: ci/cucumber-split-config.json

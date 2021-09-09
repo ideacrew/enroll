@@ -5,7 +5,7 @@ import { FileWithRuntime } from '../models';
  * nature of the set of files
  * @param files an array of files with runtime
  */
-export function runtimeDetails(files: FileWithRuntime[]): any {
+export function runtimeDetails(files: FileWithRuntime[]) {
   const [longestTest] = files.sort((a, b) => (a.runTime > b.runTime ? -1 : 1));
   const totalRuntime = files.reduce((runtime, file) => {
     // console.log(runtime);

@@ -10,6 +10,10 @@ import {
 export const featureRuntime = (feature: CucumberFeature): FileWithRuntime => {
   const { uri, elements } = feature;
 
+  // if (elements === undefined) {
+  //   console.log('ELEMENTS UNDEFINED', feature);
+  // }
+
   const scenarioElements: ScenarioElement[] = elements.filter(isScenario);
   const backgroundElements: BackgroundElement[] = elements.filter(isBackground);
 
