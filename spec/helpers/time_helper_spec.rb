@@ -91,28 +91,222 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
   end
 
   describe "SET optional_effective_on date on a SEP" do
-    let(:person_with_consumer_role) { FactoryBot.create(:person, :with_consumer_role) }
-    let(:person_with_employee_role) { FactoryBot.create(:person, :with_employee_role) }
+    let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
+
+    let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+    let(:person) { FactoryBot.create(:person) }
+    let(:hired_on)        { plan_year.start_on - 10.days }
 
     context "for shop market" do
       before do
-        allow(person).to receive(:active_employee_roles).and_return([employee_role])
-        allow(person).to receive(:has_active_employee_role?).and_return(true)
-        allow(employer_profile).to receive(:plan_years).and_return(plan_year)
-        allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record - 1.month)
-        allow(plan_year).to receive(:end_on).and_return(TimeKeeper.date_of_record - 1.month + 1.year - 1.day)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: plan_year.start_on, end_on: plan_year.end_on)
+        census_employee.reload
       end
 
-      it "returns minmum range as start_date of plan_year" do
-        expect(helper.sep_optional_date(family, 'min')).to eq(plan_year.start_on)
+      it "returns minimum range as start_date of plan_year" do
+        plan_year.update_attributes(effective_period: (TimeKeeper.date_of_record - 1.month)..(TimeKeeper.date_of_record - 1.month + 1.year - 1.day))
+        census_employee.reload
+        expect(helper.sep_optional_date(family, 'min', nil, plan_year.start_on)).to eq(plan_year.start_on)
       end
 
       it "returns maximum range as end_date of plan_year" do
-        expect(helper.sep_optional_date(family, 'max')).to eq(plan_year.end_on)
+        expect(helper.sep_optional_date(family, 'max', nil, plan_year.start_on)).to eq(plan_year.end_on)
+      end
+    end
+
+    context '#prior_plan_year_shop_sep feature turned on' do
+      let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { plan_year.start_on - 10.days }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
+        census_employee.link_employee_role!
+        census_employee.update_attributes(employee_role_id: employee_role.id)
+        census_employee.reload
+      end
+
+      context 'when PY is active' do
+        it "returns maximum range as end_date of plan_year" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record + 5.days)).to eq(initial_application.end_on)
+        end
+      end
+
+      context 'when py is expired' do
+        before do
+          start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+          end_date = start_date + 12.months - 1.day
+          effective_period = start_date..end_date
+          initial_application.update_attributes(effective_period: effective_period)
+          initial_application.expire!
+          census_employee.reload
+        end
+        it "returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
+        end
+      end
+      # TODO: Enable this when terminated state is included for prior py shopping(proj 200)
+      # context 'when py is terminated' do
+      #   before do
+      #     start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+      #     end_date = start_date + 12.months - 1.day
+      #     effective_period = start_date..end_date
+      #     initial_application.update_attributes(effective_period: effective_period)
+      #     initial_application.terminate_enrollment!
+      #     census_employee.reload
+      #   end
+      #   it "returns maximum range when py is terminated" do
+      #     expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
+      #   end
+      # end
+    end
+
+    context '#prior_plan_year_shop_sep feature turned off' do
+      let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { plan_year.start_on - 10.days }
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
+        census_employee.link_employee_role!
+        census_employee.update_attributes(employee_role_id: employee_role.id)
+      end
+
+      context 'when py is expired' do
+        before do
+          initial_application.expire!
+          census_employee.reload
+        end
+        it "not returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+        end
+      end
+
+      context 'when py is terminated' do
+        before do
+          initial_application.terminate_enrollment!
+          census_employee.reload
+        end
+        it "not returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+        end
+      end
+
+      context 'when PY is active' do
+        it "returns maximum range as end_date of plan_year" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record + 5.days)).to eq(plan_year.end_on)
+        end
+      end
+    end
+
+    context '#prior_plan_year_sep feature turned on' do
+      let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { plan_year.start_on - 10.days }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
+        census_employee.link_employee_role!
+        census_employee.update_attributes(employee_role_id: employee_role.id)
+        census_employee.reload
+      end
+
+      context 'when PY is active' do
+        it "returns maximum range as end_date of plan_year" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record + 5.days)).to eq(initial_application.end_on)
+        end
+      end
+
+      context 'when py is expired' do
+        before do
+          start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+          end_date = start_date + 12.months - 1.day
+          effective_period = start_date..end_date
+          initial_application.update_attributes(effective_period: effective_period)
+          initial_application.expire!
+          census_employee.reload
+        end
+        it "returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
+        end
+      end
+
+      context 'when py is terminated' do
+        before do
+          start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+          end_date = start_date + 12.months - 1.day
+          effective_period = start_date..end_date
+          initial_application.update_attributes(effective_period: effective_period)
+          initial_application.terminate_enrollment!
+          census_employee.reload
+        end
+        #TODO: Enable this when terminated enrollments are allowed for prior year end date changes
+        xit "returns maximum range when py is terminated" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
+        end
+      end
+    end
+
+    context '#prior_plan_year_sep feature turned off' do
+      let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { plan_year.start_on - 10.days }
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
+        census_employee.link_employee_role!
+        census_employee.update_attributes(employee_role_id: employee_role.id)
+      end
+
+      context 'when py is expired' do
+        before do
+          initial_application.expire!
+          census_employee.reload
+        end
+        it "not returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+        end
+      end
+
+      context 'when py is terminated' do
+        before do
+          initial_application.terminate_enrollment!
+          census_employee.reload
+        end
+        it "not returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+        end
+      end
+
+      context 'when PY is active' do
+        it "returns maximum range as end_date of plan_year" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record + 5.days)).to eq(plan_year.end_on)
+        end
       end
     end
 
     context "for individual market" do
+      let(:person_with_consumer_role) { FactoryBot.create(:person, :with_consumer_role) }
       before do
         allow(family).to receive_message_chain("primary_applicant.person").and_return(person_with_consumer_role)
         allow(person).to receive(:has_consumer_role?).and_return false
@@ -132,11 +326,6 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       before do
         allow(family).to receive_message_chain("primary_applicant.person").and_return(person)
         allow(person).to receive(:has_consumer_role?).and_return true
-        allow(person).to receive(:has_active_employee_role?).and_return(true)
-        allow(person).to receive(:active_employee_roles).and_return([employee_role])
-        allow(employer_profile).to receive(:plan_years).and_return(plan_year)
-        allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record - 1.month)
-        allow(plan_year).to receive(:end_on).and_return(TimeKeeper.date_of_record - 1.month + 1.year - 1.day)
       end
 
       it "returns minmum range as nil when market kind is ivl" do
@@ -148,19 +337,19 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       end
 
       it "returns minmum range as start_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'min', 'shop')).to eq(plan_year.start_on)
+        expect(helper.sep_optional_date(family, 'min', 'shop', plan_year.start_on)).to eq(plan_year.start_on)
       end
 
       it "returns maximum range as end_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'max', 'shop')).to eq(plan_year.end_on)
+        expect(helper.sep_optional_date(family, 'max', 'shop', plan_year.start_on)).to eq(plan_year.end_on)
       end
 
       it "returns minmum range as start_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'min', 'fehb')).to eq(plan_year.start_on)
+        expect(helper.sep_optional_date(family, 'min', 'fehb', plan_year.start_on)).to eq(plan_year.start_on)
       end
 
       it "returns maximum range as end_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'max', 'fehb')).to eq(plan_year.end_on)
+        expect(helper.sep_optional_date(family, 'max', 'fehb', plan_year.start_on)).to eq(plan_year.end_on)
       end
 
       it "returns minimum range as nil when market kind is nil" do
@@ -189,4 +378,3 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
     end
   end
 end
-

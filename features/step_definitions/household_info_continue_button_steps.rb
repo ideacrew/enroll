@@ -10,16 +10,24 @@ Given(/^that the user is on FAA Household Info: Family Members page$/) do
   visit root_path
   click_link 'Assisted Consumer/Family Portal'
   click_link 'Continue'
+  sleep 2
   # Security Questions
   step 'the user answers all the VERIFY IDENTITY  questions'
   click_button 'Submit'
-  click_link "Continue Application"
+  click_link 'Continue Application'
   page.all('label').detect { |l| l.text == 'Yes' }.click
   click_button 'CONTINUE'
+  # should be on application year select page
+  # TODO: Will need to be updated when year select logic implemented
+  if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    click_link 'Continue'
+    sleep 2
+  end
   click_link 'Continue'
 end
 
 When(/^at least one applicant is in the Info Needed state$/) do
+  sleep 5
   expect(application.incomplete_applicants?).to be true
   expect(page).to have_content('Info Needed')
 end
@@ -33,7 +41,7 @@ Then(/^the CONTINUE button will be disabled$/) do
 end
 
 Given(/^the primary member exists$/) do
-  expect(page).to have_content('SELF')
+  expect(page).to have_content('John Smith')
 end
 
 Given(/^NO other household members exist$/) do
@@ -45,7 +53,9 @@ Then(/^Family Relationships left section will NOT display$/) do
 end
 
 Given(/^at least one other household members exist$/) do
+  sleep 2
   click_link "Add New Person"
+  sleep 2
   fill_in "applicant_first_name", with: 'johnson'
   fill_in "applicant_last_name", with: 'smith'
   fill_in "family_member_dob_", with: '10/10/1984'
@@ -72,7 +82,10 @@ Given(/^at least one other household members exist$/) do
 end
 
 Given(/^a new household member is not applying$/) do
+  click_link 'Continue'
+  sleep 2
   click_link "Add New Person"
+  sleep 2
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
 end
 

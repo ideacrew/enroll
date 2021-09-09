@@ -35,6 +35,12 @@ When(/^selects yes they would like help paying for coverage$/) do
   choose('radio1', allow_label_click: true)
   find('button.interaction-click-control-continue').click
 
+  # should be on application year select page now
+  # TODO: Will need to be updated when year select logic implemented
+  if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    find('a.interaction-click-control-continue').click
+    sleep 2
+  end
   # should be on checklist page now
   find('a.interaction-click-control-continue').click
 end
@@ -396,6 +402,10 @@ Given(/^the kaiser paynow feature configuration is disabled$/) do
   disable_feature :kaiser_pay_now
 end
 
+Given(/^the enrollment tile feature is enabled$/) do
+  skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item
+end
+
 Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end
@@ -406,6 +416,16 @@ end
 
 Given(/^american indian or alaska native income feature is disabled$/) do
   disable_feature :american_indian_alaskan_native_income
+end
+
+Given(/the iap year selection feature is enabled/) do
+  enable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :iap_year_selection
+end
+
+Given(/the iap year selection feature is disabled/) do
+  disable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
+  disable_feature :iap_year_selection
 end
 
 Then(/^the user should see the external verification link$/) do
@@ -448,6 +468,10 @@ end
 
 Then(/^the consumer will navigate to the Cost Savings page$/) do
   expect(page).to have_content('Cost Savings Applications', wait: 10)
+end
+
+Then(/the application year will be present on the table/) do
+  expect(page).to have_content('APPLICATION YEAR')
 end
 
 When(/^the consumer manually enters the "Help Paying for Coverage" url in the browser search bar$/) do

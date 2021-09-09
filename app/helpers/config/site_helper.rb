@@ -57,6 +57,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:producer_email_address).item
     end
 
+    def contact_center_email_address_is_enabled?
+      EnrollRegistry.feature_enabled?(:contact_email_header_footer_feature)
+    end
+
     def contact_center_email_address
       EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
     end
@@ -318,6 +322,14 @@ module Config
 
     def broker_course_administering_organization_link
       EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_link).item
+    end
+
+    def tobacco_user_field_enabled?
+      EnrollRegistry.feature_enabled?(:tobacco_user_field)
+    end
+
+    def disable_form_phone_and_paper_dropdown?
+      EnrollRegistry.feature_enabled?(:disable_form_phone_and_paper_dropdown)
     end
   end
 end

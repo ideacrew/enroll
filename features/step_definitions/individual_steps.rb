@@ -108,6 +108,7 @@ Then(/the individual sees form to enter personal information$/) do
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
+  find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
@@ -453,6 +454,15 @@ When(/^the individual selects a non silver plan on Plan Shopping page$/) do
   find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
 
+
+And(/^I click confirm on the plan selection page for (.*)$/) do |named_person|
+  find('.interaction-choice-control-value-terms-check-thank-you').click
+  person = people[named_person]
+  fill_in 'first_name_thank_you', :with => (person[:first_name])
+  fill_in 'last_name_thank_you', :with => (person[:last_name])
+  click_link "Confirm"
+end
+
 And(/I select a non silver plan on plan shopping page/) do
   find(IvlChoosePlan.select_plan_btn)[0].click
   screenshot("aptc_setamount")
@@ -470,7 +480,7 @@ And(/I click on purchase button on confirmation page/) do
   click_link "Confirm"
 end
 
-And(/the individual clicks on the Continue button to go to the Individual home page/) do
+And(/^.+ clicks on the Continue button to go to the Individual home page/) do
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
   else

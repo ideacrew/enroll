@@ -128,3 +128,8 @@ registry:
         settings:
           - key: :color
             item: '#777'
+      - key: :application_text_color
+        is_enabled: true
+        settings:
+          - key: :color
+            item: "#487ba2"

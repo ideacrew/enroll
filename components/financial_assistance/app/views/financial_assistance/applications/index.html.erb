@@ -12,7 +12,11 @@
       <div class="">
         <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app') do %>
           <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
-          <%= submit_tag "Start new application", onclick: "StartNewAppModal()", class: "btn btn-primary pull-right"%>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+            <%= submit_tag "Start new application", class: "btn btn-primary pull-right"%>
+          <% else %>
+            <%= submit_tag "Start new application", onclick: "StartNewAppModal()", class: "btn btn-primary pull-right"%>
+          <% end %>
         <% end %>
         <%= raw "&nbsp;" * 10%>
       </div>
@@ -21,10 +25,15 @@
         <thead class="form-heading">
           <tr>
             <th class="form-heading">ID</th>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+              <th class="form-heading">APPLICATION YEAR</th>
+            <% end %>
             <th class="form-heading">STATUS</th>
             <th class="form-heading">STARTED ON</th>
             <th class="form-heading">SUBMITTED ON</th>
-            <th class="form-heading">DETERMINATION</th>
+            <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+              <th class="form-heading">DETERMINATION</th>
+            <% end %>
             <th class="form-heading">ACTIONS</th>
           </tr>
         </thead>
@@ -32,10 +41,15 @@
           <% @applications.each do |application| %>
           <tr>
             <td><%=application.hbx_id%></td>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+              <td><%= application.assistance_year %></td>
+            <% end %>
             <td><%= application.aasm_state == 'terminated' ? 'closed' : application.aasm_state %></td>
             <td><%=to_est application.created_at%></td>
             <td><%=to_est application.submitted_at%></td>
-            <td></td>
+            <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+              <td></td>
+            <% end %>
             <%
               dropdown = [
                 ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
@@ -51,8 +65,7 @@
               %>
             <% end %>
             <td>
-              <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: ""}, formats: :html%>
-
+              <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
             </td>
           </tr>
           <%end%>

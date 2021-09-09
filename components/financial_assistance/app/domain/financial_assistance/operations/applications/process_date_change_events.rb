@@ -63,7 +63,7 @@ module FinancialAssistance
           family_ids = FinancialAssistance::Application.where(assistance_year: @renewal_year.pred).distinct(:family_id)
           @logger.info "Total number of applications with assistance_year: #{@renewal_year.pred} are #{family_ids.count}"
           family_ids.inject([]) do |_arr, family_id|
-            params = { payload: { family_id: family_id, renewal_year: @renewal_year }, event_name: 'generate_renewal_draft' }
+            params = { payload: { family_id: family_id.to_s, renewal_year: @renewal_year }, event_name: 'generate_renewal_draft' }
             result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
             @logger.info "Successfully Published for event generate_renewal_draft, with params: #{params}" if result.success?
             @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
@@ -82,7 +82,7 @@ module FinancialAssistance
           @logger.info "Total number of renewal_draft applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"
 
           applications.inject([]) do |_arr, application|
-            params = { payload: { application_hbx_id: application.hbx_id }, event_name: 'submit_renewal_draft' }
+            params = { payload: { application_hbx_id: application.hbx_id.to_s }, event_name: 'submit_renewal_draft' }
             result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
             @logger.info "Successfully Published for event submit_renewal_draft, with params: #{params}" if result.success?
             @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?

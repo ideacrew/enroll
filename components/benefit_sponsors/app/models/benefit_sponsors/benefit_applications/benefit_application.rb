@@ -31,6 +31,7 @@ module BenefitSponsors
     TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
     ACTIVE_AND_TERMINATED_STATES  = COVERAGE_EFFECTIVE_STATES + [:terminated]
     APPPROVED_AND_TERMINATED_STATES   = APPROVED_STATES +  [:termination_pending, :terminated, :expired]
+    APPROVED_AND_EXPIRED_STATED = APPROVED_STATES + EXPIRED_STATES
     RENEWAL_TRANSMISSION_STATES = APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES
 
     # Deprecated - Use SUBMITTED_STATES
@@ -273,6 +274,15 @@ module BenefitSponsors
         "$or" => [
           {:aasm_state.in => APPROVED_STATES },
           {"$exists" => {:predecessor_id => true} }
+        ]
+      )
+    }
+
+    scope :approved_and_term_benefit_applications_by_date, lambda{ |date|
+      where(
+        "$and" => [
+          {:aasm_state.in => APPPROVED_AND_TERMINATED_STATES },
+          {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
         ]
       )
     }
@@ -826,6 +836,7 @@ module BenefitSponsors
         :binder_paid,
         :enrollment_eligible,
         :active,
+        #:terminated,
         # :termination_pending,
         :expired
       ].include?(aasm_state)

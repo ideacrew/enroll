@@ -1,0 +1,46 @@
+.faa-year-selection {
+  background-color: #ffffff;
+  border: 1px solid #c3c3c3;
+}
+
+.faays-title {
+  div {
+    display: table-cell;
+    vertical-align: top;
+
+    i {
+      color: #007BC4;
+      font-size: 23px;
+      margin: 18px 0 0 15px;
+    }
+  }
+
+  h3 {
+    color: #333;
+    margin: 10px 10px 12px;
+    font-weight: 600;
+  }
+}
+
+.faays-body {
+  padding: 15px;
+
+  div {
+    display: table-cell;
+    vertical-align: top;
+
+    i {
+      color: #69A30D;
+      font-size: 23px;
+      margin-right: 10px;
+    }
+  }
+
+  p {
+    color: #333;
+  }
+}
+
+.border-bottom-2px {
+  border-bottom: 2px solid #c2c2c2;
+}

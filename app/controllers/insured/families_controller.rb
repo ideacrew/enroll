@@ -12,6 +12,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
   before_action :can_view_entire_family_enrollment_history?, only: [:display_all_hbx_enrollments]
   before_action :transition_family_members_update_params, only: [:transition_family_members_update]
+  before_action :upload_notice_form_enabled?, only: [:upload_notice_form]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -357,6 +358,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def upload_notice_form_enabled?
+    redirect_to(root_path, notice: "Upload Notice Form is Disabled") unless EnrollRegistry.feature_enabled?(:show_upload_notices)
+  end
 
   def transition_family_members_update_params
     dynamic_transition_params_keys = params.keys.map { |key| key.match(/transition_.*/) }.compact.map(&:to_s).map(&:to_sym)

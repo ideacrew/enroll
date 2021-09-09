@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 1d042c6b6c43189fa86a3b8609b79f3b23cb60d7
-  branch: release_0.4.0
+  revision: cc6316883bc7c9da2d8e5c662af445d8eaa1d0f3
+  branch: release_0.5.0
   specs:
-    aca_entities (0.3.0)
+    aca_entities (0.4.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7f261d5a8f985b8434572390b50065b02b6bcfcd
+  revision: f2e41bee53939bb069668b314c904c43e52bdc57
   branch: trunk
   specs:
     event_source (0.5.3)
@@ -261,11 +261,11 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday_middleware (1.1.0)
       faraday (~> 1.0)
-    ffi (1.15.3)
+    ffi (1.15.4)
     font-awesome-rails (4.7.0.5)
       railties (>= 3.2, < 6.1)
     forgery (0.7.0)
-    fugit (1.5.0)
+    fugit (1.5.1)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     globalid (0.4.2)
@@ -346,12 +346,12 @@ GEM
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.2)
-    nokogiri (1.12.2)
+    nokogiri (1.12.4)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.13.0)
+    oj (3.13.2)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
@@ -366,7 +366,7 @@ GEM
     public_suffix (4.0.5)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
-    queue-bus (0.11.0)
+    queue-bus (0.12.0)
       multi_json
       redis
     raabro (1.4.0)
@@ -425,7 +425,7 @@ GEM
       resque (>= 1.10.0, < 2.0)
       resque-retry
       resque-scheduler (>= 2.0.1)
-    resque-retry (1.7.4)
+    resque-retry (1.7.6)
       resque (>= 1.25, < 3.0)
       resque-scheduler (~> 4.0)
     resque-scheduler (4.4.0)
@@ -551,4 +551,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.2.12
+   2.2.16

@@ -28,15 +28,15 @@ describe ConsumerRole, dbclean: :after_each do
   let(:is_applicant)          { true }
   let(:citizen_error_message) { 'test citizen_status is not a valid citizen status' }
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:valid_params) do
+    { is_applicant: is_applicant, person: saved_person }
+  end
 
   before :each do
     EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
   end
 
   describe '.new' do
-    let(:valid_params) do
-      { is_applicant: is_applicant, person: saved_person }
-    end
 
     context 'with no person' do
       let(:params) {valid_params.except(:person)}
@@ -92,9 +92,34 @@ describe ConsumerRole, dbclean: :after_each do
           expect(consumer_role.aasm_state).to eq 'unverified'
         end
       end
+
+      context "location_residency_verification_type feature" do
+        let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
+
+        before do
+          EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
+        end
+
+        it "should not create a location_residency verification type when turned off" do
+          expect(consumer_role.verification_types.where(type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item).present?).to eq(false)
+        end
+      end
+    end
+
+    context 'location_residency_verification_type feature is disabled' do
+      let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
+      before do
+        EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should not create a location_residency verification type when turned off" do
+        expect(consumer_role.verification_types.where(type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item).present?).to eq(false)
+      end
     end
   end
 end
+
+
 
 describe "#find_document" do
   let(:consumer_role) {ConsumerRole.new}
@@ -161,6 +186,7 @@ describe "#find_vlp_document_by_key" do
       expect(found_document).to eql(vlp_document)
     end
   end
+
 end
 
 describe "#move_identity_documents_to_outstanding" do
@@ -1750,4 +1776,3 @@ describe 'vlp documents' do
 end
 
 # rubocop:enable Metrics/ParameterLists
-

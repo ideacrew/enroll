@@ -31,11 +31,11 @@
                     <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
                     <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
                     <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
-                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_or_term_exists_for_reinstated_date? %></td>
+                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
                     <td><%= enrollment.effective_on.year %></td>
                     <td><%= enrollment.effective_on %></td>
-                    <td><%= enrollment.terminated_on %></td>
-                    <td id="reinstate"><%= enrollment.terminated_on.next_day %></td>
+                    <td><%= enrollment.fetch_term_or_expiration_date %></td>
+                    <td id="reinstate"><%= enrollment.fetch_term_or_expiration_date.next_day %></td>
                     <td>
                       <input type="checkbox" name="edi_required" value="checked" checked />
                     </td>

@@ -14,6 +14,7 @@ end
 
 When(/^the user clicks the Family Relationships link$/) do
   find(:xpath,'//*[@id="left-navigation"]/li[3]/a').click
+  sleep 2
 end
 
 Then(/^the user will navigate to the Family relationships page$/) do

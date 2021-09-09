@@ -126,6 +126,27 @@ module IvlAssistanceWorld
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
     _application = FactoryBot.create(:financial_assistance_application, aasm_state: state, family_id: family.id)
   end
+
+  def create_enrollment_for_family(family, carrier_name = nil)
+    if carrier_name == 'Kaiser'
+      enrollment_product = create_kaiser_product
+    else
+      enrollment_product = create_cat_product
+    end
+    enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                                   :family => family,
+                                   :household => family.active_household,
+                                   :aasm_state => 'coverage_selected',
+                                   :is_any_enrollment_member_outstanding => true,
+                                   :kind => 'individual',
+                                   :product => enrollment_product,
+                                   :effective_on => TimeKeeper.date_of_record.beginning_of_year)
+    family.family_members.each do |fm|
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: fm.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+    end
+    enrollment.save!
+    enrollment
+  end
 end
 
 World(IvlAssistanceWorld)

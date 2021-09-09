@@ -12,6 +12,7 @@ namespace :paynow do
       source
       enrollment_id
       datetime_of_click
+      hbx_id
     )
 
     # PaymentTransaction model to be updated with a list of locations later, will need to update/read from that when implemented
@@ -39,10 +40,12 @@ namespace :paynow do
       row << field_names
       payment_transactions.each do |pt|
         begin
+          enrollment_hbx_id = HbxEnrollment.find(pt.enrollment_id.to_s)&.hbx_id
           row << [
             pt.source,
             pt.enrollment_id,
-            pt.submitted_at
+            pt.submitted_at,
+            enrollment_hbx_id
           ]
 
           if location_count[pt.source].present?

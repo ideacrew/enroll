@@ -456,7 +456,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:employee_role_person)     { FactoryBot.create(:person, :with_employee_role)}
       let(:consumer_role_person)     { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
       let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: employee_role_person)}
-      let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role_person.employee_roles.first.id) }
+      let!(:census_employee) do
+        FactoryBot.create(:census_employee,
+                          employer_profile: employer_profile,
+                          employee_role_id: employee_role_person.employee_roles.first.id,
+                          benefit_sponsorship_id: sponsored_benefit_package.benefit_application.benefit_sponsorship.id)
+      end
 
       before do
         family_member = FamilyMember.new(:person => consumer_role_person)

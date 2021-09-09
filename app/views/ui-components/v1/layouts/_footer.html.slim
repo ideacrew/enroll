@@ -12,12 +12,13 @@ footer.footer-wrapper#footer-uic class=("#{"pre_prod_nav_color" if ENV['ENROLL_R
                 i.fas.fa-phone.fa-lg
                 | &nbsp; 
                 = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{Settings.contact_center.tty_number}"
-          li
-            = mail_to contact_center_email_address, target: '_blank' do
-              span
-                i.fas.fa-envelope.fa-lg
-                | &nbsp;
-                = Settings.contact_center.email_address
+          - if contact_center_email_address_is_enabled?
+            li
+              = mail_to contact_center_email_address, target: '_blank' do
+                span
+                  i.fas.fa-envelope.fa-lg
+                  | &nbsp;
+                  = EnrollRegistry[:enroll_app].setting(:mail_address).item
           li 
             = link_to site_faqs_url, target: '_blank' do
               i.fas.fa-question.fa-lg

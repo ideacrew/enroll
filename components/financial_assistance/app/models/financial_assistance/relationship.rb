@@ -94,7 +94,7 @@ module FinancialAssistance
     field :relative_id, type: BSON::ObjectId # successor or to
 
     validates :kind,
-              inclusion: { in: RELATIONSHIPS_UI, message: "%{value} is not a valid kind" },
+              inclusion: { in: RELATIONSHIPS, message: "%{value} is not a valid kind" },
               allow_blank: false
 
     after_create :propagate_applicant

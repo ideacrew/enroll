@@ -109,4 +109,7 @@ Rails.application.configure do
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR
+
+  # Full exceptions in non-prod environments
+  config.consider_all_requests_local = true unless ENV['AWS_ENV'] == 'prod'
 end

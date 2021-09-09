@@ -72,13 +72,24 @@ def gate_quiet_period(benefit_application, transition_at)
   end
 end
 
+def renewed_by_prior_py(enrollment)
+  return false unless enrollment.family.present?
+  latest_expired = enrollment.family.hbx_enrollments.expired.where(coverage_kind: enrollment.coverage_kind,
+                                                                   kind: enrollment.kind,
+                                                                   employee_role_id: enrollment.employee_role_id).order_by(:created_at.desc).first
+  return false unless latest_expired.present?
+  return false unless latest_expired.special_enrollment_period.present?
+  EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) && latest_expired.special_enrollment_period.coverage_renewal_flag
+      enrollment.workflow_state_transitions.any? {|wst| wst.to_state == 'auto_renewing'}
+end
+
 def can_publish_enrollment?(enrollment, transition_at)
   sb = enrollment.sponsored_benefit
   benefit_application = sb.benefit_package.benefit_application
   if is_valid_benefit_application?(benefit_application)
     return false if gate_quiet_period(benefit_application, transition_at)
     return true  if term_states.include?(enrollment.aasm_state)
-    return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months))
+    return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months)) && !renewed_by_prior_py(enrollment)
     return true
   else
     return false

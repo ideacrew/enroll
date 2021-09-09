@@ -16,6 +16,21 @@ module FinancialAssistance
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
 
+            FAA_MITC_RELATIONSHIP_MAP = {
+              'spouse' => :husband_or_wife,
+              'domestic_partner' => :domestic_partner,
+              'child' => :son_or_daughter,
+              'parent' => :parent,
+              'sibling' => :brother_or_sister,
+              'aunt_or_uncle' => :aunt_or_uncle,
+              'nephew_or_niece' => :nephew_or_niece,
+              'grandchild' => :grandchild,
+              'grandparent' => :grandparent,
+              'father_or_mother_in_law' => :mother_in_law_or_father_in_law,
+              'daughter_or_son_in_law' => :son_in_law_or_daughter_in_law,
+              'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law
+            }.freeze
+
             # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
             # @option opts [::FinancialAssistance::Application] :application
             # @return [Dry::Monads::Result]
@@ -30,7 +45,7 @@ module FinancialAssistance
             private
 
             def validate(application)
-              return Success(application) if application.submitted?
+              return Success(application) if application.submitted? || application.is_determined?
               Failure("Application is in #{application.aasm_state} state. Please submit application.")
             end
 
@@ -68,6 +83,7 @@ module FinancialAssistance
             # rubocop:disable Metrics/MethodLength
             def applicants(application)
               application.applicants.inject([]) do |result, applicant|
+                prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn,
                                                      encrypted_ssn: applicant.encrypted_ssn},
@@ -132,8 +148,8 @@ module FinancialAssistance
                            is_self_attested_long_term_care: applicant.has_daily_living_help.present?,
                            has_insurance: applicant.is_enrolled_in_insurance?,
                            has_state_health_benefit: applicant.has_state_health_benefit?,
-                           had_prior_insurance: had_prior_insurance?(applicant),
-                           prior_insurance_end_date: applicant.prior_insurance_end_date,
+                           had_prior_insurance: prior_insurance_benefit.present?,
+                           prior_insurance_end_date: prior_insurance_benefit&.end_on,
                            age_of_applicant: applicant.age_of_the_applicant,
                            hours_worked_per_week: applicant.total_hours_worked_per_week,
                            is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
@@ -279,32 +295,10 @@ module FinancialAssistance
               end
             end
 
-            # rubocop:disable Metrics/CyclomaticComplexity
             def find_relationship_code(relationship)
-              mitc_rel =
-                case relationship.kind
-                when 'spouse' || 'domestic_partner'
-                  :husband_or_wife
-                when 'child'
-                  :son_or_daughter
-                when 'parent'
-                  :parent
-                when 'sibling'
-                  :brother_or_sister
-                when 'aunt_or_uncle'
-                  :aunt_or_uncle
-                when 'nephew_or_niece'
-                  :nephew_or_niece
-                when 'grandchild'
-                  :grandchild
-                when 'grandparent'
-                  :grandparent
-                else
-                  :other
-                end
+              mitc_rel = FAA_MITC_RELATIONSHIP_MAP[relationship.kind] || :other
               ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[mitc_rel] || '88'
             end
-            # rubocop:enable Metrics/CyclomaticComplexity
 
             # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
             def wages_and_salaries(current_incomes)
@@ -467,9 +461,9 @@ module FinancialAssistance
             end
 
             # Was the applicant receiving coverage that has expired?
-            # Any benefits of type is_enrolled and end dated.
-            def had_prior_insurance?(applicant)
-              applicant.benefits.any?{ |b| b.is_enrolled? && b.end_on.present? }
+            # Benefit of type is_enrolled and end dated.
+            def prior_insurance(applicant)
+              applicant.benefits.detect{ |b| b.is_enrolled? && b.end_on.present? }
             end
 
             def vlp_document(applicant)
