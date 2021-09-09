@@ -30,7 +30,7 @@ module Operations
         family =  if family_id.present? & family_id.is_a?(BSON::ObjectId)
                     Family.find(family_id)
                   elsif family_id.present?
-                    Family.where(ext_app_id: family_id).first
+                    Family.where(external_app_id: family_id).first
                   end
 
         family.present? ? Success(family) : Failure("Unable to find Family with ID #{family_id}.")

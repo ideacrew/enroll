@@ -27,7 +27,7 @@ module Operations
       private
 
       def find(validated_params)
-        result = Operations::Families::Find.new.call(ext_app_id: validated_params.to_h[:hbx_id])
+        result = Operations::Families::Find.new.call(external_app_id: validated_params.to_h[:hbx_id])
 
         result.success? ? Failure(result) : Success(result)
       end

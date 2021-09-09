@@ -9,19 +9,14 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 
 # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
-# RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
+# RAILS_ENV=production bundle exec rails db:migrate:up source=MCR dir="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp dir="directory_path" VERSION="20210512153640"
 class MigrateFamily < Mongoid::Migration
   include EventSource::Command
 
   def self.up
-    @source = ENV["source"].to_s.downcase # MCR or ATP
-    # @file_path = "/Users/saidineshmekala/Downloads/app.json"
-    # @file_path = ENV["dir"]
-    # @file_path = "/Users/saidineshmekala/IDEACREW/aca_entities/spec/support/transform_example_payloads/test.json"
-    # @file_path = "/Users/saidineshmekala/Downloads/app_migration/app1.json"
-    # @file_path = "/Users/saidineshmekala/Downloads/app_migration/test.json
+    @source =  ENV["source"].to_s.downcase # MCR or ATP
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
@@ -37,14 +32,14 @@ class MigrateFamily < Mongoid::Migration
 
     def migrate_for_mcr
       ::AcaEntities::Ffe::Transformers::McrTo::Family.call(@filepath, { transform_mode: :batch }) do |payload|
-        if  Rails.env.development?
-          Operations::Ffe::MigrateApplication.new.call(payload)
+        if Rails.env.development?
+          result = Operations::Ffe::MigrateApplication.new.call(payload)
+          puts result
         else
           event("events.json.stream", attributes: payload).success.publish
         end
-        print "."
-      rescue StandardError => _e
-        puts "E: #{payload[:insuranceApplicationIdentifier]}" # , f: #{@family.hbx_id}  error: #{e.message.split('.').first}"
+      rescue StandardError => e
+        puts "Error: #{payload[:insuranceApplicationIdentifier]}"
       end
     end
 
@@ -605,9 +600,9 @@ class MigrateFamily < Mongoid::Migration
 
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
-        # unless persisted_applicant.valid?
-        #   binding.pry
-        # end
+        unless persisted_applicant.valid?
+          # binding.pry
+        end
         # persisted_applicant.save!(validate: false)
 
         persisted_applicant.save!

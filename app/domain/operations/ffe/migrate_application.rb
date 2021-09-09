@@ -2,9 +2,6 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
-# require 'aca_entities'
-# require 'aca_entities/ffe/operations/process_mcr_application'
-# require 'aca_entities/ffe/operations/mcr_to/family'
 require 'aca_entities'
 require 'aca_entities/ffe/operations/process_mcr_application'
 require 'aca_entities/ffe/transformers/mcr_to/family'
@@ -23,80 +20,100 @@ module Operations
       # @param [ Hash] mcr_application_payload to transform
       # @return [ Hash ] family_hash
       # api public
-      def call(app_payload)
-        payload_id = yield load(app_payload)
 
-        Success("successfully migrated payload id: #{payload_id}")
+      attr_reader :external_application_id, :payload, :family, :family_hash, :application
+
+      def call(app_payload)
+        @payload = app_payload
+        @external_application_id = app_payload[:insuranceApplicationIdentifier]
+
+        # ::FinancialAssistance::Application.all.create_indexes
+        # Family.all.create_indexes
+        # return "already migratred" if migrated.include?(external_application_id.to_s)
+        # migrated_fam = Family.where(external_app_id: external_application_id.to_s).first
+        # return if migrated_fam.present?
+        # if migrated_fam.present?
+        #   if migrated_fam.valid?
+        #     if migrated_fam.primary_applicant.person.is_applying_for_assistance
+        #       migrated_application = ::FinancialAssistance::Application.where(family_id: migrated_fam.id).first
+        #       if migrated_application.present? && !migrated_application.valid?
+        #         puts "deleting application & family "
+        #         migrated_fam.delete
+        #         migrated_application.delete
+        #       end
+        #     else
+        #       return
+        #     end
+        #   else
+        #     puts "Deleting family "
+        #     migrated_fam.delete
+        #   end
+        # end
+
+        _application = yield import_application
+
+        Success("#{external_application_id}")
+      rescue StandardError => e
+        # binding.pry
+        puts "Exception: Operations::Ffe::MigrateApplication: #{external_application_id} -- #{e}"
       end
 
       private
 
-      def load(payload)
+      def import_application
         transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
 
         if transform_payload.success?
-          family_hash = transform_payload.success.to_h.deep_stringify_keys!
+          @family_hash = transform_payload.success.to_h.deep_stringify_keys!.merge!(external_app_id: external_application_id)
         else
-          puts "aca entities failure app_identifier: #{payload[:insuranceApplicationIdentifier]}"
-          return Failure("aca entities failure app_identifier: #{payload[:insuranceApplicationIdentifier]}")
+          puts "Transform Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{transform_payload.failure}"
+          return Failure("Transform Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{transform_payload.failure}")
         end
 
         if family_hash.empty?
-          puts "family hash empty: #{payload[:insuranceApplicationIdentifier]}"
-          return Failure("family hash empty: #{payload[:insuranceApplicationIdentifier]}")
+          puts "Family Hash Empty: Operations::Ffe::MigrateApplication:: #{external_application_id}"
+          return Failure("Family Hash Empty: Operations::Ffe::MigrateApplication:: #{external_application_id}")
         end
 
-        # puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}" if family_hash.empty?
-        # return Failure("error in MigrateApplication -> family_hash is empty/nil") unless family_hash.present?
-        build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
+        return Success(external_application_id) if Family.where(external_app_id: external_application_id).present?
 
-      #   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
-      #
-      #   family = Family.where(id: result.success).first
-      #   if family.primary_applicant.person.is_applying_for_assistance
-      #     Family.create_indexes
-      #     family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
-      #
-      #     Operations::CvMigration::CreateMagiMedicaidApplication.new.call(family_hash)
-      #
-      #     # app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-      #     ::FinancialAssistance::Application.create_indexes
-      #     # fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-      #     # fix_iap_relationship(app_id, family_hash)
-      #   end
-      #  end
+        build_family
 
-        if @family.primary_applicant.person.is_applying_for_assistance
-          Family.create_indexes
+        if family.primary_applicant.person.is_applying_for_assistance
+          application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id,
+                                                                                                benchmark_product_id: BSON::ObjectId.new,
+                                                                                                years_to_renew: 5))
+          # Family.create_indexes  TODO: index
+          # ::FinancialAssistance::Application.create_indexes #TODO: index
+          if application_result.success
+            application_id = application_result.success
+            @application = ::FinancialAssistance::Application.find(application_id)
 
-          app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: @family.benchmark_product_id))
-
-          ::FinancialAssistance::Application.create_indexes
-          fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-
-          fix_iap_relationship(app_id, family_hash)
+            fill_applicants_form
+            fix_iap_relationship
+          else
+            # binding.pry
+            puts "IAP Application Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{application_result.failure}"
+            return Failure("IAP Application Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{application_result.failure}")
+          end
         end
-        puts "success #{payload[:insuranceApplicationIdentifier]}"
+        # puts "Success: #{external_application_id}"
         print "."
-        Success(payload[:insuranceApplicationIdentifier])
-      rescue StandardError => e
-        puts "exception :#{payload[:insuranceApplicationIdentifier]} -- #{e}"
-        Failure("exception: #{payload[:insuranceApplicationIdentifier]} -- #{e}")
+        Success(application)
       end
 
-      def fix_iap_relationship(app_id, family_hash)
-        @application = ::FinancialAssistance::Application.where(id: app_id).first
-        @matrix = @application.build_relationship_matrix
-        @missing_relationships = @application.find_missing_relationships(@matrix)
-        @all_relationships = @application.find_all_relationships(@matrix)
+      def fix_iap_relationship
+        @matrix = application.build_relationship_matrix
+        @missing_relationships = application.find_missing_relationships(@matrix)
+        @all_relationships = application.find_all_relationships(@matrix)
         missing_relationships = []
         all_relationships = []
         @missing_relationships.each do |rel|
           from_relation = rel.first[0]
           to_relation = rel.first[1]
-          next if @application.relationships.where(applicant_id: from_relation, relative_id: to_relation).present?
-          from_applicant = @application.applicants.where(id: from_relation).first
-          to_applicant = @application.applicants.where(id: to_relation).first
+          next if application.relationships.where(applicant_id: from_relation, relative_id: to_relation).present?
+          from_applicant = application.applicants.where(id: from_relation).first
+          to_applicant = application.applicants.where(id: to_relation).first
           from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
           to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
           member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
@@ -104,11 +121,11 @@ module Operations
           relation_kind = relationship.present? ? relationship["kind"] : "unrelated"
           missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation_kind, applicant_id: from_applicant.id, relative_id: to_applicant.id})
         end
-        @application.relationships << missing_relationships
+        application.relationships << missing_relationships
 
         @all_relationships.each do |all_rel|
           next if all_rel[:relation].present?
-          relationships = @application.relationships
+          relationships = application.relationships
           from_relation = all_rel[:applicant]
           to_relation = all_rel[:relative]
           found_relationship = relationships.where(applicant_id: from_relation,relative_id: to_relation).first
@@ -119,8 +136,8 @@ module Operations
             all_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_relation, relative_id: to_relation})
             next
           end
-          from_applicant = @application.applicants.find(from_relation)
-          to_applicant = @application.applicants.find(to_relation)
+          from_applicant = application.applicants.find(from_relation)
+          to_applicant = application.applicants.find(to_relation)
           from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
           to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
           member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
@@ -133,18 +150,16 @@ module Operations
             all_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_applicant.id, relative_id: to_applicant.id})
           end
         end
-        @application.relationships << all_relationships
-        @application.save!
+        application.relationships << all_relationships
+        application.save!
       end
 
       def build_iap(iap_hash)
         sanitize_iap_hash = sanitize_applicant_params(iap_hash)
-        result = ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash)
-
-        result.success? ? result.success : result.failure
+        ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash)
       end
 
-      def build_family(family_hash)
+      def build_family
         @family = Family.new(family_hash.except('hbx_id', 'foreign_keys', 'broker_accounts', 'magi_medicaid_applications', 'family_members',
                                                 'households'))
 
@@ -152,9 +167,8 @@ module Operations
           # puts "sorting member primary: #{family_member_hash['is_primary_applicant']}"
           create_member(family_member_hash)
         end
-
-        add_broker_accounts(@family, family_hash)
-        @family.save!
+        add_broker_accounts(family, family_hash)
+        family.save!
       end
 
       def create_member(family_member_hash)
@@ -192,7 +206,7 @@ module Operations
       end
 
       def create_or_update_family_member(person, family_member_hash)
-        family_member = @family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+        family_member = family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
         return family_member if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
 
         fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
@@ -230,7 +244,6 @@ module Operations
 
       def create_or_update_vlp_document(vlp_params, person)
         return unless vlp_params.present?
-
         vlp_params.each do |vlp|
           result = Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp, person: person })
           vlp_document = result.success
@@ -248,25 +261,23 @@ module Operations
 
       def same_address_with_primary(family_member)
         member = family_member.person
-
         compare_keys = ["address_1", "address_2", "city", "state", "zip"]
         member.is_homeless? == @primary_person.is_homeless? &&
           member.is_temporarily_out_of_state? == @primary_person.is_temporarily_out_of_state? && member.home_address &&
           member.home_address.attributes.select {|k, _v| compare_keys.include? k} == @primary_person.home_address.attributes.select do |k, _v|
-                                                                                       compare_keys.include? k
-                                                                                     end
+            compare_keys.include? k
+          end
       end
 
       def sanitize_applicant_params(iap_hash)
         applicants_hash = iap_hash['applicants']
         sanitize_params = []
         applicants_hash.sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |applicant_hash|
-          family_member = @family.family_members.select do |fm|
-            fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
+          family_member = family.family_members.select do |fm|
+            fm.external_member_id == applicant_hash["family_member_reference"]["family_member_hbx_id"]
           end.first
 
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
-
           sanitize_params << {
             family_member_id: family_member.id,
             relationship: family_member.relationship,
@@ -407,6 +418,10 @@ module Operations
             benefit['employer_id'] = benefit['employer']['employer_id']
           end
 
+          if benefit['employer_phone'] && benefit['employer_phone']['number'].nil?
+            benefit['employer_phone'] = nil
+          end
+
           benefit.except("status", "employer")
         end
       end
@@ -448,15 +463,8 @@ module Operations
         }
       end
 
-      def fill_applicants_form(app_id, applications)
-        applicants_hash = applications[:applicants]
-        application = ::FinancialAssistance::Application.where(id: app_id).first
-
-        application.parent_living_out_of_home_terms = applications["parent_living_out_of_home_terms"]
-        application.report_change_terms = applications['report_change_terms']
-        application.medicaid_terms = applications['medicaid_terms']
-        application.save!
-
+      def fill_applicants_form
+        applicants_hash = family_hash['magi_medicaid_applications'].first[:applicants]
         applicants_hash.each do |applicant|
           persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
           claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
@@ -540,9 +548,13 @@ module Operations
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
           # unless persisted_applicant.valid?
-          #
+          #   binding.pry
           # end
           # persisted_applicant.save!(validate: false)
+
+          unless persisted_applicant.valid?
+            # binding.pry
+          end
 
           persisted_applicant.save!
           ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
@@ -608,4 +620,22 @@ module Operations
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+
+# TODO: refactor
+#   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
+#   binding.pry
+#   family = Family.where(id: result.success).first
+#   if family.primary_applicant.person.is_applying_for_assistance
+#     Family.create_indexes
+#     family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
+#     binding.pry
+#     Operations::CvMigration::CreateMagiMedicaidApplication.new.call(family_hash)
+#     binding.pry
+#     # app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+#     ::FinancialAssistance::Application.create_indexes
+#     # fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+#     # fix_iap_relationship(app_id, family_hash)
+#   end
+#  end
+
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity

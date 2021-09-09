@@ -4,12 +4,12 @@ module Subscribers
   # Subscriber will receive request json payload from EA
   class JsonSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.json']
+    # include Acapi::Notifiers
 
     subscribe(:on_stream) do |delivery_info, _metadata, response|
-      logger.info '-' * 100
       payload = JSON.parse(response, :symbolize_names => true)
-
-      logger.info "on_stream: delivered payload: #{payload[:insuranceApplicationIdentifier]} #{'-' * 50}"
+      application_id = payload[:insuranceApplicationIdentifier]
+      logger.info "on_stream payload: #{application_id} #{'*' * 100}"
       result = Operations::Ffe::MigrateApplication.new.call(payload)
 
       if result.success?
@@ -25,3 +25,23 @@ module Subscribers
     end
   end
 end
+
+# application_id = payload[:insuranceApplicationIdentifier]
+# logger.info "on_stream payload: #{application_id} #{'*' * 100}"
+# result = Operations::Ffe::TransformApplication.new.call(payload)
+# if result.success?
+#   transformed_application = result.success.to_h.merge(external_app_id: payload[:insuranceApplicationIdentifier])
+#   notify("acapi.info.events.migration.transformed_application", {:application_payload => transformed_application})
+#   ack(delivery_info.delivery_tag)
+#   logger.info "Sucess: MCRSubscriber: acked with success: #{result.success}"
+# else
+#   errors = result.failure.errors.to_h
+#   # nack(delivery_info.delivery_tag) #TODO:
+#   ack(delivery_info.delivery_tag)
+#   logger.info "Failure: MCRSubscriber: nacked with failure, errors: #{errors}"
+# end
+# logger.info "on_stream completed for: #{application_id} #{'*' * 100}"
+# rescue StandardError => e
+# logger.info "Exception: MCRSubscriber: #{e.backtrace} nacked"
+# ack(delivery_info.delivery_tag)
+# # nack(delivery_info.delivery_tag)

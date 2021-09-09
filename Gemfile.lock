@@ -584,6 +584,7 @@ GEM
       faraday (~> 1.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
+    fast_jsonparser (0.5.0)
     ffaker (2.19.0)
     ffi (1.9.25)
     font-awesome-rails (4.7.0.7)
@@ -1143,6 +1144,7 @@ DEPENDENCIES
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
+  fast_jsonparser
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
@@ -1180,6 +1182,7 @@ DEPENDENCIES
   notifier!
   openhbx_cv2!
   overcommit (~> 0.47)
+  parallel
   parallel_tests (~> 2.26.2)
   prawn!
   pry
