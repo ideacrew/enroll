@@ -4,7 +4,7 @@ import {
   SplitConfig,
   FilesWithRunTime,
 } from '../models';
-// import { createGroupOverview } from './createGroupRunTimes';
+import { createGroupOverview } from './createGroupRunTimes';
 import { createSplitConfig } from './createSplitConfig';
 import { runtimeDetails } from './numberOfGroups';
 
@@ -82,8 +82,8 @@ export function splitFilesIntoGroups(
 
   // console.log('Files left', files.length);
 
-  // const overview = createGroupOverview(groupRunTimes);
-  // console.log(overview);
+  const overview = createGroupOverview(groupRunTimes);
+  console.log(overview);
 
   const a: SplitConfig = createSplitConfig(groupRunTimes);
 
