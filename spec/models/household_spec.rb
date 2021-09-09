@@ -311,11 +311,7 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     end
 
     it 'should create determination with limited csr' do
-      expect(@eligibility_determination.csr_eligibility_kind).to eq('csr_limited')
-    end
-
-    it 'should create determination with csr_percent_as_integer as -1' do
-      expect(@eligibility_determination.csr_percent_as_integer).to eq(-1)
+      expect(active_household.latest_active_thh.tax_household_members.first.csr_percent_as_integer).to eq(-1)
     end
   end
 end
