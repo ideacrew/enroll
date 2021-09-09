@@ -108,11 +108,13 @@ module Enrollments
           end
         end
         reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
-        if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
-          base_enrollment.terminate_coverage!
-          base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
-        else
-          base_enrollment.cancel_coverage! if base_enrollment.may_cancel_coverage?
+        unless base_enrollment.coverage_expired?
+          if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
+            base_enrollment.terminate_coverage!
+            base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
+          elsif base_enrollment.may_cancel_coverage?
+            base_enrollment.cancel_coverage!
+          end
         end
 
         @reinstate_enrollment = reinstated_enrollment
@@ -139,11 +141,22 @@ module Enrollments
       def form_ivl_params
         # TODO: Query is too long
         # TODO: undefined local variable or method `year' for #<Enrollments::Replicator::Reinstatement:0x00007fca4bcb2970>
+        new_product_id = base_enrollment.is_ivl_by_kind? ? product_id_csr_variant(base_enrollment) : base_enrollment.product_id
         {
-          product_id: base_enrollment.product_id,
+          product_id: new_product_id,
           consumer_role_id: base_enrollment.consumer_role_id,
           rating_area_id: ::BenefitMarkets::Locations::RatingArea.rating_area_for(base_enrollment.consumer_role.rating_address, during: new_effective_date)&.id
         }
+      end
+
+      def product_id_csr_variant(base_enrollment)
+        tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(@year)
+        base_enrollment_product_id = base_enrollment.product_id
+        return base_enrollment_product_id unless tax_household.present?
+        eligible_csr = tax_household.eligibile_csr_kind(base_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[eligible_csr]
+        products = ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(@year).where({:hios_id => "#{base_enrollment.product.hios_base_id}-#{csr_variant}"})
+        products.count >= 1 ? products.last.id : base_enrollment_product_id
       end
 
       def common_params

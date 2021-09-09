@@ -5,7 +5,7 @@ describe PersonRelationship, dbclean: :after_each do
   it { should validate_presence_of :kind }
 
   let(:kind) {"spouse"}
-  let(:person) {FactoryBot.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let!(:person) { FactoryBot.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789") }
 
   describe "class methods" do
     context "shop_display_relationship_kinds" do
@@ -80,7 +80,8 @@ describe PersonRelationship, dbclean: :after_each do
       "stepparent",
       "trustee",
       "unrelated",
-      "ward"
+      "ward",
+      'cousin'
     ] }
 
     context "consumer relationship dropdown list(family member page)" do
@@ -144,5 +145,81 @@ describe PersonRelationship, dbclean: :after_each do
       end
     end
   end
-end
 
+  describe 'create valid relationship' do
+    let!(:person2) { FactoryBot.create(:person) }
+    let(:valid_params) do
+      { kind: relative_kind,
+        relative: person,
+        person: person2 }
+    end
+
+    context 'valid params with father_or_mother_in_law' do
+      let(:relative_kind) { 'father_or_mother_in_law' }
+
+      before do
+        person.person_relationships << described_class.new(valid_params)
+        person.save!
+      end
+
+      it 'should return valid person' do
+        expect(person.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of person' do
+        expect(person.person_relationships.first.kind).to eq('father_or_mother_in_law')
+      end
+    end
+
+    context 'valid params with daughter_or_son_in_law' do
+      let(:relative_kind) { 'daughter_or_son_in_law' }
+
+      before do
+        person.person_relationships << described_class.new(valid_params)
+        person.save!
+      end
+
+      it 'should return valid person' do
+        expect(person.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of person' do
+        expect(person.person_relationships.first.kind).to eq('daughter_or_son_in_law')
+      end
+    end
+
+    context 'valid params with brother_or_sister_in_law' do
+      let(:relative_kind) { 'brother_or_sister_in_law' }
+
+      before do
+        person.person_relationships << described_class.new(valid_params)
+        person.save!
+      end
+
+      it 'should return valid person' do
+        expect(person.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of person' do
+        expect(person.person_relationships.first.kind).to eq('brother_or_sister_in_law')
+      end
+    end
+
+    context 'valid params with cousin' do
+      let(:relative_kind) { 'cousin' }
+
+      before do
+        person.person_relationships << described_class.new(valid_params)
+        person.save!
+      end
+
+      it 'should return valid person' do
+        expect(person.valid?).to be_truthy
+      end
+
+      it 'should return relationship kind of person' do
+        expect(person.person_relationships.first.kind).to eq('cousin')
+      end
+    end
+  end
+end

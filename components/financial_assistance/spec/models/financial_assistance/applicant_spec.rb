@@ -179,8 +179,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
                                                 frequency_kind: 'yearly',
                                                 amount: 30_000.00,
-                                                start_on: Date.new(TimeKeeper.date_of_record.year, 3, 1),
-                                                end_on: Date.new(TimeKeeper.date_of_record.year, 8, 31),
+                                                start_on: Date.new(TimeKeeper.date_of_record.year, 1, 1),
                                                 employer_name: 'Testing employer' })
       applicant.incomes << inc
       applicant.save!

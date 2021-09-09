@@ -176,6 +176,8 @@ registry:
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :statewide_area
             item: "Maine"
+          - key: :standard_plan_label
+            item: "CLEAR CHOICE PLAN"
           - key: :exchange_name
             item: "CoverME.gov Health Benefit Exchange"
           - key: :social_media
@@ -307,6 +309,12 @@ registry:
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
+      - key: :change_end_date
+        is_enabled: true
+        item: Operations::HbxEnrollments::EndDateChange.new
+        settings:
+          - key: :expired_enrollments
+            item: false
   - namespace:
       - :pay_now_feature
     features:
@@ -487,6 +495,8 @@ registry:
         is_enabled: false
       - key: :import_network_data
         is_enabled: true
+      - key: :import_standard_plan
+        is_enabled: true
       - key: :validate_quadrant
         item: :validate_quadrant
         is_enabled: false
@@ -513,12 +523,35 @@ registry:
         is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: true
+      - key: :tobacco_user_field
+        item: :tobacco_user_field
+        is_enabled: true 
+      - key: :in_person_application_enabled
+        item: :in_person_application_enabled
+        is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
         is_enabled: false
       - key: :show_upload_notices
         item: :show_upload_notices
         is_enabled: false
-      - key: :tobacco_user_field
-        item: :tobacco_user_field
-        is_enabled: true 
+      - key: :contact_email_header_footer_feature
+        item: :contact_email_header_footer_feature
+        is_enabled: false
+      - key: :contact_customer_service_representative
+        item: :contact_customer_service_representative
+        is_enabled: false
+      - key: :location_residency_verification_type
+        item: :location_residency_verification_type
+        is_enabled: false
+      - key: :disable_form_phone_and_paper_dropdown
+        is_enabled: true
+      - key: :saml_info_keys
+        is_enabled: true
+        settings:
+          - key: :saml_info_required_keys
+            item: ['assertion_consumer_service_url', 'assertion_consumer_logout_service_url', 'issuer', 'idp_entity_id', 'idp_sso_target_url', 'idp_slo_target_url', 'idp_cert', 'name_identifier_format',
+                   'idp_cert_fingerprint', 'idp_cert_fingerprint_algorithm', 'curam_landing_page_url', 'saml_logout_url', 'account_conflict_url', 'account_recovery_url', 'iam_login_url', 'curam_broker_dashboard',
+                    'pay_now_issuer', 'pay_now_private_key_location', 'pay_now_x509_cert_location', 'northeast_delta_dental_pay_now_url', 'northeast_delta_dental_pay_now_audience', 'northeast_delta_dental_pay_now_relay_state',
+                    'anthem_blue_cross_and_blue_shield_pay_now_url', 'anthem_blue_cross_and_blue_shield_pay_now_audience', 'anthem_blue_cross_and_blue_shield_pay_now_relay_state', 'harvard_pilgrim_health_care_pay_now_url',
+                    'harvard_pilgrim_health_care_pay_now_audience', 'harvard_pilgrim_health_care_pay_now_relay_state', 'community_health_options_pay_now_url', 'community_health_options_pay_now_audience', 'community_health_options_pay_now_relay_state']

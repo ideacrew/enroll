@@ -1,13 +1,14 @@
-@import "variables";
+@import 'variables';
 // employer portal
-#home, .plan_design_proposals {
+#home,
+.plan_design_proposals {
   nav {
     ul {
       background-color: $brand-primary;
       padding: 20px 0;
       list-style-type: none;
       img {
-        width:100%
+        width: 100%;
       }
       li {
         padding: 8px 0;
@@ -59,7 +60,6 @@
       text-transform: uppercase;
       padding-top: 10px;
       cursor: pointer;
-
     }
     .filter-options {
       display: none;
@@ -102,7 +102,10 @@
           background-image: none;
           border: none;
           border-color: none;
-          &:hover, &:active, &:focus, &:active {
+          &:hover,
+          &:active,
+          &:focus,
+          &:active {
             background-color: transparent;
             border-color: none;
             -webkit-box-shadow: none;
@@ -115,21 +118,19 @@
           border: none;
           -webkit-box-shadow: none;
           box-shadow: none;
-
         }
         &:hover {
           color: underline;
         }
       }
-
-
     }
   }
-  .employees-table, .documents-table{
-      margin-top: 20px;
-      .table-responsive {
-        border: solid 1px #d5d5d5;
-      }
+  .employees-table,
+  .documents-table {
+    margin-top: 20px;
+    .table-responsive {
+      border: solid 1px #d5d5d5;
+    }
     table {
       border: solid 1px #d5d5d5;
       width: 100%;
@@ -137,19 +138,17 @@
       border-collapse: collapse;
 
       tr {
-      th {
-        padding: 12px 0;
-        font-weight: normal;
-        text-align: left;
-        text-transform: uppercase;
-        width: 10%;
-        border-bottom: solid 2px #b2b2b2;
-        padding-left: 20px;
-        &:hover {
-          border-bottom: solid 2px $primary-blue;
-
-        }
-
+        th {
+          padding: 12px 0;
+          font-weight: normal;
+          text-align: left;
+          text-transform: uppercase;
+          width: 10%;
+          border-bottom: solid 2px #b2b2b2;
+          padding-left: 20px;
+          &:hover {
+            border-bottom: solid 2px $primary-blue;
+          }
         }
         td {
           background-color: #ffffff;
@@ -158,20 +157,16 @@
           font-size: 13px;
           &.confirm-terminate-wrapper {
             padding: 0;
-
           }
           &:first-of-type {
             font-size: 15px;
           }
           &:last-of-type {
-
           }
 
           &:hover {
             color: $primary-blue;
-
           }
-
         }
       }
     }
@@ -206,9 +201,6 @@
         color: #333;
       }
     }
-
-
-
   }
   #add_employee_action {
     .col-xs-12 {
@@ -216,13 +208,15 @@
       }
     }
   }
-  .planyear-add-tab, .employer-edit-tab, #add_employee_action {
+  .planyear-add-tab,
+  .employer-edit-tab,
+  #add_employee_action {
     padding-bottom: 45px;
     h3 {
       &:first-of-type {
         display: inline-block;
         margin-top: 0;
-        &+h4 {
+        & + h4 {
           display: inline-block;
         }
       }
@@ -279,15 +273,13 @@
               font-weight: 600;
               font-size: 24px;
               margin: 0;
-
             }
             span.month {
               text-transform: uppercase;
               font-size: 10px;
               display: block;
               position: relative;
-              top:-5px;
-
+              top: -5px;
             }
           }
         }
@@ -303,13 +295,12 @@
   }
   .planyear-add-tab {
     .row-form-wrapper {
-
-        border-top: 1px solid #ddd;
-
+      border-top: 1px solid #ddd;
     }
   }
 
-  .benefits-tab, .home-tab {
+  .benefits-tab,
+  .home-tab {
     .alert-warning {
       .fa {
         color: inherit;
@@ -321,7 +312,7 @@
     .bg-title {
       margin-bottom: 10px;
       display: inline-block;
-      color: #69A30D;
+      color: #69a30d;
       font-size: 18px;
     }
   }
@@ -336,15 +327,14 @@
     }
   }
 
-  .benefits-tab, .home-tab {
-
+  .benefits-tab,
+  .home-tab {
     .benefit-package {
       position: relative;
       .panel {
         border: none;
       }
       .col-xs-1 {
-
         .make-default {
           color: #cccccc;
           position: relative;
@@ -352,18 +342,16 @@
           margin: 0;
           display: block;
           &.active {
-            color: #FFD700;
+            color: #ffd700;
           }
           &:hover {
             cursor: pointer;
           }
         }
-
       }
       &:hover {
         .make-default {
           display: block;
-
         }
       }
     }
@@ -380,68 +368,65 @@
     }
     .details {
       cursor: pointer;
-      margin-right:20px;
+      margin-right: 20px;
     }
     .benefit-details {
       cursor: pointer;
       &:hover {
-        >* {
+        > * {
           color: #23527c;
         }
       }
     }
     .package-offering {
-
       background-color: #ffffff;
       padding: 10px 0 20px;
 
-    table {
-      padding: 0 2%;
-      margin: auto;
-      table-layout: fixed;
+      table {
+        padding: 0 2%;
+        margin: auto;
+        table-layout: fixed;
 
-      tr.not-offered {
-        opacity: 0.35;
-      }
-
-      tr:first-of-type {
-        border-top: none;
-        th:first-of-type {
-          width: 28%;
-        }
-        th {
-          font-weight: normal;
-          text-transform: uppercase;
-          padding: 10px 0;
-          color: #9b9b9b;
+        tr.not-offered {
+          opacity: 0.35;
         }
 
-      }
-      tr {
-        border-bottom: solid 1px #d5d5d5;
-        td {
-          padding: 15px 0;
-          font-size: 16px;
-          i {
-            margin-left: -15%;
-            color: #69A30D;
-            margin-right: 10px;
-            cursor: default;
+        tr:first-of-type {
+          border-top: none;
+          th:first-of-type {
+            width: 28%;
+          }
+          th {
+            font-weight: normal;
+            text-transform: uppercase;
+            padding: 10px 0;
+            color: #9b9b9b;
           }
         }
-        &:last-of-type {
-          border-bottom: none;
+        tr {
+          border-bottom: solid 1px #d5d5d5;
+          td {
+            padding: 15px 0;
+            font-size: 16px;
+            i {
+              margin-left: -15%;
+              color: #69a30d;
+              margin-right: 10px;
+              cursor: default;
+            }
+          }
+          &:last-of-type {
+            border-bottom: none;
+          }
         }
       }
-
-    }
     }
     .panel.benefitgroup.benefitgroup.referenceplan {
       border-top: none;
       border-bottom: solid 1px #b7b7b7;
       border-left: solid 1px #b7b7b7;
       border-right: solid 1px #b7b7b7;
-      &>h2 {
+      & > h2 {
         font-size: 16px;
       }
       table {
@@ -452,22 +437,20 @@
             color: #b7b7b7;
             font-size: 12px;
             text-transform: uppercase;
-            padding-right:15px;
+            padding-right: 15px;
             &:last-of-type {
               padding-right: 0;
             }
-
           }
           td {
             color: #333333;
             font-size: 12px;
             word-wrap: break-word;
             vertical-align: top;
-            padding-right:15px;
+            padding-right: 15px;
             &:last-of-type {
               padding-left: 0;
-              padding-right:0;
-
+              padding-right: 0;
             }
           }
         }
@@ -478,11 +461,10 @@
           color: #b7b7b7;
           font-size: 12px;
           text-transform: uppercase;
-          &+h2 {
+          & + h2 {
             margin: 0;
             font-size: 36px;
           }
-
         }
       }
       .col-xs-8 {
@@ -496,7 +478,6 @@
               font-size: 12px;
               padding-top: 10px;
             }
-
           }
         }
       }
@@ -520,7 +501,6 @@
             }
           }
         }
-
       }
       .est-month {
         padding: 20px 15px 30px;
@@ -541,19 +521,13 @@
           }
         }
         &.est {
-
-            padding: 20px 15px 30px;
-
+          padding: 20px 15px 30px;
         }
       }
-
-
     }
-
   }
 
   .benefits-setup-tab {
-
     .selectric-hide-select {
       display: none;
     }
@@ -573,7 +547,6 @@
           height: auto;
         }
       }
-
     }
     .row-form-wrapper.active::before {
       border-right: none;
@@ -604,14 +577,12 @@
         font-size: 14px;
         color: rgba(131, 135, 128, 1);
         margin-bottom: 0;
-
       }
 
       input {
         font-size: 18px !important;
         padding: 0 0 !important;
         color: #444;
-        font-family: 'Open Sans', sans-serif !important;
         line-height: 28px;
         &.hidden-param {
           padding: 5px !important;
@@ -628,10 +599,10 @@
           text-transform: capitalize;
         }
       }
-
     }
     .health {
-      .offerings, .composite-offerings {
+      .offerings,
+      .composite-offerings {
         .heading {
           border-top: solid 1px #d5d5d5;
         }
@@ -655,7 +626,8 @@
         }
       }
     }
-    .offerings, .composite-offerings {
+    .offerings,
+    .composite-offerings {
       .storage-input {
         max-width: 100%;
       }
@@ -675,14 +647,14 @@
         border-left: solid 1px #d5d5d5;
         border-right: solid 1px #d5d5d5;
 
-        &+.benefits-fields {
+        & + .benefits-fields {
           background-color: #ffffff;
           border-left: solid 1px #d5d5d5;
           border-right: solid 1px #d5d5d5;
           border-bottom: solid 1px #d5d5d5;
           .slider {
             .slider-selection {
-               background: #9C9C9C;
+              background: #9c9c9c;
             }
           }
 
@@ -697,7 +669,6 @@
               border-bottom: none;
             }
           }
-
         }
         .composite_offering_slider_header div.col-xs-12 {
           border-bottom: solid 1px #d5d5d5;
@@ -713,26 +684,23 @@
           border: none;
           border-left: solid 1px #d5d5d5;
           border-top: none;
-
         }
-        &+.row-form-wrapper {
-            border-top: none;
-
-
+        & + .row-form-wrapper {
+          border-top: none;
         }
-      .benefits-fields {
-        .row-form-wrapper {
-          padding: 15px 0;
+        .benefits-fields {
+          .row-form-wrapper {
+            padding: 15px 0;
+          }
         }
       }
+      .row-form-wrapper {
+        border: none;
       }
-    .row-form-wrapper {
-      border: none;
     }
 
-    }
-
-    ul.nav.nav-tabs, .plan-options .col-xs-3 a {
+    ul.nav.nav-tabs,
+    .plan-options .col-xs-3 a {
       border-bottom: none;
       li {
         a {
@@ -755,54 +723,47 @@
           }
         }
 
-          label {
-            font-weight: bold;
-            font-size: 18px;
-            margin-right: 10px;
-            padding: 10px;
-            background-color: $primary-blue;
-            border-bottom: solid 3px #003260;
-            border-radius: 6px;
-            width: 100%;
-            height: 100%;
-            color: #ffffff;
-            margin-bottom: 0;
-            text-transform: uppercase;
-            &:hover {
-              background-color: #003260;
-              cursor: pointer;
-            }
-            i {
-              padding-right: 15px;
-            }
-
+        label {
+          font-weight: bold;
+          font-size: 18px;
+          margin-right: 10px;
+          padding: 10px;
+          background-color: $primary-blue;
+          border-bottom: solid 3px #003260;
+          border-radius: 6px;
+          width: 100%;
+          height: 100%;
+          color: #ffffff;
+          margin-bottom: 0;
+          text-transform: uppercase;
+          &:hover {
+            background-color: #003260;
+            cursor: pointer;
           }
-
+          i {
+            padding-right: 15px;
+          }
+        }
       }
-      input[type=radio] {
+      input[type='radio'] {
         display: none;
       }
-      input[type=radio] + label {
-
-        &>i {
+      input[type='radio'] + label {
+        & > i {
           font-size: 28px;
           color: #b7b7b7;
 
-
-
           &:first-of-type {
             display: inline-block;
-
           }
           &:last-of-type {
             display: none;
           }
         }
       }
-      input[type=radio]:checked + label {
-
-        &>i {
-          color: #69A30D;
+      input[type='radio']:checked + label {
+        & > i {
+          color: #69a30d;
           &:first-of-type {
             display: none;
           }
@@ -812,7 +773,8 @@
         }
       }
     }
-    .elected-plans-continue, .edit-add-dental {
+    .elected-plans-continue,
+    .edit-add-dental {
       padding: 15px 0 20px;
       background-color: #fff;
       .di {
@@ -823,7 +785,7 @@
       background-color: #ffffff;
       border: solid 1px #b7b7b7;
       .metals-tab {
-        >.col-xs-3:last-of-type {
+        > .col-xs-3:last-of-type {
           display: none;
         }
       }
@@ -852,7 +814,6 @@
         text-align: center;
       }
       .col-xs-3 {
-
       }
       .col-xs-9 {
         padding-right: 0;
@@ -862,7 +823,6 @@
           -webkit-box-shadow: none;
           box-shadow: none;
           .panel-heading {
-
             padding: 0;
             border-bottom: none;
 
@@ -871,25 +831,21 @@
               padding-top: 2px;
               font-weight: bold;
               text-transform: capitalize;
-
-
             }
-
-
           }
           .panel-body {
-
           }
         }
       }
     }
-    .reference-plans, .dental-reference-plans, .elected-plans-tab  {
+    .reference-plans,
+    .dental-reference-plans,
+    .elected-plans-tab {
       background-color: #ffffff;
       border: solid 1px #d7d7d7;
       padding-bottom: 25px;
       overflow-y: scroll;
       display: none;
-
 
       .loading {
         position: relative;
@@ -897,7 +853,8 @@
         top: 50%;
         text-align: center;
       }
-      .reference-plan, .dental-reference-plan {
+      .reference-plan,
+      .dental-reference-plan {
         height: 175px;
         padding: 0;
         cursor: pointer;
@@ -942,7 +899,6 @@
             .plan-label {
               color: #b7b7b7;
               font-size: 10px;
-
             }
             a.view-summary {
               display: none;
@@ -951,32 +907,28 @@
           }
         }
 
-        input[type=radio] {
+        input[type='radio'] {
           display: none;
         }
-        input[type=radio] + label {
+        input[type='radio'] + label {
           position: relative;
           top: 50%;
 
-          &>i {
+          & > i {
             font-size: 28px;
             color: #b7b7b7;
 
-
-
             &:first-of-type {
               display: inline-block;
-
             }
             &:last-of-type {
               display: none;
             }
           }
         }
-        input[type=radio]:checked + label {
-
-          &>i {
-            color: #69A30D;
+        input[type='radio']:checked + label {
+          & > i {
+            color: #69a30d;
             &:first-of-type {
               display: none;
             }
@@ -985,29 +937,25 @@
             }
           }
         }
-
       }
-
-
     }
 
-    input[type=number] {
+    input[type='number'] {
       -moz-appearance: textfield;
     }
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
-
     }
-    input[type=radio] {
+    input[type='radio'] {
       display: inline-block;
     }
 
-   input[type=checkbox] {
+    input[type='checkbox'] {
       display: none;
       + label > i.fa {
-        color: #69A30D;
+        color: #69a30d;
       }
     }
     .checkbox {
@@ -1016,7 +964,7 @@
       padding-left: 15%;
     }
     .checkbox {
-      &>div {
+      & > div {
         display: inline-block;
         margin: auto;
       }
@@ -1036,21 +984,20 @@
       top: -5px;
       left: 10px;
     }
-    input[type=checkbox]:disabled + label i {
+    input[type='checkbox']:disabled + label i {
       color: #b7b7b7;
       cursor: not-allowed;
     }
-    input[type=checkbox] + label i {
+    input[type='checkbox'] + label i {
       &:first-of-type {
         display: none;
-
       }
       &:last-of-type {
         display: inline-block;
         width: 30px;
       }
     }
-    input[type=checkbox]:checked + label i {
+    input[type='checkbox']:checked + label i {
       &:first-of-type {
         display: inline-block;
         width: 30px;
@@ -1059,18 +1006,25 @@
         display: none;
       }
     }
-
   }
-  .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
-  .planyear-add-tab, .employer-tab, .employer-edit-tab,
-   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab {
+  .home-tab,
+  .employees-tab,
+  .employee-add-tab,
+  .benefits-tab,
+  .planyear-add-tab,
+  .employer-tab,
+  .employer-edit-tab,
+  .documents-tab,
+  #add_employee_action,
+  .benefits-setup-tab,
+  .messages-tab {
     .starter {
       max-width: 660px;
     }
     h1 {
       margin-top: 0;
       color: $primary-orange;
-      &+.panel {
+      & + .panel {
         border-radius: 0;
         ul {
           list-style: square;
@@ -1095,7 +1049,7 @@
           padding: 0;
         }
         &.panel-default {
-          &>.panel-heading {
+          & > .panel-heading {
             border-radius: 0;
             background-image: none;
             background-color: $primary-blue;
@@ -1117,7 +1071,7 @@
         padding: 0;
       }
       &.panel-default {
-        &>.panel-heading {
+        & > .panel-heading {
           border-radius: 0;
           background-image: none;
           background-color: #ffffff;
@@ -1128,18 +1082,20 @@
               color: $primary-blue;
             }
           }
-          .progress, .progress-wrapper {
+          .progress,
+          .progress-wrapper {
             max-width: 90%;
             height: 16px;
             border-radius: 4px;
             margin-bottom: 12px;
-            &+.information {
+            & + .information {
               padding-bottom: 15px;
             }
           }
         }
       }
-      &.myplanyear, &.benefitgroup {
+      &.myplanyear,
+      &.benefitgroup {
         border-left: solid 1px #b7b7b7;
         border-right: solid 1px #b7b7b7;
         background-color: #ffffff;
@@ -1148,7 +1104,6 @@
         .reference-plan-details {
           display: none;
         }
-
 
         .panel-heading {
           padding: 10px 0;
@@ -1169,7 +1124,6 @@
                 }
               }
             }
-
           }
           table {
             tr {
@@ -1202,11 +1156,11 @@
               }
             }
             td {
-                header {
-                  text-transform: uppercase;
-                  color: #9b9b9b;
-                  font-size: 12px;
-                }
+              header {
+                text-transform: uppercase;
+                color: #9b9b9b;
+                font-size: 12px;
+              }
               &:last-of-type {
                 padding-right: 15px;
                 h3 {
@@ -1225,24 +1179,24 @@
       }
     }
   }
-  .add-new-employees{
+  .add-new-employees {
     text-align: right;
     margin-left: 15%;
   }
 
-  .document-modal{
-     width: 900px;
-     .document-modal-body{
-         margin:1em;
-         border: 1px solid;
-         padding: 1em;
-     }
-     .document-modal-buttons{
-          text-align: right;
-      }
-     iframe{
-         border: 0;
-     }
+  .document-modal {
+    width: 900px;
+    .document-modal-body {
+      margin: 1em;
+      border: 1px solid;
+      padding: 1em;
+    }
+    .document-modal-buttons {
+      text-align: right;
+    }
+    iframe {
+      border: 0;
+    }
   }
   .planyear-add-tab {
     margin-bottom: 50px;
@@ -1251,8 +1205,8 @@
     form {
       display: inline;
     }
-    input[type=submit] {
-      -webkit-appearance:none;
+    input[type='submit'] {
+      -webkit-appearance: none;
       background-color: transparent;
       margin-right: 15px;
       &:hover {
@@ -1260,8 +1214,6 @@
       }
     }
   }
-
-
 }
 #add_employee_action {
   table {
@@ -1281,7 +1233,6 @@
         padding-bottom: 5px;
       }
       td {
-
       }
     }
   }
@@ -1297,7 +1248,6 @@
   table {
     table-layout: fixed;
   }
-
 }
 #modal-wrapper {
   display: none;
@@ -1307,61 +1257,58 @@
   margin: 0;
   position: fixed;
   z-index: 1040;
-  background-color: rgba(256,256,256,.9);
+  background-color: rgba(256, 256, 256, 0.9);
   .employee-upload {
-      color: #000;
-      position: relative;
-      width: 50%;
-      top: 10%;
+    color: #000;
+    position: relative;
+    width: 50%;
+    top: 10%;
+    border: solid 1px #b7b7b7;
+    background-color: rgba(256, 256, 256, 1);
+    margin: auto;
+    text-align: center;
+    padding-bottom: 50px;
+    h2 {
+      color: #003260;
+      font-weight: 300;
+      padding-top: 30px;
+    }
+    h4 {
+      padding: 0 40px;
+      &:last-of-type {
+        color: $primary-blue;
+        margin-bottom: 30px;
+      }
+    }
+    input[type='file'],
+    input[type='submit'] {
+      display: none;
+      margin-top: 30px;
+    }
+    .upload-preview {
+      padding: 10px 5px;
       border: solid 1px #b7b7b7;
-      background-color: rgba(256,256,256,1);
+      display: none;
+      width: 50%;
       margin: auto;
-      text-align: center;
-      padding-bottom: 50px;
-      h2 {
-        color: #003260;
-        font-weight: 300;
-        padding-top: 30px;
-      }
-      h4 {
-        padding: 0 40px;
-        &:last-of-type {
-          color: $primary-blue;
-          margin-bottom: 30px;
-
-        }
-      }
-      input[type=file], input[type=submit] {
-        display: none;
-        margin-top: 30px;
-      }
-      .upload-preview {
-        padding: 10px 5px;
-        border: solid 1px #b7b7b7;
-        display: none;
-        width: 50%;
-        margin: auto;
-        font-size: 16px;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
+      font-size: 16px;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+  .fa {
+    color: $primary-blue;
+    cursor: pointer;
+    &.pull-right {
+      margin: 6px 10px 0 0;
+      &:last-of-type {
+        margin: 4px 0 0 0;
+        position: absolute;
+        right: 5px;
       }
     }
-    .fa {
-      color: $primary-blue;
-      cursor: pointer;
-      &.pull-right {
-        margin: 6px 10px 0 0;
-        &:last-of-type {
-          margin: 4px 0 0 0;
-          position: absolute;
-          right: 5px;
-
-        }
-
-      }
-
-    }
+  }
 }
 
 // plan shopping
@@ -1371,21 +1318,21 @@
     .fa {
       color: $primary-blue;
       margin: 0 5px 0 0;
-      &.published, &.enrolling {
-        color: #FFD700;
+      &.published,
+      &.enrolling {
+        color: #ffd700;
       }
     }
     &.bg-title {
       font-weight: bold;
       display: inline-block;
-      color: #69A30D;
+      color: #69a30d;
       font-size: 14px;
-
     }
   }
-  input[type=checkbox] {
+  input[type='checkbox'] {
     display: none;
-    &+span {
+    & + span {
       margin-left: 0;
     }
   }
@@ -1393,14 +1340,22 @@
     margin-bottom: 10px;
   }
 }
-.edit-offering, .reference-steps, .selected-plan {
+.edit-offering,
+.reference-steps,
+.selected-plan {
   h4.change-dental-reference-plan {
     font-size: 15px;
   }
-  h4.dental-view-summary, h4.health-view-summary {
+  h4.dental-view-summary,
+  h4.health-view-summary {
     display: none;
   }
-  h4.change-plan, h4.cancel-plan-change, h4.dental-config-reference-selection, h4.change-dental-reference-plan, h4.dental-view-summary, h4.health-view-summary {
+  h4.change-plan,
+  h4.cancel-plan-change,
+  h4.dental-config-reference-selection,
+  h4.change-dental-reference-plan,
+  h4.dental-view-summary,
+  h4.health-view-summary {
     color: $primary-blue;
     &:hover {
       text-decoration: underline;
@@ -1414,7 +1369,6 @@
     padding-bottom: 0;
   }
 }
-
 
 #home .select-dental-plan {
   .fa {
@@ -1436,7 +1390,7 @@
     border: solid 1px #d5d5d5;
     .slider {
       .slider-selection {
-         background: #9C9C9C;
+        background: #9c9c9c;
       }
     }
 
@@ -1453,7 +1407,6 @@
         display: none;
       }
     }
-
   }
   .row-form-wrapper.heading {
     text-transform: uppercase;
@@ -1463,23 +1416,18 @@
     color: rgb(131, 135, 128);
     border-bottom: none;
 
-
     .col-xs-6 {
       border-bottom: solid 1px #d5d5d5;
       padding: 15px 0 25px;
       text-align: center;
-
     }
     .row-form-wrapper {
       border: none;
       border-left: solid 1px #d5d5d5;
       border-top: none;
-
     }
-    &+.row-form-wrapper {
-        border-top: none;
-
-
+    & + .row-form-wrapper {
+      border-top: none;
     }
   }
   .benefits-fields {
@@ -1495,8 +1443,6 @@
   }
 }
 
-
-
 #home #account-detail {
   .panel.myplanyear h5 {
     color: #b7b7b7;
@@ -1507,11 +1453,11 @@
     margin-bottom: 5px;
   }
   .panel.myplanyear table {
-    tr{
+    tr {
       td:last-of-type {
         text-align: right;
         font-weight: bold;
-        color: #69A30D;
+        color: #69a30d;
       }
     }
   }

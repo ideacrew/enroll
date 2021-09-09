@@ -347,8 +347,8 @@ javascript:
 
         networkTypes.forEach(function (networkType) {
           dataArray.forEach(function (enrollment) {
-            if (networkType.toLowerCase() == 'dc-metro') {
-              if (enrollment.product.dc_in_network) {
+            if (networkType.toLowerCase() == 'dc-metro' || networkType.toLowerCase() == 'maine') {
+              if (enrollment.product.in_state_network) {
                 resultsData.push(enrollment);
               }
             }
@@ -448,13 +448,12 @@ javascript:
         }
 
         var network = "";
-
-        if (result.product.dc_in_network) {
-          network = 'DC-Metro';
+        if (result.product.in_state_network) {
+          network = result.product.network;
         }
 
         if (result.product.nationwide) {
-          network = 'Nationwide';
+          network = result.product.network;
         }
 
         var div = document.createElement('div')
@@ -464,7 +463,7 @@ javascript:
         <div class="module plan-row panel panel-default">
                 <div class="panel-body">
                   <div class="row ${result.product.is_standard_plan ? '' : 'hidden'}">
-                    <span class="ml-1 text-uppercase" style="color:green"><i class="fas fa-bookmark"></i> Standard Plan</span>
+                    <span class="ml-1 text-uppercase" style="color:green"><i class="fas fa-bookmark"></i> ${result.product.standard_plan_label}</span>
                   </div>
                   <div class="row mt-1">
                     <div class="col-sm-2 col-md-2">

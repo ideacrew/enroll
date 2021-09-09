@@ -31,6 +31,7 @@ Feature: Consumer verification process
   Scenario: Consumer with outstanding verification and uploaded documents
     Given a consumer exists
     And the consumer is logged in
+    And EnrollRegistry location_residency_verification_type feature is enabled
     And consumer has outstanding verification and unverified enrollments
     When the consumer visits verification page
     Then consumer should see Verification Due date label

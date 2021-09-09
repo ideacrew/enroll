@@ -34,4 +34,4 @@ Feature: Employer terminates borker and hires new broker
     Then Employer should see broker selected successful message
     When Employer clicks on the Brokers tab
     Then Employer should see broker Max Planck and agency District Brokers Inc active for the employer
-    And Employer logs out
+    

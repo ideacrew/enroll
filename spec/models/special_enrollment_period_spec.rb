@@ -615,6 +615,21 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
   end
 
+  context "#is_eligible" do
+    let(:shop_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: shop_qle) }
+    let(:employee_role_double) { double(census_employee: census_employee_double, id: 1)}
+    let(:census_employee_double) { double(earliest_eligible_date: nil) }
+
+    before do
+      allow(family.primary_applicant.person).to receive(:active_employee_roles).and_return([employee_role_double])
+      allow(shop_qle_sep).to receive(:is_shop?).and_return(true)
+      allow(shop_qle_sep).to receive(:is_active?).and_return(true)
+    end
+    it "should not throw exception if earliest_eligible_date is nil" do
+      expect(shop_qle_sep.send(:is_eligible?)).to be_falsey
+    end
+  end
+
   context "#is_fehb?" do
     let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }
     let(:shop_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: shop_qle) }

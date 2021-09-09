@@ -18,7 +18,6 @@ module FinancialAssistance
           # add comment here
           def call(application_id:)
             application           = yield find_application(application_id)
-            application           = yield validate(application)
             family                = yield find_family(application)
             payload_params        = yield construct_payload(family, application)
             payload              = yield publish(payload_params)
@@ -34,11 +33,6 @@ module FinancialAssistance
             Success(application)
           rescue Mongoid::Errors::DocumentNotFound
             Failure("Unable to find Application with ID #{application_id}.")
-          end
-
-          def validate(application)
-            return Success(application) if application.submitted?
-            Failure("Application is in #{application.aasm_state} state. Please submit application.")
           end
 
           def find_family(application)

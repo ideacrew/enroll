@@ -33,7 +33,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7f261d5a8f985b8434572390b50065b02b6bcfcd
+  revision: f2e41bee53939bb069668b314c904c43e52bdc57
   branch: trunk
   specs:
     event_source (0.5.3)

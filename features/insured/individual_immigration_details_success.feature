@@ -4,25 +4,24 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
     Given Individual has not signed up as an HBX user
     And EnrollRegistry tobacco_cost feature is disabled
     When the user visits the Consumer portal during open enrollment
-    Then Individual creates a new HBX account
+    And Individual creates a new HBX account
     Then Individual should see a successful sign up message
     And the user sees Your Information page
-    When the user registers as an individual
-    When the individual clicks on the Continue button of the Account Setup page
-    Then Individual logs out
-
+    And the user registers as an individual
+    And the individual clicks on the Continue button of the Account Setup page
+    
   Scenario Outline: The ability to enter my document information for my <document type> Document and successfully validates the inputs
-    Given Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual should see heading labeled personal information
-    Then Individual selects eligible immigration status
-    Then Individual selects <document type> document and fills required details correctly
+    #Given Individual resumes enrollment
+    #And Individual click on Sign In
+    #And I signed in
+    #Then Individual should see heading labeled personal information
+    When Individual selects eligible immigration status
+    And Individual selects <document type> document and fills required details correctly
     Then Individual should see the <document type> document text
     Then Individual fills demographic details
     When Individual clicks on continue
     Then Individual does go to Authorization and Consent page
-    Then Individual logs out
+    
 
     Examples:
       | document type                     |

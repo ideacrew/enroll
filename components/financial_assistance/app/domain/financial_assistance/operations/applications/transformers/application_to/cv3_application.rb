@@ -16,6 +16,22 @@ module FinancialAssistance
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
 
+            FAA_MITC_RELATIONSHIP_MAP = {
+              'spouse' => :husband_or_wife,
+              'domestic_partner' => :domestic_partner,
+              'child' => :son_or_daughter,
+              'parent' => :parent,
+              'sibling' => :brother_or_sister,
+              'aunt_or_uncle' => :aunt_or_uncle,
+              'nephew_or_niece' => :nephew_or_niece,
+              'grandchild' => :grandchild,
+              'grandparent' => :grandparent,
+              'father_or_mother_in_law' => :mother_in_law_or_father_in_law,
+              'daughter_or_son_in_law' => :son_in_law_or_daughter_in_law,
+              'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law,
+              'cousin' => :first_cousin
+            }.freeze
+
             # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
             # @option opts [::FinancialAssistance::Application] :application
             # @return [Dry::Monads::Result]
@@ -30,7 +46,7 @@ module FinancialAssistance
             private
 
             def validate(application)
-              return Success(application) if application.submitted?
+              return Success(application) if application.submitted? || application.is_determined?
               Failure("Application is in #{application.aasm_state} state. Please submit application.")
             end
 
@@ -280,32 +296,10 @@ module FinancialAssistance
               end
             end
 
-            # rubocop:disable Metrics/CyclomaticComplexity
             def find_relationship_code(relationship)
-              mitc_rel =
-                case relationship.kind
-                when 'spouse' || 'domestic_partner'
-                  :husband_or_wife
-                when 'child'
-                  :son_or_daughter
-                when 'parent'
-                  :parent
-                when 'sibling'
-                  :brother_or_sister
-                when 'aunt_or_uncle'
-                  :aunt_or_uncle
-                when 'nephew_or_niece'
-                  :nephew_or_niece
-                when 'grandchild'
-                  :grandchild
-                when 'grandparent'
-                  :grandparent
-                else
-                  :other
-                end
+              mitc_rel = FAA_MITC_RELATIONSHIP_MAP[relationship.kind] || :other
               ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[mitc_rel] || '88'
             end
-            # rubocop:enable Metrics/CyclomaticComplexity
 
             # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
             def wages_and_salaries(current_incomes)

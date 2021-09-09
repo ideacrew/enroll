@@ -16,9 +16,19 @@ export const featureRuntime = (feature: CucumberFeature): FileWithRuntime => {
   const backgroundRuntime = calculateBackgroundRuntime(backgroundElements);
   const scenarioRuntime = calculateScenarioRuntime(scenarioElements);
 
+  const runTime = (backgroundRuntime + scenarioRuntime) / 1_000_000;
+  if (isNaN(runTime)) {
+    console.log('RUNTIME:', {
+      uri,
+      backgroundRuntime,
+      scenarioRuntime,
+      runTime,
+    });
+  }
+
   return {
-    filePath: feature.uri,
-    runTime: (backgroundRuntime + scenarioRuntime) / 1_000_000,
+    filePath: uri,
+    runTime,
   };
 };
 
@@ -35,7 +45,14 @@ const calculateBackgroundRuntime = (elements: BackgroundElement[]): number => {
   const elementRuntime = elements
     .map(({ before, steps }) => {
       const beforeRuntime = calculateStepRuntime(before);
-      const stepsRuntime = calculateElementStepRuntime(steps);
+
+      let stepsRuntime = 0;
+      if (steps === undefined) {
+        // console.log('calculateBackgroundRuntime steps is undefined');
+        stepsRuntime = 0;
+      } else {
+        stepsRuntime = calculateElementStepRuntime(steps);
+      }
 
       const totalBackgroundRuntime = beforeRuntime + stepsRuntime;
 
@@ -45,6 +62,7 @@ const calculateBackgroundRuntime = (elements: BackgroundElement[]): number => {
       return total + runtime;
     }, 0);
 
+  // console.log('calculateBackgroundRuntime elementRuntime', elementRuntime);
   return elementRuntime;
 };
 
@@ -52,10 +70,16 @@ const calculateScenarioRuntime = (elements: ScenarioElement[]): number => {
   const elementRuntime = elements
     .map(({ after, steps }) => {
       const afterRuntime = calculateStepRuntime(after);
-      const stepsRuntime = calculateElementStepRuntime(steps);
+
+      let stepsRuntime = 0;
+      if (steps === undefined) {
+        // console.log('calculateBackgroundRuntime steps is undefined');
+        stepsRuntime = 0;
+      } else {
+        stepsRuntime = calculateElementStepRuntime(steps);
+      }
 
       const totalBackgroundRuntime = afterRuntime + stepsRuntime;
-
       return totalBackgroundRuntime;
     })
     .reduce((total, runtime) => {
@@ -66,17 +90,38 @@ const calculateScenarioRuntime = (elements: ScenarioElement[]): number => {
 };
 
 const calculateElementStepRuntime = (steps: ElementStep[]): number => {
+  // if (steps === undefined) {
+  //   console.log('calculateElementStepRuntime steps is undefined');
+  // }
+  // console.log('HOW MANY STEPS?', steps.length);
   const stepRuntime = calculateStepRuntime(steps as BaseStep[]);
-
+  // console.log({ stepRuntime });
   const afterRuntime = calculateStepRuntime(
     steps.map((step) => step.after).flat()
   );
+
+  if (isNaN(stepRuntime) || isNaN(afterRuntime)) {
+    console.log(
+      '**********calculateElementStepRuntime stepRuntime**************',
+      stepRuntime
+    );
+  }
 
   return stepRuntime + afterRuntime;
 };
 
 const calculateStepRuntime = (steps: BaseStep[]): number => {
-  return steps.reduce((total, step) => {
-    return total + step.result.duration;
+  const stepRuntime = steps.reduce((total, step) => {
+    const stepDuration = step.result.duration ?? 0;
+
+    const accumulatedStepRuntime = total + stepDuration;
+
+    return accumulatedStepRuntime;
   }, 0);
+
+  if (isNaN(stepRuntime)) {
+    console.log('calculateStepRuntime stepRuntime', steps);
+  }
+
+  return stepRuntime;
 };

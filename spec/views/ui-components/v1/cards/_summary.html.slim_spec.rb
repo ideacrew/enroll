@@ -37,6 +37,9 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       :health_plan_kind => "HMO",
       :sbc_file => "THE SBC FILE.PDF",
       :is_standard_plan => true,
+      standard_plan_label: 'STANDARD PLAN',
+      metal_level: 'Bronze',
+      network: 'nationwide',
       :can_use_aptc? => true,
       :sbc_document => Document.new(
         {

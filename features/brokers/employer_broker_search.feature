@@ -15,7 +15,7 @@ Feature: Employer terminates borker and hires new broker
     Given there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And initial employer ABC Widgets has draft benefit application
-
+   @nightly
   Scenario: Employer assigns broker agency
     And staff role person logged in
     And ABC Widgets goes to the brokers tab
@@ -35,4 +35,3 @@ Feature: Employer terminates borker and hires new broker
     When Employer searches primary broker Jane Goodall
     Then Employer should see broker agency Browns Inc
 
-    And Employer logs out

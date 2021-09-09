@@ -1,0 +1,18 @@
+<div class="container" id="registry">
+	<h1>EnrollRegistry Settings</h1>
+	Updated At: <%= EnrollRegistry.configurations[:created_at] %>
+	<% EnrollRegistry.features.each do |f| %>
+		<% feature = EnrollRegistry[f] %>
+		<div class="<%= 'enabled-feature' if feature.enabled? %>">
+			<%= feature.namespace %>
+			<p class="mb-0"><span class="registry-feature"><%= f %></p>
+			<%= raw("<p class='mb-0'>Item: #{feature.item}</p>") if feature.item && feature.item != f %>
+			<%= raw("<p class='mb-0'>Settings:</p>") if feature.settings.any? %>
+			<ul>
+				<% feature.settings.each do |s| %>
+					<li><b><%= s.key %></b>: <%= s.item %></li>
+				<% end %>
+			</ul>
+		</div>
+	<% end %>
+</div>

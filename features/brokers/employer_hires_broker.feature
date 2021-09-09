@@ -30,4 +30,4 @@ Feature: Employer hires borker
     Then Employer should see broker selected successful message
     When Employer clicks on the Brokers tab
     Then Employer should see broker Jane Goodall and agency Browns Inc active for the employer
-    And Employer logs out
+    

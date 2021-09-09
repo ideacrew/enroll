@@ -291,6 +291,8 @@ class ApplicationController < ActionController::Base
 
     append_after_action :clear_current_user
 
+    # TODO: We need to be mindful of this in situations where the person_id is being erroneously set
+    # to the current hbx_admin
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])

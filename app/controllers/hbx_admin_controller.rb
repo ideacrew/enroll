@@ -4,6 +4,10 @@ class HbxAdminController < ApplicationController
   before_action :find_values, only: [:update_aptc_csr, :calculate_aptc_csr, :edit_aptc_csr]
   before_action :validate_aptc, only: [:update_aptc_csr, :calculate_aptc_csr]
 
+  def registry
+    redirect_to main_app.root_path if ENV['AWS_ENV'] == 'prod'
+  end
+
   def edit_aptc_csr
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
 
