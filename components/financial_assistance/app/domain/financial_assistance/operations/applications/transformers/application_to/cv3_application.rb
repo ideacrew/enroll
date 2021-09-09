@@ -684,10 +684,14 @@ module FinancialAssistance
               application.eligibility_determinations.inject([]) do |result, ed|
                 result << {hbx_id: ed.hbx_assigned_id.to_s,
                            max_aptc: ed.max_aptc,
-                           is_insurance_assistance_eligible: nil,
+                           is_insurance_assistance_eligible: get_ia_eligible_status(ed.is_eligibility_determined),
                            annual_tax_household_income: ed.aptc_csr_annual_household_income,
                            tax_household_members: get_thh_member(ed, application)}
               end
+            end
+
+            def get_ia_eligible_status(status)
+              { true => 'Yes', false => 'No', nil => 'Undertermined' }[status]
             end
 
             def get_thh_member(eligibility, application)
