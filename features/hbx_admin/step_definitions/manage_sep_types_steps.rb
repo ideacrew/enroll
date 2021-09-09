@@ -960,7 +960,7 @@ When("I click on Shop For Plans banner button") do
 end
 
 When("I click Shop for new plan button on CHH page") do
-  find(".interaction-click-control-shop-for-new-plan").click
+  find(".interaction-click-control-shop-for-new-plan", wait: 5).click
 end
 
 Then(/^.+ should see Termination on kinds dropdown$/) do
