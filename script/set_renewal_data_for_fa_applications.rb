@@ -3,7 +3,7 @@
 # This script generates a CSV report with list of all the
 # FinancialApplication::Applications with is_renewal_authorized not nil
 # where we update renewal_base_year & years_to_renew.
-# rails runner script/script/set_renewal_data_for_fa_applications.rb -e production
+# rails runner script/set_renewal_data_for_fa_applications.rb -e production
 require 'csv'
 
 csv_headers = %w[PrimaryHbxId PrimaryFullName ApplicationHbxId ApplicationAasmState
