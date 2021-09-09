@@ -317,7 +317,7 @@ module Operations
 
             is_student: applicant_hash.dig('student', 'is_student'),
             student_kind: applicant_hash.dig('student', 'student_kind'),
-            student_school_kind: applicant_hash.dig('student', 'student_school_kind'),
+            # student_school_kind: applicant_hash.dig('student', 'student_school_kind'),  # disable : no respective key found in inbound payloads from atp & mcr
             student_status_end_on: applicant_hash.dig('student', 'student_status_end_on'),
 
             is_refugee: applicant_hash['is_refugee'],
@@ -472,7 +472,7 @@ module Operations
 
           persisted_applicant.is_student = applicant[:is_student]
           persisted_applicant.student_kind = applicant[:student_kind]
-          persisted_applicant.student_school_kind = applicant[:student_school_kind]
+          # persisted_applicant.student_school_kind = applicant[:student_school_kind] # disable : no respective key found in inbound payloads from atp & mcr
           persisted_applicant.student_status_end_on = applicant[:student_status_end_on]
 
           persisted_applicant.is_refugee = applicant[:is_refugee]
