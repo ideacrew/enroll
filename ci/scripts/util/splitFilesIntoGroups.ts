@@ -54,7 +54,11 @@ export function splitFilesIntoGroups(
         group.files.push(file);
       }
 
-      const smallestFile = files[files.length - 1];
+      if (files.length === 0) {
+        break;
+      }
+
+      const smallestFile: FileWithRuntime = files[files.length - 1];
 
       const smallestFileIsAddable =
         smallestFile.runTime + getGroupRunTime(group) <= longestTest;
@@ -62,18 +66,9 @@ export function splitFilesIntoGroups(
       if (smallestFileIsAddable) {
         const file = files.pop();
         group.files.push(file);
-      }
-
-      if (!largestFileIsAddable && !smallestFileIsAddable) {
+      } else {
         break;
       }
-
-      // console.log(
-      //   'Current Group Runtime',
-      //   getGroupRunTime(group),
-      //   'and longest test',
-      //   longestTest
-      // );
     }
 
     // console.log('Group', index + 1, 'has', group.files.length, 'files.');
