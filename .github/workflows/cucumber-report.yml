@@ -72,6 +72,7 @@ jobs:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
   concat-reports:
+    needs: [cucumber-report]
     runs-on: ubuntu-latest
     steps:
       - name: Restore Node Modules
