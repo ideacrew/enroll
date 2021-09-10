@@ -855,9 +855,10 @@ class ConsumerRole
   end
 
   def can_trigger_residency?(family, opts) # trigger for change in address
-    person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
+     person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
     ((opts[:dc_status] &&
-      opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person.is_consumer_role_active? && verification_types.by_name(LOCATION_RESIDENCY).first.validation_status == "unverified"))
+      opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person&.is_consumer_role_active? && verification_types&.by_name(LOCATION_RESIDENCY)&.first.validation_status == "unverified"))
+  unless !EnrollRegistry.feature_enabled?(:location_residency_verification_type)
   end
 
   def add_type_history_element(params)
