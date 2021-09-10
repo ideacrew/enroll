@@ -121,7 +121,7 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
       allow(Settings.site).to receive(:key).and_return(:dc)
       allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
@@ -217,7 +217,10 @@ module BenefitSponsors
         context "for new on broker_agency_portal click without user" do
 
           before :each do
-
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
             get :new, params: {profile_type: "broker_agency", portal: true}
           end
 
@@ -237,10 +240,7 @@ module BenefitSponsors
           let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
 
           before :each do
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
+          
             broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
             sign_in broker_user
             get :new, params: {profile_type: "broker_agency", portal: true}
