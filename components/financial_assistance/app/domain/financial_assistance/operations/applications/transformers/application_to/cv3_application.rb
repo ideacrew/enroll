@@ -36,9 +36,9 @@ module FinancialAssistance
             # @option opts [::FinancialAssistance::Application] :application
             # @return [Dry::Monads::Result]
             def call(application)
-              application = yield validate(application)
-              notice_options = yield notice_options_for_app(application)
-              oe_start_on = yield fetch_oe_start_on(application)
+              application     = yield validate(application)
+              notice_options  = yield notice_options_for_app(application)
+              oe_start_on     = yield fetch_oe_start_on(application)
               request_payload = yield construct_payload(application, notice_options, oe_start_on)
 
               Success(request_payload)

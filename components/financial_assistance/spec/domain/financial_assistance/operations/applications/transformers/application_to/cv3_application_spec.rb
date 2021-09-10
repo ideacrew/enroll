@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
+require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
@@ -1300,9 +1300,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it 'should populate had_prior_insurance' do
-        puts '-' * 50
-        puts @applicant.to_h
-        puts '-' * 50
         expect(@applicant.had_prior_insurance).to be_truthy
         expect(@applicant.prior_insurance_end_date).to eq(applicant.benefits.first.end_on)
       end
