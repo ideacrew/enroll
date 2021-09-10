@@ -136,7 +136,6 @@ module FinancialAssistance
           def construct_updated_by(updated_by); end
 
           def transform_vlp_documents(vlp_documents)
-
             vlp_documents.collect do |vlp_document|
               next if vlp_document.subject.nil?
               {
