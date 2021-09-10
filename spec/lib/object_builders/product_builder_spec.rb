@@ -4,7 +4,7 @@ require 'rails_helper'
 require Rails.root.join('lib', 'object_builders', 'product_builder')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_benefit_template_parser')
 
-describe "qhp builder" do
+describe "qhp builder", dbclean: :after_each do
 
   before :all do
     @service_area_id = "DCS001"
