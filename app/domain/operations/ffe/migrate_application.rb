@@ -52,7 +52,7 @@ module Operations
 
         _application = yield import_application
 
-        Success("#{external_application_id}")
+        Success(external_application_id.to_s)
       rescue StandardError => e
         # binding.pry
         puts "Exception: Operations::Ffe::MigrateApplication: #{external_application_id} -- #{e}"
@@ -418,9 +418,7 @@ module Operations
             benefit['employer_id'] = benefit['employer']['employer_id']
           end
 
-          if benefit['employer_phone'] && benefit['employer_phone']['number'].nil?
-            benefit['employer_phone'] = nil
-          end
+          benefit['employer_phone'] = nil if benefit['employer_phone'] && benefit['employer_phone']['number'].nil?
 
           benefit.except("status", "employer")
         end
@@ -638,4 +636,4 @@ end
 #   end
 #  end
 
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
