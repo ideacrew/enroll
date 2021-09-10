@@ -295,7 +295,7 @@ module FinancialAssistance
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      transfer_account if result.success? && is_rt_transferrable?
+      self.transfer_account if result.success? && is_rt_transferrable?
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
 
@@ -315,7 +315,7 @@ module FinancialAssistance
 
     def is_transferrable?
       applicants = self.applicants.select do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
       end
       applicants.any?
     end
