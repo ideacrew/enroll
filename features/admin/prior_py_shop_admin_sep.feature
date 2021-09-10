@@ -4,11 +4,14 @@ Feature: SHOP employee or Admin adding a SEP which falls in prior plan year,
   plan years unless admin chooses not to renew the coverage
 
   Background: Setup Setup site, employer, and benefit applications in prior, active and renewal years
+    Given the shop market configuration is enabled
     Given a DC site exists with a benefit market
     Given benefit market catalog exists for existing employer
     And the Prior PY SHOP feature configuration is enabled
     And Admin SHOP seps are present
     And there is an employer ABC Widgets
+    And EnrollRegistry prior_plan_year_shop_sep feature is enabled
+    
 
   Scenario: Hbx Admin adding SHOP sep in prior plan year for employee with no
   prior or active coverage and renewal flag is checked and
