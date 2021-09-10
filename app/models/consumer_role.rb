@@ -157,7 +157,7 @@ class ConsumerRole
   embeds_many :ridp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true #move to verification type
-  embeds_many :verification_type_history_elements
+  embeds_many :verification_type_history_e
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents, :ridp_documents
 
@@ -858,11 +858,11 @@ class ConsumerRole
      person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
     ((opts[:dc_status] &&
       opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person&.is_consumer_role_active? && verification_types&.by_name(LOCATION_RESIDENCY)&.first.validation_status == "unverified"))
-  unless !EnrollRegistry.feature_enabled?(:location_residency_verification_type)
+    unless !EnrollRegistry.feature_enabled?(:location_residency_verification_type)
   end
 
   def add_type_history_element(params)
-    verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
+    verification_type_history_e<<VerificationTypeHistoryElement.new(params)
   end
 
   def can_start_residency_verification? # initial trigger check for coverage purchase
