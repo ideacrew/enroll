@@ -17,7 +17,7 @@ class MigrateFamily < Mongoid::Migration
   include Acapi::Notifiers
 
   def self.up
-    @source =  ENV["source"].to_s.downcase # MCR or ATP
+    @source = ENV["source"].to_s.downcase # MCR or ATP
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
@@ -495,7 +495,7 @@ class MigrateFamily < Mongoid::Migration
         end
       else
         Dir.foreach(directory_name) do |filename|
-          next unless /batch/.match("#{filename}")
+          next unless /batch/.match(filename.to_s)
           Dir.foreach("#{directory_name}/#{filename}") do |batch_file|
             if File.extname(batch_file) == '.xml' || File.extname(batch_file) == ".json"
               @filepath = "#{directory_name}/#{filename}/#{batch_file}"
