@@ -88,8 +88,8 @@ def can_publish_enrollment?(enrollment, transition_at)
   benefit_application = sb.benefit_package.benefit_application
   if is_valid_benefit_application?(benefit_application)
     return false if gate_quiet_period(benefit_application, transition_at)
-    return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months)) && !renewed_by_prior_py(enrollment)
     return true  if term_states.include?(enrollment.aasm_state)
+    return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months)) && !renewed_by_prior_py(enrollment)
     return true
   else
     return false
@@ -111,7 +111,7 @@ purchase_ids.each do |hbx_id|
   }).first.transition_at
 
     Rails.logger.info "---processing #{purchase.hbx_id}---#{purchased_at}---#{Time.now}"
-  if can_publish_enrollment?(purchase, purchased_at)
+  if can_publish_enrollment?(purchase, purchased_at) && !(purchase.new_hire_enrollment_for_shop? && (purchase.effective_on <= (Time.now - 2.months)))
     Rails.logger.info "-----publishing #{purchase.hbx_id}"
     ShopEnrollmentsPublisher.publish_action( "acapi.info.events.hbx_enrollment.coverage_selected",
                    purchase.hbx_id,
