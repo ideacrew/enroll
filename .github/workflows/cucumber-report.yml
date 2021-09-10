@@ -65,9 +65,38 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features -q --tags 'not @wip and not @broken and not @flaky and not @ma_only'
+        run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
+  concat-reports:
+    needs: [cucumber-report]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - uses: actions/download-artifact@v2
+        with:
+          path: ci/cucumber/compressed-reports
+      - run: npm run cucumber:move-reports
+      - run: npm run cucumber:concat-reports
+      - run: npm run cucumber:split-config
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cucumber-split-config
+          path: ci/cucumber-split-config.json

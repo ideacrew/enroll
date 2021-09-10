@@ -68,12 +68,7 @@ class EligibilityDetermination
       message: "%{value} is not a valid premium credit strategy kind"
     }
 
-  validates :csr_eligibility_kind,
-    allow_blank: false,
-    inclusion: {
-      in: CSR_KINDS,
-      message: "%{value} is not a valid cost sharing eligibility kind"
-    }
+  # Validation of csr kind removed as we move csr to tax household member level
 
   def csr_percent_as_integer=(new_csr_percent)
     super

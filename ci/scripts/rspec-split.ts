@@ -7,12 +7,13 @@ import {
   FileGroup,
 } from './models';
 import { createFilesWithRuntime, splitFilesIntoGroups } from './util';
+import { runtimeDetails } from './util/numberOfGroups';
 
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
-  const [splitConfigPath, manualGroupCount] = process.argv.slice(2);
+  const [splitConfigPath] = process.argv.slice(2);
 
-  if (splitConfigPath === undefined || manualGroupCount === undefined) {
+  if (splitConfigPath === undefined) {
     console.error('Missing cli arguments');
     process.exit(1);
   }
@@ -23,9 +24,11 @@ async function createSplitConfig(): Promise<void> {
   const arrayOfSlowFiles: FileWithRuntime[] =
     createFilesWithRuntime(filesByRuntime);
 
+  const { suggestedGroupCount } = runtimeDetails(arrayOfSlowFiles);
+
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     arrayOfSlowFiles,
-    parseInt(manualGroupCount, 10)
+    suggestedGroupCount
   );
 
   try {

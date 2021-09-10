@@ -41,7 +41,7 @@ module FinancialAssistance
       ira_deduction: "IRA deduction",
       reservists_performing_artists_and_fee_basis_government_official_expenses: "Certain business expenses of reservists, performing artists, and fee-basis government officials",
       tuition_and_fees: "Tuition and fees",
-      other: 'Other Deductions',
+      other: 'Other Deductions'
     }.freeze
 
     field :title, type: String

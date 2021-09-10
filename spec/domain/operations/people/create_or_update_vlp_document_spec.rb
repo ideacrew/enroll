@@ -59,7 +59,7 @@ RSpec.describe ::Operations::People::CreateOrUpdateVlpDocument, dbclean: :after_
         result = subject.call(params: params)
 
         expect(result.failure?).to be_truthy
-        expect(result.failure.errors.to_h[:subject]).to eq ["must be filled"]
+        expect(result.failure.errors.to_h[:subject]).to eq ["is missing", "must be a string"]
       end
     end
   end
