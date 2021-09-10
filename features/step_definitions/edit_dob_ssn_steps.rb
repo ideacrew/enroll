@@ -60,6 +60,7 @@ When(/^Hbx Admin enters a valid DOB and SSN and clicks on update$/) do
   fill_in 'person[ssn]', :with => '212-31-3131'
   page.find_button("Update").click
   page.driver.browser.switch_to.alert.accept
+  sleep 5
 end
 
 Then(/^Hbx Admin should see the update partial rendered with update sucessful message$/) do
