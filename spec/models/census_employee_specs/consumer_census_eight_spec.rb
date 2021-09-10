@@ -103,7 +103,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       census_employee.hired_on = TimeKeeper.date_of_record - 31.years
       expect(census_employee.save).to be_falsey
       expect(census_employee.errors[:hired_on].any?).to be_truthy
-      expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
+      expect(census_employee.errors[:hired_on].to_s).to match(/date can't be before  date of birth/)
     end
   end
 
@@ -150,9 +150,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:census_employee) do
       FactoryBot.create :benefit_sponsors_census_employee,
-                       employer_profile: employer_profile,
-                       benefit_sponsorship: organization.active_benefit_sponsorship,
-                       benefit_group_assignments: [benefit_group_assignment]
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship,
+                        benefit_group_assignments: [benefit_group_assignment]
     end
     let(:waived_hbx_enrollment_double) { double('WaivedHbxEnrollment', is_coverage_waived?: true, sponsored_benefit_package_id: benefit_group.id) }
     let(:coverage_selected_hbx_enrollment_double) { double('CoveredHbxEnrollment', is_coverage_waived?: false, sponsored_benefit_package_id: benefit_group.id) }

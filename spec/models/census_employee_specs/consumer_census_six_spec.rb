@@ -170,5 +170,5 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       expect(census_employee.benefit_group_assignments.present?).to eq false
     end
-  end 
+  end
 end

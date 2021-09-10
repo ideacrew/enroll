@@ -85,12 +85,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     context 'when earliest effective date is in future more than 30 days from current date' do
       let(:hired_on) {TimeKeeper.date_of_record}
 
-      it 'should return earliest_eligible_date as new hire enrollment period end date' do
-        # TODO: - Fix Effective On For & Eligible On on benefit package
-        expected_end_date = (hired_on + 60.days)
-        expected_end_date = (hired_on + 60.days).end_of_month + 1.day if expected_end_date.day != 1
-        # expect(census_employee.new_hire_enrollment_period.max).to eq (expected_end_date).end_of_day
-      end
+      # it 'should return earliest_eligible_date as new hire enrollment period end date' do
+      #   TODO: - Fix Effective On For & Eligible On on benefit package
+      #   expected_end_date = (hired_on + 60.days)
+      #   expected_end_date = (hired_on + 60.days).end_of_month + 1.day if expected_end_date.day != 1
+      #   expect(census_employee.new_hire_enrollment_period.max).to eq (expected_end_date).end_of_day
+      # end
     end
 
     context 'when earliest effective date less than 30 days from current date' do
@@ -113,12 +113,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       # benefit_group.plan_year.update_attributes(:aasm_state => 'published')
     end
 
-    it 'should return earliest effective date' do
+    # it 'should return earliest effective date' do
       # TODO: - Fix Effective On For & Eligible On on benefit package
-      eligible_date = (hired_on + 60.days)
-      eligible_date = (hired_on + 60.days).end_of_month + 1.day if eligible_date.day != 1
+      # eligible_date = (hired_on + 60.days)
+      # eligible_date = (hired_on + 60.days).end_of_month + 1.day if eligible_date.day != 1
       # expect(census_employee.earliest_eligible_date).to eq eligible_date
-    end
+    # end
   end
 
   context 'Validating CensusEmployee Termination Date' do

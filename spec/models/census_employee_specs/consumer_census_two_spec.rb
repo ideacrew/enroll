@@ -183,9 +183,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
 
-    context "and employer is renewing" do
-    end
-
     context 'When there are two active benefit applications' do
       let(:current_year) {TimeKeeper.date_of_record.year}
       let(:effective_period) {current_effective_date..current_effective_date.next_year.prev_day}

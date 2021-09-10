@@ -305,5 +305,5 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record - 1.month)
       expect(census_employee.cobra_eligibility_expired?).to be_falsey
     end
-  end 
+  end
 end
