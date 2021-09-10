@@ -14,6 +14,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp dir="directory_path" VERSION="20210512153640"
 class MigrateFamily < Mongoid::Migration
   include EventSource::Command
+  include Acapi::Notifiers
 
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
@@ -36,6 +37,7 @@ class MigrateFamily < Mongoid::Migration
           result = Operations::Ffe::MigrateApplication.new.call(payload)
           puts result
         else
+          notify("acapi.info.events.migration.mcr_application_payload", {:body => payload})
           event("events.json.stream", attributes: payload).success.publish
         end
       rescue StandardError => e
@@ -484,10 +486,22 @@ class MigrateFamily < Mongoid::Migration
     end
 
     def read_directory(directory_name, &block)
-      Dir.foreach(directory_name) do |filename|
-        if File.extname(filename) == '.xml' || File.extname(filename) == ".json"
-          @filepath = "#{directory_name}/#{filename}"
-          instance_eval(&block) if block_given?
+      if Rails.env.development?
+        Dir.foreach(directory_name) do |filename|
+          if File.extname(filename) == '.xml' || File.extname(filename) == ".json"
+            @filepath = "#{directory_name}/#{filename}"
+            instance_eval(&block) if block_given?
+          end
+        end
+      else
+        Dir.foreach(directory_name) do |filename|
+          next unless /batch/.match("#{filename}")
+          Dir.foreach("#{directory_name}/#{filename}") do |batch_file|
+            if File.extname(batch_file) == '.xml' || File.extname(batch_file) == ".json"
+              @filepath = "#{directory_name}/#{filename}/#{batch_file}"
+              instance_eval(&block) if block_given?
+            end
+          end
         end
       end
     end

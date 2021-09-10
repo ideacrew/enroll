@@ -19,7 +19,7 @@ module Operations
       def call(app_payload)
         family_params = yield transform(app_payload)
         validated_params = yield validate(family_params)
-        yield find(validated_params)
+        # yield find(validated_params)
 
         Success(validated_params)
       end
