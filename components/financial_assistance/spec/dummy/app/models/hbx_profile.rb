@@ -69,7 +69,6 @@ class HbxProfile
     BrokerRole.inactive
   end
 
-
   class << self
     def find(id)
       org = Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first
@@ -115,6 +114,12 @@ class HbxProfile
         broker_agency_profiles = BrokerAgencyProfile.all
       end
       broker_agency_profiles
+    end
+
+    def bcp_by_effective_period(date = TimeKeeper.date_of_record)
+      current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+        bcp.contains?(date)
+      end
     end
   end
 
