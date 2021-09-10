@@ -544,8 +544,6 @@ registry:
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
         is_enabled: false
-      - key: :disable_form_phone_and_paper_dropdown
-        is_enabled: true
       - key: :saml_info_keys
         is_enabled: true
         settings:
