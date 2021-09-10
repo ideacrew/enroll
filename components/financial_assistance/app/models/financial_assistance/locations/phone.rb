@@ -21,21 +21,19 @@ module FinancialAssistance
       field :primary, type: Boolean
       field :full_phone_number, type: String, default: ''
 
-      # TODO: undo after migration
+      validates :area_code,
+                numericality: true,
+                length: {minimum: 3, maximum: 3, message: '%{value} is not a valid area code'},
+                allow_blank: true
 
-      # validates :area_code,
-      #           numericality: true,
-      #           length: {minimum: 3, maximum: 3, message: '%{value} is not a valid area code'},
-      #           allow_blank: true
-      #
-      # validates :number,
-      #           numericality: true,
-      #           length: {minimum: 7, maximum: 7, message: '%{value} is not a valid phone number'},
-      #           allow_blank: true
-      #
-      # validates :kind,
-      #           inclusion: {in: KINDS, message: '%{value} is not a valid phone type'},
-      #           allow_blank: false
+      validates :number,
+                numericality: true,
+                length: {minimum: 7, maximum: 7, message: '%{value} is not a valid phone number'},
+                allow_blank: true
+
+      validates :kind,
+                inclusion: {in: KINDS, message: '%{value} is not a valid phone type'},
+                allow_blank: false
 
       validates_presence_of :area_code, :number
 
