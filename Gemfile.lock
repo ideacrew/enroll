@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: f6cc20977b2d880e02311b6f1982f1c978e794c1
+  revision: 5771694f895dc177b24fce4bacc2c4141956cea6
   branch: mcr_mapping
   specs:
     aca_entities (0.4.0)
@@ -584,7 +584,6 @@ GEM
       faraday (~> 1.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
-    fast_jsonparser (0.5.0)
     ffaker (2.19.0)
     ffi (1.9.25)
     font-awesome-rails (4.7.0.7)
@@ -1144,7 +1143,6 @@ DEPENDENCIES
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
-  fast_jsonparser
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
