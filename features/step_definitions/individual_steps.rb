@@ -293,8 +293,8 @@ When(/^Individual clicks on Individual and Family link/) do
   find(IvlFamilyInformation.individual_and_family_link).click
 end
 
-Then(/^Individual should be on verification page/)do
-expect(page).to have_content('Verify Identity')
+Then(/^Individual should be on verification page/) do
+  expect(page).to have_content('Verify Identity')
 end
 
 When(/^the individual clicks on the Continue button of the Family Information page$/) do
