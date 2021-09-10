@@ -4,6 +4,8 @@ import {
   SplitConfig,
   FilesWithRunTime,
 } from '../models';
+// import { createGroupOverview } from './createGroupRunTimes';
+import { createSplitConfig } from './createSplitConfig';
 import { runtimeDetails } from './numberOfGroups';
 
 export function splitFilesIntoGroups(
@@ -29,45 +31,71 @@ export function splitFilesIntoGroups(
   );
 
   // The magic happens here
-  for (const group of groupRunTimes) {
-    console.log('Files left to process', files.length, group);
+  groupRunTimes.forEach(async (group) => {
+    // console.log(
+    //   'Processing group',
+    //   index + 1,
+    //   'with',
+    //   files.length,
+    //   'files left to process.'
+    // );
 
-    while (getGroupRunTime(group) <= longestTest && files.length) {
+    while (getGroupRunTime(group) < longestTest && files.length) {
       // start with file at front of array
-      const frontFile = files[0];
+      const largestFile = files[0];
 
       // test whether that file can be added to current group
-      const fileIsAddable =
-        frontFile.runTime + getGroupRunTime(group) <= longestTest;
+      const largestFileIsAddable =
+        largestFile.runTime + getGroupRunTime(group) <= longestTest;
 
       // if that file can be added, add it
-      if (fileIsAddable) {
+      if (largestFileIsAddable) {
         const file = files.shift();
         group.files.push(file);
-      } else {
+      }
+
+      if (files.length === 0) {
+        break;
+      }
+
+      const smallestFile: FileWithRuntime = files[files.length - 1];
+
+      const smallestFileIsAddable =
+        smallestFile.runTime + getGroupRunTime(group) <= longestTest;
+
+      if (smallestFileIsAddable) {
         const file = files.pop();
         group.files.push(file);
+      } else {
+        break;
       }
     }
-  }
 
-  const a: SplitConfig = groupRunTimes.map((group) => {
-    return {
-      files: group.files.map((file) => (file as FileWithRuntime).filePath),
-    };
+    // console.log('Group', index + 1, 'has', group.files.length, 'files.');
+    // console.log('==================================================');
   });
+
+  // console.log('Files left', files.length);
+
+  // const overview = createGroupOverview(groupRunTimes);
+  // console.log(overview);
+
+  const a: SplitConfig = createSplitConfig(groupRunTimes);
 
   return a;
 }
 
-function getGroupRunTime(filesWithRunTime: FilesWithRunTime): number {
-  return Math.floor(
-    filesWithRunTime.files.reduce((runtime, file) => {
-      return file ? runtime + file.runTime : 0;
-    }, 0)
-  );
-}
+export const getGroupRunTime = (filesWithRunTime: FilesWithRunTime): number => {
+  const rawRuntime = filesWithRunTime.files.reduce((runtime, file) => {
+    return file ? runtime + file.runTime : 0;
+  }, 0);
 
-function inMinutes(runTime: number): string {
-  return `${runTime / 1000 / 60} minutes`;
-}
+  // console.log({ rawRuntime: inMinutes(rawRuntime) });
+
+  return rawRuntime;
+};
+
+export const inMinutes = (runTime: number): string =>
+  `${runTime / 1000 / 60} minutes`;
+
+export const inMinutesNum = (runTime: number): number => runTime / 1000 / 60;

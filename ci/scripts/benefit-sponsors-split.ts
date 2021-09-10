@@ -1,11 +1,9 @@
 import { promises as fs } from 'fs';
-import { runtimeDictionary } from './concat-rspec-reports';
 
 import {
   FileWithRuntime,
   FileWithRuntimeDictionary,
   FileGroup,
-  RspecReport,
 } from './models';
 import {
   createFileDictionary,
@@ -30,13 +28,11 @@ async function createSplitConfig(): Promise<void> {
   const { examples } = JSON.parse(report);
 
   // Create a dictionary of
-  const filesByRuntime: FileWithRuntimeDictionary = createFileDictionary(
-    examples
-  );
+  const filesByRuntime: FileWithRuntimeDictionary =
+    createFileDictionary(examples);
 
-  const arrayOfSlowFiles: FileWithRuntime[] = createFilesWithRuntime(
-    filesByRuntime
-  );
+  const arrayOfSlowFiles: FileWithRuntime[] =
+    createFilesWithRuntime(filesByRuntime);
 
   console.log('Creating split config');
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
