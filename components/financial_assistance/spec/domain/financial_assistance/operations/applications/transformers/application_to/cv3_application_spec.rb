@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 
+
 RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
@@ -73,8 +74,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
   let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
   let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+  let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   before do
+    allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
@@ -106,7 +113,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should have oe date for year before effective date' do
-      expect(result.value![:oe_start_on]).to eq Date.new((application.effective_date.year - 1), 11, 1)
+      expect(result.value![:oe_start_on]).to eq benefit_coverage_period.open_enrollment_start_on
     end
 
     it 'should have notice_options with send_eligibility_notices set to true' do
