@@ -17,12 +17,6 @@ module Subscribers
         logger.info "ApplicationGenerateRenewalDraftSubscriber: acked, FailureResult: #{result.failure}"
       end
       ack(delivery_info.delivery_tag)
-
-      # logger.info "ApplicationGenerateRenewalDraftSubscriber: on_generate_renewal_draft payload: #{payload}"
-      # FaApplicationJob.perform_later('::FinancialAssistance::Operations::Applications::CreateRenewalDraft',
-      #                                payload)
-      # logger.info 'ApplicationGenerateRenewalDraftSubscriber: triggered FaApplicationJob & acked'
-      # ack(delivery_info.delivery_tag)
     rescue StandardError => e
       logger.info "ApplicationGenerateRenewalDraftSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
