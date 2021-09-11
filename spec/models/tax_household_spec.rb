@@ -98,7 +98,7 @@ RSpec.describe TaxHousehold, type: :model do
       allow(tax_household).to receive(:eligibility_determinations).and_return([eligibility_determination])
     end
 
-    it "should equal to the available csr_kind of tax household members" do
+    it "should equal to the csr_kind of latest_eligibility_determination" do
       tax_household.eligibility_determinations = [eligibility_determination]
       expect(tax_household.valid_csr_kind(hbx_enrollment)).to eq tax_household.tax_household_members.first.csr_eligibility_kind
     end
@@ -185,6 +185,29 @@ RSpec.describe TaxHousehold, type: :model do
         tax_household_member.update_attributes(csr_eligibility_kind: "csr_limited")
         result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
         expect(result).to eq('limited')
+      end
+    end
+
+    context 'when enrollment' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(is_ia_eligible: false)
+        result = tax_household.valid_csr_kind(hbx_enrollment)
+        expect(result).to eq("csr_0")
+      end
+    end
+
+    context 'when all csr percent is csr_100 for tax household members' do
+      it 'should return correct csr value' do
+        result = tax_household.valid_csr_kind(hbx_enrollment)
+        expect(result).to eq('csr_100')
+      end
+    end
+
+    context 'when all csr percent is csr_94 for tax household members' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(csr_eligibility_kind: "csr_94")
+        result = tax_household.valid_csr_kind(hbx_enrollment)
+        expect(result).to eq('csr_94')
       end
     end
   end
