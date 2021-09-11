@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Subscribers
   # To receive payloads for MCR migration
   class ImportMcrApplication
@@ -15,16 +14,17 @@ module Subscribers
     end
 
     def work_with_params(body, _delivery_info, properties)
+      puts "processing in mcr subscriber"
       headers = properties.headers || {}
       headers.stringify_keys
-      begin
+      # begin
         Rails.logger.info "**********************************************************************"
         Rails.logger.info body
         Rails.logger.info "***********************************************************************"
         Operations::Ffe::MigrateApplication.new.call(body)
-      rescue StandardError => _e
-        return :ack
-      end
+      # rescue StandardError => _e
+      #   return :nack
+      # end
       :ack
     end
   end
