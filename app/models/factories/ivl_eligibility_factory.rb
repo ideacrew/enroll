@@ -225,7 +225,7 @@ module Factories
 
       # csr_kinds = tax_households.map(&:current_csr_eligibility_kind)
 
-      csr_kinds = eligibile_csr_kind(shopping_member_ids)
+      csr_kinds = tax_households.first.eligibile_csr_kind(shopping_member_ids)
       {:csr => prioritized_csr(csr_kinds)}
     end
   end
