@@ -70,7 +70,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::EmployeeRenewalInvitationsSubscriber")
       config.acapi.add_async_subscription("FinancialAssistance::Subscribers::ApplicationEligibilityResponse")
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::EmployerBenefitRenewalSubscriber")
-      config.acapi.add_amqp_worker("Subscribers::ImportMcrApplication", 10)
+      config.acapi.add_amqp_worker("Subscribers::ImportMcrApplication", 6)
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber")
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageEmployeeRenewerSubscriber")
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageReinstateGroupAssignmentSubscriber")
