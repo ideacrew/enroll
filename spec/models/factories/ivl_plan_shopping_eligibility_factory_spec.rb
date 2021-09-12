@@ -38,6 +38,9 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
       end
 
       context 'for AvailableEligibilityService' do
+        before :each do
+          family.active_household.tax_households.first.tax_household_members.update_all(csr_eligibility_kind: "csr_94")
+        end
         context 'for one member enrollment' do
           context 'tax_household exists' do
             before :each do
