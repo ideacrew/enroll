@@ -623,7 +623,7 @@ RSpec.describe Plan, dbclean: :after_each do
       let!(:person) { family.primary_person }
       let(:household) {create(:household, family: family)}
       let!(:tax_household) {create(:tax_household, household: household)}
-      let!(:tax_household_member) {tax_household.tax_household_members.create!(is_ia_eligible: true, csr_eligibility_kind: "csr_100")}
+      let!(:tax_household_member) {tax_household.tax_household_members.create!(is_ia_eligible: true, csr_eligibility_kind: "csr_94")}
 
       let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: person.primary_family.family_members[0].id) }
       let(:hbx_enrollment) do
@@ -636,6 +636,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
       before :each do
         Plan.delete_all
+        tax_household.tax_household_members.first.update_attributes!(applicant_id: family.family_members.first.id)
       end
 
       it "should return dental plans" do
@@ -648,11 +649,11 @@ RSpec.describe Plan, dbclean: :after_each do
         expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:nil,  hbx_enrollment: hbx_enrollment).to_a).to include(plan1,plan3)
       end
 
-      # TODO
-      # it "should return health plans" do
-      #   plans = [plan2]
-      #   expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household, hbx_enrollment: hbx_enrollment).to_a).to eq plans
-      # end
+      it "should return health plans" do
+        tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_94")
+        plans = [plan2]
+        expect(Plan.individual_plans(coverage_kind: 'health', active_year: TimeKeeper.date_of_record.year, tax_household: tax_household, hbx_enrollment: hbx_enrollment).to_a).to eq plans
+      end
     end
   end
 
