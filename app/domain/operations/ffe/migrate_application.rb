@@ -213,7 +213,7 @@ module Operations
         fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
                     is_consent_applicant: family_member_hash['is_consent_applicant'],
                     is_coverage_applicant: family_member_hash['is_coverage_applicant'],
-                    is_active: family_member_hash['is_active']}
+                    is_active: family_member_hash['is_active'] }
 
         external_member_id = family_member_hash['hbx_id']
 
@@ -270,6 +270,41 @@ module Operations
           end
       end
 
+      RelationshipMapping = {
+        "self" => "self",
+        "domestic_partner" => "other_relationship",
+        "spouse" => "spouse",
+        "life_partner" => "life_partner",
+        "child" => "child",
+        "adopted_child" => "adopted_child",
+        "annuitant" => "annuitant",
+        "aunt_or_uncle" => "aunt_or_uncle",
+        "brother_or_sister_in_law" => "brother_or_sister_in_law",
+        "collateral_dependent" => "collateral_dependent",
+        "court_appointed_guardian" => "court_appointed_guardian",
+        "daughter_or_son_in_law" => "daughter_or_son_in_law",
+        "dependent_of_a_minor_dependent" => "dependent_of_a_minor_dependent",
+        "father_or_mother_in_law" => "father_or_mother_in_law",
+        "foster_child" => "foster_child",
+        "grandchild" => "grandchild",
+        "grandparent" => "grandparent",
+        "great_grandchild" => "great_grandchild",
+        "great_grandparent" => "great_grandparent",
+        "guardian" => "guardian",
+        "nephew_or_niece" => "nephew_or_niece",
+        "other_relationship" => "other_relationship",
+        "parent" => "parent",
+        "sibling" => "sibling",
+        "sponsored_dependent" => "sponsored_dependent",
+        "stepchild" => "stepchild",
+        "stepparent" => "stepparent",
+        "trustee" => "trustee",
+        "unrelated" => "unrelated",
+        "ward" => "ward",
+        'stepson_or_stepdaughter' => 'stepson_or_stepdaughter',
+        'cousin' => 'cousin'
+      }
+
       def sanitize_applicant_params(iap_hash)
         applicants_hash = iap_hash['applicants']
         sanitize_params = []
@@ -281,7 +316,7 @@ module Operations
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
           sanitize_params << {
             family_member_id: family_member.id,
-            relationship: family_member.relationship,
+            relationship: RelationshipMapping[family_member.relationship],
             first_name: applicant_hash['name']['first_name'],
             middle_name: applicant_hash['name']['middle_name'],
             last_name: applicant_hash['name']['last_name'],
@@ -465,7 +500,13 @@ module Operations
       def fill_applicants_form
         applicants_hash = family_hash['magi_medicaid_applications'].first[:applicants]
         applicants_hash.each do |applicant|
-          persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
+
+          persisted_applicant = if applicant[:person_hbx_id]
+                                  application.applicants.where(person_hbx_id: applicant[:person_hbx_id]).first
+                                else
+                                  application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
+                                end
+
           claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
           persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
           persisted_applicant.is_self_attested_blind = applicant[:is_self_attested_blind]
