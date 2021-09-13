@@ -20,8 +20,9 @@ module Subscribers
       # begin
         Rails.logger.info "**********************************************************************"
         Rails.logger.info body
+        result = Operations::Ffe::MigrateApplication.new.call(JSON.parse(body))
+        Rails.logger.info result
         Rails.logger.info "***********************************************************************"
-        Operations::Ffe::MigrateApplication.new.call(body)
       # rescue StandardError => _e
       #   return :nack
       # end
