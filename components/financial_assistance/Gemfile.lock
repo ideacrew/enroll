@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 347f71110e984bb7d2ade1caccd621c64e532024
-  branch: release_0.5.0
+  revision: 0089911144307151f07524f392c6dcf091169393
+  branch: release_0.6.0
   specs:
     aca_entities (0.4.0)
       deep_merge
@@ -551,4 +551,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.2.16
+   2.2.19

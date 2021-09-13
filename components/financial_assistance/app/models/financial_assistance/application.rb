@@ -101,6 +101,9 @@ module FinancialAssistance
     # predecessor_id is the application preceding this current application
     field :predecessor_id, type: BSON::ObjectId
 
+    # Flag for user requested ATP transfer
+    field :transfer_requested, type: Boolean, default: false
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
@@ -285,15 +288,18 @@ module FinancialAssistance
       update_response_attributes(message)
       ed_updated = FinancialAssistance::Operations::Applications::Haven::AddEligibilityDetermination.new.call(application: self, eligibility_response_payload: eligibility_response_payload)
       return if ed_updated.failure? || ed_updated.value! == false
-
       determine! # If successfully loaded ed's move the application to determined state
       send_determination_to_ea
     end
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      transfer_account if result.success? && is_rt_transferrable?
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
+    end
+
+    def rt_transfer
+      return unless is_rt_transferrable?
+      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
     end
 
     def transfer_account
@@ -312,7 +318,7 @@ module FinancialAssistance
 
     def is_transferrable?
       applicants = self.applicants.select do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
       end
       applicants.any?
     end
@@ -522,7 +528,7 @@ module FinancialAssistance
       end
 
       event :determine, :after => :record_transition do
-        transitions from: :submitted, to: :determined
+        transitions from: :submitted, to: :determined, after: :rt_transfer
       end
 
       event :terminate, :after => :record_transition do
