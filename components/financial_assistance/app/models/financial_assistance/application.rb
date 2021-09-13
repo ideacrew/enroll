@@ -288,15 +288,18 @@ module FinancialAssistance
       update_response_attributes(message)
       ed_updated = FinancialAssistance::Operations::Applications::Haven::AddEligibilityDetermination.new.call(application: self, eligibility_response_payload: eligibility_response_payload)
       return if ed_updated.failure? || ed_updated.value! == false
-
       determine! # If successfully loaded ed's move the application to determined state
       send_determination_to_ea
     end
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      self.transfer_account if result.success? && is_rt_transferrable?
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
+    end
+
+    def rt_transfer
+      return unless is_rt_transferrable?
+      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
     end
 
     def transfer_account
@@ -525,7 +528,7 @@ module FinancialAssistance
       end
 
       event :determine, :after => :record_transition do
-        transitions from: :submitted, to: :determined
+        transitions from: :submitted, to: :determined, after: :rt_transfer
       end
 
       event :terminate, :after => :record_transition do
