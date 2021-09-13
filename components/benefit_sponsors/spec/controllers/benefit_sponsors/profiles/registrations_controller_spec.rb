@@ -124,6 +124,7 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)ß
       allow(Settings.site).to receive(:key).and_return(:dc)
       allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
