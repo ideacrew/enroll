@@ -56,6 +56,7 @@ module Operations
       rescue StandardError => e
         # binding.pry
         puts "Exception: Operations::Ffe::MigrateApplication: #{external_application_id} -- #{e}"
+        Failure(external_application_id.to_s)
       end
 
       private

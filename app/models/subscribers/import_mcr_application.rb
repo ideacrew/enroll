@@ -17,15 +17,15 @@ module Subscribers
       puts "processing in mcr subscriber"
       headers = properties.headers || {}
       headers.stringify_keys
-      # begin
+      begin
         Rails.logger.info "**********************************************************************"
         Rails.logger.info body
         result = Operations::Ffe::MigrateApplication.new.call(JSON.parse(body))
         Rails.logger.info result
         Rails.logger.info "***********************************************************************"
-      # rescue StandardError => _e
-      #   return :nack
-      # end
+      rescue StandardError => _e
+        return :nack
+      end
       :ack
     end
   end
