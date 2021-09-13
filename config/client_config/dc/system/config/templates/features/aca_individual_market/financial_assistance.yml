@@ -214,18 +214,18 @@ registry:
     - :renewals
     features:
     - key: :generate_draft_renewals
-      is_enabled: false
+      is_enabled: true
       settings:
         - key: :draft_renewal_generation_month
-          item: 8
+          item: 9
         - key: :draft_renewal_generation_day
-          item: 25
+          item: 14
     - key: :submit_renewal_drafts
-      is_enabled: false
+      is_enabled: true
       settings:
         - key: :renewal_draft_submission_month
-          item: 8
+          item: 9
         - key: :renewal_draft_submission_day
-          item: 26
+          item: 15
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
