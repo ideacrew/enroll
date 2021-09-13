@@ -7,6 +7,8 @@ module Subscribers
 
     subscribe(:on_submit_renewal_draft) do |delivery_info, _metadata, response|
       logger.info '-' * 100
+      subscriber_logger = Logger.new("#{Rails.root}/log/fa_submit_renewal_draft_subscriber_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      subscriber_logger.info "ApplicationSubmitRenewalDraftSubscriber, response: #{response}"
       payload = JSON.parse(response, :symbolize_names => true)
       logger.info "ApplicationSubmitRenewalDraftSubscriber on_submit_renewal_draft payload: #{payload}"
       result = ::FinancialAssistance::Operations::Applications::Renew.new.call(payload)
