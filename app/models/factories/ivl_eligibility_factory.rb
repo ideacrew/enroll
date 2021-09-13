@@ -222,9 +222,7 @@ module Factories
 
     def fetch_csr
       return {:csr => 'csr_0'} if (shopping_tax_members.count != shopping_member_ids.count) || any_aptc_ineligible?
-
-      # csr_kinds = tax_households.map(&:current_csr_eligibility_kind)
-
+      # picks csr_kind based on individual level
       csr_kinds = tax_households.first.eligibile_csr_kind(shopping_member_ids)
       {:csr => prioritized_csr(csr_kinds)}
     end

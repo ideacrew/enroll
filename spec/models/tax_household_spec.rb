@@ -160,7 +160,10 @@ RSpec.describe TaxHousehold, type: :model do
     context 'when all csr percent is csr_100 for tax household members' do
       it 'should return correct csr value' do
         result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        csr_kind = tax_household.valid_csr_kind(hbx_enrollment)
+
         expect(result).to eq(100)
+        expect(csr_kind).to eq('csr_100')
       end
     end
 
@@ -168,46 +171,43 @@ RSpec.describe TaxHousehold, type: :model do
       it 'should return correct csr value' do
         tax_household_member.update_attributes(csr_eligibility_kind: "csr_94")
         result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        csr_kind = tax_household.valid_csr_kind(hbx_enrollment)
+
         expect(result).to eq(94)
+        expect(csr_kind).to eq('csr_94')
       end
     end
 
-    context 'when all dafault csr percent when thhm is not ia_eligible' do
+    context 'when all default csr percent when thhm is not ia_eligible' do
       it 'should return correct csr value' do
         tax_household_member.update_attributes(is_ia_eligible: false)
         result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        csr_kind = tax_household.valid_csr_kind(hbx_enrollment)
+
         expect(result).to eq(0)
+        expect(csr_kind).to eq("csr_0")
       end
     end
 
-    context 'when all csr percent is csr_94 for tax household members' do
+    context 'when all csr percent is csr_limited for tax household members' do
       it 'should return correct csr value' do
         tax_household_member.update_attributes(csr_eligibility_kind: "csr_limited")
         result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        csr_kind = tax_household.valid_csr_kind(hbx_enrollment)
+
         expect(result).to eq('limited')
+        expect(csr_kind).to eq("csr_limited")
       end
     end
 
-    context 'when enrollment' do
+    context 'when all csr percent is csr_73 for tax household members' do
       it 'should return correct csr value' do
-        tax_household_member.update_attributes(is_ia_eligible: false)
-        result = tax_household.valid_csr_kind(hbx_enrollment)
-        expect(result).to eq("csr_0")
-      end
-    end
+        tax_household_member.update_attributes(csr_eligibility_kind: "csr_73")
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        csr_kind = tax_household.valid_csr_kind(hbx_enrollment)
 
-    context 'when all csr percent is csr_100 for tax household members' do
-      it 'should return correct csr value' do
-        result = tax_household.valid_csr_kind(hbx_enrollment)
-        expect(result).to eq('csr_100')
-      end
-    end
-
-    context 'when all csr percent is csr_94 for tax household members' do
-      it 'should return correct csr value' do
-        tax_household_member.update_attributes(csr_eligibility_kind: "csr_94")
-        result = tax_household.valid_csr_kind(hbx_enrollment)
-        expect(result).to eq('csr_94')
+        expect(result).to eq(73)
+        expect(csr_kind).to eq("csr_73")
       end
     end
   end
