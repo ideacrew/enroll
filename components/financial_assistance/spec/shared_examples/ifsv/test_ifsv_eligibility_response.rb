@@ -191,11 +191,11 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
              :due_on => nil,
              :updated_by => nil,
              :eligibility_results => [{
-                                        :result => :eligible,
-                                        :source => "FDSH",
-                                        :code => "HS0000000",
-                                        :code_description => "Applicant is eligible"
-                                      }]}
+               :result => :eligible,
+               :source => "FDSH",
+               :code => "HS0000000",
+               :code_description => "Applicant is eligible"
+             }]}
           ],
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
