@@ -16,9 +16,9 @@ export function splitFilesIntoGroups(
     runtimeDetails(files);
 
   console.log({
-    longestTest: inMinutes(longestTest),
+    longestTest,
     longestTestName,
-    totalRuntime: inMinutes(totalRuntime),
+    totalRuntime,
     groupCount,
     suggestedGroupCount,
   });
@@ -94,8 +94,3 @@ export const getGroupRunTime = (filesWithRunTime: FilesWithRunTime): number => {
 
   return rawRuntime;
 };
-
-export const inMinutes = (runTime: number): string =>
-  `${runTime / 1000 / 60} minutes`;
-
-export const inMinutesNum = (runTime: number): number => runTime / 1000 / 60;
