@@ -1432,7 +1432,32 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   context "CRM update" do
     let(:test_person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let(:test_family) { FactoryBot.create(:family, :with_primary_family_member, :person => test_person) }
+    let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:dependent_person_2) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:dependent_family_member) do
+      FamilyMember.new(is_primary_applicant: false, is_consent_applicant: false, person: dependent_person)
+    end
+    let(:second_dependent_family_member) do
+      FamilyMember.new(is_primary_applicant: false, is_consent_applicant: false, person: dependent_person_2)
+    end
     before do
+      family.family_members << dependent_family_member
+      person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
+      person.person_relationships.build(relative: dependent_person, kind: "spouse")
+      person.person_relationships.build(relative: dependent_person_2, kind: "child")
+      person.save!
+      person&.consumer_role&.ridp_documents&.first&.update_attributes(uploaded_at: TimeKeeper.date_of_record)
+      family.family_members.each do |fm|
+        # Delete phones with extensions due to factory
+        fm.person.phones.destroy_all
+        fm.person.phones << Phone.new(
+          kind: 'home', country_code: '',
+          area_code: '202', number: '1030404',
+          extension: '', primary: nil,
+          full_phone_number: '2021030404'
+        )
+      end
+      family.save!
       # keeps the spec less complicated
       test_family.irs_groups.destroy_all
       EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
