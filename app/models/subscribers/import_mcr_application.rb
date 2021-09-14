@@ -14,15 +14,14 @@ module Subscribers
     end
 
     def work_with_params(body, _delivery_info, properties)
-      puts "processing in mcr subscriber"
       headers = properties.headers || {}
       headers.stringify_keys
       begin
-        Rails.logger.info "**********************************************************************"
-        Rails.logger.info body
-        result = Operations::Ffe::MigrateApplication.new.call(JSON.parse(body))
+        Rails.logger.info "***********************MCR result start***********************************************"
+        payload = JSON.parse(body, :symbolize_names => true)
+        result = Operations::Ffe::MigrateApplication.new.call(payload)
         Rails.logger.info result
-        Rails.logger.info "***********************************************************************"
+        Rails.logger.info "***********************MCR result end*************************************************"
       rescue StandardError => _e
         return :nack
       end
