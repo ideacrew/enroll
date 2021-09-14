@@ -83,7 +83,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :around_
   }
   let!(:renewal_hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, applicant_id: person.id, hbx_enrollment: renewal_enrollment) }
   let!(:good_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).map(&:hbx_id)}
-  let!(:bad_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::SELECTED_AND_WAIVED).map(&:hbx_id)}
+  let!(:bad_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::WAIVED_STATUSES).map(&:hbx_id)}
 
   before do
     ce.update_attributes(:employee_role_id => employee_role.id )
