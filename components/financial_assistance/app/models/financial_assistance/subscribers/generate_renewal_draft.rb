@@ -2,6 +2,7 @@
 
 module FinancialAssistance
   module Subscribers
+    # Subscriber to process messages to generate renewal draft application for a given input payload.
     class GenerateRenewalDraft
       include Acapi::Notifiers
 
@@ -13,7 +14,7 @@ module FinancialAssistance
         )
       end
 
-      def work_with_params(body, _delivery_info, properties)
+      def work_with_params(body, _delivery_info, _properties)
         logger = Logger.new("#{Rails.root}/log/acapi_fa_generate_renewal_draft_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
         begin
           logger.info "GenerateRenewalDraft, response: #{body}"

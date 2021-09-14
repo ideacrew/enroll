@@ -71,7 +71,7 @@ module FinancialAssistance
             # @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
 
             # Acapi Publishing
-            json_payload = { family_id: family_id.to_s, renewal_year: @renewal_year }.to_json
+            json_payload = { index: index, family_id: family_id.to_s, renewal_year: @renewal_year }.to_json
             notify('acapi.info.events.assistance_application.generate_renewal_draft', { body: json_payload })
           rescue StandardError => e
             @logger.info "Failed to publish for event generate_renewal_draft, with family_id: #{family_id}, error: #{e.backtrace}"
@@ -95,7 +95,7 @@ module FinancialAssistance
             # @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
 
             # Acapi Publishing
-            json_payload = { application_hbx_id: application.hbx_id.to_s }.to_json
+            json_payload = { index: index, application_hbx_id: application.hbx_id.to_s }.to_json
             notify('acapi.info.events.assistance_application.submit_renewal_draft', { body: json_payload })
           rescue StandardError => e
             @logger.info "Failed to publish for event submit_renewal_draft, with application_hbx_id: #{application.hbx_id}, error: #{e.backtrace}"
