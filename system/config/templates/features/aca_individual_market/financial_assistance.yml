@@ -23,7 +23,7 @@ registry:
         is_enabled: true
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 17
+            item: 18
           - key: :application_new_year_effective_date_month_of_year
             item: 9
           - key: :enrollment_due_day_of_month
@@ -219,13 +219,13 @@ registry:
         - key: :draft_renewal_generation_month
           item: 9
         - key: :draft_renewal_generation_day
-          item: 15
+          item: 16
     - key: :submit_renewal_drafts
       is_enabled: true
       settings:
         - key: :renewal_draft_submission_month
           item: 9
         - key: :renewal_draft_submission_day
-          item: 16
+          item: 17
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
