@@ -42,8 +42,8 @@ module FinancialAssistance
 
         def process_renewals
           @logger.info 'Started process_renewals process'
-          publish_generate_draft_renewals if can_generate_draft_renewals?
-          publish_submit_renewal_drafts if can_submit_renewal_drafts?
+          generate_bulk_draft_renewals if can_generate_draft_renewals?
+          submit_bulk_renewal_drafts if can_submit_renewal_drafts?
           @logger.info 'Ended process_renewals process'
           Success('Processed application renewals successfully')
         end
@@ -93,6 +93,45 @@ module FinancialAssistance
           @logger.info 'Ended publish_submit_renewal_drafts process'
         rescue StandardError => e
           @logger.info "Failed to execute publish_submit_renewal_drafts, error: #{e.backtrace}"
+        end
+
+        def generate_bulk_draft_renewals
+          @logger.info 'Started generate_bulk_draft_renewals process'
+          family_ids = FinancialAssistance::Application.where(assistance_year: @renewal_year.pred).distinct(:family_id).uniq
+          @logger.info "Total number of families with fa_applications: #{family_ids.count}"
+          family_ids.inject([]) do |_arr, family_id|
+            @logger.info '-' * 20
+            payload = { family_id: family_id.to_s, renewal_year: @renewal_year }
+            result = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(payload)
+            @logger.info "Successfully generated renewal draft, with payload: #{payload}" if result.success?
+            @logger.info "Failed to generate renewal draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
+          rescue StandardError, SystemStackError => e
+            @logger.info "Errored out while generating renewal draft, with payload: #{payload}, error_message: #{e.message}, backtrace: #{e.backtrace}"
+          end
+
+          @logger.info 'Ended generate_bulk_draft_renewals process'
+        rescue StandardError => e
+          @logger.info "Failed to execute generate_bulk_draft_renewals, error: #{e.backtrace}"
+        end
+
+        def submit_bulk_renewal_drafts
+          @logger.info 'Started submit_bulk_renewal_drafts process'
+          applications = FinancialAssistance::Application.renewal_draft.where(assistance_year: @renewal_year)
+          @logger.info "Total number of renewal_draft applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"
+
+          applications.inject([]) do |_arr, application|
+            @logger.info '-' * 20
+            payload = { application_hbx_id: application.hbx_id.to_s }
+            result = ::FinancialAssistance::Operations::Applications::Renew.new.call(payload)
+            @logger.info "Successfully submitted renewal_draft, with payload: #{payload}" if result.success?
+            @logger.info "Failed to submit renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
+          rescue StandardError, SystemStackError => e
+            @logger.info "Errored out while submitting renewal draft, with payload: #{payload}, error_message: #{e.message}, backtrace: #{e.backtrace}"
+          end
+
+          @logger.info 'Ended submit_bulk_renewal_drafts process'
+        rescue StandardError => e
+          @logger.info "Failed to execute submit_bulk_renewal_drafts, error: #{e.backtrace}"
         end
 
         def date_of_draft_renewals_generation

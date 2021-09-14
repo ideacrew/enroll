@@ -21,7 +21,7 @@ module Subscribers
         logger.info "ApplicationSubmitRenewalDraftSubscriber: acked, FailureResult: #{result.failure}"
       end
       ack(delivery_info.delivery_tag)
-    rescue StandardError => e
+    rescue StandardError, SystemStackError => e
       subscriber_logger.info "ApplicationSubmitRenewalDraftSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
       logger.info "ApplicationSubmitRenewalDraftSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
