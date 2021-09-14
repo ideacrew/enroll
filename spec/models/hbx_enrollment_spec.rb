@@ -4272,8 +4272,8 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
     include_context "setup expired, and active benefit applications"
 
     before do
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -4303,8 +4303,8 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
     include_context "setup terminated and active benefit applications"
 
     before do
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }

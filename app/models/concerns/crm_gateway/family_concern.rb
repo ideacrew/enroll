@@ -13,7 +13,6 @@ module CrmGateway
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
       puts("Triggering CRM family update publish for family with mongo id #{self.id}")
       ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
-
     end
   end
 end
