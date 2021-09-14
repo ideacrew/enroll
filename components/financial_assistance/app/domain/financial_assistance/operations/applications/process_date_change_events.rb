@@ -9,6 +9,7 @@ module FinancialAssistance
       # This Operation processes all the date change events based on the date.
       class ProcessDateChangeEvents
         include Dry::Monads[:result, :do]
+        include Acapi::Notifiers
 
         # @param [Hash] opts The options to submit renewal_draft application
         # @option opts [Date] :events_execution_date (required)
@@ -42,8 +43,8 @@ module FinancialAssistance
 
         def process_renewals
           @logger.info 'Started process_renewals process'
-          generate_bulk_draft_renewals if can_generate_draft_renewals?
-          submit_bulk_renewal_drafts if can_submit_renewal_drafts?
+          publish_generate_draft_renewals if can_generate_draft_renewals?
+          publish_submit_renewal_drafts if can_submit_renewal_drafts?
           @logger.info 'Ended process_renewals process'
           Success('Processed application renewals successfully')
         end
@@ -63,12 +64,17 @@ module FinancialAssistance
           family_ids = FinancialAssistance::Application.where(assistance_year: @renewal_year.pred).distinct(:family_id)
           @logger.info "Total number of applications with assistance_year: #{@renewal_year.pred} are #{family_ids.count}"
           family_ids.each_with_index do |family_id, index|
-            params = { payload: { index: index, family_id: family_id.to_s, renewal_year: @renewal_year }, event_name: 'generate_renewal_draft' }
-            result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
-            @logger.info "Successfully Published for event generate_renewal_draft, with params: #{params}" if result.success?
-            @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
+            # EventSource Publishing
+            # params = { payload: { index: index, family_id: family_id.to_s, renewal_year: @renewal_year }, event_name: 'generate_renewal_draft' }
+            # result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
+            # @logger.info "Successfully Published for event generate_renewal_draft, with params: #{params}" if result.success?
+            # @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
+
+            # Acapi Publishing
+            json_payload = { family_id: family_id.to_s, renewal_year: @renewal_year }.to_json
+            notify('acapi.info.events.assistance_application.generate_renewal_draft', { body: json_payload })
           rescue StandardError => e
-            @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, error: #{e.backtrace}"
+            @logger.info "Failed to publish for event generate_renewal_draft, with family_id: #{family_id}, error: #{e.backtrace}"
           end
 
           @logger.info 'Ended publish_generate_draft_renewals process'
@@ -82,12 +88,17 @@ module FinancialAssistance
           @logger.info "Total number of renewal_draft applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"
 
           applications.each_with_index do |application, index|
-            params = { payload: { index: index, application_hbx_id: application.hbx_id.to_s }, event_name: 'submit_renewal_draft' }
-            result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
-            @logger.info "Successfully Published for event submit_renewal_draft, with params: #{params}" if result.success?
-            @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
+            # EventSource Publishing
+            # params = { payload: { index: index, application_hbx_id: application.hbx_id.to_s }, event_name: 'submit_renewal_draft' }
+            # result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
+            # @logger.info "Successfully Published for event submit_renewal_draft, with params: #{params}" if result.success?
+            # @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
+
+            # Acapi Publishing
+            json_payload = { application_hbx_id: application.hbx_id.to_s }.to_json
+            notify('acapi.info.events.assistance_application.submit_renewal_draft', { body: json_payload })
           rescue StandardError => e
-            @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, error: #{e.backtrace}"
+            @logger.info "Failed to publish for event submit_renewal_draft, with application_hbx_id: #{application.hbx_id}, error: #{e.backtrace}"
           end
 
           @logger.info 'Ended publish_submit_renewal_drafts process'
