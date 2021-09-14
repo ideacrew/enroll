@@ -17,8 +17,7 @@ class Person
   include ::BenefitSponsors::Concerns::Observable
   include SponsoredBenefits::Concerns::Dob
   include LegacyVersioningRecords
-  include CrmGateway::PersonConcern if EnrollRegistry.feature_enabled?(:crm_update_family_save)
-
+  include CrmGateway::PersonConcern
 
   # verification history tracking
   include Mongoid::History::Trackable
