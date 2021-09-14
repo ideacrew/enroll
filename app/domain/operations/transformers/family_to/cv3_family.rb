@@ -39,7 +39,7 @@ module Operations
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
-          payload.merge(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
+          payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           Success(payload)
         end
 
@@ -179,7 +179,7 @@ module Operations
               start_date: household.effective_starting_on,
               end_date: household.effective_ending_on,
               is_active: household.is_active,
-              irs_groups: construct_irs_group(household.irs_group),
+              irs_groups: construct_irs_group(household.family.irs_groups.last),
               tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households)
             }
