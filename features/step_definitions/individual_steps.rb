@@ -103,7 +103,7 @@ Then(/Individual should click on Individual market for plan shopping/) do
   find('.btn', text: 'CONTINUE').click
 end
 
-Then(/the individual sees form to enter personal information$/) do
+Then(/^.+ sees form to enter personal information$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
@@ -288,9 +288,12 @@ Then(/^.+ agrees to the privacy agreeement/) do
   sleep 2
 end
 
-When(/^Individual clicks on Individual and Family link should be on verification page/) do
+When(/^Individual clicks on Individual and Family link/) do
   wait_for_ajax
-  find('.interaction-click-control-individual-and-family').click
+  find(IvlFamilyInformation.individual_and_family_link).click
+end
+
+Then(/^Individual should be on verification page/) do
   expect(page).to have_content('Verify Identity')
 end
 
@@ -499,24 +502,24 @@ And(/I should see the individual home page/) do
   # click_link "My #{Settings.site.short_name}"
 end
 
-Then(/^Individual edits a dependents address$/) do
+Then(/^Individual clicks on Add New Person$/) do
   click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
-  fill_in 'dependent[first_name]', :with => (@u.first_name :first_name)
-  fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
+  fill_in IvlFamilyInformation.dependent_first_name, :with => (@u.first_name :first_name)
+  fill_in IvlFamilyInformation.dependent_last_name, :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
   click_link(@u.adult_dob.to_date.day)
   click_outside_datepicker(l10n('family_information').to_s)
-  fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find("span", :text => "choose").click
+  fill_in IvlFamilyInformation.dependent_ssn, :with => (@u.ssn :ssn)
+  find(IvlFamilyInformation.dependent_relationship_dropdown).click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
-  find(:xpath, '//label[@for="radio_male"]').click
-  find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
-  find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
-  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
-  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(IvlFamilyInformation.male_radiobtn).click
+  find(IvlFamilyInformation.us_citizen_or_national_yes_radiobtn).click
+  find(IvlFamilyInformation.naturalized_citizen_no_radiobtn).click
+  find(IvlFamilyInformation.american_or_alaskan_native_no_radiobtn).click
+  find(IvlFamilyInformation.incarcerated_no_radiobtn).click
 end
 
 Then(/Individual confirms dependent info/) do
@@ -527,15 +530,15 @@ Then(/Individual should see three dependents on the page/) do
   expect(find_all('.dependent_list').count).to eq 3
 end
 
-Then(/^Individual ads address for dependent$/) do
-  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
-  fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
-  fill_in 'dependent[addresses][0][city]', :with => 'Washington'
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+Then(/^Individual adds address for dependent$/) do
+  find(IvlFamilyInformation.lives_with_prim_subs_checkbox).click
+  fill_in IvlFamilyInformation.address_line_one, :with => '36 Campus Lane'
+  fill_in IvlFamilyInformation.city, :with => 'Washington'
+  find(IvlFamilyInformation.select_state_dropdown).click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
-  fill_in 'dependent[addresses][0][zip]', :with => "20002"
-  all(:css, ".mz").last.click
-  find('#btn-continue').click
+  fill_in IvlFamilyInformation.zip, :with => "20002"
+  find(IvlFamilyInformation.confirm_member_btn).click
+  find(IvlFamilyInformation.continue_btn).click
 end
 
 And(/I click to see my Secure Purchase Confirmation/) do
@@ -943,4 +946,9 @@ end
 
 Then(/^the consumer should see a message with dob error$/) do
   expect(page).to have_content(/dob - must be filled/)
+end
+
+And(/Individual sees Your Information page$/) do
+  expect(page).to have_content YourInformation.your_information_text
+  find(YourInformation.continue_btn).click
 end

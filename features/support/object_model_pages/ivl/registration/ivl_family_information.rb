@@ -7,6 +7,10 @@ class IvlFamilyInformation
     '#household_info_add_member'
   end
 
+  def self.individual_and_family_link
+    '.interaction-click-control-individual-and-family'
+  end
+
   def self.continue_btn
     '#btn-continue, #btn_household_continue'
   end
@@ -16,15 +20,15 @@ class IvlFamilyInformation
   end
 
   def self.dependent_first_name
-    'applicant_first_name'
+    'dependent[first_name]'
   end
 
   def self.dependent_middle_name
-    'applicant_middle_name'
+    'dependent[middle_name]'
   end
 
   def self.dependent_last_name
-    'applicant_last_name'
+    'dependent[last_name]'
   end
 
   def self.need_coverage_yes
@@ -44,11 +48,11 @@ class IvlFamilyInformation
   end
 
   def self.dependent_ssn
-    'applicant_ssn'
+    'dependent[ssn]'
   end
 
   def self.dependent_no_ssn_checkbox
-    'input[name="applicant[no_ssn]"]'
+    'input[name="dependent[no_ssn]"]'
   end
 
   def self.male_radiobtn
@@ -68,11 +72,11 @@ class IvlFamilyInformation
   end
 
   def self.us_citizen_or_national_yes_radiobtn
-    'label[for="applicant_us_citizen_true"] span'
+    'label[for="dependent_us_citizen_true"] span'
   end
 
   def self.us_citizen_or_national_no_radiobtn
-    'label[for="applicant_us_citizen_false"] span'
+    'label[for="dependent_us_citizen_false"] span'
   end
 
   def self.not_sure_us_citizen_link
@@ -80,11 +84,11 @@ class IvlFamilyInformation
   end
 
   def self.naturalized_citizen_yes_radiobtn
-    'label[for="applicant_naturalized_citizen_true"] span'
+    'label[for="dependent_naturalized_citizen_true"] span'
   end
 
   def self.naturalized_citizen_no_radiobtn
-    'label[for="applicant_naturalized_citizen_false"] span'
+    'label[for="dependent_naturalized_citizen_false"]'
   end
 
   def self.not_sure_naturalized_citizen
@@ -136,67 +140,63 @@ class IvlFamilyInformation
   end
 
   def self.white_checkbox
-    'applicant_ethnicity_white'
+    '#dependent_ethnicity_white'
   end
 
   def self.black_or_african_american_checkbox
-    '#applicant_ethnicity_black_or_african_american'
+    '#dependent_ethnicity_black_or_african_american'
   end
 
   def self.asian_indian_checkbox
-    '#applicant_ethnicity_asian_indian'
+    '#dependent_ethnicity_asian_indian'
   end
 
   def self.chinese_checkbox
-    '#applicant_ethnicity_chinese'
+    '#dependent_ethnicity_chinese'
   end
 
   def self.filipino_checkbox
-    '#applicant_ethnicity_filipino'
+    '#dependent_ethnicity_filipino'
   end
 
   def self.japanese_checkbox
-    '#applicant_ethnicity_japanese'
+    '#dependent_ethnicity_japanese'
   end
 
   def self.korean_checkbox
-    '#applicant_ethnicity_korean'
+    '#dependent_ethnicity_korean'
   end
 
   def self.vietnamese_checkbox
-    '#applicant_ethnicity_vietnamese'
+    '#dependent_ethnicity_vietnamese'
   end
 
   def self.other_asian_checkbox
-    '#applicant_ethnicity_other_asian'
+    '#dependent_ethnicity_other_asian'
   end
 
   def self.native_hawaiian_checkbox
-    '#applicant_ethnicity_native_hawaiian'
+    '#dependent_ethnicity_native_hawaiian'
   end
 
   def self.samoan_checkbox
-    '#applicant_ethnicity_samoan'
+    '#dependent_ethnicity_samoan'
   end
 
   def self.guamanian_or_chamorro_checkbox
-    '#applicant_ethnicity_guamanian_or_chamorro'
+    '#dependent_ethnicity_guamanian_or_chamorro'
   end
 
   def self.other_pacific_islander_checkbox
-    '#applicant_ethnicity_other_pacific_islander'
+    '#dependent_ethnicity_other_pacific_islander'
   end
 
   def self.american_indian_checkbox
-    '#applicant_ethnicity_american_indianalaska_native'
-  end
-
-  def self.other_race_checkbox
-    '#applicant_ethnicity_other'
+    '#dependent_ethnicity_american_indianalaska_native'
   end
 
   def self.lives_with_prim_subs_checkbox
-    'input[id="applicant_same_with_primary"]'
+    'label[for="dependent_same_with_primary"]'
   end
 
   def self.address_line_one
@@ -204,11 +204,11 @@ class IvlFamilyInformation
   end
 
   def self.address_line_two
-    'applicant_addresses_attributes_0_address_2'
+    'ADDRESS LINE 2 '
   end
 
   def self.city
-    'applicant[addresses_attributes][0][city]'
+    'dependent[addresses][0][city]'
   end
 
   def self.select_state_dropdown
@@ -216,15 +216,15 @@ class IvlFamilyInformation
   end
 
   def self.zip
-    'applicant_addresses_attributes_0_zip'
+    'dependent[addresses][0][zip]'
   end
 
   def self.living_outside_dc_checkbox
-    '#applicant_is_temporarily_out_of_state'
+    '#dependent_is_temporarily_out_of_state'
   end
 
   def self.homeless_checkbox
-    '#applicant_is_homeless'
+    '#dependent_is_homeless'
   end
 
   def self.confirm_member_btn
