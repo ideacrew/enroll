@@ -14,12 +14,15 @@ module Subscribers
       result = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(payload)
 
       if result.success?
+        subscriber_logger.info "ApplicationGenerateRenewalDraftSubscriber, success: app_hbx_id: #{result.success.hbx_id}"
         logger.info "ApplicationGenerateRenewalDraftSubscriber: acked, SuccessResult: #{result.success}"
       else
+        subscriber_logger.info "ApplicationGenerateRenewalDraftSubscriber, failure: #{result.failure}"
         logger.info "ApplicationGenerateRenewalDraftSubscriber: acked, FailureResult: #{result.failure}"
       end
       ack(delivery_info.delivery_tag)
     rescue StandardError => e
+      subscriber_logger.info "ApplicationGenerateRenewalDraftSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
       logger.info "ApplicationGenerateRenewalDraftSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end
