@@ -191,6 +191,7 @@ class PeopleController < ApplicationController
   # FIXME: This isn't even routed.  We should remove it.
   def update
     @person = find_person(params[:id])
+    @person_old_home_address = @person.addresses.select{|address| address.kind == 'home'}.first.dup
     @family = @person.primary_family
     @person.updated_by = current_user.oim_id unless current_user.nil?
     if @person.is_consumer_role_active? && request.referer.include?("insured/families/personal")
@@ -218,6 +219,9 @@ class PeopleController < ApplicationController
           format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
           format.json { head :no_content }
         end
+        @person_new_home_address = @person.addresses.select{|address| address.kind == 'home'}.first
+        fm_count = @person&.primary_family&.family_members&.count
+        update_dependent_addresses if fm_count && fm_count > 1
       else
         if @person.is_consumer_role_active?
           bubble_consumer_role_errors_by_person(@person)
@@ -320,6 +324,26 @@ private
     ["home","work"].each do |kind|
        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
+  end
+
+  def update_dependent_addresses
+    dependents = @person.primary_family.family_members.reject(&:is_primary_applicant?)
+    dependents.each do |dep|
+      dependent_same_address_as_primary(dep)
+    end
+  end
+
+  def dependent_same_address_as_primary(dependent)
+    dep_address = dependent.person.addresses.select{|address| address.kind == 'home'}.first
+
+    return unless @person_old_home_address.same_address?(dep_address)
+    dep_address.address_1 = @person_new_home_address.address_1
+    dep_address.address_2 = @person_new_home_address.address_2
+    dep_address.address_3 = @person_new_home_address.address_3
+    dep_address.city = @person_new_home_address.city
+    dep_address.state = @person_new_home_address.state
+    dep_address.zip = @person_new_home_address.zip
+    dep_address.save!
   end
 
   def sanitize_person_params
