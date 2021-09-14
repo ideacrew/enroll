@@ -584,19 +584,19 @@ module Operations
           persisted_applicant.medicaid_chip_ineligible = applicant[:ineligible_due_to_immigration_in_last_5_years]
           persisted_applicant.immigration_status_changed = applicant[:immigration_status_changed_since_ineligibility]
 
-          ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
+          # ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
           # unless persisted_applicant.valid?
           #   binding.pry
           # end
           # persisted_applicant.save!(validate: false)
 
-          unless persisted_applicant.valid?
+          # unless persisted_applicant.valid?
             # binding.pry
-          end
+          # end
 
           persisted_applicant.save!
-          ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
+          # ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
           # persisted_applicant.has_insurance = applicant[:has_insurance]
           # persisted_applicant.has_state_health_benefit = applicant[:has_state_health_benefit]
           # persisted_applicant.had_prior_insurance = applicant[:had_prior_insurance]

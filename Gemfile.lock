@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 1291427231f5379961ca4c32c9d3e10c20d65e2f
+  revision: 2c6c6075630bf3ec6bb2c700d1705ecd14dd8deb
   branch: mcr_mapping
   specs:
     aca_entities (0.4.0)
@@ -665,7 +665,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0901)
+    mime-types-data (3.2021.0704)
     mimemagic (0.3.8)
       nokogiri (~> 1)
     mini_magick (4.10.1)
