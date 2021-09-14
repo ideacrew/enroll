@@ -1433,6 +1433,8 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     let(:test_person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let(:test_family) { FactoryBot.create(:family, :with_primary_family_member, :person => test_person) }
     before do
+      # keeps the spec less complicated
+      test_family.irs_groups.destroy_all
       EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
     end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbclean: :after_each do
   let!(:person) {FactoryBot.create(:person, :with_consumer_role)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
@@ -22,8 +22,6 @@ RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :afte
       person.person_relationships.build(relative: dependent_person, kind: "spouse")
       person.save!
       person.consumer_role.ridp_documents.first.update_attributes(uploaded_at: TimeKeeper.date_of_record)
-      # person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: TimeKeeper.date_of_record - 1.day)}
-      # dependent_person.person_relationships << PersonRelationship.new(relative: dependent_person, kind: "self")
       family.family_members.each do |fm|
         # Delete phones with extensions due to factory
         fm.person.phones.destroy_all
@@ -35,13 +33,8 @@ RSpec.describe Operations::Families::PublishFamily, type: :model, dbclean: :afte
         )
       end
       family.save!
-      family.family_members.each do |fm|
-        family.households.first.coverage_households.first.coverage_household_members.build(family_member_id: fm.id).save! if family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: fm.id).blank?
-        # fm.person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Identity')
-        # fm.person.consumer_role.identity_validation = "valid"
-        # fm.person.consumer_role.application_validation = "valid"
-        # fm.person.save
-      end
+      # Just to make the spec less complicated
+      family.irs_groups.destroy_all
     end
 
     it 'should return success with correct family information' do
