@@ -11,8 +11,8 @@ module CrmGateway
 
     def trigger_crm_family_update_publish
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
-      puts("Triggering CRM family update publish for family with mongo id #{self.id.to_s}")
-      ::Operations::Families::CrmGateway::UpdateFamily.new.call(self) unless Rails.env.test?
+      puts("Triggering CRM family update publish for family with mongo id #{self.id}")
+      ::Operations::Families::PublishFamily.new.call(self)
     end
   end
 end

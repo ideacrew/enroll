@@ -1428,6 +1428,18 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       expect(enrollment.coverage_selected?).to be_truthy
     end
   end
+
+  context "CRM update" do
+    let(:test_person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let(:test_family) { FactoryBot.create(:family, :with_primary_family_member, :person => test_person) }
+    before do
+      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should publish to CRM on save" do
+      expect(test_family.send(:trigger_crm_family_update_publish).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+    end
+  end
 end
 
 describe Family, "#check_dep_consumer_role", dbclean: :after_each do

@@ -22,10 +22,11 @@ module Operations
 
         private
 
+        # rubocop:disable Metrics/CyclomaticComplexity
         def construct_payload(enr)
           product = enr.product
-          issuer = product.issuer_profile
-          consumer_role = enr.consumer_role
+          issuer = product&.issuer_profile
+          consumer_role = enr&.consumer_role
           payload = {
             effective_on: enr.effective_on,
             aasm_state: enr.aasm_state,
@@ -34,16 +35,17 @@ module Operations
             product_kind: enr.coverage_kind,
             total_premium: enr.total_premium,
             applied_aptc_amount: { cents: enr.applied_aptc_amount.cents, currency_iso: enr.applied_aptc_amount.currency.iso_code },
-            hbx_enrollment_members: enrollment_member_hash(enr),
-            product_reference: product_reference(product, issuer),
-            issuer_profile_reference: issuer_profile_reference(issuer),
-            consumer_role_reference: consumer_role_reference(consumer_role),
-            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
+            hbx_enrollment_members: enrollment_member_hash(enr)
           }
+          payload.merge!(is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))) if product
+          payload.merge!(consumer_role_reference: consumer_role_reference(consumer_role)) if consumer_role
+          payload.merge!(product_reference: product_reference(product, issuer)) if product && issuer
+          payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
 
           Success(payload)
         end
+        # rubocop:enable Metrics/CyclomaticComplexity
 
         def consumer_role_reference(consumer_role)
           {

@@ -37,8 +37,10 @@ module Operations
             local_residency_responses
             local_residency_requests
           ]
-          unnecessary_document_keys.each do |sym_value|
-            fm_hash[:person][:consumer_role][sym_value] = []
+          if fm_hash.dig(:person, :consumer_role)
+            unnecessary_document_keys.each do |sym_value|
+              fm_hash[:person][:consumer_role][sym_value] = []
+            end
           end
           fm_hash[:person][:individual_market_transitions] = []
           fm_hash[:person][:verification_types] = []

@@ -14,7 +14,7 @@ module CrmGateway
       return if Rails.env.test?
       return unless has_active_consumer_role?
       return unless self == self&.primary_family&.primary_person
-      puts("Triggering CRM primary subscriber update publish for person with mongo id #{self.id.to_s}")
+      puts("Triggering CRM primary subscriber update publish for person with mongo id #{self.id}")
       ::Operations::People::CrmGateway::PublishPrimarySubscriber.new.call(self.attributes)
     end
   end
