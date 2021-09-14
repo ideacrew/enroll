@@ -54,6 +54,25 @@ Then(/^they should see a new finanical assistance application$/) do
   expect(page).to have_content(l10n('insured.family_members.index.continue_to_get_insurance'))
 end
 
+Given(/IAP Assistance Year Display feature is enabled/) do
+  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/IAP Assistance Year Display feature is disabled/) do
+  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
+end
+
+Then(/They should see the application assistance year above Info Needed/) do
+  assistance_year = FinancialAssistance::Application.all.first.assistance_year.to_s
+  expect(page).to have_content(assistance_year[0..1])
+  expect(page).to have_content(assistance_year[2..3])
+end
+
+Then(/They should not see the application assistance year above Info Needed/) do
+  expect(page).to have_content('Your Application for Premium Reductions')
+  expect(page).to_not have_content(l10n('faa.application_for_coverage'))
+end
+
 Then(/^they should see each of their dependents listed$/) do
   consumer.person.primary_family.family_members.each do |family_member|
     expect(page).to have_content(family_member.first_name)
