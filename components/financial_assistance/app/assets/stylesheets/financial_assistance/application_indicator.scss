@@ -45,7 +45,7 @@
 
 .note.purple {
   background:#ffffff; color: #414141; margin-top: -1px; margin-bottom: 0px; padding: 9px;
-  width: 9px; position: absolute; z-index: 1; 
+  width: 9px; position: absolute; z-index: 1;
   margin-left: 189px;
   border: 0px;
 }
@@ -70,8 +70,8 @@
 .ready-4-review .whitebox {
   border-color: #69A30D;
 }
-.ready-4-review .note.purple::before { 
-  border-color:#fff #eee #69A30D #69A30D; 
+.ready-4-review .note.purple::before {
+  border-color:#fff #eee #69A30D #69A30D;
 }
 .whitebox {
   padding: 0;
@@ -113,4 +113,25 @@
   border-top: 1px solid #69A30D;
   border-bottom: 1px solid #69A30D;
   background-color: #69A30D;
+}
+
+.app-year-header {
+  color: #5C5C5C;
+  margin: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+  .app-year-column {
+    border-right: 1px solid #5C5C5C;
+    padding-right: 5px;
+    .row {
+      font-size: 25px;
+      line-height: 20px;
+    }
+  }
+
+  .app-year-title {
+    font-size: 16px;
+    line-height: 20px;
+  }
 }
