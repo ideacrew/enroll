@@ -976,7 +976,7 @@ When(/^Individual clicks on Make Changes from Actions tab$/) do
   find(IvlHomepage.make_changes_btn).click
 end
 
-When(/^Individual click on shop for new plan button on household info page$/) do 
+When(/^Individual click on shop for new plan button on household info page$/) do
   click_link "Continue"
   sleep 5
   click_button "Shop for new plan"
