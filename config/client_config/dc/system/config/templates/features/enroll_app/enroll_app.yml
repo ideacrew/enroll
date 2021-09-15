@@ -536,3 +536,9 @@ registry:
                     'dominion_national_pay_now_audience', 'dominion_national_pay_now_relay_state', 'best_life_pay_now_url', 'best_life_pay_now_audience', 'best_life_pay_now_relay_state', 'metlife_pay_now_url',
                     'metlife_pay_now_audience', 'metlife_pay_now_relay_state', 'carefirst_pay_now_url', 'carefirst_pay_now_audience', 'carefirst_pay_now_relay_state', 'aetna_pay_now_url', 'aetna_pay_now_audience',
                     'aetna_pay_now_relay_state', 'unitedhealthcare_pay_now_url', 'unitedhealthcare_pay_now_audience', 'unitedhealthcare_pay_now_relay_state']
+      - key: :crm_update_family_save
+        item: :crm_update_family_save
+        is_enabled: false
+      - key: :crm_publish_primary_subscriber
+        item: :crm_publish_primary_subscriber
+        is_enabled: false
