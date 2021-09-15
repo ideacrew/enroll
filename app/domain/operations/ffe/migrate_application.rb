@@ -21,7 +21,7 @@ module Operations
       # @return [ Hash ] family_hash
       # api public
 
-      attr_reader :external_application_id, :payload, :family, :family_hash, :application
+      attr_reader :external_application_id, :payload, :family, :family_hash, :application, :tax_household_params
 
       def call(app_payload)
         @payload = app_payload
@@ -86,6 +86,7 @@ module Operations
         build_family
 
         if family.primary_applicant.person.is_applying_for_assistance
+          @tax_household_params = family_hash["households"][0]["tax_households"][0]
           application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id,
                                                                                                 benchmark_product_id: BSON::ObjectId.new,
                                                                                                 years_to_renew: 5))
@@ -97,6 +98,7 @@ module Operations
 
             fill_applicants_form
             fix_iap_relationship
+            create_eligibility_determination
           else
             # binding.pry
             puts "IAP Application Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{application_result.failure}"
@@ -106,6 +108,27 @@ module Operations
         # puts "Success: #{external_application_id}"
         print "."
         Success(application)
+      end
+
+      def create_eligibility_determination
+        obj = @application.eligibility_determinations.new(sanitize_tax_household_params)
+        # obj.valid? ? obj.save! : "error"
+        obj.save!
+      end
+
+      def sanitize_tax_household_params
+        params = tax_household_params
+        {"max_aptc" => Monetize.parse(params.dig("eligibility_determinations",0, "max_aptc")).to_f,
+         "csr_percent_as_integer" => nil,
+         "source" => "ffe",
+         "aptc_csr_annual_household_income" => Monetize.parse(params.dig("eligibility_determinations",0, "aptc_csr_annual_household_income")).to_f,
+         "aptc_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations",0,"aptc_annual_income_limit")).to_f,
+         "csr_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations",0,"csr_annual_income_limit")).to_f,
+         "effective_starting_on" => params["start_date"],
+         "effective_ending_on" => params["end_date"],
+         "is_eligibility_determined" => params["is_eligibility_determined"],
+         "hbx_assigned_id" => nil,
+         "determined_at" => params["start_date"]}
       end
 
       def fix_iap_relationship
@@ -275,7 +298,7 @@ module Operations
           end
       end
 
-      RelationshipMapping = {
+      RELATIONSHIP_MAPPING = {
         "self" => "self",
         "domestic_partner" => "other_relationship",
         "spouse" => "spouse",
@@ -308,7 +331,7 @@ module Operations
         "ward" => "ward",
         'stepson_or_stepdaughter' => 'stepson_or_stepdaughter',
         'cousin' => 'cousin'
-      }
+      }.freeze
 
       def sanitize_applicant_params(iap_hash)
         applicants_hash = iap_hash['applicants']
@@ -318,10 +341,12 @@ module Operations
             fm.external_member_id == applicant_hash["family_member_reference"]["family_member_hbx_id"]
           end.first
 
+          tax_household_member_params = tax_household_params["tax_household_members"].select{|thm| thm.dig("family_member_reference","family_member_hbx_id") == applicant_hash["family_member_reference"]["family_member_hbx_id"]}.first
+
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
           sanitize_params << {
             family_member_id: family_member.id,
-            relationship: RelationshipMapping[family_member.relationship],
+            relationship: RELATIONSHIP_MAPPING[family_member.relationship],
             first_name: applicant_hash['name']['first_name'],
             middle_name: applicant_hash['name']['middle_name'],
             last_name: applicant_hash['name']['last_name'],
@@ -428,7 +453,13 @@ module Operations
             indian_tribe_member: applicant_hash['indian_tribe_member'] || false,
             tribal_id: applicant_hash['tribal_id'],
             tribal_name: applicant_hash['tribal_name'],
-            tribal_state: applicant_hash['tribal_state']
+            tribal_state: applicant_hash['tribal_state'],
+
+            is_ia_eligible: tax_household_member_params&.dig("product_eligibility_determination", "is_ia_eligible"),
+            is_medicaid_chip_eligible: nil,
+            is_non_magi_medicaid_eligible: nil,
+            is_totally_ineligible: nil,
+            is_without_assistance: nil
           }
         end
         iap_hash.except!('applicants').merge!(applicants: sanitize_params)
@@ -589,6 +620,12 @@ module Operations
           persisted_applicant.person_coverage_end_on = applicant[:medicaid_or_chip_coverage_end_date]
           persisted_applicant.medicaid_chip_ineligible = applicant[:ineligible_due_to_immigration_in_last_5_years]
           persisted_applicant.immigration_status_changed = applicant[:immigration_status_changed_since_ineligibility]
+
+          persisted_applicant.is_ia_eligible = applicant[:is_ia_eligible] || false
+          persisted_applicant.is_medicaid_chip_eligible = false
+          persisted_applicant.is_non_magi_medicaid_eligible = false
+          persisted_applicant.is_totally_ineligible = false
+          persisted_applicant.is_without_assistance = false
 
           # ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
 
