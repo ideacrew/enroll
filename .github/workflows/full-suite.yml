@@ -1,6 +1,6 @@
 name: full check suite
 on:
-  push:
+  # push:
   schedule:
     - cron: '0 6 * * *'
 
@@ -18,9 +18,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: bundle install
         run: |
           gem update --system
@@ -40,9 +40,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: bundle install
         run: |
           gem update --system
@@ -57,17 +57,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
-      - name: Cache Gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: gem install brakeman
-      - name: Run Brakeman
-        run: brakeman -i config/brakeman.ignore
+      - run: gem install brakeman
+      - run: brakeman -i config/brakeman.ignore
       - name: Run Brakeman In Components
         run: |
           for test_dir in `ls -1 components`; do
@@ -82,7 +73,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -97,9 +88,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
           gem update --system
@@ -110,9 +101,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -124,7 +115,6 @@ jobs:
           name: compiled-assets
           path: public/packs-test
   engines:
-    needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -142,7 +132,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -176,9 +166,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: |
@@ -206,7 +196,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -238,9 +228,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: |
@@ -292,7 +282,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -307,9 +297,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
           gem update --system
@@ -321,9 +311,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -373,7 +363,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -388,9 +378,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
           gem update --system
@@ -402,9 +392,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
