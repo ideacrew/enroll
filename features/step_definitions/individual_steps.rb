@@ -478,8 +478,8 @@ end
 
 And(/^.+ click on purchase button on confirmation page/) do
   find('.interaction-choice-control-value-terms-check-thank-you').click
-  fill_in 'first_name_thank_you', :with => ("John")
-  fill_in 'last_name_thank_you', :with => ("Smith")
+  fill_in 'first_name_thank_you', :with => "John"
+  fill_in 'last_name_thank_you', :with => "Smith"
   #fill_in 'first_name_thank_you', :with => (@u.find :first_name)
   #fill_in 'last_name_thank_you', :with => (@u.find :last_name)
   # screenshot("purchase")
@@ -974,4 +974,10 @@ end
 When(/^Individual clicks on Make Changes from Actions tab$/) do
   find(IvlHomepage.actions_dropdown).click
   find(IvlHomepage.make_changes_btn).click
+end
+
+When(/^Individual click on shop for new plan button on household info page$/) do 
+  click_link "Continue"
+  sleep 5
+  click_button "Shop for new plan"
 end

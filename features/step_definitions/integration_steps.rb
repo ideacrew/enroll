@@ -1038,7 +1038,7 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
 end
 
-When(/^.+ click on "(.*?)" button on household info page$/) do |select_action|
+When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
   sleep 5
   click_button "Shop for new plan"
