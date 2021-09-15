@@ -53,7 +53,6 @@ jobs:
           git fetch --no-tags --depth=1 origin trunk
           bundle exec rake view_translations_linter:lint_git_difference_changed_lines
   brakeman:
-    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -77,7 +76,6 @@ jobs:
             cd ../..
           done
   build-assets:
-    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -118,12 +116,15 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: compile assets
         run: RAILS_ENV=test bundle exec rake assets:precompile
+      - name: Upload asset directory
+        uses: actions/upload-artifact@v2
+        with:
+          name: compiled-assets
+          path: public/packs-test
   engines:
-    needs: [rubocop, view_linter]
+    needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -195,7 +196,7 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec
   benefit-sponsors:
-    needs: [rubocop, view_linter]
+    needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -258,7 +259,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [rubocop, view_linter]
+    needs: [rubocop, view_linter, brakeman, build-assets]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -326,15 +327,17 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - uses: actions/download-artifact@v2
+        with:
+          name: compiled-assets
+          path: public/packs-test
       - name: Run tests
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [rubocop, view_linter]
+    needs: [rubocop, view_linter, brakeman, build-assets]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -405,7 +408,9 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - uses: actions/download-artifact@v2
+        with:
+          name: compiled-assets
+          path: public/packs-test
       - name: Run tests
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
