@@ -87,9 +87,8 @@ module Operations
 
         if family.primary_applicant.person.is_applying_for_assistance
           @tax_household_params = family_hash["households"][0]["tax_households"][0]
-          application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id,
-                                                                                                benchmark_product_id: BSON::ObjectId.new,
-                                                                                                years_to_renew: 5))
+          application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new))
+
           # Family.create_indexes  TODO: index
           # ::FinancialAssistance::Application.create_indexes #TODO: index
           if application_result.success
@@ -99,6 +98,7 @@ module Operations
             fill_applicants_form
             fix_iap_relationship
             create_eligibility_determination
+            fill_application_form
           else
             # binding.pry
             puts "IAP Application Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{application_result.failure}"
@@ -108,6 +108,18 @@ module Operations
         # puts "Success: #{external_application_id}"
         print "."
         Success(application)
+      end
+
+      def fill_application_form
+        app_hash = family_hash['magi_medicaid_applications'].first
+
+        application.parent_living_out_of_home_terms = app_hash["parent_living_out_of_home_terms"]
+        application.report_change_terms = app_hash['report_change_terms']
+        application.medicaid_terms = app_hash['medicaid_terms']
+        application.is_renewal_authorized = app_hash['is_renewal_authorized']
+        application.years_to_renew = app_hash['years_to_renew']
+        application.renewal_base_year = 2021
+        application.save!
       end
 
       def create_eligibility_determination
