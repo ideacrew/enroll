@@ -1431,22 +1431,24 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
 
   context "CRM update" do
     let(:test_person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
-    let(:test_family) { FactoryBot.create(:family, :with_primary_family_member, :person => test_person) }
+    let(:test_family) do
+      FactoryBot.create(
+        :family,
+        :with_family_members,
+        people: [test_person, dependent_person_2],
+        person: test_person
+      )
+    end
     let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:dependent_person_2) { FactoryBot.create(:person, :with_consumer_role) }
-    let(:dependent_family_member) do
-      FamilyMember.new(is_primary_applicant: false, is_consent_applicant: false, person: dependent_person)
-    end
-    let(:second_dependent_family_member) do
-      FamilyMember.new(is_primary_applicant: false, is_consent_applicant: false, person: dependent_person_2)
-    end
     before do
-      family.family_members << dependent_family_member
-      person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
-      person.person_relationships.build(relative: dependent_person, kind: "spouse")
-      person.person_relationships.build(relative: dependent_person_2, kind: "child")
+      test_person.person_relationships << PersonRelationship.new(relative: test_person, kind: "self")
+      test_person.person_relationships.build(relative: dependent_person, kind: "spouse")
+      test_person.person_relationships.build(relative: dependent_person_2, kind: "child")
       person.save!
-      person&.consumer_role&.ridp_documents&.first&.update_attributes(uploaded_at: TimeKeeper.date_of_record)
+      family.save!
+
+      test_person&.consumer_role&.ridp_documents&.first&.update_attributes(uploaded_at: TimeKeeper.date_of_record)
       family.family_members.each do |fm|
         # Delete phones with extensions due to factory
         fm.person.phones.destroy_all
@@ -1457,7 +1459,6 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
           full_phone_number: '2021030404'
         )
       end
-      family.save!
       # keeps the spec less complicated
       test_family.irs_groups.destroy_all
       EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)

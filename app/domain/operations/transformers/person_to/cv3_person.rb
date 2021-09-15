@@ -359,7 +359,8 @@ module Operations
                 ssn: relative.ssn,
                 no_ssn: (relative.no_ssn == "0" || relative.ssn.present?) ? false : true,
                 dob: relative.dob,
-                gender: relative.gender
+                gender: relative.gender,
+                relationship_to_primary: rel.kind
               }
             }
           end
