@@ -119,7 +119,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.send_to_external_verification" => "Send to OFI", # TODO: This is for Maine, we don't know what it should be for DC yet, if anything,
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   # Year Selection page
-  "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
+  "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
   "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
   "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
