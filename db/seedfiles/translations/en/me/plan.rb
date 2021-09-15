@@ -30,20 +30,15 @@ PLAN_TRANSLATIONS = {
   'en.plans.nedd_hours' => '8:00 am – 4:45 pm (M-F)',
   'en.plans.nedd_contact_url' => 'www.nedelta.com',
 
-  'en.plans.kaiser.pay_now.first_payment' => "<b>Make a first payment</b> for my new plan",
-  'en.plans.kaiser.pay_now.make_payment_for_my_plan' => "<b>Make payments</b> for my plan",
-  'en.plans.kaiser.pay_now.redirection_message' => "You are leaving the %{site_short_name} website and entering a privately-owned website created, operated, and maintained by Kaiser Permanente.",
-  'en.plans.kaiser.pay_now.link_info' => 'This link is provided for your convenience to allow you to pay your first month’s insurance premium. It’s only available to make your first payment.',
-  'en.plans.kaiser.pay_now.processing' => 'It may take 3-5 business days for Kaiser Permanente to process your enrollment information, or to reflect your coverage once you’ve made your first month’s premium payment.',
-  'en.plans.kaiser.pay_now.collecting_info' => 'The information that Kaiser Permanente collects and maintains as a result of your visit to its website is different from the information that DC Health Link collects and maintains.',
-  'en.plans.kaiser.pay_now.exchange_disclaimer_for_auth' => 'DC Health Link cannot help you with any information regarding this website, including your username or password or other technical issues.',
-  'en.plans.kaiser.pay_now.exchange_disclaimer' => "By linking to this private business, DC Health Link is not endorsing its products, services, or privacy and security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by Kaiser Permanente.",
+  'en.plans.issuer.pay_now.first_payment' => "<b>Make a first payment</b> for my new plan",
+  'en.plans.issuer.pay_now.make_payment_for_my_plan' => "<b>Make payments</b> for my plan",
+  'en.plans.issuer.pay_now.redirection_message' => "You are leaving the %{site_short_name} website and entering a privately-owned website created, operated, and maintained by %{carrier_name}.",
+  'en.plans.issuer.pay_now.link_info' => 'This link is provided for your convenience to allow you to pay your first month’s insurance premium. It’s only available to make your first payment.',
+  'en.plans.issuer.pay_now.processing' => "It may take 3-5 business days for %{carrier_name} to process your enrollment information, or to reflect your coverage once you’ve made your first month’s premium payment.",
+  'en.plans.issuer.pay_now.collecting_info' => "The information that %{carrier_name} collects and maintains as a result of your visit to its website is different from the information that %{site_short_name} collects and maintains.",
+  'en.plans.issuer.pay_now.exchange_disclaimer_for_auth' => "%{site_short_name} cannot help you with any information regarding this website, including your username or password or other technical issues.",
+  'en.plans.issuer.pay_now.exchange_disclaimer' => "By linking to this private business, %{site_short_name} is not endorsing its products, services, or privacy and security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by %{carrier_name}.",
 
-  'en.plans.other.pay_now.redirection_message' => "You are leaving the %{site_short_name} website and entering a privately-owned website created, operated, and maintained by %{carrier_name}.",
-  'en.plans.other.pay_now.link_info' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>',
-  'en.plans.other.pay_now.processing' => 'It may take 3-5 business days for %{carrier_name} to process your enrollment information, or to reflect your coverage once you’ve made your first month’s premium payment.',
-  'en.plans.other.pay_now.collecting_info' => 'The information that %{carrier_name} collects and maintains as a result of your visit to its website is different from the information that DC Health Link collects and maintains.',
-  'en.plans.other.pay_now.exchange_disclaimer_for_auth' => 'DC Health Link cannot help you with any information regarding this website, including your username or password or other technical issues.',
-  'en.plans.other.pay_now.exchange_disclaimer' => "By linking to this private business, DC Health Link is not endorsing its products, services, or privacy and security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by %{carrier_name}."
+  'en.plans.other.pay_now.link_info' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>'
 
 }
