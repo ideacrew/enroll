@@ -56,20 +56,19 @@ jobs:
     needs: [build-assets]
     strategy:
       matrix:
-        feature:
-          [
-            'admin',
-            'brokers',
+        feature: [
+            # 'admin',
+            # 'brokers',
             'cover_all',
             'employee',
-            'employers',
-            'financial_assistance',
+            # 'employers',
+            # 'financial_assistance',
             'general_agencies',
             'group_selection',
             'hbx',
-            'hbx_admin',
-            'insured',
-            'permissions',
+            # 'hbx_admin',
+            # 'insured',
+            # 'permissions',
             'plan_shopping',
           ]
     runs-on: ubuntu-latest
