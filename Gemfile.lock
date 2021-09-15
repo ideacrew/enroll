@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d1da052bcbede75981ac070b5acd696f91fcac68
+  revision: a959070f4ced3c425c590e7aa4162cca8b1536f4
   branch: release_0.6.0
   specs:
-    aca_entities (0.4.0)
+    aca_entities (0.6.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
