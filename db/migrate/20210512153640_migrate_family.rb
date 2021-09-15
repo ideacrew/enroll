@@ -37,8 +37,8 @@ class MigrateFamily < Mongoid::Migration
           result = Operations::Ffe::MigrateApplication.new.call(payload)
           puts result
         else
-          # notify("acapi.info.events.migration.mcr_application_payload", {:body => JSON.dump(payload)})
-          event("events.json.stream", attributes: payload).success.publish
+          notify("acapi.info.events.migration.mcr_application_payload", {:body => JSON.dump(payload)})
+          # event("events.json.stream", attributes: payload).success.publish
         end
       rescue StandardError => e
         puts "Error: #{payload[:insuranceApplicationIdentifier]}"

@@ -50,6 +50,7 @@ module Operations
         #   end
         # end
 
+        _migrated = yield application_migrated
         _application = yield import_application
 
         Success(external_application_id.to_s)
@@ -59,6 +60,11 @@ module Operations
       end
 
       private
+
+      def application_migrated
+        result = Operations::Families::Find.new.call(external_app_id: external_application_id)
+        result.success? ? Failure("Family already migrated: #{external_application_id}") : Success("")
+      end
 
       def import_application
         transform_payload = Operations::Ffe::TransformApplication.new.call(payload)

@@ -13,17 +13,48 @@ module Subscribers
       )
     end
 
-    def work_with_params(body, _delivery_info, properties)
-      headers = properties.headers || {}
-      headers.stringify_keys
+    def work_with_params(body, _delivery_info, _properties)
+      logger = Logger.new("#{Rails.root}/log/application_migration_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       begin
-        Rails.logger.info "***********************MCR result start***********************************************"
         payload = JSON.parse(body, :symbolize_names => true)
+        application_id = payload[:insuranceApplicationIdentifier]
+        logger.info "Processing: #{application_id}"
         result = Operations::Ffe::MigrateApplication.new.call(payload)
-        Rails.logger.info result
-        Rails.logger.info "***********************MCR result end*************************************************"
-      rescue StandardError => _e
-        return :nack
+        if result.success?
+          logger.info "Success: #{application_id}"
+          notify(
+            "acapi.info.events.migration.mcr_application_success", {
+              :body => JSON.dump({
+                :application_id => application_id
+              })
+            }
+          )
+        else
+          logger.info "Failure: #{application_id} - #{result}"
+          notify(
+            "acapi.info.events.migration.mcr_application_failure", {
+              :body => JSON.dump({
+                :application_id => application_id,
+                :payload => payload,
+                :result => result
+              })
+            }
+          )
+        end
+      rescue StandardError => e
+        logger.info "Exception: #{application_id} - #{e}"
+        notify(
+          "acapi.info.events.migration.mcr_application_exception", {
+            :body => JSON.dump({
+              :application_id => application_id,
+              :payload => payload,
+              :result => result,
+              :error => e.inspect,
+              :message => e.message,
+              :backtrace => e.backtrace
+            })
+          }
+        )
       end
       :ack
     end

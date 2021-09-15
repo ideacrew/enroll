@@ -9,7 +9,7 @@ module Operations
       send(:include, Dry::Monads[:result, :do])
 
       def call(*args)
-        obj_id = args.first[:id].present? ? args.first[:id] : args.first[:ext_app_id]
+        obj_id = args.first[:id].present? ? args.first[:id] : args.first[:external_app_id]
         family_id = yield validate(obj_id)
         family    = yield find_family(family_id)
 
