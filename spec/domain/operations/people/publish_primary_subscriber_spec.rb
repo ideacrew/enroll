@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-RSpec.describe Operations::People::PublishPrimarySubscriber, type: :model, dbclean: :after_each do
+RSpec.describe Operations::People::SugarCrm::PublishPrimarySubscriber, type: :model, dbclean: :after_each do
   let!(:person) do
     # Some of these attributes are necessary in the person entity
     FactoryBot.create(
