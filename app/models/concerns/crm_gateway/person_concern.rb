@@ -14,7 +14,7 @@ module CrmGateway
       return unless has_active_consumer_role?
       return unless primary_family.present? && self == primary_family.primary_person
       puts("Triggering CRM primary subscriber update publish for person with mongo id #{self.id}")
-      ::Operations::People::PublishPrimarySubscriber.new.call(self)
+      ::Operations::People::SugarCrm::PublishPrimarySubscriber.new.call(self)
     end
   end
 end
