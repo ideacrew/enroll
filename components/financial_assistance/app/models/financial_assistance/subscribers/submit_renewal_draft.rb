@@ -19,7 +19,7 @@ module FinancialAssistance
         begin
           logger.info "SubmitRenewalDraft, response: #{body}"
           payload = JSON.parse(body, :symbolize_names => true)
-          result = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(payload)
+          result = ::FinancialAssistance::Operations::Applications::Renew.new.call(payload)
           if result.success?
             logger.info "SubmitRenewalDraft, success: app_hbx_id: #{result.success.hbx_id}"
           else
