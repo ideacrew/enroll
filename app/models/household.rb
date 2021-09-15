@@ -308,7 +308,7 @@ class Household
     tax_households.tax_household_with_year(year).active_tax_household
   end
 
-  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source, individual_csr = {})
+  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source, individual_csr = {}) # rubocop:disable Metrics/ParameterLists
     th = tax_households.build(
         allocated_aptc: 0.0,
         effective_starting_on: Date.new(date.year, date.month, date.day),
@@ -336,30 +336,26 @@ class Household
       ath.save!
     end
 
-    if individual_csr.present?
-      individual_member_csr_update(individual_csr, th)
-    end
+    individual_member_csr_update(individual_csr, th) if individual_csr.present?
 
-    deter = th.eligibility_determinations.build(
-        source: source,
-        benchmark_plan_id: slcsp,
-        max_aptc: max_aptc.to_f,
-        determined_at: Date.today
-    )
+    deter = th.eligibility_determinations.build(source: source,
+                                                benchmark_plan_id: slcsp,
+                                                max_aptc: max_aptc.to_f,
+                                                determined_at: Date.today)
     deter.save!
 
     end_multiple_thh
   end
 
-  def individual_member_csr_update(individual_csr, th)
+  def individual_member_csr_update(individual_csr, thh)
     individual_csr.gsub!("'", "\"")
     csr_hash = JSON.parse(individual_csr)
-    csr_hash.keys.each do | hbx_id |
+    csr_hash.each_key do |hbx_id|
       person = Person.where(hbx_id: hbx_id).first
       next unless person.present?
       person_fm = self.family.family_members.active.where(person_id: person.id)
       person_fm_id = person_fm.first.id
-      person_thhm = th.tax_household_members.where(applicant_id: person_fm_id).first
+      person_thhm = thh.tax_household_members.where(applicant_id: person_fm_id).first
       person_thhm.update_attributes!(csr_percent_as_integer: csr_hash[:hbx_id].to_i)
     end
   end
