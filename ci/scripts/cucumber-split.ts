@@ -10,6 +10,10 @@ const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
 async function createCucumberSplitConfig(): Promise<void> {
+  const [manualGroupCount] = process.argv.slice(2);
+
+  const manualGroupCountNumber = parseInt(manualGroupCount, 10);
+
   // Parse cucumber report
   const cucumberReport = await fs.readFile(REPORT_PATH, 'utf-8');
   const report: CucumberFeature[] = JSON.parse(cucumberReport);
@@ -21,9 +25,11 @@ async function createCucumberSplitConfig(): Promise<void> {
 
   const { suggestedGroupCount } = runtimeDetails(arrayOfSlowFiles);
 
+  const groupCount = manualGroupCountNumber || suggestedGroupCount;
+
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     arrayOfSlowFiles,
-    suggestedGroupCount
+    groupCount
   );
 
   await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));

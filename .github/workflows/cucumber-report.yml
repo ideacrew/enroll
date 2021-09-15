@@ -1,6 +1,6 @@
 name: cucumber report
 on:
-  push:
+  # push:
   workflow_dispatch:
 
 jobs:
