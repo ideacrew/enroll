@@ -30,7 +30,7 @@ Feature: Insured Plan Shopping on Individual market
     When Individual click the "Married" in qle carousel
     And I select a past qle date
     Then Individual should see confirmation and continue
-    When Individual click on "shop for new plan" button on household info page
+    When Individual click on shop for new plan button on household info page
     And Individual select a plan on plan shopping page
     And Individual click on purchase button on confirmation page
     And Individual click on continue on qle confirmation page
