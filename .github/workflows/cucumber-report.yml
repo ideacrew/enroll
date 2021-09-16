@@ -45,10 +45,9 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: compile assets
-        run: RAILS_ENV=test bundle exec rake assets:precompile
-      - name: Upload asset directory
-        uses: actions/upload-artifact@v2
+      - run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - run: RAILS_ENV=test bundle exec rake assets:precompile
+      - uses: actions/upload-artifact@v2
         with:
           name: compiled-assets
           path: public/packs-test
@@ -142,6 +141,9 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: compiled-assets
       - uses: actions/download-artifact@v2
         with:
           path: ci/cucumber/compressed-reports
