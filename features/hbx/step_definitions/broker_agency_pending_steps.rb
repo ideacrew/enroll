@@ -3,7 +3,7 @@ And(/^Hbx Admin should see broker application with carrier appointments$/) do
     find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox|
       checkbox.should be_checked
     end
-    expect(page).to have_content("Carrier appointments for broker are not necessary for participation in #{Settings.site.long_name}")
+    expect(page).to have_text(l10n("broker_carrier_appointments_enabled_note", site_long_name: site_long_name))
   end
 end
 
