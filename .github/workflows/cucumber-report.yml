@@ -46,10 +46,14 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
       - run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - uses: actions/upload-artifact@v2
+        with:
+          name: webpacker-assets
+          path: public/assets
       - run: RAILS_ENV=test bundle exec rake assets:precompile
       - uses: actions/upload-artifact@v2
         with:
-          name: compiled-assets
+          name: precompiled-assets
           path: public/packs-test
   cucumber-report:
     needs: [build-assets]
@@ -113,8 +117,12 @@ jobs:
         run: yarn install
       - uses: actions/download-artifact@v2
         with:
-          name: compiled-assets
+          name: precompiled-assets
           path: public/packs-test
+      - uses: actions/download-artifact@v2
+        with:
+          name: webpacker-assets
+          path: public/assets
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: public
