@@ -8,6 +8,7 @@ Rails.application.configure do
   config.cache_classes = true
   config.session_store :cache_store
   config.cache_store = :memory_store
+  config.assets.prefix = '/public/packs-test'
 
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that
