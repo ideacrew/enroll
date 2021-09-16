@@ -1,6 +1,6 @@
 name: full check suite
 on:
-  # push:
+  push:
   schedule:
     - cron: '0 6 * * *'
 
@@ -109,11 +109,6 @@ jobs:
         run: yarn install
       - name: compile assets
         run: RAILS_ENV=test bundle exec rake assets:precompile
-      - name: Upload asset directory
-        uses: actions/upload-artifact@v2
-        with:
-          name: compiled-assets
-          path: public/packs-test
   engines:
     runs-on: ubuntu-latest
     strategy:
@@ -233,8 +228,7 @@ jobs:
             ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: |
-          yarn install
+        run: yarn install
       - name: run webpack
         run: |
           bundle config path vendor/bundle
@@ -317,10 +311,6 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - uses: actions/download-artifact@v2
-        with:
-          name: compiled-assets
-          path: public/packs-test
       - name: Run tests
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
@@ -357,6 +347,13 @@ jobs:
             21,
             22,
             23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
           ]
     steps:
       - uses: actions/checkout@v2
@@ -398,9 +395,5 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - uses: actions/download-artifact@v2
-        with:
-          name: compiled-assets
-          path: public/packs-test
       - name: Run tests
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
