@@ -90,7 +90,7 @@ registry:
       is_enabled: false
     - key: :transfer_service
       is_enabled: true
-      item: "curam"
+      item: "aces"
   - namespace:
     - :documents
     features:
