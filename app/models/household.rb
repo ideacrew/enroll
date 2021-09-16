@@ -353,10 +353,11 @@ class Household
     csr_hash.each_key do |hbx_id|
       person = Person.where(hbx_id: hbx_id).first
       next unless person.present?
-      person_fm = self.family.family_members.active.where(person_id: person.id)
-      person_fm_id = person_fm.first.id
+      person_fm = self.family.family_members.active.where(person_id: person.id).first
+      next unless person_fm.present?
+      person_fm_id = person_fm.id
       person_thhm = thh.tax_household_members.where(applicant_id: person_fm_id).first
-      person_thhm.update_attributes!(csr_percent_as_integer: csr_hash[:hbx_id].to_i)
+      person_thhm.update_attributes!(csr_percent_as_integer: csr_hash[:hbx_id].to_i) if person_thhm.present?
     end
   end
 
