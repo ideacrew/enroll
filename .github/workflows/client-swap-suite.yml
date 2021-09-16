@@ -1,7 +1,8 @@
 name: Nightly Stored Client Tests
 on:
-  schedule:
-    - cron: '0 0 * * *'
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 0 * * *'
 
 env:
   RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
@@ -23,11 +24,11 @@ jobs:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
         with:
-          rabbitmq version: "3.8.2-management-alpine"
+          rabbitmq version: '3.8.2-management-alpine'
           host port: 5672
-          rabbitmq user: "guest"
-          rabbitmq password: "guest"
-          rabbitmq vhost: "/"
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -83,11 +84,11 @@ jobs:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
         with:
-          rabbitmq version: "3.8.2-management-alpine"
+          rabbitmq version: '3.8.2-management-alpine'
           host port: 5672
-          rabbitmq user: "guest"
-          rabbitmq password: "guest"
-          rabbitmq vhost: "/"
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -148,11 +149,11 @@ jobs:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
         with:
-          rabbitmq version: "3.8.2-management-alpine"
+          rabbitmq version: '3.8.2-management-alpine'
           host port: 5672
-          rabbitmq user: "guest"
-          rabbitmq password: "guest"
-          rabbitmq vhost: "/"
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -210,11 +211,11 @@ jobs:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
         with:
-          rabbitmq version: "3.8.2-management-alpine"
+          rabbitmq version: '3.8.2-management-alpine'
           host port: 5672
-          rabbitmq user: "guest"
-          rabbitmq password: "guest"
-          rabbitmq vhost: "/"
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -263,11 +264,11 @@ jobs:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
         with:
-          rabbitmq version: "3.8.2-management-alpine"
+          rabbitmq version: '3.8.2-management-alpine'
           host port: 5672
-          rabbitmq user: "guest"
-          rabbitmq password: "guest"
-          rabbitmq vhost: "/"
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
