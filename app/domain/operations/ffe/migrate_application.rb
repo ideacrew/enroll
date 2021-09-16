@@ -55,8 +55,7 @@ module Operations
 
         Success(external_application_id.to_s)
       rescue StandardError => e
-        puts "Exception: Operations::Ffe::MigrateApplication: #{external_application_id} -- #{e}"
-        Failure(external_application_id.to_s)
+        Failure("Exception: Operations::Ffe::MigrateApplication: #{external_application_id} -- #{e}")
       end
 
       private
