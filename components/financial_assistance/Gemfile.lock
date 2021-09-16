@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: f2e41bee53939bb069668b314c904c43e52bdc57
-  branch: trunk
+  revision: 70a8f403bb3cdcea34354d5df446febf2a795449
+  branch: set_prefetch_count
   specs:
     event_source (0.5.3)
       bunny (>= 1.7.1)
@@ -302,7 +302,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0704)
+    mime-types-data (3.2021.0901)
     mimemagic (0.3.10)
       nokogiri (~> 1)
       rake

@@ -15,7 +15,6 @@ module FinancialAssistance
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
     validate  :attestation_terms_on_parent_living_out_of_home
-    validate :check_for_valid_predecessor
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
 
@@ -967,12 +966,6 @@ module FinancialAssistance
     def check_parent_living_out_of_home_terms
       (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
         parent_living_out_of_home_terms.is_a?(FalseClass)
-    end
-
-    def check_for_valid_predecessor
-      return if self.predecessor_id.nil?
-      pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
-      self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
     end
 
     def clean_params(model_params)
