@@ -294,6 +294,16 @@ registry:
         settings:
           - key: :expired_enrollments
             item: false
+      - key: :ivl_notices
+        item: :ivl_notices
+        is_enabled: true
+        settings:
+          - key: :current_effective_period
+            item: <%= Date.new(2020,11,1)..Date.new(2021,10,31) %>
+          - key: :upcoming_effective_period
+            item: <%= Date.new(2021,11,1)..Date.new(2022,01,31) %>
+          - key: :contact_center_number_for_display
+            item: "(855) 532-5465"
   - namespace:
       - :pay_now_feature
     features:

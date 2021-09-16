@@ -13,7 +13,7 @@ module Notifier
           federal_tax_filing_status: filer_type(member['filer_type']),
           expected_income_for_coverage_year: format_currency(member['actual_income']),
           citizenship: ivl_citizen_status(dependent.is_uqhp_notice, member["citizen_status"]),
-          dc_resident: member['resident'].upcase == 'YES',
+          dc_resident: member['resident']&.capitalize,
           tax_household_size: member['tax_hh_count'],
           incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
           other_coverage: member["mec"].presence || 'No',
@@ -79,14 +79,11 @@ module Notifier
     end
 
     def ivl_oe_start_date_value
-      Settings.aca.individual_market.open_enrollment.start_on.strftime('%B %d, %Y')
+      EnrollRegistry[:ivl_notices].setting(:upcoming_effective_period).item.min.strftime('%B %d, %Y')
     end
 
     def ivl_oe_end_date_value
-      Settings.aca
-              .individual_market
-              .open_enrollment
-              .end_on.strftime('%B %d, %Y')
+      EnrollRegistry[:ivl_notices].setting(:upcoming_effective_period).item.max.strftime('%B %d, %Y')
     end
 
     def min_notice_due_date(family)
