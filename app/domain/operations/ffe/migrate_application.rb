@@ -113,6 +113,8 @@ module Operations
         app_hash = family_hash['magi_medicaid_applications'].first
 
         application.parent_living_out_of_home_terms = app_hash["parent_living_out_of_home_terms"]
+        application.attestation_terms = app_hash["parent_living_out_of_home_terms"] ? true : nil #default value
+        application.is_requesting_voter_registration_application_in_mail = true # default value
         application.report_change_terms = app_hash['report_change_terms']
         application.medicaid_terms = app_hash['medicaid_terms']
         application.is_renewal_authorized = app_hash['is_renewal_authorized']
