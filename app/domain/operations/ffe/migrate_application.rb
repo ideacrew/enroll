@@ -96,8 +96,9 @@ module Operations
 
             fill_applicants_form
             fix_iap_relationship
-            create_eligibility_determination
+            # build_eligibility_determination # TODO
             fill_application_form
+            application.save!
           else
             # binding.pry
             puts "IAP Application Failure: Operations::Ffe::MigrateApplication: #{external_application_id}: #{application_result.failure}"
@@ -113,33 +114,32 @@ module Operations
         app_hash = family_hash['magi_medicaid_applications'].first
 
         application.parent_living_out_of_home_terms = app_hash["parent_living_out_of_home_terms"]
+        application.attestation_terms = app_hash["parent_living_out_of_home_terms"] ? true : nil #default value
+        application.is_requesting_voter_registration_application_in_mail = true # default value
         application.report_change_terms = app_hash['report_change_terms']
         application.medicaid_terms = app_hash['medicaid_terms']
         application.is_renewal_authorized = app_hash['is_renewal_authorized']
         application.years_to_renew = app_hash['years_to_renew']
         application.renewal_base_year = 2021
-        application.save!
       end
 
-      def create_eligibility_determination
-        obj = @application.eligibility_determinations.new(sanitize_tax_household_params)
-        # obj.valid? ? obj.save! : "error"
-        obj.save!
+      def build_eligibility_determination
+        application.eligibility_determinations.new(sanitize_eligibility_params)
       end
 
-      def sanitize_tax_household_params
+      def sanitize_eligibility_params
         params = tax_household_params
-        {"max_aptc" => Monetize.parse(params.dig("eligibility_determinations",0, "max_aptc")).to_f,
-         "csr_percent_as_integer" => nil,
-         "source" => "ffe",
-         "aptc_csr_annual_household_income" => Monetize.parse(params.dig("eligibility_determinations",0, "aptc_csr_annual_household_income")).to_f,
-         "aptc_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations",0,"aptc_annual_income_limit")).to_f,
-         "csr_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations",0,"csr_annual_income_limit")).to_f,
-         "effective_starting_on" => params["start_date"],
-         "effective_ending_on" => params["end_date"],
-         "is_eligibility_determined" => params["is_eligibility_determined"],
-         "hbx_assigned_id" => nil,
-         "determined_at" => params["start_date"]}
+        { "max_aptc" => Monetize.parse(params.dig("eligibility_determinations", 0, "max_aptc")).to_f,
+          "csr_percent_as_integer" => nil,
+          "source" => "Ffe",
+          "aptc_csr_annual_household_income" => Monetize.parse(params.dig("eligibility_determinations", 0, "aptc_csr_annual_household_income")).to_f,
+          "aptc_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations", 0, "aptc_annual_income_limit")).to_f,
+          "csr_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations", 0, "csr_annual_income_limit")).to_f,
+          "effective_starting_on" => params["start_date"],
+          "effective_ending_on" => params["end_date"],
+          "is_eligibility_determined" => params["is_eligibility_determined"],
+          "hbx_assigned_id" => nil,
+          "determined_at" => params["start_date"] }
       end
 
       def fix_iap_relationship
@@ -207,8 +207,45 @@ module Operations
           # puts "sorting member primary: #{family_member_hash['is_primary_applicant']}"
           create_member(family_member_hash)
         end
+        build_tax_households
         add_broker_accounts(family, family_hash)
         family.save!
+      end
+
+      def build_tax_households
+        @family_members_mappings = family.family_members.collect {|fm| { fm.external_member_id.to_s => fm.id }}
+
+        family_hash['households'][0]['tax_households'].collect do |tax_household_hash|
+          params = sanitize_tax_params(tax_household_hash)
+          family.households.first.tax_households.new(params)
+        end
+      end
+
+      def sanitize_tax_params(tax_household_hash)
+        {
+          "allocated_aptc" => Monetize.parse(tax_household_hash["allocated_aptc"]).to_f,
+          "is_eligibility_determined" => tax_household_hash['is_eligibility_determined'],
+          "effective_starting_on" => tax_household_hash['start_date'],
+          "effective_ending_on" => tax_household_hash['end_date'],
+          "tax_household_members" =>
+          tax_household_hash['tax_household_members'].collect do |thhm|
+            {
+              "applicant_id" => @family_members_mappings.collect {|fm| fm[thhm.dig("family_member_reference", "family_member_hbx_id")]}.compact.first,
+              "is_ia_eligible" => thhm.dig("product_eligibility_determination", "is_ia_eligible"),
+              "is_subscriber" => thhm["is_subscriber"]
+            }
+          end,
+          "eligibility_determinations" =>
+          tax_household_hash['eligibility_determinations'].collect do |ed|
+            { "max_aptc" => Monetize.parse(ed["max_aptc"]).to_f,
+              "csr_percent_as_integer" => 0,
+              "source" => "Ffe",
+              "aptc_csr_annual_household_income" => Monetize.parse(ed["aptc_csr_annual_household_income"]).to_f,
+              "aptc_annual_income_limit" => Monetize.parse(ed["aptc_annual_income_limit"]).to_f,
+              "csr_annual_income_limit" => Monetize.parse(ed["csr_annual_income_limit"]).to_f,
+              "determined_at" => ed["start_date"] || Date.today }
+          end
+        }
       end
 
       def create_member(family_member_hash)
@@ -352,7 +389,9 @@ module Operations
             fm.external_member_id == applicant_hash["family_member_reference"]["family_member_hbx_id"]
           end.first
 
-          tax_household_member_params = tax_household_params["tax_household_members"].select{|thm| thm.dig("family_member_reference","family_member_hbx_id") == applicant_hash["family_member_reference"]["family_member_hbx_id"]}.first
+          tax_household_member_params = tax_household_params["tax_household_members"].select do |thm|
+            thm.dig("family_member_reference", "family_member_hbx_id") == applicant_hash["family_member_reference"]["family_member_hbx_id"]
+          end.first
 
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
           sanitize_params << {
@@ -646,7 +685,7 @@ module Operations
           # persisted_applicant.save!(validate: false)
 
           # unless persisted_applicant.valid?
-            # binding.pry
+          # binding.pry
           # end
 
           persisted_applicant.save!
