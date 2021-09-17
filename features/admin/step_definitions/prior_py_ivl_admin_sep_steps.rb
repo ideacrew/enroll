@@ -33,12 +33,12 @@ When(/^a SEP is added with a prior year effective date$/) do
   scroll_to(element, align: :bottom)
   find(AddSepAction.select_sep_reason_dropdown).click
   find(AddSepAction.select_sep_reason, text: AddSepAction.sep_reason_text).click
-  fill_in AddSepAction.sep_event_date, :with => Date.today - 1.year
+  fill_in AddSepAction.sep_event_date, :with => TimeKeeper.date_of_record.beginning_of_year - 1.year
   find(AddSepAction.sep_title).click
   find(AddSepAction.select_sep_options_dropdown).click
   find(AddSepAction.select_sep_option_kind, text: AddSepAction.sep_option_kind_text).click
   fill_in AddSepAction.sep_end_on, :with => ''
-  fill_in AddSepAction.sep_end_on, :with => Date.today
+  fill_in AddSepAction.sep_end_on, :with => TimeKeeper.date_of_record
 end
 
 Then(/^I see enrollments generated in prior year and current year$/) do
