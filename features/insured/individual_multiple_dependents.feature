@@ -4,6 +4,7 @@ Feature: Insured with more than two dependents
     Given an Individual has not signed up as an HBX user
     And the FAA feature configuration is enabled
 
+  @nightly
   Scenario: Individual signs up with more than two dependents
     Given the user visits the Consumer portal during open enrollment
     When the user creates a Consumer role account
@@ -16,13 +17,13 @@ Feature: Insured with more than two dependents
     And the individual answers the questions of the Identity Verification page and clicks on submit
     When the individual is on the Help Paying for Coverage page
     And the individual does not apply for assistance and clicks continue
-    Then Individual edits a dependents address
+    And Individual clicks on Add New Person
     And Individual fills in the form
     Then Individual confirms dependent info
-    Then Individual edits a dependents address
+    And Individual clicks on Add New Person
     And Individual fills in the form
     Then Individual confirms dependent info
-    Then Individual edits a dependents address
+    And Individual clicks on Add New Person
     And Individual fills in the form
     Then Individual confirms dependent info
     Then Individual should see three dependents on the page

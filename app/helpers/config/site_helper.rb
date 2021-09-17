@@ -45,6 +45,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
     end
 
+    def contact_center_number_for_display
+      EnrollRegistry[:ivl_notices].setting(:contact_center_number_for_display).item
+    end
+
     def health_benefit_exchange_authority_phone_number
       EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
     end
@@ -326,10 +330,6 @@ module Config
 
     def tobacco_user_field_enabled?
       EnrollRegistry.feature_enabled?(:tobacco_user_field)
-    end
-
-    def disable_form_phone_and_paper_dropdown?
-      EnrollRegistry.feature_enabled?(:disable_form_phone_and_paper_dropdown)
     end
   end
 end

@@ -1,52 +1,22 @@
 Feature: Insured Plan Shopping on Individual market
   Background:
     Given the FAA feature configuration is enabled
-  @flaky
-  Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
-    When the user visits the Consumer portal during open enrollment
-    Then Individual creates a new HBX account
-    Then I should see a successful sign up message
-    And the user sees Your Information page
+    And Individual visits the Consumer portal during open enrollment
+  
+  Scenario: New insured user adds dependent address  
+    When Individual creates a new HBX account
+    Then Individual should see a successful sign up message
+    And Individual sees Your Information page
     When the user registers as an individual
-    When the individual clicks on the Continue button of the Account Setup page
-    Then user should see heading labeled personal information
-    Then user should see disabled ssn & dob fields
-    Then Individual should click on Individual market for plan shopping
-    Then the individual sees form to enter personal information
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual sees previously saved address
-    Then Individual agrees to the privacy agreeement
-    Then the individual answers the questions of the Identity Verification page and clicks on submit
-    And the individual is on the Help Paying for Coverage page
-    Then Individual does not apply for assistance and clicks continue
+    And Individual clicks on the Continue button of the Account Setup page
+    Then Individual sees form to enter personal information
+    When Individual clicks on continue
+    And Individual agrees to the privacy agreeement
+    And Individual answers the questions of the Identity Verification page and clicks on submit
+    Then Individual is on the Help Paying for Coverage page
+    When Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
-    Then Individual edits a dependents address
-    Then Individual fills in the form
-    Then Individual ads address for dependent
-    And Individual logs out
-
-  @flaky
-  Scenario: New insured user should be on privacy agreeement/verification page on clicking Individual and Family link on respective pages.
-    Given Individual has not signed up as an HBX user
-    When Individual visits the Insured portal during open enrollment
-    Then Individual creates a new HBX account
-    Then I should see a successful sign up message
-    And user should see your information page
-    When user goes to register as an individual
-    When user clicks on continue button
-    Then user should see heading labeled personal information
-    Then Individual should click on Individual market for plan shopping
-    Then Individual should see a form to enter personal information
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual sees previously saved address
-    When Individual clicks on Individual and Family link should be on privacy agreeement page
-    Then Individual agrees to the privacy agreeement
-    When Individual clicks on Individual and Family link should be on verification page
-    Then Individual should see identity verification page and clicks on submit
+    When Individual clicks on Add New Person
+    And Individual fills in the form
+    Then Individual adds address for dependent

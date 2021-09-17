@@ -898,17 +898,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  context 'check_for_valid_predecessor' do
-    context 'invalid predecessor_id' do
-      it 'should return validation errors' do
-        expect do
-          application.update_attributes!({ predecessor_id: BSON::ObjectId.new })
-        end.to raise_error(Mongoid::Errors::Validations,
-                           /Predecessor expected an instance of FinancialAssistance::Application./)
-      end
-    end
-  end
-
   context 'advance_day' do
     let(:event) { Success(double) }
     let(:obj)  { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }

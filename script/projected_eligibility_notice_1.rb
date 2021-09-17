@@ -51,8 +51,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           notice_params: {
             primary_member: subscriber&.to_hash,
             dependents: dependents.map(&:to_hash),
-            uqhp_event: 'uqhp_projected_eligibility_notice_1'
-          }
+            uqhp_event: 'UQHP'
+          }.with_indifferent_access
         )
         csv << [
           family_id,

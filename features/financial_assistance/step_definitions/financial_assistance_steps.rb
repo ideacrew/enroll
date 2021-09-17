@@ -54,6 +54,25 @@ Then(/^they should see a new finanical assistance application$/) do
   expect(page).to have_content(l10n('insured.family_members.index.continue_to_get_insurance'))
 end
 
+Given(/IAP Assistance Year Display feature is enabled/) do
+  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/IAP Assistance Year Display feature is disabled/) do
+  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
+end
+
+Then(/They should see the application assistance year above Info Needed/) do
+  assistance_year = FinancialAssistance::Application.all.first.assistance_year.to_s
+  expect(page).to have_content(assistance_year[0..1])
+  expect(page).to have_content(assistance_year[2..3])
+end
+
+Then(/They should not see the application assistance year above Info Needed/) do
+  expect(page).to have_content('Your Application for Premium Reductions')
+  expect(page).to_not have_content(l10n('faa.application_for_coverage'))
+end
+
 Then(/^they should see each of their dependents listed$/) do
   consumer.person.primary_family.family_members.each do |family_member|
     expect(page).to have_content(family_member.first_name)
@@ -428,7 +447,7 @@ Given(/the iap year selection feature is disabled/) do
   disable_feature :iap_year_selection
 end
 
-Then(/^the user should see the external verification link$/) do
+Given(/^expands the "Other Options" panel/) do
   # TODO: Maybe figure out how to do this with something other than glyphicon
   other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
   other_actions_link.click
@@ -437,6 +456,43 @@ Then(/^the user should see the external verification link$/) do
       "faa.full_long_name_determination",
       program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
       program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+    )
+  )
+  find_link(
+    l10n(
+      "faa.send_to_external_verification"
+    )
+  ).disabled?.should eql(false)
+end
+
+Given(/clicks the "Send To OFI" button/) do
+  find_link(l10n("faa.send_to_external_verification"))
+  click_link(l10n("faa.send_to_external_verification"))
+end
+
+Then(/^the user should see the external verification link$/) do
+  # TODO: Maybe figure out how to do this with something other than glyphicon
+  # other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
+  # other_actions_link.click
+  expect(page).to have_content(
+    l10n(
+      "faa.full_long_name_determination",
+      program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+      program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+    )
+  )
+end
+
+Then(/the "Send To OFI" button will be disabled and the user will see the button text changed to "Sent To OFI"/) do
+  find_link(
+    l10n(
+      "faa.sent_to_external_verification"
+    )
+  )['disabled'].should eql('true')
+
+  expect(page).to have_link(
+    l10n(
+      "faa.sent_to_external_verification"
     )
   )
 end
