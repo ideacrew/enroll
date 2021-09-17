@@ -28,9 +28,9 @@ module FinancialAssistance
 
           def find_application(params)
             return Failure("Input params is not a hash: #{params}") unless params.is_a?(Hash)
-            return Failure('Missing application_id key') unless params.key?("_id")
-            application = ::FinancialAssistance::Application.find(params["_id"])
-            return Failure("Cannot find Application with input value: #{params["_id"]} for key application_id") unless application
+            return Failure('Missing application_id key') unless params.key?(:_id)
+            application = ::FinancialAssistance::Application.find(params[:_id])
+            return Failure("Cannot find Application with input value: #{params[:_id]} for key application_id") unless application
             Success(application)
           end
 
