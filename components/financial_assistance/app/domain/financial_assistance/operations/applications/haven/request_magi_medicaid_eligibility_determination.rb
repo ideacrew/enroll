@@ -47,8 +47,8 @@ module FinancialAssistance
 
               FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: application.id)
             else
-              Rails.logger.error "Application permission to renew is failed for hbx_id: #{application.hbx_id}"
-              Failure("Application permission to renew is failed for hbx_id: #{application.hbx_id}")
+              Rails.logger.error "Expired Submission is failed for hbx_id: #{application.hbx_id}"
+              Failure("Expired Submission is failed for hbx_id: #{application.hbx_id}")
             end
           end
 
