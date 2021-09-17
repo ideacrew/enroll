@@ -85,7 +85,7 @@ module Operations
         build_family
 
         if family.primary_applicant.person.is_applying_for_assistance
-          @tax_household_params = family_hash["households"][0]["tax_households"][0]
+          @tax_household_params = family_hash["households"][0]["tax_households"]
           application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new))
 
           # Family.create_indexes  TODO: index
@@ -96,7 +96,7 @@ module Operations
 
             fill_applicants_form
             fix_iap_relationship
-            # build_eligibility_determination # TODO
+            build_eligibility_determination
             fill_application_form
             application.save!
           else
@@ -124,13 +124,20 @@ module Operations
       end
 
       def build_eligibility_determination
-        application.eligibility_determinations.new(sanitize_eligibility_params)
+        family_hash['households'][0]['tax_households'].collect do |params|
+          sanitized_params = sanitize_eligibility_params(params)
+          ed = application.eligibility_determinations.new(sanitized_params)
+          ext_applicant_ids = params["tax_household_members"].collect {|a| a.dig("family_member_reference", "family_member_hbx_id")}
+
+          application.applicants.where(:ext_app_id.in => ext_applicant_ids).each do |applicant|
+            applicant.assign_attributes(eligibility_determination_id: ed.id)
+          end
+        end
       end
 
-      def sanitize_eligibility_params
-        params = tax_household_params
+      def sanitize_eligibility_params(params)
         { "max_aptc" => Monetize.parse(params.dig("eligibility_determinations", 0, "max_aptc")).to_f,
-          "csr_percent_as_integer" => nil,
+          "csr_percent_as_integer" => 0,
           "source" => "Ffe",
           "aptc_csr_annual_household_income" => Monetize.parse(params.dig("eligibility_determinations", 0, "aptc_csr_annual_household_income")).to_f,
           "aptc_annual_income_limit" => Monetize.parse(params.dig("eligibility_determinations", 0, "aptc_annual_income_limit")).to_f,
@@ -214,10 +221,11 @@ module Operations
 
       def build_tax_households
         @family_members_mappings = family.family_members.collect {|fm| { fm.external_member_id.to_s => fm.id }}
+        household = family.active_household
 
         family_hash['households'][0]['tax_households'].collect do |tax_household_hash|
           params = sanitize_tax_params(tax_household_hash)
-          family.households.first.tax_households.new(params)
+          household.tax_households.new(params)
         end
       end
 
@@ -392,15 +400,18 @@ module Operations
       def sanitize_applicant_params(iap_hash)
         applicants_hash = iap_hash['applicants']
         sanitize_params = []
+        tax_household_member_params = tax_household_params.collect do |p|
+          p['tax_household_members'].collect do |t|
+            {t.dig("family_member_reference","family_member_hbx_id").to_s => t.dig("product_eligibility_determination", "is_ia_eligible").to_s}
+          end
+        end.flatten
+
         applicants_hash.sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |applicant_hash|
           family_member = family.family_members.select do |fm|
             fm.external_member_id == applicant_hash["family_member_reference"]["family_member_hbx_id"]
           end.first
 
-          tax_household_member_params = tax_household_params["tax_household_members"].select do |thm|
-            thm.dig("family_member_reference", "family_member_hbx_id") == applicant_hash["family_member_reference"]["family_member_hbx_id"]
-          end.first
-
+          is_ia_eligible = tax_household_member_params.find {|fm| fm[family_member.external_member_id]}
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
           sanitize_params << {
             family_member_id: family_member.id,
@@ -513,7 +524,7 @@ module Operations
             tribal_name: applicant_hash['tribal_name'],
             tribal_state: applicant_hash['tribal_state'],
 
-            is_ia_eligible: tax_household_member_params&.dig("product_eligibility_determination", "is_ia_eligible"),
+            is_ia_eligible: is_ia_eligible.nil? ? false : is_ia_eligible.values[0],
             is_medicaid_chip_eligible: nil,
             is_non_magi_medicaid_eligible: nil,
             is_totally_ineligible: nil,
