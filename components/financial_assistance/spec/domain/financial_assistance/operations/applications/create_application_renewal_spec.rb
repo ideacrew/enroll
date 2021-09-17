@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pry'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal, dbclean: :after_each do
   before :all do
