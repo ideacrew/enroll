@@ -45,7 +45,11 @@ module FinancialAssistance
           end
 
           def build_event(payload)
-            event("events.iap.applications.#{@event_name}", attributes: payload)
+            if @event_name == 'application_renewal_request_created'
+              event("events.iap.applications.renewals.#{@event_name}", attributes: payload)
+            else
+              event("events.iap.applications.#{@event_name}", attributes: payload)
+            end
           end
 
           def publish(event)
