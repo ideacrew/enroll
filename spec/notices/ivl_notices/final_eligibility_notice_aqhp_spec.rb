@@ -154,7 +154,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should return ivl oe end date' do
-          end_date = Settings.aca.individual_market.open_enrollment.end_on.strftime('%B %d, %Y')
+          end_date = EnrollRegistry[:ivl_notices].setting(:upcoming_effective_period).item.max.strftime('%B %d, %Y')
           expect(merge_model.ivl_oe_end_date).to eq end_date
         end
 

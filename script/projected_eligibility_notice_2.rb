@@ -56,8 +56,9 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           notice_params: {
             primary_member: primary_member.to_hash,
             dependents: dependents.map(&:to_hash),
+            uqhp_event: 'AQHP',
             aqhp_event: 'aqhp_projected_eligibility_notice_2'
-          }
+          }.with_indifferent_access
         )
         puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?
         csv << [

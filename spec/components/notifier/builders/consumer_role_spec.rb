@@ -260,18 +260,14 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "Model Open enrollment start and end date attributes" do
+      let(:oe_start_on) { EnrollRegistry[:ivl_notices].setting(:upcoming_effective_period).item.min.strftime('%B %d, %Y') }
+      let(:oe_end_on) { EnrollRegistry[:ivl_notices].setting(:upcoming_effective_period).item.max.strftime('%B %d, %Y') }
       it "should have open enrollment start date" do
-        expect(subject.ivl_oe_start_date). to eq(Settings.aca
-                                                .individual_market
-                                                .open_enrollment
-                                                .start_on.strftime('%B %d, %Y'))
+        expect(subject.ivl_oe_start_date).to eq(oe_start_on)
       end
 
       it "should have open enrollment end date" do
-        expect(subject.ivl_oe_end_date). to eq(Settings.aca
-                                              .individual_market
-                                              .open_enrollment
-                                              .end_on.strftime('%B %d, %Y'))
+        expect(subject.ivl_oe_end_date).to eq(oe_end_on)
       end
     end
 
