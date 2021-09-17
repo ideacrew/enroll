@@ -38,7 +38,7 @@ When(/^a SEP is added with a prior year effective date$/) do
   find(AddSepAction.select_sep_options_dropdown).click
   find(AddSepAction.select_sep_option_kind, text: AddSepAction.sep_option_kind_text).click
   fill_in AddSepAction.sep_end_on, :with => ''
-  fill_in AddSepAction.sep_end_on, :with => TimeKeeper.date_of_record.beginning_of_year.end_of_month - 1.year
+  fill_in AddSepAction.sep_end_on, :with => TimeKeeper.date_of_record
 end
 
 Then(/^I see enrollments generated in prior year and current year$/) do
