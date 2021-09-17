@@ -2,7 +2,6 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
-require 'pry'
 
 module FinancialAssistance
   module Operations
