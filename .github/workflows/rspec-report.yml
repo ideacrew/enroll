@@ -144,7 +144,7 @@ jobs:
         with:
           name: components-${{ matrix.folder }}
           path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
-  concat-reports:
+  split-config:
     needs: [rspec-report, rspec-engines-report]
     runs-on: ubuntu-latest
     steps:
@@ -159,7 +159,12 @@ jobs:
           path: ci/rspec/compressed-reports
       - run: npm run rspec:move-reports
       - run: npm run rspec:split-config
+      - run: npm run benefit-sponsors:split-config
       - uses: actions/upload-artifact@v2
         with:
           name: rspec-split-config
           path: ci/rspec-split-config.json
+      - uses: actions/upload-artifact@v2
+        with:
+          name: benefit_sponsors-split-config
+          path: ci/benefit_sponsors-split-config.json
