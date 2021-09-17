@@ -3,8 +3,8 @@
 module Events
   module Iap
     module Applications
-      # This class will register event 'generate_renewal_draft'
-      class GenerateRenewalDraft < EventSource::Event
+      # This class will register event 'application_renewal_created'
+      class ApplicationRenewalCreated < EventSource::Event
         publisher_path 'publishers.application_publisher'
 
       end
