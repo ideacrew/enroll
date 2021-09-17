@@ -94,7 +94,7 @@ module FinancialAssistance
         end
 
         def build_event(application)
-          event("events.iap.applications.application_renewal_created", attributes: application.serializable_hash)
+          event("events.iap.applications.determinations.application_renewal_created", attributes: application.serializable_hash)
         end
 
         def publish(event)

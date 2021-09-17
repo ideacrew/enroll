@@ -3,7 +3,7 @@
 module Subscribers
   # Subscriber will receive request payload from EA to generate a renewal draft application
   class ApplicationRenewalRequestCreatedSubscriber
-    include ::EventSource::Subscriber[amqp: 'enroll.iap.applications']
+    include ::EventSource::Subscriber[amqp: 'enroll.iap.applications.renewals']
 
     subscribe(:on_application_renewal_request_created) do |delivery_info, _metadata, response|
       logger.info '-' * 100
