@@ -103,7 +103,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
-        @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+        @result = subject.call(@renewal_draft.serializable_hash)
         @renewed_app = @result.success
       end
 
@@ -136,30 +136,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
       end
     end
 
-    context 'for an application which is not in renewal_draft state' do
-      shared_examples_for 'non renewal_draft state application' do |app_state|
-        before do
-          application10.update_attributes!(aasm_state: app_state)
-          @result = subject.call({ application_hbx_id: application10.hbx_id })
-        end
-
-        it 'should return failure' do
-          expect(@result).to be_failure
-        end
-
-        it "should return failure with error messasge for application with aasm_state: #{app_state}" do
-          expect(@result.failure).to eq("Cannot generate renewal_draft for given application with aasm_state #{application10.aasm_state}. Application must be in renewal_draft state.")
-        end
-      end
-
-      context 'failure because of application aasm_state' do
-        it_behaves_like 'non renewal_draft state application', 'draft'
-        it_behaves_like 'non renewal_draft state application', 'submitted'
-        it_behaves_like 'non renewal_draft state application', 'determined'
-        it_behaves_like 'non renewal_draft state application', 'determination_response_error'
-      end
-    end
-
     context 'ineligible application' do
       before do
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
@@ -167,40 +143,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         ).success
       end
 
-      context 'incomplete application by validation' do
-        before do
-          @renewal_draft.update_attributes!(us_state: nil)
-          @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
-        end
-
-        it 'should return failure with error message' do
-          expect(@result.failure).to eq("Application with hbx_id: #{@renewal_draft.hbx_id} is incomplete(validations/attestations) for submission.")
-        end
-      end
-
-      context 'incomplete application by attestation' do
-        before do
-          @renewal_draft.update_attributes!(is_requesting_voter_registration_application_in_mail: nil)
-          @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
-        end
-
-        it 'should return failure with error message' do
-          expect(@result.failure).to eq("Application with hbx_id: #{@renewal_draft.hbx_id} is incomplete(validations/attestations) for submission.")
-        end
-      end
-
       context 'expired permission for renewal' do
         before do
           @renewal_draft.update_attributes!(renewal_base_year: @renewal_draft.assistance_year.pred)
-          @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+          @result = subject.call(@renewal_draft.serializable_hash)
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Expired Submission or unable to submit the application for given application hbx_id: #{@renewal_draft.hbx_id}")
-        end
-
-        it 'should also transition application to submission_pending' do
-          expect(@renewal_draft.reload.submission_pending?).to be_truthy
+          expect(@result.failure).to eq("Expired Submission is failed for hbx_id: #{@renewal_draft.hbx_id}")
         end
       end
     end
