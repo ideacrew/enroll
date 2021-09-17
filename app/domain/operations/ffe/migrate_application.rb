@@ -258,6 +258,7 @@ module Operations
           consumer_role_params = family_member_hash['person']['consumer_role']
           consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
           consumer_role = consumer_role_result.success
+          consumer_role.contact_method = consumer_role_params["contact_method"]
           consumer_role.import!
           create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person) if consumer_role_params["vlp_documents"].present?
         else
@@ -302,10 +303,17 @@ module Operations
         end
 
         family_member.external_member_id = external_member_id
+        person.update_attributes(external_person_id: external_person_hbx_id(external_member_id))
         family_member.save!
         @family.save!
 
         family_member
+      end
+
+      def external_person_hbx_id(external_member_id)
+        member_hash = family_hash.dig("households", 0, "coverage_households", 0, "coverage_household_members")
+        member = member_hash.detect { |member| member["family_member_reference"]["family_member_hbx_id"] == external_member_id }
+        member.present? ? member["family_member_reference"]["person_hbx_id"] : nil
       end
 
       def add_broker_accounts(family, family_hash)
