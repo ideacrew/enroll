@@ -17,9 +17,9 @@ module Operations
         # @return Success result
         def call(family)
           transformed_family = yield construct_payload_hash(family)
-          payload_value = yield validate_payload(transformed_family)
-          payload_entity = yield create_payload_entity(payload_value)
-          event = yield build_event(payload_entity)
+          # payload_value = yield validate_payload(transformed_family)
+          # payload_entity = yield create_payload_entity(payload_value)
+          event = yield build_event(transformed_family)
           result = yield publish(event)
           Success(result)
         end
