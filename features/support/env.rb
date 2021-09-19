@@ -82,7 +82,7 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument("headless")
   options.add_argument("--window-size=1920,1080")
   options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
-  
+
   client = Selenium::WebDriver::Remote::Http::Default.new
   client.open_timeout = 240 # instead of the default 60
   client.read_timeout = 240 # instead of the default 60
