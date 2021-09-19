@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: e61a90e6531a8749f7be3e6ac9d3676f33a2d1e2
+  revision: 36dd3726f25a2a3aa29153b014def7cca38e7feb
   branch: release_0.6.0
   specs:
     aca_entities (0.6.0)
@@ -33,7 +33,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: b650b7a2764cd4f4f64abd1d1cca57fbe8c44580
+  revision: ad421fbffd4fcefe7d82ecf30e70a8bde800a2a4
   branch: release_0.5.5
   specs:
     event_source (0.5.3)
