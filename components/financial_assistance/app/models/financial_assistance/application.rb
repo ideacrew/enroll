@@ -104,7 +104,6 @@ module FinancialAssistance
     field :transfer_requested, type: Boolean, default: false
 
     field :has_mec_check_response, type: Boolean, default: false
-    field :mec_check_date, type: Date
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'

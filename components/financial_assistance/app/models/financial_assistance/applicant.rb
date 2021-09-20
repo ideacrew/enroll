@@ -278,7 +278,8 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
     field :mec_check_response, type: String
-
+    field :mec_check_date, type: DateTime
+    
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
