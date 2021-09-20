@@ -40,7 +40,7 @@ module FinancialAssistance
               # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
               # updated_by: construct_updated_by(updated_by)
             }
-            payload.merge(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
+            payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
             Success(payload)
           end
 
@@ -48,7 +48,8 @@ module FinancialAssistance
             return unless EnrollRegistry.feature_enabled?(:financial_assistance)
             applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(:aasm_state.in => ["submitted", "determined"])
             applications.collect do |application|
-              ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
+              appl = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+              appl.success? ? appl.value! : {result: appl }
             end
           end
 
@@ -180,7 +181,7 @@ module FinancialAssistance
                 start_date: household.effective_starting_on,
                 end_date: household.effective_ending_on,
                 is_active: household.is_active,
-                irs_groups: construct_irs_group(household.irs_group),
+                irs_groups: transform_irs_groups(household.family.irs_groups),
                 tax_households: transform_tax_households(household.tax_households),
                 coverage_households: transform_coverage_households(household.coverage_households) # TO DO
                 # hbx_enrollments: hbx_enrollments
