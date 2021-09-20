@@ -13,7 +13,7 @@ class ImportMaineBrokers
     agency_profile = broker_org.broker_agency_profile
     person = create_person
     add_broker_role(person, agency_profile)
-    add_broker_staff_role(person, agency_profile)
+    #add_broker_staff_role(person, agency_profile)
     puts "Broker agency Created: #{row_hash["NPN"]}--Total agency count #{::BenefitSponsors::Organizations::ExemptOrganization.broker_agency_profiles.count}"
   end
 
@@ -52,12 +52,12 @@ class ImportMaineBrokers
     agency_profile.primary_broker_role = broker_role
     agency_profile.save!
 
-    person.broker_role.approve!
+    person.broker_role.import!
   end
 
   def add_broker_staff_role(person, agency_profile)
-    staff_role = person.broker_agency_staff_roles.new(benefit_sponsors_broker_agency_profile_id: agency_profile.id)
-    staff_role.broker_agency_accept!
+   person.broker_agency_staff_roles.new(benefit_sponsors_broker_agency_profile_id: agency_profile.id)
+   person.save
   end
 
   def build_person
