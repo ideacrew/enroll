@@ -5,7 +5,7 @@ module Events
     module Enrollments
       # This class will register event
       class  SecondVerificationsReminder < EventSource::Event
-        publisher_path 'publishers.verifications_reminder_publisher'
+        publisher_path 'publishers.enrollment_publisher'
       end
     end
   end
