@@ -2,7 +2,7 @@
 
 module Publishers
   # Publisher will send request payload to medicaid gateway for determinations
-  class EnrollmentPublisher
+  class NoticesPublisher
     include ::EventSource::Publisher[amqp: 'enroll.individual.notices']
 
     register_event 'account_created'
