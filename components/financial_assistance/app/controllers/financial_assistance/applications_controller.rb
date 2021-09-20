@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # IAP application controller
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
