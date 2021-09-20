@@ -308,6 +308,7 @@ module FinancialAssistance
     end
 
     def is_rt_transferrable?
+      puts "got here!"
       return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer)
       is_transferrable?
     end
@@ -530,8 +531,8 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => :record_transition do
-        transitions from: :submitted, to: :determined, after: :rt_transfer
+      event :determine, :after => [:record_transition] do
+        transitions from: :submitted, to: :determined
       end
 
       event :terminate, :after => :record_transition do
@@ -1106,6 +1107,7 @@ module FinancialAssistance
     end
 
     def record_transition
+      puts "record"
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
         to_state: aasm.to_state
