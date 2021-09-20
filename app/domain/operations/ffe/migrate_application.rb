@@ -168,7 +168,7 @@ module Operations
           relation_kind = relationship.present? ? relationship["kind"] : "unrelated"
           missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation_kind, applicant_id: from_applicant.id, relative_id: to_applicant.id})
         end
-        application.relationships << missing_relationships
+        application.relationships << missing_relationships if missing_relationships.present?
 
         @all_relationships.each do |all_rel|
           next if all_rel[:relation].present?
@@ -356,46 +356,11 @@ module Operations
         member = family_member.person
         compare_keys = ["address_1", "address_2", "city", "state", "zip"]
         member.is_homeless? == @primary_person.is_homeless? &&
-          member.is_temporarily_out_of_state? == @primary_person.is_temporarily_out_of_state? && member.home_address &&
+          member.is_temporarily_out_of_state? == @primary_person.is_temporarily_out_of_state? && member.home_address && @primary_person.home_address &&
           member.home_address.attributes.select {|k, _v| compare_keys.include? k} == @primary_person.home_address.attributes.select do |k, _v|
             compare_keys.include? k
           end
       end
-
-      RELATIONSHIP_MAPPING = {
-        "self" => "self",
-        "domestic_partner" => "other_relationship",
-        "spouse" => "spouse",
-        "life_partner" => "life_partner",
-        "child" => "child",
-        "adopted_child" => "adopted_child",
-        "annuitant" => "annuitant",
-        "aunt_or_uncle" => "aunt_or_uncle",
-        "brother_or_sister_in_law" => "brother_or_sister_in_law",
-        "collateral_dependent" => "collateral_dependent",
-        "court_appointed_guardian" => "court_appointed_guardian",
-        "daughter_or_son_in_law" => "daughter_or_son_in_law",
-        "dependent_of_a_minor_dependent" => "dependent_of_a_minor_dependent",
-        "father_or_mother_in_law" => "father_or_mother_in_law",
-        "foster_child" => "foster_child",
-        "grandchild" => "grandchild",
-        "grandparent" => "grandparent",
-        "great_grandchild" => "great_grandchild",
-        "great_grandparent" => "great_grandparent",
-        "guardian" => "guardian",
-        "nephew_or_niece" => "nephew_or_niece",
-        "other_relationship" => "other_relationship",
-        "parent" => "parent",
-        "sibling" => "sibling",
-        "sponsored_dependent" => "sponsored_dependent",
-        "stepchild" => "stepchild",
-        "stepparent" => "stepparent",
-        "trustee" => "trustee",
-        "unrelated" => "unrelated",
-        "ward" => "ward",
-        'stepson_or_stepdaughter' => 'stepson_or_stepdaughter',
-        'cousin' => 'cousin'
-      }.freeze
 
       def sanitize_applicant_params(iap_hash)
         applicants_hash = iap_hash['applicants']
@@ -415,7 +380,7 @@ module Operations
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
           sanitize_params << {
             family_member_id: family_member.id,
-            relationship: RELATIONSHIP_MAPPING[family_member.relationship],
+            relationship: family_member.relationship,
             first_name: applicant_hash['name']['first_name'],
             middle_name: applicant_hash['name']['middle_name'],
             last_name: applicant_hash['name']['last_name'],
@@ -543,7 +508,12 @@ module Operations
       def sanitize_income_params(incomes)
         incomes.map do |income|
           income["frequency_kind"] = income["frequency_kind"].downcase
-          income
+          if income['employer'].present?
+            income['employer_name'] = income['employer']['employer_name']
+            income['employer_id'] = income['employer']['employer_id']
+            income['employer_phone'] = income['employer']['employer_phone']
+          end
+          income.except("employer")
         end
       end
 
@@ -555,11 +525,10 @@ module Operations
           end
 
           if benefit['employer'].present?
-            benefit['employer_name']
+            benefit['employer_name'] = benefit['employer']['employer_name']
             benefit['employer_id'] = benefit['employer']['employer_id']
+            benefit['employer_phone'] =  benefit['employer']['employer_phone']
           end
-
-          benefit['employer_phone'] = nil if benefit['employer_phone'] && benefit['employer_phone']['number'].nil?
 
           benefit.except("status", "employer")
         end

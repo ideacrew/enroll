@@ -845,8 +845,10 @@ module FinancialAssistance
       validations = []
       incomes.jobs.select(&:persisted?).each do |job|
         # address = job[:employer_address]
-        address = job[:employer_address].nil? ? {} : job[:employer_address]
-        validations << (address[:address_1].present? && address[:city].present? && address[:state].present? && address[:zip].present?)
+        unless EnrollRegistry[:skip_employer_address_validation].enabled?
+          address = job[:employer_address].nil? ? {} : job[:employer_address]
+          validations << (address[:address_1].present? && address[:city].present? && address[:state].present? && address[:zip].present?)
+        end
         validations << (job[:employer_name].present? && job[:employer_phone].present?)
         validations << (job[:amount].present? && job[:frequency_kind].present? && job[:start_on].present?)
       end
