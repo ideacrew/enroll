@@ -80,7 +80,7 @@ module Insured
 
       def carrier_long_name(issuer)
         issuer_key = issuer.downcase&.gsub(' ', '_')
-        return if carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
+        carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
       end
 
       def pay_now_url(issuer_name)

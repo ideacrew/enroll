@@ -317,7 +317,7 @@ registry:
           - key: :enrollment_tile
             item: true
           - key: :carriers_long_name
-            item: 'Kaiser Permanante'
+            item: 'Kaiser Permanente'
       - key: :delta_dental_pay_now
         is_enabled: false
         settings:
