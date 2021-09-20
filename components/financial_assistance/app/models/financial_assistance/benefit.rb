@@ -246,7 +246,7 @@ module FinancialAssistance
       errors.add(:employer_name, " ' EMPLOYER NAME' can't be blank ") if employer_name.blank?
       errors.add(:esi_covered, "' Who can be covered?' can't be blank ") if esi_covered.blank?
       errors.add(:start_on, "' Start On' Date can't be blank ") if start_on.blank?
-      errors.add(:employer_id, "' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ") if !EnrollRegistry[:skip_employer_address_validation].enabled? && employer_id.blank?
+      errors.add(:employer_id, "' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ") if !EnrollRegistry[:skip_employer_id_validation].enabled? && employer_id.blank?
       errors.add(:employee_cost_frequency, "' How Often' can't be blank ") if employee_cost_frequency.blank?
       errors.add(:employee_cost, "' AMOUNT' can't be blank ") if employee_cost.blank?
     end
