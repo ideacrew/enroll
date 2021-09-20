@@ -360,6 +360,23 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  describe '.set_effective_date' do
+    let(:family_id) { BSON::ObjectId.new }
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+
+    context 'for existing effective_date' do
+      before do
+        application.update_attributes!(effective_date: Date.new(TimeKeeper.date_of_record.year + 3))
+        application.send(:set_effective_date)
+      end
+
+      it 'should not update effective_date' do
+        expect(application.effective_date).not_to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!)
+        expect(application.effective_date).to eq(Date.new(TimeKeeper.date_of_record.year + 3))
+      end
+    end
+  end
+
   describe '.eligibility_determinations' do
     it 'verifies eligibility_determinations count of a given applicant' do
       expect(application.eligibility_determinations.count).to eq 3

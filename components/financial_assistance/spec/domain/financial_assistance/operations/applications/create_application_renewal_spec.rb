@@ -66,6 +66,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
         expect(@renewal_draft_app.assistance_year).to eq(application.assistance_year.next)
       end
 
+      it 'should return application with effective_date' do
+        expect(@renewal_draft_app.effective_date).to eq(Date.new(application.assistance_year.next))
+      end
+
       # Verify if all the answers for questions on 'Your Preferences' & 'Submit Your Application' were copied
       context 'for attestations & other questions' do
         # Your Preferences:

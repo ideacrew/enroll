@@ -79,7 +79,8 @@ module FinancialAssistance
               assistance_year: validated_params[:renewal_year],
               years_to_renew: years_to_renew,
               renewal_base_year: application.renewal_base_year,
-              predecessor_id: application.id
+              predecessor_id: application.id,
+              effective_date: Date.new(validated_params[:renewal_year])
             )
 
             renewal_application.save!

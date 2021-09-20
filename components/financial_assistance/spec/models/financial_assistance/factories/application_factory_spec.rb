@@ -64,7 +64,8 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
             eligibility_response_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
             eligibility_request_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
             assistance_year: TimeKeeper.date_of_record.year,
-            renewal_base_year: TimeKeeper.date_of_record.year }
+            renewal_base_year: TimeKeeper.date_of_record.year,
+            effective_date: TimeKeeper.date_of_record.next_month.beginning_of_month }
         end
 
         before do
@@ -91,6 +92,10 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
         it 'should not copy renewal_base_year' do
           expect(@duplicate_application.renewal_base_year).to be_nil
+        end
+
+        it 'should not copy effective_date' do
+          expect(@duplicate_application.effective_date).to be_nil
         end
       end
 

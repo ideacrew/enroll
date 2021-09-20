@@ -1040,12 +1040,12 @@ module FinancialAssistance
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      )  if assistance_year.blank?
+      ) if assistance_year.blank?
     end
 
     def set_effective_date
       effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
-      update_attribute(:effective_date, effective_date)
+      update_attribute(:effective_date, effective_date) if effective_date.blank?
     end
 
     # def set_benchmark_product_id
