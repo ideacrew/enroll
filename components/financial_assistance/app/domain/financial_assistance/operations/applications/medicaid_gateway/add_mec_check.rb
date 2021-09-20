@@ -36,9 +36,7 @@ module FinancialAssistance
           end
 
           def update_application(application)
-            application.assign_attributes({ has_mec_check_response: true,
-                                            mec_check_date: Date.today
-                                          })
+            application.assign_attributes({ has_mec_check_response: true })
             if application.save
               Success(application)
             else
@@ -51,7 +49,8 @@ module FinancialAssistance
             application.applicants.each do | applicant |
                 response = params[:applicant_responses].find { |k,v| v = applicants.person_hbx_id }.value
                 applicant.update_attributes!({
-                    mec_check_response: response
+                    mec_check_response: response,
+                    mec_check_date: DateTime.now
                 })
 
             end

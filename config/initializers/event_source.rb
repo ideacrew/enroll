@@ -23,7 +23,7 @@ EventSource.configure do |config|
       warn rabbitmq.password
     end
   end
-
+ 
   async_api_resources = ::AcaEntities.async_api_config_find_by_service_name({protocol: :amqp, service_name: nil}).success
   async_api_resources += ::AcaEntities.async_api_config_find_by_service_name({protocol: :http, service_name: :enroll}).success
 
