@@ -120,7 +120,7 @@ module Operations
         application.medicaid_terms = app_hash['medicaid_terms']
         application.is_renewal_authorized = app_hash['is_renewal_authorized']
         application.years_to_renew = app_hash['years_to_renew']
-        application.renewal_base_year = 2021
+        application.renewal_base_year = 2021 + app_hash['years_to_renew']
       end
 
       def build_eligibility_determination
@@ -275,8 +275,6 @@ module Operations
       end
 
       def create_or_update_person(person_params)
-        person_params[:is_temporarily_out_of_state] = false # TODO
-        person_params[:is_disabled] = false # TODO
         person_params[:addresses] = person_params[:addresses].nil? ? [] : person_params[:addresses] # TODO
         Operations::People::CreateOrUpdate.new.call(params: person_params)
       end
@@ -559,13 +557,13 @@ module Operations
           is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
           is_applying_for_assistance: person_hash['is_applying_for_assistance'],
           is_homeless: person_hash['is_homeless'] || false, # TODO: update match with primary
-          is_temporarily_out_of_state: person_hash['is_temporarily_out_of_state'],
+          is_temporarily_out_of_state: person_hash['is_temporarily_out_of_state'] || false,
           age_off_excluded: person_hash['age_off_excluded'],
           is_active: person_hash['is_active'],
           is_disabled: person_hash['is_disabled'],
           individual_market_transitions: person_hash['individual_market_transitions'],
           verification_types: person_hash['verification_types'],
-          addresses: person_hash['addresses'],
+          addresses: person_hash['addresses'].nil? ? [] : person_hash['addresses'],
           emails: person_hash['emails'],
           phones: person_hash['phones']
         }

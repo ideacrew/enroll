@@ -8,8 +8,8 @@ module FinancialAssistance
     before_create :set_submission_timestamp
 
     embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
-    embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', cascade_callbacks: true
-    embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', cascade_callbacks: true
+    embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', validate: (EnrollRegistry[:skip_employer_address_validation].enabled? ? false : true), cascade_callbacks: true
+    embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', validate: (EnrollRegistry[:skip_employer_phone_validation].enabled? ? false : true), cascade_callbacks: true
 
     TITLE_SIZE_RANGE = (3..30).freeze
 

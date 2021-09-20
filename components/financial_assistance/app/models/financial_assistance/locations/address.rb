@@ -34,25 +34,24 @@ module FinancialAssistance
       # The name of the quadrant where this address is located
       field :quadrant, type: String, default: ""
 
-      unless EnrollRegistry[:skip_employer_address_validation].enabled?
-        validates :zip, presence: true
-        validates :kind, presence: true
-        validates :state, presence: true
+      validates :zip, presence: true
+      validates :kind, presence: true
+      validates :state, presence: true
 
-        validates :kind,
-                  inclusion: {in: KINDS, message: '%{value} is not a valid address kind'},
-                  allow_blank: true
+      validates :kind,
+                inclusion: {in: KINDS, message: '%{value} is not a valid address kind'},
+                allow_blank: true
 
-        validates :address_1, presence: {message: 'Please enter address_1'}
-        validates :city, presence: {message: 'Please enter city'}
+      validates :address_1, presence: {message: 'Please enter address_1'}
+      validates :city, presence: {message: 'Please enter city'}
 
-        validates :zip,
-                  allow_blank: false,
-                  format: {
-                    :with => /\A\d{5}(-\d{4})?\z/,
-                    :message => 'should be in the form: 12345 or 12345-1234'
-                  }
-      end
+      validates :zip,
+                allow_blank: false,
+                format: {
+                  :with => /\A\d{5}(-\d{4})?\z/,
+                  :message => 'should be in the form: 12345 or 12345-1234'
+                }
+
 
 
       def office_is_primary_location?

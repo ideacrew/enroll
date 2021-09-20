@@ -57,7 +57,8 @@
       <%= phone_fields.hidden_field :kind, value: "work" %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-12">
-          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
+          <% required = EnrollRegistry[:skip_employer_phone_validation].enabled? ? false : true %>
+          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: required, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
       </div>
     <% end %>
