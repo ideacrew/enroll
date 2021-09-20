@@ -120,7 +120,7 @@ module Operations
         application.medicaid_terms = app_hash['medicaid_terms']
         application.is_renewal_authorized = app_hash['is_renewal_authorized']
         application.years_to_renew = app_hash['years_to_renew']
-        application.renewal_base_year = 2021 + app_hash['years_to_renew']
+        application.renewal_base_year = 2021 + app_hash['years_to_renew'].to_i
       end
 
       def build_eligibility_determination
