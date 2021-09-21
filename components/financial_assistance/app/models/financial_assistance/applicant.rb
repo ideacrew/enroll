@@ -747,7 +747,7 @@ module FinancialAssistance
       questions_array << is_post_partum_period unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
       questions_array << is_physically_disabled if is_applying_coverage
-      questions_array << pregnancy_due_on << children_expected_count if is_pregnant
+      questions_array << (EnrollRegistry[:pregnancy_due_on_required].enabled? ? pregnancy_due_on : '') << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
@@ -1158,7 +1158,7 @@ module FinancialAssistance
 
     def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       if is_pregnant
-        errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
+        errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank? && EnrollRegistry[:pregnancy_due_on_required].enabled?
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
       # Nil or "" means unanswered, true/or false boolean will be passed through
       elsif is_post_partum_period.nil? || is_post_partum_period == ""
