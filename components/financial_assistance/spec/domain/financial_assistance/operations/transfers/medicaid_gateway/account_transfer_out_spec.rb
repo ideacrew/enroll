@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut, dbclean: :after_each do
   include Dry::Monads[:result, :do]
@@ -79,7 +80,14 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   let(:obj)  { FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount.new }
   let(:event) { Success(double) }
 
+  let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+  let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+
   before do
+    allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)

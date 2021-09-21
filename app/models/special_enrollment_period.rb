@@ -388,7 +388,8 @@ private
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
       eligible_date = employee_role.census_employee.earliest_eligible_date
-      eligible_date <= TimeKeeper.date_of_record
+      Rails.logger.warn("No eligibility date present for person #{person.hbx_id} employee role #{employee_role.id}")
+      eligible_date <= TimeKeeper.date_of_record if eligible_date.present?
     end
   end
 

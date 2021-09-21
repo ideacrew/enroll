@@ -22,7 +22,7 @@
             = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
           - else
             - if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == :health
-              = number_to_currency(current_cost(@hbx_enrollment, @source))
+              = number_to_currency(shopping_group_premium(@plan.total_employee_cost, @plan.total_ehb_premium, @plan.can_use_aptc?))
             - else
               = number_to_currency(@plan.total_employee_cost)
           br/
@@ -33,7 +33,8 @@
         - if @plan.try(:is_standard_plan)
           .col-md-12
             i.fa.fa-bookmark
-              | STANDARD PLAN
+              | &nbsp;
+              = @plan.standard_plan_label
       .col-xs-12
         .row
           .col-xs-7
@@ -50,14 +51,15 @@
                     | Metal Level
                   br/
                   span.ttu.dg.fourteen style=("margin-left: -10px")
-                    = display_dental_metal_level @plan
+                    - plan_level = @plan.metal_level.titleize
+                    = plan_level != 'Dental' ? plan_level : display_dental_metal_level(@plan).titleize
                 td
                   span.ttu.lg.twelve style=("margin-left: -10px")
                     | Network
                   br/
                   span.ttu.dg.fourteen style=("margin-left: -10px")
                     - if offers_nationwide_plans?
-                      = @plan.nationwide ? "Nationwide" : "DC-Metro"
+                      = @plan.network
                     - else
                       - if @plan.network_information.present?
                         | Network Notes

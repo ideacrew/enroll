@@ -59,7 +59,7 @@ class FamilyPolicy < ApplicationPolicy
   end
 
   def role
-    user.person&.hbx_staff_role
+    user&.person&.hbx_staff_role
   end
 
   def updateable?
@@ -103,9 +103,9 @@ class FamilyPolicy < ApplicationPolicy
   end
 
   def can_view_username_and_email?
-    role ||= user.person.csr_role
-    return false unless role
-    role.permission.can_view_username_and_email || role.present?
+    permission_role = role || user&.person&.csr_role
+    return false unless permission_role
+    permission_role.permission.can_view_username_and_email || user&.person&.csr_role.present?
   end
 
   def hbx_super_admin_visible?

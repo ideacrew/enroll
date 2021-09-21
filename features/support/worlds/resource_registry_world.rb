@@ -6,6 +6,7 @@ module ResourceRegistryWorld
     return if feature_enabled?(feature_name)
 
     feature_dsl = registry_name[feature_name]
+    # puts "*********** FEATURE DSL: #{feature_dsl} ***********"
     feature_dsl.feature.stub(:is_enabled).and_return(true)
   end
 

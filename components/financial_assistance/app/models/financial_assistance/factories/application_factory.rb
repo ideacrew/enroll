@@ -101,7 +101,7 @@ module FinancialAssistance
             applicant_in_context.first.update_attributes(is_active: true)
           else
             applicant_params = members_attributes.detect { |member_attributes| member_attributes[:family_member_id] == fm_id }
-            applicant = application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id])
+            applicant = application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id]).first
             if applicant.present?
               applicant.update_attributes!(applicant_params)
             else
@@ -150,6 +150,7 @@ module FinancialAssistance
 
       def create_relationships(new_application, application)
         application.relationships.each do |relationship|
+          next relationship if relationship.applicant.nil? || relationship.relative.nil?
           new_applicant = fetch_matching_applicant(new_application, relationship.applicant)
           new_relative = fetch_matching_applicant(new_application, relationship.relative)
           new_application.update_or_build_relationship(new_applicant, new_relative, relationship.kind)

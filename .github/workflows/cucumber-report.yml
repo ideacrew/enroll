@@ -1,5 +1,6 @@
 name: cucumber report
 on:
+  # push:
   workflow_dispatch:
 
 jobs:
@@ -28,7 +29,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -38,14 +39,14 @@ jobs:
           rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
-          mongoDBVersion: '3.6'
+          mongoDBVersion: '4.2'
       - name: Restore project gems
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
           gem update --system
@@ -56,18 +57,56 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - uses: actions/download-artifact@v2
+        with:
+          name: packs-test
+          path: public/packs-test
+      - uses: actions/download-artifact@v2
+        with:
+          name: assets
+          path: public/assets
+      # - name: Display structure of downloaded files
+      #   run: ls -R
+      #   working-directory: public
       - name: Run tests
-        run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features -q --tags 'not @wip and not @broken and not @flaky and not @ma_only'
+        run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
+  concat-reports:
+    needs: [cucumber-report]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - uses: actions/download-artifact@v2
+        with:
+          path: ci/cucumber/compressed-reports
+      - run: npm run cucumber:move-reports
+      - run: npm run cucumber:concat-reports
+      - run: npm run cucumber:split-config
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cucumber-split-config
+          path: ci/cucumber-split-config.json

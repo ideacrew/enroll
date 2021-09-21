@@ -2,7 +2,7 @@
   <div class="row">
     <div class="inboxes col-xs-12" id="inbox_form">
       <div class="pull-right">
-        <%= link_to(inbox_profiles_employers_employer_profile_path(:id => @employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true, class: 'pull-right') do %>
+        <%= link_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true, class: 'pull-right') do %>
           <% if @folder == 'Deleted' %>
             <strong>
               Deleted
@@ -14,7 +14,7 @@
         <span class="pull-right">
           &nbsp;|&nbsp;
         </span>
-        <%= link_to(inbox_profiles_employers_employer_profile_path(:id => @employer_profile.id, tab: 'inbox'), remote: true, class: 'pull-right') do %>
+        <%= link_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'inbox'), remote: true, class: 'pull-right') do %>
           <% if @folder == 'Inbox' %>
             <strong>
               Inbox
@@ -25,7 +25,7 @@
             <span class="badge message-badge"><%= @employer_profile.inbox.unread_messages.size %></span>
         <% end %>
         <%- if @sent_box == true %>
-          <%= link_to(inbox_profiles_employers_employer_profile_path(:id => @employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true, class: 'pull-right') do %>
+          <%= link_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true, class: 'pull-right') do %>
             <% if @folder == 'Sent' %>
               <strong>
                 Sent

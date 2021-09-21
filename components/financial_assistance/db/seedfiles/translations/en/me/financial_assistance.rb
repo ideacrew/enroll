@@ -121,15 +121,17 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.negative_income" => "Negative Income",
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
   "en.faa.send_to_external_verification" => "Send to OFI",
+  "en.faa.sent_to_external_verification" => "Sent to OFI",
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   # Year Selection page
-  "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
+  "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
   "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
   "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
   "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
-  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>."
+  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
+  "en.faa.application_for_coverage" => "Application for Coverage"
 }.freeze
 # rubocop:enable Layout/LineLength

@@ -189,6 +189,21 @@ describe "#find_vlp_document_by_key" do
 
 end
 
+describe "CRM update" do
+  let(:test_person) { FactoryBot.create(:person, :with_consumer_role, last_name: 'John', first_name: 'Doe') }
+  let(:test_family) { FactoryBot.create(:family, :with_primary_family_member, :person => test_person) }
+  before do
+    allow_any_instance_of(Person).to receive(:has_active_consumer_role?).and_return(true)
+    allow_any_instance_of(Person).to receive(:primary_family).and_return(test_family)
+    allow_any_instance_of(Family).to receive(:primary_person).and_return(test_person)
+    EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(true)
+  end
+
+  it "should publish to CRM on save" do
+    expect(test_person.send(:trigger_primary_subscriber_publish).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+  end
+end
+
 describe "#move_identity_documents_to_outstanding" do
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 

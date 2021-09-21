@@ -94,12 +94,13 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     before do
+      FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(false)
       allow(tax_household).to receive(:eligibility_determinations).and_return([eligibility_determination])
     end
 
-    it "should equal to the csr_kind of latest_eligibility_determination" do
+    it "should equal to the available csr_kind of tax household members" do
       tax_household.eligibility_determinations = [eligibility_determination]
-      expect(tax_household.valid_csr_kind(hbx_enrollment)).to eq eligibility_determination.csr_eligibility_kind
+      expect(tax_household.valid_csr_kind(hbx_enrollment)).to eq tax_household.tax_household_members.first.csr_eligibility_kind
     end
   end
 
@@ -133,6 +134,57 @@ RSpec.describe TaxHousehold, type: :model do
       it 'should return true' do
         result = tax_household.is_all_non_aptc?(hbx_enrollment)
         expect(result).to eq(true)
+      end
+    end
+  end
+
+  context '#eligible_csr_percent_as_integer' do
+    let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
+    let!(:person) { family.primary_person }
+    let(:household) {create(:household, family: family)}
+    let!(:tax_household) {create(:tax_household, household: household)}
+    let!(:tax_household_member) {tax_household.tax_household_members.create!(is_ia_eligible: true, csr_eligibility_kind: "csr_100")}
+    let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: person.primary_family.family_members[0].id) }
+    let(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        family: family,
+                        household: household,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        coverage_kind: "health")
+    end
+
+    before do
+      tax_household.tax_household_members.first.update_attributes!(applicant_id: family.family_members[0].id)
+    end
+
+    context 'when all csr percent is csr_100 for tax household members' do
+      it 'should return correct csr value' do
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(100)
+      end
+    end
+
+    context 'when all csr percent is csr_94 for tax household members' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(csr_eligibility_kind: "csr_94")
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(94)
+      end
+    end
+
+    context 'when all dafault csr percent when thhm is not ia_eligible' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(is_ia_eligible: false)
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq(0)
+      end
+    end
+
+    context 'when all csr percent is csr_94 for tax household members' do
+      it 'should return correct csr value' do
+        tax_household_member.update_attributes(csr_eligibility_kind: "csr_limited")
+        result = tax_household.eligible_csr_percent_as_integer(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        expect(result).to eq('limited')
       end
     end
   end

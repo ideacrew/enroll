@@ -1,0 +1,4 @@
+$('#btn-request-transfer').on ('ajax:success', function() {
+   $(this).prop('disabled', true);
+   $(this).text("<%= @button_sent_text %>");
+});

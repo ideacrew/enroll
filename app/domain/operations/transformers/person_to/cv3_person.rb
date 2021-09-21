@@ -25,7 +25,7 @@ module Operations
 
         def construct_payload(person)
           payload = {
-            hbx_id: person.hbx_id,
+            hbx_id: person.hbx_id.to_s,
             person_name: construct_person_name(person),
             person_demographics: construct_person_demographics(person),
             person_health: {is_tobacco_user: person.is_tobacco_user,
@@ -136,6 +136,7 @@ module Operations
 
         def transform_vlp_documents(vlp_documents)
           vlp_documents.collect do |vlp_document|
+            next if vlp_document.subject.nil?
             {
               subject: vlp_document.subject,
               alien_number: vlp_document.alien_number,
@@ -265,8 +266,8 @@ module Operations
               action: element.action,
               modifier: element.modifier,
               update_reason: element.update_reason,
-              event_response_record: construct_event_response(element.event_response_record),
-              event_request_record: construct_event_response(element.event_request_record)
+              event_response_record: element.event_response_record_id,
+              event_request_record: element.event_request_record_id
             }
           end
         end
@@ -358,7 +359,8 @@ module Operations
                 ssn: relative.ssn,
                 no_ssn: (relative.no_ssn == "0" || relative.ssn.present?) ? false : true,
                 dob: relative.dob,
-                gender: relative.gender
+                gender: relative.gender,
+                relationship_to_primary: rel.kind
               }
             }
           end

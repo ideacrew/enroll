@@ -39,7 +39,7 @@ module Operations
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
-          payload.merge(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
+          payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           Success(payload)
         end
 
@@ -166,7 +166,7 @@ module Operations
         def construct_irs_group(irs_group)
           return if irs_group.nil?
           {
-            hbx_id: irs_group.hbx_assigned_id,
+            hbx_id: irs_group.hbx_assigned_id.to_s,
             start_on: irs_group.effective_starting_on,
             end_on: irs_group.effective_ending_on,
             is_active: irs_group.is_active
@@ -175,15 +175,15 @@ module Operations
 
         def transform_households(households)
           households.collect do |household|
-            {
+            household_data = {
               start_date: household.effective_starting_on,
               end_date: household.effective_ending_on,
               is_active: household.is_active,
-              irs_groups: construct_irs_group(household.irs_group),
+              irs_groups: construct_irs_group(household.family.irs_groups.last),
               tax_households: transform_tax_households(household.tax_households),
-              coverage_households: transform_coverage_households(household.coverage_households) # TO DO
-              # hbx_enrollments: hbx_enrollments
+              coverage_households: transform_coverage_households(household.coverage_households)
             }
+            household_data.merge(hbx_enrollments: transform_hbx_enrollments(household.hbx_enrollments)) if household.hbx_enrollments.present?
           end
         end
 
@@ -193,10 +193,8 @@ module Operations
               is_immediate_family: household.is_immediate_family,
               is_determination_split_household: household.is_determination_split_household,
               submitted_at: household.submitted_at,
-              aasm_state: household.aasm_state
-              # coverage_household_members: transform_coverage_household_members(household.coverage_household_members)
-              # broker_agency_reference: household.broker_agency_reference,
-              # broker_role_reference: household.broker_role_reference
+              aasm_state: household.aasm_state,
+              coverage_household_members: transform_coverage_household_members(household.coverage_household_members)
             }
           end
         end
@@ -204,7 +202,7 @@ module Operations
         def transform_tax_households(households)
           households.collect do |household|
             {
-              hbx_id: household.hbx_assigned_id,
+              hbx_id: household.hbx_assigned_id.to_s,
               allocated_aptc: household.allocated_aptc.to_hash,
               is_eligibility_determined: household.is_eligibility_determined,
               effective_starting_on: household.effective_starting_on,
@@ -233,10 +231,29 @@ module Operations
           end
         end
 
+        def transform_coverage_household_members(members)
+          members.collect do |member|
+            {
+              family_member_reference: transform_family_member_reference(member),
+              is_subscriber: member.is_subscriber
+            }
+          end
+        end
+
+        def transform_family_member_reference(member)
+          {
+            family_member_hbx_id: member.family_member.person.hbx_id.to_s,
+            first_name: member.family_member.person.first_name,
+            last_name: member.family_member.person.last_name,
+            is_primary_family_member: member.family_member.is_primary_applicant,
+            age: member.family_member.person.age_on(TimeKeeper.date_of_record)
+          }
+        end
+
         def transform_tax_household_members(members)
           members.collect do |member|
             {
-              family_member_reference: member.family_member_id,
+              family_member_reference: transform_family_member_reference(member),
               # product_eligibility_determination: member.product_eligibility_determination,
               is_subscriber: member.is_subscriber,
               reason: member.reason
@@ -247,7 +264,7 @@ module Operations
         def transform_family_members(family_members)
           family_members.collect do |member|
             {
-              hbx_id: member.hbx_id,
+              hbx_id: member.hbx_id.to_s,
               is_primary_applicant: member.is_primary_applicant,
               # foreign_keys
               is_consent_applicant: member.is_consent_applicant,
@@ -260,8 +277,16 @@ module Operations
           end
         end
 
+        def transform_hbx_enrollments(enrollments)
+          enrollments.map { |enrollment| transform_hbx_enrollment(enrollment) }
+        end
+
         def construct_updated_by(updated_by)
           # To do
+        end
+
+        def transform_hbx_enrollment(enrollment)
+          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment).value!
         end
 
         def transform_person(person)

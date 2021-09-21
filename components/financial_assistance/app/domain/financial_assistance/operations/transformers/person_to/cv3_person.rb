@@ -137,6 +137,7 @@ module FinancialAssistance
 
           def transform_vlp_documents(vlp_documents)
             vlp_documents.collect do |vlp_document|
+              next if vlp_document.subject.nil?
               {
                 subject: vlp_document.subject,
                 alien_number: vlp_document.alien_number,
@@ -266,8 +267,8 @@ module FinancialAssistance
                 action: element.action,
                 modifier: element.modifier,
                 update_reason: element.update_reason,
-                event_response_record: construct_event_response(element.event_response_record),
-                event_request_record: construct_event_response(element.event_request_record)
+                event_response_record: element.event_response_record_id,
+                event_request_record: element.event_request_record_id
               }
             end
           end

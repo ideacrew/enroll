@@ -364,6 +364,7 @@ class CensusEmployee < CensusMember
   # @param effective_on [Date]
   # @return [BenefitGroupAssignment]
   def benefit_package_assignment_on(date = TimeKeeper.date_of_record)
+    date ||= TimeKeeper.date_of_record
     BenefitGroupAssignment.on_date(self, date)
   end
 

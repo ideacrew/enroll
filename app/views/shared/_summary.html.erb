@@ -32,7 +32,7 @@
       <% if @plan.try(:is_standard_plan) %>
       <div class="col-md-12">
         <i class="fa fa-bookmark">
-          STANDARD PLAN
+          <%= @plan.standard_plan_label %>
         </i>
       </div>
       <% end %>
@@ -67,7 +67,7 @@
                 <br/>
                 <span class="ttu dg fourteen" style="margin-left: -10px">
                   <% if offers_nationwide_plans? %>
-                    <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                    <%= @plan.network %>
                   <% else %>
                     <% if @plan.network_information.present? %>
                         Network Notes

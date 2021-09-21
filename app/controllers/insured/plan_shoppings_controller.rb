@@ -347,7 +347,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @metal_levels = %w[high low]
       @plan_types = %w[ppo hmo epo]
     end
-    @networks = %w[Nationwide DC-Metro]
+    @networks = ::BenefitMarkets::Products::Product.network_labels
   end
 
   # no dental as of now
@@ -405,6 +405,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
       build_same_plan_premiums
     end
+
+    @plans = @plans.select { |a| a.premium_tables.present? }
 
     # for carrier search options
     carrier_profile_ids = @plans.map(&:issuer_profile_id).map(&:to_s).uniq

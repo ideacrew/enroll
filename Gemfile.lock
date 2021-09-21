@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 3d3985fc09f3f183d3c8b89e9687c9c7949760f8
+  revision: e047cacbb7077d2cdf262784d87b5e55af40396b
   branch: trunk
   specs:
-    aca_entities (0.4.0)
+    aca_entities (0.6.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -530,7 +530,7 @@ GEM
     equalizer (0.0.11)
     erubi (1.10.0)
     erubis (2.7.0)
-    et-orbi (1.2.4)
+    et-orbi (1.2.5)
       tzinfo
     ethon (0.12.0)
       ffi (>= 1.3.0)
@@ -570,7 +570,7 @@ GEM
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
     forgery (0.7.0)
-    fugit (1.5.1)
+    fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gherkin (5.1.0)
@@ -664,7 +664,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0704)
+    mime-types-data (3.2021.0901)
     mimemagic (0.3.8)
       nokogiri (~> 1)
     mini_magick (4.10.1)
@@ -733,7 +733,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.4)
+    oj (3.13.7)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
@@ -1208,4 +1208,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.19
+   2.2.27

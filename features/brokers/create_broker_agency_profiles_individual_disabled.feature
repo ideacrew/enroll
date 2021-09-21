@@ -10,128 +10,38 @@ Feature: Create Primary Broker and Broker Agency
   The Broker should be able to select a family covered by that Employer
   The Broker should be able to purchase insurance for that family
 
-  Scenario: Broker can enter ACH information
-    Given the shop market configuration is enabled
-    Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for enrollment_open initial employer with health benefits
-    And there is an employer ABC Widgets
-    When Primary Broker visits the HBX Broker Registration form
-    Given a valid ach record exists
-    Given Primary Broker has not signed up as an HBX user
-    When a Primary Broker visits the HBX Broker Registration form POM
-    When Primary Broker enters personal information POM
-    When Primary Broker enters personal information
-    And Primary Broker enters broker agency information for SHOP markets
-    And Primary Broker enters office location for default_office_location
-    Then Primary Broker should see broker registration successful message
+  # TODO: Keep this commented out for DC. This is a Massachusetts feature:
+  # https://github.com/health-connector/enroll/blob/68cb76ed84baeb0a3afaa0fadf2d74c9667b567c/config/settings.yml#L156
+  #Scenario: Broker can enter ACH information
+  #  Given the shop market configuration is enabled
+  #  Given a CCA site exists with a benefit market
+  #  Given benefit market catalog exists for enrollment_open initial employer with health benefits
+  #  And there is an employer ABC Widgets
+  #  Given a valid ach record exists
+  #  Given Primary Broker has not signed up as an HBX user
+  #  When a Primary Broker visits the HBX Broker Registration form
+  #  When Primary Broker enters personal information
+  #  And Primary Broker enters broker agency information for SHOP markets
+  #  And Primary Broker enters office location for default_office_location
+  #  Then Primary Broker should see broker registration successful message
   
-  @flaky
-  # The below sceario passes completely, but fails occasionally both locally and on Github
-  # Some research should be done into its purpose
-  Scenario: Primary Broker has not signed up on the HBX
-    Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for enrollment_open initial employer with health benefits
-    When Primary Broker visits the HBX Broker Registration form
-    Given a valid ach record exists
-    Given Primary Broker has not signed up as an HBX user
-    When a Primary Broker visits the HBX Broker Registration form POM
-    When Primary Broker enters personal information POM
-    And Primary Broker enters broker agency information POM
-    Then Primary Broker should see broker registration successful message
-    Given Hbx Admin exists
-    When Hbx Admin logs on to the Hbx Portal
-    And I select the all security question and give the answer
-    When I have submitted the security questions
-    Given user visits the Hbx Portal
-    And Hbx Admin clicks on the Brokers dropdown
-    And Hbx Admin clicks on the Broker Applications option
-    Then Hbx Admin should see the list of broker applicants
-    When Hbx Admin clicks on the current broker applicant show button
-    Then Hbx Admin should see the broker application with carrier appointments
-    And HBX Admin clicks the Approve Broker button POM
-    Then Hbx Admin should see the broker successfully approved message
-    And Hbx Admin logs out
-
-    Then Primary Broker should receive an invitation email
-    When Primary Broker visits invitation url in email
-    Then Primary Broker should see the create account page
-    When Primary Broker registers with valid information
-    Then Primary Broker should see successful message with broker agency home page
-    And Primary Broker select the all security question and give the answer
-    When Primary Broker have submit the security questions
-    And Primary Broker logs out
-
-    Given Employer has not signed up as an HBX user
-    When I visit the Employer portal
-    Then Tim Wood creates an HBX account
-    When Tim Wood has already provided security question responses
-    # Then Tim Wood should see a successful sign up message
-    Then I should click on employer portal
-    Then all required fields have valid inputs on the Employer Registration Form
-    When user clicks the confirm button
-    # And Tim Wood creates a new employer profile with default_office_location
-    When Employer clicks on the Brokers tab
-    Then Employer should see no active broker
-    When Employer click on Browse Brokers button
-    Then Employer should see broker agencies index view
-    # When Employer searches broker agency by name
-    # Then Employer should see broker agency
-    When Employer clicks select broker button
-    Then Employer should see confirm modal dialog box
-    When Employer confirms broker selection
-    Then Employer should see broker selected successful message
-    When Employer clicks on the Brokers tab
-    # Then Employer should see broker active for the employer
-    When Employer terminates broker
-    Then Employer should see broker terminated message
-    When Employer clicks on the Brokers tab
-    Then Employer should see no active broker
-    When Employer clicks on Browse Brokers button
-    Then Employer should see broker agencies index view
-    # Then Employer should see broker agency
-    When Employer clicks select broker button
-    Then Employer should see confirm modal dialog box
-    When Employer confirms broker selection
-    Then Employer should see broker selected successful message
-    And Employer logs out
-
-    Then Primary Broker logs on to the Broker Agency Portal
-    And Primary Broker clicks on the Employers tab
-    Then Primary Broker should see Employer and click on legal name
-    Then Primary Broker should see the Employer Profile page as Broker
-    When Primary Broker creates and publishes a plan year
-    Then Primary Broker should see a published success message without employee
-    When Primary Broker clicks on the Employees tab
-    Then Primary Broker clicks to add the first employee
-    Then Primary Broker creates Broker Assisted as a roster employee
-    Then Primary Broker sees employer census family created
-    And I log out
-
-    When I go to the employee account creation page
-    When Broker Assisted creates an HBX account
-    And Broker Assisted select the all security question and give the answer
-    When Broker Assisted have submit the security questions
-    #Then Broker Assisted should be logged on as an unlinked employee
-    When Broker Assisted goes to register as an employee
-    Then Broker Assisted should see the employee search page
-    When Broker Assisted enter the identifying info of Broker Assisted
-    # Then Broker Assisted should see the matched employee record form
-    When Broker Assisted accepts the matched employer
-    And Broker  completes and submits the matched employee form for Broker Assisted
-    And I log out
-
-    Then Primary Broker logs on to the Broker Agency Portal
-    And Primary Broker clicks on the Employers tab
-    Then Primary Broker should see Employer and click on legal name
-    Then Primary should see the Employer Profile page as Broker
-    When Primary Broker clicks on the Families tab
-    # Then Broker Assisted is a family
-    Then Primary Broker goes to the Consumer page
-    # Then Primary Broker is on the consumer home page
-    # Then Primary Broker shops for plans
-    # Then Primary Broker sees covered family members
-    # Then Primary Broker should see the list of plans
-    # Then Primary Broker selects a plan on the plan shopping page
-    # And Primary Broker clicks on purchase button on the coverage summary page
-    # And Primary Broker should see the receipt page
-    Then Primary Broker logs out
+  
+  Scenario: Broker purchase insurance for a family
+    Given the shop market configuration is enabled
+    And a CCA site exists with a benefit market
+    And benefit market catalog exists for active initial employer with health benefits
+    And there is a Broker Agency exists for District Brokers Inc
+    And the broker Max Planck is primary broker for District Brokers Inc
+    And there is an employer Acme Inc.
+    And employer Acme Inc. hired broker Max Planck from District Brokers Inc
+    And initial employer Acme Inc. has active benefit application
+    And there is a census employee record and employee role for Patrick Doe for employer Acme Inc.
+    And employer Acme Inc. is listed under the account for broker District Brokers Inc
+    When Max Planck logs on to the Broker Agency Portal
+    And Primary Broker clicks on the Families tab
+    And Primary Broker should see Patrick Doe as family and click on name
+    And Primary Broker clicks on shop for plans
+    And Primary Broker selects a plan on the plan shopping page
+    And Primary Broker clicks on confirm Confirm button on the coverage summary page
+    And Primary Broker sees Enrollment Submitted and clicks Continue
+    Then Primary Broker should see Coverage Selected

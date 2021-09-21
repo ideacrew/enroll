@@ -202,7 +202,8 @@
 
       <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
         @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
-        @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? %>
+        @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? &&
+        !@application.is_transferrable? %>
         <div class="er-medicaid mt-20">
           <div class="er-title">
             <h3>
@@ -221,8 +222,9 @@
                   program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
                   ) %><br/>
                 <br/>
-              <div>
-                <%= link_to l10n("faa.send_to_external_verification"), applications_path, class: "btn btn-small btn-primary" %>
+                <div>
+                  <%# <%= link_to l10n("faa.send_to_external_verification"), applications_path, class: "btn btn-small btn-primary" %>
+                  <%= link_to l10n("faa.send_to_external_verification"), update_transfer_requested_application_url, method: :put, class: "btn btn-small btn-primary", id: "btn-request-transfer", remote: true %>
                 </div>
               </div>
             </div>

@@ -34,7 +34,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       if ApplicationHelperModStubber.checkbook_integration_enabled?
         allow(subject).to receive(:construct_body_shop).and_return({})
         allow(HTTParty).to receive(:post).and_return(result)
-        hbx_enrollment.household = ce_household 
+        hbx_enrollment.household = ce_household
         hbx_enrollment.reload
         # expect(subject.generate_url).to eq Rails.application.config.checkbook_services_congress_url+"#{hbx_enrollment.effective_on.year}/"
         expect(subject.generate_url).to eq checkbook_url
@@ -125,7 +125,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     context 'when all members are aptc eligible' do
       ::EligibilityDetermination::CSR_KINDS.each do |csr_kind|
         it "should return a value mapped to #{csr_kind} as all members are aptc eligible" do
-          ivl_ed.update_attributes!(csr_eligibility_kind: csr_kind)
+          ivl_thhm.first.update_attributes!(csr_eligibility_kind: csr_kind)
           csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
           expect(subject.csr_value).to eq ("-" + csr)
         end

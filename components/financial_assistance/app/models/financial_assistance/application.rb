@@ -15,7 +15,6 @@ module FinancialAssistance
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
     validate  :attestation_terms_on_parent_living_out_of_home
-    validate :check_for_valid_predecessor
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
 
@@ -101,6 +100,9 @@ module FinancialAssistance
     # predecessor_id is the application preceding this current application
     field :predecessor_id, type: BSON::ObjectId
 
+    # Flag for user requested ATP transfer
+    field :transfer_requested, type: Boolean, default: false
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
@@ -139,6 +141,8 @@ module FinancialAssistance
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
+    # Applications that are in submitted and after submission states. Non work in progress applications.
+    scope :submitted_and_after, -> { where(:aasm_state.in => ['submitted', 'determination_response_error', 'determined']) }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -262,6 +266,7 @@ module FinancialAssistance
     end
 
     def find_missing_relationships(matrix)
+      return [] if matrix.flatten.all?(&:present?)
       id_map = {}
       applicant_ids = active_applicants.map(&:id)
       applicant_ids.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
@@ -282,15 +287,18 @@ module FinancialAssistance
       update_response_attributes(message)
       ed_updated = FinancialAssistance::Operations::Applications::Haven::AddEligibilityDetermination.new.call(application: self, eligibility_response_payload: eligibility_response_payload)
       return if ed_updated.failure? || ed_updated.value! == false
-
       determine! # If successfully loaded ed's move the application to determined state
       send_determination_to_ea
     end
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      transfer_account if result.success? && is_rt_transferrable?
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
+    end
+
+    def rt_transfer
+      return unless is_rt_transferrable?
+      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
     end
 
     def transfer_account
@@ -309,7 +317,7 @@ module FinancialAssistance
 
     def is_transferrable?
       applicants = self.applicants.select do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
       end
       applicants.any?
     end
@@ -404,51 +412,12 @@ module FinancialAssistance
       # BrotherOrSisterInLaw Rule: brother_or_sister_in_law
       missing_relationships = execute_brother_or_sister_in_law_rule(missing_relationships)
 
+      # CousinLaw Rule: cousin
+      missing_relationships = execute_cousin_rule(missing_relationships)
+
       matrix
     end
     #TODO: end of work progress
-
-    # If MemberA is parent to MemberB,
-    # and MemberB is Spouse to MemberC,
-    # then MemberA is father_or_mother_in_law to MemberC
-    def execute_father_or_mother_in_law_rule(missing_relationships)
-      missing_relationships.each do |rel|
-        applicant_ids = rel.to_a.flatten
-        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'parent')
-        applicant_relations.each do |each_relation|
-          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
-          spouse_relation = relationships.where(applicant_id: other_applicant_id, kind: 'spouse').first
-          next if spouse_relation.relative_id != each_relation.relative_id
-          parent_in_law = applicants.where(id: each_relation.applicant_id).first
-          child_in_law = applicants.where(id: other_applicant_id).first
-          add_or_update_relationships(parent_in_law, child_in_law, 'father_or_mother_in_law')
-          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
-        end
-      end
-      missing_relationships
-    end
-
-    # If MemberA is spouse to MemberB,
-    # and MemberB is sibling to MemberC,
-    # then MemberA is brother_or_sister_in_law to MemberC
-    def execute_brother_or_sister_in_law_rule(missing_relationships)
-      missing_relationships.each do |rel|
-        applicant_ids = rel.to_a.flatten
-        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'spouse')
-        applicant_relations.each do |each_relation|
-          # Do not continue if there are no missing relationships.
-          return missing_relationships if missing_relationships.blank?
-          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
-          sibling_relation = relationships.where(applicant_id: other_applicant_id, kind: 'sibling').first
-          next if sibling_relation.relative_id != each_relation.relative_id
-          sibling1_in_law = applicants.where(id: each_relation.applicant_id).first
-          sibling2_in_law = applicants.where(id: other_applicant_id).first
-          add_or_update_relationships(sibling1_in_law, sibling2_in_law, 'brother_or_sister_in_law')
-          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
-        end
-      end
-      missing_relationships
-    end
 
     # Set the benchmark product for this financial assistance application.
     # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
@@ -558,7 +527,7 @@ module FinancialAssistance
       end
 
       event :determine, :after => :record_transition do
-        transitions from: :submitted, to: :determined
+        transitions from: :submitted, to: :determined, after: :rt_transfer
       end
 
       event :terminate, :after => :record_transition do
@@ -780,7 +749,7 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      find_missing_relationships(build_relationship_matrix).present? ? false : true
+      find_missing_relationships(build_relationship_matrix).blank?
     end
 
     def is_draft?
@@ -921,6 +890,70 @@ module FinancialAssistance
 
     private
 
+    # If MemberA is parent to MemberB,
+    # and MemberB is Spouse to MemberC,
+    # then MemberA is father_or_mother_in_law to MemberC
+    def execute_father_or_mother_in_law_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'parent')
+        applicant_relations.each do |each_relation|
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          spouse_relation = relationships.where(applicant_id: other_applicant_id, kind: 'spouse').first
+          next if spouse_relation.nil? || spouse_relation.relative_id != each_relation.relative_id
+          parent_in_law = applicants.where(id: each_relation.applicant_id).first
+          child_in_law = applicants.where(id: other_applicant_id).first
+          add_or_update_relationships(parent_in_law, child_in_law, 'father_or_mother_in_law')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
+
+    # If MemberA is spouse to MemberB,
+    # and MemberB is sibling to MemberC,
+    # then MemberA is brother_or_sister_in_law to MemberC
+    def execute_brother_or_sister_in_law_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'spouse')
+        applicant_relations.each do |each_relation|
+          # Do not continue if there are no missing relationships.
+          return missing_relationships if missing_relationships.blank?
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          sibling_relation = relationships.where(applicant_id: other_applicant_id, kind: 'sibling').first
+          next if sibling_relation.nil? || sibling_relation.relative_id != each_relation.relative_id
+          sibling1_in_law = applicants.where(id: each_relation.applicant_id).first
+          sibling2_in_law = applicants.where(id: other_applicant_id).first
+          add_or_update_relationships(sibling1_in_law, sibling2_in_law, 'brother_or_sister_in_law')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
+
+    # If MemberA is nephew_or_niece to MemberB,
+    # and MemberB is parent to MemberC,
+    # then MemberA is cousin to MemberC
+    def execute_cousin_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'nephew_or_niece')
+        applicant_relations.each do |each_relation|
+          # Do not continue if there are no missing relationships.
+          return missing_relationships if missing_relationships.blank?
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          child_relation = relationships.where(applicant_id: other_applicant_id, kind: 'child').first
+          next if child_relation.nil? || child_relation.relative_id != each_relation.relative_id
+          cousin1 = applicants.where(id: each_relation.applicant_id).first
+          cousin2 = applicants.where(id: other_applicant_id).first
+          add_or_update_relationships(cousin1, cousin2, 'cousin')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
+
     def calculate_renewal_base_year
       ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
       if is_renewal_authorized.present?
@@ -933,12 +966,6 @@ module FinancialAssistance
     def check_parent_living_out_of_home_terms
       (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
         parent_living_out_of_home_terms.is_a?(FalseClass)
-    end
-
-    def check_for_valid_predecessor
-      return if self.predecessor_id.nil?
-      pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
-      self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
     end
 
     def clean_params(model_params)

@@ -25,4 +25,4 @@ Feature: Broker Manages Employer Account
     Then Primary Broker clicks on the add employee button
     Then Primary Broker creates Broker Assisted as a roster employee
     Then Primary Broker sees employer census family created
-    Then Primary Broker logs out
+    

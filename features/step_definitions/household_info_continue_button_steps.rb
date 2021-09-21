@@ -41,7 +41,8 @@ Then(/^the CONTINUE button will be disabled$/) do
 end
 
 Given(/^the primary member exists$/) do
-  expect(page).to have_content('John Smith')
+  sleep 2
+  expect(page).to have_content('SELF')
 end
 
 Given(/^NO other household members exist$/) do
@@ -82,8 +83,6 @@ Given(/^at least one other household members exist$/) do
 end
 
 Given(/^a new household member is not applying$/) do
-  click_link 'Continue'
-  sleep 2
   click_link "Add New Person"
   sleep 2
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click

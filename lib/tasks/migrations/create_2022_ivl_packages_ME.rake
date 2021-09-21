@@ -51,7 +51,7 @@ namespace :import do
       end
     end
 
-    ivl_products = BenefitMarkets::Products::Product.aca_individual_market
+    ivl_products = BenefitMarkets::Products::Product.aca_individual_market.with_premium_tables
     puts 'no ivl product present' if ivl_products.blank?
     abort if ivl_products.blank?
 
