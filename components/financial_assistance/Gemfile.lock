@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d0d7ce9ee6c22f1a6b857bbd5370e865a3fd9736
-  branch: release_0.6.0
+  revision: e047cacbb7077d2cdf262784d87b5e55af40396b
+  branch: trunk
   specs:
-    aca_entities (0.4.0)
+    aca_entities (0.6.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 70a8f403bb3cdcea34354d5df446febf2a795449
-  branch: set_prefetch_count
+  revision: f2e41bee53939bb069668b314c904c43e52bdc57
+  branch: trunk
   specs:
     event_source (0.5.3)
       bunny (>= 1.7.1)
@@ -237,7 +237,7 @@ GEM
       dry-schema (~> 1.5, >= 1.5.2)
     erubi (1.9.0)
     erubis (2.7.0)
-    et-orbi (1.2.4)
+    et-orbi (1.2.5)
       tzinfo
     ethon (0.14.0)
       ffi (>= 1.15.0)
@@ -265,7 +265,7 @@ GEM
     font-awesome-rails (4.7.0.5)
       railties (>= 3.2, < 6.1)
     forgery (0.7.0)
-    fugit (1.5.1)
+    fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     globalid (0.4.2)
@@ -351,7 +351,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.13.6)
+    oj (3.13.7)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
@@ -551,4 +551,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.2.19
+   2.2.27
