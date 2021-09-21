@@ -68,6 +68,11 @@ module BenefitSponsors
         def family_datatable
           authorize self
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
+          @display_family_link = if ::EnrollRegistry.feature_enabled?(:disable_family_link_in_broker_agency)
+                                   current_user.has_hbx_staff_role? || !::EnrollRegistry[:disable_family_link_in_broker_agency].setting(:enable_after_time_period).item.cover?(TimeKeeper.date_of_record)
+                                 else
+                                   true
+                                 end
           dt_query = extract_datatable_parameters
 
           query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id, @broker_agency_profile.market_kind)
