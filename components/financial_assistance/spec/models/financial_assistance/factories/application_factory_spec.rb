@@ -219,4 +219,25 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
       end
     end
   end
+
+  describe 'family with just one family member' do
+    let!(:person11) do
+      FactoryBot.create(:person,
+                        :with_consumer_role,
+                        :with_active_consumer_role,
+                        :with_ssn,
+                        first_name: 'Person11')
+    end
+    let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+
+    before do
+      application.update_attributes!(family_id: family11.id)
+      applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+      @new_application = described_class.new(application).copy_application
+    end
+
+    it 'should return application with one applicant' do
+      expect(@new_application.applicants.count).to eq(1)
+    end
+  end
 end

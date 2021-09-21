@@ -89,9 +89,8 @@ module FinancialAssistance
         active_member_ids = members_attributes.inject([]) do |fm_ids, member_param_hash|
                               fm_ids << member_param_hash[:family_member_id]
                             end
-        applicants.each do |app|
-          app.update_attributes(:is_active => false) unless active_member_ids.include?(app.family_member_id)
-        end
+        application.applicants.where(:family_member_id.nin => active_member_ids).destroy_all if active_member_ids.present?
+        set_applicants
         active_applicant_family_member_ids = application.active_applicants.map(&:family_member_id)
 
         active_member_ids.each do |fm_id|
