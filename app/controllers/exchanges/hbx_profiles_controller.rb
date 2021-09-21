@@ -835,7 +835,7 @@ def employer_poc
       current_enr = dup_enrollments.detect{ |en| en.product_id == product_id}
       dup_enrs =  if current_enr.is_shop?
                     dup_enrollments.select do |enr|
-                      (enr.subscriber.applicant_id == current_enr.subscriber.applicant_id) &&
+                      (enr.subscriber&.applicant_id == current_enr.subscriber&.applicant_id) &&
                         (enr.market_name == current_enr.market_name) &&
                         (enr.product.id == current_enr.product.id) &&
                         (enr.employer_profile.id == current_enr.employer_profile.id) &&
