@@ -25,8 +25,8 @@ module Subscribers
           notify(
             "acapi.info.events.migration.mcr_application_success", {
               :body => JSON.dump({
-                :application_id => application_id
-              })
+                                   :application_id => application_id
+                                 })
             }
           )
         else
@@ -34,10 +34,10 @@ module Subscribers
           notify(
             "acapi.info.events.migration.mcr_application_failure", {
               :body => JSON.dump({
-                :application_id => application_id,
-                :payload => payload,
-                :result => result
-              })
+                                   :application_id => application_id,
+                                   :payload => payload,
+                                   :result => result
+                                 })
             }
           )
         end
@@ -46,13 +46,13 @@ module Subscribers
         notify(
           "acapi.info.events.migration.mcr_application_exception", {
             :body => JSON.dump({
-              :application_id => application_id,
-              :payload => payload,
-              :result => result,
-              :error => e.inspect,
-              :message => e.message,
-              :backtrace => e.backtrace
-            })
+                                 :application_id => application_id,
+                                 :payload => payload,
+                                 :result => result,
+                                 :error => e.inspect,
+                                 :message => e.message,
+                                 :backtrace => e.backtrace
+                               })
           }
         )
       end

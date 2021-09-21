@@ -318,7 +318,7 @@ module Operations
 
       def external_person_hbx_id(external_member_id)
         member_hash = family_hash.dig("households", 0, "coverage_households", 0, "coverage_household_members")
-        member = member_hash.detect { |member| member["family_member_reference"]["family_member_hbx_id"] == external_member_id }
+        member = member_hash.detect { |m| m["family_member_reference"]["family_member_hbx_id"] == external_member_id }
         member.present? ? member["family_member_reference"]["person_hbx_id"] : nil
       end
 
