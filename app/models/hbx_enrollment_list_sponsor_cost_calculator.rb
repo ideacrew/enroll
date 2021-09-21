@@ -197,7 +197,7 @@ class HbxEnrollmentListSponsorCostCalculator
     contribution_total = 0.00
     group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
     group_mapper.each do |ce_roster|
-      price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution, sponsored_benefit)
+      price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution)
       contribution_group = c_calculator.calculate_contribution_for(contribution_model, price_group, sponsor_contribution)
       price_total = price_total + contribution_group.group_enrollment.product_cost_total
       contribution_total = contribution_total + contribution_group.group_enrollment.sponsor_contribution_total
