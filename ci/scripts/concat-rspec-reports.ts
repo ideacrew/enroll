@@ -4,7 +4,7 @@ import { createFileDictionary } from './util';
 
 async function getJson(): Promise<RspecReport[]> {
   console.log('Reading gha reports');
-  const ghaDir: string[] = await fs.readdir('./ci/rspec/gha');
+  const ghaDir: string[] = await fs.readdir('./ci/rspec');
 
   const ghaReports = ghaDir.filter((file) => file.endsWith('.json'));
 
@@ -12,7 +12,7 @@ async function getJson(): Promise<RspecReport[]> {
 
   for (let index = 0; index < ghaReports.length; index++) {
     const path = ghaReports[index];
-    const file = await fs.readFile(`./ci/rspec/gha/${path}`, 'utf-8');
+    const file = await fs.readFile(`./ci/rspec/${path}`, 'utf-8');
 
     const report = JSON.parse(file);
     rspecReports.push(report);

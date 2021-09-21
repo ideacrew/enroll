@@ -1,5 +1,6 @@
 name: rspec report
 on:
+  # push:
   workflow_dispatch:
 
 jobs:
@@ -8,6 +9,7 @@ jobs:
       matrix:
         folder:
           [
+            'client_config',
             'components',
             'concerns',
             'controllers',
@@ -24,6 +26,7 @@ jobs:
             'notices',
             'policies',
             'reflexes',
+            'requests',
             'reports',
             'routing',
             'script',
@@ -40,7 +43,7 @@ jobs:
           node-version: '14'
       - uses: wbari/start-mongoDB@v0.2
         with:
-          mongoDBVersion: '3.6'
+          mongoDBVersion: '4.2'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -52,9 +55,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
           gem update --system
@@ -108,14 +111,14 @@ jobs:
           rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
-          mongoDBVersion: '3.6'
+          mongoDBVersion: '4.2'
       - name: Restore project gems
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
           gem update --system
@@ -141,3 +144,27 @@ jobs:
         with:
           name: components-${{ matrix.folder }}
           path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
+  split-config:
+    needs: [rspec-report, rspec-engines-report]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn install
+      - uses: actions/download-artifact@v2
+        with:
+          path: ci/rspec/compressed-reports
+      - run: npm run rspec:move-reports
+      - run: npm run rspec:split-config
+      - run: npm run benefit-sponsors:split-config
+      - uses: actions/upload-artifact@v2
+        with:
+          name: rspec-split-config
+          path: ci/rspec-split-config.json
+      - uses: actions/upload-artifact@v2
+        with:
+          name: benefit_sponsors-split-config
+          path: ci/benefit_sponsors-split-config.json
