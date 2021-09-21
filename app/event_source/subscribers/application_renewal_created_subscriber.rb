@@ -11,7 +11,7 @@ module Subscribers
 
       subscriber_logger = Logger.new("#{Rails.root}/log/on_application_renewal_created_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       subscriber_logger.info "on_application_renewal_created, application hbx_id: #{payload[:hbx_id]}"
-      
+
       logger.info "ApplicationRenewalCreatedSubscriber on_application_renewal_created payload: #{payload[:_id]}"
       result = ::FinancialAssistance::Operations::Applications::Haven::RequestMagiMedicaidEligibilityDetermination.new.call(payload)
 

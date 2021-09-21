@@ -7,7 +7,6 @@ module FinancialAssistance
   module Operations
     module Applications
       module MedicaidGateway
-
         # This class will query all distinct family_ids with renwal eligible applications and trigger renewal events
         class CreateApplicationRenewalRequest
           include Dry::Monads[:result, :do, :try]
@@ -28,7 +27,7 @@ module FinancialAssistance
 
             Success(family_records)
           end
-      
+
           def generate_renewal_events(renewal_year, family_ids)
             logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
@@ -37,10 +36,10 @@ module FinancialAssistance
             family_ids.each_with_index do |family_id, index|
               # EventSource Publishing
               params = { payload: { index: index, family_id: family_id[0].to_s, family_hbx_id: family_id[1], renewal_year: renewal_year }, event_name: 'application_renewal_request_created' }
-              
-              Try {
+
+              Try do
                 ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
-              }.bind do |result|
+              end.bind do |result|
                 if result.success?
                   logger.info "Successfully Published for event application_renewal_request_created, with params: #{params}"
                 else

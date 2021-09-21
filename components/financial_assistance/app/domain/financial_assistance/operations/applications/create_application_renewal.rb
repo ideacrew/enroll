@@ -44,9 +44,7 @@ module FinancialAssistance
             return Failure("Renewal application already created for #{validated_params}")
           end
 
-          application = applications_by_family
-            .by_year(validated_params[:renewal_year].pred)
-            .renewal_eligible.created_asc.last
+          application = applications_by_family.by_year(validated_params[:renewal_year].pred).renewal_eligible.created_asc.last
 
           if application.present?
             Success(application)
@@ -63,7 +61,7 @@ module FinancialAssistance
             Rails.logger.error "Unable to create renewal application #{application.failure.errors} with #{validated_params}"
             return Failure("Unable to create renewal application #{application.failure.errors} with #{validated_params}")
           end
-          
+
           application
         end
 
