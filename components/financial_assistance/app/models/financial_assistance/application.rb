@@ -316,10 +316,9 @@ module FinancialAssistance
     end
 
     def is_transferrable?
-      applicants = self.applicants.select do |applicant|
+      self.applicants.any? do |applicant|
         applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
       end
-      applicants.any?
     end
 
     def update_application(error_message, status_code)
@@ -526,8 +525,8 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => :record_transition do
-        transitions from: :submitted, to: :determined, after: :rt_transfer
+      event :determine, :after => [:record_transition] do
+        transitions from: :submitted, to: :determined
       end
 
       event :terminate, :after => :record_transition do

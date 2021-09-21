@@ -22,7 +22,7 @@ module FinancialAssistance
             payload_params        = yield construct_payload(family, application)
             payload              = yield publish(payload_params)
 
-            Success(payload) #switch variable as methods done
+            Success(payload)
           end
 
           private
@@ -44,13 +44,16 @@ module FinancialAssistance
           end
 
           def construct_payload(family, application)
-            family_hash = FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).value!
-            family_hash[:magi_medicaid_applications] = family_hash[:magi_medicaid_applications].select{ |a| a[:hbx_id] == application.hbx_id }
+            result = FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+            return result unless result.success?
+            family_hash = result.value!
+            app_hash = family_hash[:magi_medicaid_applications].find{ |a| a[:hbx_id] == application.hbx_id }
+            family_hash[:magi_medicaid_applications] = app_hash || {}
             fam = {family: family_hash}
             Success(fam)
           end
 
-          # publish xml to medicaid gateway using event source
+          # publish to medicaid gateway using event source
           def publish(payload)
             FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount.new.call(payload)
           end
