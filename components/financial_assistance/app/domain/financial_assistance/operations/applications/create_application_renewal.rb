@@ -66,9 +66,13 @@ module FinancialAssistance
         end
 
         def create_renewal_draft_application(application, validated_params)
+          # Directly using Application Factory instead of ApplicationService as
+          # ApplicationService is quering for latest submitted application(submitted_at) and
+          # then creating a new application using the latest submitted application.
+          # In our context we want to create new application from the existing application
+          # that is sent from this Operation.
           Try() do
-            service = ::FinancialAssistance::Services::ApplicationService.new(application_id: application.id)
-            service.copy!
+            ::FinancialAssistance::Factories::ApplicationFactory.new(old_app).copy_application
           end.bind do |renewal_application|
             years_to_renew = calculate_years_to_renew(application)
 

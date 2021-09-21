@@ -171,7 +171,7 @@ module FinancialAssistance
 
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?
-        # Update relationship object only if the existing RelationshipKind is different some the incoming RelationshipKind.
+        # Update relationship object only if the existing RelationshipKind is different from the incoming RelationshipKind.
         relationship.update(kind: relation_kind) if relationship.kind != relation_kind
         return relationship
       end
