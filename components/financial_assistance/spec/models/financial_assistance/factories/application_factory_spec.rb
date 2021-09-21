@@ -284,7 +284,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
                           family_member_id: BSON::ObjectId.new,
                           first_name: 'Test',
                           last_name: 'Last',
-                          person_hbx_id:'10002')
+                          person_hbx_id: '10002')
       end
 
       let!(:new_applicant2) do
@@ -294,7 +294,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
                           family_member_id: BSON::ObjectId.new,
                           first_name: 'Test',
                           last_name: 'Last',
-                          person_hbx_id:'10001')
+                          person_hbx_id: '10001')
       end
 
       before do
