@@ -56,10 +56,12 @@ end
 
 Given(/IAP Assistance Year Display feature is enabled/) do
   EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
+  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
 end
 
 Given(/IAP Assistance Year Display feature is disabled/) do
   EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
+  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
 end
 
 Then(/They should see the application assistance year above Info Needed/) do
