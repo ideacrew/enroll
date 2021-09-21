@@ -529,11 +529,11 @@ module Notifier
       end
 
       def aqhp_event
-        merge_model.aqhp_event = payload['notice_params']['uqhp_event'].upcase == 'AQHP'
+        merge_model.aqhp_event = payload['notice_params']['uqhp_event']&.upcase == 'AQHP'
       end
 
       def uqhp_event
-        merge_model.uqhp_event = payload['notice_params']['uqhp_event'].upcase == 'UQHP'
+        merge_model.uqhp_event = payload['notice_params']['uqhp_event']&.upcase == 'UQHP'
       end
 
       def primary_member_present
@@ -700,7 +700,7 @@ module Notifier
       end
 
       def uqhp_notice?
-        payload['notice_params']['uqhp_event'].upcase == 'UQHP'
+        payload['notice_params']['uqhp_event']&.upcase == 'UQHP'
       end
 
       def primary_nil?

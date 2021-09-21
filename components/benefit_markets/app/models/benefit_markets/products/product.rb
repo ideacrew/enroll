@@ -173,11 +173,18 @@ module BenefitMarkets
     # method when we already have the document, I'm going to abuse lazy
     # enumeration to create something that behaves like a scope but will
     # only be evaluated once.
-      def self.by_coverage_date(collection, coverage_date)
-        collection.select do |product|
-          product.premium_tables.any? do |pt|
-            (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
+
+      class << self
+        def by_coverage_date(collection, coverage_date)
+          collection.select do |product|
+            product.premium_tables.any? do |pt|
+              (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
+            end
           end
+        end
+
+        def network_labels
+          ['Nationwide', EnrollRegistry[:enroll_app].setting(:statewide_area).item]
         end
       end
 

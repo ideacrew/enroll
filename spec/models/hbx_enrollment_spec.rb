@@ -1055,6 +1055,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+
         end
 
         it "should cancel the enrollment" do
@@ -3157,16 +3159,15 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
   context "expired enrollment re-instatement" do
     before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:assign_contribution_model_aca_shop).and_return(true)
-      allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
-      allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return true
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return true
+      EnrollRegistry[:assign_contribution_model_aca_shop].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
     end
 
     context "for Individual market" do
@@ -3255,16 +3256,15 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
   context "reinstating prior year terminated enrollment" do
     before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:assign_contribution_model_aca_shop).and_return(true)
-      allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
-      allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return true
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return true
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:assign_contribution_model_aca_shop].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
     end
     context "for Individual market" do
       let(:person)   { FactoryBot.create(:person, :with_consumer_role, :with_family) }
@@ -3396,12 +3396,10 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
-        allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
-        allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
       end
 
       it "previous year terminated enrollment  can be reinstated?" do
@@ -3468,14 +3466,12 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
-        allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
-        allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:assign_contribution_model_aca_shop).and_return(true)
-        allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:assign_contribution_model_aca_shop].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
       end
 
       context "reinstating coverage_terminated enrollment" do
@@ -3672,14 +3668,12 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
   describe "#has_active_term_or_expired_exists_for_reinstated_date?" do
 
     before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
-      allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
-      allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:assign_contribution_model_aca_shop).and_return(true)
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:assign_contribution_model_aca_shop].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
     end
 
     context "for Individual market" do
@@ -3804,12 +3798,11 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
         end
 
         before do
-          allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(false)
-          allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(false)
-          allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(false)
-          allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(false)
-          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
-          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
         end
 
         it "should return true if there is an active enrollment exists for reinstated date" do
@@ -4279,8 +4272,8 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
     include_context "setup expired, and active benefit applications"
 
     before do
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -4310,8 +4303,8 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
     include_context "setup terminated and active benefit applications"
 
     before do
-      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -4518,10 +4511,10 @@ describe "#select_coverage event for shop", dbclean: :after_each do
     end
 
     before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:prior_plan_year_ivl_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
       census_employee.benefit_group_assignments << terminated_bga
       census_employee.benefit_group_assignments << active_bga
       census_employee.save
