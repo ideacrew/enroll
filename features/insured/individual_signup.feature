@@ -11,7 +11,7 @@ Feature: Insured Plan Shopping on Individual market
     When Individual clicks on continue
     And Individual sees form to enter personal information
     
-  Scenario: New insured user purchases on individual market and update plan thru qualifying life event 
+  Scenario: New insured user purchases on individual market
     When Individual clicks on continue
     And Individual agrees to the privacy agreeement
     And Individual answers the questions of the Identity Verification page and clicks on submit
@@ -23,18 +23,7 @@ Feature: Insured Plan Shopping on Individual market
     And Individual should not see any plan which premium is 0
     And Individual select a plan on plan shopping page
     And Individual click on purchase button on confirmation page
-    And Individual clicks on the Continue button to go to the Individual home page
-    When Individual click the "Married" in qle carousel
-    And Individual select a future qle date
-    Then Individual should see not qualify message
-    When Individual click the "Married" in qle carousel
-    And I select a past qle date
-    Then Individual should see confirmation and continue
-    When Individual click on shop for new plan button on household info page
-    And Individual select a plan on plan shopping page
-    And Individual click on purchase button on confirmation page
-    And Individual click on continue on qle confirmation page
-    Then I should see the individual home page
+    Then Individual clicks on the Continue button to go to the Individual home page
     
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
     When Individual clicks on continue
