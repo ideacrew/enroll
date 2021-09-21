@@ -101,6 +101,8 @@ module Services
     end
 
     def trigger_reminder_notices(family, event_name)
+      return unless event_name.present?
+
       if EnrollRegistry[:legacy_enrollment_trigger].enabled?
         person = family.primary_person
         IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name)

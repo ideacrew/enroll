@@ -231,12 +231,12 @@ module Operations
       end
 
       def build_event(payload, event_name)
-        result = event("events.individual.enrollments.#{event_name}", attributes: payload)
+        result = event("events.individual.notices.#{event_name}", attributes: payload)
         unless Rails.env.test?
           logger.info('-' * 100)
           logger.info(
             "Enroll Reponse Publisher to external systems(polypress),
-            event_key: events.individual.enrollments.#{event_name}, attributes: #{payload.to_h}, result: #{result}"
+            event_key: events.individual.notices.#{event_name}, attributes: #{payload.to_h}, result: #{result}"
           )
           logger.info('-' * 100)
         end
