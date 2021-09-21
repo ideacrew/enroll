@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pry'
 
 RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each do
   let(:family_id) { BSON::ObjectId.new }
