@@ -12,7 +12,7 @@ module Subscribers
 
       subscriber_logger = Logger.new("#{Rails.root}/log/on_application_renewal_request_created_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, response: #{payload}"
-      
+
       logger.info "ApplicationRenewalRequestCreatedSubscriber on_submit_renewal_draft payload: #{payload}"
       result = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(payload)
 
