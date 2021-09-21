@@ -467,6 +467,7 @@ class HbxEnrollment
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber, :set_is_any_enrollment_member_outstanding
   after_save :check_created_at
   after_save :notify_on_save
+  after_save :trigger_primary_subscriber_publish
 
   # def max_aptc
   #   family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
@@ -2562,6 +2563,13 @@ class HbxEnrollment
   end
 
   private
+
+  def trigger_primary_subscriber_publish
+    valid_last_action_states = ["shopping", "coverage_selected", "coverage_terminated", "coverage_expired"]
+    return unless EnrollRegistry.feature_enabled?(:crm_publish_primary_subscriber) && valid_last_action_states.include?(aasm_state) && consumer_role
+    person = consumer_role.person
+    ::Operations::People::SugarCrm::PublishPrimarySubscriber.new.call(person, last_ea_action: aasm_state)
+  end
 
   def set_is_any_enrollment_member_outstanding
     if kind == "individual"

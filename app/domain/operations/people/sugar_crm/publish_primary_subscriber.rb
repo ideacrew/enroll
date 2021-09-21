@@ -13,7 +13,11 @@ module Operations
         include EventSource::Command
         include EventSource::Logging
 
-        def call(primary_subscriber_person)
+        attr_accessor :last_ea_action
+
+        # last_ea_action will come from Hbx Enrollments or FinancialAssistance Applications if present
+        def call(primary_subscriber_person, last_ea_action = nil)
+          @last_ea_action = last_ea_action
           transformed_person = yield construct_payload_hash(primary_subscriber_person)
           #payload_value = yield validate_payload(transformed_person)
           simplified_person_payload = simplify_crm_person_payload(transformed_person)
@@ -46,6 +50,7 @@ module Operations
           end
           transformed_person[:individual_market_transitions] = []
           transformed_person[:verification_types] = []
+          transformed_person[:last_ea_action] = last_ea_action if last_ea_action
           transformed_person
         end
 
