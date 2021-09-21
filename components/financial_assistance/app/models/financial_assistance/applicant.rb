@@ -279,7 +279,7 @@ module FinancialAssistance
 
     field :mec_check_response, type: String
     field :mec_check_date, type: DateTime
-    
+
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
@@ -395,9 +395,7 @@ module FinancialAssistance
     end
 
     def self.encrypt_ssn(val)
-      if val.blank?
-        return nil
-      end
+      return nil if val.blank?
       ssn_val = val.to_s.gsub(/\D/, '')
       SymmetricEncryption.encrypt(ssn_val)
     end

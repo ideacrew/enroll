@@ -27,9 +27,8 @@ module FinancialAssistance
           private
 
           def find_application(application_id)
-            
             application = FinancialAssistance::Application.find(application_id)
-           
+
             Success(application)
           rescue Mongoid::Errors::DocumentNotFound
             Failure("Unable to find Application with ID #{application_id}.")
@@ -45,13 +44,12 @@ module FinancialAssistance
           end
 
           def update_applicants(application, params)
-
-            application.applicants.each do | applicant |
-                response = params[:applicant_responses].find { |k,v| v = applicants.person_hbx_id }.value
-                applicant.update_attributes!({
-                    mec_check_response: response,
-                    mec_check_date: DateTime.now
-                })
+            application.applicants.each do |applicant|
+              response = params[:applicant_responses].find { |_k,_v| applicants.person_hbx_id }.value
+              applicant.update_attributes!({
+                                             mec_check_response: response,
+                                             mec_check_date: DateTime.now
+                                           })
 
             end
             #   applicant = find_matching_applicant(elig_d, thhm_entity.applicant_reference.person_hbx_id)
@@ -66,7 +64,7 @@ module FinancialAssistance
             #                                  is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
             #                                  is_totally_ineligible: ped_entity.is_totally_ineligible,
             #                                  is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
-            #                                  is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })          
+            #                                  is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
           end
 
           def find_matching_applicant(elig_det, applicant_ref)
