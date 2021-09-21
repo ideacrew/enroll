@@ -10,10 +10,10 @@ module Insured
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
         "Kaiser" => "https://kp.org/paypremium",
-        "Community Health Options" => "https://uatmcho.onlineinsight.com/ehp/eapp/samlpaymentacs",
-        "Harvard Pilgrim Health Care" => "https://b2bu.harvardpilgrim.org/CMSInitalPayments",
-        "Anthem Blue Cross and Blue Shield" => "https://payment.sit2.va.anthem.com/sales/payment/exchange?state=ME",
-        "Northeast Delta Dental" => "https://qaaca.deltadentalcoversme.com/acapayment/"
+        "Community Health Options" => "https://healthoptions.org",
+        "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
+        "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
+        "Northeast Delta Dental" => "https://www.nedelta.com/Home"
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
