@@ -184,7 +184,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4]
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -234,7 +234,7 @@ jobs:
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         env:
-          RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/engines/benefit-sponsors/rspec-split-config.json'
+          RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/benefit_sponsors-split-config.json'
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '${{ github.workspace }}/components/benefit_sponsors/**/*_spec.rb'
         run: |
           echo 
@@ -242,7 +242,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [rubocop, view_linter, brakeman, build-assets]
+    needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -316,7 +316,7 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [rubocop, view_linter, brakeman, build-assets]
+    needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
