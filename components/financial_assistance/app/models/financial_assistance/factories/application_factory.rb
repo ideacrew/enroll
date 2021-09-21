@@ -28,7 +28,7 @@ module FinancialAssistance
       def duplicate
         new_application = faa_klass.create(application_params)
 
-        application.applicants.each do |applicant|
+        application.active_applicants.each do |applicant|
           create_applicant(applicant, new_application)
         end
 
@@ -158,7 +158,15 @@ module FinancialAssistance
         new_application.save!
       end
 
+      # First check is to verify if we can find applicant using person_hbx_id,
+      # and if we are not able to find using this then we want to check using
+      # a combination of dob, last_name and first_name.
       def fetch_matching_applicant(new_application, old_applicant)
+        if old_applicant.person_hbx_id.present?
+          applicant = new_application.applicants.where(person_hbx_id: old_applicant.person_hbx_id).first
+          return applicant if applicant.present?
+        end
+
         search_params = {dob: old_applicant.dob, last_name: old_applicant.last_name, first_name: old_applicant.first_name}
         search_params[:encrypted_ssn] = old_applicant.encrypted_ssn if old_applicant.ssn.present?
         new_application.applicants.where(search_params).first
