@@ -208,6 +208,8 @@ registry:
           item: 'DHS'
     - key: :student_follow_up_questions
       is_enabled: true
+    - key: :pregnancy_due_on_required
+      is_enabled: true
   - namespace:
     - :renewals
     features:
