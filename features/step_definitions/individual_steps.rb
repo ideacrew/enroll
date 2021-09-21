@@ -976,8 +976,20 @@ When(/^Individual clicks on Make Changes from Actions tab$/) do
   find(IvlHomepage.make_changes_btn).click
 end
 
-When(/^Individual click on shop for new plan button on household info page$/) do 
+When(/^Individual click on shop for new plan button on household info page$/) do
   click_link "Continue"
   sleep 5
   click_button "Shop for new plan"
+end
+
+When(/Individual clicks on None of the situations listed above apply checkbox$/) do
+  sleep 2
+  expect(page).to have_content 'None of the situations listed above apply'
+  find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
+  expect(page).to have_content 'To enroll before open enrollment'
+end
+
+Then(/Individual should land on Home page$/) do
+  sleep 1
+  expect(page).to have_content "My #{Settings.site.short_name}"
 end
