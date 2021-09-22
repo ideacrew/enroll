@@ -122,9 +122,10 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       let(:hired_on)        { plan_year.start_on - 10.days }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
         census_employee.update_attributes(employee_role_id: employee_role.id)
@@ -173,9 +174,9 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       let(:person) { FactoryBot.create(:person) }
       let(:hired_on)        { plan_year.start_on - 10.days }
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
         census_employee.update_attributes(employee_role_id: employee_role.id)
@@ -216,10 +217,10 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       let(:hired_on)        { plan_year.start_on - 10.days }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
         census_employee.update_attributes(employee_role_id: employee_role.id)
@@ -269,10 +270,10 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       let(:person) { FactoryBot.create(:person) }
       let(:hired_on)        { plan_year.start_on - 10.days }
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+        EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
         census_employee.update_attributes(employee_role_id: employee_role.id)
