@@ -29,11 +29,23 @@ async function createSplitConfig(): Promise<void> {
   const arrayOfSlowFiles: FileWithRuntime[] =
     createFilesWithRuntime(filesByRuntime);
 
-  const { suggestedGroupCount } = runtimeDetails(arrayOfSlowFiles);
+  const shortenedPaths: FileWithRuntime[] = arrayOfSlowFiles.map((file) => {
+    // This removes the `components/benefit_sponsors` from the path
+    const shortenedFilePath = file.filePath.substring(28);
+
+    const fileWithRuntime: FileWithRuntime = {
+      filePath: shortenedFilePath,
+      runTime: file.runTime,
+    };
+
+    return fileWithRuntime;
+  });
+
+  const { suggestedGroupCount } = runtimeDetails(shortenedPaths);
 
   console.log('Creating split config');
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
-    arrayOfSlowFiles,
+    shortenedPaths,
     suggestedGroupCount
   );
 
