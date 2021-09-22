@@ -8,10 +8,10 @@ class SamlController < ApplicationController
   # end
 
   def login
-    relay_state = params['RelayState']
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
+    relay_state = params['RelayState'] || response.attributes['relay_state']
     sign_out current_user if current_user.present?
 
     if response.is_valid? && response.name_id.present?
