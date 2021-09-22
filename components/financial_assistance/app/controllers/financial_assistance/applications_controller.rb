@@ -53,7 +53,6 @@ module FinancialAssistance
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
-              @application.rt_transfer if @application.is_rt_transferrable?
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
@@ -164,7 +163,6 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-
       render layout: 'financial_assistance'
     end
 
@@ -172,7 +170,7 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-
+      @application.rt_transfer
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
