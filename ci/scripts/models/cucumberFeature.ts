@@ -8,24 +8,32 @@ export interface CucumberFeature {
   elements: Array<ScenarioElement | BackgroundElement>;
 }
 
-export interface BaseElement {
-  name: string;
-  description: string;
-  line: number;
-  steps: ElementStep[] | undefined;
-}
-
-export interface BackgroundElement extends BaseElement {
+export interface BackgroundElement {
   keyword: 'Background';
   type: 'background';
   before: BaseStep[];
+  name: string;
+  description: string;
+  line: number;
+  steps?: ElementStep[];
 }
 
-export interface ScenarioElement extends BaseElement {
+export interface ScenarioElement {
   id: string;
-  keyword: 'Scenario';
+  keyword: string;
   type: 'scenario';
+  before?: BaseStep[];
   after: BaseStep[];
+  name: string;
+  description: string;
+  line: number;
+  steps?: ElementStep[];
+  comments?: Comment[];
+}
+
+interface Comment {
+  value: string;
+  line: number;
 }
 
 export interface ElementStep extends BaseStep {
