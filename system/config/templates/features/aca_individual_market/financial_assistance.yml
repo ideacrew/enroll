@@ -23,7 +23,7 @@ registry:
         is_enabled: true
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 19
+            item: 27
           - key: :application_new_year_effective_date_month_of_year
             item: 9
           - key: :enrollment_due_day_of_month
