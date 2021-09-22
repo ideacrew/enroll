@@ -372,7 +372,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.you_pay' => "You Pay",
   :'en.plan_details' => "Plan Details",
   :'en.insured.plan_shoppings.help_me_sign_up_options' => "Help me Sign Up Options",
-  :'en.insured.plan_shoppings.help_from_a_broker' => "Help from a Broker",
+  :'en.insured.plan_shoppings.help_from_a_broker' => "Help from an Expert",
   :'en.insured.plan_shoppings.help_from_an_inperson_assister' => "Help from an In-Person Assister",
   :'en.insured.plan_shoppings.help_from_a_customer_service_representative' => "Help from a Customer Service Representative",
   :'en.insured.plan_shoppings.help_from_a_certified_applicant_counselor' => "Help from a Certified Applicant Counselor (CAC)",
