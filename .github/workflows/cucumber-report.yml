@@ -1,6 +1,6 @@
 name: cucumber report
 on:
-  # push:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -105,6 +105,10 @@ jobs:
           path: ci/cucumber/compressed-reports
       - run: npm run cucumber:move-reports
       - run: npm run cucumber:concat-reports
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cucumber-concatenated-reports
+          path: ci/cucumber/local-cucumber-report.json
       - run: npm run cucumber:split-config
       - uses: actions/upload-artifact@v2
         with:
