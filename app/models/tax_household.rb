@@ -43,9 +43,22 @@ class TaxHousehold
   end
 
   def eligibile_csr_kind(family_member_ids)
+    # send shopping family members ids as input
     thh_members = tax_household_members.where(:applicant_id.in => family_member_ids)
-    thh_m_eligibility_kind = thh_members&.pluck(:csr_eligibility_kind)&.uniq
-    (thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kind.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kind)
+    thhm_appid_csr_hash = thh_members.inject({}) do |result, thhm|
+      result[thhm.applicant_id] = thhm.csr_eligibility_kind
+      result
+    end
+
+    if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+      thh_members.map(&:family_member).each do |family_member|
+        thhm_appid_csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member
+      end
+      family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
+      thh_members = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
+    end
+    thh_m_eligibility_kinds = thhm_appid_csr_hash.values.uniq
+    (thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kinds)
   end
 
   def eligible_csr_percent_as_integer(family_member_ids)
@@ -56,7 +69,7 @@ class TaxHousehold
   def fetch_csr_percent(csr_kind)
     {
       "csr_0" => 0,
-      "csr_limited" => -1,
+      "csr_limited" => 'limited',
       'csr_100' => 100,
       "csr_94" => 94,
       "csr_87" => 87,
@@ -73,10 +86,8 @@ class TaxHousehold
   end
 
   def valid_csr_kind(hbx_enrollment)
-    csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
-    ia_eligible = tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible)
-    ia_eligible.empty? || ia_eligible.include?(false) ? 'csr_0' : csr_kind
+    eligibile_csr_kind(shopping_family_member_ids)
   end
 
   def current_csr_percent
@@ -340,4 +351,3 @@ class TaxHousehold
     ::BenefitMarkets::Products::ProductFactory
   end
 end
-

@@ -1,0 +1,58 @@
+name: cucumber runner
+on:
+  # push:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 6 * * *'
+
+jobs:
+  cucumber:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 5672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '3.6'
+      - name: Restore project gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: run webpack
+        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: Run tests
+        run: bundle exec cucumber features/admin/new_plan_year.feature features/admin/paper_phone.feature features/admin/reset_password.feature features/admin/search_broker_agency.feature features/brokers/broker_manages_employee_account.feature features/brokers/employer_hires_broker.feature features/brokers/employer_terminates_and_hires_new_broker.feature features/cover_all/transition_family_member.feature features/financial_assistance/destroy_applicant.feature features/financial_assistance/job_income.feature features/financial_assistance/other_questions_page.feature features/financial_assistance/review_applications.feature features/general_agencies/ga_registration.feature features/general_agencies/update_general_agency_profile.feature features/insured/individual_with_existing_sep.feature features/permissions/extend_open_enrollment_cancelled.feature features/permissions/send_secure_message.feature features/employers/benefit_applications/create_off_cycle_benefit_application.feature --format json --out ci/cucumber/custom-cucumber-report.json -r features -q --tags 'not @wip and not @broken and not @flaky and not @ma_only'
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: custom-cucumber-report
+          path: ci/cucumber/custom-cucumber-report.json

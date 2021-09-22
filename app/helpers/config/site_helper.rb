@@ -331,10 +331,6 @@ module Config
     def tobacco_user_field_enabled?
       EnrollRegistry.feature_enabled?(:tobacco_user_field)
     end
-
-    def disable_form_phone_and_paper_dropdown?
-      EnrollRegistry.feature_enabled?(:disable_form_phone_and_paper_dropdown)
-    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

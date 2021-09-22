@@ -15,7 +15,7 @@
           </div>
           <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 form-group form-group-lg no-pd">
             <%= f.fields_for :family do |f| %>
-              <% if @person.primary_family.e_case_id.present? && !(@person.primary_family.e_case_id.include? "curam_landing") %>
+              <% if @consumer_role.person.primary_family.e_case_id.present? && !(@consumer_role.person.primary_family.e_case_id.include? "curam_landing") %>
                 <%= f.select(:application_type, options_for_select(["Curam"], selected: "Curam"), required: true, id:'application_type_id' ) %>
               <% elsif pundit_allow(ConsumerRole, :can_view_application_types?) %>
                   <% application_type_options = ["Phone", "Paper", "Curam", "Mobile"].tap do |options_array|

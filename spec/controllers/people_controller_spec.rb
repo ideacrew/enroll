@@ -140,5 +140,45 @@ RSpec.describe PeopleController, dbclean: :after_each do
         expect(flash[:notice]).to eq 'Person was successfully updated.'
       end
     end
+
+    context "dependent lives with primary member" do
+      let(:dependent) { FactoryBot.create(:person) }
+      let(:address) { FactoryBot.create(:address, kind: "home", address_1: "address1_a", address_2: "", city: "city1", state: "DC", zip: "22211", person: dependent) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:family_member) { FactoryBot.create(:family_member, family: family, person: dependent) }
+      let(:addresses_attributes2) do
+        {
+          "0" => { "kind" => "home",
+                   "address_1" => "address1_changed",
+                   "address_2" => "",
+                   "city" => "city1",
+                   "state" => "DC",
+                   "zip" => "22211",
+                   "id" => person.addresses[0].id.to_s },
+          "1" => { "kind" => "mailing",
+                   "address_1" => "address1_b",
+                   "address_2" => "",
+                   "city" => "city1",
+                   "state" => "DC",
+                   "zip" => "22211",
+                   "id" => person.addresses[1].id.to_s }
+        }
+      end
+
+      before do
+        family.save
+        family_member.save
+        person.primary_family.reload
+
+        person_attributes[:addresses_attributes] = addresses_attributes2
+        post :update, params: {id: person.id, person: person_attributes}
+      end
+
+      it "when primary address is updated" do
+        primary_address = person.addresses.select{|address| address.kind == 'home'}.first
+        dependent_address = person.primary_family.family_members.reject(&:is_primary_applicant?).first.person.addresses.first
+        expect(primary_address.same_address?(dependent_address)).to eq true
+      end
+    end
   end
 end

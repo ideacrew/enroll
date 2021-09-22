@@ -10,6 +10,7 @@
 
 class Family
   require 'autoinc'
+  require "#{Rails.root}/app/models/concerns/crm_gateway/family_concern.rb"
 
   include Mongoid::Document
   include SetCurrentUser
@@ -19,6 +20,7 @@ class Family
   include Mongoid::Autoinc
   include DocumentsVerificationStatus
   include RemoveFamilyMember
+  include CrmGateway::FamilyConcern
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 

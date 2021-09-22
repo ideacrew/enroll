@@ -17,6 +17,7 @@ class Person
   include ::BenefitSponsors::Concerns::Observable
   include SponsoredBenefits::Concerns::Dob
   include LegacyVersioningRecords
+  include CrmGateway::PersonConcern
 
   # verification history tracking
   include Mongoid::History::Trackable

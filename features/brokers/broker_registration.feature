@@ -26,7 +26,7 @@ Feature: Broker Agency Registration
     Then Primary Broker should see the create account page
     When Primary Broker registers with valid information
     Then they should see a welcome message
-    And Primary Broker logs out
+    
 
   @broken
   Scenario: When the broker is hired as a census employee and registration is complete through employee role

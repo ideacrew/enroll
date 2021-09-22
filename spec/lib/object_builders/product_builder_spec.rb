@@ -28,7 +28,7 @@ describe "qhp builder" do
       allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'single'))
     end
 
-    it "should have 1 existing product" do
+    xit "should have 1 existing product" do
       expect(BenefitMarkets::Products::Product.all.count).to eq 1
     end
 
@@ -46,7 +46,7 @@ describe "qhp builder" do
         product.run
       end
 
-      it "should load/update 2 aca_shop products from file" do
+      xit "should load/update 2 aca_shop products from file" do
         expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
       end
 
@@ -62,7 +62,7 @@ describe "qhp builder" do
         expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product.hios_id).count).to eq 1
       end
 
-      it "should have all qhp_cost_share_variances for all the products" do
+      xit "should have all qhp_cost_share_variances for all the products" do
         BenefitMarkets::Products::Product.all.each do |product|
           expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
         end

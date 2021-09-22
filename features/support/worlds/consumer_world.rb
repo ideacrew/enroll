@@ -159,10 +159,10 @@ end
 
 World(ConsumerWorld)
 
-And(/(.*) has active individual market role and verified identity and IVL enrollment$/) do |named_person|
-  # Using Kaiser as a specific case for pay_now
+And(/(.*) has active individual market role and verified identity and IVL (.*) enrollment$/) do |named_person, issuer|
+  # Using Kaiser as a specific case for DC pay_now
   consumer_with_verified_identity(named_person)
-  create_consumer_ivl_enrollment(named_person, 'Kaiser')
+  create_consumer_ivl_enrollment(named_person, issuer)
 end
 
 And(/(.*) has HBX enrollment with future effective on date$/) do |named_person|

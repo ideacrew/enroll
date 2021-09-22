@@ -674,10 +674,6 @@ module ApplicationHelper
     end
   end
 
-  def ivl_metal_network(plan)
-    (plan.nationwide ? 'nationwide' : EnrollRegistry[:enroll_app].setting(:statewide_area).item) if plan.benefit_market_kind == :aca_individual
-  end
-
   def ivl_hsa_status(plan_hsa_status, plan)
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
@@ -686,14 +682,6 @@ module ApplicationHelper
     return 0 unless products
 
     products.count
-  end
-
-  def network_type(product)
-    if product.nationwide
-      'Nationwide'
-    elsif product.in_state_network
-      EnrollRegistry[:enroll_app].setting(:statewide_area).item
-    end
   end
 
   def make_binder_checkbox_disabled(employer)

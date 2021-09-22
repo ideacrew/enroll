@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # IAP application controller
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
@@ -52,6 +53,7 @@ module FinancialAssistance
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
+              @application.rt_transfer if @application.is_rt_transferrable?
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
@@ -199,6 +201,20 @@ module FinancialAssistance
           FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
         ), :disposition => "inline", :type => "application/pdf"
       )
+    end
+
+    def update_transfer_requested
+      @application = Application.find(params[:id])
+      @button_sent_text = l10n("faa.sent_to_external_verification")
+
+      respond_to do |format|
+        if @application.update_attributes(transfer_requested: true)
+          format.js
+        else
+          # TODO: respond with HTML on failure???
+          format.html
+        end
+      end
     end
 
     private

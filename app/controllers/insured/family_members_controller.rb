@@ -6,30 +6,47 @@ class Insured::FamilyMembersController < ApplicationController
   include ::L10nHelper
 
   before_action :dependent_person_params, only: [:create, :update]
-  before_action :set_current_person, :set_family
-  before_action :set_dependent, only: [:destroy, :show, :edit, :update]
+  before_action :set_current_person
+  before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
   def index
     set_bookmark_url
     set_admin_bookmark_url(insured_family_members_path)
-    @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
-
+    # There was an error where choosing a shop sep would eventually bring them to a @type == 'consumer'
+    @type = if params[:qle_id].present?
+              market_kind = QualifyingLifeEventKind.find(params[:qle_id]).market_kind
+              market_kind == 'individual' ? 'consumer' : 'employee'
+            elsif params[:employee_role_id].present? && params[:employee_role_id] != 'None'
+              "employee"
+            else
+              "consumer"
+            end
     if params[:resident_role_id].present? && params[:resident_role_id]
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
-      @family.hire_broker_agency(current_user.person.broker_role.try(:id))
-      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id],
+      @family = @resident_role.person.primary_family
+      # Why are we passing current_user? Isn't it supposed to be the actual family this is on
+      broker_role_id = @resident_role.person.broker_role.try(:id)
+      @family.hire_broker_agency(broker_role_id)
+      redirect_to resident_index_insured_family_members_path(:resident_role_id => @resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id],
                                                              :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
     end
 
     if @type == "employee"
-      emp_role_id = params.require(:employee_role_id)
-      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+      emp_role_id = params[:employee_role_id].present? ? params.require(:employee_role_id) : nil
+      @employee_role = if emp_role_id.present?
+                         @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+                       else
+                         @person.employee_roles.detect { |emp_role| emp_role.is_active == true }
+                       end
+      @family = @person.primary_family
     elsif @type == "consumer"
       @consumer_role = @person.consumer_role
-      @family.hire_broker_agency(current_user.person.broker_role.try(:id))
+      @family = @consumer_role.person.primary_family
+      broker_role_id = @consumer_role.person.broker_role.try(:id)
+      @family.hire_broker_agency(broker_role_id)
     end
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
@@ -73,7 +90,8 @@ class Insured::FamilyMembersController < ApplicationController
   def create
     @dependent = ::Forms::FamilyMember.new(params[:dependent])
     @address_errors = validate_address_params(params)
-    if Family.find(@dependent.family_id).primary_applicant.person.resident_role?
+    @family = Family.find(@dependent.family_id)
+    if @family.primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
         @created = true
         respond_to do |format|
@@ -112,13 +130,11 @@ class Insured::FamilyMembersController < ApplicationController
 
   def destroy
     @dependent.destroy!
-    if @family.present?
-      active_family_members_count = @family.active_family_members&.count
-      household = @family.active_household
-      immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
-      extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
-      Rails.logger.info("In FamilyMembersController Destroy action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
-    end
+    active_family_members_count = @family.active_family_members&.count
+    household = @family.active_household
+    immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
+    extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
+    Rails.logger.info("In FamilyMembersController Destroy action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
     respond_to do |format|
       format.html { render 'index' }
       format.js { render 'destroyed' }
@@ -163,13 +179,11 @@ class Insured::FamilyMembersController < ApplicationController
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
-      if @family.present?
-        active_family_members_count = @family.active_family_members.count
-        household = @family.active_household
-        immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
-        extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
-        Rails.logger.info("In FamilyMembersController Update action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
-      end
+      active_family_members_count = @family.active_family_members.count
+      household = @family.active_household
+      immediate_household_members_count = household&.immediate_family_coverage_household&.coverage_household_members&.count
+      extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
+      Rails.logger.info("In FamilyMembersController Update action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role&.check_for_critical_changes(
         @dependent.family_member.family,
@@ -201,12 +215,14 @@ class Insured::FamilyMembersController < ApplicationController
   def resident_index
     set_bookmark_url
     set_admin_bookmark_url(resident_index_insured_family_members_path)
-    @resident_role = @person.resident_role
+    @resident_role = ResidentRole.find(params[:resident_role_id])
+    @family = @resident_role.person.primary_family
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
+      # TODO: How do we know @family is getting set here
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       @effective_on_date = special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
@@ -255,10 +271,6 @@ class Insured::FamilyMembersController < ApplicationController
     params.permit(:dependent => {})
   end
 
-  def set_family
-    @family = @person.try(:primary_family)
-  end
-
   def init_address_for_dependent
     if @dependent.same_with_primary == "true"
       @dependent.addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
@@ -289,12 +301,14 @@ class Insured::FamilyMembersController < ApplicationController
   def duplicate_sep(sep)
     sp = SpecialEnrollmentPeriod.new(sep.attributes.except("effective_on", "submitted_at", "_id"))
     sp.qualifying_life_event_kind = sep.qualifying_life_event_kind    # initiate sep dates
+    # TODO: Gotta make sure this is being set properly
     @family.special_enrollment_periods << sp
     sp.save
     sp
   end
 
-  def set_dependent
+  def set_dependent_and_family
     @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    @family = Family.find(@dependent.family_id)
   end
 end

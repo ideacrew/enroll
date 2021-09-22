@@ -340,8 +340,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.set_assistance_year' do
     let(:family_id)       { BSON::ObjectId.new }
-    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+    let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
+      application.update_attributes!(assistance_year: nil)
       application.send(:set_assistance_year)
       expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
@@ -898,17 +899,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  context 'check_for_valid_predecessor' do
-    context 'invalid predecessor_id' do
-      it 'should return validation errors' do
-        expect do
-          application.update_attributes!({ predecessor_id: BSON::ObjectId.new })
-        end.to raise_error(Mongoid::Errors::Validations,
-                           /Predecessor expected an instance of FinancialAssistance::Application./)
-      end
-    end
-  end
-
   context 'advance_day' do
     let(:event) { Success(double) }
     let(:obj)  { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
@@ -1209,6 +1199,55 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           ).to eq('brother_or_sister_in_law')
         end
       end
+
+      context 'applicant13 is sibling to primary' do
+        before do
+          application10.ensure_relationship_with_primary(applicant12, 'spouse')
+          application10.add_or_update_relationships(applicant13, applicant12, 'sibling')
+          application10.build_relationship_matrix
+        end
+
+        it 'should populate all the relationships' do
+          expect(application10.reload.relationships_complete?).to be_truthy
+        end
+
+        it 'should create a relationship i.e., applicant11 is brother_or_sister_in_law to applicant13' do
+          expect(
+            application10.relationships.where(applicant_id: applicant11.id, relative_id: applicant13.id).first.kind
+          ).to eq('brother_or_sister_in_law')
+        end
+
+        it 'should create a relationship i.e., applicant13 is brother_or_sister_in_law to applicant11' do
+          expect(
+            application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant11.id).first.kind
+          ).to eq('brother_or_sister_in_law')
+        end
+      end
     end
+
+    context 'with valid case for CousinLaw' do
+      before do
+        application10.ensure_relationship_with_primary(applicant12, 'aunt_or_uncle')
+        application10.add_or_update_relationships(applicant12, applicant13, 'parent')
+        application10.build_relationship_matrix
+      end
+
+      it 'should populate all the relationships' do
+        expect(application10.relationships_complete?).to be_truthy
+      end
+
+      it 'should create a relationship i.e., applicant11 is cousin to applicant13' do
+        expect(
+          application10.relationships.where(applicant_id: applicant11.id, relative_id: applicant13.id).first.kind
+        ).to eq('cousin')
+      end
+
+      it 'should create a relationship i.e., applicant13 is cousin to applicant11' do
+        expect(
+          application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant11.id).first.kind
+        ).to eq('cousin')
+      end
+    end
+
   end
 end

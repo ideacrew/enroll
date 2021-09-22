@@ -49,6 +49,7 @@ module FinancialAssistance
         def create_renewal_draft_application(application, validated_params)
           service = ::FinancialAssistance::Services::ApplicationService.new(application_id: application.id)
           draft_app = service.copy!
+          draft_app.save!
           attach_additional_data(draft_app, application, validated_params)
           Success(draft_app)
         rescue StandardError => e

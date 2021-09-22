@@ -90,7 +90,7 @@ Rails.application.configure do
 #  config.acapi.add_async_subscription(Subscribers::DateChange)
   config.acapi.publish_amqp_events = true
   config.acapi.app_id = "enroll"
-  config.acapi.remote_broker_uri = "amqp://#{ENV['RABBITMQ_USERNAME']}:#{ENV['RABBITMQ_PASSWORD']}@#{ENV['RABBITMQ__HOST']}:#{ENV['RABBITMQ__PORT']}"
+  config.acapi.remote_broker_uri = ENV['RABBITMQ_URL']
   config.acapi.remote_request_exchange = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.e.fanout.requests"
   config.acapi.remote_event_queue = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.q.application.enroll.inbound_events"
   config.action_mailer.default_url_options = { :host => (ENV['ENROLL_FQDN']).to_s }

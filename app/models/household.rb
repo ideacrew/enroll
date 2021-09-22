@@ -34,14 +34,14 @@ class Household
   # after_build :build_irs_group
 
   def active_hbx_enrollments
-    actives = hbx_enrollments.collect() do |list, enrollment|
+    actives = []
+    hbx_enrollments.each do |enrollment|
       if enrollment.plan.present? &&
          (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
          (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
 
-        list << enrollment
+        actives << enrollment
       end
-      list
     end
     actives.sort! { |a,b| a.submitted_at <=> b.submitted_at }
   end
@@ -252,7 +252,7 @@ class Household
 
   def irs_group
     return @irs_group if defined? @irs_group
-    @irs_group = parent.irs_groups.find(self.irs_group_id)
+    @irs_group = parent.irs_groups.where(self.irs_group_id).first
   end
 
   def is_active?
@@ -308,7 +308,7 @@ class Household
     tax_households.tax_household_with_year(year).active_tax_household
   end
 
-  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source)
+  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source, individual_csr = {}) # rubocop:disable Metrics/ParameterLists
     th = tax_households.build(
         allocated_aptc: 0.0,
         effective_starting_on: Date.new(date.year, date.month, date.day),
@@ -320,20 +320,8 @@ class Household
         family_member: family.primary_family_member,
         is_subscriber: true,
         is_ia_eligible: true,
-        csr_percent_as_integer: csr
+        csr_percent_as_integer: (csr == 'limited' ? '-1' : csr)
     )
-
-    deter = th.eligibility_determinations.build(
-      source: source,
-        benchmark_plan_id: slcsp,
-        max_aptc: max_aptc.to_f,
-        csr_percent_as_integer: (csr == 'limited' ? '-1' : csr),
-        determined_at: Date.today
-    )
-
-    deter.save!
-
-    end_multiple_thh
 
     th.save!
 
@@ -342,9 +330,34 @@ class Household
       ath.tax_household_members.build(
           family_member: fm,
           is_subscriber: false,
-          is_ia_eligible: true
+          is_ia_eligible: true,
+          csr_percent_as_integer: (csr == 'limited' ? '-1' : csr)
       )
       ath.save!
+    end
+
+    individual_member_csr_update(individual_csr, th) if individual_csr.present?
+
+    deter = th.eligibility_determinations.build(source: source,
+                                                benchmark_plan_id: slcsp,
+                                                max_aptc: max_aptc.to_f,
+                                                determined_at: Date.today)
+    deter.save!
+
+    end_multiple_thh
+  end
+
+  def individual_member_csr_update(individual_csr, thh)
+    individual_csr.gsub!("'", "\"")
+    csr_hash = JSON.parse(individual_csr)
+    csr_hash.each_key do |hbx_id|
+      person = Person.where(hbx_id: hbx_id).first
+      next unless person.present?
+      person_fm = self.family.family_members.active.where(person_id: person.id).first
+      next unless person_fm.present?
+      person_fm_id = person_fm.id
+      person_thhm = thh.tax_household_members.where(applicant_id: person_fm_id).first
+      person_thhm.update_attributes!(csr_percent_as_integer: csr_hash[:hbx_id].to_i) if person_thhm.present?
     end
   end
 

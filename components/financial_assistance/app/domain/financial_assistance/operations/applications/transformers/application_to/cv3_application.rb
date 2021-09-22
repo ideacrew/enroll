@@ -28,16 +28,18 @@ module FinancialAssistance
               'grandparent' => :grandparent,
               'father_or_mother_in_law' => :mother_in_law_or_father_in_law,
               'daughter_or_son_in_law' => :son_in_law_or_daughter_in_law,
-              'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law
+              'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law,
+              'cousin' => :first_cousin
             }.freeze
 
             # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
             # @option opts [::FinancialAssistance::Application] :application
             # @return [Dry::Monads::Result]
             def call(application)
-              application = yield validate(application)
-              notice_options = yield notice_options_for_app(application)
-              request_payload = yield construct_payload(application, notice_options)
+              application     = yield validate(application)
+              notice_options  = yield notice_options_for_app(application)
+              oe_start_on     = yield fetch_oe_start_on(application)
+              request_payload = yield construct_payload(application, notice_options, oe_start_on)
 
               Success(request_payload)
             end
@@ -54,7 +56,12 @@ module FinancialAssistance
               Success({ send_eligibility_notices: !renewal_app, send_open_enrollment_notices: renewal_app })
             end
 
-            def construct_payload(application, notice_options)
+            def fetch_oe_start_on(application)
+              return Failure('Application does not have effective date') unless application.effective_date.present?
+              ::Operations::Individual::OpenEnrollmentStartOn.new.call({date: application.effective_date.to_date})
+            end
+
+            def construct_payload(application, notice_options, oe_start_on)
               payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
                          assistance_year: application.assistance_year,
                          aptc_effective_date: application.effective_date,
@@ -67,7 +74,7 @@ module FinancialAssistance
                          tax_households: tax_households(application),
                          us_state: application.us_state,
                          hbx_id: application.hbx_id,
-                         oe_start_on: Date.new((application.effective_date.year - 1), 11, 1),
+                         oe_start_on: oe_start_on,
                          notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}

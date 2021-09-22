@@ -31,6 +31,14 @@ class BrokerEmployersPage
     '.col-string.col-actions li:nth-child(5)'
   end
 
+  def self.select_general_agency_dropdown
+    '#general_agency_profile_id'
+  end
+
+  def self.submit_btn
+    'input[type="submit"]'
+  end
+
   def self.all_tab
     'div[id="Tab:all"]'
   end

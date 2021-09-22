@@ -76,9 +76,10 @@ class ProductBuilder
   end
 
   def build_product_attributes(benefit_market_kind = nil)
+    plan_marketing_name = @cost_share_variance.plan_marketing_name.squish!
     shared_attributes = {
       benefit_market_kind: benefit_market_kind || "aca_#{parse_market}",
-      title: @cost_share_variance.plan_marketing_name.squish!,
+      title: plan_marketing_name,
       issuer_profile_id: get_issuer_profile_id,
       hios_id: is_health_product? ? @cost_share_variance.hios_plan_and_variant_id : @hios_base_id,
       hios_base_id: @hios_base_id,
@@ -93,11 +94,17 @@ class ProductBuilder
 
     # Dont import for DC as it comes from master excel
     if EnrollRegistry.feature_enabled?(:import_network_data)
-      nationwide, dc_in_network = @qhp.national_network.downcase.strip == "yes" ? ["true", "false"] : ["false", "true"]
+      nationwide, in_state_network = @qhp.national_network.downcase.strip == "yes" ? ["true", "false"] : ["false", "true"]
 
       shared_attributes.merge!(
         nationwide: nationwide,
-        dc_in_network: dc_in_network
+        dc_in_network: in_state_network
+      )
+    end
+
+    if EnrollRegistry.feature_enabled?(:import_standard_plan)
+      shared_attributes.merge!(
+        is_standard_plan: ['Clear Choice', 'CC'].select { |a| plan_marketing_name.include?(a) }.present?
       )
     end
 

@@ -275,4 +275,28 @@ describe 'user permission' do
       expect(subject.change_enrollment_end_date?).to be_truthy
     end
   end
+
+  context 'change_enrollment_end_date?' do
+    let(:permission) { instance_double(Permission, :can_view_username_and_email => true) }
+    it 'should return true' do
+      expect(subject.can_view_username_and_email?).to be_truthy
+    end
+
+    context 'when person is not linked to user' do
+      let(:permission) { instance_double(Permission, :can_view_username_and_email => true) }
+      let(:user) { instance_double(User, :person => nil) }
+
+      it 'should return false' do
+        expect(subject.can_view_username_and_email?).to be_falsey
+      end
+    end
+
+    context 'when hbx_staff role is nil' do
+      let(:permission) { instance_double(Permission, :can_view_username_and_email => true) }
+      let(:permissioned_person) { instance_double(Person, :id => double, :hbx_staff_role => nil, csr_role: nil) }
+      it 'should return false' do
+        expect(subject.can_view_username_and_email?).to be_falsey
+      end
+    end
+  end
 end

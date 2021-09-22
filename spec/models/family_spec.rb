@@ -1428,6 +1428,46 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       expect(enrollment.coverage_selected?).to be_truthy
     end
   end
+
+  context "CRM update" do
+    let(:test_person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let(:test_family) do
+      FactoryBot.create(
+        :family,
+        :with_family_members,
+        people: [test_person, dependent_person_2],
+        person: test_person
+      )
+    end
+    let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:dependent_person_2) { FactoryBot.create(:person, :with_consumer_role) }
+    before do
+      test_person.person_relationships << PersonRelationship.new(relative: test_person, kind: "self")
+      test_person.person_relationships.build(relative: dependent_person, kind: "spouse")
+      test_person.person_relationships.build(relative: dependent_person_2, kind: "child")
+      person.save!
+      family.save!
+
+      test_person&.consumer_role&.ridp_documents&.first&.update_attributes(uploaded_at: TimeKeeper.date_of_record)
+      family.family_members.each do |fm|
+        # Delete phones with extensions due to factory
+        fm.person.phones.destroy_all
+        fm.person.phones << Phone.new(
+          kind: 'home', country_code: '',
+          area_code: '202', number: '1030404',
+          extension: '', primary: nil,
+          full_phone_number: '2021030404'
+        )
+      end
+      # keeps the spec less complicated
+      test_family.irs_groups.destroy_all
+      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should publish to CRM on save" do
+      expect(test_family.send(:trigger_crm_family_update_publish).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+    end
+  end
 end
 
 describe Family, "#check_dep_consumer_role", dbclean: :after_each do

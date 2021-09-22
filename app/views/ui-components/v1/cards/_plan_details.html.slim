@@ -10,7 +10,7 @@
         .col-md-12
           span style="color:green"
             i.fas.fa-bookmark.mr-1 data-toggle="tooltip" data-placement="top" data-container="body" title="#{l10n('insured.plan_shoppings.standard_plan_title_info')}"
-            = l10n("standard_plan").to_s.upcase
+            = plan.standard_plan_label
     .row.mt-1
       - if @enrolled_hbx_enrollment_plan_ids.include?(plan.id)
         link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous"
