@@ -36,8 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
-      - name: Cache Gems
-        uses: actions/cache@v2
+      - uses: actions/cache@v2
         with:
           path: vendor/bundle
           key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -184,7 +183,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        group: [1, 2, 3, 4, 5]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -235,9 +235,7 @@ jobs:
       - name: test engine
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/benefit_sponsors-split-config.json'
-          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '${{ github.workspace }}/components/benefit_sponsors/**/*_spec.rb'
         run: |
-          echo 
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
