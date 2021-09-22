@@ -130,6 +130,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
           allow(view).to receive(:individual?).and_return(true)
           allow(view).to receive(:past_effective_on?).and_return(true)
+          allow(view).to receive(:can_pay_now?).and_return(true)
           allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
           render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         end
@@ -138,7 +139,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           expect(rendered).to have_content('Individual & Family')
           expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
           expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
-          expect(rendered).to have_content('Make Payments') if EnrollRegistry[:carefirst_pay_now].enabled?
+          expect(rendered).to have_content('Make a first payment') if EnrollRegistry[:carefirst_pay_now].enabled?
         end
       end
     end
