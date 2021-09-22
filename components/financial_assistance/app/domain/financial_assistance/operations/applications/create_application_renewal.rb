@@ -65,6 +65,7 @@ module FinancialAssistance
           application
         end
 
+        # rubocop:disable Style/MultilineBlockChain
         def create_renewal_draft_application(application, validated_params)
           # Directly using Application Factory instead of ApplicationService as
           # ApplicationService is quering for latest submitted application(submitted_at) and
@@ -72,7 +73,7 @@ module FinancialAssistance
           # In our context we want to create new application from the existing application
           # that is sent from this Operation.
           Try() do
-            ::FinancialAssistance::Factories::ApplicationFactory.new(old_app).copy_application
+            ::FinancialAssistance::Factories::ApplicationFactory.new(application).copy_application
           end.bind do |renewal_application|
             years_to_renew = calculate_years_to_renew(application)
 
@@ -89,6 +90,7 @@ module FinancialAssistance
             Success(renewal_application)
           end.to_result
         end
+        # rubocop:enable Style/MultilineBlockChain
 
         # Deduct one year from years_to_renew as this is a renewal application(application for prospective year)
         def calculate_years_to_renew(application)

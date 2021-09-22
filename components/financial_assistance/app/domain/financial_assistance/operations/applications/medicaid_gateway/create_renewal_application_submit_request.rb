@@ -27,6 +27,7 @@ module FinancialAssistance
             Success(applications)
           end
 
+          # rubocop:disable Style/MultilineBlockChain
           def generate_requests(renewal_year, applications)
             @logger.info "Total number of renewal_draft applications with assistance_year: #{renewal_year.pred} are #{applications.count}"
 
@@ -42,6 +43,7 @@ module FinancialAssistance
                 end
               end
             end
+            # rubocop:enable Style/MultilineBlockChain
 
             Success(applications)
           end
