@@ -224,7 +224,6 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
     let!(:person11) do
       FactoryBot.create(:person,
                         :with_consumer_role,
-                        :with_active_consumer_role,
                         :with_ssn,
                         first_name: 'Person11')
     end
@@ -245,7 +244,6 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
     let!(:person11) do
       FactoryBot.create(:person,
                         :with_consumer_role,
-                        :with_active_consumer_role,
                         :with_ssn,
                         first_name: 'Person11')
     end
@@ -300,6 +298,38 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
       it 'should return applicant that matches with the person_hbx_id' do
         expect(@applicant_result.person_hbx_id).to eq(applicant.person_hbx_id)
+      end
+    end
+  end
+
+  describe 'relationship' do
+    context 'multiple family members' do
+      let!(:person11) do
+        FactoryBot.create(:person,
+                          :with_consumer_role,
+                          :with_ssn,
+                          hbx_id: '1000001',
+                          first_name: 'Primary')
+      end
+      let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+      let!(:person12) do
+        per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Dependent', hbx_id: '1000002')
+        person11.ensure_relationship_with(per, 'child')
+        per
+      end
+      let!(:family_member12) do
+        FactoryBot.create(:family_member, family: family11, person: person12)
+      end
+
+      before do
+        application.update_attributes!(family_id: family11.id)
+        applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+        applicant2.destroy!
+        @new_application = described_class.new(application).copy_application
+      end
+
+      it 'should return relationships' do
+        expect(@new_application.relationships.count).to eq(2)
       end
     end
   end

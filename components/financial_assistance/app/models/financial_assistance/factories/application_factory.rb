@@ -99,12 +99,18 @@ module FinancialAssistance
           if applicant_in_context.present?
             applicant_in_context.first.update_attributes(is_active: true)
           else
-            applicant_params = members_attributes.detect { |member_attributes| member_attributes[:family_member_id] == fm_id }
+            member_params = members_attributes.detect { |member_attributes| member_attributes[:family_member_id] == fm_id }
+            applicant_params = member_params.except(:relationship)
             applicant = application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id]).first
             if applicant.present?
               applicant.update_attributes!(applicant_params)
             else
-              applicants.create!(applicant_params)
+              applicant = applicants.create!(applicant_params)
+            end
+            # Have to update relationship separately because the applicant should already be persisted before doing this.
+            if member_params[:relationship].present? && member_params[:relationship] != 'self'
+              applicant.relationship = member_params[:relationship]
+              applicant.save!
             end
           end
         end
