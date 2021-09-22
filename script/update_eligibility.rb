@@ -71,7 +71,7 @@ def check_and_run
         csr_hash = JSON.parse(individual_csr)
         csr_hash.keys.each do |person_hbx_id|
           person = Person.where(hbx_id: person_hbx_id).first # what happens when there is no person record or multiple person with same hbx_id
-          csr_int = csr_hash[:person_hbx_id]
+          csr_int = csr_hash[person_hbx_id]
           csr_int = (csr_int == 'limited' ? '-1' : csr_int)
           person_fm = primary_family.family_members.active.where(person_id: person.id) if person.present?
           unless person_fm.empty?
