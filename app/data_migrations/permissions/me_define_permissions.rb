@@ -14,7 +14,7 @@ class MeDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true, can_add_sep: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true, manage_agency_staff: false,
-                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: true, can_view_username_and_email: true,
+                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
                           can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true, can_reset_password: true,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true,
                           can_access_identity_verification_sub_tab: false, can_access_accept_reject_identity_documents: false, view_agency_staff: false,
@@ -27,7 +27,7 @@ class MeDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_send_secure_message: true, can_add_sep: true,
                           send_broker_agency_message: true, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true, can_access_pay_now: false,
-                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: true, can_view_username_and_email: true,
+                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
                           can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true, can_reset_password: true,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false, can_view_sep_history: true,
@@ -37,7 +37,7 @@ class MeDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_access_pay_now: false,
                           send_broker_agency_message: true, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true,
-                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: true, can_view_username_and_email: true,
+                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
                           can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true, can_reset_password: true,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false,
@@ -238,9 +238,6 @@ class MeDefinePermissions < MigrationTask
   def hbx_admin_can_add_pdc
     Permission.hbx_staff.update_attributes!(can_add_pdc: true)
     Permission.super_admin.update_attributes!(can_add_pdc: true)
-    Permission.hbx_csr_supervisor.update_attributes!(can_add_pdc: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_add_pdc: true)
-    Permission.hbx_csr_tier1.update_attributes!(can_add_pdc: true)
     Permission.hbx_tier3.update_attributes!(can_add_pdc: true)
   end
 
