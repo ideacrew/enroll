@@ -42,7 +42,7 @@ module Insured
 
       def carrier_link(product)
         legal_name = product.issuer_profile.legal_name
-        (link_to l10n("plans.kaiser.pay_now.first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
+        (link_to l10n("plans.issuer.pay_now.first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
       end
 
       def individual?(hbx_enrollment)
@@ -76,6 +76,11 @@ module Insured
       def carrier_paynow_enabled(issuer)
         issuer = issuer.downcase&.gsub(' ', '_')
         issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
+      end
+
+      def carrier_long_name(issuer)
+        issuer_key = issuer.downcase&.gsub(' ', '_')
+        carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
       end
 
       def pay_now_url(issuer_name)

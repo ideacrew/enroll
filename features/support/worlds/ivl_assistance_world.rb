@@ -130,6 +130,8 @@ module IvlAssistanceWorld
   def create_enrollment_for_family(family, carrier_name = nil)
     if carrier_name == 'Kaiser'
       enrollment_product = create_kaiser_product
+    elsif carrier_name == 'Anthm'
+      enrollment_product = create_anthm_product
     else
       enrollment_product = create_cat_product
     end
