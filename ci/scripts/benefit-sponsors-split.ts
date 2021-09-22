@@ -10,7 +10,6 @@ import {
   createFilesWithRuntime,
   splitFilesIntoGroups,
 } from './util';
-import { runtimeDetails } from './util/numberOfGroups';
 
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
@@ -19,6 +18,13 @@ async function createSplitConfig(): Promise<void> {
     './ci/rspec/components-benefit_sponsors-rspec-report.json',
     'utf-8'
   );
+
+  const [manualGroupCountInput] = process.argv.slice(2);
+
+  const groupCount: number | undefined =
+    manualGroupCountInput !== undefined
+      ? parseInt(manualGroupCountInput, 10)
+      : undefined;
 
   const { examples } = JSON.parse(report);
 
@@ -41,12 +47,10 @@ async function createSplitConfig(): Promise<void> {
     return fileWithRuntime;
   });
 
-  const { suggestedGroupCount } = runtimeDetails(shortenedPaths);
-
   console.log('Creating split config');
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     shortenedPaths,
-    suggestedGroupCount
+    groupCount
   );
 
   try {
