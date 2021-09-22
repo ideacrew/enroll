@@ -100,6 +100,31 @@ module Services
       ::Operations::Notices::IvlEnrNoticeTrigger.new.call(enrollment: enrollment) unless Rails.env.test?
     end
 
+    def trigger_reminder_notices(family, event_name)
+      return unless event_name.present?
+
+      if EnrollRegistry[:legacy_enrollment_trigger].enabled?
+        person = family.primary_person
+        IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name)
+        @logger.info "Sent #{event_name} to #{person.hbx_id}" unless Rails.env.test?
+      else
+        ::Operations::Notices::IvlDocumentReminderNoticeTrigger.new.call(family: family, event_name: event_name) unless Rails.env.test?
+      end
+    end
+
+    def event_name(family, date)
+      case (family.best_verification_due_date.to_date.mjd - date.mjd)
+      when 85
+        "first_verifications_reminder"
+      when 70
+        "second_verifications_reminder"
+      when 45
+        "third_verifications_reminder"
+      when 30
+        "fourth_verifications_reminder"
+      end
+    end
+
     def send_reminder_notices_for_ivl(date)
       families = Family.outstanding_verification_datatable
       return if families.blank?
@@ -113,23 +138,11 @@ module Services
           consumer_role = family.primary_applicant.person.consumer_role
           person = family.primary_applicant.person
           if consumer_role.present? && family.best_verification_due_date.present? && (family.best_verification_due_date > date)
-            case (family.best_verification_due_date.to_date.mjd - date.mjd)
-            when 85
-              IvlNoticesNotifierJob.perform_later(person.id.to_s, "first_verifications_reminder")
-              @logger.info "Sent first_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
-            when 70
-              IvlNoticesNotifierJob.perform_later(person.id.to_s, "second_verifications_reminder")
-              @logger.info "Sent second_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
-            when 45
-              IvlNoticesNotifierJob.perform_later(person.id.to_s, "third_verifications_reminder")
-              @logger.info "Sent third_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
-            when 30
-              IvlNoticesNotifierJob.perform_later(person.id.to_s, "fourth_verifications_reminder")
-              @logger.info "Sent fourth_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
-            end
+            event_name = event_name(family, date)
+            trigger_reminder_notices(family, event_name)
           end
         rescue StandardError => e
-          @logger.info "Unable to send verification reminder notices to #{person.hbx_id} due to #{e}"
+          @logger.info "Unable to send verification reminder notices to #{family.primary_person&.hbx_id} due to #{e}"
         end
       end
       @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
