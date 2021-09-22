@@ -52,7 +52,7 @@ module Operations
           sep = enrollment.family.latest_active_sep
           qle = sep.qualifying_life_event_kind
           {
-            qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle),
+            qualifying_life_event_kind_reference: sep.qualifying_life_event_kind,
             qle_on: sep.qle_on,
             start_on: sep.start_on,
             end_on: sep.end_on,
