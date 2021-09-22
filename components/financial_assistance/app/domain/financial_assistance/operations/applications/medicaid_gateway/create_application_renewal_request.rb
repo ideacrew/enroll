@@ -28,6 +28,7 @@ module FinancialAssistance
             Success(family_records)
           end
 
+          # rubocop:disable Style/MultilineBlockChain
           def generate_renewal_events(renewal_year, family_ids)
             logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
@@ -50,6 +51,7 @@ module FinancialAssistance
 
             Success(family_ids)
           end
+          # rubocop:enable Style/MultilineBlockChain
         end
       end
     end
