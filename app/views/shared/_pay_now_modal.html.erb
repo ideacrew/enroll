@@ -1,4 +1,5 @@
 <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
+<% carrier_long_name = carrier_long_name(carrier) %>
 <% first_payment = carrier_paynow_enabled(carrier) && past_effective_on?(hbx_enrollment) %>
 <% plan_shopping = carrier_paynow_enabled(carrier) && source == "Plan Shopping"  %>
 <% url = first_payment || plan_shopping ? pay_now_url(carrier) : carrier_url(carrier) %>
@@ -13,18 +14,18 @@
       </div>
       <div class="modal-body">
         <p>
-          <%= l10n("plans.#{carrier_key}.pay_now.redirection_message", site_short_name: Settings.site.short_name, carrier_name: carrier) %><br/>
+          <%= l10n("plans.issuer.pay_now.redirection_message", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: carrier_long_name) %><br/>
           <ul>
             <% if !past_effective_on?(hbx_enrollment) %>
               <li><%= l10n("plans.#{carrier_key}.pay_now.link_info")%></li>
             <% else %>
-              <li><%= l10n("plans.#{carrier_key}.pay_now.processing", carrier_name: carrier)%></li>
+              <li><%= l10n("plans.issuer.pay_now.processing", carrier_name: carrier_long_name)%></li>
             <% end %>
-            <li><%= l10n("plans.#{carrier_key}.pay_now.collecting_info", carrier_name: carrier)%></li>
-            <li><%= l10n("plans.#{carrier_key}.pay_now.exchange_disclaimer_for_auth") %></li>
+            <li><%= l10n("plans.issuer.pay_now.collecting_info", carrier_name: carrier_long_name, site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)%></li>
+            <li><%= l10n("plans.issuer.pay_now.exchange_disclaimer_for_auth", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></li>
             <br/>
           </ul>
-          <%= l10n("plans.#{carrier_key}.pay_now.exchange_disclaimer", carrier_name: carrier) %>
+          <%= l10n("plans.issuer.pay_now.exchange_disclaimer", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: carrier_long_name) %>
         </p>
       </div>
       <%= hidden_field_tag 'source', source %>
@@ -35,7 +36,7 @@
             <input type="hidden" name="RelayState" value=<%= pay_now_relay_state(carrier) %>/>
           <% end %>
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
-            <%= l10n("leave_dc_health_link")%>
+            <%= EnrollRegistry[:enroll_app].setting(:short_name).item == "CoverME.gov" ?  l10n("continue") : l10n("leave_dc_health_link") %>
           </button>
         </form>
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><%= l10n("go_back")%></button>
