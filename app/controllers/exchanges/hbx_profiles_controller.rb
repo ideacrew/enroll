@@ -285,7 +285,7 @@ def employer_poc
   end
 
   def find_email(agent, role)
-    if role == 'Broker'
+    if role == l10n("broker")
       agent.try(:broker_role).try(:email).try(:address)
     else
       agent.try(:user).try(:email)
@@ -308,7 +308,7 @@ def employer_poc
         consumer = Person.find(params[:person])
         family = consumer.primary_family
         family.hire_broker_agency(broker_role_id)
-        role = 'Broker'
+        role = l10n("broker")
       else
         agent = Person.find(params[:assister])
         role = 'In-Person Assister'
