@@ -23,6 +23,3 @@ footer.footer-wrapper class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIR
                 i.fas.fa-question.fa-lg
                 | &nbsp;
                 | GET HELP
-            - if EnrollRegistry.feature_enabled?(:live_chat_widget)
-              li
-                = render "shared/customer_support/live_chat_widget"
