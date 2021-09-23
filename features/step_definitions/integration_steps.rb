@@ -1221,3 +1221,13 @@ Then(/^I should see Shop for new plan button$/) do
   shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
   expect(shop_for_new_plan_input.present?).to eq(true)
 end
+
+Then(/^they should see the live chat button$/) do
+  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
+  expect(live_chat_button.present?).to eq(true)
+end
+
+Then(/^they should not see the live chat button$/) do
+  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
+  expect(live_chat_button.present?).to eq(false)
+end
