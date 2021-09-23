@@ -291,7 +291,7 @@ registry:
         is_enabled: false
         item: ""
       - key: :change_end_date
-        is_enabled: true
+        is_enabled: false
         item: Operations::HbxEnrollments::EndDateChange.new
         settings:
           - key: :expired_enrollments
