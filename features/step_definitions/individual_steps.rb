@@ -993,3 +993,11 @@ Then(/Individual should land on Home page$/) do
   sleep 1
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
+
+When(/Individual clicks on Go To My Account button$/) do
+  click_link "GO TO MY ACCOUNT"
+end
+
+When(/Individual clicks on continue button on Choose Coverage page$/) do
+  click_button 'CONTINUE', :wait => 10
+end

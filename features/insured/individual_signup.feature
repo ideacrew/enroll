@@ -17,8 +17,8 @@ Feature: Insured Plan Shopping on Individual market
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And Individual clicks on continue
-    And Individual click on continue button on group selection page
+    And Individual clicks on the Continue button of the Family Information page
+    And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
     And Individual should not see any plan which premium is 0
     And Individual select a plan on plan shopping page
@@ -34,8 +34,8 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on Add New Person
     And Individual fills in the form
     And Individual clicks on confirm member
-    And Individual clicks on continue
-    And Individual click on continue button on group selection page
+    And Individual clicks on the Continue button of the Family Information page
+    And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
     And Individual should not see any plan which premium is 0
     And Individual select a plan on plan shopping page
@@ -98,7 +98,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
     And Individual clicks on the Continue button of the Family Information page
-    And Individual clicks on the Continue button of the Household Info page
+    And Individual clicks on continue button on Choose Coverage page
     And I select a plan on plan shopping page
     And Individual checks the Insured portal open enrollment dates
     And Individual click on purchase button on confirmation page
