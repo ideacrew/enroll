@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
@@ -80,7 +82,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   end
 
   let(:members) { [new_member, new_member] }
-  let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }
+  let(:carrier_profile){ double("CarrierProfile", legal_name: "carefirst") }
 
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:'',product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {double(member_enrollments:[member_enrollment], product_cost_total:0.0,sponsor_contribution_total:0.0, employee_cost_total:0.0)}
@@ -155,11 +157,17 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     before do
       sign_in(user)
       allow(view).to receive(:show_pay_now?).and_return true
+      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
     end
 
     it "should have a Pay now button" do
       render file: "insured/plan_shoppings/receipt.en.html.erb"
-      expect(rendered).to have_selector('button', text: /Pay Now/)
+      carrier = carrier_profile.legal_name
+      if EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:plan_shopping).item
+        expect(rendered).to have_selector('button', text: /Pay Now/)
+      else
+        expect(rendered).to_not have_selector('button', text: /Pay Now/)
+      end
     end
   end
 end
