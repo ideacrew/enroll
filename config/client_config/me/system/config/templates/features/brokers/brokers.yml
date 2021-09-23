@@ -15,3 +15,6 @@ registry:
         settings:
           - key: :carrier_appointments
             item: {"Anthem Blue Cross and Blue Shield": nil, "Community Health Options": nil, "Harvard Pilgrim Health Care":  nil, "Northeast Delta Dental": nil, "Renaissance Dental": nil} # Should be a hash with the carrier name as a string and the value as nil
+      - key: :broker_attestation_fields
+        item: :broker_attestation_fields
+        is_enabled: true
