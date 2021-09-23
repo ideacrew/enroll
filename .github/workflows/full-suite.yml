@@ -350,7 +350,6 @@ jobs:
             27,
             28,
             29,
-            30,
           ]
     steps:
       - uses: actions/checkout@v2

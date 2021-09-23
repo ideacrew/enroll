@@ -19,10 +19,20 @@ async function createCucumberSplitConfig(): Promise<void> {
     .map(featureRuntime)
     .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
 
-  const { suggestedGroupCount } = runtimeDetails(arrayOfSlowFiles);
+  // Map file runtimes from nanoseconds to seconds
+  const slowFiles: FileWithRuntime[] = arrayOfSlowFiles.map((file) => {
+    return {
+      filePath: file.filePath,
+      runTime: file.runTime / 1000000,
+    };
+  });
+
+  const { suggestedGroupCount } = runtimeDetails(slowFiles);
+
+  console.log({ slowFiles: slowFiles[0] });
 
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
-    arrayOfSlowFiles,
+    slowFiles,
     suggestedGroupCount
   );
 
