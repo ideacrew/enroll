@@ -66,7 +66,6 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And the other income form should not show
     And NO should be selected again for unemployment income
 
-  @flaky
   Scenario: Unemployment Not Sure popup shows correct text
     When the user clicks the Not sure link next to the unemployment income question
     Then the user should see the popup for the unemployment income question

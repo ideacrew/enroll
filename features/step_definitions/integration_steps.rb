@@ -1044,7 +1044,7 @@ When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_button "Shop for new plan"
 end
 
-When(/^I click on continue on qle confirmation page$/) do
+When(/^^.+ click on continue on qle confirmation page$/) do
   expect(page).to have_content "Enrollment Submitted"
   # screenshot("qle_confirm")
   click_link "GO TO MY ACCOUNT"
@@ -1107,7 +1107,7 @@ Then(/^I should see the dependents and group selection page$/) do
   scroll_then_click(@browser.a(class: /interaction-click-control-purchase/))
 end
 
-And(/I select three plans to compare/) do
+And(/.+ select three plans to compare/) do
   wait_for_ajax
   expect(page).to have_content("Select Plan")
   if page.all("span.checkbox-custom-label").count > 3
@@ -1123,7 +1123,7 @@ And(/I select three plans to compare/) do
   end
 end
 
-And(/I should not see any plan which premium is 0/) do
+And(/.+ should not see any plan which premium is 0/) do
   page.all("h2.plan-premium").each do |premium|
     expect(premium).not_to have_content("$0.00")
   end
