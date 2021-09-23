@@ -210,6 +210,8 @@ registry:
       is_enabled: true
     - key: :no_coverage_tribe_details
       is_enabled: true
+    - key: :pregnancy_due_on_required
+      is_enabled: false
   - namespace:
     - :renewals
     features:
