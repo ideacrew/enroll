@@ -1,5 +1,6 @@
 BROKER_AGENCIES_TRANSLATIONS = {
-	"en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Broker Agency",
+	"en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Broker",
+  "en.broker_agencies.broker_roles.agency_name_placeholder" => "Agency/Broker Name,NPN",
 	"en.search" => "Search",
 	"en.submit_application" => "Submit Application",
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information" => "Broker Agency Information",
