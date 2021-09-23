@@ -55,6 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
     application10.applicants.destroy_all
     application10.applicants = [appli]
     application10.save!
+    appli
   end
 
   let(:event) { Success(double) }
@@ -69,12 +70,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
   context 'success' do
     context 'is_renewal_authorized set to true i.e. renewal authorized for next 5 years' do
       before do
-        # allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
-        # allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
-        @result = subject.call(@renewal_draft.serializable_hash)
+        @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
         @renewed_app = @result.success
       end
 
@@ -100,10 +101,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
         application10.update_attributes!({ is_renewal_authorized: false, years_to_renew: [1, 2, 3, 4, 5].sample })
-        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
-        @result = subject.call(@renewal_draft.serializable_hash)
+        @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
         @renewed_app = @result.success
       end
 
@@ -126,6 +127,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
   end
 
   context 'failure' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+    end
+
     context 'invalid input data' do
       before do
         @result = subject.call('test')
@@ -138,7 +144,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
 
     context 'ineligible application' do
       before do
-        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
       end
@@ -146,12 +152,46 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
       context 'expired permission for renewal' do
         before do
           @renewal_draft.update_attributes!(renewal_base_year: @renewal_draft.assistance_year.pred)
-          @result = subject.call(@renewal_draft.serializable_hash)
+          @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
         end
 
         it 'should return failure with error message' do
           expect(@result.failure).to eq("Expired Submission is failed for hbx_id: #{@renewal_draft.hbx_id}")
         end
+      end
+    end
+
+    context 'Haven request failure because of invalid payload' do
+      let!(:create_job_income) do
+        inc = ::FinancialAssistance::Income.new({
+                                                  kind: 'wages_and_salaries',
+                                                  frequency_kind: 'yearly',
+                                                  amount: 30_000.00,
+                                                  start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                  employer_name: 'Testing employer'
+                                                })
+        create_appli.incomes << inc
+        create_appli.save!
+      end
+
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
+          { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
+        ).success
+        income = @renewal_draft.applicants.first.incomes.first
+        income.assign_attributes(kind: 'test')
+        income.save(validate: false)
+        @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_failure
+      end
+
+      it 'should return failure with a message' do
+        expect(@result.failure).to include(/The value 'urn:openhbx:terms:v1:financial_assistance_income#test' is not an element of the set {'ur/)
       end
     end
   end

@@ -19,7 +19,7 @@ module Subscribers
         subscriber_logger.info "application hbx_id: #{payload[:hbx_id]} processed successfully"
         logger.info "ApplicationRenewalCreatedSubscriber: acked, SuccessResult: #{result.success}"
       else
-        subscriber_logger.info "application hbx_id: #{payload[:hbx_id]} failed!!"
+        subscriber_logger.info "application hbx_id: #{payload[:hbx_id]} failed!!, FailureResult: #{result.failure}"
         logger.info "ApplicationRenewalCreatedSubscriber: acked, FailureResult: #{result.failure}"
       end
 
