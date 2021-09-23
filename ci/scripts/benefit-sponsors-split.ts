@@ -11,13 +11,13 @@ import {
   splitFilesIntoGroups,
 } from './util';
 
+const REPORT_PATH = './ci/rspec/components-benefit_sponsors-rspec-report.json';
+const SPLIT_CONFIG_PATH = './ci/benefit_sponsors-split-config.json';
+
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
 
-  const report: string = await fs.readFile(
-    './ci/rspec/components-benefit_sponsors-rspec-report.json',
-    'utf-8'
-  );
+  const report: string = await fs.readFile(REPORT_PATH, 'utf-8');
 
   const [manualGroupCountInput] = process.argv.slice(2);
 
@@ -54,10 +54,7 @@ async function createSplitConfig(): Promise<void> {
   );
 
   try {
-    await fs.writeFile(
-      `./ci/benefit_sponsors-split-config.json`,
-      JSON.stringify(splitConfig)
-    );
+    await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
   } catch (e) {
     console.error(e);
   }

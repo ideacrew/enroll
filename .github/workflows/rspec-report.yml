@@ -158,6 +158,11 @@ jobs:
         with:
           path: ci/rspec/compressed-reports
       - run: npm run rspec:move-reports
+      - run: npm run rspec:concat-reports
+      - uses: actions/upload-artifact@v2
+        with:
+          name: concatenated-rspec-reports
+          path: ci/rspec/local-rspec-report.json
       - run: npm run rspec:split-config
       - run: npm run benefit-sponsors:split-config
       - uses: actions/upload-artifact@v2
