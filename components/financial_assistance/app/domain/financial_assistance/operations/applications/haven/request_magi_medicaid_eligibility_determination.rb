@@ -39,26 +39,37 @@ module FinancialAssistance
             if application.have_permission_to_renew?
               if application.may_submit?
                 application.submit!
+                request_result = request_determination(application)
+                application.unsubmit! if request_result.failure?
+                request_result
               else
                 application.fail_submission!
                 Rails.logger.error "Unable to submit the application for given application hbx_id: #{application.hbx_id}"
-                return Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}")
+                Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}")
               end
-
-              FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: application.id)
             else
               Rails.logger.error "Expired Submission is failed for hbx_id: #{application.hbx_id}"
               Failure("Expired Submission is failed for hbx_id: #{application.hbx_id}")
             end
           end
 
-          # def haven_determination_is_enabled?
-          #   FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
-          # end
+          def request_determination(application)
+            if is_haven_determination_enabled?
+              ::FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: application.id)
+            elsif is_medicaid_gateway_determination_enabled?
+              ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
+            else
+              Failure('None of the Haven or MedicaidGateway integration is enabled for determining Eligibility.')
+            end
+          end
 
-          # def medicaid_gateway_determination_is_enabled?
-          #   FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
-          # end
+          def is_haven_determination_enabled?
+            FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          end
+
+          def is_medicaid_gateway_determination_enabled?
+            FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+          end
 
           def build_event(payload)
             event("events.iap.applications.haven_magi_medicaid_eligibility_determination_requested", attributes: {determination: payload})

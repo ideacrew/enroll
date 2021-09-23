@@ -75,6 +75,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
+        @renewal_draft.update_attributes!(effective_date: TimeKeeper.date_of_record)
         @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
         @renewed_app = @result.success
       end
@@ -104,6 +105,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
+        @renewal_draft.update_attributes!(effective_date: TimeKeeper.date_of_record)
         @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
         @renewed_app = @result.success
       end
@@ -170,7 +172,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
       context 'incomplete application by validation' do
         before do
-          @renewal_draft.update_attributes!(us_state: nil)
+          @renewal_draft.update_attributes!(us_state: nil, effective_date: TimeKeeper.date_of_record)
           @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
         end
 
@@ -181,7 +183,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
       context 'incomplete application by attestation' do
         before do
-          @renewal_draft.update_attributes!(is_requesting_voter_registration_application_in_mail: nil)
+          @renewal_draft.update_attributes!(is_requesting_voter_registration_application_in_mail: nil, effective_date: TimeKeeper.date_of_record)
           @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
         end
 
@@ -192,7 +194,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
       context 'expired permission for renewal' do
         before do
-          @renewal_draft.update_attributes!(renewal_base_year: @renewal_draft.assistance_year.pred)
+          @renewal_draft.update_attributes!(renewal_base_year: @renewal_draft.assistance_year.pred, effective_date: TimeKeeper.date_of_record)
           @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
         end
 
