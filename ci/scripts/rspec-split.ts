@@ -11,7 +11,6 @@ import {
   createFilesWithRuntime,
   splitFilesIntoGroups,
 } from './util';
-import { runtimeDetails } from './util/numberOfGroups';
 
 const REPORT_PATH = './ci/rspec/local-rspec-report.json';
 const SPLIT_CONFIG_PATH = './ci/rspec-split-config.json';
@@ -22,6 +21,13 @@ async function createSplitConfig(): Promise<void> {
   const rspecExamples = await fs.readFile(REPORT_PATH, 'utf-8');
   const examples: RspecExample[] = JSON.parse(rspecExamples);
 
+  const [manualGroupCountInput] = process.argv.slice(2);
+
+  const groupCount: number | undefined =
+    manualGroupCountInput !== undefined
+      ? parseInt(manualGroupCountInput, 10)
+      : undefined;
+
   // Create a dictionary of
   const filesByRuntime: FileWithRuntimeDictionary =
     createFileDictionary(examples);
@@ -29,11 +35,9 @@ async function createSplitConfig(): Promise<void> {
   const arrayOfSlowFiles: FileWithRuntime[] =
     createFilesWithRuntime(filesByRuntime);
 
-  const { suggestedGroupCount } = runtimeDetails(arrayOfSlowFiles);
-
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     arrayOfSlowFiles,
-    suggestedGroupCount
+    groupCount
   );
 
   try {
