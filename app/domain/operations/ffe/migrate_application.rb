@@ -261,7 +261,7 @@ module Operations
         person_result = create_or_update_person(person_params)
         if person_result.success?
           @person = person_result.success
-          @person.update_attributes(is_applying_for_assistance: person_params[:is_applying_for_assistance])
+          @person.update_attributes(is_applying_for_assistance: person_params[:is_applying_for_assistance], indian_tribe_member: person_params[:indian_tribe_member])
           @family_member = create_or_update_family_member(@person, family_member_hash)
           consumer_role_params = family_member_hash['person']['consumer_role']
           consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
@@ -376,6 +376,7 @@ module Operations
 
           is_ia_eligible = tax_household_member_params.find {|fm| fm[family_member.external_member_id]}
           citizen_status_info = applicant_hash['citizenship_immigration_status_information']
+          native_american_info = applicant_hash['native_american_information']
           sanitize_params << {
             family_member_id: family_member.id,
             relationship: family_member.relationship,
@@ -482,10 +483,10 @@ module Operations
             had_prior_insurance: applicant_hash['had_prior_insurance'],
             age_of_applicant: applicant_hash['age_of_applicant'],
             hours_worked_per_week: applicant_hash['hours_worked_per_week'],
-            indian_tribe_member: applicant_hash['indian_tribe_member'] || false,
-            tribal_id: applicant_hash['tribal_id'],
-            tribal_name: applicant_hash['tribal_name'],
-            tribal_state: applicant_hash['tribal_state'],
+            indian_tribe_member: native_american_info['indian_tribe_member'],
+            tribal_id: native_american_info['tribal_id'],
+            tribal_name: native_american_info['tribal_name'],
+            tribal_state: native_american_info['tribal_state'],
 
             is_ia_eligible: is_ia_eligible.nil? ? false : is_ia_eligible.values[0],
             is_medicaid_chip_eligible: nil,
@@ -549,6 +550,7 @@ module Operations
           race: "",
           ethnicity: person_hash['person_demographics']['ethnicity'],
           is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
+          indian_tribe_member: person_hash['person_demographics']['indian_tribe_member'],
           tribal_id: person_hash['person_demographics']['tribal_id'],
           tribal_name: person_hash['person_demographics']['tribal_name'],
           tribal_state: person_hash['person_demographics']['tribal_state'],
