@@ -17,11 +17,11 @@ Feature: Insured Plan Shopping on Individual market
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     Then Individual does not apply for assistance and clicks continue
-    And Individual clicks on continue
+    And Individual clicks on the Continue button of the Family Information page
     When Individual click the "Had a baby" in qle carousel
     And Individual selects a past qle date
     Then Individual should see confirmation and continue
-    When Individual clicks on continue
+    And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
     Then Individual should not see any plan which premium is 0
     When Individual select a plan on plan shopping page
@@ -35,7 +35,7 @@ Feature: Insured Plan Shopping on Individual market
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     Then Individual does not apply for assistance and clicks continue
-    And Individual clicks on continue
+    And Individual clicks on the Continue button of the Family Information page
     When Individual clicks on None of the situations listed above apply checkbox
     And Individual clicks Back to my account button
     Then Individual should land on Home page
@@ -46,7 +46,7 @@ Feature: Insured Plan Shopping on Individual market
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     Then Individual does not apply for assistance and clicks continue
-    And Individual clicks on continue
+    And Individual clicks on the Continue button of the Family Information page
     When Individual click the "Losing other health insurance" in qle carousel
     And Individual selects a past qle date
     Then Individual should see confirmation and continue

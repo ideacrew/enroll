@@ -1,31 +1,28 @@
 Feature: Consumer verification process
 
-  @flaky
-  Scenario: Outstanding verification
+# TO DO: confirm and update last two steps as far as what is the expected residency link to finish refactor 
+@flaky
+Scenario: Outstanding verification
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
-    * the user visits the Consumer portal during open enrollment
-    * Individual creates HBX account
-    * I should see a successful sign up message
-    * the user sees Your Information page
-    * the user registers as an individual
-    * the individual clicks on the Continue button of the Account Setup page
-    * user should see heading labeled personal information
-    * Individual should click on Individual market for plan shopping
-    * the individual sees form to enter personal information
-    * Individual click continue button
-    * Individual agrees to the privacy agreeement
-    * the individual answers the questions of the Identity Verification page and clicks on submit
-    * the individual is on the Help Paying for Coverage page
-    * Individual does not apply for assistance and clicks continue
-    * Individual should see the dependents form
-    * the individual clicks on the Continue button of the Household Info page
-    * I click on continue button on group selection page
-    * I select a plan on plan shopping page
-    * I click on purchase button on confirmation page
-    * the individual clicks on the Continue button to go to the Individual home page
-    * I should see Documents link
-    * I click on verification link
+    When Individual visits the Consumer portal during open enrollment
+    And Individual creates a new HBX account
+    Then Individual should see a successful sign up message
+    And Individual sees Your Information page
+    When user registers as an individual
+    And Individual clicks on continue
+    And Individual sees form to enter personal information
+    And Individual clicks on continue
+    And Individual agrees to the privacy agreeement
+    And Individual answers the questions of the Identity Verification page and clicks on submit
+    Then Individual is on the Help Paying for Coverage page
+    When Individual does not apply for assistance and clicks continue
+    And Individual clicks on continue
+    And Individual clicks on continue button on Choose Coverage page
+    When Individual select a plan on plan shopping page
+    And Individual click on purchase button on confirmation page
+    And Individual clicks on Go To My Account button
+    And Individual clicks on Documents link
     * I should see page for documents verification
 
   Scenario: Consumer with outstanding verification and uploaded documents

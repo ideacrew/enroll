@@ -14,7 +14,8 @@ Then(/^I should see Documents link$/) do
   expect(page).to have_content "Documents"
 end
 
-When(/^I click on verification link$/) do
+When(/^.+ clicks on Documents link$/) do
+  expect(page).to have_content "Documents"
   click_link "Documents"
 end
 
