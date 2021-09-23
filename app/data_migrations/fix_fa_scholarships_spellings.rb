@@ -6,13 +6,11 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class FixFaScholarshipsSpellings < MongoidMigrationTask
   def migrate
     abort("Financial Assistance not configured.") unless EnrollRegistry.feature_enabled?(:financial_assistance)
-    misspelled_incomes = ::FinancialAssistance::Application.all.flat_map(&:applicants).flat_map(&:incomes).select do |income|
-      income.kind == 'scholorship_payments'
-    end
-    abort("No misspelled scholarship incomes present.") if misspelled_incomes.blank?
-    puts("#{misspelled_incomes.count} misspelled scholarship")
-    misspelled_incomes.each do |income|
-      income.update_attributes!(kind: "scholarship_payments")
+    apps_with_misspelled_income_kind = FinancialAssistance::Application.where(:"applicants.incomes.kind" => 'scholorship_payments')
+    apps_with_misspelled_income_kind.each do |application|
+      application.applicants.where(:"incomes.kind" => 'scholorship_payments').each do |applicant|
+        applicant.incomes.where(kind: 'scholorship_payments').each { |income| income.update_attributes!(kind: 'scholarship_payments') }
+      end
     end
     puts("Incomes spelling update rake complete.")
   end
