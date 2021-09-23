@@ -552,3 +552,6 @@ registry:
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
         is_enabled: false
+      - key: :live_chat_widget
+        item: :live_chat_widget
+        is_enabled: false
