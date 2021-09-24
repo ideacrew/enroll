@@ -677,7 +677,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                             })
       benefit = ::FinancialAssistance::Benefit.new({
                                                      :employee_cost => 500.00,
-                                                     :employer_id => "12-2132133",
+                                                     :employer_id => '122132133',
                                                      :kind => "is_enrolled",
                                                      :insurance_kind => "employer_sponsored_insurance",
                                                      :employer_name => "er1",
@@ -718,7 +718,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                      employee_cost_frequency: 'monthly',
                                                      start_on: Date.today.prev_year.beginning_of_month,
                                                      employer_name: "er1",
-                                                     employer_id: '23-2675213' })
+                                                     employer_id: '232675213' })
       applicant.benefits << benefit
       applicant.save!
     end
