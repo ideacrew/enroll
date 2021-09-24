@@ -4,6 +4,7 @@ class QhpRateBuilder
   METLIFE_HIOS_IDS = ["43849DC0090001", "43849DC0080001"]
 
   def initialize
+    @rating_method = 'Age-Based Rates'
     @rates_array = []
     @results_array = []
     @rating_area_id_cache = {}
@@ -26,9 +27,16 @@ class QhpRateBuilder
       @action = action
     else
       rates_hash[:plan_rate_group_attributes].each do |rate_group_attributes|
-        @rates_array = @rates_array + rate_group_attributes[:items]
+        @rating_method = rate_group_attributes[:rating_method]
+        @rates_array += assign_rating_method(rate_group_attributes[:items])
         @action = action
       end
+    end
+  end
+
+  def assign_rating_method(item_attributes)
+    item_attributes.each do |item|
+      item[:rating_method] = @rating_method
     end
   end
 
@@ -108,7 +116,7 @@ class QhpRateBuilder
       end
     end
     @premium_table_cache.each_pair do |k, v|
-      product_hios_id, rating_area_id, applicable_range = k
+      product_hios_id, rating_area_id, applicable_range, rating_method = k
       premium_tables = []
       premium_tuples = []
 
@@ -129,6 +137,7 @@ class QhpRateBuilder
       active_year = applicable_range.first.year
       products = ::BenefitMarkets::Products::Product.where(hios_id: /#{product_hios_id}/).select{|a| a.active_year == active_year}
       products.each do |product|
+        product.rating_method = rating_method
         product.premium_tables << premium_tables
         product.premium_ages = premium_tuples.map(&:age).minmax
         product.save
@@ -141,12 +150,13 @@ class QhpRateBuilder
     applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
     rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}00")
     rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
+
     if assign_age.zero?
       (14..64).each do |age|
-        @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+        @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range, @rate[:rating_method]]][age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
       end
     else
-      @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+      @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range, @rate[:rating_method]]][assign_age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
     end
     @results_array << "#{@rate[:plan_id]},#{active_year}"
   end
