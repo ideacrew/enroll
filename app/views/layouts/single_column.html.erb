@@ -44,7 +44,9 @@
 
         <%= yield %>
     </div>
-
+    <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
+      <%= render "shared/customer_support/live_chat_widget" %>
+    <% end %>
     <%= render partial: './ui-components/v1/layouts/footer' %>
 
   </body>

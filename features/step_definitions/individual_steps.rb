@@ -297,7 +297,7 @@ Then(/^Individual should be on verification page/) do
   expect(page).to have_content('Verify Identity')
 end
 
-When(/^the individual clicks on the Continue button of the Family Information page$/) do
+When(/^.+ clicks on the Continue button of the Family Information page$/) do
   find(IvlFamilyInformation.continue_btn).click
 end
 
@@ -373,6 +373,7 @@ end
 
 And(/^.+ clicks on the Continue button of the Household Info page/) do
   screenshot("line 161")
+  sleep 2
   find(IvlIapFamilyInformation.continue_btn).click
 end
 
@@ -444,11 +445,11 @@ And(/Aptc user signed in$/) do
   find('.sign-in-btn').click
 end
 
-And(/^I click on continue button on group selection page$/) do
+And(/^.+click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end
 
-And(/I select a plan on plan shopping page/) do
+And(/.+ select a plan on plan shopping page/) do
   screenshot("plan_shopping")
   find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
@@ -475,10 +476,12 @@ Then(/the individual should see the modal pop up for eligibility/) do
   expect(page).to have_content IvlChoosePlan.non_silver_plan_modal_text
 end
 
-And(/I click on purchase button on confirmation page/) do
+And(/^.+ click on purchase button on confirmation page/) do
   find('.interaction-choice-control-value-terms-check-thank-you').click
-  fill_in 'first_name_thank_you', :with => (@u.find :first_name)
-  fill_in 'last_name_thank_you', :with => (@u.find :last_name)
+  fill_in 'first_name_thank_you', :with => "John"
+  fill_in 'last_name_thank_you', :with => "Smith"
+  #fill_in 'first_name_thank_you', :with => (@u.find :first_name)
+  #fill_in 'last_name_thank_you', :with => (@u.find :last_name)
   # screenshot("purchase")
   click_link "Confirm"
 end
@@ -923,7 +926,7 @@ When(/^\w+ checks? the Insured portal open enrollment dates$/) do
   end
 end
 
-Then("I should see a new renewing enrollment title on home page") do
+Then(/^.+should see a new renewing enrollment title on home page$/) do
   expect(page).to have_content "Auto Renewing"
 end
 
@@ -951,4 +954,50 @@ end
 And(/Individual sees Your Information page$/) do
   expect(page).to have_content YourInformation.your_information_text
   find(YourInformation.continue_btn).click
+end
+
+When(/^Individual select a future qle date$/) do
+  expect(page).to have_content "Married"
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record + 5.days).strftime("%m/%d/%Y")
+  click_link "CONTINUE"
+end
+
+Then(/^Individual should see not qualify message$/) do
+  expect(page).to have_content "The date you submitted does not qualify for special enrollment"
+end
+
+Then(/^Individual should see confirmation and continue$/) do
+  expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
+  click_button "Continue"
+end
+
+When(/^Individual clicks on Make Changes from Actions tab$/) do
+  find(IvlHomepage.actions_dropdown).click
+  find(IvlHomepage.make_changes_btn).click
+end
+
+When(/^Individual click on shop for new plan button on household info page$/) do
+  click_link "Continue"
+  sleep 5
+  click_button "Shop for new plan"
+end
+
+When(/Individual clicks on None of the situations listed above apply checkbox$/) do
+  sleep 2
+  expect(page).to have_content 'None of the situations listed above apply'
+  find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
+  expect(page).to have_content 'To enroll before open enrollment'
+end
+
+Then(/Individual should land on Home page$/) do
+  sleep 1
+  expect(page).to have_content "My #{Settings.site.short_name}"
+end
+
+When(/Individual clicks on Go To My Account button$/) do
+  click_link "GO TO MY ACCOUNT"
+end
+
+When(/Individual clicks on continue button on Choose Coverage page$/) do
+  click_button 'CONTINUE', :wait => 10
 end

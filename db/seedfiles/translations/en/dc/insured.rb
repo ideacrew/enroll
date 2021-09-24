@@ -228,6 +228,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.none_of_the_above' => "None of the Above",
   :'en.my_site_short_name' => "My %{site_short_name}",
   :'en.my_broker' => "My Broker",
+  :'en.brokers_tab' => "broker",
   :'en.action_needed' => "Action Needed",
   :'en.upload_paper_application' => "Upload Paper Application",
   :'en.messages' => "Messages",
