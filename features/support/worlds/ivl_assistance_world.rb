@@ -124,7 +124,7 @@ module IvlAssistanceWorld
     @user.save
     @person = FactoryBot.create(:person, :with_consumer_role, user: user)
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
-    _application = FactoryBot.create(:financial_assistance_application, aasm_state: state, family_id: family.id)
+    FactoryBot.create(:financial_assistance_application, aasm_state: state, family_id: family.id, effective_date: TimeKeeper.date_of_record)
   end
 
   def create_enrollment_for_family(family, carrier_name = nil)
