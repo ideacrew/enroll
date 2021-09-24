@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
+
   before :all do
     DatabaseCleaner.clean
   end
@@ -35,6 +37,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
                       last_name: 'Rivers',
                       dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
                       application: application)
+  end
+
+  let(:event) { Success(double) }
+  let(:operation_instance) { described_class.new }
+
+  before do
+    allow(operation_instance.class).to receive(:new).and_return(operation_instance)
+    allow(operation_instance).to receive(:build_event).and_return(event)
+    allow(event.success).to receive(:publish).and_return(true)
   end
 
   context 'success' do

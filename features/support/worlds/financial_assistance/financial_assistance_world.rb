@@ -19,6 +19,7 @@ module FinancialAssistance
       attributes = traits.extract_options!
       attributes.merge!(family_id: consumer.primary_family.id)
       @application ||= FactoryBot.create(:financial_assistance_application, *traits, attributes).tap do |application|
+        application.update_attributes!(effective_date: TimeKeeper.date_of_record) if application.effective_date.blank?
         consumer.primary_family.family_members.each do |member|
           applicant = application.applicants.create(first_name: member.first_name,
                                                     last_name: member.last_name,

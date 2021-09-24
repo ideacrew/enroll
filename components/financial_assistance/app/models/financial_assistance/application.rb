@@ -1044,8 +1044,9 @@ module FinancialAssistance
     end
 
     def set_effective_date
+      return if effective_date.present?
       effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
-      update_attribute(:effective_date, effective_date) if effective_date.blank?
+      update_attribute(:effective_date, effective_date)
     end
 
     # def set_benchmark_product_id

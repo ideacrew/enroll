@@ -60,10 +60,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
 
   let(:event) { Success(double) }
   let(:obj) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+  let(:obj2) { ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new }
+  let(:obj3) { described_class.new }
 
   before do
     allow(obj.class).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
+    allow(obj2.class).to receive(:new).and_return(obj2)
+    allow(obj2).to receive(:build_event).and_return(event)
+    allow(obj3.class).to receive(:new).and_return(obj3)
+    allow(obj3).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
   end
 
