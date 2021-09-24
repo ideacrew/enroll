@@ -7,14 +7,14 @@ require 'aca_entities/magi_medicaid/libraries/iap_library'
 module FinancialAssistance
   module Operations
     module Applications
-      module Ifsv
-        module H9t
-          # This Operation determines applicants ifsv eligibility
-          # Operation receives the Application with ifsv determination values
-          class IfsvEligibilityDetermination
+      module Rrv
+        module Ifsv
+          # This Operation determines applicants rrv ifsv eligibility
+          # Operation receives the Application with renewal ifsv determination values
+          class AddRrvIfsvDetermination
             include Dry::Monads[:result, :do]
 
-            # @param [Hash] opts The options to add ifsv determination to applicants
+            # @param [Hash] opts The options to add rrv ifsv determination to applicants
             # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params
             # @return [Dry::Monads::Result]
             def call(params)

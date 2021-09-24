@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/ifsv/test_ifsv_eligibility_response"
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvEligibilityDetermination, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRrvIfsvDetermination, dbclean: :after_each do
   before :all do
     DatabaseCleaner.clean
   end
@@ -31,7 +31,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
   end
 
   context 'success' do
-    context 'FTI Ifsv eligible response' do
+    context 'FDSH RRV Ifsv eligible response' do
       include_context 'FDSH IFSV sample response'
 
       before do
@@ -53,7 +53,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end
-    context 'FTI Ifsv ineligible response' do
+
+    context 'FDSH RRV Ifsv ineligible response' do
       include_context 'FDSH IFSV sample response'
 
       before do

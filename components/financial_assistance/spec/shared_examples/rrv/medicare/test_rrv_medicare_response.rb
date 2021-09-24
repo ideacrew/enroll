@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata do
+RSpec.shared_context 'FDSH RRV Medicare sample response', :shared_context => :metadata do
   let(:current_date) { Date.today }
   let(:member_dob) { Date.new(current_date.year - 22, current_date.month, current_date.day) }
   let(:aptc_effective_date) { Date.today.next_month.beginning_of_month }
   let(:response_payload) do
     {
-      :family_reference => {:hbx_id => "10205"},
+      :family_reference => { :hbx_id => "10205" },
       :assistance_year => 2021,
       :aptc_effective_date => Date.new(2021, 10, 0o1),
       :years_to_renew => nil,
@@ -16,9 +16,9 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
       :applicants => [
         {
           :name => {
-            :first_name => "esi",
-            :middle_name => nil,
-            :last_name => "evidence",
+            :first_name => "CLARA",
+            :middle_name => 'K',
+            :last_name => "STEPHENS",
             :name_sfx => nil,
             :name_pfx => nil
           },
@@ -137,7 +137,72 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
           :emails => [],
           :phones => [],
           :incomes => [],
-          :benefits => [],
+          :benefits => [
+            {
+              :name => nil,
+              :kind => "medicare",
+              :status => "is_enrolled",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            },
+            {
+              :name => nil,
+              :kind => "veterans_administration_health_benefits",
+              :status => "is_enrolled",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            },
+            {
+              :name => nil,
+              :kind => "tricare",
+              :status => "is_eligible",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            },
+            {
+              :name => nil,
+              :kind => "acf_refugee_medical_assistance",
+              :status => "is_eligible",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            }
+          ],
           :deductions => [],
           :is_medicare_eligible => false,
           :is_self_attested_long_term_care => false,
@@ -184,18 +249,8 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
             :other_magi_eligible_income => 0
           },
           :evidences => [
-            {:key => :esi_mec,
-             :title => "MEC",
-             :description => nil,
-             :eligibility_status => "verified",
-             :due_on => nil,
-             :updated_by => nil,
-             :eligibility_results => [{
-               :result => :eligible,
-               :source => "FDSH",
-               :code => "HS0000000",
-               :code_description => "Applicant is eligible"
-             }]}
+            {:key => :non_esi_mec, :title => "NON ESI MEC", :description => nil, :eligibility_status => "outstanding", :due_on => nil, :updated_by => nil,
+            }
           ],
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
@@ -208,12 +263,11 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
           :max_aptc => 0,
           :is_insurance_assistance_eligible => nil,
           :annual_tax_household_income => 0,
-          :is_ifsv_eligible => true,
           :tax_household_members => [
             {
               :applicant_reference => {
-                :first_name => "esi",
-                :last_name => "evidence",
+                :first_name => "CLARA",
+                :last_name => "STEPHENS",
                 :dob => Date.new(1988, 11, 11),
                 :person_hbx_id => "1629165429385938",
                 :encrypted_ssn => "3sO2LBAb5OGkrkPQixhf5w==\n"
@@ -243,26 +297,27 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
         :send_open_enrollment_notices => false
       },
       :mitc_households => [
-        {:household_id => "1",
-         :people => [
-           {
-             :person_id => "1629165429385938"
-           }
-         ]}
+        { :household_id => "1",
+          :people => [
+            {
+              :person_id => "1629165429385938"
+            }
+          ] }
       ],
       :mitc_tax_returns => [
         {
           :filers => [
-            {:person_id => "1629165429385938"}
+            { :person_id => "1629165429385938" }
           ],
           :dependents => []
         }
       ]
     }
   end
+
   let(:response_payload_2) do
     {
-      :family_reference => {:hbx_id => "10205"},
+      :family_reference => { :hbx_id => "10205" },
       :assistance_year => 2021,
       :aptc_effective_date => Date.new(2021, 10, 0o1),
       :years_to_renew => nil,
@@ -272,9 +327,9 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
       :applicants => [
         {
           :name => {
-            :first_name => "esi",
-            :middle_name => nil,
-            :last_name => "evidence",
+            :first_name => "CLARA",
+            :middle_name => 'K',
+            :last_name => "STEPHENS",
             :name_sfx => nil,
             :name_pfx => nil
           },
@@ -393,7 +448,72 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
           :emails => [],
           :phones => [],
           :incomes => [],
-          :benefits => [],
+          :benefits => [
+            {
+              :name => nil,
+              :kind => "medicare",
+              :status => "is_enrolled",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            },
+            {
+              :name => nil,
+              :kind => "veterans_administration_health_benefits",
+              :status => "is_enrolled",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            },
+            {
+              :name => nil,
+              :kind => "tricare",
+              :status => "is_eligible",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            },
+            {
+              :name => nil,
+              :kind => "acf_refugee_medical_assistance",
+              :status => "is_eligible",
+              :is_employer_sponsored => false,
+              :employer => nil,
+              :esi_covered => nil,
+              :is_esi_waiting_period => false,
+              :is_esi_mec_met => false,
+              :employee_cost => 0,
+              :employee_cost_frequency => nil,
+              :start_on => Date.today,
+              :end_on => nil,
+              :submitted_at => DateTime.now,
+              :hra_kind => nil
+            }
+          ],
           :deductions => [],
           :is_medicare_eligible => false,
           :is_self_attested_long_term_care => false,
@@ -440,16 +560,8 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
             :other_magi_eligible_income => 0
           },
           :evidences => [
-            {:key => :esi_mec,
-             :title => "MEC",
-             :description => nil,
-             :eligibility_status => "verified",
-             :due_on => nil,
-             :updated_by => nil,
-             :eligibility_results => [{:result => :eligible,
-                                       :source => "FDSH",
-                                       :code => "HS0000000",
-                                       :code_description => "Applicant is eligible"}]}
+            {:key => :non_esi_mec, :title => "NON ESI MEC", :description => nil, :eligibility_status => "attested", :due_on => nil, :updated_by => nil,
+            }
           ],
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
@@ -462,12 +574,11 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
           :max_aptc => 0,
           :is_insurance_assistance_eligible => nil,
           :annual_tax_household_income => 0,
-          :is_ifsv_eligible => false,
           :tax_household_members => [
             {
               :applicant_reference => {
-                :first_name => "esi",
-                :last_name => "evidence",
+                :first_name => "CLARA",
+                :last_name => "STEPHENS",
                 :dob => Date.new(1988, 11, 11),
                 :person_hbx_id => "1629165429385938",
                 :encrypted_ssn => "3sO2LBAb5OGkrkPQixhf5w==\n"
@@ -497,17 +608,17 @@ RSpec.shared_context 'FDSH IFSV sample response', :shared_context => :metadata d
         :send_open_enrollment_notices => false
       },
       :mitc_households => [
-        {:household_id => "1",
-         :people => [
-           {
-             :person_id => "1629165429385938"
-           }
-         ]}
+        { :household_id => "1",
+          :people => [
+            {
+              :person_id => "1629165429385938"
+            }
+          ] }
       ],
       :mitc_tax_returns => [
         {
           :filers => [
-            {:person_id => "1629165429385938"}
+            { :person_id => "1629165429385938" }
           ],
           :dependents => []
         }
