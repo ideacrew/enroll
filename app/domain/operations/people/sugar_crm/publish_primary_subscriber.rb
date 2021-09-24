@@ -41,6 +41,7 @@ module Operations
             local_residency_responses
             local_residency_requests
           ]
+          transformed_person[:person_demographics][:no_ssn] = transformed_person[:person_demographics][:no_ssn].to_s
           unnecessary_document_keys.each do |sym_value|
             transformed_person[:consumer_role][sym_value] = []
           end
