@@ -9,7 +9,7 @@ module Operations
       send(:include, Dry::Monads[:result, :do])
 
       def call(*args)
-        obj_id = args.first[:id].present? ? args.first[:id] : args.first[:ext_app_id]
+        obj_id = args.first[:id].present? ? args.first[:id] : args.first[:external_app_id]
         family_id = yield validate(obj_id)
         family    = yield find_family(family_id)
 
@@ -30,7 +30,7 @@ module Operations
         family =  if family_id.present? & family_id.is_a?(BSON::ObjectId)
                     Family.find(family_id)
                   elsif family_id.present?
-                    Family.where(ext_app_id: family_id).first
+                    Family.where(external_app_id: family_id).first
                   end
 
         family.present? ? Success(family) : Failure("Unable to find Family with ID #{family_id}.")

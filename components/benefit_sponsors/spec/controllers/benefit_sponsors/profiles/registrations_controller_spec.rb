@@ -118,12 +118,28 @@ module BenefitSponsors
     end
 
     before :each do
+      Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
       allow(Settings.site).to receive(:key).and_return(:dc)
       allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
 
+    after do
+      Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
+    end
+
     shared_examples_for "initialize registration form" do |action, params, profile_type|
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
         user = self.send("#{profile_type}_user")
         sign_in user if user
         if params[:id].present?
@@ -148,6 +164,10 @@ module BenefitSponsors
       shared_examples_for "initialize profile for new" do |profile_type|
 
         before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
           user = self.send("#{profile_type}_user")
           sign_in user if user
           get :new, params: {profile_type: profile_type}
@@ -205,6 +225,10 @@ module BenefitSponsors
         context "for new on broker_agency_portal click without user" do
 
           before :each do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
             get :new, params: {profile_type: "broker_agency", portal: true}
           end
 
@@ -224,6 +248,7 @@ module BenefitSponsors
           let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
 
           before :each do
+
             broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
             sign_in broker_user
             get :new, params: {profile_type: "broker_agency", portal: true}
@@ -271,9 +296,18 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
+            # allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_approval_period).and_return(true)
             BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
             BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop if profile_type == 'general_agency'
             site.benefit_markets.first.save!
+            # Stubbing the controller method (which has two conditions, one of which is a Resource Registry check) is easier
+            allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true) if profile_type == 'broker_agency'
             user = self.send("#{profile_type}_user")
             sign_in user if user
             post :create, params: {:agency => self.send("#{profile_type}_params")}

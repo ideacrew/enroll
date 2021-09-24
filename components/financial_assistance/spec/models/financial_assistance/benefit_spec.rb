@@ -182,15 +182,22 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
           benefit.insurance_kind = "employer_sponsored_insurance"
           benefit.employer_id = nil
           benefit.valid?(:step_1)
-          expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
-
+          if EnrollRegistry[:skip_employer_id_validation].enabled?
+            expect(benefit.errors["employer_id"]).to be_empty
+          else
+            expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+          end
         end
 
         it 'should be invalid on submission' do
           benefit.insurance_kind = "employer_sponsored_insurance"
           benefit.employer_id = nil
           benefit.valid?(:submission)
-          expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+          if EnrollRegistry[:skip_employer_id_validation].enabled?
+            expect(benefit.errors["employer_id"]).to be_empty
+          else
+            expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+          end
         end
       end
 
@@ -207,7 +214,11 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
           benefit.insurance_kind = "employer_sponsored_insurance"
           benefit.employer_id = nil
           benefit.valid?(:submission)
-          expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+          if EnrollRegistry[:skip_employer_id_validation].enabled?
+            expect(benefit.errors["employer_id"]).to be_empty
+          else
+            expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+          end
         end
       end
     end

@@ -205,7 +205,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
     end
 
     it 'should have constant SOURCE_KINDS with a specific set of list' do
-      expect(::EligibilityDetermination::SOURCE_KINDS).to eq(['Curam', 'Admin', 'Renewals', 'Faa'])
+      expect(::EligibilityDetermination::SOURCE_KINDS).to eq(['Curam', 'Admin', 'Renewals', 'Faa', 'Ffe'])
     end
   end
 end

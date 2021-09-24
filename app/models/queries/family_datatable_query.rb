@@ -56,6 +56,10 @@ module Queries
       end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
+      if EnrollRegistry[:display_external_id_in_family_datatable].enabled?
+        ext_family = family.where(external_app_id: @search_string)
+        return ext_family if ext_family.any?
+      end
       person_id = build_people_id_criteria(@search_string)
       #Caution Mongo optimization on chained "$in" statements with same field
       #is to do a union, not an interactionl

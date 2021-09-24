@@ -57,3 +57,5 @@ registry:
         is_enabled: :false
       - key: :admin_ivl_end_date_changes
         is_enabled: :false
+      - key: :display_external_id_in_family_datatable
+        is_enabled: :false

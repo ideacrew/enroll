@@ -1,8 +1,9 @@
 name: Nightly Stored Client Tests
 on:
   workflow_dispatch:
+  # push:
   # schedule:
-  #   - cron: '0 0 * * *'
+  # - cron: '0 0 * * *'
 
 env:
   RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
@@ -196,7 +197,7 @@ jobs:
         run: |
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
-          rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+          rspec_booster --job ${{ matrix.group }}/2
   rspec:
     runs-on: ubuntu-latest
     strategy:
@@ -302,4 +303,4 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        run: cucumber_booster --job ${{ matrix.group }}/5

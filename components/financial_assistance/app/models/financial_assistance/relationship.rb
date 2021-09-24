@@ -38,7 +38,8 @@ module FinancialAssistance
       "unrelated",
       "ward",
       'stepson_or_stepdaughter',
-      'cousin'
+      'cousin',
+      'domestic_partner'
     ].freeze
 
     RELATIONSHIPS_UI = [

@@ -9,7 +9,7 @@ class BrokerRole
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
-  BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'all'].freeze
+  BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'imported','all'].freeze
 
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
@@ -281,9 +281,10 @@ class BrokerRole
     state :broker_agency_declined
     state :broker_agency_terminated
     state :application_extended
+    state :imported
 
     event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
-      transitions from: [:applicant, :application_extended], to: :active, :guard => :is_primary_broker?
+      transitions from: [:applicant, :application_extended, :imported], to: :active, :guard => :is_primary_broker?
       transitions from: :broker_agency_pending, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
     end
@@ -332,6 +333,11 @@ class BrokerRole
     event :extend_application, :after => :record_transition do
       transitions from: :application_extended, to: :application_extended, :after => :notify_broker_pending
       transitions from: [:broker_agency_pending, :denied], to: :application_extended
+    end
+
+    # Imported brokers will be placed in imported state
+    event :import, :after => :record_transition do
+      transitions from: :applicant, to: :imported
     end
   end
 
