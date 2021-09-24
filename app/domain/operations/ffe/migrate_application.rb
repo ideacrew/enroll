@@ -98,6 +98,7 @@ module Operations
             fix_iap_relationship
             build_eligibility_determination
             fill_application_form
+            application.import!
             application.save!
           else
             # binding.pry

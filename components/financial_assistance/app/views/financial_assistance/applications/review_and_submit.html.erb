@@ -191,38 +191,40 @@
                         <div class="col-md-6">Employer Name</div>
                         <div class="col-md-6"><%= income.employer_name %></div>
                       </div>
-
-                      <div class="row ptb no-buffer row-height">
-                        <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
-                        <div class="col-md-6"><%= income.employer_address.address_1 %></div>
-                      </div>
-
-                      <% if income.employer_address.address_2.present? %>
+                      <% if income.employer_address.present? %>
                         <div class="row ptb no-buffer row-height">
-                          <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
-                          <div class="col-md-6"><%= income.employer_address.address_2 %></div>
+                          <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
+                          <div class="col-md-6"><%= income.employer_address.address_1 %></div>
+                        </div>
+
+                        <% if income.employer_address.address_2.present? %>
+                          <div class="row ptb no-buffer row-height">
+                            <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
+                            <div class="col-md-6"><%= income.employer_address.address_2 %></div>
+                          </div>
+                        <% end %>
+
+                        <div class="row ptb no-buffer row-height">
+                          <div class="col-md-6">CITY</div>
+                          <div class="col-md-6"><%= income.employer_address.city %></div>
+                        </div>
+
+                        <div class="row ptb no-buffer row-height">
+                          <div class="col-md-6">STATE</div>
+                          <div class="col-md-6"><%= income.employer_address.state %></div>
+                        </div>
+
+                        <div class="row ptb no-buffer row-height">
+                          <div class="col-md-6">ZIP</div>
+                          <div class="col-md-6"><%= income.employer_address.zip %></div>
                         </div>
                       <% end %>
-
-                      <div class="row ptb no-buffer row-height">
-                        <div class="col-md-6">CITY</div>
-                        <div class="col-md-6"><%= income.employer_address.city %></div>
-                      </div>
-
-                      <div class="row ptb no-buffer row-height">
-                        <div class="col-md-6">STATE</div>
-                        <div class="col-md-6"><%= income.employer_address.state %></div>
-                      </div>
-
-                      <div class="row ptb no-buffer row-height">
-                        <div class="col-md-6">ZIP</div>
-                        <div class="col-md-6"><%= income.employer_address.zip %></div>
-                      </div>
-
-                      <div class="row ptb no-buffer row-height border-bottom">
-                        <div class="col-md-6">EMPLOYER PHONE</div>
-                        <div class="col-md-6"><%= format_phone(income.employer_phone.full_phone_number) %></div>
-                      </div>
+                      <% if income.employer_phone.present? %>
+                        <div class="row ptb no-buffer row-height border-bottom">
+                          <div class="col-md-6">EMPLOYER PHONE</div>
+                          <div class="col-md-6"><%= format_phone(income.employer_phone.full_phone_number) %></div>
+                        </div>
+                      <% end %>
                     </div>
                   <% end %>
                 <% end %>

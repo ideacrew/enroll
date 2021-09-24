@@ -490,6 +490,7 @@ module FinancialAssistance
       state :submitted
       state :determination_response_error
       state :determined
+      state :imported
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
@@ -547,6 +548,10 @@ module FinancialAssistance
       # Currently, this event will be used during renewal generations
       event :fail_submission, :after => :record_transition do
         transitions from: :renewal_draft, to: :submission_pending
+      end
+
+      event :import, :after => [:record_transition] do
+        transitions from: :draft, to: :imported
       end
     end
 
