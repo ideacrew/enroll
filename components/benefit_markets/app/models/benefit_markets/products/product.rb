@@ -37,6 +37,7 @@ module BenefitMarkets
       field :deductible, type: String
       field :family_deductible, type: String
       field :issuer_assigned_id, type: String
+      field :rating_method, type: String, default: 'Age-Based Rates'
       field :service_area_id, type: BSON::ObjectId
       field :network_information, type: String
       field :nationwide, type: Boolean # Nationwide
