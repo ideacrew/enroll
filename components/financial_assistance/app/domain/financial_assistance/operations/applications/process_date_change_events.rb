@@ -43,20 +43,14 @@ module FinancialAssistance
 
         def process_renewals
           @logger.info 'Started process_renewals process'
-          # create_application_renewal_requests if can_generate_draft_renewals?
-          # publish_submit_renewal_drafts if can_submit_renewal_drafts?
+          create_application_renewal_requests if can_trigger_bulk_application_renewals?
           @logger.info 'Ended process_renewals process'
           Success('Processed application renewals successfully')
         end
 
-        def can_generate_draft_renewals?
-          FinancialAssistanceRegistry.feature_enabled?(:generate_draft_renewals) &&
-            TimeKeeper.date_of_record == date_of_draft_renewals_generation
-        end
-
-        def can_submit_renewal_drafts?
-          FinancialAssistanceRegistry.feature_enabled?(:submit_renewal_drafts) &&
-            TimeKeeper.date_of_record == date_of_submit_renewal_drafts
+        def can_trigger_bulk_application_renewals?
+          FinancialAssistanceRegistry.feature_enabled?(:create_renewals_on_date_change) &&
+            TimeKeeper.date_of_record == bulk_application_renewal_trigger_date
         end
 
         def create_application_renewal_requests
@@ -67,62 +61,9 @@ module FinancialAssistance
           @logger.info "Failed to execute create_application_renewal_requests, error: #{e.backtrace}"
         end
 
-        # def create_renewal_application_submit_requests
-        #   @logger.info 'Started create_renewal_application_submit_requests process'
-        #   ::FinancialAssistance::Operations::Applications::MedicaidGateway::CreateRenewalApplicationSubmitRequest.new.call(renewal_year: @renewal_year)
-        #   @logger.info 'Ended create_renewal_application_submit_requests process'
-        # rescue StandardError => e
-        #   @logger.info "Failed to execute create_renewal_application_submit_requests, error: #{e.backtrace}"
-        # end
-
-        def generate_bulk_draft_renewals
-          @logger.info 'Started generate_bulk_draft_renewals process'
-          family_ids = FinancialAssistance::Application.where(assistance_year: @renewal_year.pred).distinct(:family_id).uniq
-          @logger.info "Total number of families with fa_applications: #{family_ids.count}"
-          family_ids.inject([]) do |_arr, family_id|
-            @logger.info '-' * 20
-            payload = { family_id: family_id.to_s, renewal_year: @renewal_year }
-            result = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(payload)
-            @logger.info "Successfully generated renewal draft, with payload: #{payload}" if result.success?
-            @logger.info "Failed to generate renewal draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
-          rescue StandardError, SystemStackError => e
-            @logger.info "Errored out while generating renewal draft, with payload: #{payload}, error_message: #{e.message}, backtrace: #{e.backtrace}"
-          end
-
-          @logger.info 'Ended generate_bulk_draft_renewals process'
-        rescue StandardError => e
-          @logger.info "Failed to execute generate_bulk_draft_renewals, error: #{e.backtrace}"
-        end
-
-        def submit_bulk_renewal_drafts
-          @logger.info 'Started submit_bulk_renewal_drafts process'
-          applications = FinancialAssistance::Application.renewal_draft.where(assistance_year: @renewal_year)
-          @logger.info "Total number of renewal_draft applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"
-
-          applications.inject([]) do |_arr, application|
-            @logger.info '-' * 20
-            payload = { application_hbx_id: application.hbx_id.to_s }
-            result = ::FinancialAssistance::Operations::Applications::Renew.new.call(payload)
-            @logger.info "Successfully submitted renewal_draft, with payload: #{payload}" if result.success?
-            @logger.info "Failed to submit renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
-          rescue StandardError, SystemStackError => e
-            @logger.info "Errored out while submitting renewal draft, with payload: #{payload}, error_message: #{e.message}, backtrace: #{e.backtrace}"
-          end
-
-          @logger.info 'Ended submit_bulk_renewal_drafts process'
-        rescue StandardError => e
-          @logger.info "Failed to execute submit_bulk_renewal_drafts, error: #{e.backtrace}"
-        end
-
-        def date_of_draft_renewals_generation
-          day = FinancialAssistanceRegistry[:generate_draft_renewals].settings(:draft_renewal_generation_day).item
-          month = FinancialAssistanceRegistry[:generate_draft_renewals].settings(:draft_renewal_generation_month).item
-          Date.new(TimeKeeper.date_of_record.year, month, day)
-        end
-
-        def date_of_submit_renewal_drafts
-          day = FinancialAssistanceRegistry[:submit_renewal_drafts].settings(:renewal_draft_submission_day).item
-          month = FinancialAssistanceRegistry[:submit_renewal_drafts].settings(:renewal_draft_submission_month).item
+        def bulk_application_renewal_trigger_date
+          day = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_day).item
+          month = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_month).item
           Date.new(TimeKeeper.date_of_record.year, month, day)
         end
       end
