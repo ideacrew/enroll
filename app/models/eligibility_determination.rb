@@ -7,7 +7,7 @@ class EligibilityDetermination
   embedded_in :tax_household
   after_create :apply_aptc_aggregate
 
-  SOURCE_KINDS = %w[Curam Admin Renewals Faa].freeze # TODO change "Renewals" source kind
+  SOURCE_KINDS = %w[Curam Admin Renewals Faa Ffe].freeze # TODO: change "Renewals" source kind
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0 csr_limited)
 

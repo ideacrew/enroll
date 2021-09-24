@@ -28,6 +28,8 @@ class FamilyMember
   # Immediately preceding family where this person was a member
   field :former_family_id, type: BSON::ObjectId
 
+  field :external_member_id, type: String
+
   validate :no_duplicate_family_members
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }

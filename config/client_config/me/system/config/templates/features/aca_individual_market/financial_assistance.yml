@@ -229,5 +229,11 @@ registry:
           item: 8
         - key: :renewal_draft_submission_day
           item: 26
+    - key: :skip_employer_address_validation
+      is_enabled: :true
+    - key: :skip_employer_phone_validation
+      is_enabled: :true
+    - key: :skip_employer_id_validation
+      is_enabled: :true
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

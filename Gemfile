@@ -26,7 +26,6 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 gem 'database_cleaner',       '~> 1.7'
-
 #######################################################
 
 #######################################################

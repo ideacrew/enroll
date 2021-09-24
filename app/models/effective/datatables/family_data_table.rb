@@ -13,6 +13,7 @@ module Effective
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
+        table_column :external_app_id, :label => 'External ID', :proc => proc { |row| row.external_app_id }, :filter => false, :sortable => false if EnrollRegistry[:display_external_id_in_family_datatable].enabled?
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :active_enrollments, :label => 'Active Enrollments?', :proc => proc { |row| active_admin_dt_enrollments(row).any? ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :registered?, :width => '100px', :proc => proc { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"}, :filter => false, :sortable => false

@@ -50,6 +50,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
                                      kind: 'work',
                                      area_code: '202',
                                      number: '1111111',
+                                     full_phone_number: '2021111111',
                                      extension: '',
                                      primary: true)]
     application10.applicants.destroy_all

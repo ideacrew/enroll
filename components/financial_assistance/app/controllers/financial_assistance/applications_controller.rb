@@ -50,6 +50,10 @@ module FinancialAssistance
           @current_step = @current_step.next_step if @current_step.next_step.present?
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
+            if @application.imported?
+              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
+              return
+            end
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
