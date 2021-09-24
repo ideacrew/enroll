@@ -442,7 +442,7 @@ module Operations
             is_enrolled_on_medicaid: applicant_hash.dig('pregnancy_information', 'is_enrolled_on_medicaid'),
             is_post_partum_period: applicant_hash.dig('pregnancy_information', 'is_post_partum_period'),
             children_expected_count: applicant_hash.dig('pregnancy_information', 'expected_children_count'),
-            pregnancy_due_on: applicant_hash.dig('pregnancy_information', 'pregnancy_due_on'),
+            pregnancy_due_on: nil,
             pregnancy_end_on: applicant_hash.dig('pregnancy_information', 'pregnancy_end_on'),
 
             is_subject_to_five_year_bar: applicant_hash['is_refugee'],
