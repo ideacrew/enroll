@@ -6,7 +6,7 @@ module CrmGateway
     extend ActiveSupport::Concern
 
     included do
-      # after_save :trigger_crm_family_update_publish
+      after_save :trigger_crm_family_update_publish
     end
 
     def trigger_crm_family_update_publish
