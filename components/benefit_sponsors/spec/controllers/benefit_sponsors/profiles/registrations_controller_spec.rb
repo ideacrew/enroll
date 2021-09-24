@@ -295,10 +295,14 @@ module BenefitSponsors
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
+            # allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_approval_period).and_return(true)
             BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
             BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop if profile_type == 'general_agency'
             site.benefit_markets.first.save!
+            # Stubbing the controller method (which has two conditions, one of which is a Resource Registry check) is easier
+            allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true) if profile_type == 'broker_agency'
             user = self.send("#{profile_type}_user")
             sign_in user if user
             post :create, params: {:agency => self.send("#{profile_type}_params")}
