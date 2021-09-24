@@ -5,7 +5,7 @@ require 'ui_helpers/workflow/line'
 module UIHelpers
   module Workflow
     class Section
-      attr_accessor :heading, :lines, :heading_text, :classNames, :enabled
+      attr_accessor :heading, :lines, :heading_text, :classNames, :enabled # rubocop:disable Naming/MethodName
 
       def initialize(section)
         @lines = section["lines"].map { |line| Workflow::Line.new line }
