@@ -665,7 +665,7 @@ module Operations
           persisted_applicant.is_totally_ineligible = false
           persisted_applicant.is_without_assistance = false
 
-          # ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
+          ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false)
 
           # unless persisted_applicant.valid?
           #   binding.pry
@@ -677,7 +677,7 @@ module Operations
           # end
 
           persisted_applicant.save!
-          # ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
+          ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false)
           # persisted_applicant.has_insurance = applicant[:has_insurance]
           # persisted_applicant.has_state_health_benefit = applicant[:has_state_health_benefit]
           # persisted_applicant.had_prior_insurance = applicant[:had_prior_insurance]

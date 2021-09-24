@@ -1149,7 +1149,6 @@ DEPENDENCIES
   notifier!
   openhbx_cv2!
   overcommit (~> 0.47)
-  parallel
   parallel_tests (~> 2.26.2)
   prawn!
   pry

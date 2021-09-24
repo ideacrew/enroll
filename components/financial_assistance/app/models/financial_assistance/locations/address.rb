@@ -52,8 +52,6 @@ module FinancialAssistance
                   :message => 'should be in the form: 12345 or 12345-1234'
                 }
 
-
-
       def office_is_primary_location?
         kind == 'primary'
       end
