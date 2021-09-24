@@ -216,7 +216,7 @@ registry:
     - :renewals
     features:
     - key: :create_renewals_on_date_change
-      is_enabled: true
+      is_enabled: false
       settings:
         - key: :renewals_creation_month
           item: 9
