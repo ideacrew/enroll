@@ -9,9 +9,11 @@ module Parser
 
     has_one :header, Parser::PlanRateHeaderParser, tag: "header"
     has_many :items, Parser::PlanRateItemsParser, tag: "items"
+    element :rating_method, String, tag: 'ratingMethod'
 
     def to_hash
       {
+        rating_method: rating_method.present? ? rating_method.gsub(/\n/,'').strip : "",
         header: header.to_hash,
         items: items.map(&:to_hash)
       }
