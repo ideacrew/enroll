@@ -22,10 +22,7 @@ module FinancialAssistance
           private
 
           def find_families(renewal_year)
-            family_ids = FinancialAssistance::Application.by_year(renewal_year.pred).renewal_eligible.distinct(:family_id)
-            family_records = Family.where(:id.in => family_ids).pluck(:id, :hbx_assigned_id).sort_by(&:last) # Optimize this to make it work for large dataset ex. 30000 records
-
-            Success(family_records)
+            Success(::FinancialAssistance::Application.by_year(renewal_year.pred).renewal_eligible.distinct(:family_id))
           end
 
           # rubocop:disable Style/MultilineBlockChain
@@ -36,7 +33,7 @@ module FinancialAssistance
             logger.info "Total number of applications with assistance_year: #{renewal_year.pred} are #{family_ids.count}"
             family_ids.each_with_index do |family_id, index|
               # EventSource Publishing
-              params = { payload: { index: index, family_id: family_id[0].to_s, family_hbx_id: family_id[1], renewal_year: renewal_year }, event_name: 'application_renewal_request_created' }
+              params = { payload: { index: index, family_id: family_id.to_s, renewal_year: renewal_year }, event_name: 'application_renewal_request_created' }
 
               Try do
                 ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
