@@ -19,9 +19,36 @@ module BenefitMarkets
 
     default_scope   ->{ order(:"age".asc) }
 
-
     def comparable_attrs
       [:age, :cost]
+    end
+
+    def couple_enrollee
+      20
+    end
+
+    def couple_enrollee_one_dependent
+      30
+    end
+
+    def couple_enrollee_two_dependent
+      40
+    end
+
+    def couple_enrollee_many_dependent
+      60
+    end
+
+    def primary_enrollee_one_dependent
+      10
+    end
+
+    def primary_enrollee_two_dependent
+      20
+    end
+
+    def primary_enrollee_many_dependent
+      30
     end
 
     # Define Comparable operator
