@@ -1,12 +1,6 @@
 module ApplicationHelper
   include FloatHelper
 
-  def article_helper(word)
-    vowels = ['a', 'e', 'i', 'o', 'u']
-    return "an" if word.is_a?(String) && vowels.include?(word.downcase[0])
-    "a"
-  end
-
   def seed_url_helper(row)
     case row.record_class_name
     when nil
