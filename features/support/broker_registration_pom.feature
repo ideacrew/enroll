@@ -1,6 +1,7 @@
 Feature: Broker Agency Registration
 
   Scenario: Primary Broker has not signed up on the HBX
+    And EnrollRegistry broker_attestation_fields feature is disabled
     Given a CCA site exists with a benefit market
     When a Primary Broker visits the HBX Broker Registration form POM
     Given Primary Broker has not signed up as an HBX user
