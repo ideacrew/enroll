@@ -454,7 +454,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   fill_in SignIn.password, :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in SignIn.username, :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
-  find(SignIn.sign_in_btn).click
+  find(SignIn.sign_in_btn, wait: 5).click
 
   # visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error

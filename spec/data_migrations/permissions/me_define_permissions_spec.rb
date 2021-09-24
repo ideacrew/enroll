@@ -4,7 +4,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "permissions", "me_define_permissions")
 
 # TODO: We need to refactor this file to be conditional based on client
-describe MeDefinePermissions, dbclean: :around_each do
+describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'me' do
   subject { MeDefinePermissions.new(given_task_name, double(:current_scope => nil))}
   let(:roles) {%w[hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin] }
   describe 'create permissions' do
