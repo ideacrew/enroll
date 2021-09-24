@@ -80,7 +80,7 @@ class ImportMaineBrokers
   end
 
   def build_broker_agency_org
-    exempt_organization = ::BenefitSponsors::Organizations::ExemptOrganization.new({ legal_name: "#{row_hash["Last Name"]}_#{row_hash["NPN"]}",
+    exempt_organization = ::BenefitSponsors::Organizations::ExemptOrganization.new({ legal_name: "#{row_hash["First Name"]} #{row_hash["Last Name"]}",
                                                                                      entity_kind: "s_corporation",
                                                                                      site: site
                                                                                  })
@@ -161,16 +161,9 @@ class ImportMaineBrokers
 end
 
 file_name = "#{Rails.root}/db/producer_list.csv"
-# file_name = "/Users/saidineshmekala/Downloads/app_migration/broker_migration/producer_list.csv"
 CSV.foreach(file_name, headers: true) do |row|
   row_hash = row.to_hash
   next unless row_hash["NPN_IN_ALMS"] == "Y"
   importklass= ImportMaineBrokers.new(row_hash)
   importklass.import
 end
-
-
-
-
-
-

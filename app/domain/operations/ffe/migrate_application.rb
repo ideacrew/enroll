@@ -741,22 +741,4 @@ module Operations
     end
   end
 end
-
-# TODO: refactor
-#   result = Operations::CvMigration::CreateFamily.new.call(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier]))
-#   binding.pry
-#   family = Family.where(id: result.success).first
-#   if family.primary_applicant.person.is_applying_for_assistance
-#     Family.create_indexes
-#     family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
-#     binding.pry
-#     Operations::CvMigration::CreateMagiMedicaidApplication.new.call(family_hash)
-#     binding.pry
-#     # app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-#     ::FinancialAssistance::Application.create_indexes
-#     # fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
-#     # fix_iap_relationship(app_id, family_hash)
-#   end
-#  end
-
 # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

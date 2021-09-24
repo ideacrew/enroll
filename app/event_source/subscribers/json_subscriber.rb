@@ -25,23 +25,3 @@ module Subscribers
     end
   end
 end
-
-# application_id = payload[:insuranceApplicationIdentifier]
-# logger.info "on_stream payload: #{application_id} #{'*' * 100}"
-# result = Operations::Ffe::TransformApplication.new.call(payload)
-# if result.success?
-#   transformed_application = result.success.to_h.merge(external_app_id: payload[:insuranceApplicationIdentifier])
-#   notify("acapi.info.events.migration.transformed_application", {:application_payload => transformed_application})
-#   ack(delivery_info.delivery_tag)
-#   logger.info "Sucess: MCRSubscriber: acked with success: #{result.success}"
-# else
-#   errors = result.failure.errors.to_h
-#   # nack(delivery_info.delivery_tag) #TODO:
-#   ack(delivery_info.delivery_tag)
-#   logger.info "Failure: MCRSubscriber: nacked with failure, errors: #{errors}"
-# end
-# logger.info "on_stream completed for: #{application_id} #{'*' * 100}"
-# rescue StandardError => e
-# logger.info "Exception: MCRSubscriber: #{e.backtrace} nacked"
-# ack(delivery_info.delivery_tag)
-# # nack(delivery_info.delivery_tag)
