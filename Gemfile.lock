@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 42ee843bff1c75d068fa4c52482f97500c854a60
+  revision: c0f8fd2d562fed3624fc6a422a2fbf8e1a83120e
   branch: mcr_mapping
   specs:
     aca_entities (0.6.0)
