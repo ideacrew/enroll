@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 9c05d647cc728656d8d9a6c7ee6196dea2c04692
+  revision: 25ec7f2501e658b6a2bcad701e053a86ae5f6543
   branch: iap_application_renewal
   specs:
     aca_entities (0.6.0)
