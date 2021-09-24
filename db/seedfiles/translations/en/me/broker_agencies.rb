@@ -1,5 +1,6 @@
 BROKER_AGENCIES_TRANSLATIONS = {
-	"en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Broker Agency",
+	"en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Expert",
+  "en.broker_agencies.broker_roles.agency_name_placeholder" => "Agency Name, NPN",
 	"en.search" => "Search",
 	"en.submit_application" => "Submit Application",
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information" => "Broker Agency Information",
@@ -23,7 +24,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.assign" => "Assign",
   "en.broker_agency" => "Agency",
   "en.add_broker_staff_role" => "Add Staff",
-  "en.broker_agency_staff" => "Staff",
+  "en.broker_agency_staff" => "Expert Staff",
 	"en.general_agencies" => "General Agencies",
 	"en.select_general_agency" => "Select General Agency",
 	"en.general_agencies.general_agency_staff_role_success" => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.",
