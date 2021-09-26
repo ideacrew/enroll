@@ -55,9 +55,7 @@ module FinancialAssistance
 
               applicant_esi_evidence = applicant.evidences.by_name(:non_esi_mec).first
 
-              if ["outstanding"].include?(response_esi_evidence.eligibility_status)
-                applicant_esi_evidence.update_attributes(eligibility_status: response_esi_evidence.eligibility_status)
-              end
+              applicant_esi_evidence.update_attributes(eligibility_status: response_esi_evidence.eligibility_status) if ["outstanding"].include?(response_esi_evidence.eligibility_status)
 
               if response_esi_evidence.eligibility_results.present?
                 response_esi_evidence.eligibility_results.each do |eligibility_result|
