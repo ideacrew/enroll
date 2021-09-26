@@ -125,6 +125,11 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(class_constants.include?(:SUBMITTED_STATUS)).to be_truthy
       expect(described_class::SUBMITTED_STATUS).to eq(%w[submitted verifying_income])
     end
+
+    it 'should have RENEWAL_ELIGIBLE_STATES constant' do
+      expect(class_constants.include?(:RENEWAL_ELIGIBLE_STATES)).to be_truthy
+      expect(described_class::RENEWAL_ELIGIBLE_STATES).to eq(%w[submitted determined imported])
+    end
   end
 
   describe '.Scopes' do

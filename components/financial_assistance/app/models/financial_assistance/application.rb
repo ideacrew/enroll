@@ -34,8 +34,7 @@ module FinancialAssistance
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
-    RENEWAL_ELIGIBLE_STATES = %w[submitted determined].freeze
-    # RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
+    RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
 
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
@@ -492,8 +491,6 @@ module FinancialAssistance
       state :submitted
       state :determination_response_error
       state :determined
-      state :imported
-
       state :imported
 
       # submit is the same event that can be used in renewal context as well

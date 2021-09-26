@@ -229,6 +229,94 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
       end
     end
 
+    context 'imported application' do
+      before do
+        application.update_attributes!({ aasm_state: 'imported', years_to_renew: [0, nil].sample })
+        application.reload
+        @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        @renewal_draft_app = @result.success
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should return application' do
+        expect(@renewal_draft_app).to be_a(::FinancialAssistance::Application)
+      end
+
+      it 'should return application in renewal_draft state' do
+        expect(@renewal_draft_app.renewal_draft?).to be_truthy
+      end
+
+      it 'should return application with predecessor_id' do
+        expect(@renewal_draft_app.predecessor_id).to eq(application.id)
+      end
+
+      it 'should return application with assistance_year' do
+        expect(@renewal_draft_app.assistance_year).to eq(application.assistance_year.next)
+      end
+
+      # Verify if all the answers for questions on 'Your Preferences' & 'Submit Your Application' were copied
+      context 'for attestations & other questions' do
+        # Your Preferences:
+        #   is_renewal_authorized
+        #   is_requesting_voter_registration_application_in_mail
+        #   years_to_renew
+        context 'Your Preferences' do
+          it 'should return application with is_renewal_authorized' do
+            expect(@renewal_draft_app.is_renewal_authorized).to eq(application.is_renewal_authorized)
+          end
+
+          it 'should return application with is_requesting_voter_registration_application_in_mail' do
+            expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
+          end
+
+          it 'should return application with years_to_renew as zero' do
+            expect(@renewal_draft_app.years_to_renew).to be_zero
+          end
+        end
+
+        # Submit Your Application:
+        #   medicaid_terms
+        #   report_change_terms
+        #   medicaid_insurance_collection_terms
+        #   parent_living_out_of_home_terms
+        #   attestation_terms
+        #   submission_terms
+        #   full_medicaid_determination
+        context 'Submit Your Application' do
+          it 'should return application with medicaid_terms' do
+            expect(@renewal_draft_app.medicaid_terms).to eq(application.medicaid_terms)
+          end
+
+          it 'should return application with report_change_terms' do
+            expect(@renewal_draft_app.report_change_terms).to eq(application.report_change_terms)
+          end
+
+          it 'should return application with medicaid_insurance_collection_terms' do
+            expect(@renewal_draft_app.medicaid_insurance_collection_terms).to eq(application.medicaid_insurance_collection_terms)
+          end
+
+          it 'should return application with parent_living_out_of_home_terms' do
+            expect(@renewal_draft_app.parent_living_out_of_home_terms).to eq(application.parent_living_out_of_home_terms)
+          end
+
+          it 'should return application with submission_terms' do
+            expect(@renewal_draft_app.submission_terms).to eq(application.submission_terms)
+          end
+
+          it 'should return application with attestation_terms' do
+            expect(@renewal_draft_app.attestation_terms).to eq(application.attestation_terms)
+          end
+
+          it 'should return application with full_medicaid_determination' do
+            expect(@renewal_draft_app.full_medicaid_determination).to eq(application.full_medicaid_determination)
+          end
+        end
+      end
+    end
+
     context 'renewal_base_year' do
       before do
         application.update_attributes!({ aasm_state: 'draft', years_to_renew: rand(0..5), is_renewal_authorized: false })
