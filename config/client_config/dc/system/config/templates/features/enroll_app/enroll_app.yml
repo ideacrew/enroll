@@ -557,4 +557,7 @@ registry:
         is_enabled: false
       - key: :in_person_assister
         item: :in_person_assister
+        is_enabled: true
+      - key: :expanded_npn_duplicate
+        item: :expanded_npn_duplicate
         is_enabled: false
