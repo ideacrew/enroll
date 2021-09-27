@@ -17,7 +17,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
         logger.info "MecCheckSubscriber: acked with success: #{result.success}"
       else
-        errors = result.failure.errors.to_h
+        errors = result.failure
         nack(delivery_info.delivery_tag)
         logger.info "MecCheckSubscriber: nacked with failure, errors: #{errors}"
       end
