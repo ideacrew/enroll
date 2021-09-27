@@ -43,16 +43,15 @@ module BenefitMarkets
     end
 
     def qhp_premium_table
-      Rails.cache.fetch("benefit_market_qhp_premium_table_#{id}") do
-        return nil if product.age_based_rating?
+      return nil if product.age_based_rating?
+      return nil if qhp_product.blank?
 
-        qhp = ::Products::Qhp.where(standard_component_id: product.hios_base_id, active_year: product.active_year).first
-        return nil if qhp.blank?
+      qhp_product.qhp_premium_tables
+                 .detect { |qpt| qpt.rate_area_id == premium_table.exchange_provided_code }
+    end
 
-        qhp.qhp_premium_tables
-           .where(rate_area_id: premium_table.exchange_provided_code)
-           .first
-      end
+    def qhp_product
+      @qhp_product ||= ::Products::Qhp.where(standard_component_id: product.hios_base_id, active_year: product.active_year).first
     end
 
     # Define Comparable operator
