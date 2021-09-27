@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: c5e310097513f16323c2aa63bf29e0bd28e7bb04
-  branch: iap_renewals_event_source_setup
+  revision: d779e9bef637f846c552239e9fcd45f4940c8958
+  branch: release_0.8.0
   specs:
     aca_entities (0.6.0)
       deep_merge
@@ -346,7 +346,7 @@ GEM
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.2)
-    nokogiri (1.12.4)
+    nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
