@@ -30,7 +30,6 @@ module BenefitSponsors
         begin
           saved, result_url = @agency.save
           result_url = self.send(result_url)
-          binding.irb
           if saved && is_employer_profile?
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
@@ -38,16 +37,15 @@ module BenefitSponsors
           elsif saved && is_general_agency_profile?
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
           end
-          template_filename = if EnrollRegistry.feature_enabled?(:redirect_to_requirements_page_after_confirmation)
+          template_filename = if redirect_to_requirements_after_confirmation?
                                 "confirmation"
                               else
                                 "broker_agencies/broker_roles/extended_confirmation.html.erb"
                               end
-          # Change me file to extended_confirrmation
-          if is_broker_profile?
-            binding.irb
+          if is_broker_profile? && saved
             render template_filename, :layout => 'single_column'
-          else
+            return
+          elsif saved
             redirect_to result_url
           end
           return

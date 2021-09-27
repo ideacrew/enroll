@@ -319,7 +319,6 @@ module BenefitSponsors
           end
 
           it "should render confirmation template for broker agency" do
-            binding.irb if profile_type == 'broker_agency'
             expect(response).to render_template('confirmation') if profile_type == 'broker_agency'
           end
 
