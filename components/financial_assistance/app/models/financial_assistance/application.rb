@@ -34,7 +34,7 @@ module FinancialAssistance
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
-    RENEWAL_ELIGIBLE_STATES = %w[submitted determined].freeze
+    RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
 
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
@@ -148,6 +148,7 @@ module FinancialAssistance
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, -> { where(:aasm_state.in => ['submitted', 'determination_response_error', 'determined']) }
+    scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -169,7 +170,7 @@ module FinancialAssistance
 
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?
-        # Update relationship object only if the existing RelationshipKind is different some the incoming RelationshipKind.
+        # Update relationship object only if the existing RelationshipKind is different from the incoming RelationshipKind.
         relationship.update(kind: relation_kind) if relationship.kind != relation_kind
         return relationship
       end
@@ -1036,10 +1037,11 @@ module FinancialAssistance
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      )  if assistance_year.blank?
+      ) if assistance_year.blank?
     end
 
     def set_effective_date
+      return if effective_date.present?
       effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
       update_attribute(:effective_date, effective_date)
     end

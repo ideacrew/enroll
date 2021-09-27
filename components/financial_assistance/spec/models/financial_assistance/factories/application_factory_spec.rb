@@ -64,7 +64,8 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
             eligibility_response_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
             eligibility_request_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
             assistance_year: TimeKeeper.date_of_record.year,
-            renewal_base_year: TimeKeeper.date_of_record.year }
+            renewal_base_year: TimeKeeper.date_of_record.year,
+            effective_date: TimeKeeper.date_of_record.next_month.beginning_of_month }
         end
 
         before do
@@ -91,6 +92,10 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
         it 'should not copy renewal_base_year' do
           expect(@duplicate_application.renewal_base_year).to be_nil
+        end
+
+        it 'should not copy effective_date' do
+          expect(@duplicate_application.effective_date).to be_nil
         end
       end
 
@@ -211,6 +216,120 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         it 'should not copy net_annual_income' do
           expect(@duplicate_applicant.net_annual_income).to be_nil
         end
+      end
+    end
+  end
+
+  describe 'family with just one family member for copy_application' do
+    let!(:person11) do
+      FactoryBot.create(:person,
+                        :with_consumer_role,
+                        :with_ssn,
+                        first_name: 'Person11')
+    end
+    let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+
+    before do
+      application.update_attributes!(family_id: family11.id)
+      applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+      @new_application = described_class.new(application).copy_application
+    end
+
+    it 'should return application with one applicant' do
+      expect(@new_application.applicants.count).to eq(1)
+    end
+  end
+
+  describe 'family with just one family member for duplicate' do
+    let!(:person11) do
+      FactoryBot.create(:person,
+                        :with_consumer_role,
+                        :with_ssn,
+                        first_name: 'Person11')
+    end
+    let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+
+    before do
+      application.update_attributes!(family_id: family11.id)
+      applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+      applicant2.update_attributes!(is_active: false)
+      @new_application = described_class.new(application).duplicate
+    end
+
+    it 'should return application with one applicant' do
+      expect(@new_application.applicants.count).to eq(1)
+    end
+  end
+
+  describe 'fetch_matching_applicant' do
+    context 'multiple applicants with different person_hbx_ids' do
+      let!(:new_application) do
+        FactoryBot.create(:application,
+                          family_id: BSON::ObjectId.new,
+                          aasm_state: "determined",
+                          effective_date: TimeKeeper.date_of_record)
+      end
+
+      let!(:new_applicant1) do
+        FactoryBot.create(:applicant,
+                          application: new_application,
+                          dob: TimeKeeper.date_of_record - 40.years,
+                          is_primary_applicant: true,
+                          family_member_id: BSON::ObjectId.new,
+                          first_name: 'Test',
+                          last_name: 'Last',
+                          person_hbx_id: '10002')
+      end
+
+      let!(:new_applicant2) do
+        FactoryBot.create(:applicant,
+                          application: new_application,
+                          dob: TimeKeeper.date_of_record - 40.years,
+                          family_member_id: BSON::ObjectId.new,
+                          first_name: 'Test',
+                          last_name: 'Last',
+                          person_hbx_id: '10001')
+      end
+
+      before do
+        applicant.update_attributes!(person_hbx_id: '10001', first_name: 'Test', last_name: 'Last', dob: TimeKeeper.date_of_record - 40.years)
+        @applicant_result = described_class.new(application).send(:fetch_matching_applicant, new_application, applicant)
+      end
+
+      it 'should return applicant that matches with the person_hbx_id' do
+        expect(@applicant_result.person_hbx_id).to eq(applicant.person_hbx_id)
+      end
+    end
+  end
+
+  describe 'relationship' do
+    context 'multiple family members' do
+      let!(:person11) do
+        FactoryBot.create(:person,
+                          :with_consumer_role,
+                          :with_ssn,
+                          hbx_id: '1000001',
+                          first_name: 'Primary')
+      end
+      let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+      let!(:person12) do
+        per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Dependent', hbx_id: '1000002')
+        person11.ensure_relationship_with(per, 'child')
+        per
+      end
+      let!(:family_member12) do
+        FactoryBot.create(:family_member, family: family11, person: person12)
+      end
+
+      before do
+        application.update_attributes!(family_id: family11.id)
+        applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+        applicant2.destroy!
+        @new_application = described_class.new(application).copy_application
+      end
+
+      it 'should return relationships' do
+        expect(@new_application.relationships.count).to eq(2)
       end
     end
   end

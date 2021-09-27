@@ -221,20 +221,13 @@ registry:
   - namespace:
     - :renewals
     features:
-    - key: :generate_draft_renewals
-      is_enabled: true
+    - key: :create_renewals_on_date_change
+      is_enabled: false
       settings:
-        - key: :draft_renewal_generation_month
+        - key: :renewals_creation_month
           item: 9
-        - key: :draft_renewal_generation_day
+        - key: :renewals_creation_day
           item: 16
-    - key: :submit_renewal_drafts
-      is_enabled: true
-      settings:
-        - key: :renewal_draft_submission_month
-          item: 9
-        - key: :renewal_draft_submission_day
-          item: 17
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation

@@ -677,7 +677,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                             })
       benefit = ::FinancialAssistance::Benefit.new({
                                                      :employee_cost => 500.00,
-                                                     :employer_id => "12-2132133",
+                                                     :employer_id => '12-2132133',
                                                      :kind => "is_enrolled",
                                                      :insurance_kind => "employer_sponsored_insurance",
                                                      :employer_name => "er1",

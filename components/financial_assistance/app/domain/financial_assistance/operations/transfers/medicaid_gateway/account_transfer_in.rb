@@ -276,7 +276,7 @@ module FinancialAssistance
               last_name: person_hash['person_name']['last_name'],
               full_name: person_hash['person_name']['full_name'],
               ssn: person_hash['person_demographics']['ssn'],
-              no_ssn: person_hash['person_demographics']['no_ssn'], # update in aca entities contracts to receive as string
+              no_ssn: transform_no_ssn(person_hash['person_demographics']['no_ssn']), # update in aca entities contracts to receive as string
               gender: person_hash['person_demographics']['gender'],
               dob: person_hash['person_demographics']['dob'],
               date_of_death: person_hash['person_demographics']['date_of_death'],
@@ -301,6 +301,10 @@ module FinancialAssistance
               emails: person_hash['emails'],
               phones: person_hash['phones']
             }
+          end
+
+          def transform_no_ssn(no_ssn_value)
+            no_ssn_value ? '1' : '0'
           end
 
           def fill_applicants_form(applications, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
