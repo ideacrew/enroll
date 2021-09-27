@@ -43,6 +43,7 @@ module BenefitSponsors
                                 "broker_agencies/broker_roles/extended_confirmation.html.erb"
                               end
           if is_broker_profile? && saved
+            flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             render template_filename, :layout => 'single_column'
             return
           elsif saved
