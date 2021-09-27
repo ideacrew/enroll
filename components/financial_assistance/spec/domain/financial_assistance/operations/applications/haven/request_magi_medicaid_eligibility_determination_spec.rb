@@ -36,7 +36,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
   end
   let!(:create_appli) do
     appli = FactoryBot.build(:financial_assistance_applicant,
-                             :with_work_phone,
                              person_hbx_id: '100095',
                              is_primary_applicant: true,
                              first_name: 'Gerald',
@@ -46,12 +45,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                              gender: 'male',
                              ethnicity: [],
                              dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day))
-    appli.phones = [FactoryBot.build(:financial_assistance_phone,
-                                     kind: 'work',
-                                     area_code: '202',
-                                     number: '1111111',
-                                     extension: '',
-                                     primary: true)]
     application10.applicants.destroy_all
     application10.applicants = [appli]
     application10.save!
