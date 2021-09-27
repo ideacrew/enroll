@@ -691,7 +691,7 @@ module FinancialAssistance
             end
 
             def get_ia_eligible_status(status)
-              { true => 'Yes', false => 'No', nil => 'Undertermined' }[status]
+              { true => 'Yes', false => 'No', nil => 'UnDetermined' }[status]
             end
 
             def get_thh_member(eligibility, application)
