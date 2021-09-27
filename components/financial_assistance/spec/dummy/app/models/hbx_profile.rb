@@ -6,6 +6,7 @@ class HbxProfile
 
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Config::AcaModelConcern
 
   embedded_in :organization
 
@@ -90,7 +91,7 @@ class HbxProfile
     end
 
     def current_hbx
-      find_by_state_abbreviation("DC")
+      find_by_state_abbreviation(aca_state_abbreviation)
     end
 
     def transmit_group_xml(employer_profile_ids)
