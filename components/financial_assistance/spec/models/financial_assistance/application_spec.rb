@@ -580,6 +580,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
     let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
+    before do
+      allow(valid_app).to receive(:trigger_fdhs_calls).and_return(true)
+    end
+
     it 'should allow a sucessful state transition for valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
       expect(valid_app.submit).to be_truthy
@@ -627,12 +631,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
     end
 
     it 'should create MEC evidences' do
       application.send(:create_evidences)
-      expect(applicant1.evidences.count).to eq 2
-      expect(applicant2.evidences.count).to eq 2
+      expect(applicant1.evidences.count).to eq 3
+      expect(applicant2.evidences.count).to eq 3
     end
 
     it 'should have both income and mec in pending state' do
