@@ -26,6 +26,8 @@ module ConsumerWorld
   end
 
   def create_prior_and_current_benefit_packages
+    EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).stub(:item).and_return('single')
+    EnrollRegistry[:service_area].setting(:service_area_model).stub(:item).and_return('single')
     prior_coverage_year = Date.today.year - 1
     current_coverage_year = Date.today.year
     prior_hbx_profile = FactoryBot.create(:hbx_profile,
@@ -45,6 +47,8 @@ module ConsumerWorld
   end
 
   def create_prior_current_and_future_benefit_packages
+    EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).stub(:item).and_return('single')
+    EnrollRegistry[:service_area].setting(:service_area_model).stub(:item).and_return('single')
     prior_coverage_year = Date.today.year - 1
     hbx_profile = FactoryBot.create(:hbx_profile,
                                     :no_open_enrollment_coverage_period,
@@ -159,10 +163,10 @@ end
 
 World(ConsumerWorld)
 
-And(/(.*) has active individual market role and verified identity and IVL enrollment$/) do |named_person|
-  # Using Kaiser as a specific case for pay_now
+And(/(.*) has active individual market role and verified identity and IVL (.*) enrollment$/) do |named_person, issuer|
+  # Using Kaiser as a specific case for DC pay_now
   consumer_with_verified_identity(named_person)
-  create_consumer_ivl_enrollment(named_person, 'Kaiser')
+  create_consumer_ivl_enrollment(named_person, issuer)
 end
 
 And(/(.*) has HBX enrollment with future effective on date$/) do |named_person|

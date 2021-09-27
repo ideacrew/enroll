@@ -174,7 +174,7 @@ registry:
           - key: :state_dmv_link
             item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
           - key: :health_benefit_exchange_authority_phone_number
-            item: '(202) 715-7576'
+            item: '(855) 532-5465 TTY: 711'
           - key: :contact_center_name
             item: "DC Health Link's Customer Care Center"
           - key: :contact_center_po_box
@@ -291,7 +291,7 @@ registry:
         is_enabled: false
         item: ""
       - key: :change_end_date
-        is_enabled: true
+        is_enabled: false
         item: Operations::HbxEnrollments::EndDateChange.new
         settings:
           - key: :expired_enrollments
@@ -315,9 +315,9 @@ registry:
           - key: :plan_shopping
             item: true
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
-            item: 'Kaiser Permanante'
+            item: 'Kaiser Permanente'
       - key: :delta_dental_pay_now
         is_enabled: false
         settings:
@@ -551,4 +551,10 @@ registry:
         is_enabled: false
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
+        is_enabled: false
+      - key: :live_chat_widget
+        item: :live_chat_widget
+        is_enabled: false
+      - key: :in_person_assister
+        item: :in_person_assister
         is_enabled: false

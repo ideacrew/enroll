@@ -61,7 +61,7 @@
         </div>
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-lg-6 col-md-6 top-buffer'>
-            <span class="fa-text-color">Pregnancy due date? *</span>
+            <span class="fa-text-color">Pregnancy due date?<%= FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) ? '*' : '' %></span>
           </div>
           <div class='col-lg-6 col-md-6'>
             <%= f.text_field :pregnancy_due_on, class: "jq-datepicker floatlabel", id: "applicant_pregnancy_due_on", placeholder: "Due Date" %>

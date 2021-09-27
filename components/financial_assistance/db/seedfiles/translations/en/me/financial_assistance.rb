@@ -126,9 +126,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
-  "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
-  "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
-  "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
+  "en.faa.year_selection_oe_year" => " Open Enrollment",
+  "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
+  "en.faa.see_if_you_qualify_2" => " #{Settings.site.short_name} health insurance or free Medicaid coverage.",
+  "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
+  "en.faa.year_selection_oe_range_through" => " through ",
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",

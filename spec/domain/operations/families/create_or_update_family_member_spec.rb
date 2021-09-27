@@ -108,11 +108,14 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
       target_person.reload
       expect(target_person.consumer_role.vlp_documents.where(subject: "Income").count).to eq(0)
     end
-    it "should create an income vlp document if no incomes are present" do
-      @result = subject.call(applicant_params.merge!(incomes: []))
-      target_person.reload
-      expect(target_person.consumer_role.vlp_documents.where(subject: "Income").count).to eq(1)
-    end
+    # (REF pivotal ticket: 178800234) Whenever this class is called to create_or_update_vlp_document, below code is overriding vlp_document_params and only creates document for income subject.
+    # This code is blocking ATP and MCR migration for vlp data, commenting below code as this does not make anysense to override the incoming vlp_document_params
+    # TODO: refactor this accordingly based on requirement
+    # it "should create an income vlp document if no incomes are present" do
+    #   @result = subject.call(applicant_params.merge!(incomes: []))
+    #   target_person.reload
+    #   expect(target_person.consumer_role.vlp_documents.where(subject: "Income").count).to eq(1)
+    # end
   end
 
   context 'for failure flow' do

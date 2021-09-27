@@ -56,10 +56,12 @@ end
 
 Given(/IAP Assistance Year Display feature is enabled/) do
   EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
+  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
 end
 
 Given(/IAP Assistance Year Display feature is disabled/) do
   EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
+  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
 end
 
 Then(/They should see the application assistance year above Info Needed/) do
@@ -422,7 +424,7 @@ Given(/^the kaiser paynow feature configuration is disabled$/) do
 end
 
 Given(/^the enrollment tile feature is enabled$/) do
-  skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item
+  skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item || EnrollRegistry[:anthem_blue_cross_and_blue_shield_pay_now].setting(:enrollment_tile).item
 end
 
 Given(/^the FAA feature configuration is enabled$/) do

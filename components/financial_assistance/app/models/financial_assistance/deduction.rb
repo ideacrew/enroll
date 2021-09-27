@@ -24,6 +24,7 @@ module FinancialAssistance
         ira_deduction
         reservists_performing_artists_and_fee_basis_government_official_expenses
         tuition_and_fees
+        other
       ].freeze
 
     DEDUCTION_TYPE = {
@@ -39,7 +40,8 @@ module FinancialAssistance
       health_savings_account: "Health savings account",
       ira_deduction: "IRA deduction",
       reservists_performing_artists_and_fee_basis_government_official_expenses: "Certain business expenses of reservists, performing artists, and fee-basis government officials",
-      tuition_and_fees: "Tuition and fees"
+      tuition_and_fees: "Tuition and fees",
+      other: 'Other Deductions'
     }.freeze
 
     field :title, type: String

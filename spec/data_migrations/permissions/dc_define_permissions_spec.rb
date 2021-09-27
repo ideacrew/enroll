@@ -2,8 +2,7 @@
 
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "permissions", "dc_define_permissions")
-
-describe DcDefinePermissions, dbclean: :around_each do
+describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc' do
   subject { DcDefinePermissions.new(given_task_name, double(:current_scope => nil))}
   let(:roles) {%w[hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin] }
   describe 'create permissions' do
@@ -1417,7 +1416,8 @@ describe DcDefinePermissions, dbclean: :around_each do
       expect(Person.all.to_a.map{|p| p.hbx_staff_role.subrole}).to match_array roles
     end
 
-    context "user and their permission attributes" do
+    context "user and their permission attributes for DC" do
+
       it "user with 'hbx_staff' as permission" do
         permission = User.all.detect { |u| u.permission.name == 'hbx_staff'}.permission
         expect(permission.name).to eq 'hbx_staff'

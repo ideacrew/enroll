@@ -24,5 +24,9 @@ FactoryBot.define do
     trait :kaiser_profile do
       legal_name        { "Kaiser" }
     end
+
+    trait :anthm_profile do
+      legal_name {"Anthem Blue Cross and Blue Shield"}
+    end
   end
 end

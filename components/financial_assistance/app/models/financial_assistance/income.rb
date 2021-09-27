@@ -8,8 +8,8 @@ module FinancialAssistance
     before_create :set_submission_timestamp
 
     embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
-    embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', cascade_callbacks: true
-    embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', cascade_callbacks: true
+    embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', validate: (EnrollRegistry[:skip_employer_address_validation].enabled? ? false : true), cascade_callbacks: true
+    embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', validate: (EnrollRegistry[:skip_employer_phone_validation].enabled? ? false : true), cascade_callbacks: true
 
     TITLE_SIZE_RANGE = (3..30).freeze
 
@@ -49,7 +49,7 @@ module FinancialAssistance
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
-    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = %w[net_self_employment capital_gains farming_and_fishing].freeze
+    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = %w[net_self_employment capital_gains farming_and_fishing other].freeze
 
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',

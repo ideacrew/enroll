@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # IAP application controller
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
@@ -49,6 +50,10 @@ module FinancialAssistance
           @current_step = @current_step.next_step if @current_step.next_step.present?
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
+            if @application.imported?
+              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
+              return
+            end
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
@@ -162,7 +167,6 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-
       render layout: 'financial_assistance'
     end
 
@@ -170,7 +174,7 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-
+      @application.rt_transfer
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 

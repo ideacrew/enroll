@@ -167,8 +167,14 @@ Then(/^I should click on pay now button$/) do
   find(IvlEnrollmentSubmitted.pay_now_btn).click
 end
 
-Then(/I should see the Kaiser pop up text/) do
-  expect(page).to have_content(l10n("plans.kaiser.pay_now.redirection_message", site_short_name: Settings.site.short_name))
+Then(/I should see the (.*) pop up text/) do |issuer|
+  case issuer
+  when 'Kaiser'
+    carrier_name = 'Kaiser Permanente'
+  when 'Anthm'
+    carrier_name = 'Anthem Blue Cross and Blue Shield'
+  end
+  expect(page).to have_content(l10n("plans.issuer.pay_now.redirection_message", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: carrier_name))
 end
 
 And(/the Kaiser user form should be active/) do
@@ -178,7 +184,7 @@ And(/the Kaiser user form should be active/) do
 end
 
 Then(/I should see the non-Kaiser pop up text/) do
-  expect(page).to have_content(l10n("plans.other.pay_now.redirection_message", site_short_name: Settings.site.short_name, carrier_name: "CareFirst"))
+  expect(page).to have_content(l10n("plans.issuer.pay_now.redirection_message", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: "CareFirst"))
 end
 
 Then(/the user closes the pop up modal/) do
@@ -336,4 +342,8 @@ And(/^the person click on qle continue$/) do
     find(IvlSpecialEnrollmentPeriod.continue_qle_btn).click
   end
   find(IvlSpecialEnrollmentPeriod.effective_date_continue_btn).click
+end
+
+Given(/^a (.*) site exists$/) do |site_key|
+  skip_this_scenario unless EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == site_key
 end

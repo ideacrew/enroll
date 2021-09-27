@@ -15,9 +15,10 @@ module Operations
 
         def call(primary_subscriber_person)
           transformed_person = yield construct_payload_hash(primary_subscriber_person)
-          payload_value = yield validate_payload(transformed_person)
-          payload_entity = yield create_payload_entity(payload_value)
-          event = yield build_event(payload_entity)
+          #payload_value = yield validate_payload(transformed_person)
+          simplified_person_payload = simplify_crm_person_payload(transformed_person)
+          #payload_entity = yield create_payload_entity(simplified_person_payload)
+          event = yield build_event(simplified_person_payload)
           result = yield publish(event)
           Success(result)
         end
@@ -40,6 +41,7 @@ module Operations
             local_residency_responses
             local_residency_requests
           ]
+          transformed_person[:person_demographics][:no_ssn] = transformed_person[:person_demographics][:no_ssn].to_s
           unnecessary_document_keys.each do |sym_value|
             transformed_person[:consumer_role][sym_value] = []
           end

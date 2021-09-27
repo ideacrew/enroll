@@ -19,18 +19,11 @@ module Operations
       def call(app_payload)
         family_params = yield transform(app_payload)
         validated_params = yield validate(family_params)
-        yield find(validated_params)
 
         Success(validated_params)
       end
 
       private
-
-      def find(validated_params)
-        result = Operations::Families::Find.new.call(ext_app_id: validated_params.to_h[:hbx_id])
-
-        result.success? ? Failure(result) : Success(result)
-      end
 
       def transform(app_payload)
         result = AcaEntities::Ffe::Operations::ProcessMcrApplication.new(source_hash: app_payload, worker: :single).call

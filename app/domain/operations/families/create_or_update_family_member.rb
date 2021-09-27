@@ -45,7 +45,10 @@ module Operations
           @family_member = create_or_update_family_member(@person, family, applicant_params)
           create_or_update_consumer_role(applicant_params, @family_member)
           create_or_update_vlp_document(applicant_params, @person)
-          create_or_update_income_vlp_document(applicant_params, @person) if EnrollRegistry.feature_enabled?(:verification_type_income_verification) && applicant_params[:incomes].blank?
+          # (REF pivotal ticket: 178800234) Whenever this class is called to create_or_update_vlp_document, below code is overriding vlp_document_params and only creates document for income subject.
+          # This code is blocking ATP and MCR migration for vlp data, commenting below code as this does not make anysense to override the incoming vlp_document_params
+          # TODO: refactor this accordingly based on requirement
+          # create_or_update_income_vlp_document(applicant_params, @person) if EnrollRegistry.feature_enabled?(:verification_type_income_verification) && applicant_params[:incomes].blank?
         else
           return @person
         end
@@ -77,9 +80,12 @@ module Operations
         Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params, person: person})
       end
 
-      def create_or_update_income_vlp_document(applicant_params, person)
-        Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params.merge(subject: "Income"), person: person})
-      end
+      # (REF pivotal ticket: 178800234) Whenever this class is called to create_or_update_vlp_document, below code is overriding vlp_document_params and only creates document for income subject.
+      # This code is blocking ATP and MCR migration for vlp data, commenting below code as this does not make anysense to override the incoming vlp_document_params
+      # TODO: refactor this accordingly based on requirement
+      # def create_or_update_income_vlp_document(applicant_params, person)
+      #   Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params.merge(subject: "Income"), person: person})
+      # end
 
       def create_or_update_relationship(person, family, relationship_kind)
         primary_person = family.primary_person

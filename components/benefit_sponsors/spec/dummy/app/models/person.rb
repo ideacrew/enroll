@@ -12,6 +12,7 @@ class Person
   include Ssn
   include Mongoid::Attributes::Dynamic
   include BenefitSponsors::Concerns::UnsetableSparseFields
+  include CrmGateway::PersonConcern
   GENDER_KINDS = %w[male female].freeze
 
   IDENTIFYING_INFO_ATTRIBUTES = %w[first_name last_name ssn dob].freeze

@@ -9,7 +9,7 @@ registry:
         item: :aceds_curam
         is_enabled: false
       - key: :ivl_application_checklist
-        is_enabled: true
+        is_enabled: false
         item: :ivl_application_checklist
         settings:
           - key: :file_location
@@ -23,9 +23,9 @@ registry:
         is_enabled: true
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 1
+            item: 19
           - key: :application_new_year_effective_date_month_of_year
-            item: 11
+            item: 9
           - key: :enrollment_due_day_of_month
             is_enabled: true
             item: 15
@@ -87,9 +87,9 @@ registry:
     - key: :real_time_transfer
       is_enabled: false
     - key: :batch_transfer
-      is_enabled: false
+      is_enabled: true
     - key: :transfer_service
-      is_enabled: false
+      is_enabled: true
       item: "aces"
   - namespace:
     - :documents
@@ -210,6 +210,8 @@ registry:
       is_enabled: true
     - key: :no_coverage_tribe_details
       is_enabled: true
+    - key: :pregnancy_due_on_required
+      is_enabled: false
   - namespace:
     - :renewals
     features:
@@ -227,5 +229,11 @@ registry:
           item: 8
         - key: :renewal_draft_submission_day
           item: 26
+    - key: :skip_employer_address_validation
+      is_enabled: :true
+    - key: :skip_employer_phone_validation
+      is_enabled: :true
+    - key: :skip_employer_id_validation
+      is_enabled: :true
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

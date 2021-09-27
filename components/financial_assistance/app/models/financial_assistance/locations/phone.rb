@@ -45,7 +45,12 @@ module FinancialAssistance
 
       def save_phone_components
         phone_number = filter_non_numeric(self.full_phone_number).to_s
-        return if phone_number.blank?
+        if phone_number.blank?
+          self.area_code = ''
+          self.extension = ''
+          self.number = ''
+          return
+        end
 
         length = phone_number.length
 
@@ -77,7 +82,8 @@ module FinancialAssistance
       end
 
       def to_s
-        full_number = (self.area_code + self.number).to_i
+        full_number = area_code.present? && number.present? ? (self.area_code + self.number).to_i : ""
+        return "" unless full_number.present?
         if self.extension.present?
           full_number.to_s(:phone, area_code: true, extension: self.extension)
         else

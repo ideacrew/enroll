@@ -132,6 +132,11 @@ module FinancialAssistance
                                   }
 
     index({ 'family_id' => 1 })
+    index({ "relationships._id" => 1 })
+    index({ "applicants._id" => 1 })
+    index({"relationships.applicant_id" => 1})
+    index({"relationships.relative_id" => 1})
+    index({"relationships.kind" => 1})
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
@@ -316,10 +321,9 @@ module FinancialAssistance
     end
 
     def is_transferrable?
-      applicants = self.applicants.select do |applicant|
+      self.applicants.any? do |applicant|
         applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
       end
-      applicants.any?
     end
 
     def update_application(error_message, status_code)
@@ -486,6 +490,7 @@ module FinancialAssistance
       state :submitted
       state :determination_response_error
       state :determined
+      state :imported
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
@@ -526,8 +531,8 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => :record_transition do
-        transitions from: :submitted, to: :determined, after: :rt_transfer
+      event :determine, :after => [:record_transition] do
+        transitions from: :submitted, to: :determined
       end
 
       event :terminate, :after => :record_transition do
@@ -543,6 +548,10 @@ module FinancialAssistance
       # Currently, this event will be used during renewal generations
       event :fail_submission, :after => :record_transition do
         transitions from: :renewal_draft, to: :submission_pending
+      end
+
+      event :import, :after => [:record_transition] do
+        transitions from: :draft, to: :imported
       end
     end
 
