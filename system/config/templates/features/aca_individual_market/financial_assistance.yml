@@ -219,16 +219,16 @@ registry:
       is_enabled: true
       settings:
         - key: :draft_renewal_generation_month
-          item: 9
+          item: 10
         - key: :draft_renewal_generation_day
-          item: 16
+          item: 14
     - key: :submit_renewal_drafts
       is_enabled: true
       settings:
         - key: :renewal_draft_submission_month
-          item: 9
+          item: 10
         - key: :renewal_draft_submission_day
-          item: 17
+          item: 15
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation
