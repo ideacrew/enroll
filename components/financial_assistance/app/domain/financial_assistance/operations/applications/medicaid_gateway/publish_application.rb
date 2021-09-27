@@ -11,8 +11,8 @@ module FinancialAssistance
         # Currently, this Operations works for following events:
         #   1. determine_eligibility for publishing the payload to get determination from MedicaidGateway
         #      The event determine_eligibility is for integration b/w Enroll & MedicaidGateway
-        #   2. generate_renewal_draft for publishing the payload to generate renewal draft application
-        #      The event generate_renewal_draft is for EA's internal use
+        #   2. application_renewal_request_created for publishing the payload to generate renewal draft application
+        #      The event application_renewal_request_created is for EA's internal use
         #   3. submit_renewal_draft for publishing the payload to submit/renew renewal draft application
         #      The event submit_renewal_draft is for EA's internal use
         class PublishApplication
@@ -20,7 +20,7 @@ module FinancialAssistance
           include EventSource::Command
 
           # Update this constant with new events that are added/registered in ::Publishers::ApplicationPublisher
-          REGISTERED_EVENTS = %w[determine_eligibility generate_renewal_draft submit_renewal_draft].freeze
+          REGISTERED_EVENTS = %w[determine_eligibility application_renewal_request_created submit_renewal_draft].freeze
 
           def call(params)
             payload = yield validate_input_params(params)
@@ -45,7 +45,11 @@ module FinancialAssistance
           end
 
           def build_event(payload)
-            event("events.iap.applications.#{@event_name}", attributes: payload)
+            if @event_name == 'application_renewal_request_created'
+              event("events.iap.applications.renewals.#{@event_name}", attributes: payload)
+            else
+              event("events.iap.applications.#{@event_name}", attributes: payload)
+            end
           end
 
           def publish(event)

@@ -27,6 +27,10 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
       expect(@result.success.first[:person_hbx_id]).to eq(person.hbx_id)
     end
 
+    it 'should include relationship' do
+      expect(@result.success.first[:relationship]).to eq('self')
+    end
+
     it 'should have all the matching keys' do
       [:person_hbx_id, :is_applying_coverage, :citizen_status, :is_consumer_role,
        :indian_tribe_member, :is_incarcerated, :addresses, :phones, :emails,
@@ -69,6 +73,76 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
 
     it 'should not return full_text' do
       expect(@address.keys).not_to include(:full_text)
+    end
+  end
+
+  describe 'with inactive family members' do
+    let!(:person11) do
+      FactoryBot.create(:person,
+                        :with_consumer_role,
+                        :with_active_consumer_role,
+                        :with_ssn,
+                        first_name: 'Person11')
+    end
+    let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+    let!(:person12) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'Person12')
+      person11.ensure_relationship_with(per, 'spouse')
+      per
+    end
+    let!(:family_member12) do
+      FactoryBot.create(:family_member, is_active: false, person: person12, family: family11)
+    end
+
+    before do
+      @result = subject.call(family_id: family11.id)
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+
+    it 'response should match the number of active_family_members' do
+      expect(@result.success.count).to eq(family11.active_family_members.count)
+    end
+
+    it 'should return attributes of active family members only' do
+      expect(@result.success.first[:first_name]).to eq(person11.first_name)
+    end
+  end
+
+  describe 'with inactive family members' do
+    let!(:person11) do
+      FactoryBot.create(:person,
+                        :with_consumer_role,
+                        :with_active_consumer_role,
+                        :with_ssn,
+                        first_name: 'Person11')
+    end
+    let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+    let!(:person12) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'Person12')
+      person11.ensure_relationship_with(per, 'spouse')
+      per
+    end
+    let!(:family_member12) do
+      FactoryBot.create(:family_member, person: person12, family: family11)
+    end
+
+    before do
+      @result = subject.call(family_id: family11.id)
+      @member_hashes = @result.success
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+
+    it 'should include relationship key with value' do
+      @member_hashes.each do |member_hash|
+        expect(member_hash.keys).to include(:relationship)
+        expect(member_hash[:relationship]).to be_truthy
+      end
     end
   end
 end

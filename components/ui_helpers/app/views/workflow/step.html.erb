@@ -26,6 +26,7 @@
 
         <div class="focus_effect module">
           <% @current_step.sections.each do |section| %>
+            <% next if !section.enabled.blank? && ERB.new(section.enabled).result == "false"%>
             <% if step_enabled?(section) %>
               <% unless !FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) && section.lines.first.cells.last.attribute == "full_medicaid_determination" %>
                 <div class="margin-bottom-30 margin-bottom-adjustment">

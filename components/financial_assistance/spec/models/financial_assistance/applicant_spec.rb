@@ -357,35 +357,68 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   end
 
   context '#other_questions_complete?' do
-    before do
-      applicant.update_attributes!({
-                                     is_pregnant: true,
-                                     children_expected_count: 1,
-                                     pregnancy_due_on: nil,
-                                     is_applying_coverage: true,
-                                     is_physically_disabled: false
-                                   })
+    context 'pregnancy_due_on' do
+      before do
+        applicant.update_attributes!({
+                                       is_pregnant: true,
+                                       children_expected_count: 1,
+                                       pregnancy_due_on: nil,
+                                       is_applying_coverage: true,
+                                       is_physically_disabled: false
+                                     })
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(true)
+      end
+
+      context 'pregnancy_due_on_required feature disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+        end
+
+        it 'should return true without pregnancy_due_on_required' do
+          expect(applicant.other_questions_complete?).to eq true
+        end
+      end
+
+      context 'pregnancy_due_on_required feature enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(true)
+        end
+
+        it 'should return false without pregnancy_due_on_required' do
+          expect(applicant.other_questions_complete?).to eq false
+        end
+      end
     end
 
-    context 'pregnancy_due_on_required feature disabled' do
+    context 'is_physically_disabled' do
       before do
+        applicant.update_attributes!({
+                                       is_pregnant: true,
+                                       children_expected_count: 1,
+                                       pregnancy_due_on: nil,
+                                       is_applying_coverage: true,
+                                       is_physically_disabled: nil
+                                     })
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
       end
 
-      it 'should return true without pregnancy_due_on_required' do
-        expect(applicant.other_questions_complete?).to eq true
-      end
-    end
-
-    context 'pregnancy_due_on_required feature enabled' do
-      before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(true)
+      context 'question_required feature disabled' do
+        it 'should return true without is_physically_disabled' do
+          expect(applicant.other_questions_complete?).to eq true
+        end
       end
 
-      it 'should return false without pregnancy_due_on_required' do
-        expect(applicant.other_questions_complete?).to eq false
+      context 'question_required feature enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(true)
+        end
+
+        it 'should return false without is_physically_disabled' do
+          expect(applicant.other_questions_complete?).to eq false
+        end
       end
     end
   end

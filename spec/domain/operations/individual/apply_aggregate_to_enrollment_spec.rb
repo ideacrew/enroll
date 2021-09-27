@@ -117,8 +117,20 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       @result = subject.call(input_params)
     end
 
-    it 'should return monthly aggregate amount' do
+    it 'should not apply aggregate amount' do
       expect(@result.failure).to eq('Cannot find any enrollments with Non-Catastrophic Plan.')
+    end
+  end
+
+  context 'when eligibility is created for year with no active enrollments' do
+    before do
+      tax_household.update_attributes(effective_starting_on: tax_household.effective_starting_on.next_year)
+      input_params = {eligibility_determination: eligibility_determination}
+      @result = subject.call(input_params)
+    end
+
+    it 'should not apply aggregate' do
+      expect(@result.failure).to eq('Cannot find any IVL health enrollments in any of the active states.')
     end
   end
 

@@ -746,7 +746,7 @@ module FinancialAssistance
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-      questions_array << is_physically_disabled if is_applying_coverage
+      questions_array << is_physically_disabled if is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:question_required)
       questions_array << pregnancy_due_on if is_pregnant && FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required)
       questions_array << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period

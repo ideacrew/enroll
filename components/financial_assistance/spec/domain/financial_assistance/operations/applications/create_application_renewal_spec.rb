@@ -2,7 +2,9 @@
 
 require 'rails_helper'
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDraft, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
+
   before :all do
     DatabaseCleaner.clean
   end
@@ -37,6 +39,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
                       application: application)
   end
 
+  let(:event) { Success(double) }
+  let(:operation_instance) { described_class.new }
+
+  before do
+    allow(operation_instance.class).to receive(:new).and_return(operation_instance)
+    allow(operation_instance).to receive(:build_event).and_return(event)
+    allow(event.success).to receive(:publish).and_return(true)
+  end
+
   context 'success' do
     context 'submitted application' do
       before do
@@ -64,6 +75,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
 
       it 'should return application with assistance_year' do
         expect(@renewal_draft_app.assistance_year).to eq(application.assistance_year.next)
+      end
+
+      it 'should return application with effective_date' do
+        expect(@renewal_draft_app.effective_date).to eq(Date.new(application.assistance_year.next))
       end
 
       # Verify if all the answers for questions on 'Your Preferences' & 'Submit Your Application' were copied
@@ -129,6 +144,94 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
     context 'determined application' do
       before do
         application.update_attributes!({ aasm_state: 'determined', years_to_renew: [0, nil].sample })
+        application.reload
+        @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        @renewal_draft_app = @result.success
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should return application' do
+        expect(@renewal_draft_app).to be_a(::FinancialAssistance::Application)
+      end
+
+      it 'should return application in renewal_draft state' do
+        expect(@renewal_draft_app.renewal_draft?).to be_truthy
+      end
+
+      it 'should return application with predecessor_id' do
+        expect(@renewal_draft_app.predecessor_id).to eq(application.id)
+      end
+
+      it 'should return application with assistance_year' do
+        expect(@renewal_draft_app.assistance_year).to eq(application.assistance_year.next)
+      end
+
+      # Verify if all the answers for questions on 'Your Preferences' & 'Submit Your Application' were copied
+      context 'for attestations & other questions' do
+        # Your Preferences:
+        #   is_renewal_authorized
+        #   is_requesting_voter_registration_application_in_mail
+        #   years_to_renew
+        context 'Your Preferences' do
+          it 'should return application with is_renewal_authorized' do
+            expect(@renewal_draft_app.is_renewal_authorized).to eq(application.is_renewal_authorized)
+          end
+
+          it 'should return application with is_requesting_voter_registration_application_in_mail' do
+            expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
+          end
+
+          it 'should return application with years_to_renew as zero' do
+            expect(@renewal_draft_app.years_to_renew).to be_zero
+          end
+        end
+
+        # Submit Your Application:
+        #   medicaid_terms
+        #   report_change_terms
+        #   medicaid_insurance_collection_terms
+        #   parent_living_out_of_home_terms
+        #   attestation_terms
+        #   submission_terms
+        #   full_medicaid_determination
+        context 'Submit Your Application' do
+          it 'should return application with medicaid_terms' do
+            expect(@renewal_draft_app.medicaid_terms).to eq(application.medicaid_terms)
+          end
+
+          it 'should return application with report_change_terms' do
+            expect(@renewal_draft_app.report_change_terms).to eq(application.report_change_terms)
+          end
+
+          it 'should return application with medicaid_insurance_collection_terms' do
+            expect(@renewal_draft_app.medicaid_insurance_collection_terms).to eq(application.medicaid_insurance_collection_terms)
+          end
+
+          it 'should return application with parent_living_out_of_home_terms' do
+            expect(@renewal_draft_app.parent_living_out_of_home_terms).to eq(application.parent_living_out_of_home_terms)
+          end
+
+          it 'should return application with submission_terms' do
+            expect(@renewal_draft_app.submission_terms).to eq(application.submission_terms)
+          end
+
+          it 'should return application with attestation_terms' do
+            expect(@renewal_draft_app.attestation_terms).to eq(application.attestation_terms)
+          end
+
+          it 'should return application with full_medicaid_determination' do
+            expect(@renewal_draft_app.full_medicaid_determination).to eq(application.full_medicaid_determination)
+          end
+        end
+      end
+    end
+
+    context 'imported application' do
+      before do
+        application.update_attributes!({ aasm_state: 'imported', years_to_renew: [0, nil].sample })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
@@ -294,21 +397,24 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
     end
 
     context 'no applications for given inputs' do
+      let(:validated_params) { { family_id: family.id, renewal_year: TimeKeeper.date_of_record.year } }
       before do
         ::FinancialAssistance::Application.destroy_all
-        @result = subject.call({ family_id: family.id, renewal_year: TimeKeeper.date_of_record.year })
+        @result = subject.call(validated_params)
       end
 
       it 'should return failure with error message' do
-        expect(@result.failure).to match(/Could not find any applications with the given inputs params: /)
+        expect(@result.failure).to eq("Could not find any applications that are renewal eligible: #{validated_params}.")
       end
     end
 
     context 'for an application which is not in determined state' do
       shared_examples_for 'non determined state application' do |app_state|
+
+        let(:validated_params) { { family_id: application.family_id, renewal_year: application.assistance_year.next } }
         before do
           application.update_attributes!(aasm_state: app_state)
-          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @result = subject.call(validated_params)
         end
 
         it 'should return failure' do
@@ -316,8 +422,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
         end
 
         it "should return failure with error messasge for application with aasm_state: #{app_state}" do
-          eligible_states = ::FinancialAssistance::Application::RENEWAL_ELIGIBLE_STATES
-          expect(@result.failure).to eq("Cannot generate renewal_draft for given application with aasm_state #{application.aasm_state}. Application must be in one of #{eligible_states} states.")
+          expect(@result.failure).to eq("Could not find any applications that are renewal eligible: #{validated_params}.")
         end
       end
 
