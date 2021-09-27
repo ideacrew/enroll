@@ -78,8 +78,7 @@ class TaxHousehold
   end
 
   def valid_csr_kind(hbx_enrollment)
-    shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
-    eligibile_csr_kind(shopping_family_member_ids)
+    eligibile_csr_kind(hbx_enrollment.hbx_enrollment_members.map(&:applicant_id))
   end
 
   def current_csr_percent
