@@ -13,7 +13,7 @@ head
 
   = form_for @agency, as: :agency, url: {action: "create"}, html: {class: "needs-validation s508", id: 'broker_registration_form', novalidate: true} do |f|
 
-    = f.hidden_field :profile_type, value: params[:profile_type]
+    = f.hidden_field :profile_type, value: "broker_agency"
     - if EnrollRegistry.feature_enabled?(:expanded_npn_duplicate)
       = render 'shared/npn_error_message', :object => @agency
     - else
