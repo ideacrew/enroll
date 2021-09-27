@@ -12,6 +12,19 @@ module BenefitMarkets
     field :cost,  type: Float
     field :tobacco_cost, type: Float # if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
+    delegate :primary_enrollee,
+             :couple_enrollee,
+             :couple_enrollee_one_dependent,
+             :couple_enrollee_two_dependent,
+             :couple_enrollee_many_dependent,
+             :primary_enrollee_one_dependent,
+             :primary_enrollee_two_dependent,
+             :primary_enrollee_many_dependent,
+             to: :qhp_premium_table,
+             allow_nil: true
+
+    delegate :rating_method, to: :product, allow_nil: true
+
     # Allowed values are 'Y', 'N', or nil for 'NA'
     field :tobacco_use, type: String
 
@@ -23,32 +36,19 @@ module BenefitMarkets
       [:age, :cost]
     end
 
-    def couple_enrollee
-      20
+    def product
+      Rails.cache.fetch("rating_method_#{id}") do
+        premium_table.product
+      end
     end
 
-    def couple_enrollee_one_dependent
-      30
-    end
+    def qhp_premium_table
+      Rails.cache.fetch("benefit_market_qhp_premium_table_#{id}") do
+        return nil if product.age_based_rating?
 
-    def couple_enrollee_two_dependent
-      40
-    end
-
-    def couple_enrollee_many_dependent
-      60
-    end
-
-    def primary_enrollee_one_dependent
-      10
-    end
-
-    def primary_enrollee_two_dependent
-      20
-    end
-
-    def primary_enrollee_many_dependent
-      30
+        qhp = ::Products::Qhp.where(standard_component_id: product.hios_base_id, active_year: product.active_year).first
+        qhp.qhp_premium_tables.where(rate_area_id: premium_table.exchange_provided_code).first
+      end
     end
 
     # Define Comparable operator
