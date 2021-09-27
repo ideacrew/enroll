@@ -58,7 +58,7 @@ module Operations
 
         def construct_payload_hash(family)
           if family.is_a?(::Family)
-            Operations::Transformers::FamilyTo::CrmCv3Family.new.call(family)
+            Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
           else
             Failure("Invalid Family Object. Family class is: #{family.class}")
           end
