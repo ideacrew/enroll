@@ -194,6 +194,8 @@ registry:
             item: "Kennebec"
           - key: :contact_center_state_and_city
             item: "Augusta, ME"
+          - key: :area_code
+            item: "207"
           - key: :contact_center_zip_code
             item: "04330"
           - key: :contact_center_email_address
