@@ -212,6 +212,8 @@ registry:
       is_enabled: true
     - key: :pregnancy_due_on_required
       is_enabled: true
+    - key: :question_required
+      is_enabled: true
   - namespace:
     - :renewals
     features:
