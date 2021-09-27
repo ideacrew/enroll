@@ -192,6 +192,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.market' => "Market",
   :'en.issuer' => "Issuer",
   :'en.broker' => "Broker",
+  :'en.select_this_broker_button' => "Select This Broker",
   :'en.broker_agency_note' => "NOTE: If you are not associated with a broker agency, please enter your personal information. Do not enter a General Agency or Third Party Administrator‘s Information.",
   :'en.benefit_type' => "Benefit Type",
   :'en.member_ct' => "Member Ct",
