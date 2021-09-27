@@ -1,8 +1,8 @@
 name: full check suite
 on:
-  push:
-  schedule:
-    - cron: '0 6 * * *'
+  # push:
+  # schedule:
+  #   - cron: '0 6 * * *'
 
 env:
   REPORT_PATH: 'ci/cuke-report.json'
