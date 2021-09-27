@@ -222,5 +222,11 @@ registry:
           item: 9
         - key: :renewals_creation_day
           item: 16
+    - key: :skip_employer_address_validation
+      is_enabled: :false
+    - key: :skip_employer_phone_validation
+      is_enabled: :false
+    - key: :skip_employer_id_validation
+      is_enabled: :false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
