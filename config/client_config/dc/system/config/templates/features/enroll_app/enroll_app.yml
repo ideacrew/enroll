@@ -181,6 +181,8 @@ registry:
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
             item: "Washington, DC"
+          - key: :area_code
+            item: "202"
           - key: :contact_center_city
             item: "Washington"
           - key: :contact_center_county
