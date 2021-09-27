@@ -63,17 +63,6 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - uses: actions/download-artifact@v2
-        with:
-          name: packs-test
-          path: public/packs-test
-      - uses: actions/download-artifact@v2
-        with:
-          name: assets
-          path: public/assets
-      # - name: Display structure of downloaded files
-      #   run: ls -R
-      #   working-directory: public
       - name: Run tests
         run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
@@ -105,6 +94,10 @@ jobs:
           path: ci/cucumber/compressed-reports
       - run: npm run cucumber:move-reports
       - run: npm run cucumber:concat-reports
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cucumber-concatenated-reports
+          path: ci/cucumber/local-cucumber-report.json
       - run: npm run cucumber:split-config
       - uses: actions/upload-artifact@v2
         with:

@@ -10,7 +10,7 @@ import { runtimeDetails } from './numberOfGroups';
 
 export function splitFilesIntoGroups(
   files: FileWithRuntime[],
-  groupCount: number
+  groupCount: number | undefined
 ): SplitConfig {
   const { longestTest, longestTestName, totalRuntime, suggestedGroupCount } =
     runtimeDetails(files);
@@ -19,27 +19,38 @@ export function splitFilesIntoGroups(
     longestTest: inMinutes(longestTest),
     longestTestName,
     totalRuntime: inMinutes(totalRuntime),
-    groupCount,
+    incomingGroupCount: groupCount ?? 'No provided group count',
     suggestedGroupCount,
   });
 
+  const expectedGroupCount = groupCount ?? suggestedGroupCount;
+
   const groupRunTimes: FilesWithRunTime[] = Array.from(
-    { length: groupCount },
+    { length: expectedGroupCount },
     () => ({
       files: [],
     })
   );
 
+  // The total runtime of a group is limited based on either:
+  // 1. The longest test if the suggested group count is used
+  // 2. The total runtime of all the tests divided by the manual group count
+  let maxGroupRuntime: number;
+  if (groupCount === undefined) {
+    maxGroupRuntime = longestTest;
+  } else {
+    maxGroupRuntime = totalRuntime / expectedGroupCount;
+  }
+
+  console.log({ maxGroupRuntime: inMinutes(maxGroupRuntime) });
+
+  if (maxGroupRuntime < longestTest) {
+    console.error(`The max group runtime is less than the longest test.`);
+    console.error(`Decrease group count or run without a second argument.`);
+  }
+
   // The magic happens here
   groupRunTimes.forEach(async (group) => {
-    // console.log(
-    //   'Processing group',
-    //   index + 1,
-    //   'with',
-    //   files.length,
-    //   'files left to process.'
-    // );
-
     while (getGroupRunTime(group) < longestTest && files.length) {
       // start with file at front of array
       const largestFile = files[0];
