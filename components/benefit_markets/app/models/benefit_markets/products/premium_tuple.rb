@@ -47,7 +47,11 @@ module BenefitMarkets
         return nil if product.age_based_rating?
 
         qhp = ::Products::Qhp.where(standard_component_id: product.hios_base_id, active_year: product.active_year).first
-        qhp.qhp_premium_tables.where(rate_area_id: premium_table.exchange_provided_code).first
+        return nil if qhp.blank?
+
+        qhp.qhp_premium_tables
+           .where(rate_area_id: premium_table.exchange_provided_code)
+           .first
       end
     end
 

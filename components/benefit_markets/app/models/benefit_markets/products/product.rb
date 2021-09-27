@@ -19,6 +19,7 @@ module BenefitMarkets
       MARKET_KINDS = %w[shop individual].freeze
       INDIVIDUAL_MARKET_KINDS = %w[individual coverall].freeze
       AGE_BASED_RATING = 'Age-Based Rates'
+      FAMILY_BASED_RATING = 'Family-Tier Rates'
 
       field :benefit_market_kind,   type: Symbol
 
@@ -401,7 +402,7 @@ module BenefitMarkets
       end
 
       def family_based_rating?
-        !age_based_rating
+        rating_method == FAMILY_BASED_RATING
       end
 
       def is_same_plan_by_hios_id_and_active_year?(product)

@@ -96,6 +96,11 @@ class Products::Qhp
     cascade_callbacks: true,
     validate: true
 
+  embeds_many :qhp_premium_tables,
+              class_name: "Products::QhpPremiumTable",
+              cascade_callbacks: true,
+              validate: true
+
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variances
 
   index({"issuer_id" => 1})
