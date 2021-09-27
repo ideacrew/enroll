@@ -13,9 +13,10 @@ head
 
   = form_for @agency, as: :agency, url: {action: "create"}, html: {class: "needs-validation s508", id: 'broker_registration_form', novalidate: true} do |f|
 
-    = f.hidden_field :profile_type, value: params[:profile_type]
-
-    = render 'shared/error_messages', :object => @agency
+    - if EnrollRegistry.feature_enabled?(:expanded_npn_duplicate)
+      = render 'shared/npn_error_message', :object => @agency
+    - else
+      = render 'shared/error_messages', :object => @agency
     = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
       = render partial: './ui-components/v1/forms/broker_registration/personal_information', locals: {f: f}
 
