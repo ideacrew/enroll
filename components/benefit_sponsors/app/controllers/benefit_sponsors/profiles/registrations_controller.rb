@@ -38,25 +38,24 @@ module BenefitSponsors
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
           end
           template_filename = if EnrollRegistry.feature_enabled?(:redirect_to_requirements_page_after_confirmation)
-                      "confirmation"
-                     else
-                      "broker_agencies/broker_roles/extended_confirmation.html.erb"
-                    end
+                                "confirmation"
+                              else
+                                "broker_agencies/broker_roles/extended_confirmation.html.erb"
+                              end
           # Change me file to extended_confirrmation
           if is_broker_profile?
             render template_filename, :layout => 'single_column'
-            return
           else
             redirect_to result_url
-            return
           end
+          return
         rescue Exception => e
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
         render default_template, :flash => { :error => @agency.errors.full_messages }
       end
-          
+
 
       def edit
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
