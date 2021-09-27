@@ -9,6 +9,9 @@ class UserMailer < ApplicationMailer
   include Config::SiteHelper
   include Config::ContactCenterHelper
   include ::L10nHelper
+  layout EnrollRegistry[:custom_email_templates].settings(:me_email_template_1).item if EnrollRegistry.feature_enabled?(:custom_email_templates)
+
+
 
   def welcome(user)
     if user.email.present?
@@ -139,7 +142,7 @@ class UserMailer < ApplicationMailer
   def generic_consumer_welcome(first_name, hbx_id, email)
     if email.present?
       mail({to: email, subject: site_short_name, from: "no-reply@individual.#{site_domain_name}"}) do |format|
-        format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
+        format.html { render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id} }
       end
     end
   end
