@@ -21,7 +21,7 @@ module FinancialAssistance
 
           private
 
-          def build_event(payload)
+          def build_event(payload)            
             event('events.iap.mec_check.mec_check_requested', attributes: payload)
           end
 

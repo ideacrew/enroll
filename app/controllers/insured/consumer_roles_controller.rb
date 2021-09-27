@@ -212,6 +212,8 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :update?
     save_and_exit = params['exit_after_method'] == 'true'
 
+    mec_check(@person.hbx_id) if @person.mec_check_eligible? # && EnrollRegistry.feature_enabled?(:mec_check)
+binding.pry
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
@@ -284,10 +286,11 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
-      set_current_person
+      set_current_person      
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
+      binding.pry
     else
       render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
     end
@@ -295,12 +298,12 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage_response
     set_current_person
-    if params["is_applying_for_assistance"].blank?
+    if params["is_applying_for_assistance"].blank?      
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_insured_consumer_role_index_path
     elsif params["is_applying_for_assistance"] == "true"
       begin
-        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
+        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)          
         if result.success?
           redirect_to help_paying_coverage_redirect_path(result)
         else
@@ -318,6 +321,10 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def mec_check(person_id)
+    ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecCheck.new.call(person_id)
+  end
 
   def help_paying_coverage_redirect_path(result)
     return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection)

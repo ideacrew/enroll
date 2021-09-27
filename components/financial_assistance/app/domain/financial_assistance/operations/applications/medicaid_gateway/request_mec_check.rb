@@ -15,25 +15,15 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
 
-          # add comment here
-          def call(application_id:, person_id:)
-            application           = yield find_application(application_id)
+          def call(person_id)
             person                = yield find_person(person_id)
-            payload_params        = yield construct_payload(person, application)
+            payload_params        = yield construct_payload(person)
             payload               = yield publish(payload_params)
 
-            Success(payload) #switch variable as methods done
+            Success(payload)
           end
 
           private
-
-          def find_application(application_id)
-            application = FinancialAssistance::Application.find(application_id)
-
-            Success(application)
-          rescue Mongoid::Errors::DocumentNotFound
-            Failure("Unable to find Application with ID #{application_id}.")
-          end
 
           def find_person(person_id)
             person = ::Person.find_by(hbx_id: person_id)
@@ -43,14 +33,23 @@ module FinancialAssistance
             Failure("Unable to find Person with ID #{person_id}.")
           end
 
-          def construct_payload(person, application)
-            person_hash = Operations::Transformers::PersonTo::Cv3Person.new.call(person).value!
-            payload = {}
-            payload[:application] = application.hbx_id
-            payload[:fam] = ::Family.find(application.family_id).hbx_assigned_id.to_s
-            payload[:person] = person_hash
-            puts payload
-            Success(payload)
+          def transform_person(person)
+            Operations::Transformers::PersonTo::Cv3Person.new.call(person)
+          end
+
+          def construct_payload(person)
+            transformed_person = transform_person(person)            
+            if transformed_person.success?
+              person_hash = transformed_person.value!
+              payload = {}
+              payload[:family_id] = person.primary_family.id 
+              payload[:person] = person_hash
+              payload[:type] = "person"
+
+              Success(payload)
+            else
+              transformed_person.failure
+            end
           end
 
           # publish xml to medicaid gateway using event source

@@ -329,6 +329,11 @@ module FinancialAssistance
       end
     end
 
+    def has_mec_check?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.has_mec_check_response
+    end
+
     def update_application(error_message, status_code)
       set_determination_response_error!
       update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
