@@ -18,7 +18,7 @@ module BenefitMarkets
       CSR_KIND_TO_PRODUCT_VARIANT_MAP = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
       MARKET_KINDS = %w[shop individual].freeze
       INDIVIDUAL_MARKET_KINDS = %w[individual coverall].freeze
-      AGE_BASED_RATING = 'Age-Based Rates'.freeze
+      AGE_BASED_RATING = 'Age-Based Rates'
 
       field :benefit_market_kind,   type: Symbol
 
