@@ -207,7 +207,7 @@ registry:
           - key: :contact_center_name
             item: "CoverME.gov's Customer Care Center"
           - key: :contact_center_short_number
-            item: "1-866 636 0355"
+            item: "(866) 636-0355"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
             item: "711"
           - key: :producer_advisory_committee_url
