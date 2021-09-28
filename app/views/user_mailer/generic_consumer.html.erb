@@ -1,8 +1,7 @@
 <% content_for(:hbx_id) { hbx_id } %>
 <p>Dear <%=first_name%>,</p>
-<p>You have a new message from <%= site_short_name %> about your health coverage that may be time sensitive and require action. Please log in to your account at <a href="<%= site_home_business_url %>"><%= site_short_name %></a> to read this message.
+<p>You have a new message from <%= site_short_name %> about your health coverage that may be time sensitive and require action. Please log in to your account at <a href="<%= site_home_business_url %>"><%= site_short_name %></a> to read this message.</p>
 <% if EnrollRegistry.feature_enabled?(:custom_email_templates) %>
-  <br>
   <%= link_to "Log In To Your Account", site_home_business_url, class: "button-link" %>
 <% end %>
 <p>Your Account: <%=hbx_id %></p>
