@@ -1,6 +1,10 @@
 class ProductBuilder
-  INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051",
-  "18076MA0010001", "80538MA0020001", "80538MA0020002", "11821MA0020001", "11821MA0040001"] # These plan ids are suppressed and we dont save these while importing.
+  INVALID_PLAN_IDS = [
+    '48396ME0710102', '48396ME0710092', '48396ME0710077', '48396ME0710093', '48396ME0710106',
+    '48396ME0710103', '48396ME0710105', '48396ME0710101', '48396ME0710104',
+    "88806MA0020005", "88806MA0040005", "88806MA0020051",
+    "18076MA0010001", "80538MA0020001", "80538MA0020002", "11821MA0020001", "11821MA0040001"
+  ].freeze # These plan ids are suppressed and we dont save these while importing.
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_products_#{Time.now.to_s.gsub(' ', '')}.log"
 
   def initialize(qhp_hash)
