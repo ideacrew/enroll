@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: a71021e5c5250814b0e6ba58cc4f10658a1492b0
+  revision: f3b6801f2c3a562e04eb897ada9228fd7380bd14
   branch: mcr_fixs
   specs:
     aca_entities (0.6.0)
@@ -734,7 +734,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.7)
+    oj (3.13.8)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
