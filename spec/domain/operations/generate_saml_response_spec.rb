@@ -18,6 +18,7 @@ RSpec.describe Operations::GenerateSamlResponse do
   end
 
   before do
+    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
     allow(HTTParty).to receive(:post).and_return connection
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response

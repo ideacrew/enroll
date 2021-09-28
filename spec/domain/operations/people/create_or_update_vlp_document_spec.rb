@@ -24,8 +24,13 @@ RSpec.describe ::Operations::People::CreateOrUpdateVlpDocument, dbclean: :after_
   end
   let(:params) { {applicant_params: applicant_params, person: person} }
 
+  before do
+    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+  end
+
   describe 'create vlp document' do
     context 'when valid document parameters passed' do
+
 
       let(:vlp_doc_params) do
         {

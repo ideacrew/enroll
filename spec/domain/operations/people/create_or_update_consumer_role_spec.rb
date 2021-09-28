@@ -25,6 +25,10 @@ RSpec.describe ::Operations::People::CreateOrUpdateConsumerRole, dbclean: :after
   let(:applicant_params) { applicant.attributes.merge(vlp_doc_params) }
   let(:params) { {applicant_params: applicant_params, family_member: applicant_family_member} }
 
+  before do
+    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+  end
+
   describe 'create consumer role' do
     context 'when valid consumer role parameters passed' do
 
