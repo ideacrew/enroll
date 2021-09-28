@@ -38,7 +38,7 @@ module FinancialAssistance
                                         mec_check_response: response,
                                         mec_check_date: DateTime.now
                                       })
-            Success("Updated person")
+            Success("Updated person.")
           end
         end
       end

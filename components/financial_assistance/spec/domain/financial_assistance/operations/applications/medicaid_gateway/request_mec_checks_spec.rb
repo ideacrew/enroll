@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecCheck, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "b3dc8e08e28e487f80285fb79681b337") }
@@ -13,26 +13,33 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       family_id: family.id,
                       id: application_id)
   end
+  let(:missing_family_application_id) { "id123" }
   let!(:missing_family_application) do
     FactoryBot.create(:financial_assistance_application,
                       family_id: "invalid",
-                      id: "id123")
+                      id: missing_family_application_id)
   end
 
-  let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecCheck.new }
+  let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new }
 
   context 'Given invalid data' do
-    it 'should fail when the person does not exist' do
+    it 'should fail when the application does not exist' do
       invalid_id = "invalid_id"
       result = operation.call(invalid_id)
       expect(result).not_to be_success
-      expect(result.failure).to eq "Unable to find Person with ID invalid_id."
+      expect(result.failure).to eq "Unable to find Application with ID invalid_id."
+    end
+
+    it 'should fail when the family does not exist' do
+      result = operation.call(missing_family_application_id)
+      expect(result).not_to be_success
+      expect(result.failure).to eq "Unable to find Family with ID invalid."
     end
   end
 
-  context 'Given a valid person' do
+  context 'Given a valid application' do
     before :each do
-      @result = operation.call(person.hbx_id)
+      @result = operation.call(application_id)
     end
 
     it 'should succeed' do

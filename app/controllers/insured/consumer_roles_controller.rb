@@ -212,8 +212,8 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :update?
     save_and_exit = params['exit_after_method'] == 'true'
 
-    mec_check(@person.hbx_id) if @person.mec_check_eligible? # && EnrollRegistry.feature_enabled?(:mec_check)
-binding.pry
+    mec_check(@person.hbx_id) if @person.mec_check_eligible? && EnrollRegistry.feature_enabled?(:mec_check)
+
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
@@ -222,32 +222,26 @@ binding.pry
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
+      elsif current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+        redirect_to upload_ridp_document_insured_consumer_role_index_path
+      elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+        @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+        consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+        redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+        redirect_to URI.parse(redirect_path).to_s
       else
-        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
-          redirect_to upload_ridp_document_insured_consumer_role_index_path
-        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
-          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-          redirect_to URI.parse(redirect_path).to_s
-          # rubocop:enable Metrics/BlockNesting
-        else
-          redirect_to ridp_agreement_insured_consumer_role_index_path
-        end
+        redirect_to ridp_agreement_insured_consumer_role_index_path
+      end
+    elsif save_and_exit
+      respond_to do |format|
+        format.html {redirect_to destroy_user_session_path}
       end
     else
-      if save_and_exit
-        respond_to do |format|
-          format.html {redirect_to destroy_user_session_path}
-        end
-      else
-        @consumer_role.build_nested_models_for_person
-        @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
-        bubble_address_errors_by_person(@consumer_role.person)
-        respond_to do |format|
-          format.html { render "edit" }
-        end
+      @consumer_role.build_nested_models_for_person
+      @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+      bubble_address_errors_by_person(@consumer_role.person)
+      respond_to do |format|
+        format.html { render "edit" }
       end
     end
   end
@@ -286,11 +280,10 @@ binding.pry
 
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
-      set_current_person      
+      set_current_person
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
-      binding.pry
     else
       render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
     end
@@ -298,12 +291,12 @@ binding.pry
 
   def help_paying_coverage_response
     set_current_person
-    if params["is_applying_for_assistance"].blank?      
+    if params["is_applying_for_assistance"].blank?
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_insured_consumer_role_index_path
     elsif params["is_applying_for_assistance"] == "true"
       begin
-        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)          
+        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
         if result.success?
           redirect_to help_paying_coverage_redirect_path(result)
         else

@@ -15,7 +15,7 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
 
-          def call(application_id)            
+          def call(application_id)
             application           = yield find_application(application_id)
             family                = yield find_family(application)
             people                = yield get_people(application)
@@ -53,7 +53,7 @@ module FinancialAssistance
           end
 
           def find_person(person_id)
-            person = ::Person.find_by(hbx_id: person_id)
+            ::Person.find_by(hbx_id: person_id)
           end
 
           def transform_people(people)

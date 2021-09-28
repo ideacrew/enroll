@@ -2,22 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheck, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckApplication, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let(:person_id) { "b3dc8e08e28e487f80285fb79681b337" }
   let(:application_id) { "614cd09ca54d7584cbc9532d" }
 
-  let(:person_payload) do
-    {
-      application_identifier: "n/a",
-      family_identifier: "10453",
-      applicant_responses: { person_id => "Applicant Not Found" },
-      type: "person"
-    }
-  end
+  let(:person_id) { "b3dc8e08e28e487f80285fb79681b337" }
 
-  let(:application_payload) do
+  let(:payload) do
     {
       application_identifier: application_id,
       family_identifier: "10453",
@@ -26,9 +18,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     }
   end
 
+  let(:invalid_payload) do
+    {
+      application_identifier: "invalid",
+      family_identifier: "10453",
+      applicant_responses: { b3dc8e08e28e487f80285fb79681b337: "Applicant Not Found" }
+    }
+  end
+
   let!(:person) { FactoryBot.create(:person, hbx_id: "b3dc8e08e28e487f80285fb79681b337") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-
   let!(:application) do
     FactoryBot.create(:financial_assistance_application,
                       family_id: family.id,
@@ -63,19 +62,38 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       is_post_partum_period: false)
   end
 
-  let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheck.new }
+  let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckApplication.new }
 
-  context 'Given a person payload' do
-    it 'should call the AddMecCheckPerson class' do
-      result = operation.call(person_payload)
-      expect(result.value!).to eq "Updated person."
+  context 'Given an invalid payload' do
+    it 'should fail' do
+      result = operation.call(invalid_payload)
+      expect(result).not_to be_success
     end
   end
 
-  context 'Given an application payload' do
-    it 'should call the AddMecCheckApplication class' do
-      result = operation.call(application_payload)
-      expect(result.value!).to eq "MEC check added for all applicants."
+  context 'Given a valid payload' do
+
+    before :each do
+      @result = operation.call(payload)
+    end
+
+    it 'should be successful' do
+      expect(@result).to be_success
+    end
+
+    it 'should update the Application has_mec_check_response field to true' do
+      updated_application = FinancialAssistance::Application.find(application_id)
+      expect(updated_application.has_mec_check_response).to eq true
+    end
+
+    it 'should update the Person MEC check response' do
+      updated_person = Person.find_by(hbx_id: person_id)
+      expect(updated_person.mec_check_response).to eq "Applicant Not Found"
+    end
+
+    it 'should update the Person MEC check date' do
+      updated_person = Person.find_by(hbx_id: person_id)
+      expect(updated_person.mec_check_date).not_to be_nil
     end
   end
 end
