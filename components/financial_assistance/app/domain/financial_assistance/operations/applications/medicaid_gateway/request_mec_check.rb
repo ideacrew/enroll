@@ -38,11 +38,11 @@ module FinancialAssistance
           end
 
           def construct_payload(person)
-            transformed_person = transform_person(person)            
+            transformed_person = transform_person(person)
             if transformed_person.success?
               person_hash = transformed_person.value!
               payload = {}
-              payload[:family_id] = person.primary_family.id 
+              payload[:family_id] = person.primary_family.id
               payload[:person] = person_hash
               payload[:type] = "person"
 

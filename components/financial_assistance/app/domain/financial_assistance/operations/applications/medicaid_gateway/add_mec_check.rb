@@ -24,9 +24,10 @@ module FinancialAssistance
 
           def update_fields(params)
             payload_type = params[:type]
-            if payload_type == "person"
+            case payload_type
+            when "person"
               FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckPerson.new.call(params)
-            elsif payload_type == "application"
+            when "application"
               FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckApplication.new.call(params)
             end
           end

@@ -14,10 +14,10 @@ module FinancialAssistance
 
           # @param [Hash] opts The options to add eligibility determination to Application(persistence object)
           # @return [Dry::Monads::Result]
-          def call(params)                    
+          def call(params)
             application = yield find_application(params[:application_identifier])
             people = yield get_people(application)
-            application = yield update_application(application)            
+            _application = yield update_application(application)
             result = yield update_people(people, params)
 
             Success(result)
@@ -28,14 +28,14 @@ module FinancialAssistance
           def get_people(application)
             person_ids = application.applicants.map(&:person_hbx_id)
             people = person_ids.map do |id|
-                person = find_person(id)
-                return person if person.failure?
-                person.value! 
+              person = find_person(id)
+              return person if person.failure?
+              person.value!
             end
             Success(people)
           end
 
-          def find_person(person_id)            
+          def find_person(person_id)
             person = ::Person.find_by(hbx_id: person_id)
 
             Success(person)
@@ -45,18 +45,18 @@ module FinancialAssistance
 
           def update_people(people, params)
             people.each do |person|
-                response = params[:applicant_responses][person.hbx_id]
-                result = update_person(person, response)
-                return result if result.failure?                
+              response = params[:applicant_responses][person.hbx_id]
+              result = update_person(person, response)
+              return result if result.failure?
             end
             Success("MEC check added for all applicants.")
           end
 
           def update_person(person, response)
             result = person.update_attributes!({
-                                        mec_check_response: response,
-                                        mec_check_date: DateTime.now
-                                      })
+                                                 mec_check_response: response,
+                                                 mec_check_date: DateTime.now
+                                               })
             result ? Success("Updated person MEC check.") : Failure("Failed to update person MEC check.")
           end
 
@@ -75,7 +75,7 @@ module FinancialAssistance
             else
               Failure("Unable to update application with hbx_id: #{application.hbx_id}.")
             end
-          end          
+          end
         end
       end
     end
