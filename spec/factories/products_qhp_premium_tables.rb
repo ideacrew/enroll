@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :products_qhp_premium_tables, :class => 'Products::QhpPremiumTable' do
 
