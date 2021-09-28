@@ -68,7 +68,7 @@ module FinancialAssistance
                         found_families.first
                       else
                         ::Family.new(family_hash.except('hbx_id', 'foreign_keys', 'broker_accounts', 'magi_medicaid_applications', 'family_members',
-                                                        'households'))
+                                                        'households', 'ext_app_id'))
                       end
 
             family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
