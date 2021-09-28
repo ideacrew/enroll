@@ -6,8 +6,8 @@ registry:
       - key: :custom_email_templates
         is_enabled: true
         settings:
-          - key: :me_email_template_1
-            item: "me_email_template_1"
+          - key: :email_template
+            item: "email_template"
       - key: :application_font
         is_enabled: true
         settings:

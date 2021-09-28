@@ -9,7 +9,7 @@ class UserMailer < ApplicationMailer
   include Config::SiteHelper
   include Config::ContactCenterHelper
   include ::L10nHelper
-  layout EnrollRegistry[:custom_email_templates].settings(:me_email_template_1).item if EnrollRegistry.feature_enabled?(:custom_email_templates)
+  layout EnrollRegistry[:custom_email_templates].settings(:email_template).item if EnrollRegistry.feature_enabled?(:custom_email_templates)
 
 
 
