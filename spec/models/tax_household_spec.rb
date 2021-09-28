@@ -69,16 +69,6 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
-  context "current_csr_eligibility_kind" do
-    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_at: TimeKeeper.date_of_record)}
-    let(:tax_household) {TaxHousehold.new}
-
-    it "should equal to the csr_eligibility_kind of latest_eligibility_determination" do
-      tax_household.eligibility_determinations = [eligibility_determination]
-      expect(tax_household.current_csr_eligibility_kind).to eq eligibility_determination.csr_eligibility_kind
-    end
-  end
-
   context "valid_csr_kind" do
     let!(:family) {create(:family, :with_primary_family_member_and_dependent)}
     let(:household) {create(:household, family: family)}
@@ -101,16 +91,6 @@ RSpec.describe TaxHousehold, type: :model do
     it "should equal to the available csr_kind of tax household members" do
       tax_household.eligibility_determinations = [eligibility_determination]
       expect(tax_household.valid_csr_kind(hbx_enrollment)).to eq tax_household.tax_household_members.first.csr_eligibility_kind
-    end
-  end
-
-  context 'for current_csr_percent_as_integer' do
-    let(:ed) {EligibilityDetermination.new(csr_percent_as_integer: 73, determined_at: TimeKeeper.date_of_record)}
-    let(:thh) {TaxHousehold.new}
-
-    it 'should equal to the csr_eligibility_kind of latest_eligibility_determination' do
-      thh.eligibility_determinations = [ed]
-      expect(thh.current_csr_percent_as_integer).to eq ed.csr_percent_as_integer
     end
   end
 
