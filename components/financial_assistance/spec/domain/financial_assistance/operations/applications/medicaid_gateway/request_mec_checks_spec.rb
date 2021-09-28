@@ -20,6 +20,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       id: missing_family_application_id)
   end
 
+  let(:payload_params) do
+    { 
+      application: BSON::ObjectId('614cd09ca54d7584cbc9532d'),
+      family_id: "10000",
+      people: [],
+      type: "application"
+    }
+  end
   let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new }
 
   context 'Given invalid data' do
@@ -39,7 +47,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
   context 'Given a valid application' do
     before :each do
-      @result = operation.call(application_id)
+        allow(operation).to receive(:publish).with(payload_params).and_return(Success())
+        @result = operation.call(application_id)
     end
 
     it 'should succeed' do
