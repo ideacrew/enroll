@@ -6,7 +6,7 @@ require "action_mailer/railtie"
 require "rails/test_unit/railtie"
 require "action_cable/engine"
 require "sprockets/railtie" # Uncomment this line for Rails 3.1+
-require "config/initializers"
+require "config"
 
 # Configure fallbacks for mongoid errors:
 require "i18n/backend/fallbacks"
