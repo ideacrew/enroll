@@ -37,7 +37,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       @result = operation.call(person.hbx_id)
     end
 
-    it 'should succeed' do        
+    it 'should succeed' do
       expect(@result).to be_success
     end
   end
