@@ -3,6 +3,13 @@ registry:
   - namespace:
       - :features
     features:
+      - key: :amqp_worker_count
+        is_enabled: false
+        settings:
+          - key: :prod
+            item: 3
+          - key: :uat
+            item: 1
       - key: :enroll_app
         is_enabled: true
         meta:
