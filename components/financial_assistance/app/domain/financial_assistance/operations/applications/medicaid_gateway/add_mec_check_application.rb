@@ -45,7 +45,7 @@ module FinancialAssistance
 
           def update_people(people, params)
             people.each do |person|
-              response = params[:applicant_responses][person.hbx_id]
+              response = params[:applicant_responses][person.hbx_id.to_sym]
               result = update_person(person, response)
               return result if result.failure?
             end
