@@ -13,7 +13,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     {
       application_identifier: application_id,
       family_identifier: "10453",
-      applicant_responses: { person_id => "Applicant Not Found" },
+      applicant_responses: { person_id.to_sym => "Applicant Not Found" },
       type: "application"
     }
   end
@@ -26,7 +26,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     }
   end
 
-  let!(:person) { FactoryBot.create(:person, hbx_id: "b3dc8e08e28e487f80285fb79681b337") }
+  let!(:person) { FactoryBot.create(:person, hbx_id: person_id) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:application) do
     FactoryBot.create(:financial_assistance_application,
