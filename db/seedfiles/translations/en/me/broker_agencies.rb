@@ -227,6 +227,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.broker_application_confirm.any_questions" => "Please reach out to %{site_short_name} at %{site_producer_email_address} with any questions.",
   "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect. You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.",
   "en.broker_attestation.required_trainings" => "I have completed all required <a href=%{trainings_link} target='_blank'> %{site_short_name} trainings</a>",
-  "en.broker_attestation.active_license" => "I have an active license with the %{state_name} health authority",
+  "en.broker_attestation.active_license" => "I have an active license with health authority with the Maine Bureau of Insurance",
   "en.broker_attestation.broker_agreement" => "I have read and agree to the <a href=%{agreement_pdf_url} target='_blank'>%{site_short_name} Broker Agreement</a>"
 }.freeze

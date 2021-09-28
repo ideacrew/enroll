@@ -59,8 +59,6 @@ registry:
             item: https://www.coverme.gov"
           - key: :main_web_address
             item: "https://www.coverme.gov"
-          - key: :website_name
-            item: "https://www.coverme.gov"
           - key: :main_web_address
             item: "https://www.coverme.gov"
           - key: :state_name
@@ -133,7 +131,7 @@ registry:
           - key: :forms
             item: ""
           - key: :website_url
-            item: "www.healthcare.gov"
+            item: "https://www.healthcare.gov"
           - key: :healthcare_name
             item: "www.healthcare.gov"
           - key: :healthcare_url
