@@ -122,7 +122,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   context "is_cost_sharing_satisfied?" do
     include_context "BradyBunchAfterAll"
     let(:consumer_role) { ConsumerRole.new}
-    let(:tax_household) { double("TaxHousehold", current_csr_eligibility_kind: nil, eligibile_csr_kind: nil)}
+    let(:tax_household) { double("TaxHousehold", eligibile_csr_kind: nil)}
     before :all do
       create_tax_household_for_mikes_family
       @consumer_role = mike.consumer_role
