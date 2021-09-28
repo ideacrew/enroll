@@ -222,7 +222,7 @@ module FinancialAssistance
 
     private
 
-    def mec_check(application_id)      
+    def mec_check(application_id)
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id)
     end
 
