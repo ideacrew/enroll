@@ -48,7 +48,7 @@ module Enroll
     ]
 
     unless Rails.env.test?
-      worker_count = EnrollRegistry.feature_enabled?(:amqp_worker_count) ? EnrollRegistry[:amqp_worker_count].settings(:uat).item : EnrollRegistry[:amqp_worker_count].settings(:prod).item
+      worker_count = ::EnrollRegistry.feature_enabled?(:amqp_worker_count) ? ::EnrollRegistry[:amqp_worker_count].settings(:uat).item : ::EnrollRegistry[:amqp_worker_count].settings(:prod).item
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
       config.acapi.add_subscription("Events::SsaVerificationRequestsController")
       config.acapi.add_subscription("Events::VlpVerificationRequestsController")
