@@ -194,6 +194,8 @@ registry:
             item: "Kennebec"
           - key: :contact_center_state_and_city
             item: "Augusta, ME"
+          - key: :area_code
+            item: "207"
           - key: :contact_center_zip_code
             item: "04330"
           - key: :contact_center_email_address
@@ -205,7 +207,7 @@ registry:
           - key: :contact_center_name
             item: "CoverME.gov's Customer Care Center"
           - key: :contact_center_short_number
-            item: "1-866 636 0355"
+            item: "(866) 636-0355"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
             item: "711"
           - key: :producer_advisory_committee_url
@@ -575,5 +577,6 @@ registry:
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
-      - key: expanded_npn_duplicate
+      - key: :expanded_npn_duplicate
+        item: :expanded_npn_duplicate
         is_enabled: true
