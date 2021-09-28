@@ -48,7 +48,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
       slim (~> 3.0)
-      symmetric-encryption (~> 3.9.1)
+      symmetric-encryption
       virtus (~> 1.0)
 
 PATH
@@ -79,7 +79,7 @@ PATH
       rails (~> 5.2.4.3)
       roo (~> 2.1)
       slim (~> 3.0)
-      symmetric-encryption (~> 3.9.1)
+      symmetric-encryption
       virtus (~> 1.0)
       webpacker (~> 4.0.2)
 
@@ -310,7 +310,7 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2021.0225)
-    mimemagic (0.3.6)
+    mimemagic (0.3.8)
     mini_mime (1.0.2)
     mini_portile2 (2.6.1)
     minitest (5.14.2)
