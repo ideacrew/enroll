@@ -57,7 +57,6 @@ module FinancialAssistance
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
-              @application.rt_transfer if @application.is_rt_transferrable?
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
