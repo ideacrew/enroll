@@ -48,6 +48,7 @@ module Enroll
     ]
 
     unless Rails.env.test?
+      worker_count = EnrollRegistry.feature_enabled?(:amqp_worker_count) ? EnrollRegistry[:amqp_worker_count].settings(:uat).item : EnrollRegistry[:amqp_worker_count].settings(:prod).item
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
       config.acapi.add_subscription("Events::SsaVerificationRequestsController")
       config.acapi.add_subscription("Events::VlpVerificationRequestsController")
@@ -71,8 +72,8 @@ module Enroll
       config.acapi.add_async_subscription("FinancialAssistance::Subscribers::ApplicationEligibilityResponse")
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::EmployerBenefitRenewalSubscriber")
       config.acapi.add_amqp_worker("Subscribers::ImportMcrApplication")
-      config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber", 3)
-      config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageEmployeeRenewerSubscriber", 3)
+      config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber", worker_count)
+      config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageEmployeeRenewerSubscriber", worker_count)
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageReinstateGroupAssignmentSubscriber")
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::ReinstateEmployeeEnrollmentSubscriber")
       config.acapi.add_amqp_worker("TransportProfiles::Subscribers::TransportArtifactSubscriber")
