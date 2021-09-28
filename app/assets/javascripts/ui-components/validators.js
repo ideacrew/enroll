@@ -38,6 +38,17 @@ function isNumberKey(evt){
   }
 }
 
+// Allows only alpha numeric characters
+function isAlphaNumeric(event) {
+  var charCode = (event.which) ? event.which : event.keyCode
+  if ((charCode >= 48 && charCode <= 57) || (charCode>= 65 && charCode <= 90)){
+    console.log("input was 0-9");
+    console.log("input was a-z");
+    return true;
+  } else {
+    return false;
+}
+
 // Formats dates for Benefit Applications
 function getFormattedDate(date){
   var new_date = new Date(date)
