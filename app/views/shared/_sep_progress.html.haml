@@ -39,7 +39,7 @@
   %button.btn.btn-lg.btn-primary.btn-block.interaction-click-control-continue{type: 'submit'}
     CONTINUE
 - elsif ridp == true && step == 2
-  - if EnrollRegistry.feature_enabled?(:ridp_h139)
+  - if EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true')
     = link_to "Continue", new_insured_fdsh_ridp_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
   - else
     = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
