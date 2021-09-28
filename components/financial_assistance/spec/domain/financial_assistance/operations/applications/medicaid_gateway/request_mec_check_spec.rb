@@ -32,10 +32,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
   context 'Given a valid person' do
     before :each do
+      allow(operation).to receive(:construct_payload).with(person).and_return(Success({}))
+      allow(operation).to receive(:publish).with({}).and_return(Success())
       @result = operation.call(person.hbx_id)
     end
 
-    it 'should succeed' do
+    it 'should succeed' do        
       expect(@result).to be_success
     end
   end
