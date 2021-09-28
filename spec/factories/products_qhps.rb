@@ -25,5 +25,4 @@ FactoryBot.define do
     national_network { "yes" }
     summary_benefit_and_coverage_url { "www.example.com" }
   end
-
 end
