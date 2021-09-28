@@ -97,7 +97,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_premium
-    return family_tier_total_premium if family_based_rating? && __getobj__.benefit_market_kind == :aca_individual
+    return family_tier_total_premium if family_tier_eligible?
     members.reduce(0.00) do |sum, member|
       (sum + premium_for(member)).round(2)
     end
@@ -114,7 +114,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_aptc_amount
-    return @elected_aptc if family_based_rating?
+    return @elected_aptc if family_tier_eligible?
     result = members.reduce(0.00) do |sum, member|
       (sum + aptc_amount(member))
     end
@@ -125,6 +125,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_employee_cost
+    if family_tier_eligible?
+      cost = (family_tier_total_premium - total_aptc_amount).round(2)
+      cost = 0.00 if cost < 0
+      return cost
+    end
+
     members.reduce(0.00) do |sum, member|
       (sum + employee_cost_for(member)).round(2)
     end.round(2)
@@ -162,7 +168,15 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     @member_bool_hash.values.all?
   end
 
+  def family_tier_eligible?
+    @family_tier_eligible ||= family_based_rating? && is_ivl_product?
+  end
+
   def family_based_rating?
-    __getobj__.family_based_rating?
+    @family_based_rating ||= __getobj__.family_based_rating?
+  end
+
+  def is_ivl_product?
+    @is_ivl_product ||= __getobj__.benefit_market_kind == :aca_individual
   end
 end
