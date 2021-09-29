@@ -3,6 +3,8 @@ registry:
   - namespace:
       - :css_components
     features:
+      - key: :custom_email_templates
+        is_enabled: false
       - key: :application_font
         is_enabled: true
         settings:
