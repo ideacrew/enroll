@@ -6,7 +6,7 @@ module CrmGateway
     extend ActiveSupport::Concern
 
     included do
-      after_save :trigger_primary_subscriber_publish
+      # after_save :trigger_primary_subscriber_publish
     end
 
     def trigger_primary_subscriber_publish
