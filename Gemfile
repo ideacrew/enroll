@@ -32,7 +32,7 @@ gem 'database_cleaner',       '~> 1.7'
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'iap_renewals_event_source_setup'
+gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'release_0.8.0'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
@@ -110,7 +110,7 @@ gem 'sassc',                    '~> 1.12'
 gem 'sass-rails',               '~> 5'
 gem 'slim',                     '~> 3.0'
 gem 'slim-rails',               '~> 3.2'
-gem 'symmetric-encryption',     '~> 3.9.1'
+gem 'symmetric-encryption'
 gem 'turbolinks',               '~> 5'
 gem 'uglifier',                 '>= 4'
 gem 'virtus',                   '~> 1.0'

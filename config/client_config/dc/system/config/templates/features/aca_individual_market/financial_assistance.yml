@@ -225,7 +225,7 @@ registry:
       is_enabled: false
       settings:
         - key: :renewals_creation_month
-          item: 9
+          item: 10
         - key: :renewals_creation_day
           item: 16
     - key: :skip_employer_address_validation

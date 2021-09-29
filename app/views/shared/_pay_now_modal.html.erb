@@ -16,7 +16,7 @@
         <p>
           <%= l10n("plans.issuer.pay_now.redirection_message", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: carrier_long_name) %><br/>
           <ul>
-            <% if !past_effective_on?(hbx_enrollment) %>
+            <% if past_effective_on?(hbx_enrollment) %>
               <li><%= l10n("plans.#{carrier_key}.pay_now.link_info")%></li>
             <% else %>
               <li><%= l10n("plans.issuer.pay_now.processing", carrier_name: carrier_long_name)%></li>

@@ -118,7 +118,7 @@ registry:
           - key: :forms
             item: "https://dchealthlink.com/forms#en"
           - key: :website_url
-            item: "www.healthcare.gov"
+            item: "https://www.healthcare.gov"
           - key: :healthcare_name
             item: "www.healthcare.gov"
           - key: :healthcare_url

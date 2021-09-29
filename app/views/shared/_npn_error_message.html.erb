@@ -1,10 +1,10 @@
 <% if object.errors.any? %>
 	<div class="alert alert-danger">
-		<div>This NPN is already registered on <a target='_blank' href=<%= EnrollRegistry[:enroll_app].setting(:website_name).item %>><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></a></div>
+		<div>This NPN is already registered on <a target='_blank' href=<%= EnrollRegistry[:enroll_app].setting(:main_web_address).item %>><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></a></div>
 		<ul>
 			<li>If you have clients on <a target='_blank' href=<%= EnrollRegistry[:enroll_app].setting(:website_url).item %>>HealthCare.gov</a>, you do not need to register. We’ll email you an account invitation once you’ve completed training and we’ve confirmed your active license with health authority with the Maine Bureau of Insurance</li>
-			<li>If you work for a broker but do not have your own NPN, please register using the Expert Staff option. If you already have an account on <a href=<%= EnrollRegistry[:enroll_app].setting(:website_name).item %>><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></a>, login to that account.</li>
-			<li>If you have questions, call <a target='_blank' href=<%= EnrollRegistry[:enroll_app].setting(:website_name).item %>><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></a> at <a><%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %></a> TTY: <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%></li>
+			<li>If you work for a broker but do not have your own NPN, please register using the Expert Staff option. If you already have an account on <a href=<%= EnrollRegistry[:enroll_app].setting(:main_web_address).item %>><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></a>, login to that account.</li>
+			<li>If you have questions, call <a target='_blank' href=<%= EnrollRegistry[:enroll_app].setting(:main_web_address).item %>><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></a> at <a><%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %></a> TTY: <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%></li>
 		</ul>
 	</div>
 <% end %>
