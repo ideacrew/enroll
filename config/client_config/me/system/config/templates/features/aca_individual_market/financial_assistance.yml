@@ -74,11 +74,6 @@ registry:
         is_enabled: true
       - key: :immigration_status_question_required
         is_enabled: false
-      - key: :state_based_language_preferences
-        item: ["English", "Spanish", "French", "Chinese (Mandarin)", "Arabic",
-             "Kirundi", "Lingala", "Somali", "Swahili", "Portuguese", "Vietnamese", "Khmer",
-             "Thai", "Tagalog", "Russian", "German"]
-        is_enabled: true
   - namespace:
     - :request_determination
     features:

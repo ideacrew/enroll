@@ -74,9 +74,6 @@ registry:
       - key: :primary_caregiver_other_question
         item: :primary_caregiver_other_question
         is_enabled: false
-      - key: :state_based_language_preferences
-        item: ["English", "Amharic", "Spanish"]
-        is_enabled: false
   - namespace:
     - :request_determination
     features:
