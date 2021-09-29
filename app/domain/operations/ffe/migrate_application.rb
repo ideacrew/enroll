@@ -146,7 +146,7 @@ module Operations
 
         application.parent_living_out_of_home_terms = app_hash["parent_living_out_of_home_terms"]
         application.attestation_terms = app_hash["parent_living_out_of_home_terms"] ? true : nil #default value
-        application.is_requesting_voter_registration_application_in_mail = true # default value
+        # application.is_requesting_voter_registration_application_in_mail = true # default value
         application.report_change_terms = app_hash['report_change_terms']
         application.medicaid_terms = app_hash['medicaid_terms']
         application.is_renewal_authorized = app_hash['is_renewal_authorized']
@@ -298,6 +298,7 @@ module Operations
           consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
           consumer_role = consumer_role_result.success
           consumer_role.contact_method = consumer_role_params["contact_method"]
+          consumer_role.language_preference = consumer_role_params["language_preference"]
           consumer_role.import!
           create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person) if consumer_role_params["vlp_documents"].present?
         else
