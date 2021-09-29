@@ -6,6 +6,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information" => "Broker Agency Information",
   "en.broker_agencies.broker_roles.new_broker_agency_form.new_broker_agency_note" => "NOTE: If you are not associated with a broker agency, please enter your personal information. Do not enter a General Agency or Third Party Administrator‘s Information.",
   "en.broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency" => "Submit",
+  "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information_edit_form" => "Agency Information",
 	"en.email" => "Email",
 	"en.npn" => "NPN",
 	"en.legal_name"=> "Legal Name",
