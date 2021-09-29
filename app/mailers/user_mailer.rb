@@ -115,9 +115,10 @@ class UserMailer < ApplicationMailer
   end
 
   def message_to_broker(person, broker, params)
-    return unless broker.email.present?
-    mail({to: broker.email, subject: params[:subject], from: person.user.email}) do |format|
-      format.html { render "message_to_broker", :locals => { :person => person, :broker => broker, :message_body => params[:body] }}
+    if broker.email_address.present?
+      mail({to: broker.email_address, subject: params[:subject], from: person.user.email}) do |format|
+        format.html { render "message_to_broker", :locals => { :person => person, :broker => broker, :message_body => params[:body] }}
+      end
     end
   end
 
