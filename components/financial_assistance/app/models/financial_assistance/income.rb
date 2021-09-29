@@ -49,7 +49,7 @@ module FinancialAssistance
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
-    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = %w[net_self_employment capital_gains farming_and_fishing other].freeze
+    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = EnrollRegistry[:negative_amount_income_types].setting(:income_types).item || %w[net_self_employment capital_gains farming_and_fishing].freeze
 
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',
