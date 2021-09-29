@@ -14,7 +14,19 @@ module FinancialAssistance
       def call(_event_name, _e_start, _e_end, _msg_id, payload)
         stringed_key_payload = payload.stringify_keys
         xml = stringed_key_payload['body']
-        application = FinancialAssistance::Application.where(:hbx_id => stringed_key_payload['assistance_application_id']).first if stringed_key_payload['assistance_application_id'].present?
+
+        if stringed_key_payload['assistance_application_id'].present?
+          applications = FinancialAssistance::Application.where(:hbx_id => stringed_key_payload['assistance_application_id'])
+          if applications.count == 1
+            application = applications.first
+          else
+            log(xml, {:severity => 'critical', :error_message => "ERROR: Found #{applications.count} applications with given assistance_application_id"})
+            return
+          end
+        else
+          log(xml, {:severity => 'critical', :error_message => 'ERROR: Unable to find value for key assistance_application_id in the headers'})
+          return
+        end
 
         if application.present?
           payload_http_status_code = stringed_key_payload['return_status']

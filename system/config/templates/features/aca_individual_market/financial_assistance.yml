@@ -15,17 +15,17 @@ registry:
           - key: :file_location
             item: 'db/documents/ivl_checklist.pdf'
       - key: :iap_year_selection
-        is_enabled: false
+        is_enabled: true
       - key: :iap_assistance_year_display
-        is_enabled: false
+        is_enabled: true
       - key: :enrollment_dates
         item: :enrollment_dates
         is_enabled: true
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 27
+            item: 1
           - key: :application_new_year_effective_date_month_of_year
-            item: 9
+            item: 11
           - key: :enrollment_due_day_of_month
             is_enabled: true
             item: 15
@@ -85,11 +85,11 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: false
+      is_enabled: true
     - key: :batch_transfer
-      is_enabled: false
+      is_enabled: true
     - key: :transfer_service
-      is_enabled: false
+      is_enabled: true
       item: "curam"
   - namespace:
     - :documents
@@ -225,7 +225,7 @@ registry:
       is_enabled: false
       settings:
         - key: :renewals_creation_month
-          item: 9
+          item: 10
         - key: :renewals_creation_day
           item: 16
     - key: :skip_employer_address_validation

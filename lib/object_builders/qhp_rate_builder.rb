@@ -4,6 +4,7 @@ class QhpRateBuilder
   METLIFE_HIOS_IDS = ["43849DC0090001", "43849DC0080001"]
 
   def initialize
+    @rating_method = 'Age-Based Rates'
     @rates_array = []
     @results_array = []
     @rating_area_id_cache = {}
@@ -26,9 +27,16 @@ class QhpRateBuilder
       @action = action
     else
       rates_hash[:plan_rate_group_attributes].each do |rate_group_attributes|
-        @rates_array = @rates_array + rate_group_attributes[:items]
+        @rating_method = rate_group_attributes[:rating_method]
+        @rates_array += assign_rating_method(rate_group_attributes[:items])
         @action = action
       end
+    end
+  end
+
+  def assign_rating_method(item_attributes)
+    item_attributes.each do |item|
+      item[:rating_method] = @rating_method
     end
   end
 
@@ -40,10 +48,49 @@ class QhpRateBuilder
       build_product_premium_tables
     end
     if @action == "new"
+      find_qhp_and_create_premium_tables
       find_plan_and_create_premium_tables
       find_product_and_create_premium_tables
     else
       find_plan_and_update_premium_tables
+    end
+  end
+
+  def find_qhp_and_create_premium_tables
+    @qhp_rates_hash = Hash.new {|h, k| h[k] = []}
+    @rates_array.each do |rate|
+      @qhp_rates_hash[rate[:plan_id]] << rate.except(:rating_method)
+    end
+    @qhp_rates_hash.each do |hios_id, qhp_rates|
+      qhp = Products::Qhp.where(active_year: qhp_rates.first[:effective_date].to_date.year, standard_component_id: hios_id).first
+
+      next if qhp.blank?
+
+      qhp.qhp_premium_tables = [] if qhp.qhp_premium_tables.present?
+      rates = []
+      qhp_rates.each do |qhp_rate|
+        qhp_rate_attributes = {
+          rate_area_id: qhp_rate[:rate_area_id].gsub("Rating Area ", "R-#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}00"),
+          plan_id: qhp_rate[:plan_id],
+          tobacco: qhp_rate[:tobacco],
+          effective_date: qhp_rate[:effective_date],
+          expiration_date: qhp_rate[:expiration_date],
+          age_number: assign_age(qhp_rate[:age_number]),
+          primary_enrollee: qhp_rate[:primary_enrollee],
+          couple_enrollee: qhp_rate[:couple_enrollee],
+          couple_enrollee_one_dependent: qhp_rate[:couple_enrollee_one_dependent],
+          couple_enrollee_two_dependent: qhp_rate[:couple_enrollee_two_dependent],
+          couple_enrollee_many_dependent: qhp_rate[:couple_enrollee_many_dependent],
+          primary_enrollee_one_dependent: qhp_rate[:primary_enrollee_one_dependent],
+          primary_enrollee_two_dependent: qhp_rate[:primary_enrollee_two_dependent],
+          primary_enrollee_many_dependent: qhp_rate[:primary_enrollee_many_dependent],
+          is_issuer_data: qhp_rate[:is_issuer_data],
+          primary_enrollee_tobacco: qhp_rate[:primary_enrollee_tobacco]
+        }
+        rates << qhp_rate_attributes
+      end
+      qhp.qhp_premium_tables = rates
+      qhp.save
     end
   end
 
@@ -86,13 +133,13 @@ class QhpRateBuilder
 
       attrs.merge!({tobacco_cost: @rate[:primary_enrollee_tobacco]}) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
-      if assign_age.zero?
+      if assign_age(@rate[:age_number]).zero?
         (14..64).each do |age|
           @results[key] << attrs.merge!({age: age})
           @results[key]
         end
       else
-        @results[key] << attrs.merge!({age: assign_age})
+        @results[key] << attrs.merge!({age: assign_age(@rate[:age_number])})
         @results[key]
       end
     end
@@ -108,7 +155,7 @@ class QhpRateBuilder
       end
     end
     @premium_table_cache.each_pair do |k, v|
-      product_hios_id, rating_area_id, applicable_range = k
+      product_hios_id, rating_area_id, applicable_range, rating_method = k
       premium_tables = []
       premium_tuples = []
 
@@ -129,6 +176,7 @@ class QhpRateBuilder
       active_year = applicable_range.first.year
       products = ::BenefitMarkets::Products::Product.where(hios_id: /#{product_hios_id}/).select{|a| a.active_year == active_year}
       products.each do |product|
+        product.rating_method = rating_method
         product.premium_tables << premium_tables
         product.premium_ages = premium_tuples.map(&:age).minmax
         product.save
@@ -141,18 +189,19 @@ class QhpRateBuilder
     applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
     rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}00")
     rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
-    if assign_age.zero?
+
+    if assign_age(@rate[:age_number]).zero?
       (14..64).each do |age|
-        @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+        @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range, @rate[:rating_method]]][age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
       end
     else
-      @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+      @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range, @rate[:rating_method]]][assign_age(@rate[:age_number])] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
     end
     @results_array << "#{@rate[:plan_id]},#{active_year}"
   end
 
-  def assign_age
-    case @rate[:age_number]
+  def assign_age(rate)
+    case rate
     when "0-14"
       14
     when "0-20"
@@ -162,7 +211,7 @@ class QhpRateBuilder
     when "65 and over"
       65
     else
-      @rate[:age_number].to_i
+      rate.to_i
     end
   end
 
