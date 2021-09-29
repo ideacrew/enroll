@@ -6,7 +6,7 @@ module BenefitSponsors
 
     describe "#map_binder_payment_due_date_by_start_on" do
       let(:benefit_application_schedular) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new }
-      let(:date_hash) { Settings.aca.shop_market.binder_payment_dates }
+      let(:date_hash) { EnrollRegistry[:enroll_app].setting(:binder_payment_dates).item }
 
       context 'when start on in hash key' do
         it 'should return the corresponding value' do
