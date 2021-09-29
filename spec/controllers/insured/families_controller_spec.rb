@@ -604,7 +604,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "choosing contact_method via dropdown is enabled" do
       before :each do
         allow(family).to receive(:active_family_members).and_return(family_members)
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(true)
         sign_in user
         get :personal
       end
@@ -617,7 +617,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "choosing contact_method via dropdown is disabled (choose from checkbox)" do
       before :each do
         allow(family).to receive(:active_family_members).and_return(family_members)
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(false)
         sign_in user
         get :personal
       end

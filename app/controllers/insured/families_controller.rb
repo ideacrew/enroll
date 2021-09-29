@@ -112,7 +112,7 @@ class Insured::FamiliesController < FamiliesController
 
   def personal
     @tab = params['tab']
-    @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless FinancialAssistanceRegistry.feature_enabled?(:contact_method_via_dropdown)
+    @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
     @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?

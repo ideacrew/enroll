@@ -73,9 +73,7 @@ registry:
       - key: :mainecare_healthcare_questions
         is_enabled: true
       - key: :immigration_status_question_required
-        is_enabled: false
-      - key: :contact_method_via_dropdown
-        is_enabled: false         
+        is_enabled: false       
   - namespace:
     - :request_determination
     features:

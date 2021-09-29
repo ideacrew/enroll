@@ -71,7 +71,8 @@ class ConsumerRole
     ["Mail", "Text"] => "Paper and Text Message communications",
     ["Text"] => "Only Text Message communication",
     ["Mail"] => "Only Paper communication",
-    ["Email"] => "Only Electronic communications"}.freeze
+    ["Email"] => "Only Electronic communications"
+  }.freeze
 
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
