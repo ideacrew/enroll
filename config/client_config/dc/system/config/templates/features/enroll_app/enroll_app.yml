@@ -172,7 +172,7 @@ registry:
           - key: :state_dmv_link
             item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
           - key: :health_benefit_exchange_authority_phone_number
-            item: '(855) 532-5465 TTY: 71'
+            item: '(855) 532-5465 TTY: 711'
           - key: :contact_center_name
             item: "DC Health Link's Customer Care Center"
           - key: :contact_center_po_box
