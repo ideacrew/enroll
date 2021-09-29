@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: bdbcfe8422b4d2b663242b87cdbd1b5265734b8f
-  branch: release_0.8.0
+  revision: c5e310097513f16323c2aa63bf29e0bd28e7bb04
+  branch: iap_renewals_event_source_setup
   specs:
-    aca_entities (0.8.0)
+    aca_entities (0.6.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -13,7 +13,6 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
-      symmetric-encryption (~> 3.9.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -97,7 +96,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.3)
       slim (~> 3.0)
-      symmetric-encryption
+      symmetric-encryption (= 3.9.1)
 
 GEM
   remote: https://rubygems.org/
