@@ -217,6 +217,21 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           expect(@duplicate_applicant.net_annual_income).to be_nil
         end
       end
+
+      context 'for claimed_as_tax_dependent_by' do
+        let(:mocked_params) { { claimed_as_tax_dependent_by: BSON::ObjectId.new } }
+
+        before do
+          applicant.update_attributes!(mocked_params)
+          factory = described_class.new(application)
+          duplicate_application = factory.duplicate
+          @duplicate_applicant = duplicate_application.applicants.first
+        end
+
+        it 'should not copy claimed_as_tax_dependent_by' do
+          expect(@duplicate_applicant.claimed_as_tax_dependent_by).to be_nil
+        end
+      end
     end
   end
 
