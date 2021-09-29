@@ -74,6 +74,8 @@ registry:
       - key: :primary_caregiver_other_question
         item: :primary_caregiver_other_question
         is_enabled: false
+      - key: :contact_method_via_dropdown
+        is_enabled: true  
   - namespace:
     - :request_determination
     features:

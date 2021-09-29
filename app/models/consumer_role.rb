@@ -63,6 +63,16 @@ class ConsumerRole
     'None of these'
   ].freeze
 
+  # ME contact method feature
+  CONTACT_METHOD_MAPPING = {
+    ["Email", "Mail", "Text"] => "Paper, Electronic and Text Message communications",
+    ["Email", "Text"] => "Electronic and Text Message communications",
+    ["Email", "Mail"] => "Paper and Electronic communications",
+    ["Mail", "Text"] => "Paper and Text Message communications",
+    ["Text"] => "Only Text Message communication",
+    ["Mail"] => "Only Paper communication",
+    ["Email"] => "Only Electronic communications"}.freeze
+
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
