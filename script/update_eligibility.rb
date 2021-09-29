@@ -66,9 +66,9 @@ def check_and_run
       active_thh = active_household.latest_active_thh_with_year(effective_date.year)
       deter = active_thh.try(:latest_eligibility_determination)
 
+      individual_csr.gsub!("'", "\"")
+      csr_hash = JSON.parse(individual_csr)
       if active_thh && deter.present? && active_thh.effective_starting_on.to_date == effective_date && deter.max_aptc.to_f == aptc.to_f
-        individual_csr.gsub!("'", "\"")
-        csr_hash = JSON.parse(individual_csr)
         csr_hash.keys.each do |person_hbx_id|
           person = Person.where(hbx_id: person_hbx_id).first # what happens when there is no person record or multiple person with same hbx_id
           csr_int = csr_hash[person_hbx_id]
@@ -77,6 +77,7 @@ def check_and_run
           unless person_fm.empty?
             person_fm_id = person_fm.first.id
             person_thhm = active_thh.tax_household_members.where(applicant_id: person_fm_id).first
+            next if person_thhm.csr_percent_as_integer == csr_int.to_i
             person_thhm.update_attributes!(csr_percent_as_integer: csr_int)
             ran += 1
             updated_member_csr += 1
@@ -88,7 +89,7 @@ def check_and_run
           end
         end
       else
-        active_household.build_thh_and_eligibility(aptc, 0, effective_date, @slcsp, 'Renewals', individual_csr) # send 0 csr as default
+        active_household.build_thh_and_eligibility(aptc, 0, effective_date, @slcsp, 'Renewals', csr_hash) # send 0 csr as default
         ran += 1
         created_eligibility += 1
         csv << [primary_ssn, primary_hbx_id, "Created Eligibility for family with primary_person_hbx_id: #{primary_person.hbx_id}"]
