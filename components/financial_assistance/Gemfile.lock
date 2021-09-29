@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 20029e25fd586a953cfce05b5b4e81dec95791e0
+  revision: bdbcfe8422b4d2b663242b87cdbd1b5265734b8f
   branch: release_0.8.0
   specs:
     aca_entities (0.8.0)
@@ -13,7 +13,7 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
-      symmetric-encryption (~> 4.3)
+      symmetric-encryption (~> 3.9.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -501,7 +501,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    symmetric-encryption (4.3.3)
+    symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.2)
     test-prof (0.5.0)

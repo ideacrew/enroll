@@ -97,9 +97,16 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_premium
+    return family_tier_total_premium if family_tier_eligible?
     members.reduce(0.00) do |sum, member|
       (sum + premium_for(member)).round(2)
     end
+  end
+
+  def family_tier_total_premium
+    qhp = ::Products::Qhp.where(standard_component_id: __getobj__.hios_base_id, active_year: __getobj__.active_year).first
+    qpt = qhp.qhp_premium_tables.where(rate_area_id: hbx_enrollment.rating_area.exchange_provided_code).first
+    qpt&.send(@hbx_enrollment.family_tier_value)
   end
 
   def total_employer_contribution
@@ -107,6 +114,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_aptc_amount
+    return @elected_aptc if family_tier_eligible?
     result = members.reduce(0.00) do |sum, member|
       (sum + aptc_amount(member))
     end
@@ -117,6 +125,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_employee_cost
+    if family_tier_eligible?
+      cost = (family_tier_total_premium - total_aptc_amount).round(2)
+      cost = 0.00 if cost < 0
+      return cost
+    end
+
     members.reduce(0.00) do |sum, member|
       (sum + employee_cost_for(member)).round(2)
     end.round(2)
@@ -136,6 +150,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def can_round_cents?
     return false if elected_aptc <= 0
+    return false if family_based_rating?
 
     if @hbx_enrollment.persisted?
       serv_obj = ::Services::ApplicableAptcService.new(hbx_enrollment.id, hbx_enrollment.effective_on, elected_aptc, [__getobj__.id.to_s])
@@ -151,5 +166,17 @@ class UnassistedPlanCostDecorator < SimpleDelegator
       result
     end
     @member_bool_hash.values.all?
+  end
+
+  def family_tier_eligible?
+    @family_tier_eligible ||= family_based_rating? && is_ivl_product?
+  end
+
+  def family_based_rating?
+    @family_based_rating ||= __getobj__.family_based_rating?
+  end
+
+  def is_ivl_product?
+    @is_ivl_product ||= __getobj__.benefit_market_kind == :aca_individual
   end
 end

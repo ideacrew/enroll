@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'roo',                       '~> 2.1'
   s.add_dependency 'virtus',                    '~> 1.0'
   s.add_dependency "slim",                      "~> 3.0"
-  s.add_dependency 'symmetric-encryption'
+  s.add_dependency 'symmetric-encryption',      '3.9.1'
   s.add_dependency 'webpacker',                 '~> 4.0.2'
   s.add_dependency 'dry-types'
   s.add_dependency 'mail'
