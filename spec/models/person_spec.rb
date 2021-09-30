@@ -54,6 +54,14 @@ describe Person, :dbclean => :after_each do
           end
         end
       end
+
+      context "after_create callbacks" do
+        let(:params) {valid_params}
+        let!(:person) {Person.create(**params)}
+        it "#create_inbox will create an inbox with a message" do
+          expect(person.send(:create_inbox).body).to_not be(nil)
+        end
+      end
     end
 
     describe ".new" do
