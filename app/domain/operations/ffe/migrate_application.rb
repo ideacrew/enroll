@@ -429,7 +429,7 @@ module Operations
             is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
             is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
             same_with_primary: same_address_with_primary(family_member),
-            is_incarcerated: applicant_hash['is_applying_coverage'] ? (applicant_hash.dig('attestation', 'is_incarcerated') || false) : nil,
+            is_incarcerated: applicant_hash['is_applying_coverage'] ? family_member.person.is_incarcerated : nil,
             is_physically_disabled: applicant_hash.dig('attestation', 'is_self_attested_disabled'),
             is_self_attested_disabled: applicant_hash.dig('attestation', 'is_self_attested_disabled'),
             is_self_attested_blind: applicant_hash.dig('attestation', 'is_self_attested_blind'),
