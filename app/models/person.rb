@@ -1289,7 +1289,7 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    welcome_body_translation_key = if broker_role || broker_agency_staff_roles.present? 
+    welcome_body_translation_key = if broker_role || broker_agency_staff_roles.present?
                                      "inbox.create_inbox_broker_message"
                                    else
                                      "inbox.create_inbox_normal_user_message"
