@@ -239,5 +239,7 @@ registry:
       settings:
         - key: :income_types
           item: ["net_self_employment", "capital_gains", "farming_and_fishing", "rental_and_royalty", "other"]
+    - key: :skip_zero_income_amount_validation
+      is_enabled: :true
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

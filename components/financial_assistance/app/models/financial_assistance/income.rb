@@ -112,7 +112,7 @@ module FinancialAssistance
                        numericality: {
                          greater_than: 0, message: "%{value} must be greater than $0"
                        },
-                       on: [:step_1, :submission], unless: :negative_income_accepted?
+                       on: [:step_1, :submission], unless: :income_amount_validate
 
     validates :kind, presence: true,
                      inclusion: {
@@ -147,6 +147,15 @@ module FinancialAssistance
     def negative_income_accepted?
       NEGATIVE_AMOUNT_INCOME_TYPE_KINDS.include?(kind)
     end
+
+    def skip_zero_income_amount_validation
+      FinancialAssistanceRegistry.feature_enabled?(:skip_zero_income_amount_validation)
+    end
+
+    def income_amount_validate
+      (negative_income_accepted? || skip_zero_income_amount_validation)
+    end
+
 
     def <=>(other)
       [amount, kind, frequency, start_on, end_on, is_projected] ==
