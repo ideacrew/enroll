@@ -1299,7 +1299,8 @@ class Person
       site_short_name: site_short_name,
       state_name: site_state_name,
       contact_center_short_number: contact_center_short_number,
-      contact_center_tty_number: contact_center_tty_number
+      contact_center_tty_number: contact_center_tty_number,
+      contact_center_name: contact_center_name
     )
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
