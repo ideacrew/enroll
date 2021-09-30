@@ -581,22 +581,54 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET personal" do
-    before :each do
-      allow(family).to receive(:active_family_members).and_return(family_members)
-      sign_in user
-      get :personal
+    context "render template" do
+      before :each do
+        allow(family).to receive(:active_family_members).and_return(family_members)
+        sign_in user
+        get :personal
+      end
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render person edit page" do
+        expect(response).to render_template("personal")
+      end
+
+      it "should assign variables" do
+        expect(assigns(:family_members)).to eq(family_members)
+      end
     end
 
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
+    context "choosing contact_method via dropdown is enabled" do
+      before :each do
+        allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(true)
+        sign_in user
+        get :personal
+      end
+
+      it "should not assign value" do
+        expect(assigns(:contact_preferences_mapping)).to eq(nil)
+      end
     end
 
-    it "should render person edit page" do
-      expect(response).to render_template("personal")
-    end
+    context "choosing contact_method via dropdown is disabled (choose from checkbox)" do
+      before :each do
+        allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(false)
+        sign_in user
+        get :personal
+      end
 
-    it "should assign variables" do
-      expect(assigns(:family_members)).to eq(family_members)
+      it "should assign value" do
+        expect(assigns(:contact_preferences_mapping)).not_to be_nil
+      end
     end
   end
 
