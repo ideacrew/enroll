@@ -519,6 +519,8 @@ module Operations
             tribal_id: native_american_info['tribal_id'],
             tribal_name: native_american_info['tribal_name'],
             tribal_state: native_american_info['tribal_state'],
+            health_service_eligible: native_american_info['health_service_eligible'],
+            health_service_through_referral: native_american_info['health_service_through_referral'],
 
             is_ia_eligible: is_ia_eligible.nil? ? false : is_ia_eligible.values[0],
             is_medicaid_chip_eligible: nil,

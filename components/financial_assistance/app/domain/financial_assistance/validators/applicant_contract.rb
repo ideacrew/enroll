@@ -27,6 +27,8 @@ module FinancialAssistance
         optional(:tribal_id).maybe(:string)
         optional(:tribal_state).maybe(:string)
         optional(:tribal_name).maybe(:string)
+        optional(:health_service_eligible).maybe(:bool)
+        optional(:health_service_through_referral).maybe(:bool)
 
         optional(:language_code).maybe(:string) # Fix Me
         optional(:no_dc_address).filled(:bool) # Fix Me
