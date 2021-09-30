@@ -21,7 +21,7 @@
         <div class="col-md-6 col-sm-6 form-group-lg no-pd">
           <label class='personal_landing_page_label'>Language Preference</label>
           <br>
-          <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
+          <%= person_role.select :language_preference, options_for_select(EnrollRegistry[:state_based_language_preferences].item || ["English"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
         </div>
       </div>
       <% if role == :employee_roles && @person.active_employee_roles.size > 1 %>
