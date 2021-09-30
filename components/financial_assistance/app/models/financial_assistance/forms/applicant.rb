@@ -87,7 +87,7 @@ module FinancialAssistance
 
       def applicant
         return @applicant if defined? @applicant
-        @applicant = @application.applicants.find(applicant_id) if applicant_id.present?
+        @applicant = @application&.applicants.find(applicant_id) if applicant_id.present?
       end
 
       def save
