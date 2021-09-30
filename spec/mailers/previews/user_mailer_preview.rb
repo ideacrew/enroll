@@ -4,7 +4,26 @@
 # Visit http://localhost:3000/rails/mailers/
 # And you'll see an index of emails
 class UserMailerPreview < ActionMailer::Preview
-  def broker_staff_invitation_email; end
+  def broker_staff_invitation_email
+    person = Person.all.to_a.sample
+    person.emails.create!(
+      kind: 'work',
+      address: "fakeemail50@gmail.com"
+    )
+    email = person.emails.last
+    person_name = person.full_name
+    person_id = person.id.to_s
+    person.build_broker_role
+    user = User.all.to_a.sample
+    invitation = Invitation.create!(
+      invitation_email: email,
+      source_id: user.id,
+      invitation_email_type: "broker_role",
+      source_kind: "broker_role",
+      role: "broker_role"
+    )
+    UserMailer.broker_staff_invitation_email(email, person_name, invitation, person_id)
+  end
 
   def broker_denied
     person = Person.all.to_a.sample
