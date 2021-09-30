@@ -494,7 +494,7 @@ module Operations
             has_enrolled_health_coverage: applicant_hash['has_enrolled_health_coverage'],
             has_eligible_health_coverage: applicant_hash['has_eligible_health_coverage'],
 
-            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip', 'not_eligible_in_last_90_days'),
+            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip', 'denied_on') ? applicant_hash.dig('medicaid_and_chip', 'not_eligible_in_last_90_days') : false,
             denied_on: applicant_hash.dig('medicaid_and_chip', 'denied_on'),
             ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip', 'ended_as_change_in_eligibility'),
             hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip', 'hh_income_or_size_changed'),
