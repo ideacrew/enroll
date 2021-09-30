@@ -57,9 +57,19 @@ describe Person, :dbclean => :after_each do
 
       context "after_create callbacks" do
         let(:params) {valid_params}
-        let!(:person) {Person.create(**params)}
-        it "#create_inbox will create an inbox with a message" do
-          expect(person.send(:create_inbox).body).to_not be(nil)
+        let(:person) {Person.create(**params)}
+        context "non broker" do
+          it "#create_inbox will create an inbox with a message" do
+            expect(person.send(:create_inbox).body).to_not be(nil)
+          end
+        end
+        context "broker" do
+          before do
+            allow(person).to receive(:broker_role).and_return(BrokerRole.new)
+          end
+          it "#create_inbox will create an inbox with a message" do
+            expect(person.send(:create_inbox).body).to_not be(nil)
+          end
         end
       end
     end
