@@ -21,3 +21,6 @@ registry:
       - key: :allow_alphanumeric_npn
         item: :allow_alphanumeric_npn
         is_enabled: false
+      - key: :broker_training_link
+        is_enabled: false
+        item: ""
