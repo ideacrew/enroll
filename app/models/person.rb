@@ -1289,7 +1289,7 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    welcome_body_translation_key = if broker_role || broker_agency_staff_roles.present? 
+    welcome_body_translation_key = if broker_role || broker_agency_staff_roles.present?
                                      "inbox.create_inbox_broker_message"
                                    else
                                      "inbox.create_inbox_normal_user_message"
@@ -1299,7 +1299,8 @@ class Person
       site_short_name: site_short_name,
       state_name: site_state_name,
       contact_center_short_number: contact_center_short_number,
-      contact_center_tty_number: contact_center_tty_number
+      contact_center_tty_number: contact_center_tty_number,
+      contact_center_name: contact_center_name
     )
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
