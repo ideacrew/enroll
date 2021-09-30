@@ -11,6 +11,7 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
+      mongoid (~> 7.0.2)
       nokogiri-happymapper
       oj (~> 3.11)
       rbnacl (~> 7.1)

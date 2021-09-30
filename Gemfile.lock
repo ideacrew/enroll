@@ -18,10 +18,10 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
+      mongoid (~> 7.0.2)
       nokogiri-happymapper
       oj (~> 3.11)
       rbnacl (~> 7.1)
-
 GIT
   remote: https://github.com/ideacrew/acapi.git
   revision: 1c596657b145faf493ef4bdede218384515c012a
