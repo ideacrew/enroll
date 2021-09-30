@@ -5,6 +5,10 @@ module Config
   # Site wide helpers
   # TODO: Everything in this with Settings.site should be configured into ResourceRegistry files eventually
   module SiteHelper
+    def state_name
+      EnrollRegistry[:enroll_app].setting(:state_name).item
+    end
+
     def statewide_area
       EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
