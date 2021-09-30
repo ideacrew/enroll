@@ -7,7 +7,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
     DatabaseCleaner.clean
   end
 
-  let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family.xml')) }
   let(:message) do
     {determination_http_status_code: 200, has_eligibility_response: true,
      haven_app_id: '1234', haven_ic_id: '124', eligibility_response_payload: xml}
@@ -35,6 +34,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
 
   context 'success' do
     context 'Haven Integration payload' do
+      let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family.xml')) }
 
       before do
         ed.update_attributes!(hbx_assigned_id: '205828')
@@ -81,6 +81,56 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
         end
       end
     end
+
+    context 'xml without eligibility_determinations section' do
+      let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family_without_ed.xml')) }
+
+      before do
+        ed.update_attributes!(hbx_assigned_id: '205828')
+        application.update_response_attributes(message)
+        @result = subject.call(application: application)
+        @ed = ed
+        @applicant = @ed.applicants.first
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should return true' do
+        expect(@result.success).to eq(true)
+      end
+
+      context 'for Eligibility Determination' do
+        it 'should update determined_at' do
+          expect(@ed.determined_at).not_to be_nil
+          expect(@ed.determined_at).to be_truthy
+        end
+
+        it 'should update source' do
+          expect(@ed.source).to eq('Faa')
+        end
+      end
+
+      context 'for Applicant' do
+        it 'should update is_without_assistance' do
+          expect(@applicant.is_without_assistance).to eq(true)
+        end
+
+        it 'should update is_ia_eligible' do
+          expect(@applicant.is_ia_eligible).to eq(false)
+        end
+
+        it 'should update is_medicaid_chip_eligible' do
+          expect(@applicant.is_medicaid_chip_eligible).to eq(false)
+        end
+
+        it 'should set csr_eligibility_kind to default' do
+          expect(@applicant.csr_eligibility_kind).to eq('csr_0')
+        end
+      end
+    end
+
   end
 
   context 'failure' do

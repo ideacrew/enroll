@@ -63,7 +63,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
       slim (~> 3.0)
-      symmetric-encryption (~> 3.9.1)
+      symmetric-encryption (= 3.9.1)
       virtus (~> 1.0)
 
 GEM

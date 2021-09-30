@@ -7,8 +7,8 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   let(:rating_area) { double(exchange_provided_code: exchange_provided_code) }
   let(:premium_table) { double(rating_area: rating_area) }
   let(:premium_tables) { [premium_table] }
-  let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health", premium_tables: premium_tables) }
-  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, premium_tables: premium_tables) }
+  let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health", family_based_rating?: false, premium_tables: premium_tables) }
+  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, family_based_rating?: false, premium_tables: premium_tables) }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
   let(:area) { EnrollRegistry[:rating_area].settings(:areas).item.first }
   context "rating a large family" do
@@ -349,6 +349,57 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       it 'should return 0.00 when invalid information is given' do
         expect(@upcd_1.member_ehb_premium(hbx_enrollment_member2)).to eq 802.1383400000001
+      end
+    end
+  end
+
+  describe 'family_based_rating' do
+    let(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          rating_method: 'Family-Tier Rates'
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, rating_area: rating_area) }
+
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+    let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'shopping', product: product, rating_area_id: rating_area.id)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, hbx_enrollment: hbx_enrollment)}
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+    let(:qhp_pt) { FactoryBot.build(:products_qhp_premium_tables, couple_enrollee: 1200.00, primary_enrollee_one_dependent: 1200.00, rate_area_id: rating_area.exchange_provided_code)}
+    let!(:qhp) { FactoryBot.create(:products_qhp, standard_component_id: product.hios_base_id, active_year: product.active_year, qhp_premium_tables: [qhp_pt]) }
+
+    context 'without any aptc' do
+
+      before do
+        @decorator = UnassistedPlanCostDecorator.new(product, hbx_enrollment)
+      end
+
+      it 'should return family tier premium' do
+        expect(@decorator.total_premium).to eq(1200.00)
+      end
+    end
+
+    context 'with aptc' do
+      let(:elected_aptc) { 500.00 }
+
+      before do
+        @decorator = UnassistedPlanCostDecorator.new(product, hbx_enrollment, elected_aptc)
+      end
+
+      it 'should return elected aptc for total aptc amount' do
+        expect(@decorator.total_aptc_amount).to eq elected_aptc
+      end
+
+      it 'should return family tier premium' do
+        expect(@decorator.total_premium).to eq(1200.00)
       end
     end
   end

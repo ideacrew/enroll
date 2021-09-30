@@ -32,8 +32,12 @@ module FinancialAssistance
           end
 
           def find_application(application_entity)
-            application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
-            application.present? ? Success(application) : Failure("Could not find application with given hbx_id: #{application_entity.hbx_id}")
+            applications = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id)
+            if applications.count == 1
+              Success(applications.first)
+            else
+              Failure("Found #{applications.count} applications with given hbx_id: #{application_entity.hbx_id}")
+            end
           end
 
           def update_application(application, application_entity)

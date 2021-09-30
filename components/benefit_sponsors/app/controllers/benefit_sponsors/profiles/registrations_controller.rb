@@ -40,7 +40,7 @@ module BenefitSponsors
           template_filename = if redirect_to_requirements_after_confirmation?
                                 "confirmation"
                               else
-                                "broker_agencies/broker_roles/extended_confirmation.html.erb"
+                                "broker_agencies/broker_roles/extended_confirmation"
                               end
           if is_broker_profile? && saved
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
@@ -48,13 +48,13 @@ module BenefitSponsors
             return
           elsif saved
             redirect_to result_url
+            return
           end
-          return
         rescue Exception => e
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render default_template, :flash => { :error => @agency.errors.full_messages }
+        render 'new', :flash => { :error => @agency.errors.full_messages }
       end
 
       def edit
