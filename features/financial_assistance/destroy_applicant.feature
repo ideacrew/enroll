@@ -4,6 +4,8 @@ Feature: Functionality for the Destroy Applicant
     Given a consumer exists
     And is logged in
     And a benchmark plan exists
+    And EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And at least two other household members exist
