@@ -1,3 +1,4 @@
 USER_MAILER_TRANSLATIONS = {
   "en.user_mailer.generic_consumer.bottom_text" => "<p class='heading'>Questions or need help?</p><p>Call the %{contact_center_name} at %{marketplace_phone} or go online to <a href='%{site_home_business_url}'>CoverME website</a>.</p>"
+  "en.generic_notice_alert.full_text" => "<p>Hi %{first_name},</p><p>You have a new message from %{site_short_name} about your health coverage that may require action. Login to your account to read this message.<br><a href=%{site_home_business_url} class='button-link'>Log In To %{site_short_name}</a><br><p>Questions? Call us at %{contact_center_phone_number}.</p><p>The %{site_short_name} Team</p>"
 }
