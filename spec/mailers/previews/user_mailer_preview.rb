@@ -8,6 +8,15 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.welcome(User.first)
   end
 
+  def broker_application_confirmation
+    person = Person.all.to_a.sample
+    person.emails.create!(
+      kind: 'work',
+      address: "fakeemail50@gmail.com"
+    )
+    UserMailer.broker_application_confirmation(person)
+  end
+
   def generic_consumer
     UserMailer.generic_consumer_welcome(Person.first.first_name, Person.first.hbx_id, "genericemail@exmaple.com")
   end
