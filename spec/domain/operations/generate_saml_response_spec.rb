@@ -18,6 +18,8 @@ RSpec.describe Operations::GenerateSamlResponse do
   end
 
   before do
+    EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
+    EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
     EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
     allow(HTTParty).to receive(:post).and_return connection
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
