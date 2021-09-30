@@ -1,9 +1,10 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: c5e310097513f16323c2aa63bf29e0bd28e7bb04
-  branch: iap_renewals_event_source_setup
+  revision: 30639aced18d6c8ae6392767af1d4b98a51cb451
+  branch: release_0.8.0
   specs:
-    aca_entities (0.6.0)
+    aca_entities (0.8.0)
+      bson (~> 4.3)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -11,8 +12,10 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
+      mongoid (~> 7.0.2)
       nokogiri-happymapper
       oj (~> 3.11)
+      symmetric-encryption (= 3.9.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git

@@ -7,10 +7,11 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 8de30c8f4f53218a761b89232552633a4823cc60
+  revision: 30639aced18d6c8ae6392767af1d4b98a51cb451
   branch: release_0.8.0
   specs:
-    aca_entities (0.6.0)
+    aca_entities (0.8.0)
+      bson (~> 4.3)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -18,8 +19,10 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
+      mongoid (~> 7.0.2)
       nokogiri-happymapper
       oj (~> 3.11)
+      symmetric-encryption (= 3.9.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
