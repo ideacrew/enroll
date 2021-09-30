@@ -4,9 +4,8 @@
 # Visit http://localhost:3000/rails/mailers/
 # And you'll see an index of emails
 class UserMailerPreview < ActionMailer::Preview
-  def broker_staff_invitation_email
+  def broker_staff_invitation_email; end
 
-  end
   def broker_denied
     person = Person.all.to_a.sample
     person.emails.create!(
@@ -16,6 +15,7 @@ class UserMailerPreview < ActionMailer::Preview
     broker_role = person.build_broker_role
     UserMailer.broker_denied_notification(broker_role)
   end
+
   def welcome_email
     UserMailer.welcome(User.first)
   end
