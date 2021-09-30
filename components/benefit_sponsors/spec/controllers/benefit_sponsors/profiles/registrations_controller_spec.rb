@@ -296,7 +296,7 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true) if profile_type == 'general_agency'
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
@@ -308,6 +308,7 @@ module BenefitSponsors
             site.benefit_markets.first.save!
             # Stubbing the controller method (which has two conditions, one of which is a Resource Registry check) is easier
             allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true) if profile_type == 'broker_agency'
+            allow(controller).to receive(:is_broker_profile?).and_return(true) if profile_type == 'broker_agency'
             user = self.send("#{profile_type}_user")
             sign_in user if user
             post :create, params: {:agency => self.send("#{profile_type}_params")}

@@ -31,7 +31,7 @@ registry:
         is_enabled: true
       - key: :redirect_to_requirements_page_after_confirmation
         item: :redirect_to_requirements_page_after_confirmation
-        is_enabled: true
+        is_enabled: false
       - key: :disable_family_link_in_broker_agency
         is_enabled: true
         settings:

@@ -348,16 +348,14 @@ class Household
   end
 
   def individual_member_csr_update(individual_csr, thh)
-    individual_csr.gsub!("'", "\"")
-    csr_hash = JSON.parse(individual_csr)
-    csr_hash.each_key do |hbx_id|
+    individual_csr.each_key do |hbx_id|
       person = Person.where(hbx_id: hbx_id).first
       next unless person.present?
       person_fm = self.family.family_members.active.where(person_id: person.id).first
       next unless person_fm.present?
       person_fm_id = person_fm.id
       person_thhm = thh.tax_household_members.where(applicant_id: person_fm_id).first
-      person_thhm.update_attributes!(csr_percent_as_integer: csr_hash[:hbx_id].to_i) if person_thhm.present?
+      person_thhm.update_attributes!(csr_percent_as_integer: individual_csr[:hbx_id].to_i) if person_thhm.present?
     end
   end
 

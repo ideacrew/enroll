@@ -3,6 +3,8 @@ class PeopleController < ApplicationController
   include ErrorBubble
   include VlpDoc
 
+  before_action :sanitize_contact_method, only: [:update]
+
   def new
     @person = Person.new
     build_nested_models
@@ -374,6 +376,14 @@ private
 
   def person_params
     params.require(:person).permit(*person_parameters_list)
+  end
+
+  def sanitize_contact_method
+    contact_method = params.dig("person", "consumer_role_attributes", "contact_method")
+    return unless contact_method.is_a?(Array)
+    return if contact_method.empty?
+
+    params.dig("person", "consumer_role_attributes").merge!("contact_method" => ConsumerRole::CONTACT_METHOD_MAPPING[contact_method])
   end
 
   def person_parameters_list

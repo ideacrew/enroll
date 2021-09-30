@@ -73,7 +73,7 @@ registry:
       - key: :mainecare_healthcare_questions
         is_enabled: true
       - key: :immigration_status_question_required
-        is_enabled: false
+        is_enabled: false       
   - namespace:
     - :request_determination
     features:
@@ -85,7 +85,7 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: false
+      is_enabled: true
     - key: :batch_transfer
       is_enabled: true
     - key: :transfer_service
@@ -221,20 +221,13 @@ registry:
   - namespace:
     - :renewals
     features:
-    - key: :generate_draft_renewals
+    - key: :create_renewals_on_date_change
       is_enabled: false
       settings:
-        - key: :draft_renewal_generation_month
-          item: 8
-        - key: :draft_renewal_generation_day
-          item: 25
-    - key: :submit_renewal_drafts
-      is_enabled: false
-      settings:
-        - key: :renewal_draft_submission_month
-          item: 8
-        - key: :renewal_draft_submission_day
-          item: 26
+        - key: :renewals_creation_month
+          item: 10
+        - key: :renewals_creation_day
+          item: 16
     - key: :skip_employer_address_validation
       is_enabled: :true
     - key: :skip_employer_phone_validation
