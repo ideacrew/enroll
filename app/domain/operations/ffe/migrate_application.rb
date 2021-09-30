@@ -489,6 +489,7 @@ module Operations
             has_unemployment_income: applicant_hash['has_unemployment_income'],
             has_other_income: applicant_hash['has_other_income'],
             has_deductions: applicant_hash['has_deductions'],
+            has_american_indian_alaskan_native_income: applicant_hash['has_american_indian_alaskan_native_income'],
             has_enrolled_health_coverage: applicant_hash['has_enrolled_health_coverage'],
             has_eligible_health_coverage: applicant_hash['has_eligible_health_coverage'],
 
@@ -658,6 +659,7 @@ module Operations
           persisted_applicant.has_unemployment_income = applicant[:has_unemployment_income]
           persisted_applicant.has_other_income = applicant[:has_other_income]
           persisted_applicant.has_deductions = applicant[:has_deductions]
+          persisted_applicant.has_american_indian_alaskan_native_income = applicant[:has_american_indian_alaskan_native_income]
           persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
           persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
 
