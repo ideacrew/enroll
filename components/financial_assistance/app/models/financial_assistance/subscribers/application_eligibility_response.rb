@@ -20,7 +20,7 @@ module FinancialAssistance
           if applications.count == 1
             application = applications.first
           else
-            log(xml, {:severity => 'critical', :error_message => "ERROR: Found #{applications.count} applications with given assistance_application_id"})
+            log(xml, {:severity => 'critical', :error_message => "ERROR: Found #{applications.count} applications for given assistance_application_id: #{stringed_key_payload['assistance_application_id']}"})
             return
           end
         else
