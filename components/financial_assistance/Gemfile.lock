@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: dd0021f2b111c3bb2bbd9a2f62aa2a2b34ec4ed9
-  branch: test_mongoid_fields_issue
+  revision: 30639aced18d6c8ae6392767af1d4b98a51cb451
+  branch: release_0.8.0
   specs:
     aca_entities (0.8.0)
       bson (~> 4.3)
