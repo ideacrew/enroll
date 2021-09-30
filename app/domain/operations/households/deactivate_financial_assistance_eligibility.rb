@@ -30,7 +30,7 @@ module Operations
       # returns Success(nil)
       def execute(values)
         family = Operations::Families::Find.new.call(id: BSON::ObjectId(values[:family_id]))
-        tax_households = family.success.active_household.latest_active_tax_households.tax_household_with_year(values[:date].year)
+        tax_households = family.success.active_household.latest_active_tax_households.tax_household_with_year(values[:date].to_date.year)
         return Success('No Active Tax Households to deactivate') unless tax_households.present?
 
         tax_households.each do |thh|
