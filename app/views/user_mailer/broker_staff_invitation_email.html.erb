@@ -1,8 +1,2 @@
-<html>
-<body>
-<%= person_name %>,
-<br />
-<div>Thank you for registering as a broker staff through <%= Settings.site.short_name %>.</div>
-<div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation, person_id: person_id) %> to create your broker staff account and manage your clients.</div>
-</body>
-</html>
+
+<%= l10n("user_mailer.broker_staff_invitation_email.full_text", person_name: person_name, site_short_name: site_short_name, invitation_url: link_to "#{site_short_name}", claim_invitation_url(invitation, person_id: person_id), person_id: person_id, contact_center_phone_number: contact_center_phone_number) %>
