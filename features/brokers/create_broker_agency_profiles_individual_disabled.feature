@@ -24,7 +24,11 @@ Feature: Create Primary Broker and Broker Agency
   #  And Primary Broker enters broker agency information for SHOP markets
   #  And Primary Broker enters office location for default_office_location
   #  Then Primary Broker should see broker registration successful message
-  
+
+  Background: CRM gateway features are disabled
+    And EnrollRegistry disable_family_link_in_broker_agency feature is disabled
+    And EnrollRegistry aca_shop_market feature is enabled
+    
   
   Scenario: Broker purchase insurance for a family
     Given the shop market configuration is enabled
