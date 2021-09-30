@@ -167,8 +167,9 @@ Then(/^\w+ should see listed individual market SEP Types with ascending position
 end
 
 When("Admin sorts Individual SEP Types by drag and drop") do
-  l = find("#birth_individual")
-  k = find("#marriage_individual")
+  l = find("#marriage_individual")
+  sleep 2
+  k = find("#birth_individual")
   k.drag_to(l)
 end
 
@@ -189,8 +190,8 @@ Then(/^\w+ should see listed shop market SEP Types with ascending positions$/) d
 end
 
 When("Admin sorts Shop SEP Types by drag and drop") do
-  l = find("#covid-19_shop")
-  k = find("#marriage_shop")
+  l = find("#marriage_shop")
+  k = find("#covid-19_shop")
   k.drag_to(l)
 end
 
@@ -211,8 +212,9 @@ Then(/^\w+ should see listed congress market SEP Types with ascending positions$
 end
 
 When("Admin sorts Congress SEP Types by drag and drop") do
-  l = find("#lost_access_to_mec_fehb")
-  k = find("#adoption_fehb")
+  l = find("#adoption_fehb")
+  k = find("#lost_access_to_mec_fehb")
+  sleep 2
   k.drag_to(l)
 end
 
