@@ -702,6 +702,10 @@ module Operations
           persisted_applicant.is_totally_ineligible = false
           persisted_applicant.is_without_assistance = false
 
+          #'Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?*' (conditional question for children under 18 or 19)
+          persisted_applicant.has_dependent_with_coverage = false if persisted_applicant.age_on(TimeKeeper.date_of_record) < 19
+          #persisted_applicant.dependent_job_end_on = nil
+
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false)
 
           # unless persisted_applicant.valid?
