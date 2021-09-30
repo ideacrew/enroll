@@ -76,7 +76,7 @@ module FinancialAssistance
                   next unless applicants_persons_hbx_ids.include?(thhm.person_id)
                   update_verified_applicants(@application, verified_family, thhm, vthh)
                 end
-                update_eligibility_determinations(vthh, eligibility_determination) unless verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+                update_eligibility_determinations(vthh, eligibility_determination)
               else
                 @application.update_application("Failed to find eligibility determinations in our DB with the ids in xml", 422)
                 return Failure("Failed to find eligibility determinations in our DB with the ids in xml")
@@ -87,17 +87,19 @@ module FinancialAssistance
           # rubocop:enable Metrics/CyclomaticComplexity
 
           def update_eligibility_determinations(vthh, eligibility_determination)
-            verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
-            source = "Faa"
-            verified_aptc = verified_eligibility_determination.maximum_aptc.to_f > 0.00 ? verified_eligibility_determination.maximum_aptc : 0.00
-            eligibility_determination.update_attributes(
-              max_aptc: verified_aptc,
-              determined_at: verified_eligibility_determination.determination_date,
-              aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
-              aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
-              csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
-              source: source
-            )
+            ed_update_params = { source: 'Faa', determined_at: DateTime.now }
+
+            if vthh.eligibility_determinations.present?
+              verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date)
+              verified_aptc = verified_eligibility_determination.maximum_aptc.to_f > 0.00 ? verified_eligibility_determination.maximum_aptc : 0.00
+              ed_update_params.merge!({ max_aptc: verified_aptc,
+                                        determined_at: verified_eligibility_determination.determination_date,
+                                        aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
+                                        aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
+                                        csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit })
+            end
+
+            eligibility_determination.update_attributes!(ed_update_params)
           end
 
           def update_verified_applicants(application_in_context, verified_family, thhm, verified_thh)
