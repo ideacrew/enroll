@@ -424,7 +424,7 @@ module Operations
             has_ssn: applicant_hash['identifying_information']['has_ssn'],
             gender: applicant_hash['demographic']['gender'].to_s.downcase,
             dob: applicant_hash['demographic']['dob'],
-            ethnicity: applicant_hash['demographic']['ethnicity'],
+            ethnicity: family_member.person.ethnicity,
             race: applicant_hash['demographic']['race'],
             is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
             is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
@@ -702,6 +702,8 @@ module Operations
           persisted_applicant.is_totally_ineligible = false
           persisted_applicant.is_without_assistance = false
 
+          persisted_applicant.is_veteran_or_active_military = applicant[:is_veteran_or_active_military]
+          persisted_applicant.is_vets_spouse_or_child = applicant[:is_vets_spouse_or_child]
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false)
 
           # unless persisted_applicant.valid?
