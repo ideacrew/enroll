@@ -59,3 +59,8 @@ registry:
         is_enabled: :false
       - key: :display_external_id_in_family_datatable
         is_enabled: :false
+      - key: :contact_method_via_dropdown
+        is_enabled: :true
+      - key: :state_based_language_preferences
+        item: ["English", "Amharic", "Spanish"]
+        is_enabled: true
