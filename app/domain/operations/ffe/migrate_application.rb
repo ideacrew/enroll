@@ -9,7 +9,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# rubocop:disable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 module Operations
   module Ffe
     # operation to transform mcr data to enroll format
@@ -702,7 +702,7 @@ module Operations
           persisted_applicant.is_totally_ineligible = false
           persisted_applicant.is_without_assistance = false
 
-          #'Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?*' (conditional question for children under 18 or 19)
+          #'Did this person have coverage through a job (for example, a parent's job) that ended in the last 3 months?*' (conditional question for children under 18 or 19)
           persisted_applicant.has_dependent_with_coverage = false if persisted_applicant.age_on(TimeKeeper.date_of_record) < 19
           #persisted_applicant.dependent_job_end_on = nil
 
@@ -783,4 +783,4 @@ module Operations
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# rubocop:enable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
