@@ -8,6 +8,14 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.welcome(User.first)
   end
 
+  def broker_pending_missing_training_completed_carrier
+    # Needs to satisfy: !broker_role.training && !unchecked_carriers.present?
+    person = Person.all.to_a.sample
+    broker_role = person.build_broker_role
+    unchecked_carriers = {}
+    UserMailer.broker_pending_notification(broker_role, unchecked_carriers)
+  end
+
   def broker_application_confirmation
     person = Person.all.to_a.sample
     person.emails.create!(
