@@ -14,6 +14,8 @@ module FinancialAssistance
       current = if controller_name == 'applications'
                   if action_name == 'edit'
                     :household_info
+                  elsif action_name == 'application_year_selection'
+                    :application_year_selection
                   else
                     :review_and_submit
                   end
@@ -39,10 +41,12 @@ module FinancialAssistance
                   :relationships
                 end
 
-      order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :other_income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
+      order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :other_income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit, :application_year_selection]
 
       if current.blank?
         ''
+      elsif target == :application_year_selection && current == :application_year_selection
+        'app-year-family-info-tab'
       elsif target == current
         'activer active'
       elsif order.index(target) < order.index(current)
