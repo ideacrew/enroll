@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "broker_agencies/broker_roles/_search_broker_agency.html.erb" do
   let(:organization) { FactoryBot.create(:organization) }
   let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
-  let (:broker_agency_name) {l10n("broker_agency_name")}
+  let(:broker_agency_name) {l10n("broker_agency_name")}
 
   before :each do
     assign :broker_agency_profiles, [broker_agency_profile]
