@@ -36,4 +36,4 @@ registry:
         is_enabled: true
         settings:
           - key: :enable_after_time_period
-            item: <%= Date.new(2021,9,1)..Date.new(2021,12,1) %>
+            item: <%= Date.new(2021,9,1)..Date.new(2021,11,1) %>

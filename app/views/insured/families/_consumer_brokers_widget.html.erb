@@ -4,7 +4,7 @@
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>
-        <% if current_broker_agency %>
+        <% if current_broker_agency && display_broker_info_for_consumer %>
           <%= l10n("insured.your_broker_or_assister") %>
         <% else %>
           <%= l10n("insured.select_broker_or_assister") %>
@@ -15,7 +15,7 @@
   <div class="panel-body">
     <div class="text-center">
       <i aria-hidden="true" class="fa fa-user fa-3x"></i>
-      <% if current_broker_agency %>
+      <% if current_broker_agency && display_broker_info_for_consumer %>
         <br/>
         <span class="word-break">
           <%=  current_broker_agency&.broker_agency_profile&.legal_name&.capitalize %>
@@ -26,7 +26,7 @@
       <% end %>
     </div>
     <div class="text-left">
-      <% if writing_agent %>
+      <% if writing_agent && display_broker_info_for_consumer %>
         <div class="broker-information">
           <span class="word-break">
             <%= writing_agent&.person&.first_name&.capitalize %>
@@ -53,7 +53,7 @@
         </small>
         <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker?"), body: l10n("insured.answer_for_broker", site_short_name: site_short_name ) } %>
       <% end %>
-      <% if current_broker_agency %>
+      <% if current_broker_agency && display_broker_info_for_consumer %>
         <small>
         <%= link_to l10n("insured.find_assistance_another_way"), '', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
         </small>
