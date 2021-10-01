@@ -203,9 +203,9 @@ registry:
           - key: :health_benefit_exchange_authority_phone_number
             item: "1-800-965-7476"
           - key: :contact_center_name
-            item: "CoverME.gov's Customer Assistance Center"
+            item: "CoverME.gov Customer Assistance Center"
           - key: :contact_center_short_number
-            item: "(866) 636-0355"
+            item: "(866) 636-0355 TTY: 711"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
             item: "711"
           - key: :producer_advisory_committee_url

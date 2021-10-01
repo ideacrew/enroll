@@ -21,3 +21,6 @@ registry:
       - key: :allow_alphanumeric_npn
         item: :allow_alphanumeric_npn
         is_enabled: true
+      - key: :broker_training_link
+        is_enabled: true
+        item: "https://coverme.inquisiqlms.com/"
