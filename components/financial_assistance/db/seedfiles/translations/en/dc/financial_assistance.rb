@@ -126,7 +126,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.see_if_you_qualify_2" => " #{Settings.site.short_name} health insurance or free Medicaid coverage.",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2021-coverage?utm_source=2021EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2021'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2021-coverage?utm_source=2021EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2021'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage"
