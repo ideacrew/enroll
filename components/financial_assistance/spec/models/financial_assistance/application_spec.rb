@@ -136,7 +136,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should have RENEWAL_ELIGIBLE_STATES constant' do
       expect(class_constants.include?(:RENEWAL_ELIGIBLE_STATES)).to be_truthy
-      expect(described_class::RENEWAL_ELIGIBLE_STATES).to eq(%w[submitted determined imported haven_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_determined haven_magi_medicaid_eligibility_determined])
+      renewal_eligible_states = %w[submitted determined imported haven_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_determined haven_magi_medicaid_eligibility_determined]
+      expect(described_class::RENEWAL_ELIGIBLE_STATES).to eq(renewal_eligible_states)
     end
   end
 
