@@ -28,13 +28,36 @@ module FinancialAssistance
     REQUEST_KINDS     = %w[].freeze
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
-    SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
-    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
+    SUBMITTED_STATUS  = %w[submitted verifying_income haven_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_requested].freeze
+    REVIEWABLE_STATUSES = %w[submitted
+                             determination_response_error
+                             determined
+                             terminated
+                             haven_magi_medicaid_eligibility_requested
+                             mitc_magi_medicaid_eligibility_requested
+                             mitc_magi_medicaid_eligibility_determined
+                             haven_magi_medicaid_eligibility_determined
+                             mitc_magi_medicaid_eligibility_response_errored
+                             haven_magi_medicaid_eligibility_response_errored
+                             mitc_magi_medicaid_eligibility_response_logic_errored
+                             haven_magi_medicaid_eligibility_response_logic_errored].freeze
     CLOSED_STATUSES = %w[cancelled terminated].freeze
 
-    STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
+    STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined
+                                  haven_magi_medicaid_eligibility_requested
+                                  mitc_magi_medicaid_eligibility_requested
+                                  mitc_magi_medicaid_eligibility_response_errored
+                                  haven_magi_medicaid_eligibility_response_errored
+                                  mitc_magi_medicaid_eligibility_response_logic_errored
+                                  haven_magi_medicaid_eligibility_response_logic_errored
+                                  mitc_magi_medicaid_eligibility_determined
+                                  haven_magi_medicaid_eligibility_determined].freeze
 
-    RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
+    RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported
+                                 haven_magi_medicaid_eligibility_requested
+                                 mitc_magi_medicaid_eligibility_requested
+                                 mitc_magi_medicaid_eligibility_determined
+                                 haven_magi_medicaid_eligibility_determined].freeze
 
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
@@ -328,7 +351,7 @@ module FinancialAssistance
     end
 
     def update_application(error_message, status_code)
-      set_determination_response_error!
+      record_determination_response_error!
       update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
       log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
     end
@@ -478,7 +501,6 @@ module FinancialAssistance
       applicants.find(id)
     end
 
-
     # TODO: define the states and transitions for Assisted Application workflow process
     aasm do
       state :draft, initial: true
@@ -488,30 +510,72 @@ module FinancialAssistance
       # :submission_pending is a state where some corrective action is required
       # :submission_pending is a state where we are unable to submit the application for some reason
       state :submission_pending
-      state :submitted
-      state :determination_response_error
-      state :determined
+      state :submitted # Depricated
+      state :determination_response_error # Depricated
+      state :determined # Depricated
       state :imported
+
+      # states when request build fails(to generate request for Haven/Mitc)
+      state :mitc_magi_medicaid_eligibility_request_errored
+      state :haven_magi_medicaid_eligibility_request_errored
+
+      # Start: New states for state 'submitted'
+      # states when request successfully published.
+      state :mitc_magi_medicaid_eligibility_requested
+      state :haven_magi_medicaid_eligibility_requested
+      # End: New states for state 'submitted'
+
+      # Start: New states for state 'determination_response_error'
+      # States when response payload is schema invalid.
+      state :mitc_magi_medicaid_eligibility_response_errored
+      state :haven_magi_medicaid_eligibility_response_errored
+
+      # States when we are unable to process the response payload(Data/Logic errors).
+      state :mitc_magi_medicaid_eligibility_response_logic_errored
+      state :haven_magi_medicaid_eligibility_response_logic_errored
+      # End: New states for state 'determination_response_error'
+
+      # Start: New states for state 'determined'
+      # States when we successfully processed the response payload.
+      state :mitc_magi_medicaid_eligibility_determined
+      state :haven_magi_medicaid_eligibility_determined
+      # End: New states for state 'determined'
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
-        transitions from: [:draft, :renewal_draft], to: :submitted do
-          guard do
-            is_application_valid?
+        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          transitions from: [:draft, :renewal_draft], to: :mitc_magi_medicaid_eligibility_requested do
+            guard do
+              is_application_valid?
+            end
           end
         end
 
-        transitions from: :draft, to: :draft, :after => :report_invalid do
-          guard do
-            !is_application_valid?
+        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          transitions from: [:draft, :renewal_draft], to: :haven_magi_medicaid_eligibility_requested do
+            guard do
+              is_application_valid?
+            end
           end
         end
+      end
 
-        transitions from: :renewal_draft, to: :renewal_draft, :after => :report_invalid do
-          guard do
-            !is_application_valid?
-          end
-        end
+      event :fail_submission, :after => [:record_transition, :set_submit] do
+        transitions from: [:draft, :renewal_draft], to: :mitc_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+
+        transitions from: [:draft, :renewal_draft], to: :haven_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      end
+
+      event :record_determination_response_error, :after => :record_transition do
+        transitions from: [:haven_magi_medicaid_eligibility_requested, :submitted], to: :haven_magi_medicaid_eligibility_response_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+
+        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_response_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      end
+
+      event :record_determination_response_logic_error, :after => :record_transition do
+        transitions from: [:haven_magi_medicaid_eligibility_requested, :submitted], to: :haven_magi_medicaid_eligibility_response_logic_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+
+        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_response_logic_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
       end
 
       event :unsubmit, :after => [:record_transition, :unset_submit] do
@@ -533,7 +597,9 @@ module FinancialAssistance
       end
 
       event :determine, :after => [:record_transition] do
-        transitions from: :submitted, to: :determined
+        transitions from: [:haven_magi_medicaid_eligibility_requested, :submitted], to: :haven_magi_medicaid_eligibility_determined if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+
+        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_determined if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
       end
 
       event :terminate, :after => :record_transition do
@@ -544,11 +610,6 @@ module FinancialAssistance
       event :cancel, :after => :record_transition do
         transitions from: [:draft],
                     to: :cancelled
-      end
-
-      # Currently, this event will be used during renewal generations
-      event :fail_submission, :after => :record_transition do
-        transitions from: :renewal_draft, to: :submission_pending
       end
 
       event :import, :after => [:record_transition] do
@@ -709,10 +770,6 @@ module FinancialAssistance
 
     def complete?
       is_application_valid? # && check for the validity of applicants too.
-    end
-
-    def is_submitted?
-      self.aasm_state == "submitted"
     end
 
     def send_failed_response
@@ -1131,7 +1188,7 @@ module FinancialAssistance
     end
 
     def set_submit
-      return unless submitted?
+      return if !mitc_magi_medicaid_eligibility_requested? && !haven_magi_medicaid_eligibility_requested?
       calculate_total_net_income_for_applicants
       set_submission_date
       set_assistance_year

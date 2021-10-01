@@ -6,6 +6,14 @@ require 'aasm/rspec'
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
+  before do
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(false)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+  end
+
   let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -123,12 +131,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should have submitted status constant' do
       expect(class_constants.include?(:SUBMITTED_STATUS)).to be_truthy
-      expect(described_class::SUBMITTED_STATUS).to eq(%w[submitted verifying_income])
+      expect(described_class::SUBMITTED_STATUS).to eq(%w[submitted verifying_income haven_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_requested])
     end
 
     it 'should have RENEWAL_ELIGIBLE_STATES constant' do
       expect(class_constants.include?(:RENEWAL_ELIGIBLE_STATES)).to be_truthy
-      expect(described_class::RENEWAL_ELIGIBLE_STATES).to eq(%w[submitted determined imported])
+      expect(described_class::RENEWAL_ELIGIBLE_STATES).to eq(%w[submitted determined imported haven_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_requested mitc_magi_medicaid_eligibility_determined haven_magi_medicaid_eligibility_determined])
     end
   end
 
@@ -149,7 +157,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.has_accepted_medicaid_terms?' do
     it 'returns true if includes SUBMITTED_STATUS' do
-      application.update_attributes(aasm_state: 'submitted')
+      application.update_attributes(aasm_state: 'haven_magi_medicaid_eligibility_requested')
       application.send(:has_accepted_medicaid_terms?)
       expect(described_class::SUBMITTED_STATUS.include?(application.aasm_state)).to eq(true)
     end
@@ -162,7 +170,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.has_accepted_attestation_terms?' do
     it 'returns true if includes SUBMITTED_STATUS' do
-      application.update_attributes(aasm_state: 'submitted')
+      application.update_attributes(aasm_state: 'haven_magi_medicaid_eligibility_requested')
       application.send(:has_accepted_attestation_terms?)
       expect(described_class::SUBMITTED_STATUS.include?(application.aasm_state)).to eq(true)
     end
@@ -175,7 +183,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.has_accepted_submission_terms?' do
     it 'returns true if includes SUBMITTED_STATUS' do
-      application.update_attributes(aasm_state: 'submitted')
+      application.update_attributes(aasm_state: 'haven_magi_medicaid_eligibility_requested')
       application.send(:has_accepted_submission_terms?)
       expect(described_class::SUBMITTED_STATUS.include?(application.aasm_state)).to eq(true)
     end
@@ -213,26 +221,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should returns false if application is not valid' do
       allow(application).to receive(:is_application_valid?).and_return(false)
       expect(application.complete?).to be_falsey
-    end
-  end
-
-  describe '.is_submitted?' do
-    it 'should returns true if aasm state is submitted' do
-      application.update_attributes(aasm_state: 'submitted')
-      expect(application.is_submitted?).to be_truthy
-    end
-
-    it 'should returns aasm state as submitted' do
-      application.update_attributes(aasm_state: 'submitted')
-      expect(application.aasm_state).to include('submitted')
-    end
-
-    it 'should return false if aasm state is not submitted' do
-      expect(application.is_submitted?).to be_falsey
-    end
-
-    it 'should not return aasm state as submitted' do
-      expect(application.aasm_state).not_to include('submitted')
     end
   end
 
@@ -401,7 +389,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'trigger eligibility notice' do
     let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: BSON::ObjectId.new) }
     before do
-      application.update_attributes(:aasm_state => 'submitted')
+      application.update_attributes(:aasm_state => 'haven_magi_medicaid_eligibility_requested')
     end
 
     it 'on event determine and family totally eligibile' do
@@ -418,7 +406,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         applicant.is_totally_ineligible = true
         applicant.save!
       end
-      application.update_attributes(:aasm_state => 'submitted')
+      application.update_attributes(:aasm_state => 'haven_magi_medicaid_eligibility_requested')
     end
 
     it 'event determine and family totally ineligibile' do
@@ -546,7 +534,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let(:faa) { double(:application) }
     context 'when submitted' do
       it 'should return true' do
-        allow(application).to receive(:aasm_state).and_return('submitted')
+        allow(application).to receive(:aasm_state).and_return('haven_magi_medicaid_eligibility_requested')
         expect(application.is_reviewable?).to eq true
       end
     end
@@ -573,8 +561,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'check the validity of an application' do
 
-    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family_id) }
-    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
+    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family_id, hbx_id: '127887') }
+    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft', hbx_id: '127888') }
     let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: valid_app) }
     let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: invalid_app) }
     let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
@@ -584,13 +572,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
       expect(valid_app.submit).to be_truthy
       expect(valid_app.determine).to be_truthy
-      expect(valid_app.aasm_state).to eq 'determined'
+      expect(['mitc_magi_medicaid_eligibility_determined', 'haven_magi_medicaid_eligibility_determined']).to include(valid_app.aasm_state)
     end
 
     it 'should prevent state transition for invalid application' do
       invalid_app.update_attributes!(hbx_id: nil)
-      expect(invalid_app).to receive(:report_invalid)
-      invalid_app.submit!
+      # expect(invalid_app).to receive(:report_invalid)
+      expect { invalid_app.submit! }.to raise_error AASM::InvalidTransition
       expect(invalid_app.aasm_state).to eq 'draft'
     end
 
@@ -615,8 +603,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should not create verification documents for schema invalid application' do
       invalid_app.update_attributes!(hbx_id: nil)
-      expect(invalid_app).to receive(:report_invalid)
-      invalid_app.submit!
+      # expect(invalid_app).to receive(:report_invalid)
+      expect { invalid_app.submit! }.to raise_error AASM::InvalidTransition
       expect(invalid_app.aasm_state).to eq 'draft'
       expect(applicant_primary2.verification_types.count).to eq 0
     end
@@ -667,7 +655,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let(:family_10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
     let(:family10_id) { family_10.id }
     let(:family_member10_id) { BSON::ObjectId.new }
-    let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family10_id, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
+    let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family10_id, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'haven_magi_medicaid_eligibility_requested') }
     let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application10, csr_percent_as_integer: nil, max_aptc: 0.0) }
     let!(:applicant10) do
       FactoryBot.create(:applicant, application: application10,
@@ -841,7 +829,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           application.update_attributes!(aasm_state: 'renewal_draft')
         end
 
-        context 'from renewal_draft to submitted' do
+        context 'from renewal_draft to mitc_magi_medicaid_eligibility_requested or haven_magi_medicaid_eligibility_requested' do
           context 'guard success' do
             before do
               allow(application).to receive(:is_application_valid?).and_return(true)
@@ -849,32 +837,30 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
             end
 
             it 'should transition application to submit' do
-              expect(application.reload.submitted?).to be_truthy
+              application.reload
+              expect(application.mitc_magi_medicaid_eligibility_requested? || application.haven_magi_medicaid_eligibility_requested?).to be_truthy
             end
           end
 
           context 'guard failure' do
-            before do
-              application.submit!
-            end
-
             it 'should not transition application to submit' do
+              expect { application.submit! }.to raise_error AASM::InvalidTransition
               expect(application.reload.renewal_draft?).to be_truthy
             end
           end
         end
+        # No state transition from renewal_draft to renewal_draft
+        # context 'from renewal_draft to renewal_draft' do
+        #   context 'guard success' do
+        #     before do
+        #       application.submit!
+        #     end
 
-        context 'from renewal_draft to renewal_draft' do
-          context 'guard success' do
-            before do
-              application.submit!
-            end
-
-            it 'should transition application to renewal_draft' do
-              expect(application.reload.renewal_draft?).to be_truthy
-            end
-          end
-        end
+        #     it 'should transition application to renewal_draft' do
+        #       expect(application.reload.renewal_draft?).to be_truthy
+        #     end
+        #   end
+        # end
       end
 
       context 'event: unsubmit' do
@@ -898,34 +884,30 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
             end
           end
 
-          context 'guard failure' do
-            before do
-              application.unsubmit!
-            end
-
-            it 'should not transition application to draft' do
-              expect(application.reload.draft?).to be_truthy
-            end
-          end
+          # context 'guard failure' do
+          #   it 'should not transition application to draft' do
+          #     expect { application.unsubmit! }.to raise_error AASM::InvalidTransition
+          #     expect(application.reload.draft?).to be_truthy
+          #   end
+          # end
         end
       end
     end
 
-    context 'submission_pending' do
-      context 'event: fail_submission' do
+    context 'event: fail_submission' do
+      before do
+        application.update_attributes!(aasm_state: 'renewal_draft')
+      end
+
+      context 'from renewal_draft to submission_pending' do
         before do
-          application.update_attributes!(aasm_state: 'renewal_draft')
+          allow(application).to receive(:is_application_valid?).and_return(true)
+          application.fail_submission!
         end
 
-        context 'from renewal_draft to submission_pending' do
-          before do
-            allow(application).to receive(:is_application_valid?).and_return(true)
-            application.fail_submission!
-          end
-
-          it 'should transition application to submission_pending' do
-            expect(application.reload.submission_pending?).to be_truthy
-          end
+        it 'should transition application to submission_pending' do
+          application.reload
+          expect(application.mitc_magi_medicaid_eligibility_request_errored? || application.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
         end
       end
     end
@@ -939,6 +921,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
       allow(obj).to receive(:build_event).and_return(event)
       allow(event.success).to receive(:publish).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:create_renewals_on_date_change).and_return(false)
     end
 
     it 'should not raise error with input date' do
