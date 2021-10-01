@@ -31,7 +31,6 @@ RSpec.describe ::Operations::People::CreateOrUpdateVlpDocument, dbclean: :after_
   describe 'create vlp document' do
     context 'when valid document parameters passed' do
 
-
       let(:vlp_doc_params) do
         {
           vlp_subject: 'I-551 (Permanent Resident Card)',

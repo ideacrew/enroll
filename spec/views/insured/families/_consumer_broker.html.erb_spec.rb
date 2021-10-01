@@ -27,7 +27,8 @@ RSpec.describe "insured/families/_consumer_broker.html.erb" do
 
     it "should render the partial" do
       render partial: 'insured/families/consumer_broker.html.erb', locals: { title: nil}
-      expect(rendered).to match(your_broker)
+      # TODO: Make this more dry
+      expect(rendered).to have_content(your_broker)
     end
 
     it "the partial should have Assignment Date" do
