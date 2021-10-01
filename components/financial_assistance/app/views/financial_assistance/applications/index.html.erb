@@ -53,7 +53,7 @@
             <%
               dropdown = [
                 ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
-                ['Copy to new application', copy_application_path(application), (application.is_draft? || application.is_closed? || !(application.imported? && current_user.has_hbx_staff_role?)) ? 'disabled' : 'static'],
+                ['Copy to new application', copy_application_path(application), (application.is_draft? || application.is_closed? || (application.imported? ? !current_user.has_hbx_staff_role? : false)) ? 'disabled' : 'static'],
                 ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
                 ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
               ]
