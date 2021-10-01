@@ -3,9 +3,9 @@
 Feature: Start a new Financial Assistance Application and fills out the job and self employed income forms
 
   Background: User logs in and visits applicant's Job income page
-    And EnrollRegistry crm_update_family_save feature is disabled
+    Given EnrollRegistry crm_update_family_save feature is disabled
     And EnrollRegistry crm_publish_primary_subscriber feature is disabled
-    Given a consumer, with a family, exists
+    And a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled

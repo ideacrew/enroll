@@ -1,8 +1,8 @@
 Feature: My Financial Assistance Applications page that visit the Review Application page
   Background: Review your application page
-    And EnrollRegistry crm_update_family_save feature is disabled
+    Given EnrollRegistry crm_update_family_save feature is disabled
     And EnrollRegistry crm_publish_primary_subscriber feature is disabled
-    Given a consumer exists
+    And a consumer exists
     And the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
     And the primary caretaker question configuration is enabled

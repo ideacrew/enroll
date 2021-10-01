@@ -9,7 +9,7 @@ RSpec.describe "insured/families/_consumer_broker.html.erb" do
   let(:family1) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
   let(:broker_agency_account){FactoryBot.create(:broker_agency_account,is_active:true)}
-  let(:your_broker) { EnrollRegistry.feature_enabled?(:in_person_assister) ? "Your Broker" : "Your Expert" }
+  let(:your_broker) { l10n("insured.your_broker") }
 
 
 
