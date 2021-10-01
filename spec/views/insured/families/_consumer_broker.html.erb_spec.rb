@@ -9,6 +9,7 @@ RSpec.describe "insured/families/_consumer_broker.html.erb" do
   let(:family1) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
   let(:broker_agency_account){FactoryBot.create(:broker_agency_account,is_active:true)}
+  let(:your_broker) { EnrollRegistry.feature_enabled?(:in_person_assister) ? "Your Broker" : "Your Expert" }
 
 
 
@@ -26,7 +27,7 @@ RSpec.describe "insured/families/_consumer_broker.html.erb" do
 
     it "should render the partial" do
       render partial: 'insured/families/consumer_broker.html.erb', locals: { title: nil}
-      expect(rendered).to match /Your Broker/
+      expect(rendered).to match(your_broker)
     end
 
     it "the partial should have Assignment Date" do

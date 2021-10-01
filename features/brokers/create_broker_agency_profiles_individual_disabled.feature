@@ -27,9 +27,9 @@ Feature: Create Primary Broker and Broker Agency
 
   Background: CRM gateway features are disabled
     And EnrollRegistry disable_family_link_in_broker_agency feature is disabled
-    And EnrollRegistry aca_shop_market feature is enabled
-    
-  
+    And EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
+
   Scenario: Broker purchase insurance for a family
     Given the shop market configuration is enabled
     And a CCA site exists with a benefit market
