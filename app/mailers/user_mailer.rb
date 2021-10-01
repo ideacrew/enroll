@@ -109,7 +109,7 @@ class UserMailer < ApplicationMailer
   def broker_staff_invitation_email(email, person_name, invitation, person_id)
     return if email.blank?
 
-    mail({to: email, subject: "Invitation to create your Broker Staff account on #{Settings.site.short_name} "}) do |format|
+    mail({to: email, subject: "Set up your #{site_short_name} account"}) do |format|
       format.html { render "broker_staff_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
     end
   end
