@@ -349,11 +349,11 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
     end
   end
 
-  describe 'claimed_as_tax_dependent_by' do
+  describe 'Copy Application' do
     let!(:person_11) { FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_11')}
     let!(:person_12) do
       per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_12')
-      person_11.ensure_relationship_with(person_11, 'spouse')
+      person_11.ensure_relationship_with(per, 'spouse')
       per
     end
     let!(:family_11) { FactoryBot.create(:family, :with_primary_family_member, person: person_11)}
@@ -382,27 +382,64 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
       application_11.ensure_relationship_with_primary(applicant_12, 'spouse')
     end
 
-    context 'it should populate data for claimed_as_tax_dependent_by' do
-      before do
-        @new_application = described_class.new(application_11).copy_application
-        @claimed_applicant = @new_application.applicants.where(is_claimed_as_tax_dependent: true).first
-        @claiming_applicant = @new_application.applicants.find(@claimed_applicant.claimed_as_tax_dependent_by)
+    context 'sync_family_members_with_applicants' do
+      context 'New Family member added without corresponding applicant' do
+        let!(:person_13) do
+          per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_13')
+          person_11.ensure_relationship_with(per, 'child')
+          per
+        end
+        let!(:family_member_13) { FactoryBot.create(:family_member, person: person_13, family: family_11)}
+
+        before do
+          @new_application_factory = described_class.new(application_11)
+        end
+
+        it 'should set family_members_changed to true on factory' do
+          expect(@new_application_factory.family_members_changed).to eq false
+          @new_application_factory.copy_application
+          expect(@new_application_factory.family_members_changed).to eq true
+        end
       end
 
-      it 'should create applicants with correct claimed as tax dependent' do
-        expect(@claimed_applicant.claimed_as_tax_dependent_by).to be_truthy
-      end
+      context 'New Family member dropped with corresponding applicant' do
+        before do
+          family_11.remove_family_member(family_member_12.person)
+          family_11.save!
+          @new_application_factory = described_class.new(application_11)
+        end
 
-      it "should match the claimed applicants's claimed_as_tax_dependent_by with claiming applicant" do
-        expect(@claimed_applicant.claimed_as_tax_dependent_by).to eq(@claiming_applicant.id)
+        it 'should set family_members_changed to true on factory' do
+          expect(@new_application_factory.family_members_changed).to eq false
+          @new_application_factory.copy_application
+          expect(@new_application_factory.family_members_changed).to eq true
+        end
       end
+    end
 
-      it "should match the claimed applicants's person_hbx_id with old application's claimed applicants's person_hbx_id" do
-        expect(@claimed_applicant.person_hbx_id).to eq(applicant_12.person_hbx_id)
-      end
+    context 'claimed_as_tax_dependent_by' do
+      context 'it should populate data for claimed_as_tax_dependent_by' do
+        before do
+          @new_application = described_class.new(application_11).copy_application
+          @claimed_applicant = @new_application.applicants.where(is_claimed_as_tax_dependent: true).first
+          @claiming_applicant = @new_application.applicants.find(@claimed_applicant.claimed_as_tax_dependent_by)
+        end
 
-      it "should match the claiming applicants's person_hbx_id with old application's claiming applicants's person_hbx_id" do
-        expect(@claiming_applicant.person_hbx_id).to eq(applicant_11.person_hbx_id)
+        it 'should create applicants with correct claimed as tax dependent' do
+          expect(@claimed_applicant.claimed_as_tax_dependent_by).to be_truthy
+        end
+
+        it "should match the claimed applicants's claimed_as_tax_dependent_by with claiming applicant" do
+          expect(@claimed_applicant.claimed_as_tax_dependent_by).to eq(@claiming_applicant.id)
+        end
+
+        it "should match the claimed applicants's person_hbx_id with old application's claimed applicants's person_hbx_id" do
+          expect(@claimed_applicant.person_hbx_id).to eq(applicant_12.person_hbx_id)
+        end
+
+        it "should match the claiming applicants's person_hbx_id with old application's claiming applicants's person_hbx_id" do
+          expect(@claiming_applicant.person_hbx_id).to eq(applicant_11.person_hbx_id)
+        end
       end
     end
   end

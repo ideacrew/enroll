@@ -492,6 +492,7 @@ module FinancialAssistance
       state :determination_response_error
       state :determined
       state :imported
+      state :applicants_update_required
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do

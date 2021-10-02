@@ -58,8 +58,8 @@ module FinancialAssistance
           application = create_renewal_draft_application(application, validated_params)
 
           if application.failure?
-            Rails.logger.error "Unable to create renewal application #{application.failure.errors} with #{validated_params}"
-            return Failure("Unable to create renewal application #{application.failure.errors} with #{validated_params}")
+            Rails.logger.error "Unable to create renewal application #{application.failure} with #{validated_params}"
+            return Failure("Unable to create renewal application #{application.failure} with #{validated_params}")
           end
 
           application
@@ -73,12 +73,14 @@ module FinancialAssistance
           # In our context we want to create new application from the existing application
           # that is sent from this Operation.
           Try() do
-            ::FinancialAssistance::Factories::ApplicationFactory.new(application).copy_application
-          end.bind do |renewal_application|
+            ::FinancialAssistance::Factories::ApplicationFactory.new(application)
+          end.bind do |renewal_application_factory|
+            renewal_application = renewal_application_factory.copy_application
+            family_members_changed = renewal_application_factory.family_members_changed
             years_to_renew = calculate_years_to_renew(application)
 
             renewal_application.assign_attributes(
-              aasm_state: 'renewal_draft',
+              aasm_state: family_members_changed ? 'applicants_update_required' : 'renewal_draft',
               assistance_year: validated_params[:renewal_year],
               years_to_renew: years_to_renew,
               renewal_base_year: application.renewal_base_year,
@@ -87,7 +89,11 @@ module FinancialAssistance
             )
 
             renewal_application.save!
-            Success(renewal_application)
+            if renewal_application.renewal_draft?
+              Success(renewal_application)
+            else
+              Failure("Renewal Application Applicants Update required - #{renewal_application.hbx_id}")
+            end
           end.to_result
         end
         # rubocop:enable Style/MultilineBlockChain
