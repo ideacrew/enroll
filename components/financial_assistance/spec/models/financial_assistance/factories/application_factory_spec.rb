@@ -348,4 +348,62 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
       end
     end
   end
+
+  describe 'claimed_as_tax_dependent_by' do
+    let!(:person_11) { FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_11')}
+    let!(:person_12) do
+      per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_12')
+      person_11.ensure_relationship_with(person_11, 'spouse')
+      per
+    end
+    let!(:family_11) { FactoryBot.create(:family, :with_primary_family_member, person: person_11)}
+    let!(:family_member_12) { FactoryBot.create(:family_member, person: person_12, family: family_11)}
+    let!(:application_11) { FactoryBot.create(:financial_assistance_application, family_id: family_11.id, aasm_state: 'submitted', hbx_id: "111000", effective_date: TimeKeeper.date_of_record) }
+    let!(:applicant_11) do
+      FactoryBot.create(:applicant,
+                        application: application_11,
+                        first_name: person_11.first_name,
+                        dob: TimeKeeper.date_of_record - 40.years,
+                        is_primary_applicant: true,
+                        person_hbx_id: person_11.hbx_id,
+                        family_member_id: family_11.primary_applicant.id)
+    end
+    let!(:applicant_12) do
+      FactoryBot.create(:applicant,
+                        application: application_11,
+                        first_name: person_12.first_name,
+                        dob: TimeKeeper.date_of_record - 10.years,
+                        person_hbx_id: person_12.hbx_id,
+                        is_claimed_as_tax_dependent: true,
+                        claimed_as_tax_dependent_by: applicant_11.id,
+                        family_member_id: family_member_12.id)
+    end
+    let!(:relationships) do
+      application_11.ensure_relationship_with_primary(applicant_12, 'spouse')
+    end
+
+    context 'it should populate data for claimed_as_tax_dependent_by' do
+      before do
+        @new_application = described_class.new(application_11).copy_application
+        @claimed_applicant = @new_application.applicants.where(is_claimed_as_tax_dependent: true).first
+        @claiming_applicant = @new_application.applicants.find(@claimed_applicant.claimed_as_tax_dependent_by)
+      end
+
+      it 'should create applicants with correct claimed as tax dependent' do
+        expect(@claimed_applicant.claimed_as_tax_dependent_by).to be_truthy
+      end
+
+      it "should match the claimed applicants's claimed_as_tax_dependent_by with claiming applicant" do
+        expect(@claimed_applicant.claimed_as_tax_dependent_by).to eq(@claiming_applicant.id)
+      end
+
+      it "should match the claimed applicants's person_hbx_id with old application's claimed applicants's person_hbx_id" do
+        expect(@claimed_applicant.person_hbx_id).to eq(applicant_12.person_hbx_id)
+      end
+
+      it "should match the claiming applicants's person_hbx_id with old application's claiming applicants's person_hbx_id" do
+        expect(@claiming_applicant.person_hbx_id).to eq(applicant_11.person_hbx_id)
+      end
+    end
+  end
 end
