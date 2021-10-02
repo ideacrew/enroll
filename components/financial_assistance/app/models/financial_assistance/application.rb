@@ -543,7 +543,7 @@ module FinancialAssistance
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
-        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
           transitions from: [:draft, :renewal_draft], to: :mitc_magi_medicaid_eligibility_requested do
             guard do
               is_application_valid?
@@ -561,21 +561,25 @@ module FinancialAssistance
       end
 
       event :fail_submission, :after => [:record_transition, :set_submit] do
-        transitions from: [:draft, :renewal_draft], to: :mitc_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        transitions from: [:draft,
+                           :renewal_draft,
+                           :mitc_magi_medicaid_eligibility_requested], to: :mitc_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
 
-        transitions from: [:draft, :renewal_draft], to: :haven_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        transitions from: [:draft,
+                           :renewal_draft,
+                           :haven_magi_medicaid_eligibility_requested], to: :haven_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
       end
 
       event :record_determination_response_error, :after => :record_transition do
         transitions from: [:haven_magi_medicaid_eligibility_requested, :submitted], to: :haven_magi_medicaid_eligibility_response_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
 
-        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_response_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_response_errored if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
       end
 
       event :record_determination_response_logic_error, :after => :record_transition do
         transitions from: [:haven_magi_medicaid_eligibility_requested, :submitted], to: :haven_magi_medicaid_eligibility_response_logic_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
 
-        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_response_logic_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_response_logic_errored if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
       end
 
       event :unsubmit, :after => [:record_transition, :unset_submit] do
@@ -599,7 +603,7 @@ module FinancialAssistance
       event :determine, :after => [:record_transition] do
         transitions from: [:haven_magi_medicaid_eligibility_requested, :submitted], to: :haven_magi_medicaid_eligibility_determined if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
 
-        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_determined if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        transitions from: [:mitc_magi_medicaid_eligibility_requested, :submitted], to: :mitc_magi_medicaid_eligibility_determined if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
       end
 
       event :terminate, :after => :record_transition do
