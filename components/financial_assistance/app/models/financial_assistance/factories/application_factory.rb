@@ -39,7 +39,7 @@ module FinancialAssistance
       end
 
       def update_claimed_as_tax_dependent_by(new_application)
-        claimed_applicants = new_application.applicants.where(:claimed_as_tax_dependent_by.ne => nil)
+        claimed_applicants = new_application.applicants.where(is_claimed_as_tax_dependent: true)
         claimed_applicants.each do |new_appl|
           new_matching_applicant = claiming_applicant(new_appl)
           new_appl.update_attributes(claimed_as_tax_dependent_by: new_matching_applicant.id) if new_matching_applicant
@@ -119,8 +119,12 @@ module FinancialAssistance
       private
 
       def claiming_applicant(new_applicant)
-        old_applicant = @application.applicants.find(new_applicant.claimed_as_tax_dependent_by)
-        new_applicant.application.applicants.detect{ |applicant| applicant.person_hbx_id == old_applicant.person_hbx_id } if old_applicant&.person_hbx_id
+        old_dependent_applicant = @application.applicants.where(person_hbx_id: new_applicant.person_hbx_id).first
+        return unless old_dependent_applicant&.claimed_as_tax_dependent_by.present?
+        # Applicant that claimed the above applicant
+        old_tax_applicant = @application.applicants.find(old_dependent_applicant.claimed_as_tax_dependent_by)
+        return unless old_tax_applicant&.person_hbx_id.present?
+        new_applicant.application.applicants.detect{ |applicant| applicant.person_hbx_id == old_tax_applicant.person_hbx_id }
       end
 
       def application_params
@@ -190,6 +194,8 @@ module FinancialAssistance
            predecessor_id renewal_base_year effective_date]
       end
 
+      # Do not exclude is_claimed_as_tax_dependent. If you want to exclude is_claimed_as_tax_dependent,
+      # also refactor code for method update_claimed_as_tax_dependent_by.
       def reject_applicant_params
         %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types
            medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
