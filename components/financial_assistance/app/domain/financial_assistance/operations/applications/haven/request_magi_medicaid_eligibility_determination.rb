@@ -40,7 +40,7 @@ module FinancialAssistance
               if application.may_submit?
                 application.submit!
                 request_result = request_determination(application)
-                application.unsubmit! if request_result.failure?
+                application.set_magi_medicaid_eligibility_request_errored! if request_result.failure?
                 request_result
               else
                 application.fail_submission!

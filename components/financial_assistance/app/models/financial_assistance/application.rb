@@ -493,6 +493,14 @@ module FinancialAssistance
       state :determined
       state :imported
       state :applicants_update_required
+      # states when request build fails(to generate request for Haven/Mitc)
+      state :mitc_magi_medicaid_eligibility_request_errored
+      state :haven_magi_medicaid_eligibility_request_errored
+
+      event :set_magi_medicaid_eligibility_request_errored, :after => :record_transition do
+        transitions from: :submitted, to: :mitc_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+        transitions from: :submitted, to: :haven_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      end
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
