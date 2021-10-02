@@ -176,17 +176,21 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
-        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
+        @renewal_app = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
-        income = @renewal_draft.applicants.first.incomes.first
+        income = @renewal_app.applicants.first.incomes.first
         income.assign_attributes(kind: 'test')
         income.save(validate: false)
-        @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
+        @result = subject.call(@renewal_app.serializable_hash.deep_symbolize_keys)
       end
 
       it 'should return failure' do
         expect(@result).to be_failure
+      end
+
+      it 'should transition the application to magi_medicaid_eligibility_request_errored' do
+        expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
       end
 
       it 'should return failure with a message' do
