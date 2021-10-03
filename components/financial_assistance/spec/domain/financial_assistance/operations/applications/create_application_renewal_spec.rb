@@ -96,8 +96,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
             expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
           end
 
-          it 'should return application with years_to_renew one less than previous application' do
-            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew.pred)
+          it 'should return application with years_to_renew same as previous application' do
+            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew)
           end
         end
 
