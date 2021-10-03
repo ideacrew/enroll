@@ -35,7 +35,6 @@ module FinancialAssistance
           end
 
           def renew_application(application)
-            application.set_renewal_base_year
             if application.have_permission_to_renew?
               if application.may_submit?
                 application.submit!
