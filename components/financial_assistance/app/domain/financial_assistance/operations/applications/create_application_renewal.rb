@@ -77,13 +77,13 @@ module FinancialAssistance
           end.bind do |renewal_application_factory|
             renewal_application = renewal_application_factory.copy_application
             family_members_changed = renewal_application_factory.family_members_changed
-            years_to_renew = calculate_years_to_renew(application)
+            calculated_renewal_base_year = calculate_renewal_base_year(application)
 
             renewal_application.assign_attributes(
               aasm_state: family_members_changed ? 'applicants_update_required' : 'renewal_draft',
               assistance_year: validated_params[:renewal_year],
-              years_to_renew: years_to_renew,
-              renewal_base_year: application.renewal_base_year,
+              years_to_renew: application.years_to_renew || 0,
+              renewal_base_year: calculated_renewal_base_year,
               predecessor_id: application.id,
               effective_date: Date.new(validated_params[:renewal_year])
             )
@@ -98,10 +98,9 @@ module FinancialAssistance
         end
         # rubocop:enable Style/MultilineBlockChain
 
-        # Deduct one year from years_to_renew as this is a renewal application(application for prospective year)
-        def calculate_years_to_renew(application)
-          return 0 if application.years_to_renew.nil? || !application.years_to_renew.positive?
-          application.years_to_renew.pred
+        def calculate_renewal_base_year(application)
+          return application.renewal_base_year if application.renewal_base_year.present?
+          application.calculate_renewal_base_year
         end
 
         def build_event(application)
