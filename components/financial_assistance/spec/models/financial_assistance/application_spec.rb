@@ -1282,4 +1282,21 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
   end
+
+  describe 'set_magi_medicaid_eligibility_request_errored' do
+    context 'NoMagiMedicaidEngine' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
+        application.update_attributes!(aasm_state: 'submitted')
+      end
+
+      it 'should not raise error NoMagiMedicaidEngine' do
+        expect(FinancialAssistanceRegistry.feature_enabled?(:haven_determination)).to be_falsey
+        expect(FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)).to be_falsey
+        expect(application.set_magi_medicaid_eligibility_request_errored).to be_truthy
+      end
+    end
+  end
 end
