@@ -498,8 +498,13 @@ module FinancialAssistance
       state :haven_magi_medicaid_eligibility_request_errored
 
       event :set_magi_medicaid_eligibility_request_errored, :after => :record_transition do
-        transitions from: :submitted, to: :mitc_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
-        transitions from: :submitted, to: :haven_magi_medicaid_eligibility_request_errored if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          transitions from: :submitted, to: :haven_magi_medicaid_eligibility_request_errored
+        elsif FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+          transitions from: :submitted, to: :mitc_magi_medicaid_eligibility_request_errored
+        else
+          raise NoMagiMedicaidEngine
+        end
       end
 
       # submit is the same event that can be used in renewal context as well
