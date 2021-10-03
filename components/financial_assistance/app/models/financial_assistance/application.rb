@@ -907,6 +907,15 @@ module FinancialAssistance
       update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
     end
 
+    def calculate_renewal_base_year
+      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
+      if is_renewal_authorized.present?
+        ass_year + YEARS_TO_RENEW_RANGE.max
+      elsif is_renewal_authorized.is_a?(FalseClass)
+        ass_year + (years_to_renew || 0)
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -971,15 +980,6 @@ module FinancialAssistance
         end
       end
       missing_relationships
-    end
-
-    def calculate_renewal_base_year
-      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
-      if is_renewal_authorized.present?
-        ass_year + YEARS_TO_RENEW_RANGE.max
-      elsif is_renewal_authorized.is_a?(FalseClass)
-        ass_year + years_to_renew
-      end
     end
 
     def check_parent_living_out_of_home_terms
