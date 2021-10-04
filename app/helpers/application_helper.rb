@@ -913,4 +913,12 @@ module ApplicationHelper
     return family_members if family_members.present?
     primary_person&.primary_family&.active_family_members || []
   end
+
+  def display_broker_info_for_consumer
+    if ::EnrollRegistry.feature_enabled?(:disable_family_link_in_broker_agency)
+      current_user.has_hbx_staff_role? || !::EnrollRegistry[:disable_family_link_in_broker_agency].setting(:enable_after_time_period).item.cover?(TimeKeeper.date_of_record)
+    else
+      true
+    end
+  end
 end

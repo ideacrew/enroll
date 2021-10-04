@@ -1,39 +1,46 @@
-<html>
-  <body>
-    <% if EnrollRegistry.feature_enabled?(:broker_invitation) %>
-      <%= person_name %>,
-      <br />
-      <div><%= l10n("broker_agencies.broker_invitation.thank_you_registering", site_short_name: site_short_name) %></div>
-      <div><%= l10n("broker_agencies.broker_invitation.create_broker_acc", url: claim_invitation_url(invitation), site_short_name: site_short_name) %></div>
-    <% else %>
-      <div>
-        <%= l10n("broker_agencies.broker_invitation.person_name") %>
-      </div>
-      <br />
-      <div>
-        <%= l10n("en.broker_agencies.broker_invitation.approved_broker") %>
-      </div>
-      <div>
-        <p><strong><%= l10n("broker_agencies.broker_invitation.next_steps") %></strong></p>
-      </div>
-      <div>
-        <p>
-          <%= l10n("broker_agencies.broker_invitation.create_new_acc") %>
-        </p>
-      </div>
-      <div>
-        <p>
-          <%= l10n("broker_agencies.broker_invitation.login_to_broker") %>
-        </p>
-      </div>
+<% case EnrollRegistry[:enroll_app].settings(:site_key).item.to_s.downcase %>
+  <% when 'dc' %> 
 
-      <div>
-        <%= l10n("broker_agencies.broker_invitation.call_for_help") %>
-      </div>
+    <html>
+      <body>
+        <% if EnrollRegistry.feature_enabled?(:broker_invitation) %>
+          <%= person_name %>,
+          <br />
+          <div><%= l10n("broker_agencies.broker_invitation.thank_you_registering", site_short_name: site_short_name) %></div>
+          <div><%= l10n("broker_agencies.broker_invitation.create_broker_acc", url: claim_invitation_url(invitation), site_short_name: site_short_name) %></div>
+        <% else %>
+          <div>
+            <%= l10n("broker_agencies.broker_invitation.person_name") %>
+          </div>
+          <br />
+          <div>
+            <%= l10n("en.broker_agencies.broker_invitation.approved_broker") %>
+          </div>
+          <div>
+            <p><strong><%= l10n("broker_agencies.broker_invitation.next_steps") %></strong></p>
+          </div>
+          <div>
+            <p>
+              <%= l10n("broker_agencies.broker_invitation.create_new_acc") %>
+            </p>
+          </div>
+          <div>
+            <p>
+              <%= l10n("broker_agencies.broker_invitation.login_to_broker") %>
+            </p>
+          </div>
 
-      <div>
-        <%= l10n("broker_agencies.broker_invitation.site_foote") %>
-      </div>
-    <% end %>
-  </body>
-</html>
+          <div>
+            <%= l10n("broker_agencies.broker_invitation.call_for_help") %>
+          </div>
+
+          <div>
+            <%= l10n("broker_agencies.broker_invitation.site_foote") %>
+          </div>
+        <% end %>
+      </body>
+    </html>
+  <% when 'me' %>
+    <%= l10n("user_mailer.broker_invitation_email.full_text", first_name: person_name, site_short_name: site_short_name, contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item, invitation_url: claim_invitation_url(invitation)).html_safe %>
+<% end %>
+

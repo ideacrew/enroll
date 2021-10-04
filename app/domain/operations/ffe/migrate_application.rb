@@ -9,7 +9,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# rubocop:disable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 module Operations
   module Ffe
     # operation to transform mcr data to enroll format
@@ -50,6 +50,7 @@ module Operations
         #   end
         # end
 
+        _dup = yield application_dup
         _migrated = yield application_migrated
         _application = yield import_application
 
@@ -60,6 +61,33 @@ module Operations
 
       private
 
+      def application_dup
+        # migrating list
+        # ["3654638599", "3653545566", "3655669235", "3656048335", "3655176192", "3653739431", "3654726512", "3654917025",
+        #  "3656046449", "3703540271", "3654186542", "3715498949", "3720039656", "3656296751", "3736090550", "3753262194",
+        #  "3698523219", "3726489109", "3752159826", "3690953787", "3789998132", "3942246878", "3783193340", "3791987236",
+        #  "3814304009", "4071973876", "3922175933", "3866859385", "3789413969", "4059628869", "3921306099", "4057512462",
+        #  "3963681631", "3655447280", "3793679309", "3775505336", "3770687752", "3956526075", "4064839169", "4007554188",
+        #  "4023502228", "3783529311","3747430017", "3656133587", "3743174122", "3706289263", "3654714693", "3654745957",
+        # "3878412998", "3653852422", "4066027101", "3795341920", "3654714693", "3794924231", "3656490078", "3730462612",
+        # "3706289263", "3656133587", "3743174122", "3743146491", "4062488565", "3747430017", "3656490078", "3743146491",
+        # "3730462612", "3654745957", "3909927316", "4066027101", "3909927316", "3794924231", "4013144552", "4013144552",
+        # "4062488565", "3653852422", "3878412998", "3795341920"]
+        dups = ["3653661530", "3653835451", "3655103341", "3654647425", "3655199651", "3655050863", "3655446385",
+                "3655845985", "3655473710", "3655221287", "3656379459", "3655195010", "3656281232", "3656308100",
+                "3654881326", "3679195400", "3655508494", "3656101873", "3694631216", "3691339160", "3699716118",
+                "3655320635", "3654199812", "3655481814", "3654189404", "4061853917", "3656064729", "3656240817",
+                "3656394545", "3653836120", "3887243470", "3656824321", "3996525167", "3763371082", "3655120315",
+                "3655429746", "3654370357", "3655797066", "3656791057", "4023970705", "3809789830", "3655485373",
+                "3654478431", "3654354357", "3654587217", "3654935600", "3655737145", "3764290138", "3654265734",
+                "3796431048", "3655895410", "3655646562", "3655967545", "3655656463", "3656865574", "3656327410",
+                "3725241030", "3883632840", "4013177626"]
+        if dups.include?(external_application_id.to_s)
+          raise "Duplicate Application: #{external_application_id}"
+        else
+          Success("")
+        end
+      end
       def application_migrated
         result = Operations::Families::Find.new.call(external_app_id: external_application_id)
         result.success? ? Failure("Family already migrated: #{external_application_id}") : Success("")
@@ -116,7 +144,7 @@ module Operations
 
         application.parent_living_out_of_home_terms = app_hash["parent_living_out_of_home_terms"]
         application.attestation_terms = app_hash["parent_living_out_of_home_terms"] ? true : nil #default value
-        application.is_requesting_voter_registration_application_in_mail = true # default value
+        # application.is_requesting_voter_registration_application_in_mail = true # default value
         application.report_change_terms = app_hash['report_change_terms']
         application.medicaid_terms = app_hash['medicaid_terms']
         application.is_renewal_authorized = app_hash['is_renewal_authorized']
@@ -268,6 +296,7 @@ module Operations
           consumer_role_result = create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
           consumer_role = consumer_role_result.success
           consumer_role.contact_method = consumer_role_params["contact_method"]
+          consumer_role.language_preference = consumer_role_params["language_preference"]
           consumer_role.import!
           create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person) if consumer_role_params["vlp_documents"].present?
         else
@@ -393,12 +422,12 @@ module Operations
             has_ssn: applicant_hash['identifying_information']['has_ssn'],
             gender: applicant_hash['demographic']['gender'].to_s.downcase,
             dob: applicant_hash['demographic']['dob'],
-            ethnicity: applicant_hash['demographic']['ethnicity'],
+            ethnicity: family_member.person.ethnicity,
             race: applicant_hash['demographic']['race'],
             is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
             is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
             same_with_primary: same_address_with_primary(family_member),
-            is_incarcerated: applicant_hash['is_applying_coverage'] ? (applicant_hash.dig('attestation', 'is_incarcerated') || false) : nil,
+            is_incarcerated: applicant_hash['is_applying_coverage'] ? family_member.person.is_incarcerated : nil,
             is_physically_disabled: applicant_hash.dig('attestation', 'is_self_attested_disabled'),
             is_self_attested_disabled: applicant_hash.dig('attestation', 'is_self_attested_disabled'),
             is_self_attested_blind: applicant_hash.dig('attestation', 'is_self_attested_blind'),
@@ -460,10 +489,11 @@ module Operations
             has_unemployment_income: applicant_hash['has_unemployment_income'],
             has_other_income: applicant_hash['has_other_income'],
             has_deductions: applicant_hash['has_deductions'],
+            has_american_indian_alaskan_native_income: applicant_hash['has_american_indian_alaskan_native_income'],
             has_enrolled_health_coverage: applicant_hash['has_enrolled_health_coverage'],
             has_eligible_health_coverage: applicant_hash['has_eligible_health_coverage'],
 
-            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip', 'not_eligible_in_last_90_days'),
+            not_eligible_in_last_90_days: applicant_hash.dig('medicaid_and_chip', 'denied_on') ? applicant_hash.dig('medicaid_and_chip', 'not_eligible_in_last_90_days') : false,
             denied_on: applicant_hash.dig('medicaid_and_chip', 'denied_on'),
             ended_as_change_in_eligibility: applicant_hash.dig('medicaid_and_chip', 'ended_as_change_in_eligibility'),
             hh_income_or_size_changed: applicant_hash.dig('medicaid_and_chip', 'hh_income_or_size_changed'),
@@ -488,6 +518,8 @@ module Operations
             tribal_id: native_american_info['tribal_id'],
             tribal_name: native_american_info['tribal_name'],
             tribal_state: native_american_info['tribal_state'],
+            health_service_eligible: native_american_info['health_service_eligible'],
+            health_service_through_referral: native_american_info['health_service_through_referral'],
 
             is_ia_eligible: is_ia_eligible.nil? ? false : is_ia_eligible.values[0],
             is_medicaid_chip_eligible: nil,
@@ -627,6 +659,7 @@ module Operations
           persisted_applicant.has_unemployment_income = applicant[:has_unemployment_income]
           persisted_applicant.has_other_income = applicant[:has_other_income]
           persisted_applicant.has_deductions = applicant[:has_deductions]
+          persisted_applicant.has_american_indian_alaskan_native_income = applicant[:has_american_indian_alaskan_native_income]
           persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
           persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
 
@@ -657,8 +690,11 @@ module Operations
           persisted_applicant.has_eligibility_changed = applicant[:ended_as_change_in_eligibility]
           persisted_applicant.has_household_income_changed = applicant[:hh_income_or_size_changed]
           persisted_applicant.person_coverage_end_on = applicant[:medicaid_or_chip_coverage_end_date]
-          persisted_applicant.medicaid_chip_ineligible = applicant[:ineligible_due_to_immigration_in_last_5_years]
-          persisted_applicant.immigration_status_changed = applicant[:immigration_status_changed_since_ineligibility]
+
+          if persisted_applicant.eligible_immigration_status
+            persisted_applicant.medicaid_chip_ineligible = applicant[:ineligible_due_to_immigration_in_last_5_years]
+            persisted_applicant.immigration_status_changed = applicant[:immigration_status_changed_since_ineligibility]
+          end
 
           persisted_applicant.is_ia_eligible = applicant[:is_ia_eligible] || false
           persisted_applicant.is_medicaid_chip_eligible = false
@@ -666,6 +702,12 @@ module Operations
           persisted_applicant.is_totally_ineligible = false
           persisted_applicant.is_without_assistance = false
 
+          #'Did this person have coverage through a job (for example, a parent's job) that ended in the last 3 months?*' (conditional question for children under 18 or 19)
+          persisted_applicant.has_dependent_with_coverage = false if persisted_applicant.age_on(TimeKeeper.date_of_record) < 19
+          #persisted_applicant.dependent_job_end_on = nil
+
+          persisted_applicant.is_veteran_or_active_military = applicant[:is_veteran_or_active_military]
+          persisted_applicant.is_vets_spouse_or_child = applicant[:is_vets_spouse_or_child]
           ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false)
 
           # unless persisted_applicant.valid?
@@ -741,4 +783,4 @@ module Operations
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# rubocop:enable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

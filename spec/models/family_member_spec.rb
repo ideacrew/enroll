@@ -208,8 +208,9 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
   let!(:person) {FactoryBot.create(:person)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:household) {FactoryBot.create(:household, family: family)}
-  let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(2020, 1, 1), effective_ending_on: nil, is_eligibility_determined: true)}
+  let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_ending_on: nil, is_eligibility_determined: true)}
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
+
   it 'should deactivate eligibility when member is updated' do
     family.active_household.tax_households << tax_household
     family.save!

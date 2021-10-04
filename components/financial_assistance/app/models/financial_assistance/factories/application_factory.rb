@@ -28,7 +28,7 @@ module FinancialAssistance
       def duplicate
         new_application = faa_klass.create(application_params)
 
-        application.applicants.each do |applicant|
+        application.active_applicants.each do |applicant|
           create_applicant(applicant, new_application)
         end
 
@@ -89,9 +89,8 @@ module FinancialAssistance
         active_member_ids = members_attributes.inject([]) do |fm_ids, member_param_hash|
                               fm_ids << member_param_hash[:family_member_id]
                             end
-        applicants.each do |app|
-          app.update_attributes(:is_active => false) unless active_member_ids.include?(app.family_member_id)
-        end
+        application.applicants.where(:family_member_id.nin => active_member_ids).destroy_all if active_member_ids.present?
+        set_applicants
         active_applicant_family_member_ids = application.active_applicants.map(&:family_member_id)
 
         active_member_ids.each do |fm_id|
@@ -100,12 +99,18 @@ module FinancialAssistance
           if applicant_in_context.present?
             applicant_in_context.first.update_attributes(is_active: true)
           else
-            applicant_params = members_attributes.detect { |member_attributes| member_attributes[:family_member_id] == fm_id }
+            member_params = members_attributes.detect { |member_attributes| member_attributes[:family_member_id] == fm_id }
+            applicant_params = member_params.except(:relationship)
             applicant = application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id]).first
             if applicant.present?
               applicant.update_attributes!(applicant_params)
             else
-              applicants.create!(applicant_params)
+              applicant = applicants.create!(applicant_params)
+            end
+            # Have to update relationship separately because the applicant should already be persisted before doing this.
+            if member_params[:relationship].present? && member_params[:relationship] != 'self'
+              applicant.relationship = member_params[:relationship]
+              applicant.save!
             end
           end
         end
@@ -159,7 +164,15 @@ module FinancialAssistance
         new_application.save!
       end
 
+      # First check is to verify if we can find applicant using person_hbx_id,
+      # and if we are not able to find using this then we want to check using
+      # a combination of dob, last_name and first_name.
       def fetch_matching_applicant(new_application, old_applicant)
+        if old_applicant.person_hbx_id.present?
+          applicant = new_application.applicants.where(person_hbx_id: old_applicant.person_hbx_id).first
+          return applicant if applicant.present?
+        end
+
         search_params = {dob: old_applicant.dob, last_name: old_applicant.last_name, first_name: old_applicant.first_name}
         search_params[:encrypted_ssn] = old_applicant.encrypted_ssn if old_applicant.ssn.present?
         new_application.applicants.where(search_params).first
@@ -174,7 +187,7 @@ module FinancialAssistance
       def reject_application_params
         %w[_id created_at updated_at submitted_at workflow_state_transitions applicants relationships
            determination_http_status_code has_eligibility_response eligibility_response_payload eligibility_request_payload
-           predecessor_id renewal_base_year]
+           predecessor_id renewal_base_year effective_date]
       end
 
       def reject_applicant_params
@@ -182,7 +195,7 @@ module FinancialAssistance
            medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
            magi_medicaid_monthly_household_income is_without_assistance is_ia_eligible is_medicaid_chip_eligible
            is_totally_ineligible is_eligible_for_non_magi_reasons is_non_magi_medicaid_eligible
-           csr_percent_as_integer csr_eligibility_kind net_annual_income]
+           csr_percent_as_integer csr_eligibility_kind net_annual_income claimed_as_tax_dependent_by]
       end
 
       def reject_embed_params

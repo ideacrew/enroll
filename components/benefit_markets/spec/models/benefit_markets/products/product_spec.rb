@@ -265,6 +265,26 @@ module BenefitMarkets
 
     end
 
+    context '.rating_method' do
+      context 'when age_based_rating' do
+        let(:product) { FactoryBot.build(:benefit_markets_products_health_products_health_product) }
+
+        it 'should return true' do
+          expect(product.age_based_rating?).to be_truthy
+          expect(product.family_based_rating?).to be_falsey
+        end
+      end
+
+      context 'when family_based_rating' do
+        let(:product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, rating_method: 'Family-Tier Rates') }
+
+        it 'should return true' do
+          expect(product.family_based_rating?).to be_truthy
+          expect(product.age_based_rating?).to be_falsey
+        end
+      end
+    end
+
     context "An open file in SERFF template format" do
       context "and the contents are Qualified Health Plans" do
       end

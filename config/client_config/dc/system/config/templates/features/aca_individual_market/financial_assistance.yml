@@ -15,17 +15,17 @@ registry:
           - key: :file_location
             item: 'db/documents/ivl_checklist.pdf'
       - key: :iap_year_selection
-        is_enabled: false
+        is_enabled: true
       - key: :iap_assistance_year_display
-        is_enabled: false
+        is_enabled: true
       - key: :enrollment_dates
         item: :enrollment_dates
         is_enabled: true
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 27
+            item: 1
           - key: :application_new_year_effective_date_month_of_year
-            item: 9
+            item: 11
           - key: :enrollment_due_day_of_month
             is_enabled: true
             item: 15
@@ -212,28 +212,34 @@ registry:
       is_enabled: true
     - key: :pregnancy_due_on_required
       is_enabled: true
+    - key: :voter_registration_through_ext_url
+      is_enabled: false
+    - key: :voter_registration_through_hbx
+      is_enabled: true
+    - key: :question_required
+      is_enabled: true
   - namespace:
     - :renewals
     features:
-    - key: :generate_draft_renewals
-      is_enabled: true
+    - key: :create_renewals_on_date_change
+      is_enabled: false
       settings:
-        - key: :draft_renewal_generation_month
-          item: 9
-        - key: :draft_renewal_generation_day
+        - key: :renewals_creation_month
+          item: 10
+        - key: :renewals_creation_day
           item: 16
-    - key: :submit_renewal_drafts
-      is_enabled: true
-      settings:
-        - key: :renewal_draft_submission_month
-          item: 9
-        - key: :renewal_draft_submission_day
-          item: 17
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation
       is_enabled: :false
     - key: :skip_employer_id_validation
+      is_enabled: :false
+    - key: :negative_amount_income_types
+      is_enabled: true
+      settings:
+        - key: :income_types
+          item: ["net_self_employment", "capital_gains", "farming_and_fishing"]
+    - key: :skip_zero_income_amount_validation
       is_enabled: :false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

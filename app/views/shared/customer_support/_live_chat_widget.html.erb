@@ -10,7 +10,7 @@
         transport: {
           type: 'purecloud-v2-sockets',
           dataURL: 'https://api.usw2.pure.cloud',
-          deploymentKey: '60b16add-5e86-4be1-86b4-c1e870cef2ed',
+          deploymentKey: '<%= ENV['LIVE_CHAT_DEPLOY_KEY'] || '60b16add-5e86-4be1-86b4-c1e870cef2ed' %>',
           orgGuid: '72ccb33f-2747-4e02-aa7e-4030bdc11f13',
           interactionData: {
             routing: {

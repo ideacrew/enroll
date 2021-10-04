@@ -2,7 +2,7 @@ nav
   ul#uic-families-right-menu
     li
       = link_to l10n("my_site_short_name", site_short_name: site_short_name), main_app.family_account_path(tab: 'home')
-    - if display_my_broker?(@person, @employee_role)
+    - if display_my_broker?(@person, @employee_role) && display_broker_info_for_consumer
       li
         = link_to l10n("my_broker"), main_app.brokers_insured_families_path(tab: l10n("brokers_tab"))
     - if display_documents_tab?(@family_members, @person)

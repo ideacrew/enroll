@@ -9,6 +9,9 @@ class UserMailer < ApplicationMailer
   include Config::SiteHelper
   include Config::ContactCenterHelper
   include ::L10nHelper
+  layout EnrollRegistry[:custom_email_templates].settings(:email_template).item if EnrollRegistry.feature_enabled?(:custom_email_templates)
+
+
 
   def welcome(user)
     if user.email.present?
@@ -106,7 +109,7 @@ class UserMailer < ApplicationMailer
   def broker_staff_invitation_email(email, person_name, invitation, person_id)
     return if email.blank?
 
-    mail({to: email, subject: "Invitation to create your Broker Staff account on #{Settings.site.short_name} "}) do |format|
+    mail({to: email, subject: "Set up your #{site_short_name} account"}) do |format|
       format.html { render "broker_staff_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
     end
   end
@@ -139,7 +142,7 @@ class UserMailer < ApplicationMailer
   def generic_consumer_welcome(first_name, hbx_id, email)
     if email.present?
       mail({to: email, subject: site_short_name, from: "no-reply@individual.#{site_domain_name}"}) do |format|
-        format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
+        format.html { render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id} }
       end
     end
   end

@@ -120,7 +120,7 @@ registry:
           - key: :forms
             item: "https://dchealthlink.com/forms#en"
           - key: :website_url
-            item: "www.healthcare.gov"
+            item: "https://www.healthcare.gov"
           - key: :healthcare_name
             item: "www.healthcare.gov"
           - key: :healthcare_url
@@ -181,6 +181,8 @@ registry:
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
             item: "Washington, DC"
+          - key: :area_code
+            item: "202"
           - key: :contact_center_city
             item: "Washington"
           - key: :contact_center_county
@@ -557,4 +559,7 @@ registry:
         is_enabled: false
       - key: :in_person_assister
         item: :in_person_assister
+        is_enabled: true
+      - key: :expanded_npn_duplicate
+        item: :expanded_npn_duplicate
         is_enabled: false

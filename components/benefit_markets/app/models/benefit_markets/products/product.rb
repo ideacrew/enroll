@@ -18,6 +18,8 @@ module BenefitMarkets
       CSR_KIND_TO_PRODUCT_VARIANT_MAP = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
       MARKET_KINDS = %w[shop individual].freeze
       INDIVIDUAL_MARKET_KINDS = %w[individual coverall].freeze
+      AGE_BASED_RATING = 'Age-Based Rates'
+      FAMILY_BASED_RATING = 'Family-Tier Rates'
 
       field :benefit_market_kind,   type: Symbol
 
@@ -37,6 +39,7 @@ module BenefitMarkets
       field :deductible, type: String
       field :family_deductible, type: String
       field :issuer_assigned_id, type: String
+      field :rating_method, type: String, default: AGE_BASED_RATING
       field :service_area_id, type: BSON::ObjectId
       field :network_information, type: String
       field :nationwide, type: Boolean # Nationwide
@@ -392,6 +395,14 @@ module BenefitMarkets
 
       def dental?
         kind == :dental
+      end
+
+      def age_based_rating?
+        rating_method == AGE_BASED_RATING
+      end
+
+      def family_based_rating?
+        rating_method == FAMILY_BASED_RATING
       end
 
       def is_same_plan_by_hios_id_and_active_year?(product)

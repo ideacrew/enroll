@@ -2561,6 +2561,34 @@ class HbxEnrollment
       workflow_state_transitions.any?{ |wst| canceled_after?(wst, application_transition.transition_at) || termed_after?(wst, application_transition.transition_at)}
   end
 
+  def family_tier_value
+    return couple_tier_value if couple_enrollee?
+    primary_tier_value if primary_enrollee?
+  end
+
+  def couple_tier_value
+    return 'couple_enrollee_one_dependent' if hbx_enrollment_members.size == 3
+    return 'couple_enrollee_two_dependent' if hbx_enrollment_members.size == 4
+    return 'couple_enrollee_many_dependent' if hbx_enrollment_members.size > 4
+    'couple_enrollee'
+  end
+
+  def primary_tier_value
+    return 'primary_enrollee_one_dependent' if hbx_enrollment_members.size == 2
+    return 'primary_enrollee_two_dependent' if hbx_enrollment_members.size == 3
+    return 'primary_enrollee_many_dependent' if hbx_enrollment_members.size > 3
+
+    'primary_enrollee'
+  end
+
+  def primary_enrollee?
+    @primary_enrollee ||= hbx_enrollment_members.where(is_subscriber: true).present?
+  end
+
+  def couple_enrollee?
+    @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| hem.primary_relationship == 'spouse'}
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding

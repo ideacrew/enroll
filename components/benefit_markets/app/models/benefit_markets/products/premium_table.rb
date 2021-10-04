@@ -22,6 +22,8 @@ module BenefitMarkets
     embeds_many :premium_tuples,
                 class_name: "BenefitMarkets::Products::PremiumTuple"
 
+    delegate :exchange_provided_code, to: :rating_area
+
     validates_presence_of :effective_period, :rating_area
     # validates_presence_of :premium_tuples, :allow_blank => false
 
@@ -51,5 +53,14 @@ module BenefitMarkets
     def create_copy_for_embedding
       self.class.new(self.attributes.except(:premium_tuples))
     end
+
+    def start_on
+      effective_period.min
+    end
+
+    def end_on
+      effective_period.max
+    end
+
   end
 end

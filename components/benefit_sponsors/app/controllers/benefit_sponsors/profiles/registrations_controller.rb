@@ -30,25 +30,31 @@ module BenefitSponsors
         begin
           saved, result_url = @agency.save
           result_url = self.send(result_url)
-          if saved
-            if is_employer_profile?
+          if saved && is_employer_profile?
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
               end
-            elsif is_general_agency_profile? || redirect_to_requirements_after_confirmation?
-              flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-            end
-            redirect_to result_url unless redirect_to_requirements_after_confirmation?
-            # The "confirmation" page is a special view the broker will be redirected to informing them of the necessary requirements to become a broker on the site
-            # It is not enabled by default
-            render 'confirmation', :layout => 'single_column' if redirect_to_requirements_after_confirmation?
+          elsif saved && is_general_agency_profile?
+            flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+          end
+          template_filename = if redirect_to_requirements_after_confirmation?
+                                "confirmation"
+                              else
+                                "broker_agencies/broker_roles/extended_confirmation"
+                              end
+          if is_broker_profile? && saved
+            flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+            render template_filename, :layout => 'single_column'
+            return
+          elsif saved
+            redirect_to result_url
             return
           end
         rescue Exception => e
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render default_template, :flash => { :error => @agency.errors.full_messages }
+        render 'new', :flash => { :error => @agency.errors.full_messages }
       end
 
       def edit
@@ -143,7 +149,7 @@ module BenefitSponsors
       end
 
       def redirect_to_requirements_after_confirmation?
-        is_broker_profile? && EnrollRegistry.feature_enabled?(:redirect_to_requirements_page_after_confirmation)
+        EnrollRegistry.feature_enabled?(:redirect_to_requirements_page_after_confirmation)
       end
 
       def user_not_authorized(exception)

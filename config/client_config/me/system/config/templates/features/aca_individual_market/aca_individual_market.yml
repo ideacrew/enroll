@@ -59,3 +59,10 @@ registry:
         is_enabled: :false
       - key: :display_external_id_in_family_datatable
         is_enabled: :true
+      - key: :contact_method_via_dropdown
+        is_enabled: :false
+      - key: :state_based_language_preferences
+        item: ["English", "Spanish", "French", "Chinese (Mandarin)", "Arabic",
+             "Kirundi", "Lingala", "Somali", "Swahili", "Portuguese", "Vietnamese", "Khmer",
+             "Thai", "Tagalog", "Russian", "German"]
+        is_enabled: true

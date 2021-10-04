@@ -111,5 +111,17 @@ module BenefitMarkets
       end
     end
 
+    context '.start_on_and_end_on' do
+      let(:premium_table) { FactoryBot.build(:benefit_markets_products_premium_table) }
+
+      it 'returns correct start_on date' do
+        expect(premium_table.start_on).to eq premium_table.effective_period.min
+      end
+
+      it 'returns correct end_on date' do
+        expect(premium_table.end_on).to eq premium_table.effective_period.max
+      end
+    end
+
   end
 end

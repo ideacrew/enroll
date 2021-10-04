@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: e047cacbb7077d2cdf262784d87b5e55af40396b
+  revision: e8d0bc5f7eecaaa53fbc34828693d784aa451539
   branch: trunk
   specs:
-    aca_entities (0.6.0)
+    aca_entities (0.8.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -96,7 +96,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.3)
       slim (~> 3.0)
-      symmetric-encryption (~> 3.9.1)
+      symmetric-encryption (= 3.9.1)
 
 GEM
   remote: https://rubygems.org/
@@ -346,12 +346,12 @@ GEM
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.2)
-    nokogiri (1.12.4)
+    nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.13.7)
+    oj (3.13.8)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)

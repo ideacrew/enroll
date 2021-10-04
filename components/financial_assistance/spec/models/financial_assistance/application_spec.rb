@@ -125,6 +125,11 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(class_constants.include?(:SUBMITTED_STATUS)).to be_truthy
       expect(described_class::SUBMITTED_STATUS).to eq(%w[submitted verifying_income])
     end
+
+    it 'should have RENEWAL_ELIGIBLE_STATES constant' do
+      expect(class_constants.include?(:RENEWAL_ELIGIBLE_STATES)).to be_truthy
+      expect(described_class::RENEWAL_ELIGIBLE_STATES).to eq(%w[submitted determined imported])
+    end
   end
 
   describe '.Scopes' do
@@ -356,6 +361,33 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       it 'should not update assistance year' do
         expect(application.assistance_year).not_to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
         expect(application.assistance_year).to eq(TimeKeeper.date_of_record.year + 3)
+      end
+    end
+  end
+
+  describe '.set_effective_date' do
+    let(:family_id) { BSON::ObjectId.new }
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+
+    context 'for non existing effective_date' do
+      before do
+        application.send(:set_effective_date)
+      end
+
+      it 'should update effective_date' do
+        expect(application.effective_date).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!)
+      end
+    end
+
+    context 'for existing effective_date' do
+      before do
+        application.update_attributes!(effective_date: Date.new(TimeKeeper.date_of_record.year + 3))
+        application.send(:set_effective_date)
+      end
+
+      it 'should not update effective_date' do
+        expect(application.effective_date).not_to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!)
+        expect(application.effective_date).to eq(Date.new(TimeKeeper.date_of_record.year + 3))
       end
     end
   end

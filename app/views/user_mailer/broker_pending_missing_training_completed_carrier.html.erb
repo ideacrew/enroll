@@ -1,7 +1,9 @@
-Dear <%=applicant_name%>,
-<br/><br/>
-Thank you for submitting an application to <%= site_short_name %> to become an approved broker.
-We show that you have all the necessary carrier appointments, but you have not yet completed the required training administered through <a href="https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e">NAHU’s online platform<a/>
-.
-Our <a href="https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf">Broker Registration Guide<a/> is available.
-<br/><br/>
+<%= l10n(
+  "user_mailer.broker_pending_missing_training_completed_carrier.full_text",
+  applicant_name: applicant_name,
+  site_short_name: site_short_name,
+  contact_center_name: contact_center_name,
+  contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+  training_link: EnrollRegistry[:broker_training_link].item
+) %>
+

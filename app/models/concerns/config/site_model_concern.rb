@@ -2,6 +2,7 @@ module Config::SiteModelConcern
   extend ActiveSupport::Concern
 
   included do
+    delegate :site_state_name, to: :class
     delegate :site_short_name, :to => :class
     delegate :site_key, :to => :class
     delegate :is_shop_market_enabled?, :to => :class
@@ -12,6 +13,18 @@ module Config::SiteModelConcern
   end
 
   class_methods do
+    def site_state_name
+      EnrollRegistry[:enroll_app].settings(:state_name).item
+    end
+
+    def contact_center_tty_number
+      EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item
+    end
+
+    def contact_center_short_number
+      EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+    end
+
     def is_broker_agency_enabled?
       EnrollRegistry.feature_enabled?(:brokers)
     end
