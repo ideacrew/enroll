@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: c5e310097513f16323c2aa63bf29e0bd28e7bb04
-  branch: iap_renewals_event_source_setup
+  revision: e8d0bc5f7eecaaa53fbc34828693d784aa451539
+  branch: trunk
   specs:
-    aca_entities (0.6.0)
+    aca_entities (0.8.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
