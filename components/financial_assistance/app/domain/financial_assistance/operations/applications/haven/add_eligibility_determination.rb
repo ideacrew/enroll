@@ -68,7 +68,7 @@ module FinancialAssistance
             parsed_eds = verified_family.households.flat_map(&:tax_households).flat_map(&:eligibility_determinations)
             return true unless parsed_eds.any?{|ed| ed.maximum_aptc.to_f > 0.00 }
 
-            verified_family.family_members.any?{|mem| mem.is_insurance_assistance_eligible }
+            verified_family.family_members.any?(&:is_insurance_assistance_eligible)
           end
 
           def update_application_and_applicant(verified_family)
