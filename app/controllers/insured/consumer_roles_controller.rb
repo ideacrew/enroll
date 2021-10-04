@@ -407,7 +407,8 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_temporarily_out_of_state,
       :is_moving_to_state,
       :user_id,
-      :dob_check
+      :dob_check,
+      :is_tobacco_user
     ]
   end
 
