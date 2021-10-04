@@ -485,9 +485,9 @@ module FinancialAssistance
       # :renewal_draft State where the previous year's application is renewed
       # :renewal_draft state is the initial state for a renewal application
       state :renewal_draft
-      # :submission_pending is a state where some corrective action is required
-      # :submission_pending is a state where we are unable to submit the application for some reason
-      state :submission_pending
+      # :income_verification_extension_required is a state where some corrective action is required
+      # to extend income verification year.
+      state :income_verification_extension_required
       state :submitted
       state :determination_response_error
       state :determined
@@ -561,8 +561,8 @@ module FinancialAssistance
       end
 
       # Currently, this event will be used during renewal generations
-      event :fail_submission, :after => :record_transition do
-        transitions from: :renewal_draft, to: :submission_pending
+      event :set_income_verification_extension_required, :after => :record_transition do
+        transitions from: :renewal_draft, to: :income_verification_extension_required
       end
 
       event :import, :after => [:record_transition] do
