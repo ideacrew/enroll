@@ -1,16 +1,19 @@
 version: "3.4"
 services:
-  web:
+  enroll:
+    image: enroll:release_21.10.4
     build:
       context: .
       dockerfile: ./.docker/development/Dockerfile
       args:
-        BUNDLER_VERSION_OVERRIDE: '2.0.1'
-        NODE_MAJOR: '10'
-        YARN_VERSION: '1.22.4'
-    image: enroll:dev-0.1.0
-    links:
-      - db
+        BUNDLER_VERSION_OVERRIDE: "2.0.1"
+        NODE_MAJOR: "10"
+        YARN_VERSION: "1.22.4"
+    container_name: enroll_local
+    depends_on:
+      - mongodb
+      - amqp
+      - redis
     ports:
       - "3000:3000"
     volumes:
@@ -36,12 +39,14 @@ services:
       - ACAPI_BROKER_PORT=${ACAPI_BROKER_PORT:-5672}
       - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@amqp:5672}
     command: bash -c "rm -f tmp/pids/server.pid && mkdir -p tmp/pids && yarn install --check-files && bundle install && bundle exec puma -C config/puma.rb"
+
   remote_event_listener:
-    image: enroll:dev-0.1.0
+    image: enroll_event_listener
+    container_name: enroll_event_listener_local
     ports:
       - 3000
-    links:
-      - db
+    depends_on:
+      - mongodb
     volumes:
       - .:/enroll:cached
       - bundle:/bundle
@@ -65,17 +70,34 @@ services:
       - ACAPI_BROKER_PORT=${ACAPI_BROKER_PORT:-5672}
       - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@amqp:5672}
     command: bash -c "rm -f tmp/pids/server.pid && mkdir -p tmp/pids && yarn install --check-files && bundle install && bundle exec rails runner script/remote_event_listener.rb"
-  db:
+
+  mongodb:
     image: mongo:4.2
     volumes:
       - mongodb:/data/db
       - mongodb_config:/data/db_config
     ports:
       - 27017:27017
+
+  # rabbitmq:
+  #   build: .docker/Dockerfile.rabbitmq
+  #   hostname: rabbitmq
+  #   # env_file:
+  #   #   - .docker/rabbitmq/rabbitmq.env
+  #   volumes:
+  #     - rabbitmq_etc:/etc/rabbitmq/
+  #     - rabbitmq_data:/var/lib/rabbitmq/
+  #     - rabbitmq_logs:/var/log/rabbitmq/
+  #     - ./.docker/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+  #     - ./.docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+
   amqp:
     build:
       context: .
-      dockerfile: ./.docker/development/Dockerfile.rabbitmq
+      dockerfile: ./.docker/development/Dockerfile.rabbitmq-orig
       args:
         - HBX_ID=${HBX_ID:-dc0}
         - ENV_NAME=${ENV_NAME:-dev}
@@ -93,6 +115,15 @@ services:
       - 5672:5672
       - 25672:25672
       - 15672:15672
+
+  redis:
+    build: ./.docker/redis
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+
 volumes:
   mongodb:
   mongodb_config:
@@ -101,3 +132,9 @@ volumes:
   rabbitmq_etc:
   rabbitmq_data:
   rabbitmq_logs:
+  redis:
+
+networks:
+  default:
+    external:
+      name: dev_vpc

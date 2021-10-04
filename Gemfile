@@ -38,6 +38,7 @@ gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', 
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
+gem 'keycloak',    git: 'https://github.com/ideacrew/keycloak-client.git', branch: 'master'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
@@ -98,6 +99,7 @@ gem 'net-ssh',                  '= 4.2.0'
 gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
+gem 'puma',         '~> 3.12.4'
 gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
@@ -121,7 +123,6 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
-gem 'puma',                   '~> 3.12.4'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
@@ -146,6 +147,7 @@ group :development, :test do
   gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
+  gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
@@ -153,6 +155,7 @@ group :development, :test do
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
+  gem 'pry-byebug'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
