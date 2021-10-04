@@ -57,5 +57,5 @@ PLAN_TRANSLATIONS = {
   'en.plans.issuer.pay_now.exchange_disclaimer_for_auth' => "%{site_short_name} cannot help you with any information regarding this website, including your username or password or other technical issues.",
   'en.plans.issuer.pay_now.exchange_disclaimer' => "By linking to this private business, %{site_short_name} is not endorsing its products, services, or privacy and security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by %{carrier_name}.",
 
-  'en.plans.other.pay_now.link_info' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>'
+  'en.plans.other.pay_now.processing' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>'
 }
