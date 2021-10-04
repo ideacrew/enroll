@@ -852,7 +852,7 @@ GEM
       ffi (~> 1.0)
     rbnacl (7.1.1)
       ffi
-    rdoc (6.2.1)
+    rdoc (6.3.2)
     recaptcha (4.14.0)
       json
     recurring_select (3.0.0)
