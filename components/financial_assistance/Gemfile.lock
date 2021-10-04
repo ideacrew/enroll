@@ -16,12 +16,12 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
-  revision: e10f9ab0a454f861916a986986daa9e055798fde
-  branch: trunk
+  revision: a14733a148597bdfa7382bfa4b77cd1d6750af0d
+  branch: sneakers-and-bunny-upgrade
   specs:
-    acapi (1.3.2)
+    acapi (1.3.3)
       activesupport (> 4.2.0)
-      bunny (~> 1.7.0)
+      bunny (~> 2.19.0)
       sneakers
 
 GIT
@@ -146,7 +146,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    amq-protocol (1.9.2)
+    amq-protocol (2.3.2)
     arel (9.0.0)
     ast (2.4.1)
     bcrypt (3.1.15)
@@ -154,8 +154,9 @@ GEM
       msgpack (~> 1.0)
     bson (4.10.0)
     builder (3.2.4)
-    bunny (1.7.1)
-      amq-protocol (~> 1.9.2)
+    bunny (2.19.0)
+      amq-protocol (~> 2.3, >= 2.3.1)
+      sorted_set (~> 1, >= 1.0.2)
     byebug (11.1.3)
     capybara (3.33.0)
       addressable
@@ -284,7 +285,7 @@ GEM
       haml (>= 4.0, < 6)
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
-    i18n (1.8.5)
+    i18n (1.8.10)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     iso_country_codes (0.7.8)
@@ -308,7 +309,7 @@ GEM
       rake
     mini_mime (1.0.2)
     mini_portile2 (2.6.1)
-    minitest (5.14.1)
+    minitest (5.14.4)
     monetize (1.9.4)
       money (~> 6.12)
     money (6.13.8)
@@ -407,6 +408,7 @@ GEM
       thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
     rake (13.0.1)
+    rbtree (0.4.4)
     redis (4.4.0)
     redis-namespace (1.8.1)
       redis (>= 3.0.4)
@@ -474,8 +476,9 @@ GEM
       sexp_processor (~> 4.9)
     rufus-scheduler (3.8.0)
       fugit (~> 1.1, >= 1.1.6)
-    serverengine (1.5.11)
+    serverengine (2.0.7)
       sigdump (~> 0.2.2)
+    set (1.0.1)
     sexp_processor (4.15.0)
     shoulda-matchers (3.1.3)
       activesupport (>= 4.0.0)
@@ -488,11 +491,15 @@ GEM
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
-    sneakers (1.1.2)
-      bunny (>= 1.7.0, <= 2.0.0)
-      serverengine (~> 1.5.5)
+    sneakers (2.11.0)
+      bunny (~> 2.12)
+      concurrent-ruby (~> 1.0)
+      rake
+      serverengine (~> 2.0.5)
       thor
-      thread (~> 0.1.7)
+    sorted_set (1.0.3)
+      rbtree
+      set (~> 1.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -504,8 +511,7 @@ GEM
       coercible (~> 1.0)
     temple (0.8.2)
     test-prof (0.5.0)
-    thor (1.0.1)
-    thread (0.1.7)
+    thor (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
     typhoeus (1.4.0)

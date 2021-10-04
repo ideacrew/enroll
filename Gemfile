@@ -32,7 +32,7 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 # Local components/engines
 #######################################################
-gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
+gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'sneakers-and-bunny-upgrade'
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"

@@ -32,32 +32,6 @@ GIT
       sneakers
 
 GIT
-  remote: https://github.com/ideacrew/event_source.git
-  revision: f2e41bee53939bb069668b314c904c43e52bdc57
-  branch: trunk
-  specs:
-    event_source (0.5.3)
-      bunny (>= 1.7.1)
-      deep_merge (~> 1.2.0)
-      dry-events (~> 0.3)
-      dry-inflector (~> 0.2)
-      dry-initializer (~> 3.0)
-      dry-monads (~> 1.3)
-      dry-schema (= 1.6.2)
-      dry-struct (~> 1.4)
-      dry-types (~> 1.5)
-      dry-validation (~> 1.6)
-      faraday (~> 1.4.1)
-      faraday_middleware (~> 1.0)
-      logging (~> 2.3.0)
-      mime-types
-      nokogiri (>= 1.10.8)
-      oj (~> 3.11)
-      ox (~> 2.14)
-      resque-bus (~> 0.7.0)
-      typhoeus (~> 1.4.0)
-
-GIT
   remote: https://github.com/ideacrew/openhbx_cv2.git
   revision: 6567dd46112982e6a9c90001b617caf313271fc9
   branch: trunk
@@ -98,6 +72,30 @@ GIT
       pdf-reader (~> 1.2)
       ruby-rc4
       ttfunk (~> 1.0.3)
+
+PATH
+  remote: ../event_source
+  specs:
+    event_source (0.5.3)
+      bunny (>= 1.7.1)
+      deep_merge (~> 1.2.0)
+      dry-events (~> 0.3)
+      dry-inflector (~> 0.2)
+      dry-initializer (~> 3.0)
+      dry-monads (~> 1.3)
+      dry-schema (= 1.6.2)
+      dry-struct (~> 1.4)
+      dry-types (~> 1.5)
+      dry-validation (~> 1.6)
+      faraday (~> 1.4.1)
+      faraday_middleware (~> 1.0)
+      logging (~> 2.3.0)
+      mime-types
+      nokogiri (>= 1.10.8)
+      oj (~> 3.11)
+      ox (~> 2.14)
+      resque-bus (~> 0.7.0)
+      typhoeus (~> 1.4.0)
 
 PATH
   remote: components/benefit_markets
