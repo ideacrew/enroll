@@ -16,7 +16,8 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(params)
             valid_params = yield validate(params)
-            result = yield update_application_and_applicant(valid_params)
+            parsed_family = yield parse_and_validate_response(valid_params)
+            result = yield update_application_and_applicant(parsed_family)
 
             Success(result)
           end
@@ -29,7 +30,7 @@ module FinancialAssistance
             Success(params)
           end
 
-          def update_application_and_applicant(valid_params)
+          def parse_and_validate_response(valid_params)
             @application = valid_params[:application]
             @response_payload = @application.eligibility_response_payload
 
@@ -37,7 +38,40 @@ module FinancialAssistance
 
             verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
             verified_family.parse(@response_payload)
+            result, message = check_parsed_payload_for_validation(verified_family)
+            if result
+              Success(verified_family)
+            else
+              @application.update_application(message, 422)
+              Failure(message)
+            end
+          end
 
+          def check_parsed_payload_for_validation(verified_family)
+            if !max_aptc_with_eligible_members?(verified_family)
+              [false, "Max APTC exists but no member is eligible for insurance assistance"]
+            elsif !ia_eligible_members_with_aptc(verified_family)
+              [false, "Members are eligible for insurance assistance but no eligibility section exists in the payload"]
+            else
+              [true, '']
+            end
+          end
+
+          def ia_eligible_members_with_aptc(verified_family)
+            return true if verified_family.family_members.all?{|mem| !mem.is_insurance_assistance_eligible }
+
+            parsed_eds = verified_family.households.flat_map(&:tax_households).flat_map(&:eligibility_determinations)
+            parsed_eds.empty? ? false : true
+          end
+
+          def max_aptc_with_eligible_members?(verified_family)
+            parsed_eds = verified_family.households.flat_map(&:tax_households).flat_map(&:eligibility_determinations)
+            return true unless parsed_eds.any?{|ed| ed.maximum_aptc.to_f > 0.00 }
+
+            verified_family.family_members.any?{|mem| mem.is_insurance_assistance_eligible }
+          end
+
+          def update_application_and_applicant(verified_family)
             @application.update_response_attributes(integrated_case_id: verified_family.integrated_case_id)
             verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
             verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
