@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 # development dependencies will be added by default to the :development group.
 gemspec
 
-gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'sneakers-and-bunny-upgrade'
+gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
 gem 'pry-byebug'
 

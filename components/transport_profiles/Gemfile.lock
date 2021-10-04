@@ -1,11 +1,11 @@
 GIT
   remote: https://github.com/ideacrew/acapi.git
-  revision: a14733a148597bdfa7382bfa4b77cd1d6750af0d
-  branch: sneakers-and-bunny-upgrade
+  revision: 1c596657b145faf493ef4bdede218384515c012a
+  branch: amqp_proc_title
   specs:
-    acapi (1.3.3)
+    acapi (1.3.4)
       activesupport (> 4.2.0)
-      bunny (~> 2.19.0)
+      bunny (~> 2.14.0)
       sneakers
 
 PATH
@@ -83,9 +83,8 @@ GEM
       aws-sdk-core (= 2.2.37)
     bson (4.11.1)
     builder (3.2.4)
-    bunny (2.19.0)
-      amq-protocol (~> 2.3, >= 2.3.1)
-      sorted_set (~> 1, >= 1.0.2)
+    bunny (2.14.4)
+      amq-protocol (~> 2.3, >= 2.3.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     concurrent-ruby (1.1.9)
@@ -110,10 +109,11 @@ GEM
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     method_source (1.0.0)
-    mimemagic (0.3.8)
+    mimemagic (0.3.10)
       nokogiri (~> 1)
+      rake
     mini_mime (1.0.2)
-    mini_portile2 (2.5.0)
+    mini_portile2 (2.6.1)
     minitest (5.14.4)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
@@ -124,8 +124,8 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     nio4r (2.5.4)
-    nokogiri (1.11.2)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.12.5)
+      mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     public_suffix (3.0.3)
     racc (1.5.2)
@@ -156,8 +156,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.19.0, < 2.0)
-    rake (13.0.3)
-    rbtree (0.4.4)
+    rake (13.0.6)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -183,7 +182,6 @@ GEM
     safe_yaml (1.0.4)
     serverengine (2.0.7)
       sigdump (~> 0.2.2)
-    set (1.0.1)
     shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
     sigdump (0.2.4)
@@ -193,9 +191,6 @@ GEM
       rake
       serverengine (~> 2.0.5)
       thor
-    sorted_set (1.0.3)
-      rbtree
-      set (~> 1.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
