@@ -144,6 +144,52 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
       end
     end
 
+    context 'xml with members is insurance assistance not eligible but have eligibility determinations with aptc ' do
+      let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family_with_ed_and_member_not_eligible.xml')) }
+
+      before do
+        ed.update_attributes!(hbx_assigned_id: '205828')
+        application.update_response_attributes(message)
+        @result = subject.call(application: application)
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_failure
+      end
+
+      it 'should return failure with error message' do
+        expect(@result.failure).to eq('Max APTC exists but no member is eligible for insurance assistance')
+      end
+
+      it 'should return failure with error message' do
+        application.reload
+        expect(application.aasm_state).to eq('determination_response_error')
+      end
+    end
+
+    context 'xml with members is insurance assistance eligible but no eligibility determinations section' do
+      let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family_without_ed_and_member_eligible.xml')) }
+
+      before do
+        ed.update_attributes!(hbx_assigned_id: '205828')
+        application.update_response_attributes(message)
+        @result = subject.call(application: application)
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_failure
+      end
+
+      it 'should return failure with error message' do
+        expect(@result.failure).to eq('Members are eligible for insurance assistance but no eligibility section exists in the payload')
+      end
+
+      it 'should return failure with error message' do
+        application.reload
+        expect(application.aasm_state).to eq('determination_response_error')
+      end
+    end
+
     context 'no response payload present on application' do
 
       before do
