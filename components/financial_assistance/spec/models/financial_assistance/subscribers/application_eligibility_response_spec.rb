@@ -23,13 +23,13 @@ RSpec.describe ::FinancialAssistance::Subscribers::ApplicationEligibilityRespons
   let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, csr_percent_as_integer: nil, max_aptc: 0.0) }
   let!(:applicant) do
     FactoryBot.create(:applicant, application: application,
-                      family_member_id: family_member10_id,
-                      person_hbx_id: person.hbx_id,
-                      ssn: '243108282',
-                      dob: Date.new(1984, 3, 8),
-                      first_name: 'Domtest34',
-                      last_name: 'Test',
-                      eligibility_determination_id: ed.id)
+                                  family_member_id: family_member10_id,
+                                  person_hbx_id: person.hbx_id,
+                                  ssn: '243108282',
+                                  dob: Date.new(1984, 3, 8),
+                                  first_name: 'Domtest34',
+                                  last_name: 'Test',
+                                  eligibility_determination_id: ed.id)
   end
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, hbx_assigned_id: "205828", application: application) }
