@@ -1,5 +1,6 @@
-<% case EnrollRegistry[:enroll_app].settings(:site_key).item.to_s.downcase %>
-  <% when 'dc' %> 
+
+    l10n(EnrollRegistry.feature_enabled?(:broker_approval_period) ? "user_mailer.broker_application_confirmation.full_text" : )
+    
     <html>
       <body>
         <div>
@@ -52,4 +53,4 @@
   <% when 'me' %>
     <%= l10n("user_mailer.broker_application_confirmation.full_text", contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s, first_name: person.first_name, site_short_name: site_short_name, contact_center_short_name: contact_center_name, state_name: state_name,
       training_link: EnrollRegistry[:broker_training_link].item).html_safe%>
-<% end %>
+
