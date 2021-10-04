@@ -1,39 +1,14 @@
-name: full check suite
+name: hotfix check
 on:
   push:
-    branches-ignore:
+    branches:
       - hotfix*
-
-  schedule:
-    - cron: '0 6 * * *'
 
 env:
   REPORT_PATH: 'ci/cuke-report.json'
   CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/cucumber-split-config.json'
 
 jobs:
-  rubocop:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: Cache Gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: bundle install
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-      - name: Run rubocop
-        run: |
-          git config diff.renameLimit 800
-          git fetch --no-tags --depth=1 origin trunk
-          bundle exec rubocop-git origin/trunk | grep "no offenses detected"
   view_linter:
     runs-on: ubuntu-latest
     steps:
@@ -243,7 +218,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [rubocop, view_linter, brakeman]
+    needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -317,7 +292,7 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [rubocop, view_linter, brakeman]
+    needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
