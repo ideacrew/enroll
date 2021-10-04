@@ -195,6 +195,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         it 'should return failure with error message' do
           expect(@result.failure).to eq("Expired Submission is failed for hbx_id: #{@renewal_draft.hbx_id}")
         end
+
+        it 'should transition application to income_verification_extension_required state' do
+          expect(@renewal_draft.reload.income_verification_extension_required?).to be_truthy
+        end
       end
     end
 

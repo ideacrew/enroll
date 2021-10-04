@@ -911,20 +911,20 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context 'submission_pending' do
-      context 'event: fail_submission' do
+    context 'income_verification_extension_required' do
+      context 'event: set_income_verification_extension_required' do
         before do
           application.update_attributes!(aasm_state: 'renewal_draft')
         end
 
-        context 'from renewal_draft to submission_pending' do
+        context 'from renewal_draft to income_verification_extension_required' do
           before do
             allow(application).to receive(:is_application_valid?).and_return(true)
-            application.fail_submission!
+            application.set_income_verification_extension_required!
           end
 
-          it 'should transition application to submission_pending' do
-            expect(application.reload.submission_pending?).to be_truthy
+          it 'should transition application to income_verification_extension_required' do
+            expect(application.reload.income_verification_extension_required?).to be_truthy
           end
         end
       end
