@@ -72,6 +72,29 @@ describe BrokerRole, dbclean: :around_each do
           expect(BrokerRole.find(broker_role.id).id.to_s).to eq broker_role.id.to_s
         end
       end
+
+      context "CRM update" do
+        let(:broker_agency_profile) do
+          FactoryBot.create(:broker_agency_profile)
+        end
+        let(:broker_role) do
+          valid_params.merge!(
+            broker_agency_profile_id: broker_agency_profile.id,
+            broker_agency_profile: broker_agency_profile,
+            aasm_state: 'active'
+          )
+          saved_person.build_broker_role(valid_params).save
+          saved_person.broker_role
+        end
+
+        before do
+          EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it "should publish to CRM on save" do
+          expect(broker_role.person.send(:trigger_primary_subscriber_publish).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+        end
+      end
     end
 
     context "assign to employer" do

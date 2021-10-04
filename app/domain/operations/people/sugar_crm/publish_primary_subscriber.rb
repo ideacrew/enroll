@@ -43,7 +43,7 @@ module Operations
           ]
           transformed_person[:person_demographics][:no_ssn] = transformed_person[:person_demographics][:no_ssn].to_s
           unnecessary_document_keys.each do |sym_value|
-            transformed_person[:consumer_role][sym_value] = []
+            transformed_person[:consumer_role][sym_value] = [] if transformed_person[:consumer_role]
           end
           transformed_person[:individual_market_transitions] = []
           transformed_person[:verification_types] = []
