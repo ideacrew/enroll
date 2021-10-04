@@ -1,6 +1,8 @@
 Feature: Start a new Financial Assistance Application and answers questions on Other Questions page
 
   Background: User logs in and visits applicant's other questions page
+    And EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
     And the FAA feature configuration is enabled
     And the primary caretaker question configuration is enabled
     And FAA student_follow_up_questions feature is enabled

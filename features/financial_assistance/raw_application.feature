@@ -5,6 +5,8 @@ Feature: Cost Savings Raw Application
   consumer shall not be able see or access Cost Savings page.
 
   Background:
+    And EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
     Given the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
     And a family with financial application in determined state exists

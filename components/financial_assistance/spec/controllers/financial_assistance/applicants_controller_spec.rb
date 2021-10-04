@@ -71,6 +71,9 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
   context "GET save questions" do
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       applicant.update_attributes(is_primary_caregiver: nil) if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
     end
     it "should save questions and redirects to edit_financial_assistance_application_path", dbclean: :after_each do
