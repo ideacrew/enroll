@@ -2,7 +2,7 @@
 
 require 'rake'
 
-describe 'load_rate_reference:update_rating_areas' do
+describe 'load_rate_reference:update_rating_areas', if: EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single' do
   before :all do
     DatabaseCleaner.clean
 
