@@ -11,6 +11,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
+                                  :with_student_information,
                                   first_name: person.first_name,
                                   last_name: person.last_name,
                                   dob: person.dob,
@@ -1307,6 +1308,32 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should not return nil for prior_insurance_end_date' do
         expect(@applicant.prior_insurance_end_date).not_to be_nil
         expect(@applicant.prior_insurance_end_date).to eq(applicant.benefits.first.end_on)
+      end
+    end
+  end
+
+  describe 'had_prior_insurance & prior_insurance_end_date' do
+    context 'success' do
+      before do
+        result = subject.call(application)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @student = @entity_init.success.applicants.first.student
+      end
+
+      it 'should populate is_student for student' do
+        expect(@student.is_student).to eq(applicant.is_student)
+      end
+
+      it 'should populate student_kind for student' do
+        expect(@student.student_kind).to eq('full_time')
+      end
+
+      it 'should populate student_school_kind for student' do
+        expect(@student.student_school_kind).to eq('graduate_school')
+      end
+
+      it 'should populate student_school_kind for student' do
+        expect(@student.student_status_end_on).to eq(TimeKeeper.date_of_record.end_of_month)
       end
     end
   end
