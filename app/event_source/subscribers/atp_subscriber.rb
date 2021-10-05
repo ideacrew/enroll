@@ -21,7 +21,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: acked with success: #{result.success}"
       else
-        transfer_details[:result] = "Unsucessfully ingested by Enroll"
+        transfer_details[:result] = "Unsucessfully ingested by Enroll - #{result.failure}"
         errors = result.failure.errors.to_h
         nack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: nacked with failure, errors: #{errors}"
