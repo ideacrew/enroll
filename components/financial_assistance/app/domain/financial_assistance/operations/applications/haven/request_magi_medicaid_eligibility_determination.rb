@@ -35,19 +35,18 @@ module FinancialAssistance
           end
 
           def renew_application(application)
-            application.set_renewal_base_year
             if application.have_permission_to_renew?
               if application.may_submit?
                 application.submit!
                 request_result = request_determination(application)
-                application.unsubmit! if request_result.failure?
+                application.set_magi_medicaid_eligibility_request_errored! if request_result.failure?
                 request_result
               else
-                application.fail_submission!
                 Rails.logger.error "Unable to submit the application for given application hbx_id: #{application.hbx_id}"
                 Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}")
               end
             else
+              application.set_income_verification_extension_required!
               Rails.logger.error "Expired Submission is failed for hbx_id: #{application.hbx_id}"
               Failure("Expired Submission is failed for hbx_id: #{application.hbx_id}")
             end
