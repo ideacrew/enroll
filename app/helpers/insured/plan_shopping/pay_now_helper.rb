@@ -78,6 +78,10 @@ module Insured
         issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
       end
 
+      def is_kaiser_translation_key?(carrier_key)
+        carrier_key == 'kaiser' ? 'issuer' : 'other'
+      end
+
       def carrier_long_name(issuer)
         issuer_key = issuer.downcase&.gsub(' ', '_')
         carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer

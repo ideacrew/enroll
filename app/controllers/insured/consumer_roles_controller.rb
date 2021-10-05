@@ -212,6 +212,8 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :update?
     save_and_exit = params['exit_after_method'] == 'true'
 
+    mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.mec_check_eligible?
+
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
@@ -318,6 +320,10 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def mec_check(person_id)
+    ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecCheck.new.call(person_id)
+  end
 
   def help_paying_coverage_redirect_path(result)
     return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection)

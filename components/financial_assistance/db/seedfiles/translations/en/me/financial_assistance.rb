@@ -134,6 +134,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
-  "en.faa.application_for_coverage" => "Application for Coverage"
+  "en.faa.application_for_coverage" => "Application for Coverage",
+  # Mec check
+  "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application."
 }.freeze
 # rubocop:enable Layout/LineLength

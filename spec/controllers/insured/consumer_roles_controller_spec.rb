@@ -297,6 +297,8 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
+      EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+      allow(person).to receive(:mec_check_eligible?).and_return(false)
       person_params[:addresses_attributes] = addresses_attributes
       person_params[:consumer_role_attributes] = consumer_role_attributes
       sign_in user
@@ -380,6 +382,8 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(person).to receive(:employee_roles).and_return [employee_role]
         EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+        allow(person).to receive(:mec_check_eligible?).and_return(false)
         put :update, params: { person: person_params, id: "test" }
       end
 
