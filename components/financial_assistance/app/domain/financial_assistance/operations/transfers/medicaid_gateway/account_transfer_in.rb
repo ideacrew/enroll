@@ -26,7 +26,7 @@ module FinancialAssistance
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
             applicants = yield fill_applicants_form(payload["family"]['magi_medicaid_applications'].first, application)
-            Success(applicants)
+            publish_ids(family, application)
           end
 
           private

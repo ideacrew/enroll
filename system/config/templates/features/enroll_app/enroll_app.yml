@@ -604,7 +604,7 @@ registry:
         is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget
-        is_enabled: false
+        is_enabled: true
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
