@@ -266,7 +266,7 @@ class Household
 
   def latest_active_tax_household
     return tax_households.first if tax_households.length == 1
-    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).last
   end
 
   def latest_active_tax_households
