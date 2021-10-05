@@ -14,12 +14,10 @@ module Subscribers
       result = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn.new.call(payload)
       transfer_details = {}
       transfer_details[:transfer_id] = payload[:family][:magi_medicaid_applications][0][:transfer_id] || payload
-      
+
       if result.success?
         transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(payload)
-        if transfer_response.success?
-          transfer_details = transfer_details.merge(transfer_response.value!)
-        end
+        transfer_details = transfer_details.merge(transfer_response.value!) if transfer_response.success?
         ack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: acked with success: #{result.success}"
       else
@@ -30,7 +28,7 @@ module Subscribers
       end
 
       FinancialAssistance::Operations::Transfers::MedicaidGateway::PublishTransferResponse.new.call(transfer_details)
-    
+
     rescue StandardError => e
       nack(delivery_info.delivery_tag)
       logger.info "AtpSubscriber: error: #{e.backtrace}"
