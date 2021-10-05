@@ -80,6 +80,8 @@ fixture_dumps
 *.csv
 # IVL Testbed Scenarios is made up data used for golden seed.
 !ivl_testbed_scenarios_2021.csv
+# This is a test version of this file
+!update_bulk_broker_emails_2021_10_5.csv
 *.txt
 *.xml
 *.xls
