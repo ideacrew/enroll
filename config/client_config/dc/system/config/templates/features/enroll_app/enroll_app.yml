@@ -308,6 +308,12 @@ registry:
             item: <%= Date.new(2021,11,1)..Date.new(2022,01,31) %>
           - key: :contact_center_number_for_display
             item: "(855) 532-5465"
+          - key: :mailing_address_1
+            item: "1225 I Street NW, Suite 400"
+          - key: :mailing_address_city
+            item: "Washington"
+          - key: :mailing_address_zip
+            item: "20005"
   - namespace:
       - :pay_now_feature
     features:
