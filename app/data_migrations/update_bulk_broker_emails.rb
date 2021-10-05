@@ -7,13 +7,17 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 # Just need to confirm the formats
 # rubocop:disable Metrics/CyclomaticComplexity:
 class UpdateBulkBrokerEmails < MongoidMigrationTask
-  def migrate
+
+  def broker_csv
     filename = "#{Rails.root}/update_bulk_broker_emails_*.csv"
     update_broker_csvs = Dir.glob(filename)
     puts("No broker CSV present. Please place CSV in Enroll root directory with filename update_bulk_broker_emails_*.") if update_broker_csvs.blank?
     abort if update_broker_csvs.blank?
     broker_csv_file = update_broker_csvs.first
-    broker_csv = File.read(broker_csv_file)
+    File.read(broker_csv_file)
+  end
+
+  def migrate
     CSV.parse(broker_csv, :headers => true).each do |broker_info|
       npn = broker_info[0]
       current_email = broker_info[3]
