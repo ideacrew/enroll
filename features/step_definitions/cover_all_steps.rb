@@ -29,10 +29,10 @@ end
 
 When(/Hbx Admin goes to register a user as individual$/) do
   step "I use unique values"
-  fill_in 'person[first_name]', :with => "Carlos"
-  fill_in 'person[last_name]', :with => "Devina"
+  fill_in IvlPersonalInformation.first_name, :with => "Carlos"
+  fill_in IvlPersonalInformation.last_name, :with => "Devina"
   fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
-  find(:xpath, '//label[@for="radio_male"]').click
+  find(IvlPersonalInformation.male_radiobtn).click
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -41,14 +41,13 @@ Then(/^Hbx Admin clicks on continue button$/) do
 end
 
 Then(/Hbx Admin should see a form to enter personal information$/) do
-  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
-  fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
-  fill_in "person_addresses_attributes_0_address_2", :with => "212"
-  fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
-  fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD"
+  fill_in IvlPersonalInformation.address_line_two, :with => "212"
+  fill_in IvlPersonalInformation.city, :with => "Washington"
+  find(IvlPersonalInformation.select_state_dropdown).click
+  find(IvlPersonalInformation.select_dc_state).click
+  fill_in IvlPersonalInformation.zip, :with => "20002"
   # expect(page).to have_css("#home_address_tooltip")
   find('.btn', text: 'CONTINUE').click
 end
@@ -97,9 +96,9 @@ Then(/Hbx Admin should see the summary page of plan selection/) do
 end
 
 When(/Hbx Admin clicks on Confirm button on the summary page of plan selection/) do
-  find(:xpath, '//*[@id="terms_check_thank_you"]').click
-  fill_in 'first_name_thank_you', :with => "Carlos"
-  fill_in 'last_name_thank_you', :with => "Devina"
+  find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Carlos"
+  fill_in IvlConfirmYourPlanSelection.last_name,  :with => "Devina"
   find('.btn', text: 'CONFIRM').click
 end
 
