@@ -13,17 +13,17 @@ module Subscribers
       payload = JSON.parse(response, :symbolize_names => true)
       result = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn.new.call(payload)
       transfer_details = {}
-
       transfer_details[:transfer_id] = payload[:family][:magi_medicaid_applications][0][:transfer_id] || payload
       
       if result.success?
         transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(payload)
-        transfer_details.merge(transfer_response.value!) if transfer_response.success?
+        if transfer_response.success?
+          transfer_details = transfer_details.merge(transfer_response.value!)
+        end
         ack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: acked with success: #{result.success}"
-        }
       else
-        transfer_details[:status] = "Unsucessfully ingested by Enroll"
+        transfer_details[:result] = "Unsucessfully ingested by Enroll"
         errors = result.failure.errors.to_h
         nack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: nacked with failure, errors: #{errors}"

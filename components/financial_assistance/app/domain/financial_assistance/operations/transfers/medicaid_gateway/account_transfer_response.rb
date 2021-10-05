@@ -40,9 +40,9 @@ module FinancialAssistance
 
           def construct_payload(application, family)
             response_hash = {}
-            response_hash[:family_id] = family.hbx_assigned_id.to_s
-            response_hash[:application_id] = application.hbx_id
-            response_hash[:status] = "Sucessfully ingested by Enroll"
+            response_hash[:family_identifier] = family.hbx_assigned_id.to_s
+            response_hash[:application_identifier] = application.hbx_id
+            response_hash[:result] = "Sucessfully ingested by Enroll"
             Success(response_hash)
           end
 
