@@ -222,26 +222,32 @@ class Insured::ConsumerRolesController < ApplicationController
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
-      elsif current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
-        redirect_to upload_ridp_document_insured_consumer_role_index_path
-      elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
-        @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-        consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-        redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-        redirect_to URI.parse(redirect_path).to_s
       else
-        redirect_to ridp_agreement_insured_consumer_role_index_path
-      end
-    elsif save_and_exit
-      respond_to do |format|
-        format.html {redirect_to destroy_user_session_path}
+        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+          redirect_to upload_ridp_document_insured_consumer_role_index_path
+        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+          # rubocop:disable Metrics/BlockNesting
+          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          redirect_to URI.parse(redirect_path).to_s
+          # rubocop:enable Metrics/BlockNesting
+        else
+          redirect_to ridp_agreement_insured_consumer_role_index_path
+        end
       end
     else
-      @consumer_role.build_nested_models_for_person
-      @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
-      bubble_address_errors_by_person(@consumer_role.person)
-      respond_to do |format|
-        format.html { render "edit" }
+      if save_and_exit
+        respond_to do |format|
+          format.html {redirect_to destroy_user_session_path}
+        end
+      else
+        @consumer_role.build_nested_models_for_person
+        @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+        bubble_address_errors_by_person(@consumer_role.person)
+        respond_to do |format|
+          format.html { render "edit" }
+        end
       end
     end
   end

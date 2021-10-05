@@ -8,13 +8,12 @@ module FinancialAssistance
   module Operations
     module Applications
       module MedicaidGateway
-        # This Operation adds the MEC Check to the Application(persistence object) and Applicants
+        # This Operation adds the MEC Check to the Application or Person
         # Operation receives the MEC Check results
         class AddMecCheck
           include Dry::Monads[:result, :do]
 
-          # @param [Hash] opts The options to add eligibility determination to Application(persistence object)
-          # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params
+          # @param [Hash] params The params to add MEC check responses to Application or Person
           # @return [Dry::Monads::Result]
           def call(params)
             update_fields(params)
