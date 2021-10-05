@@ -911,20 +911,20 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context 'submission_pending' do
-      context 'event: fail_submission' do
+    context 'income_verification_extension_required' do
+      context 'event: set_income_verification_extension_required' do
         before do
           application.update_attributes!(aasm_state: 'renewal_draft')
         end
 
-        context 'from renewal_draft to submission_pending' do
+        context 'from renewal_draft to income_verification_extension_required' do
           before do
             allow(application).to receive(:is_application_valid?).and_return(true)
-            application.fail_submission!
+            application.set_income_verification_extension_required!
           end
 
-          it 'should transition application to submission_pending' do
-            expect(application.reload.submission_pending?).to be_truthy
+          it 'should transition application to income_verification_extension_required' do
+            expect(application.reload.income_verification_extension_required?).to be_truthy
           end
         end
       end
@@ -1281,5 +1281,22 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
+  end
+
+  describe 'set_magi_medicaid_eligibility_request_errored' do
+    context 'NoMagiMedicaidEngine' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
+        application.update_attributes!(aasm_state: 'submitted')
+      end
+
+      it 'should not raise error NoMagiMedicaidEngine' do
+        expect(FinancialAssistanceRegistry.feature_enabled?(:haven_determination)).to be_falsey
+        expect(FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)).to be_falsey
+        expect(application.set_magi_medicaid_eligibility_request_errored).to be_truthy
+      end
+    end
   end
 end

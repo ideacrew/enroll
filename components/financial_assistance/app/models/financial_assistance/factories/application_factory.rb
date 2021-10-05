@@ -4,12 +4,13 @@ module FinancialAssistance
   module Factories
     # Modify application and sub models data
     class ApplicationFactory
-      attr_accessor :application, :applicants
+      attr_accessor :application, :applicants, :family_members_changed
 
       EMBED_MODALS = [:incomes, :benefits, :deductions].freeze
 
       def initialize(application)
         @application = application
+        @family_members_changed = false
         set_applicants
       end
 
@@ -39,7 +40,7 @@ module FinancialAssistance
       end
 
       def update_claimed_as_tax_dependent_by(new_application)
-        claimed_applicants = new_application.applicants.where(:claimed_as_tax_dependent_by.ne => nil)
+        claimed_applicants = new_application.applicants.where(is_claimed_as_tax_dependent: true)
         claimed_applicants.each do |new_appl|
           new_matching_applicant = claiming_applicant(new_appl)
           new_appl.update_attributes(claimed_as_tax_dependent_by: new_matching_applicant.id) if new_matching_applicant
@@ -62,7 +63,7 @@ module FinancialAssistance
         params = old_obj.attributes.reject {|attr| reject_embed_params.include?(attr)}
         new_obj = new_applicant.send(old_obj_klass(old_obj)).create(params)
 
-        return new_obj if old_obj.class == deduction_klass
+        return new_obj if old_obj.instance_of?(deduction_klass)
 
         assign_employer_contact(new_obj, employer_params(old_obj))
         new_obj
@@ -87,9 +88,17 @@ module FinancialAssistance
         return if result.failure?
         members_attributes = result.success
         active_member_ids = members_attributes.inject([]) do |fm_ids, member_param_hash|
-                              fm_ids << member_param_hash[:family_member_id]
-                            end
-        application.applicants.where(:family_member_id.nin => active_member_ids).destroy_all if active_member_ids.present?
+          fm_ids << member_param_hash[:family_member_id]
+        end
+
+        if active_member_ids.present?
+          inactive_applicants = application.applicants.where(:family_member_id.nin => active_member_ids)
+          if inactive_applicants.present?
+            inactive_applicants.destroy_all
+            @family_members_changed = true
+          end
+        end
+
         set_applicants
         active_applicant_family_member_ids = application.active_applicants.map(&:family_member_id)
 
@@ -106,6 +115,7 @@ module FinancialAssistance
               applicant.update_attributes!(applicant_params)
             else
               applicant = applicants.create!(applicant_params)
+              @family_members_changed = true
             end
             # Have to update relationship separately because the applicant should already be persisted before doing this.
             if member_params[:relationship].present? && member_params[:relationship] != 'self'
@@ -119,8 +129,12 @@ module FinancialAssistance
       private
 
       def claiming_applicant(new_applicant)
-        old_applicant = @application.applicants.find(new_applicant.claimed_as_tax_dependent_by)
-        new_applicant.application.applicants.detect{ |applicant| applicant.person_hbx_id == old_applicant.person_hbx_id } if old_applicant&.person_hbx_id
+        old_dependent_applicant = @application.applicants.where(person_hbx_id: new_applicant.person_hbx_id).first
+        return unless old_dependent_applicant&.claimed_as_tax_dependent_by.present?
+        # Applicant that claimed the above applicant
+        old_tax_applicant = @application.applicants.find(old_dependent_applicant.claimed_as_tax_dependent_by)
+        return unless old_tax_applicant&.person_hbx_id.present?
+        new_applicant.application.applicants.detect{ |applicant| applicant.person_hbx_id == old_tax_applicant.person_hbx_id }
       end
 
       def application_params
@@ -179,9 +193,9 @@ module FinancialAssistance
       end
 
       def old_obj_klass(old_obj)
-        return :benefits if old_obj.class == benefit_klass
-        return :incomes if old_obj.class == income_klass
-        return :deductions if old_obj.class == deduction_klass
+        return :benefits if old_obj.instance_of?(benefit_klass)
+        return :incomes if old_obj.instance_of?(income_klass)
+        return :deductions if old_obj.instance_of?(deduction_klass)
       end
 
       def reject_application_params
@@ -190,6 +204,8 @@ module FinancialAssistance
            predecessor_id renewal_base_year effective_date]
       end
 
+      # Do not exclude is_claimed_as_tax_dependent. If you want to exclude is_claimed_as_tax_dependent,
+      # also refactor code for method update_claimed_as_tax_dependent_by.
       def reject_applicant_params
         %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types
            medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
