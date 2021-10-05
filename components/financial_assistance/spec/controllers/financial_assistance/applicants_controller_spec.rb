@@ -76,6 +76,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       applicant.update_attributes(is_primary_caregiver: nil) if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
     end
+
     it "should save questions and redirects to edit_financial_assistance_application_path", dbclean: :after_each do
       get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_valid }
       expect(response).to have_http_status(302)
@@ -97,6 +98,12 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
 
     context "Pregnancy questions validation" do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        applicant.update_attributes(is_primary_caregiver: nil) if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+      end
       let(:faa_invalid_params_pregenancy) do
         {
           "is_pregnant" => true,
@@ -137,7 +144,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with due date nill", dbclean: :after_each do
-        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_without_due_date }
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_params_pregenancy }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'other_questions'
         expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))

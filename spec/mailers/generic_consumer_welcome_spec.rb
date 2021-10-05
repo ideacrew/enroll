@@ -20,9 +20,9 @@ RSpec.describe UserMailer do
     end
 
     it 'should have body text' do
-      expect(email.body).to match(/#{site_short_name} is strongly committed/)
+      expect(email.body).to match(/You have a new message from #{site_short_name}/)
       expect(email.body).to match(/Your Account/)
-      expect(email.body).to match(/Customer Care Center/)
+      expect(email.body).to match(/Log In To Your Account/)
     end
   end
 end

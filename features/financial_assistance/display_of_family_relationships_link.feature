@@ -1,6 +1,8 @@
 Feature: Conditional Display of Family Relationships link in the left nav of the FAA Household Info page.
 
   Background: Household Info page
+    And EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
     Given a consumer exists
     And is logged in
     And a benchmark plan exists
