@@ -103,6 +103,8 @@ module FinancialAssistance
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
 
+    field :has_mec_check_response, type: Boolean, default: false
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
@@ -325,6 +327,11 @@ module FinancialAssistance
       self.applicants.any? do |applicant|
         applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
       end
+    end
+
+    def has_mec_check?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.has_mec_check_response
     end
 
     def update_application(error_message, status_code)
