@@ -155,7 +155,7 @@ module BenefitSponsors
       def map_binder_payment_due_date_by_start_on(is_renewing, start_on)
         dates_map = {}
 
-        Settings.aca.shop_market.binder_payment_dates.each do |dates_pair|
+        EnrollRegistry[:enroll_app].setting(:binder_payment_dates).item.each do |dates_pair|
           dates_map[dates_pair.first[0].to_s] = Date.strptime(dates_pair.first[1], '%Y,%m,%d')
         end
 

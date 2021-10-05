@@ -103,6 +103,8 @@ module FinancialAssistance
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
 
+    field :has_mec_check_response, type: Boolean, default: false
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
@@ -327,6 +329,11 @@ module FinancialAssistance
       end
     end
 
+    def has_mec_check?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.has_mec_check_response
+    end
+
     def update_application(error_message, status_code)
       set_determination_response_error!
       update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
@@ -485,13 +492,27 @@ module FinancialAssistance
       # :renewal_draft State where the previous year's application is renewed
       # :renewal_draft state is the initial state for a renewal application
       state :renewal_draft
-      # :submission_pending is a state where some corrective action is required
-      # :submission_pending is a state where we are unable to submit the application for some reason
-      state :submission_pending
+      # :income_verification_extension_required is a state where some corrective action is required
+      # to extend income verification year.
+      state :income_verification_extension_required
       state :submitted
       state :determination_response_error
       state :determined
       state :imported
+      state :applicants_update_required
+      # states when request build fails(to generate request for Haven/Mitc)
+      state :mitc_magi_medicaid_eligibility_request_errored
+      state :haven_magi_medicaid_eligibility_request_errored
+
+      event :set_magi_medicaid_eligibility_request_errored, :after => :record_transition do
+        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          transitions from: :submitted, to: :haven_magi_medicaid_eligibility_request_errored
+        elsif FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+          transitions from: :submitted, to: :mitc_magi_medicaid_eligibility_request_errored
+        else
+          raise NoMagiMedicaidEngine
+        end
+      end
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
@@ -547,8 +568,8 @@ module FinancialAssistance
       end
 
       # Currently, this event will be used during renewal generations
-      event :fail_submission, :after => :record_transition do
-        transitions from: :renewal_draft, to: :submission_pending
+      event :set_income_verification_extension_required, :after => :record_transition do
+        transitions from: :renewal_draft, to: :income_verification_extension_required
       end
 
       event :import, :after => [:record_transition] do
@@ -898,6 +919,15 @@ module FinancialAssistance
       update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
     end
 
+    def calculate_renewal_base_year
+      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
+      if is_renewal_authorized.present?
+        ass_year + YEARS_TO_RENEW_RANGE.max
+      elsif is_renewal_authorized.is_a?(FalseClass)
+        ass_year + (years_to_renew || 0)
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -962,15 +992,6 @@ module FinancialAssistance
         end
       end
       missing_relationships
-    end
-
-    def calculate_renewal_base_year
-      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
-      if is_renewal_authorized.present?
-        ass_year + YEARS_TO_RENEW_RANGE.max
-      elsif is_renewal_authorized.is_a?(FalseClass)
-        ass_year + years_to_renew
-      end
     end
 
     def check_parent_living_out_of_home_terms

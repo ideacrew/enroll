@@ -45,6 +45,8 @@ RSpec.describe Insured::ConsumerRolesController do
       sign_in(user)
       allow(ConsumerRole).to receive(:find).with(consumer_role_id).and_return(consumer_role)
       allow(consumer_role).to receive(:update_by_person).with(person_controller_parameters).and_return(true)
+      EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+      allow(person).to receive(:mec_check_eligible?).and_return(false)
     end
 
     describe "when the value for 'is_applying_coverage' is provided" do
