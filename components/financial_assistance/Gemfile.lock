@@ -13,7 +13,6 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
-      symmetric-encryption (~> 4.3)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -97,7 +96,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.3)
       slim (~> 3.0)
-      symmetric-encryption
+      symmetric-encryption (= 3.9.1)
 
 GEM
   remote: https://rubygems.org/
@@ -501,7 +500,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    symmetric-encryption (4.3.3)
+    symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.2)
     test-prof (0.5.0)

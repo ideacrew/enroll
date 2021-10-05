@@ -63,7 +63,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
       slim (~> 3.0)
-      symmetric-encryption
+      symmetric-encryption (= 3.9.1)
       virtus (~> 1.0)
 
 GEM
@@ -430,7 +430,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    symmetric-encryption (4.3.3)
+    symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.2)
     test-prof (0.5.0)
