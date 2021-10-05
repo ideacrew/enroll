@@ -215,7 +215,6 @@ And(/^they should see the newly added income/) do
   page.should have_content('Income Added')
 end
 
-
 Then(/^they should be taken back to the application's details page for income$/) do
   page.should have_content("Income for #{application.primary_applicant.first_name}")
 end
@@ -431,6 +430,14 @@ Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end
 
+Given(/^the MEC check feature configuration is enabled$/) do
+  enable_feature :mec_check
+end
+
+Given(/^the consumer has received a successful MEC check response$/) do
+  consumer.person.mec_check_response = "Success"
+end
+
 Given(/^american indian or alaska native income feature is enabled$/) do
   enable_feature :american_indian_alaskan_native_income
 end
@@ -497,6 +504,11 @@ Then(/the "Send To OFI" button will be disabled and the user will see the button
       "faa.sent_to_external_verification"
     )
   )
+end
+
+Then(/^they should see the MedicaidCurrently Enrolled warning text$/) do
+  expect(page).to have_content(l10n('faa.mc_success'))
+  expect(page).to have_content(l10n('faa.mc_continue'))
 end
 
 # TODO: Refactor these with the resource_registry_world.rb helpers
