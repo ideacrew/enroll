@@ -6,7 +6,9 @@ Feature: Cost Savings -  Start New Application
   up will show up
 
   Scenario Outline: FAA is enabled - and consumer has a FAA applications
-    Given the FAA feature configuration is enabled
+    Given EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
+    And the FAA feature configuration is enabled
     And a family with financial application in <application_state> state exists
     And the user with consumer role is logged in
     When consumer visits home page

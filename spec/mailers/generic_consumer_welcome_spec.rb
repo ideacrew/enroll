@@ -22,7 +22,7 @@ RSpec.describe UserMailer do
     it 'should have body text' do
       expect(email.body).to match(/You have a new message from #{site_short_name}/)
       expect(email.body).to match(/Your Account/)
-      expect(email.body).to match(/Log In To Your Account/)
+      expect(email.body).to match(/Please log in to your account/)
     end
   end
 end

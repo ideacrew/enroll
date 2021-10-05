@@ -3,12 +3,15 @@ Feature: Broker Manages Employee Account
   The Broker should be able to do plan shopping for employees
 
   Background: Broker registration
-    Given the shop market configuration is enabled
-    Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for draft initial employer with health benefits
-    Given there is a Broker Agency exists for District Brokers Inc
+    Given EnrollRegistry disable_family_link_in_broker_agency feature is disabled
+    And EnrollRegistry crm_update_family_save feature is disabled
+    And EnrollRegistry crm_publish_primary_subscriber feature is disabled
+    And the shop market configuration is enabled
+    And a CCA site exists with a benefit market
+    And benefit market catalog exists for draft initial employer with health benefits
+    And there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
-    Given there is an employer ABC Widgets
+    And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And employer ABC Widgets hired broker Max Planck from District Brokers Inc
     And initial employer ABC Widgets has enrollment_open benefit application
