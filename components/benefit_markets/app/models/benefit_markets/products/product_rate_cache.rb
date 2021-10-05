@@ -30,14 +30,25 @@ module BenefitMarkets
             r_area_tag = rating_area_cache[pt.rating_area_id]
             pt.premium_tuples.each do |tuple|
               ::BenefitMarkets::Products::PremiumTuple::TOBACCO_USE_VALUES.each do |tobacco_value|
-                $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] = (
-                  $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] +
-                  [{
-                    start_on: pt.effective_period.min,
-                    end_on: pt.effective_period.max,
-                    cost: tuple.cost
-                  }]
-                )
+                if tobacco_value == 'Y'
+                  $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] = (
+                    $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] +
+                    [{
+                      start_on: pt.effective_period.min,
+                      end_on: pt.effective_period.max,
+                      cost: tuple.tobacco_cost
+                    }]
+                  )
+                else
+                  $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] = (
+                    $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] +
+                    [{
+                      start_on: pt.effective_period.min,
+                      end_on: pt.effective_period.max,
+                      cost: tuple.cost
+                    }]
+                  )
+                end
               end
             end
           end
