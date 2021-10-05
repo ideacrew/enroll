@@ -3,6 +3,12 @@
 FactoryBot.define do
   factory :applicant, class: "FinancialAssistance::Applicant" do
 
+    trait :with_student_information do
+      is_student { true }
+      student_kind { 'Full Time' }
+      student_school_kind { 'Graduate School' }
+      student_status_end_on { TimeKeeper.date_of_record.end_of_month.to_s }
+    end
   end
 
   factory :financial_assistance_applicant, class: "FinancialAssistance::Applicant" do
@@ -49,6 +55,13 @@ FactoryBot.define do
 
     trait :spouse do
       relationship { 'spouse' }
+    end
+
+    trait :with_student_information do
+      is_student { true }
+      student_kind { 'Full Time' }
+      student_school_kind { 'Graduate School' }
+      student_status_end_on { TimeKeeper.date_of_record.end_of_month.to_s }
     end
 
     trait :with_home_address do

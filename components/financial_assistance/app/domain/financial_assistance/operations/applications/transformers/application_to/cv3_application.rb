@@ -32,6 +32,31 @@ module FinancialAssistance
               'cousin' => :first_cousin
             }.freeze
 
+            FAA_MITC_STUDENT_KINDS_MAP = {
+              'Dropout' => :dropped_out,
+              'Full Time' => :full_time,
+              'Graduated' => :graduated,
+              'Half Time' => :half_time,
+              'Part Time' => :part_time,
+              'Not In Schoool' => :not_in_school
+            }.freeze
+
+            FAA_MITC_STUDENT_SCHOOL_KINDS_MAP = {
+              "Pre School" => :pre_school,
+              "Graduate School" => :graduate_school,
+              "English Language Institute" => :english_language_institute,
+              "Open University" => :open_university,
+              "Primary" => :primary,
+              "Elementary" => :elementary,
+              "GED" => :ged,
+              "Junior School" => :junior_school,
+              "High School" => :high_school,
+              "Equivalent Vocational/Tech" => :equivalent_vocational_tech,
+              "Vocational" => :vocational,
+              "Technical" => :technical,
+              "Undergraduate" => :undergraduate
+            }.freeze
+
             # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
             # @option opts [::FinancialAssistance::Application] :application
             # @return [Dry::Monads::Result]
@@ -227,10 +252,20 @@ module FinancialAssistance
             end
 
             def student_information(applicant)
-              {is_student: applicant.is_student.present?,
-               student_kind: applicant.student_kind,
-               student_school_kind: applicant.student_school_kind,
-               student_status_end_on: applicant.student_status_end_on}
+              { is_student: applicant.is_student.present?,
+                student_kind: FAA_MITC_STUDENT_KINDS_MAP[applicant.student_kind] || applicant.student_kind,
+                student_school_kind: FAA_MITC_STUDENT_SCHOOL_KINDS_MAP[applicant.student_school_kind] || applicant.student_school_kind,
+                student_status_end_on: str_to_date(applicant.student_status_end_on) }
+            end
+
+            def str_to_date(student_status_end_on)
+              return if student_status_end_on.blank?
+
+              begin
+                Date.strptime(student_status_end_on, '%m/%d/%Y')
+              rescue StandardError
+                student_status_end_on
+              end
             end
 
             def pregnancy_information(applicant)
