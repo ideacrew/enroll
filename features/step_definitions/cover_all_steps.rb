@@ -27,28 +27,27 @@ Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
   expect(page).to have_content('Personal Information')
 end
 
-When(/HBX Admin goes to register an user as individual$/) do
+When(/Hbx Admin goes to register a user as individual$/) do
   step "I use unique values"
-  fill_in 'person[first_name]', :with => "Carlos"
-  fill_in 'person[last_name]', :with => "Devina"
+  fill_in IvlPersonalInformation.first_name, :with => "Carlos"
+  fill_in IvlPersonalInformation.last_name, :with => "Devina"
   fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
-  find(:xpath, '//label[@for="radio_male"]').click
+  find(IvlPersonalInformation.male_radiobtn).click
   find('.btn', text: 'CONTINUE').click
 end
 
-Then(/^HBX Admin clicks on continue button$/) do
+Then(/^Hbx Admin clicks on continue button$/) do
   click_link "Continue"
 end
 
-Then(/HBX Admin should see a form to enter personal information$/) do
-  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
-  fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
-  fill_in "person_addresses_attributes_0_address_2", :with => "212"
-  fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
-  fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+Then(/Hbx Admin should see a form to enter personal information$/) do
+  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD"
+  fill_in IvlPersonalInformation.address_line_two, :with => "212"
+  fill_in IvlPersonalInformation.city, :with => "Washington"
+  find(IvlPersonalInformation.select_state_dropdown).click
+  find(IvlPersonalInformation.select_dc_state).click
+  fill_in IvlPersonalInformation.zip, :with => "20002"
   # expect(page).to have_css("#home_address_tooltip")
   find('.btn', text: 'CONTINUE').click
 end
@@ -68,7 +67,7 @@ Then(/^Hbx Admin should see text Special Enrollment Period$/) do
   expect(page).to have_content('Married')
 end
 
-When(/Hbx Admin click the "(.*?)" in qle carousel/) do |qle_event|
+When(/Hbx Admin clicks "(.*?)" in qle carousel/) do |qle_event|
   click_link "#{qle_event}"
 end
 
@@ -87,23 +86,23 @@ Then(/Hbx Admin should see confirmation and clicks continue/) do
   click_button "Continue"
 end
 
-When(/HBX Admin selects a plan from shopping plan page/) do
+When(/Hbx Admin selects a plan from shopping plan page/) do
   find(:xpath, '//*[@id="ivl_plans"]/div[1]/div/div[5]/div[3]/a[1]').click
 end
 
-Then(/HBX Admin should see the summary page of plan selection/) do
+Then(/Hbx Admin should see the summary page of plan selection/) do
   expect(page).to have_content('Confirm Your Plan Selection')
   # screenshot("summary_page")
 end
 
-When(/HBX Admin clicks on Confirm button on the summary page of plan selection/) do
-  find(:xpath, '//*[@id="terms_check_thank_you"]').click
-  fill_in 'first_name_thank_you', :with => "Carlos"
-  fill_in 'last_name_thank_you', :with => "Devina"
+When(/Hbx Admin clicks on Confirm button on the summary page of plan selection/) do
+  find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Carlos"
+  fill_in IvlConfirmYourPlanSelection.last_name,  :with => "Devina"
   find('.btn', text: 'CONFIRM').click
 end
 
-Then(/HBX Admin should see the enrollment receipt page/) do
+Then(/Hbx Admin should see the enrollment receipt page/) do
   expect(page).to have_content('Enrollment Submitted')
   # screenshot("receipt_page")
 end
@@ -116,12 +115,12 @@ When(/(.*) is clicked by HBX Admin/) do |btn|
   find('.btn', text: btn).click
 end
 
-Then(/HBX Admin should see the home page with text coverage selected/) do
+Then(/Hbx Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
   # screenshot("home_page")
 end
 
-Then(/^HBX Admin should see broker assister search box$/) do
+Then(/^Hbx Admin should see broker assister search box$/) do
   expect(page).to have_content('Select a Broker or Assister')
 end
 
@@ -161,4 +160,8 @@ end
 
 Then(/^Transition family members form should be closed$/) do
   expect(page).not_to have_content(/Transition Family Members/i)
+end
+
+When(/^Hbx Admin clicks on continue button on Choose Coverage page$/) do
+  click_button 'CONTINUE', :wait => 10
 end
