@@ -4,7 +4,7 @@ Feature: Create Benefit Application by admin UI
     Given the shop market configuration is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for draft initial employer with health benefits
+    And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
 
@@ -51,7 +51,6 @@ Feature: Create Benefit Application by admin UI
       # | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
       | Active            | active            | Active             | Existing plan year with overlapping coverage exists |
 
-  @flaky
   Scenario: Creating New Plan Year while application is in termination_pending aasm_state
     And initial employer ABC Widgets has active benefit application
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
@@ -63,28 +62,22 @@ Feature: Create Benefit Application by admin UI
     When the user clicks Actions for that benefit application
     Then the user will see Terminate button
     When the user enters last_day and other details for voluntary termination
-    When user clicks submit button
+    And the user clicks on submit button
     Then user should see termination successful message
     And user logs out
     And staff role person logged in
     And update rating area
     When ABC Widgets is logged in and on the home page
     And staff role person clicked on benefits tab
-    And staff role person clicked on benefits tab
     Then employer should see benefit application in termination pending state
-    And employer should see Add Plan Year link
-    Then employer should see add plan year button
     And employer clicks Add Plan Year link
     And employer clicks OK in warning modal
-    #Then employer should see continue button disabled
     And employer filled all the fields on benefit application form
     And employer clicked on continue button
-    Then employer should see form for benefit package
     And employer filled all the fields on benefit package form for off-cycle application
     And employer selected by metal level plan offerings
-    Then employer should see gold metal level type
     And employer clicked on gold metal level
-    Then employer should see create plan year button disabled
     And employer selected 100 contribution percent for the application
     Then employer should see your estimated montly cost
-    And employer should see that the create plan year is true
+    And employer clicks Create Plan Year
+    Then employer should see a success message after clicking on create plan year button
