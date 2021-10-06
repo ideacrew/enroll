@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: c27f783c5ca1a648f0e22a8c4aa3369f44bb259d
+  revision: ba377c8751c017f5169555652eb5bef477958cbf
   branch: release_0.9.0
   specs:
     aca_entities (0.8.0)
@@ -20,6 +20,7 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
+      rbnacl (~> 7.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -803,6 +804,8 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbnacl (7.1.1)
+      ffi
     rdoc (6.2.1)
     recaptcha (4.14.0)
       json
