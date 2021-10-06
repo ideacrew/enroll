@@ -87,11 +87,10 @@ end
 When /^the HBX admin visits the link received in the approval email$/ do
   staff = general_agency_organization.general_agency_profile.general_agency_primary_staff
   email_address = staff.email_address
-
   open_email(email_address)
   expect(current_email.to).to eq([email_address])
 
-  invitation_link = links_in_email(current_email).first
+  invitation_link = links_in_email(current_email).detect { |link| link['invitation']}
   invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
   visit(invitation_link)
 end
