@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe '_consumer_brokers_widget.html.erb' do
 
   context 'insured home broker widget as consumer with primary family and broker agency accounts' do
+    let(:your_broker) { l10n("insured.your_broker") }
     let!(:consumer_role) { FactoryBot.create(:consumer_role) }
     let(:broker_agency_profile){ FactoryBot.create(:broker_agency_profile) }
     let(:broker_agency_account) { FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile.id) }
