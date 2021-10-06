@@ -21,9 +21,13 @@ module BenefitSponsors
     end
 
     before :each do
-      EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
-      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:assign_contribution_model_aca_shop).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
     end
 
     context "A new model instance" do

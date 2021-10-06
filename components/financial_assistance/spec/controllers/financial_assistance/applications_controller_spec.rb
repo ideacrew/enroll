@@ -186,6 +186,13 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         end
       end
 
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(false)
+      end
+
       it "When model is saved" do
         post :step, params: { id: application.id, application: application_valid_params }
         expect(application.save).to eq true
