@@ -10,15 +10,15 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   before :all do
     DatabaseCleaner.clean
   end
-  
+
   let(:transfer_id) { "tr123" }
-  
+
   context 'success' do
     context 'with valid transfer id' do
       before do
         family = FactoryBot.create(:family, :with_primary_family_member)
         application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
-        @expected_response = 
+        @expected_response =
           {
             family_identifier: family.hbx_assigned_id.to_s,
             application_identifier: application.hbx_id,
