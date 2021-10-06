@@ -20,8 +20,11 @@
             <% if past_effective_on?(hbx_enrollment) && carrier_key == 'kaiser' %>
               <li><%= l10n("plans.issuer.pay_now.link_info")%></li>
             <% end %>
+            <% if !past_effective_on?(hbx_enrollment) && carrier_key != 'kaiser' %>
+              <li><%= l10n('plans.issuer.pay_now.please_note') %></li>
+            <% end %>
             <% unless past_effective_on?(hbx_enrollment) %>
-              <li><%= l10n("plans.#{translation_key}.pay_now.processing", carrier_name: carrier_long_name)%></li>
+              <li><%= l10n("plans.issuer.pay_now.processing", carrier_name: carrier_long_name)%></li>
             <% end %>
             <li><%= l10n("plans.issuer.pay_now.collecting_info", carrier_name: carrier_long_name, site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)%></li>
             <li><%= l10n("plans.issuer.pay_now.exchange_disclaimer_for_auth", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></li>

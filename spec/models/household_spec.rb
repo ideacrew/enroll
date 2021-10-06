@@ -49,6 +49,20 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
+  context "latest_active_tax_household" do
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:household) {FactoryBot.create(:household, family: family)}
+    let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: TimeKeeper.date_of_record - 1.months, effective_ending_on: nil)}
+    let(:tax_household2) {FactoryBot.create(:tax_household, household: household, effective_starting_on: TimeKeeper.date_of_record - 2.months, effective_ending_on: nil)}
+    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, family: family, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+
+    it "return correct tax_household" do
+      household.tax_households << tax_household
+      household.tax_households << tax_household2
+      expect(household.latest_active_tax_household).to eq tax_household
+    end
+  end
+
   context "latest_active_tax_household_with_year" do
     let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
     let!(:household) {FactoryBot.create(:household, family: family)}
