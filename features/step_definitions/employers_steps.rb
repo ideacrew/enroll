@@ -602,8 +602,8 @@ end
 And /^employer filled all the fields on benefit application form$/ do
   find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div[2]/div/div[1]/div", wait: 20).click
   find('li[data-index="1"]').click
-  fill_in 'benefit_application[fte_count]', with: 5
-  fill_in 'benefit_application[pte_count]', with: 5
+  fill_in EmployerAddBenefitPackage.full_time_employees, with: 5
+  fill_in EmployerAddBenefitPackage.part_time_employees, with: 5
 end
 
 And /^employer clicked on continue button$/ do
@@ -632,7 +632,7 @@ And(/^employer filled all the fields on benefit package form for (.*) applicatio
 end
 
 And /^employer selected by metal level plan offerings$/ do
-  find(".interaction-click-control-by-metal-level").click
+  find(EmployerBenefitPackageSetUp.by_metal_level_btn).click
 end
 
 Then /^employer should see gold metal level type$/ do

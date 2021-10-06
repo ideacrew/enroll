@@ -45,7 +45,12 @@
                   <% end %>
                 </div>
               </div>
-
+                
+              <% if @person.mec_check_response == "Success" %>
+                <div id="mec-check-response">
+                  <%= render partial: 'financial_assistance/applications/mec_check_results', locals: { person: @person } %>
+                </div>             
+              <% end %>
             </div>
 
           </div>

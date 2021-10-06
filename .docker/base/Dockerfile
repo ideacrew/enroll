@@ -8,21 +8,17 @@ LABEL author="IdeaCrew"
 
 ARG NODE_MAJOR
 
-# NodeJS download/config
-RUN curl -sL https://deb.nodesource.com/setup_$NODE_MAJOR.x | bash -
-
-# Yarn download/config
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo 'deb http://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
-
-ARG YARN_VERSION
-# Install required packages/libraries
 RUN apt-get update && \
     apt-get -yq dist-upgrade && \
-    apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev libffi6 libreadline-dev \
+    apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev libffi6 libreadline-dev libsodium-dev \
                        zlibc libgdbm-dev libncurses-dev autoconf fontconfig unzip zip sshpass bzip2 libxrender1 libxext6 \
-                       build-essential nodejs yarn=$YARN_VERSION-1 && \
+                       build-essential ca-certificates && \
     apt-get autoremove -y
+
+# NodeJS download/config
+RUN curl -sL https://deb.nodesource.com/setup_$NODE_MAJOR.x | bash -x -
+RUN apt-get install nodejs -y
+RUN npm install --global yarn
 
 # Configure bundler and PATH, install bundler version
 ENV LANG=C.UTF-8 \
