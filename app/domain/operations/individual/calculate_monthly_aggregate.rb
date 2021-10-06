@@ -36,7 +36,7 @@ module Operations
         @subscriber_applicant_id = values[:subscriber_applicant_id]
 
         aptc_enrollments = HbxEnrollment.yearly_aggregate(@family.id, @effective_on.year)
-        aptc_enrollments = aptc_enrollments.reject{|enr| enr.effective_on > @effective_on && enr.subscriber.applicant_id == @subscriber_applicant_id}
+        aptc_enrollments = aptc_enrollments.reject{|enr| enr.effective_on >= @effective_on && enr.subscriber.applicant_id == @subscriber_applicant_id}
         consumed_aptc = 0
         aptc_enrollments.each do |enrollment|
           consumed_aptc += aptc_amount_consumed_by_enrollment(enrollment)
