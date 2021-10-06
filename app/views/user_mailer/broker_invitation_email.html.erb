@@ -3,5 +3,7 @@
       person_name: person_name,
       url: claim_invitation_url(invitation),
       site_short_name: site_short_name,
-      contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
+      contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+      invitation_url: claim_invitation_url(invitation),
+      site_home_business_url: site_home_business_url
 ).html_safe %>
