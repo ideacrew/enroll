@@ -216,8 +216,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
       end
 
       before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
         @renewal_app = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
@@ -231,12 +229,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         expect(@result).to be_failure
       end
 
-      it 'should transition the application to magi_medicaid_eligibility_request_errored' do
-        expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
-      end
+      if FinancialAssistanceRegistry.feature_enabled?(:haven_determination) && !FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+        it 'should transition the application to magi_medicaid_eligibility_request_errored' do
+          expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
+        end
 
-      it 'should return failure with a message' do
-        expect(@result.failure).to include(/The value 'urn:openhbx:terms:v1:financial_assistance_income#test' is not an element of the set {'ur/)
+      elsif !FinancialAssistanceRegistry.feature_enabled?(:haven_determination) && FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+        it 'should transition the application to magi_medicaid_eligibility_request_errored' do
+          expect(@renewal_app.reload.mitc_magi_medicaid_eligibility_request_errored?).to be_truthy
+        end
       end
     end
   end

@@ -9,6 +9,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     #include_context "setup benefit market with market catalogs and product packages"
 
   before :each do
+    EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
+    EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
     EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
   end

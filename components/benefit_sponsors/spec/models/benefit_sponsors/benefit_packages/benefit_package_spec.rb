@@ -20,6 +20,12 @@ module BenefitSponsors
       }
     end
 
+    before :each do
+      EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+    end
+
     context "A new model instance" do
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_field(:title).of_type(String).with_default_value_of("")}

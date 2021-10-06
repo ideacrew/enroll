@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe "_employee_brokers_widget.html.erb" do
 
   context 'insured home broker widget as employee' do
+    let(:your_broker) {l10n('insured.your_broker_or_assister')}
     let!(:employee_role) { FactoryBot.create(:employee_role) }
     let(:person) { employee_role.person }
     let!(:employer_profile) do
@@ -22,7 +23,7 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
     end
 
     it "should display broker widget for consumer" do
-      expect(rendered).to have_text("Your Broker")
+      expect(rendered).to have_text(your_broker)
     end
 
     it "should display brokers email" do
