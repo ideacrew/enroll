@@ -1435,21 +1435,20 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       FactoryBot.create(
         :family,
         :with_family_members,
-        people: [test_person, dependent_person_2],
+        people: [test_person, dependent_person, dependent_person_2],
         person: test_person
       )
     end
     let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:dependent_person_2) { FactoryBot.create(:person, :with_consumer_role) }
     before do
+      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
       test_person.person_relationships << PersonRelationship.new(relative: test_person, kind: "self")
       test_person.person_relationships.build(relative: dependent_person, kind: "spouse")
       test_person.person_relationships.build(relative: dependent_person_2, kind: "child")
-      person.save!
-      family.save!
-
+      test_person.save!
       test_person&.consumer_role&.ridp_documents&.first&.update_attributes(uploaded_at: TimeKeeper.date_of_record)
-      family.family_members.each do |fm|
+      test_family.family_members.each do |fm|
         # Delete phones with extensions due to factory
         fm.person.phones.destroy_all
         fm.person.phones << Phone.new(
@@ -1461,11 +1460,23 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       end
       # keeps the spec less complicated
       test_family.irs_groups.destroy_all
-      EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
+      # Targeting the first person for our test
+      allow(dependent_person).to receive(:previous_changes).and_return({})
+      allow(dependent_person_2).to receive(:previous_changes).and_return({})
     end
 
-    it "should publish to CRM on save" do
-      expect(test_family.send(:trigger_crm_family_update_publish).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+    it "should publish to CRM on save only of critical attributes" do
+      # Nothing has changed since creation- won't trigger.
+      expect(test_family.send(:trigger_crm_family_update_publish_after_save)).to eq(nil)
+      test_person.ssn ="994849494"
+      test_person.last_name =  "Pizza"
+      test_person.dob = TimeKeeper.date_of_record - 20.years
+      # Has been updated since creation, it will trigger
+      test_person.save!
+      expect(test_family.send(:trigger_crm_family_update_publish_after_save).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+      # Shouldn't return now, nothing changed since last save.
+      test_family.save
+      expect(test_family.send(:trigger_crm_family_update_publish_after_save)).to eq(nil)
     end
   end
 end
