@@ -112,6 +112,7 @@ module FinancialAssistance
             end
 
             def encrypt(value)
+              return nil unless value
               AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
             end
 
@@ -121,9 +122,7 @@ module FinancialAssistance
               application.applicants.inject([]) do |result, applicant|
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
-                           identifying_information: {has_ssn: applicant.no_ssn,
-                                                     encrypted_ssn: encrypt(applicant.ssn),
-                                                    },
+                           identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,

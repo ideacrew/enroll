@@ -401,6 +401,8 @@ module Operations
         end
 
         def encrypt(value)
+          return nil unless value
+
           AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
         end
       end
