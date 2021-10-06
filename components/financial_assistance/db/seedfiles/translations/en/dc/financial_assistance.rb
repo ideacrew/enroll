@@ -25,7 +25,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
-  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums of %{reduction_amount} per month </strong>.",
+  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums with savings of %{reduction_amount} per month to be applied to the monthly premium amount selected during plan selection</strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
   "en.faa.qualify_for_lower_costs_1" => "They also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. ",
   "en.faa.qualify_for_csr_100" => "They also won’t pay anything for services they receive from an Indian Health Service provider.",
