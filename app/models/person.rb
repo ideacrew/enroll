@@ -201,6 +201,7 @@ class Person
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
 
   index({hbx_id: 1}, {sparse:true, unique: true})
+  index({external_person_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
 
   index({last_name:  1})

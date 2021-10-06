@@ -26,14 +26,15 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 gem 'database_cleaner',       '~> 1.7'
-
+gem 'pry'
 #######################################################
 
 #######################################################
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'release_0.9.0'
+gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'mcr_enrollment_fix'
+# gem 'aca_entities',       path: '/Users/saidineshmekala/IDEACREW/aca_entities'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
@@ -119,6 +120,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+# gem 'fast_jsonparser'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
 gem 'puma',                   '~> 3.12.4'

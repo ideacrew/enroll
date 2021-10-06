@@ -110,6 +110,7 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
   field :external_id, type: String
+  field :external_group_identifiers, type: Array
   field :special_enrollment_period_id, type: BSON::ObjectId
   field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String

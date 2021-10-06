@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: c27f783c5ca1a648f0e22a8c4aa3369f44bb259d
-  branch: release_0.9.0
+  revision: 9cbb9930bc6ac0fe4bd7cde2d38631e15009f07a
+  branch: mcr_enrollment_fix
   specs:
     aca_entities (0.8.0)
       deep_merge
@@ -413,6 +413,7 @@ GEM
     climate_control (0.2.0)
     cocaine (0.6.0)
       terrapin (= 0.6.0)
+    coderay (1.1.3)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.2.2)
@@ -750,6 +751,9 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    pry (0.14.1)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
     public_suffix (4.0.3)
     puma (3.12.4)
     pundit (2.1.0)
@@ -1147,6 +1151,7 @@ DEPENDENCIES
   overcommit (~> 0.47)
   parallel_tests (~> 2.26.2)
   prawn!
+  pry
   puma (~> 3.12.4)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
