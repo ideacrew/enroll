@@ -22,7 +22,7 @@ module Operations
         @payload = payload
         @policy_tracking_id = payload[:policyTrackingNumber]
 
-        # _migrated = yield existing_policy
+        _migrated = yield existing_policy
         _dont_migrate = yield renaissance_dental
         enrollment_id = yield import_enrollment
 
