@@ -113,6 +113,9 @@ class Person
   field :is_moving_to_state, type: Boolean, default: false
   field :immigration_doc_statuses, type: Array
 
+  # Mec check
+  field :mec_check_response, type: String
+  field :mec_check_date, type: DateTime
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
@@ -1372,5 +1375,11 @@ class Person
 
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
+  end
+
+  # Mec check
+  def mec_check_eligible?
+    return true if self.mec_check_response.nil?
+    mec_check_date.day != Date.today
   end
 end
