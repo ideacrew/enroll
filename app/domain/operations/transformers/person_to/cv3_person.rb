@@ -341,7 +341,7 @@ module Operations
 
         def construct_person_demographics(person)
           {
-            ssn: person.ssn,
+            encrypted_ssn: encrypt(person.ssn),
             no_ssn: person.no_ssn == "0" || person.ssn.present? ? false : true,
             gender: person.gender,
             dob: person.dob,
@@ -365,7 +365,7 @@ module Operations
                 first_name: relative.first_name,
                 middle_name: relative.middle_name,
                 last_name: relative.last_name,
-                ssn: relative.ssn,
+                encrypted_ssn: encrypt(relative.ssn),
                 no_ssn: (relative.no_ssn == "0" || relative.ssn.present?) ? false : true,
                 dob: relative.dob,
                 gender: relative.gender,
@@ -398,6 +398,10 @@ module Operations
             roles: user.roles,
             timestamps: {created_at: user.created_at.to_datetime, modified_at: user.updated_at.to_datetime}
           }
+        end
+
+        def encrypt(value)
+          AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
         end
       end
     end

@@ -111,15 +111,19 @@ module FinancialAssistance
               ::Family.find(family_id)
             end
 
-                        # rubocop:disable Metrics/AbcSize
+            def encrypt(value)
+              AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
+            end
+
+            # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
             def applicants(application, benchmark_premiums)
               application.applicants.inject([]) do |result, applicant|
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn,
-                                                     encrypted_ssn: applicant.encrypted_ssn,
-                                                     ssn: applicant.ssn},
+                                                     encrypted_ssn: encrypt(applicant.ssn),
+                                                    },
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
@@ -761,11 +765,13 @@ module FinancialAssistance
             end
 
             def applicant_reference(applicant)
-              {first_name: applicant.first_name,
-               last_name: applicant.last_name,
-               dob: applicant.dob,
-               person_hbx_id: applicant.person_hbx_id,
-               encrypted_ssn: applicant.encrypted_ssn}
+              {
+                first_name: applicant.first_name,
+                last_name: applicant.last_name,
+                dob: applicant.dob,
+                person_hbx_id: applicant.person_hbx_id,
+                encrypted_ssn: encrypt(applicant.ssn)
+              }
             end
 
             def application_relationships(application)
