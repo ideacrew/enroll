@@ -1,5 +1,8 @@
 <div class="container privacy">
-  <%= render "insured/consumer_roles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/state_based_privacy_statement" %>
+  <h1><%= l10n("your_information") %></h1>
+  <p class="starter">
+    <%= l10n("privacy_statement") %></p>
+  <br>
   <div>
     <%= link_to 'CONTINUE', search_insured_consumer_role_index_path(@search_path), :class => "btn btn-lg btn-primary  interaction-click-control-continue" %>
   </div>
