@@ -29,7 +29,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Pu
   context 'When connection is available' do
     context 'transferred_account_response' do
       before do
-        @result = subject.call(transfer_details)
+        @result = obj.call(transfer_details)
       end
 
       it 'should return success' do
