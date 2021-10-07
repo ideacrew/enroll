@@ -397,7 +397,17 @@ jobs:
       - name: Run tests
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   quality-workbench:
-    needs: [rubocop, view_linter, brakeman, build_assets, engines, benefit-sponsors, rspec, cucumber],
+    needs:
+      [
+        rubocop,
+        view_linter,
+        brakeman,
+        build_assets,
+        engines,
+        benefit-sponsors,
+        rspec,
+        cucumber,
+      ]
     runs-on: ubuntu-latest
     steps:
       - name: Check each job has passed
