@@ -193,6 +193,9 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       end
 
       context 'for AvailableEligibilityService' do
+        before :each do
+          family.active_household.tax_households.first.tax_household_members.update_all(csr_eligibility_kind: "csr_94")
+        end
         context 'for one member enrollment' do
           context 'tax_household exists' do
             before :each do
@@ -624,7 +627,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       end
       let(:primary_fm) {agg_family.primary_applicant}
       let!(:agg_tax_household) { FactoryBot.create(:tax_household, household: agg_family.active_household, effective_ending_on: nil)}
-      let!(:agg_thh_member) { FactoryBot.create(:tax_household_member, applicant_id: primary_fm.id, tax_household: agg_tax_household)}
+      let!(:agg_thh_member) { FactoryBot.create(:tax_household_member, applicant_id: primary_fm.id, tax_household: agg_tax_household, csr_eligibility_kind: "csr_94")}
       let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: agg_tax_household)}
       let!(:agg_enrollment) do
         enr = FactoryBot.create(:hbx_enrollment,
@@ -645,7 +648,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       context 'with an existing enrollment' do
         context 'with valid tax household for all the shopping members' do
           before :each do
-            FactoryBot.create(:tax_household_member, applicant_id: agg_family.family_members.second.id, tax_household: agg_tax_household)
+            FactoryBot.create(:tax_household_member, applicant_id: agg_family.family_members.second.id, tax_household: agg_tax_household, csr_eligibility_kind: "csr_94")
             @eligibility_factory ||= described_class.new(agg_enrollment.id, new_effective_date)
             @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
           end
