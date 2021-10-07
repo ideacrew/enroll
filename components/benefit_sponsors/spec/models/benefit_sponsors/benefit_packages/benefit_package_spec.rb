@@ -28,6 +28,8 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
     end
 
     context "A new model instance" do
