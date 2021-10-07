@@ -104,15 +104,9 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.plan_shopping_completed(user, enrollment, plan_decorator)
   end
 
-  def new_client_notification
+  def new_client_notification; end
 
-  end
+  def broker_pending_completed_training_missing_carrier; end
 
-  def broker_pending_completed_training_missing_carrier
-
-  end
-
-  def reset_password_instructions
-
-  end
+  def reset_password_instructions; end
 end
