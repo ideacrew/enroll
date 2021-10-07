@@ -291,6 +291,7 @@ class HbxEnrollment
   index({"family_id" => 1})
   index({"writing_agent_id" => 1}, { sparse: true })
   index({"hbx_id" => 1})
+  index({"external_id" => 1})
   index({"kind" => 1})
   index({"submitted_at" => 1})
   index({"effective_on" => 1})
