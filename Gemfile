@@ -34,7 +34,7 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'atp_response_event'
-gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
+gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'release_0.5.5'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
@@ -160,8 +160,6 @@ group :development, :test do
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
-  gem 'pry'
-  gem 'pry-byebug'
 end
 
 group :test do
