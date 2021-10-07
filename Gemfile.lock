@@ -20,6 +20,7 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
+      rbnacl (~> 7.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -33,11 +34,11 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: f2e41bee53939bb069668b314c904c43e52bdc57
-  branch: trunk
+  revision: 3d69618c16fbbe09912eeba097aedac47d1abc15
+  branch: release_0.5.5
   specs:
-    event_source (0.5.3)
-      bunny (>= 1.7.1)
+    event_source (0.5.5)
+      bunny (~> 2.14)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
       dry-inflector (~> 0.2)
@@ -807,6 +808,8 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbnacl (7.1.1)
+      ffi
     rdoc (6.2.1)
     recaptcha (4.14.0)
       json
