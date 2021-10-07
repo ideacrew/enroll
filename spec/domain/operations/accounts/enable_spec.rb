@@ -42,7 +42,7 @@ RSpec.describe Operations::Accounts::Enable, type: :request do
     end
 
     let!(:account_id) do
-      Operations::Accounts::Create.new.call(account: account_params).failure['user']['id']
+      ::Operations::Accounts::Create.new.call(account: account_params).failure['user']['id']
     end
 
     let(:params) { { id: account_id } }
@@ -71,7 +71,7 @@ RSpec.describe Operations::Accounts::Enable, type: :request do
       }
     end
 
-    let!(:user) { Operations::Accounts::Create.new.call(account: account_params) }
+    let!(:user) { ::Operations::Accounts::Create.new.call(account: account_params) }
 
     let(:params) { { login: username } }
 

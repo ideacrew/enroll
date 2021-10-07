@@ -6,17 +6,17 @@ require 'dry/monads/do'
 module Operations
   module Accounts
     # Create a new Keycloak Account
-    # a {Sections::SectionItem}
     class Delete
       include Dry::Monads[:result, :do, :try]
 
       # @param [Hash] opts the parameters to delete a {AcaEntities::Accounts::Account}
       # @option opts [String] :id required
+      # @option opts [String] :login optional
       # @option opts [Hash] :cookies optional
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
-        _token_proc = yield proc_cookie_token(values)
+        _token_proc = yield cookie_token(values)
         result = yield delete(values.to_h)
 
         Success(result)
@@ -25,10 +25,14 @@ module Operations
       private
 
       def validate(params)
-        params.key?(:id) ? Success(params) : Failure('params must include :id')
+        if params.key?(:login) || params.key?(:id)
+          Success(params)
+        else
+          Failure('params must include :id or :login')
+        end
       end
 
-      def proc_cookie_token(values)
+      def cookie_token(values)
         cookies =
           values[:cookies] || {
             keycloak_token: Keycloak::Client.get_token_by_client_credentials
@@ -37,21 +41,20 @@ module Operations
         if cookies.nil?
           Failure('unable to set proc_cookie_token')
         else
-          Success(
-            Keycloak.proc_cookie_token = -> { cookies[:keycloak_token] }
-          )
+          Success(Keycloak.proc_cookie_token = -> { cookies[:keycloak_token] })
         end
       end
 
       # rubocop:disable Layout/MultilineMethodCallIndentation
       def delete(values)
-        Try() { Keycloak::Admin.delete_user(values[:id]) }.to_result
-          .bind do |response|
-          if response
-            Success("account_id: #{values[:id]} deleted")
+        Try() do
+          if values[:id]
+            Keycloak::Admin.delete_user(values[:id])
           else
-            Failure("error deleting account_id: #{values[:id]}")
+            Keycloak::Internal.delete_user_by_login(values[:login])
           end
+        end.to_result.bind do |response|
+          response ? Success(true) : Failure(false)
         end
       end
       # rubocop:enable Layout/MultilineMethodCallIndentation

@@ -24,7 +24,7 @@ RSpec.describe Operations::Accounts::Delete, type: :request do
     end
   end
 
-  context 'Given a valid account_id' do
+  context 'Given an existing aqccount' do
     let(:username) { 'captain_america' }
     let(:password) { '$3cr3tP@55w0rd' }
     let(:email) { 'steve.rodgersk@avengers.org' }
@@ -41,14 +41,29 @@ RSpec.describe Operations::Accounts::Delete, type: :request do
       }
     end
 
-    let(:id) { Operations::Accounts::Create.new.call(account: account).success['id'] }
+    let(:target_account) do
+      ::Operations::Accounts::Create.new.call(account: account).success
+    end
 
-    it 'should delete the account' do
-      # cookies[:keycloak_token] =
-      #   Keycloak::Client.get_token_by_client_credentials
-      response = subject.call(id: id)
+    context 'it should delete an account by user login' do
+      before { target_account }
 
-      expect(response.success?).to be_truthy
+      it 'should delete the account by login' do
+        response = subject.call(login: username)
+        expect(response.success?).to be_truthy
+      end
+    end
+
+    context 'it should delete an account by user id' do
+      before { target_account }
+      let(:id) { target_account[:id] || nil }
+
+      it 'should delete the account by ID' do
+        expect(id).to_not be_nil
+
+        response = subject.call(id: id)
+        expect(response.success?).to be_truthy
+      end
     end
   end
 end

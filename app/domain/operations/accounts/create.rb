@@ -6,26 +6,33 @@ require 'dry/monads/do'
 module Operations
   module Accounts
     # Create a new Keycloak Account
-    # a {Sections::SectionItem}
     class Create
       include Dry::Monads[:result, :do, :try]
-      include ActionController::Cookies
 
-      # @param [Hash] opts the parameters wrapped in account: hash to create a
-      # {AcaEntities::Accounts::Account}
-      # @option opts [String] :username optional
-      # @option opts [String] :password required
-      # @option opts [String] :email required
-      # @option opts [String] :first_name required
-      # @option opts [String] :last_name required
-      # @option opts [Hash] :cookies optional
+      # @param [Hash] acct {AcaEntities::Accounts::Account}-related parameters
+      # @option acct [String] :id optional
+      # @option acct [String] :username required
+      # @option acct [String] :password optional
+      # @option acct [String] :email optional
+      # @option acct [String] :first_name optional
+      # @option acct [String] :last_name optional
+      # @option acct [Boolean] :enabled optional
+      # @option acct [Boolean] :email_verified optional
+      # @option acct [Hash] :attributes optional
+      # @option acct [Array<String>] :groups optional
+      # @option acct [Hash] :access optional
+      # @option acct [Integer] :not_before optional
+      # @option acct [Time] :created_at optional
+      # @param [Hash] opts Cookie-related parameters
+      # @option opts [Hash] :cookie optional
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
-        _token_proc = yield proc_cookie_token(values)
-        new_account = yield create(values.to_h)
+        _token_proc = yield cookie_token(values)
+        keycloak_attrs = yield create(values)
+        account_attrs = yield map_attributes(keycloak_attrs)
 
-        Success(new_account)
+        Success(account_attrs)
       end
 
       private
@@ -36,7 +43,7 @@ module Operations
         )
       end
 
-      def proc_cookie_token(values)
+      def cookie_token(values)
         cookies =
           values[:cookies] || {
             keycloak_token: Keycloak::Client.get_token_by_client_credentials
@@ -57,12 +64,13 @@ module Operations
               return { 'user' => user, 'new_user' => new_user }
             end
 
+          args = values.to_h
           Keycloak::Internal.create_simple_user(
-            values[:username] || values[:email],
-            values[:password],
-            values[:email],
-            values[:first_name],
-            values[:last_name],
+            args[:username] || args[:email],
+            args[:password],
+            args[:email],
+            args[:first_name],
+            args[:last_name],
             [],
             ['Public'],
             after_insert
@@ -72,6 +80,30 @@ module Operations
         end
       end
       # rubocop:enable Style/MultilineBlockChain
+
+      def map_attributes(keycloak_attrs)
+        account_attrs = {
+          id: keycloak_attrs['user']['id'],
+          username: keycloak_attrs['user']['username'],
+          enabled: keycloak_attrs['user']['enabled'],
+          totp: keycloak_attrs['user']['totp'],
+          email: keycloak_attrs['user']['email'],
+          email_verified: keycloak_attrs['user']['emailVerified'],
+          access: keycloak_attrs['user']['access'],
+          first_name: keycloak_attrs['user']['firstName'],
+          last_name: keycloak_attrs['user']['lastName'],
+          attributes: keycloak_attrs['user']['attributes'] || {},
+          groups: keycloak_attrs['user']['groups'] || [],
+          not_before: keycloak_attrs['user']['notBefore'],
+          created_at: epoch_to_time(keycloak_attrs['user']['createdTimestamp'])
+        }
+
+        Success(account_attrs)
+      end
+
+      def epoch_to_time(value)
+        Time.at(value / 1000)
+      end
     end
   end
 end

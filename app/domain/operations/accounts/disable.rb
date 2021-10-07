@@ -16,7 +16,7 @@ module Operations
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
-        _token_proc = yield proc_cookie_token(values)
+        _token_proc = yield cookie_token(values)
         result = yield disable(values.to_h)
 
         Success(result)
@@ -32,7 +32,7 @@ module Operations
         end
       end
 
-      def proc_cookie_token(values)
+      def cookie_token(values)
         cookies =
           values[:cookies] || {
             keycloak_token: Keycloak::Client.get_token_by_client_credentials
