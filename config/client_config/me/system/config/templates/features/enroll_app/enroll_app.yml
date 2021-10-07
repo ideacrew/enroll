@@ -367,6 +367,12 @@ registry:
             item: <%= Date.new(2021,11,1)..Date.new(2022,01,31) %>
           - key: :contact_center_number_for_display
             item: "(855) 532-5465"
+          - key: :mailing_address_1
+            item: ""
+          - key: :mailing_address_city
+            item: ""
+          - key: :mailing_address_zip
+            item: ""
   - namespace:
       - :pay_now_feature
     features:
