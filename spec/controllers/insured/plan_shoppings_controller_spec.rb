@@ -620,8 +620,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       context "when user has_active_consumer_role" do
         let(:tax_household) {double("TaxHousehold")}
         let(:family) { FactoryBot.build(:individual_market_family) }
-        let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
-        let(:user) {double("user",person: person)}
+        let(:person) {FactoryBot.create(:person, :with_family, :with_consumer_role)}
+        let(:user) {double("user",person: person, has_hbx_staff_role?: true)}
 
         before do
           allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
@@ -639,16 +639,17 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             allow(person).to receive(:active_employee_roles).and_return []
             allow(person).to receive(:employee_roles).and_return []
             allow(hbx_enrollment).to receive(:kind).and_return 'individual'
-            get :show, params: {id: "hbx_id"}
+            get :show, params: {id: "hbx_id", market_kind: "individual"}
           end
 
-          # it "should get max_aptc" do
-          #   expect(assigns(:max_aptc)).to eq 111
-          # end
-          #
-          # it "should get default selected_aptc_pct" do
-          #   expect(assigns(:elected_aptc)).to eq 111*0.85
-          # end
+          it "should get max_aptc" do
+            expect(assigns(:max_aptc)).to eq 111
+          end
+
+          it "should get default selected_aptc_pct" do
+            percentage = EnrollRegistry[:enroll_app].setting(:default_percentage).item
+            expect(assigns(:elected_aptc)).to eq (111*percentage) / 100
+          end
         end
 
         context "without tax_household" do
