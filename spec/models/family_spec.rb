@@ -1475,8 +1475,11 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       test_person.save!
       expect(test_family.send(:trigger_crm_family_update_publish_after_save).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
       # Shouldn't return now, nothing changed since last save.
-      test_family.save
+      test_person.save!
       expect(test_family.send(:trigger_crm_family_update_publish_after_save)).to eq(nil)
+      test_person.last_name = "Apples"
+      test_person.save!
+      expect(test_family.send(:trigger_crm_family_update_publish_after_save).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
     end
   end
 end

@@ -5,7 +5,7 @@ module CrmGateway
   module FamilyConcern
     extend ActiveSupport::Concern
 
-    CRITICAL_ATTRIBUTES = ['first_name', 'last_name', 'dob', 'encrypted_ssn'].freeze
+    CRITICAL_CRM_ATTRIBUTES = ['first_name', 'last_name', 'dob', 'encrypted_ssn'].freeze
 
     included do
       before_save :assign_critical_previous_changes
@@ -17,7 +17,7 @@ module CrmGateway
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
       relevant_previous_changes_array = []
       self.family_members.each do |family_member|
-        previous_changes_attributes = family_member.person.previous_changes.reject { |key, _value| CRITICAL_ATTRIBUTES.exclude?(key) }
+        previous_changes_attributes = family_member.person.previous_changes.reject { |key, _value| CRITICAL_CRM_ATTRIBUTES.exclude?(key) }
         relevant_previous_changes_array << previous_changes_attributes.merge!(hbx_id: family_member.person.hbx_id) unless previous_changes_attributes.blank?
       end
       self.relevant_previous_changes = relevant_previous_changes_array
@@ -38,14 +38,14 @@ module CrmGateway
     end
 
     # Any time after the family is saved, the CRM publish will only trigger if the family's family_member
-    # person records have any of the CRITICAL_ATTRIBUTES listed above changed from their previous values
+    # person records have any of the CRITICAL_CRM_ATTRIBUTES listed above changed from their previous values
     def trigger_crm_family_update_publish_after_save
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
       # Only publish on critical changes
       current_previous_changes = self.relevant_previous_changes
       new_previous_changes = []
       self.family_members.map do |member|
-        critical_changes = member.person.previous_changes.reject { |key, _value| CRITICAL_ATTRIBUTES.exclude?(key) }
+        critical_changes = member.person.previous_changes.reject { |key, _value| CRITICAL_CRM_ATTRIBUTES.exclude?(key) }
         critical_changes.merge!(hbx_id: member.person.hbx_id) if critical_changes.present?
         next unless critical_changes.present?
         member_previous_changes_hash = current_previous_changes.detect { |attributes_hash| attributes_hash['hbx_id'] == member.person.hbx_id }
