@@ -28,14 +28,14 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Pu
 
   context 'When connection is available' do
     context 'transferred_account_response' do
-      before do 
+      before do
         @result = subject.call(transfer_details)
-    end
+      end
 
       it 'should return success' do
         expect(@result).to be_success
         expect(@result.success).to eq "Returned transfer response to Medicaid Gateway"
       end
-    end    
+    end
   end
 end
