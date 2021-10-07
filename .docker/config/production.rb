@@ -47,7 +47,7 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = false
 
-=begin 
+=begin
   config.content_security_policy do |policy|
     policy.default_src :self, :https
     policy.font_src :self, :https, :data, "*.gstatic.com  *.fontawesome.com"
