@@ -1468,8 +1468,8 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     it "should publish to CRM on save only of critical attributes" do
       # Nothing has changed since creation- won't trigger.
       expect(test_family.send(:trigger_crm_family_update_publish_after_save)).to eq(nil)
-      test_person.ssn ="994849494"
-      test_person.last_name =  "Pizza"
+      test_person.ssn = "994849494"
+      test_person.last_name = "Pizza"
       test_person.dob = TimeKeeper.date_of_record - 20.years
       # Has been updated since creation, it will trigger
       test_person.save!
