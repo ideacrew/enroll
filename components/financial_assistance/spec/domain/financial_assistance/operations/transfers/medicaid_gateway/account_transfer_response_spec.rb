@@ -22,7 +22,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           {
             family_identifier: family.hbx_assigned_id.to_s,
             application_identifier: application.hbx_id,
-            result: "Sucessfully ingested by Enroll"
+            result: "Success"
           }
         @result = subject.call(transfer_id)
       end
