@@ -111,4 +111,8 @@ class UserMailerPreview < ActionMailer::Preview
   def broker_pending_completed_training_missing_carrier
 
   end
+
+  def reset_password_instructions
+
+  end
 end
