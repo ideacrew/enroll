@@ -1,4 +1,3 @@
-@flaky
 Feature:  Employee passive renewal should be canceled when Employee waived coverage
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
@@ -8,7 +7,6 @@ Feature:  Employee passive renewal should be canceled when Employee waived cover
     And this employer offering 0.75 contribution to Employee
     And this employer ABC Widgets has first_of_month rule
 
-  @flaky
   Scenario: Renewing employee waive coverage
     Given there exists Patrick Doe employee for employer ABC Widgets
       And employee Patrick Doe has current hired on date
@@ -17,9 +15,9 @@ Feature:  Employee passive renewal should be canceled when Employee waived cover
       Then Employee should see the group selection page
       When Employee clicks continue on group selection page
       Then Employee should see the list of plans
-      And I should not see any plan which premium is 0
+      And Employee should not see any plan which premium is 0
       When Employee selects waiver on the plan shopping page
-      When Employee submits waiver reason
+      And Employee submits waiver reason
       Then Employee should see waiver summary page 
       When Employee clicks continue on waiver summary page
-      Then Employee should able to see Waiver tile
+      Then Employee should see Waiver tile

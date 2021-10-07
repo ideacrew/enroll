@@ -1,5 +1,5 @@
 
-$(document).on('click', ".interaction-click-control-leave-dc-health-link", function(e) {
+$(document).on('click', "#pay-now", function(e) {
   if ($(this).parent('form').attr('method') == 'post') {
     e.preventDefault();
     let hbx_id = $(this).val();

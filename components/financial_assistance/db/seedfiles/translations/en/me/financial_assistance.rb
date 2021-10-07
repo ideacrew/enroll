@@ -28,7 +28,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.referral" => "Special MaineCare Referral",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",
-  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums of %{reduction_amount} per month </strong>.",
+  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums with savings of %{reduction_amount} per month to be applied to the monthly premium amount selected during plan selection</strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
   "en.faa.qualify_for_lower_costs_1" => "These people also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. ",
   "en.faa.qualify_for_csr_100" => "They also won’t pay anything for services they receive from an Indian Health Service provider.",
@@ -134,6 +134,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
-  "en.faa.application_for_coverage" => "Application for Coverage"
+  "en.faa.application_for_coverage" => "Application for Coverage",
+  # Mec check
+  "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application."
 }.freeze
 # rubocop:enable Layout/LineLength

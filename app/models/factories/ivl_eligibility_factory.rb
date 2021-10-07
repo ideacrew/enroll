@@ -206,25 +206,12 @@ module Factories
       {:aptc => aptc_breakdowns}
     end
 
-    def prioritized_csr(csr_kinds)
-      if csr_kinds.include?('csr_0')
-        'csr_0'
-      elsif csr_kinds.include?('csr_94')
-        'csr_94'
-      elsif csr_kinds.include?('csr_87')
-        'csr_87'
-      elsif csr_kinds.include?('csr_73')
-        'csr_73'
-      else
-        'csr_100'
-      end
-    end
-
     def fetch_csr
       return {:csr => 'csr_0'} if (shopping_tax_members.count != shopping_member_ids.count) || any_aptc_ineligible?
+      # picks csr_kind based on individual level
 
-      csr_kinds = tax_households.map(&:current_csr_eligibility_kind)
-      {:csr => prioritized_csr(csr_kinds)}
+      csr_kind = tax_households.last.eligibile_csr_kind(shopping_member_ids)
+      {:csr => csr_kind }
     end
   end
 end

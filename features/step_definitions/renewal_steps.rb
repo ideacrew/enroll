@@ -86,7 +86,7 @@ When(/^.+ clicks continue on waiver summary page/) do
   page.find('.interaction-click-control-continue').click
 end
 
-Then("Employee should able to see Waiver tile") do
+Then("Employee should see Waiver tile") do
   find('.interaction-click-control-shop-for-plans', wait: 5)
 
   expect(page).to have_content 'Waived'

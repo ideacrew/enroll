@@ -35,7 +35,7 @@ module BenefitMarkets
                   [{
                     start_on: pt.effective_period.min,
                     end_on: pt.effective_period.max,
-                    cost: tuple.cost
+                    cost: tobacco_value == 'Y' ? tuple.tobacco_cost : tuple.cost
                   }]
                 )
               end
