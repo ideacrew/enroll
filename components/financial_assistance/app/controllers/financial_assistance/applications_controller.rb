@@ -175,7 +175,7 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-      @application.rt_transfer
+      @application.rt_transfer if params.keys.include?('cur')
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 

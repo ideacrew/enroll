@@ -37,28 +37,23 @@ module FinancialAssistance
           end
 
           def find_family(family_hash)
-            primary = family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first
-            person_params = sanitize_person_params(primary)
+            person_params = sanitize_person_params(family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first)
             candidate = PersonCandidate.new(person_params[:ssn], person_params[:dob], person_params[:first_name], person_params[:last_name])
-            person = if primary[:no_ssn] == '1'
+            person = if person_params[:no_ssn] == '1'
                        Person.where(first_name: /^#{candidate.first_name}$/i, last_name: /^#{candidate.last_name}$/i,
                                     dob: candidate.dob).first
                      else
                        Person.match_existing_person(candidate)
                      end
-
-            if person
-              Family.where(
-                "family_members" => {
-                  "$elemMatch" => {
-                    "is_primary_applicant" => true,
-                    "person_id" => BSON::ObjectId.from_string(person.id.to_s)
-                  }
-                }, "is_active" => true
-              )
-            else
-              []
-            end
+            return [] unless person
+            Family.where(
+              "family_members" => {
+                "$elemMatch" => {
+                  "is_primary_applicant" => true,
+                  "person_id" => BSON::ObjectId.from_string(person.id.to_s)
+                }
+              }, "is_active" => true
+            )
           end
 
           def build_family(family_hash)
@@ -151,9 +146,8 @@ module FinancialAssistance
           end
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
-            applicants_hash = iap_hash['applicants']
             sanitize_params = []
-            applicants_hash.each do |applicant_hash|
+            iap_hash['applicants'].each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
                 fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
               end.first
@@ -270,7 +264,10 @@ module FinancialAssistance
           def sanitize_person_params(family_member_hash)
             person_hash = family_member_hash['person']
             consumer_role_hash = person_hash["consumer_role"]
+            build_person_hash(person_hash, consumer_role_hash)
+          end
 
+          def build_person_hash(person_hash, consumer_role_hash)
             {
               first_name: person_hash['person_name']['first_name'],
               last_name: person_hash['person_name']['last_name'],
@@ -308,10 +305,9 @@ module FinancialAssistance
           end
 
           def fill_applicants_form(applications, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-            applicants_hash = applications[:applicants]
             application = FinancialAssistance::Application.where(id: app_id).first
 
-            applicants_hash.each do |applicant|
+            applications[:applicants].each do |applicant|
               persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
               next if persisted_applicant.nil?
