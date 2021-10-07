@@ -402,7 +402,7 @@ jobs:
         rubocop,
         view_linter,
         brakeman,
-        build_assets,
+        build-assets,
         engines,
         benefit-sponsors,
         rspec,
