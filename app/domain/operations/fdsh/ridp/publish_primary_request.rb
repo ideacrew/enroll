@@ -21,7 +21,8 @@ module Operations
         private
 
         def build_event(payload)
-          event('events.fdsh.ridp.primary_determination_requested', attributes: payload.to_h, headers: { correlation_id: payload.to_h[:hbx_id] })
+          hbx_id = payload.to_h[:family_members].detect{|fm| fm[:is_primary_applicant] == true}[:person][:hbx_id]
+          event('events.fdsh.ridp.primary_determination_requested', attributes: payload.to_h, headers: { correlation_id: hbx_id })
         end
 
         def publish(event)
