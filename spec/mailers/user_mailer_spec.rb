@@ -1,5 +1,6 @@
 require 'rails_helper'
-  include Config::SiteHelper
+include Config::SiteHelper
+
 RSpec.describe UserMailer do
   describe 'generic_notice_alert' do
     let(:hbx_id) { rand(10000 )}
@@ -29,6 +30,28 @@ RSpec.describe UserMailer do
       expect(new_client_email.body).to match("Client New")
       expect(new_client_email.body).to match("client@new.com")
     end
+  end
 
+  context "#account_transfer_success_notification" do
+    let(:email)do
+      UserMailer.account_transfer_success_notification(person, "johnanderson@fake.com")
+    end
+
+    let(:person) { FactoryBot.create(:person) }
+
+    let(:email_body) do
+      l10n(
+        "user_mailer.account_transfer_success_notification.full_text",
+        medicaid_or_chip_agency_long_name: EnrollRegistry[:medicaid_or_chip_agency_long_name].settings(:name).item,
+        medicaid_or_chip_program_short_name: EnrollRegistry[:medicaid_or_chip_program_short_name].settings(:name).item,
+        person_name: person.full_name,
+        site_home_business_url: site_home_business_url,
+        state_name: state_name
+      )
+    end
+
+    it "should render the email with the proper text" do
+      expect(email.body.raw_source).to eq(email_body)
+    end
   end
 end
