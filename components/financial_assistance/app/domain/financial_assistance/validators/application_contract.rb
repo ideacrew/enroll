@@ -13,6 +13,7 @@ module FinancialAssistance
         optional(:is_ridp_verified).maybe(:bool)
         optional(:is_renewal_authorized).maybe(:bool)
         required(:applicants).array(:hash)
+        optional(:transfer_id).maybe(:string)
       end
 
       rule(:years_to_renew, :renewal_consent_through_year, :is_renewal_authorized) do
