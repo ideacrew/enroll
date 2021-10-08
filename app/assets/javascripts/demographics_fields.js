@@ -401,6 +401,19 @@ var PersonValidations = (function(window, undefined) {
     }
   }
 
+  function validationForContactMethod(e) {
+    const isChecked = false;
+    $( "contact-method" ).each(function( index ){
+        if ( $('input[checked="checked"]')){
+          isChecked = true;
+        }
+      })
+      if( isChecked == false ){
+        alert('Warning: Atleast one contact method must be selected.');
+        PersonValidations.restoreRequiredAttributes(e);
+      }
+    }
+
   // explicitly return public methods when this object is instantiated
   return {
     manageRequiredValidations: manageRequiredValidations,
@@ -410,6 +423,7 @@ var PersonValidations = (function(window, undefined) {
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
+    validationForContactMethod: validationForContactMethod,
     restoreRequiredAttributes: restoreRequiredAttributes
 
   };
@@ -431,6 +445,7 @@ function demographicValidations(){
     PersonValidations.validationForIncarcerated(e);
     PersonValidations.validationForTobaccoUser(e);
     PersonValidations.validationForVlpDocuments(e);
+    PersonValidations.validationForContactMethod(e);
   });
 
   isApplyingCoverage("person");
