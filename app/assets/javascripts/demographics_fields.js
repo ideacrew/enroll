@@ -402,16 +402,15 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForContactMethod(e) {
-    if(document.getElementById("contact-method") !== null)
-    {
-      const isChecked = false;
-      $( "contact-method" ).each(function( index ){
-        if ( $('input[checked="checked"]')){
+    if( $(".contact-method").length ){
+      var isChecked = false;
+      $( ".contact-method input" ).each(function( i ,el ){
+        if($(el).prop("checked")){
           isChecked = true;
-        }
+        } 
       })
       if( isChecked == false ){
-        alert('Warning: Atleast one contact method must be selected.');
+        alert('Warning: At least one contact method must be selected.');
         PersonValidations.restoreRequiredAttributes(e);
       }
     }
