@@ -1,12 +1,11 @@
 require 'rails_helper'
-include Config::SiteHelper
 
 RSpec.describe UserMailer do
+  include Config::SiteHelper
   # Helps make sure it works for all clients
   def change_target_translation_text(translation_key, state_name, filename)
-    translations_to_seed = []
     seedfile_location = "db/seedfiles/translations/en/#{state_name}/#{filename}.rb"
-    require Rails.root.to_s + "/" + seedfile_location
+    require "#{Rails.root}/#{seedfile_location}"
     # Save the constant from the file
     "#{filename.upcase}_TRANSLATIONS".constantize.each do |key, value|
       Translation.where(key: key).first_or_create.update_attributes!(value: "\"#{value}\"") if key == translation_key
@@ -22,9 +21,9 @@ RSpec.describe UserMailer do
     person
   end
   describe 'generic_notice_alert' do
-    let(:hbx_id) { rand(10000 )}
+    let(:hbx_id) { rand(10_000)}
     let(:file){ Rails.root.join("spec","mailers","user_mailer_spec.rb").to_s }
-    let(:email){UserMailer.generic_notice_alert('john', hbx_id, 'john@dc.gov' , {"file_name" => file})}
+    let(:email){UserMailer.generic_notice_alert('john', hbx_id, 'john@dc.gov', {"file_name" => file})}
     let(:new_client_email){UserMailer.new_client_notification("agent@email.com", "Client", "Client New", "Consumer", "client@new.com", true)}
 
     it 'should not allow a reply' do
@@ -52,7 +51,7 @@ RSpec.describe UserMailer do
   end
 
   context "#account_transfer_success_notification" do
-    let(:account_transfer_email)do
+    let(:account_transfer_email) do
       UserMailer.account_transfer_success_notification(person, "johnanderson@fake.com")
     end
 
@@ -95,7 +94,7 @@ RSpec.describe UserMailer do
         site_short_name: site_short_name,
         site_broker_registration_guide: site_broker_registration_guide,
         site_producer_email_address: site_producer_email_address,
-        contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
         first_name: person_with_work_email.first_name,
         contact_center_short_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
         state_name: state_name,
