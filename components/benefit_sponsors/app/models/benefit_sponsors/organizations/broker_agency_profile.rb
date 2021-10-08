@@ -105,7 +105,10 @@ module BenefitSponsors
       end
 
       def language_options
-        LanguageList::COMMON_LANGUAGES
+        other_language_options = ["Kirundi", "Lingala", "Somali", "Swahili", "Khmer", "Tagalog"]
+        common_languages = LanguageList::COMMON_LANGUAGES.map {|lan| lan.common_name}
+        langs = other_language_options + common_languages
+        langs.sort
       end
 
       def languages
