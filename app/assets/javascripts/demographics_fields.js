@@ -402,8 +402,10 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForContactMethod(e) {
-    const isChecked = false;
-    $( "contact-method" ).each(function( index ){
+    if(document.getElementById("contact-method") !== null)
+    {
+      const isChecked = false;
+      $( "contact-method" ).each(function( index ){
         if ( $('input[checked="checked"]')){
           isChecked = true;
         }
@@ -413,6 +415,7 @@ var PersonValidations = (function(window, undefined) {
         PersonValidations.restoreRequiredAttributes(e);
       }
     }
+  }
 
   // explicitly return public methods when this object is instantiated
   return {
