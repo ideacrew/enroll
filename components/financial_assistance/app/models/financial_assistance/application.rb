@@ -102,6 +102,8 @@ module FinancialAssistance
 
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
+    # Account was transferred to medicaid service via atp
+    field :account_transferred, type: Boolean, default: false
 
     # Transfer ID of to be set if the application was transferred into Enroll via ATP
     field :transfer_id, type: String
@@ -317,7 +319,7 @@ module FinancialAssistance
     end
 
     def is_rt_transferrable?
-      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer)
+      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer) && self.account_transferred == false
       is_transferrable?
     end
 
