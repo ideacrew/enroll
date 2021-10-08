@@ -73,3 +73,6 @@ registry:
       - key: :curam_application_type
         item: "Curam"
         is_enabled: true
+      - key: :verification_reasons
+        item: ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+        is_enabled: true

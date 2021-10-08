@@ -75,3 +75,6 @@ registry:
       - key: :curam_application_type
         item: "State Medicaid Agency"
         is_enabled: true
+      - key: :verification_reasons
+        item: ["Document in EnrollApp", "Electronic data source", "State Medicaid Agency"]
+        is_enabled: true
