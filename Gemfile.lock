@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 95c2f79dc4b9fdf4b63a722ff6626acbe3e59853
+  revision: 2ef5f4430d223269fcb5c7e97706052120d20824
   branch: release_0.9.0
   specs:
     aca_entities (0.8.0)
@@ -18,11 +18,9 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
-      mongoid (~> 7.0.2)
       nokogiri-happymapper
       oj (~> 3.11)
       rbnacl (~> 7.1)
-      symmetric-encryption (= 3.9.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -62,7 +60,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/keycloak-client.git
-  revision: a6c721c395f6ad04a3a5bda395cd8c2205e9cde9
+  revision: b707685c41c91937143aa55eb032021936d4bc09
   branch: master
   specs:
     keycloak (3.2.2)
@@ -360,7 +358,8 @@ GEM
     builder (3.2.4)
     bunny (2.14.4)
       amq-protocol (~> 2.3, >= 2.3.0)
-    cable_ready (4.3.0)
+    byebug (11.1.3)
+    cable_ready (4.5.0)
       rails (>= 5.2)
       thread-local (>= 1.1.0)
     capistrano (3.16.0)
@@ -599,7 +598,7 @@ GEM
       faraday (~> 1.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
-    ffaker (2.19.0)
+    ffaker (2.20.0)
     ffi (1.9.25)
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
@@ -717,7 +716,7 @@ GEM
       monetize (~> 1.9.0)
       money (~> 6.13.2)
       railties (>= 3.0)
-    mongo (2.15.1)
+    mongo (2.16.0)
       bson (>= 4.8.2, < 5.0.0)
     mongo_session_store (3.2.1)
       actionpack (>= 4.0)
@@ -943,7 +942,7 @@ GEM
     rspec-support (3.10.2)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (1.22.0)
+    rubocop (1.22.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -1028,7 +1027,6 @@ GEM
       rake
       serverengine (~> 2.0.5)
       thor
-      thread (~> 0.1.7)
     spring (2.1.1)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -1064,7 +1062,6 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     test-prof (1.0.7)
     thor (1.1.0)
-    thread (0.1.7)
     thread-local (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
@@ -1134,7 +1131,7 @@ GEM
       yard (>= 0.8.4)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-19
 
 DEPENDENCIES
   aasm (~> 4.8)
@@ -1278,4 +1275,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.0.1
+   2.2.12

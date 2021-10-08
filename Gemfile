@@ -33,13 +33,8 @@ gem 'database_cleaner',       '~> 1.7'
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-<<<<<<< HEAD
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'release_0.9.0'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'release_0.5.5'
-=======
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'release_0.8.0'
-gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
->>>>>>> 5d4c63e195 (Update .docker to re-enable dev)
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
