@@ -28,7 +28,7 @@ module FinancialAssistance
     REQUEST_KINDS     = %w[].freeze
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
-    SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
+    SUBMITTED_STATUS = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
     CLOSED_STATUSES = %w[cancelled terminated].freeze
 
@@ -102,6 +102,9 @@ module FinancialAssistance
 
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
+
+    # Transfer ID of to be set if the application was transferred into Enroll via ATP
+    field :transfer_id, type: String
 
     field :has_mec_check_response, type: Boolean, default: false
 
@@ -1055,10 +1058,11 @@ module FinancialAssistance
     end
 
     def set_assistance_year
+      return unless assistance_year.blank?
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      ) if assistance_year.blank?
+      )
     end
 
     def set_effective_date

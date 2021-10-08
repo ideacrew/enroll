@@ -21,7 +21,8 @@ RSpec.describe FinancialAssistance::Validators::ApplicationContract,  dbclean: :
   end
   let(:optional_params) do
     {
-      is_ridp_verified: false, renewal_consent_through_year: 2020
+      is_ridp_verified: false, renewal_consent_through_year: 2020,
+      transfer_id: "tr123"
     }
   end
   let(:all_params) { required_params.merge(optional_params)}
