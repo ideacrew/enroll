@@ -136,5 +136,4 @@ volumes:
 
 networks:
   default:
-    external:
-      name: dev_vpc
+    name: dev_vpc

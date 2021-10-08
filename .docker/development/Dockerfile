@@ -23,7 +23,7 @@ RUN apt-get update \
   && apt-get -yq dist-upgrade \
   && apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev \
     libffi6 libreadline-dev zlibc libgdbm-dev libncurses-dev autoconf fontconfig unzip zip \
-    sshpass bzip2 libxrender1 libxext6 build-essential nodejs vim \
+    sshpass bzip2 libxrender1 libxext6 build-essential nodejs vim libsodium18 \
   && apt-get autoremove -y
 
 ENV GEM_HOME="/usr/local/bundle"
