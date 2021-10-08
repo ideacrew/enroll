@@ -417,14 +417,14 @@ var PersonValidations = (function(window, undefined) {
 
       if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-email").prop('checked') ){
         if( !$("#person_emails_attributes_0_address").val() ){
-          alert("Please enter personal email address");
+          alert("You must enter an email address to receive notices and updates by email.");
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
       if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
-        if( !$("#person_phones_attributes_1_full_phone_number").val() ){
-          alert("Please enter mobile phone number");
+        if( !$("#person_phones_attributes_0_full_phone_number").val() ){
+          alert("ou must enter a mobile phone number to receive notices and updates by text.");
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
