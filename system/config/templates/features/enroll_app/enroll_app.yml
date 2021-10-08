@@ -290,7 +290,7 @@ registry:
                     {"2022-03-01": '2022,2,14'},
                   ]
           - key: :default_percentage
-            item: 100
+            item: 85
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
