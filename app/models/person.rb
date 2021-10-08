@@ -20,7 +20,6 @@ class Person
   include CrmGateway::PersonConcern
   include L10nHelper
 
-
   # verification history tracking
   include Mongoid::History::Trackable
 
@@ -1299,11 +1298,11 @@ class Person
                                    end
     welcome_body = l10n(
       welcome_body_translation_key,
-      site_short_name: site_short_name,
-      state_name: site_state_name,
+      site_short_name: EnrollRegistry[:enroll_app].settings(:short_name).item,
+      state_name: EnrollRegistry[:enroll_app].setting(:state_name).item,
       contact_center_short_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
-      contact_center_tty_number: contact_center_tty_number,
-      contact_center_name: contact_center_name
+      contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
+      contact_center_name: EnrollRegistry[:enroll_app].settings(:contact_center_name).item
     ).html_safe
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
