@@ -5,7 +5,6 @@
 Devise.setup do |config|
   # custom path for expired warden sessions
   require "custom_failure_app"
-  include L10nHelper
 
   config.warden do |manager|
     manager.failure_app = CustomFailureApp
