@@ -648,7 +648,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
           it "should get default selected_aptc_pct" do
             percentage = EnrollRegistry[:enroll_app].setting(:default_percentage).item
-            expect(assigns(:elected_aptc)).to eq (111*percentage) / 100
+            expect(assigns(:elected_aptc)).to eq (111 * percentage) / 100
           end
         end
 
