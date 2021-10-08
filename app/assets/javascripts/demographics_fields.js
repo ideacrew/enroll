@@ -414,6 +414,20 @@ var PersonValidations = (function(window, undefined) {
         alert('Warning: You must select at least one contact method.');
         PersonValidations.restoreRequiredAttributes(e);
       }
+
+      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-email").prop('checked') ){
+        if( !$("#person_emails_attributes_0_address").val() ){
+          alert("Please enter personal email address");
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+      }
+
+      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
+        if( !$("#person_phones_attributes_1_full_phone_number").val() ){
+          alert("Please enter mobile phone number");
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+      }
     }
   }
 
