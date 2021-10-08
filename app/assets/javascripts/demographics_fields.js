@@ -401,6 +401,7 @@ var PersonValidations = (function(window, undefined) {
     }
   }
 
+  // client specific feature for ME, validates that a contact method is selected
   function validationForContactMethod(e) {
     if( $(".contact-method").length ){
       var isChecked = false;
@@ -410,7 +411,7 @@ var PersonValidations = (function(window, undefined) {
         } 
       })
       if( isChecked == false ){
-        alert('Warning: At least one contact method must be selected.');
+        alert('Warning: You must select at least one contact method.');
         PersonValidations.restoreRequiredAttributes(e);
       }
     }
