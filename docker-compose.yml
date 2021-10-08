@@ -1,7 +1,7 @@
 version: "3.4"
 services:
   enroll:
-    image: enroll:release_21.10.4
+    image: enroll:release_21.10.18
     build:
       context: .
       dockerfile: ./.docker/development/Dockerfile
@@ -97,7 +97,7 @@ services:
   amqp:
     build:
       context: .
-      dockerfile: ./.docker/development/Dockerfile.rabbitmq-orig
+      dockerfile: ./.docker/development/rabbitmq/Dockerfile
       args:
         - HBX_ID=${HBX_ID:-dc0}
         - ENV_NAME=${ENV_NAME:-dev}
@@ -117,7 +117,7 @@ services:
       - 15672:15672
 
   redis:
-    build: ./.docker/redis
+    build: ./.docker/development/redis
     container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
