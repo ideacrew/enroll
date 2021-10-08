@@ -38,7 +38,14 @@ module FinancialAssistance
             Failure("Unable to find Family with ID #{application.family_id}.")
           end
 
+          def send_account_transfer_email(family)
+            primary_person = family.primary_person
+            email_address = primary_person.emails.first.address
+            UserMailer.send_account_transfer_email(primary_person, email_address).deliver_now
+          end
+
           def construct_payload(application, family)
+            send_account_transfer_email(family)
             response_hash = {}
             response_hash[:family_identifier] = family.hbx_assigned_id.to_s
             response_hash[:application_identifier] = application.hbx_id
