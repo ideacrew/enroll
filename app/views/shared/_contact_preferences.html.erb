@@ -14,7 +14,7 @@
             <%= person_role.select :contact_method, options_for_select([["Only paper communication", "Only Paper communication"], ["Only electronic communications", "Only Electronic communications"], [ "Both electronic and paper communications", "Paper and Electronic communications"]], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
           <% else %>
             <% ["Email", "Mail", "Text"].each do |type| %>
-              <span style="margin: 0 5px"><%= person_role.check_box(:contact_method, {checked: contact_preferences_mapping[person_role.object.contact_method].to_a.include?(type), multiple: true }, type, nil) %>&nbsp;<%= type%></span>
+              <span class="contact-method" style="margin: 0 5px"><%= person_role.check_box(:contact_method, {checked: contact_preferences_mapping[person_role.object.contact_method].to_a.include?(type), multiple: true }, type, nil) %>&nbsp;<%= type%></span>
             <% end %>
           <% end%>
           </div>
