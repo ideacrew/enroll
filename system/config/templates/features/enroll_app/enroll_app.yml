@@ -369,111 +369,111 @@ registry:
           - key: :carriers_long_name
             item: 'Kaiser Permanente'
       - key: :delta_dental_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Delta Dental'
       - key: :dentegra_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Dentegra'
       - key: :dominion_national_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Dominion National'
       - key: :best_life_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'BEST Life'
       - key: :metlife_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'MetLife'
       - key: :carefirst_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'CareFirst'
       - key: :aetna_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Aetna'
       - key: :unitedhealthcare_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'UnitedHealthcare'
       - key: :northeast_delta_dental_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Northeast Delta Dental'
       - key: :anthem_blue_cross_and_blue_shield_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Anthem Blue Cross and Blue Shield'
       - key: :harvard_pilgrim_health_care_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Harvard Pilgrim Health Care'
       - key: :community_health_options_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Community Health Options'
   - namespace:
