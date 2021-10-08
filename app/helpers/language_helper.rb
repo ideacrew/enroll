@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# module collects languages used in EA
 module LanguageHelper
   ALL_LANGUAGES = [
     ["Afrikaans", "af"], ["Arabic", "ar"], ["Bengali", "bn"],
@@ -20,7 +21,7 @@ module LanguageHelper
     ["Samoan", "sm"], ["Somali", "so"], ["Spanish", "es"], ["Albanian", "sq"],
     ["Serbian", "sr"], ["Swahili", "sw"], ["Swedish", "sv"], ["Tamil", "ta"],
     ["Tatar", "tt"], ["Telugu", "te"], ["Thai", "th"], ["Tagalog", "tl"],
-    ["Tonga (Tonga Islands)", "to"], ["Turkish", "tr"], ["Ukrainian", "uk"], 
+    ["Tonga (Tonga Islands)", "to"], ["Turkish", "tr"], ["Ukrainian", "uk"],
     ["Urdu", "ur"], ["Uzbek", "uz"], ["Vietnamese", "vi"], ["Xhosa", "xh"], ["Chinese", "zh"]
   ].freeze
 
