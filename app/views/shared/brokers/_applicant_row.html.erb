@@ -8,6 +8,7 @@
 
 <% if broker_role.broker_agency_profile %>
 <tr>
+  <td><%= applicant.hbx_id %></td>
   <td>
     <%= link_to applicant.full_name, edit_path, class: "interaction-click-control-broker-show", method: :get,
     remote: false %>

@@ -5,6 +5,7 @@ class BrokerRole
   include AASM
   include Acapi::Notifiers
   include Mongoid::History::Trackable
+  include L10nHelper
 
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
@@ -55,12 +56,10 @@ class BrokerRole
   after_initialize :initial_transition
 
   validates_presence_of :npn, :provider_kind
+  validates_uniqueness_of :npn
+  validates_length_of :npn, :in => 1..10, :allow_blank => false
+  validate :npn_format
 
-  validates :npn,
-    numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },
-    uniqueness: true,
-    allow_blank: false
 
   validates :provider_kind,
     allow_blank: false,
@@ -347,6 +346,22 @@ class BrokerRole
 
 
   private
+
+  def npn_format
+    return unless npn.present?
+    valid_format = if EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn)
+                     ('a'..'z').to_a + ('A'..'Z').to_a + (0..9).to_a.map(&:to_s)
+                   else
+                     (0..9).to_a.map(&:to_s)
+                   end
+    npn_chars = npn.split("")
+    invalid_npn_chars_present = npn_chars.any? { |ch| !ch.in?(valid_format) }
+    return unless invalid_npn_chars_present
+    errors.add(
+      :npn,
+      l10n("broker_agencies.profiles.npn_alphanumeric_error")
+    )
+  end
 
   def is_primary_broker?
     return false unless broker_agency_profile

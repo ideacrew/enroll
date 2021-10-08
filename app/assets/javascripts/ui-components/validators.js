@@ -38,6 +38,20 @@ function isNumberKey(evt){
   }
 }
 
+// Prevents non alphanumeric characters from being typed
+function isAlphaNumeric(event) {
+  var character = String.fromCharCode(event.keyCode);
+  const alpha = Array.from(Array(26)).map((e, i) => i + 65);
+  const alphabet = alpha.map((x) => String.fromCharCode(x));
+  var number_regex = /^\d+$/;
+  var char_uppercase = character.toUpperCase();
+  if (number_regex.test(character) == true || alphabet.includes(char_uppercase) == true) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // Formats dates for Benefit Applications
 function getFormattedDate(date){
   var new_date = new Date(date)
