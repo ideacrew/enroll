@@ -29,10 +29,9 @@ module Operations
       def call(params)
         values = yield validate(params)
         _token_proc = yield cookie_token(values)
-        keycloak_attrs = yield create(values)
-        account_attrs = yield map_attributes(keycloak_attrs)
+        account = yield create(values)
 
-        Success(account_attrs)
+        Success(account)
       end
 
       private
@@ -71,34 +70,31 @@ module Operations
             args[:email],
             args[:first_name],
             args[:last_name],
-            [],
-            ['Public'],
+            args[:realm_roles] || [], # realm roles
+            [], # client roles
             after_insert
           )
         end.to_result.bind do |response|
-          response['new_user'] ? Success(response) : Failure(response)
+          if response['new_user']
+            Success(map_attributes(response))
+          else
+            Failure(map_attributes(response))
+          end
         end
       end
+
       # rubocop:enable Style/MultilineBlockChain
 
-      def map_attributes(keycloak_attrs)
-        account_attrs = {
-          id: keycloak_attrs['user']['id'],
-          username: keycloak_attrs['user']['username'],
-          enabled: keycloak_attrs['user']['enabled'],
-          totp: keycloak_attrs['user']['totp'],
-          email: keycloak_attrs['user']['email'],
-          email_verified: keycloak_attrs['user']['emailVerified'],
-          access: keycloak_attrs['user']['access'],
-          first_name: keycloak_attrs['user']['firstName'],
-          last_name: keycloak_attrs['user']['lastName'],
-          attributes: keycloak_attrs['user']['attributes'] || {},
-          groups: keycloak_attrs['user']['groups'] || [],
-          not_before: keycloak_attrs['user']['notBefore'],
-          created_at: epoch_to_time(keycloak_attrs['user']['createdTimestamp'])
-        }
-
-        Success(account_attrs)
+      def map_attributes(attributes)
+        attributes.reduce({}) do |map, (k, v)|
+          if v.is_a? Hash
+            map.merge!(k.underscore.to_sym => map_attributes(v))
+          elsif k == 'createdTimestamp'
+            map.merge!(created_at: epoch_to_time(v))
+          else
+            map.merge!(k.underscore.to_sym => v)
+          end
+        end
       end
 
       def epoch_to_time(value)

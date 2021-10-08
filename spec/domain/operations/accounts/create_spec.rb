@@ -16,9 +16,7 @@ RSpec.describe Operations::Accounts::Create, type: :request do
   end
 
   context 'Creating a Keycloak Account' do
-
     context 'Given valid parameters for a new user' do
-
       let(:username) { 'ironman' }
       let(:password) { '$3cr3tP@55w0rd' }
       let(:email) { 'tony.stark@avengers.org' }
@@ -41,9 +39,9 @@ RSpec.describe Operations::Accounts::Create, type: :request do
         response = subject.call(account: account)
 
         expect(response.success?).to be_truthy
-        expect(response.success[:username]).to eq account[:username]
-        expect(response.success[:email]).to eq account[:email]
-        expect(response.success[:created_at]).to be_a Time
+        expect(response.success[:user][:username]).to eq account[:username]
+        expect(response.success[:user][:email]).to eq account[:email]
+        expect(response.success[:user][:created_at]).to be_a Time
       end
     end
   end

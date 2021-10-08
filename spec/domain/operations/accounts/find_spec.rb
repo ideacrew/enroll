@@ -27,7 +27,7 @@ RSpec.describe Operations::Accounts::Find, type: :request do
     end
 
     before { target_account }
-    after { Operations::Accounts::Delete.new.call(username: username) }
+    after { Operations::Accounts::Delete.new.call(login: username) }
 
     context 'it should find an account by user login' do
       it 'should find the account' do
