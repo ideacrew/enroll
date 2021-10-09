@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 9cbb9930bc6ac0fe4bd7cde2d38631e15009f07a
+  revision: 359a687d2c57736cbd31434c4476bdbdf2cd73bd
   branch: mcr_enrollment_fix
   specs:
     aca_entities (0.8.0)
@@ -20,7 +20,6 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
-      rbnacl (~> 7.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -735,7 +734,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.8)
+    oj (3.13.9)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
@@ -808,8 +807,6 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rbnacl (7.1.1)
-      ffi
     rdoc (6.2.1)
     recaptcha (4.14.0)
       json

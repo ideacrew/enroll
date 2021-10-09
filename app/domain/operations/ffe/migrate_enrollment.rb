@@ -16,14 +16,14 @@ module Operations
       # @return [ Hash ] enrollment_hash
       # api public
 
-      attr_reader :payload, :policy_tracking_id, :sanitized_hash
+      attr_reader :payload, :policy_tracking_id, :sanitized_hash, :enrollment_hash
 
       def call(payload)
         @payload = payload
         @policy_tracking_id = payload[:policyTrackingNumber]
 
         _migrated = yield existing_policy
-        _dont_migrate = yield renaissance_dental
+        _transformed = yield transform
         enrollment_id = yield import_enrollment
 
         Success("#{policy_tracking_id} -- #{enrollment_id}")
@@ -34,30 +34,70 @@ module Operations
       private
 
       def existing_policy
-        result = Operations::HbxEnrollments::Find.new.call({external_id: policy_tracking_id })
-        result.success? ? Failure("Enrollment already migrated: #{policy_tracking_id}") : Success(policy_tracking_id)
+        Rails.cache.fetch("enrollment_#{policy_tracking_id}", expires_in: 12.hour) do
+          result = Operations::HbxEnrollments::Find.new.call({external_id: policy_tracking_id })
+          result.success? ? Failure("Enrollment already migrated: #{policy_tracking_id}") : Success(policy_tracking_id)
+        end
       end
 
-      def renaissance_dental
-        renaissance_policy = payload[:issuerName] == "Renaissance Dental"
-        renaissance_policy ? Failure("Renaissance Dental: #{policy_tracking_id}") : Success(policy_tracking_id)
+      def transform
+        transform_payload = ::AcaEntities::FFE::Operations::McrTo::Enrollment.new.call(payload)
+        if transform_payload.success?
+          @enrollment_hash = transform_payload.success.to_h.deep_stringify_keys!
+          Success(policy_tracking_id)
+        else
+          Failure("Transform Failure: Operations::Ffe::MigrateEnrollment: #{policy_tracking_id}: #{transform_payload.failure}")
+        end
       end
 
       def import_enrollment
-        transform_payload = ::AcaEntities::FFE::Operations::McrTo::Enrollment.new.call(payload)
-
-        if transform_payload.success?
-          enrollment_hash = transform_payload.success.to_h.deep_stringify_keys!
-        else
-          puts "Transform Failure: Operations::Ffe::MigrateEnrollment: #{policy_tracking_id}: #{transform_payload.failure}"
-          return Failure("Transform Failure: Operations::Ffe::MigrateEnrollment: #{policy_tracking_id}: #{transform_payload.failure}")
-        end
+        return Success(policy_tracking_id) if skip_enrollment_migration
 
         @sanitized_hash = sanitize_enrollment_hash(enrollment_hash)
-
         enrollment = create_hbx_enrollment
         print "."
         Success(enrollment.hbx_id)
+      end
+
+      def skip_enrollment_migration
+        return_success_case1 || return_success_case2 || return_success_case3
+      end
+
+      def renaissance_dental
+        payload[:issuerName] == "Renaissance Dental"
+      end
+
+      def return_success_case1
+        renaissance_dental
+      end
+
+      def applications_not_migrated
+        ["3653661530", "3653835451", "3655103341", "3654647425", "3655199651", "3655050863", "3655446385",
+         "3655845985", "3655473710", "3655221287", "3656379459", "3655195010", "3656281232", "3656308100",
+         "3654881326", "3679195400", "3655508494", "3656101873", "3694631216", "3691339160", "3699716118",
+         "3655320635", "3654199812", "3655481814", "3654189404", "4061853917", "3656064729", "3656240817",
+         "3656394545", "3653836120", "3887243470", "3656824321", "3996525167", "3763371082", "3655120315",
+         "3655429746", "3654370357", "3655797066", "3656791057", "4023970705", "3809789830", "3655485373",
+         "3654478431", "3654354357", "3654587217", "3654935600", "3655737145", "3764290138", "3654265734",
+         "3796431048", "3655895410", "3655646562", "3655967545", "3655656463", "3656865574", "3656327410",
+         "3725241030", "3883632840", "4013177626"]
+      end
+
+      def return_success_case2
+        enrollment_hash["aasm_state"] != "coverage_selected" && applications_not_migrated.include?(enrollment_hash["family_hbx_id"])
+      end
+
+      def return_success_case3
+        enrollment_hash["hbx_enrollment_members"] = enrollment_members
+        enrollment_hash["hbx_enrollment_members"].nil?
+      end
+
+      def enrollment_members
+        family = find_family(enrollment_hash["family_hbx_id"])
+        if enrollment_hash["aasm_state"] != "coverage_selected"
+          return sanitize_enrollment_member_hash(family, enrollment_hash["hbx_enrollment_members"]) rescue nil
+        end
+        sanitize_enrollment_member_hash(family, enrollment_hash["hbx_enrollment_members"])
       end
 
       def sanitize_enrollment_hash(hash)
@@ -113,49 +153,100 @@ module Operations
         hash["created_at"] = hash["timestamp"]["created_at"]
         hash.delete("timestamp")
 
-        hash["hbx_enrollment_members"] = sanitize_enrollment_member_hash(family, hash["hbx_enrollment_members"])
         hash
       end
 
-      def find_benefit_coverage_period(effective_on)
-        sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
-        sponsorship.benefit_coverage_periods.detect{ |bcp| bcp.start_on ==  effective_on.beginning_of_year }
-      end
-
       def sanitize_enrollment_member_hash(family, member_hash)
-        member_hash.inject([]) do |members, m_hash|
-          applicant = find_family_member(family, m_hash["family_member_reference"])
+        eliigble_members = member_hash.reject {|mem|  mem["coverage_end_on"] == mem["coverage_start_on"]}
+        eliigble_members.inject([]) do |members, m_hash|
+          applicant = find_family_member(family, m_hash)
           m_hash["applicant_id"] = applicant.id
+          m_hash["coverage_end_on"] = nil
           m_hash.delete("family_member_reference")
           members << m_hash
         end
       end
 
-      def find_family(external_id)
-        result = Operations::Families::Find.new.call(external_app_id: external_id)
-        result.success? ? result.success : result
+      def find_benefit_coverage_period(effective_on)
+        Rails.cache.fetch("benefit_coverage_period_2021", expires_in: 12.hour) do
+          sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
+          sponsorship.benefit_coverage_periods.detect{ |bcp| bcp.start_on ==  effective_on.beginning_of_year }
+        end
       end
 
-      def find_family_member(family, fm_hash)
-        external_person_id = fm_hash["person_hbx_id"]
-        person = Person.where(external_person_id: external_person_id).first
-        family_member = family.family_members.active.detect { |fam| fam.person_id == person.id}
+      def find_family(external_id)
+        Rails.cache.fetch("family_#{external_id}", expires_in: 12.hour) do
+          result = Operations::Families::Find.new.call(external_app_id: external_id)
+          if result.success?
+            result.success
+          else
+            raise "family not found"
+          end
+        end
+      end
+
+      def find_family_member(family, m_hash)
+        fm_hash = m_hash["family_member_reference"]
+        family_member = family.family_members.active.detect do |mem|
+          ssn_dob_match?(mem.person, fm_hash) || info_match?(mem.person,fm_hash) || ext_id_match?(mem.person, fm_hash)
+        end
+
+        unless family_member
+          raise "family member not found"
+        end
 
         coverage_household = family.active_household.immediate_family_coverage_household
         unless coverage_household.coverage_household_members.any? {|c_mem| c_mem.family_member_id == family_member.id}
           raise "coverage household not found"
         else
+          family_member.person.update_attribute(:is_tobacco_user, m_hash["tobacco_use"])
           family_member
         end
       end
 
+      def ssn_dob_match?(person, fm_hash)
+        fm_hash["ssn"] &&
+        fm_hash["dob"] &&
+        person.ssn == fm_hash["ssn"] &&
+        person.dob == fm_hash["dob"]
+      end
+
+      def info_match?(person,fm_hash)
+        fm_hash["last_name"].downcase.strip == person.last_name.downcase.strip &&
+        fm_hash["first_name"].downcase.strip == person.first_name.downcase.strip &&
+        fm_hash["dob"] == person.dob
+      end
+
+      def ext_id_match?(person, fm_hash)
+        person.id == person_by_external_id(fm_hash).id
+      end
+
+      def person_by_external_id(fm_hash)
+        Rails.cache.fetch("person_#{fm_hash["person_hbx_id"]}", expires_in: 12.hour) do
+          people = Person.where(external_person_id: fm_hash["person_hbx_id"])
+          if people.count > 1
+            raise "more than one person found"
+          end
+
+          people.first
+        end
+      end
+
       def find_product(product_hash, year)
-        result = Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
-        result.success? ? result.success : result
+        Rails.cache.fetch("product_#{product_hash["hios_id"]}", expires_in: 12.hour) do
+          result = Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
+          if result.success?
+            result.success
+          else
+            raise "product not found"
+          end
+        end
       end
 
       def rating_area(rating_area_code)
-        BenefitMarkets::Locations::RatingArea.where(exchange_provided_code: "R-#{rating_area_code}", active_year: '2021').first
+        Rails.cache.fetch("rating_area_R-#{rating_area_code}", expires_in: 12.hour) do
+          BenefitMarkets::Locations::RatingArea.where(exchange_provided_code: "R-#{rating_area_code}", active_year: '2021').first
+        end
       end
 
       def create_hbx_enrollment
@@ -216,6 +307,7 @@ module Operations
       def create_state_transition(enrollment)
         enrollment.workflow_state_transitions << WorkflowStateTransition.new(
           from_state: "shopping",
+          comment:"external enrollments",
           to_state: enrollment.aasm_state
         )
       end
