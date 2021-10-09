@@ -28,6 +28,7 @@ ENV GEM_HOME="/usr/local/bundle"
 ENV LANG=C.UTF-8 \
   BUNDLE_JOBS=4 \
   BUNDLE_RETRY=3 \
+  BUNDLER_VERSION=2.2.29 \
   BUNDLE_PATH=$GEM_HOME
 ENV BUNDLE_BIN=$BUNDLE_PATH/bin
 
@@ -39,12 +40,14 @@ ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
 COPY . $HOME
 
 # RUN gem install bundler -v "<2" -N
-# RUN cd $HOME \
-#   && gem install --source "https://rubygems.org" bundler --version '2.2.24' \
-#   && bundle update --bundler \
-#   && bundle install && bundle binstubs bundler
+# && gem install --source "https://rubygems.org" bundler --version '1.16.6' \
+# && gem install --source "https://rubygems.org" bundler --version '2.2.29' \
+RUN cd $HOME \
+  && gem install bundler \
+  && bundle install \
+  && bundle binstubs bundler
 
-# RUN cd $HOME && yarn install --check-files
+RUN cd $HOME && yarn install --check-files
 
 RUN unset BUNDLE_PATH
 RUN unset BUNDLE_BIN
