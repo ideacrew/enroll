@@ -97,8 +97,8 @@ services:
 
   amqp:
     build:
-      context: .
-      dockerfile: ./.docker/development/rabbitmq/Dockerfile
+      context: ./.docker/development/rabbitmq
+      dockerfile: Dockerfile
       args:
         - HBX_ID=${HBX_ID:-dc0}
         - ENV_NAME=${ENV_NAME:-dev}
