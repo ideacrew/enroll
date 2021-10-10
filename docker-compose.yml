@@ -38,38 +38,39 @@ services:
       - ACAPI_BROKER_HOST=${ACAPI_BROKER_HOST:-amqp}
       - ACAPI_BROKER_PORT=${ACAPI_BROKER_PORT:-5672}
       - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@amqp:5672}
-    command: bash -c "rm -f tmp/pids/server.pid && mkdir -p tmp/pids && yarn install --check-files && bundle install && bundle exec puma -C config/puma.rb"
+    command: bash -c "rm -rf tmp/pids/server.pid && mkdir -p tmp/pids && bundle exec bundle install &&  bin/rails server --port 3000 --binding 0.0.0.0"
+    # command: bash -c "rm -f tmp/pids/server.pid && mkdir -p tmp/pids && yarn install --check-files && bundle install && bundle exec puma -C config/puma.rb"
 
-  remote_event_listener:
-    image: enroll_event_listener
-    container_name: enroll_event_listener_local
-    ports:
-      - 3000
-    depends_on:
-      - mongodb
-    volumes:
-      - .:/enroll:cached
-      - bundle:/bundle
-      - node_modules:/enroll/node_modules
-    environment:
-      - RAILS_ENV=${RAILS_ENV:-development}
-      - DB_DATABASE=enroll_development
-      - DB_USERNAME=enroll
-      - DB_PASSWORD=enroll_local
-      - DB_HOST=db
-      - DB_PORT=27017
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-AKIA123456789}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-AbcD987654321}
-      - AWS_REGION=${AWS_REGION:-us-east-1}
-      - AWS_S3_ROOT_NAMESPACE=${AWS_S3_ROOT_NAMESPACE:-root_bucket}
-      - AWS_BUCKET_ROOT_NAMESPACE=${AWS_BUCKET_ROOT_NAMESPACE:-root_bucket}
-      - ACTION_MAILER_HOST=${ACTION_MAILER_HOST:-localhost}
-      - HBX_ID=${HBX_ID:-dc0}
-      - ENV_NAME=${ENV_NAME:-dev}
-      - ACAPI_BROKER_HOST=${ACAPI_BROKER_HOST:-amqp}
-      - ACAPI_BROKER_PORT=${ACAPI_BROKER_PORT:-5672}
-      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@amqp:5672}
-    command: bash -c "rm -f tmp/pids/server.pid && mkdir -p tmp/pids && yarn install --check-files && bundle install && bundle exec rails runner script/remote_event_listener.rb"
+  # remote_event_listener:
+  #   image: enroll_event_listener
+  #   container_name: enroll_event_listener_local
+  #   ports:
+  #     - 3000
+  #   depends_on:
+  #     - mongodb
+  #   volumes:
+  #     - .:/enroll:cached
+  #     - bundle:/bundle
+  #     - node_modules:/enroll/node_modules
+  #   environment:
+  #     - RAILS_ENV=${RAILS_ENV:-development}
+  #     - DB_DATABASE=enroll_development
+  #     - DB_USERNAME=enroll
+  #     - DB_PASSWORD=enroll_local
+  #     - DB_HOST=db
+  #     - DB_PORT=27017
+  #     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-AKIA123456789}
+  #     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-AbcD987654321}
+  #     - AWS_REGION=${AWS_REGION:-us-east-1}
+  #     - AWS_S3_ROOT_NAMESPACE=${AWS_S3_ROOT_NAMESPACE:-root_bucket}
+  #     - AWS_BUCKET_ROOT_NAMESPACE=${AWS_BUCKET_ROOT_NAMESPACE:-root_bucket}
+  #     - ACTION_MAILER_HOST=${ACTION_MAILER_HOST:-localhost}
+  #     - HBX_ID=${HBX_ID:-dc0}
+  #     - ENV_NAME=${ENV_NAME:-dev}
+  #     - ACAPI_BROKER_HOST=${ACAPI_BROKER_HOST:-amqp}
+  #     - ACAPI_BROKER_PORT=${ACAPI_BROKER_PORT:-5672}
+  #     - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@amqp:5672}
+  #   command: bash -c "rm -f tmp/pids/server.pid && mkdir -p tmp/pids && yarn install --check-files && bundle install && bundle exec rails runner script/remote_event_listener.rb"
 
   mongodb:
     image: mongo:4.2
