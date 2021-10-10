@@ -2,6 +2,7 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
+require "#{Rails.root}/app/mailers/user_mailer"
 
 module FinancialAssistance
   module Operations
@@ -38,7 +39,14 @@ module FinancialAssistance
             Failure("Unable to find Family with ID #{application.family_id}.")
           end
 
+          def send_successful_account_transfer_email(family)
+            primary_person = family.primary_person
+            email_address = primary_person.emails.first.address
+            UserMailer.account_transfer_success_notification(primary_person, email_address).deliver_now
+          end
+
           def construct_payload(application, family)
+            send_successful_account_transfer_email(family)
             response_hash = {}
             response_hash[:family_identifier] = family.hbx_assigned_id.to_s
             response_hash[:application_identifier] = application.hbx_id
