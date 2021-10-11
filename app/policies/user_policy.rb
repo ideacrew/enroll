@@ -14,7 +14,7 @@ class UserPolicy < ApplicationPolicy
 
   def change_username_and_email?
     return false unless role = user.person && user.person.hbx_staff_role
-    role.permission.can_view_username_and_email
+    role.permission.can_change_username_and_email
   end
 
   def view_login_history?

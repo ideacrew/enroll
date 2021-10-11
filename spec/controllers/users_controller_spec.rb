@@ -63,7 +63,8 @@ describe UsersController, dbclean: :after_each do
       end
       it "doesn't render the change username form" do
         get :change_username_and_email, params: { id: user_id }, format: :js
-        expect(response.code).to eq "403"
+        expect(flash[:alert]).to be_present
+        expect(flash[:alert]).to include('You are not authorized for this action.')
       end
     end
   end
