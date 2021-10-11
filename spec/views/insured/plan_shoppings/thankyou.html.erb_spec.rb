@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
-  include TranslationSpecHelper
+
   context "shop enrollment" do
     let(:employee_role){FactoryBot.create(:employee_role)}
     let(:plan) do
@@ -41,7 +41,6 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
 
     before :each do
       assign(:plan, plan)
-      allow(hbx_enrollment.product).to receive(:total_premium).and_return(1)
       assign(:enrollment, hbx_enrollment)
       assign(:person, employee_role.person)
       assign(:member_group, member_group)
@@ -49,7 +48,6 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
     #  allow(@enrollment).to receive(:is_shop?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, can_access_progress?: true))
-      EnrollRegistry[:extended_aptc_individual_agreement_message].feature.stub(:is_enabled).and_return(false)
     end
 
     it 'should display the correct plan selection text' do
@@ -73,65 +71,6 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
-    end
-  end
-
-  context "extended individual agreement" do
-    let(:consumer_role) { FactoryBot.create(:consumer_role) }
-    let(:hbx_enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        kind: "individual",
-                        product: product,
-                        household: family.latest_household,
-                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
-                        enrollment_kind: "open_enrollment",
-                        family: family,
-                        aasm_state: 'coverage_selected',
-                        consumer_role: consumer_role,
-                        enrollment_signature: true)
-    end
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_role.person) }
-    let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    let(:plan_decorator) do
-      double(
-        "PlanCostDecorator",
-        title: product.title,
-        premium_for: double("premium_for"),
-        employer_contribution_for: double("employer_contribution_for"),
-        employee_cost_for: double("employee_cost_for"),
-        total_premium: double("total_premium"),
-        total_employer_contribution: double("total_employer_contribution"),
-        total_employee_cost: double("total_employee_cost"),
-        issuer_profile: double(legal_name: "carefirst"),
-        metal_level: "Silver",
-        coverage_kind: "health",
-        kind: "health",
-        name: product.name,
-        metal_level_kind: '',
-        total_premium_amount: 1,
-        total_aptc_amount: 1,
-        id: product.id
-      )
-    end
-
-    before :each do
-      allow(hbx_enrollment).to receive(:elected_aptc_pct).and_return(1)
-      assign(:plan, plan_decorator)
-      allow(product).to receive(:issuer_profile).and_return(carrier_profile)
-      allow(hbx_enrollment).to receive(:product).and_return(product)
-
-      assign(:enrollment, hbx_enrollment)
-      assign(:person, consumer_role.person)
-      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, can_access_progress?: true))
-      EnrollRegistry[:extended_aptc_individual_agreement_message].feature.stub(:is_enabled).and_return(true)
-      change_target_translation_text("en.insured.individual_agreement_non_aptc", "me", "user_mailer")
-    end
-
-    it 'should show the proper translation' do
-      render :template => "insured/plan_shoppings/thankyou.html.erb"
-      expect(rendered).to match("I must file a federal income tax return")
     end
   end
 =begin
