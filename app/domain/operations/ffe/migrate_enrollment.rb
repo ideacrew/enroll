@@ -94,17 +94,17 @@ module Operations
       end
 
       def validate_enrollment_members
-
-        if enrollment_members.blank?
+        members = enrollment_hash["hbx_enrollment_members"]
+        if members.blank?
           raise "no enrollment member"
         end
 
-        if enrollment_members.any? { |mem| mem["applicant_id"].nil? }
+        if members.any? { |mem| mem["applicant_id"].nil? }
           raise "family member not found"
         end
 
         coverage_household = family.active_household.immediate_family_coverage_household
-        enrollment_members.each do |mem|
+        members.each do |mem|
           unless coverage_household.coverage_household_members.any? { |c_mem| c_mem.family_member_id == mem["applicant_id"] }
             raise "coverage household not found"
           end
