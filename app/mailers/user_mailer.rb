@@ -216,4 +216,10 @@ class UserMailer < ApplicationMailer
       end
     end
   end
+
+  def account_transfer_success_notification(person, email_address)
+    mail({to: email_address, subject: "Action needed to get covered on #{site_short_name}"}) do |format|
+      format.html { render "account_transfer_success_notification", :locals => { :person_name => person.full_name }}
+    end
+  end
 end

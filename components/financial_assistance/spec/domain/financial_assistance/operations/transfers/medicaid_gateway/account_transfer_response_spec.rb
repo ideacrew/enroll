@@ -17,6 +17,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     context 'with valid transfer id' do
       before do
         family = FactoryBot.create(:family, :with_primary_family_member)
+        family.primary_person.emails.create(kind: "home", address: "fakeemail@email.com")
         application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
         @expected_response =
           {
