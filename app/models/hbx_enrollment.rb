@@ -345,9 +345,20 @@ class HbxEnrollment
     where(
       :family_id => family.id,
       :aasm_state => "coverage_canceled",
+      :external_enrollment => false,
       :product_id.nin => [nil]
     ).order(
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+    )
+  end
+  scope :family_home_page_hidden_external_enrollments, ->(family) do
+    where(
+        :family_id => family.id,
+        :aasm_state.nin => ["shopping"],
+        :external_enrollment => true,
+        :product_id.nin => [nil]
+    ).order(
+        effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
@@ -1547,6 +1558,11 @@ class HbxEnrollment
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
+  def self.family_external_enrollments(family)
+    external_enrollments = HbxEnrollment.family_home_page_hidden_external_enrollments(family)
+    external_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
