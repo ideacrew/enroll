@@ -16,7 +16,7 @@ module Operations
       # @return [ Hash ] enrollment_hash
       # api public
 
-      attr_reader :payload, :policy_tracking_id, :sanitized_hash, :enrollment_hash
+      attr_reader :payload, :policy_tracking_id, :enrollment_hash, :family
 
       def call(payload)
         @payload = payload
@@ -34,10 +34,10 @@ module Operations
       private
 
       def existing_policy
-        Rails.cache.fetch("enrollment_#{policy_tracking_id}", expires_in: 12.hour) do
-          result = Operations::HbxEnrollments::Find.new.call({external_id: policy_tracking_id })
-          result.success? ? Failure("Enrollment already migrated: #{policy_tracking_id}") : Success(policy_tracking_id)
+        result = Rails.cache.fetch("enrollment_#{policy_tracking_id}", expires_in: 12.hour) do
+          Operations::HbxEnrollments::Find.new.call({external_id: policy_tracking_id })
         end
+        result.success? ? Failure("Enrollment already migrated: #{policy_tracking_id}") : Success(policy_tracking_id)
       end
 
       def transform
@@ -54,7 +54,7 @@ module Operations
         return Success(policy_tracking_id) if skip_enrollment_migration
 
         validate_enrollment_members
-        @sanitized_hash = sanitize_enrollment_hash(enrollment_hash)
+        sanitize_enrollment_hash(enrollment_hash)
         enrollment = create_hbx_enrollment
         print "."
         Success(enrollment.hbx_id)
@@ -112,7 +112,7 @@ module Operations
       end
 
       def enrollment_members
-        family = find_family(enrollment_hash["family_hbx_id"])
+        @family = find_family(enrollment_hash["family_hbx_id"])
         enrollment_hash["hbx_enrollment_members"] = sanitize_enrollment_member_hash(family, enrollment_hash["hbx_enrollment_members"])
       end
 
@@ -191,13 +191,14 @@ module Operations
       end
 
       def find_family(external_id)
-        Rails.cache.fetch("family_#{external_id}", expires_in: 12.hour) do
-          result = Operations::Families::Find.new.call(external_app_id: external_id)
-          if result.success?
-            result.success
-          else
-            raise "family not found"
-          end
+        result = Rails.cache.fetch("family_#{external_id}", expires_in: 12.hour) do
+          Operations::Families::Find.new.call(external_app_id: external_id)
+        end
+
+        if result.success?
+          result.success
+        else
+          raise "family not found"
         end
       end
 
@@ -230,24 +231,26 @@ module Operations
       end
 
       def person_by_external_id(fm_hash)
-        Rails.cache.fetch("person_#{fm_hash["person_hbx_id"]}", expires_in: 12.hour) do
-          people = Person.where(external_person_id: fm_hash["person_hbx_id"])
-          if people.count > 1
-            raise "more than one person found"
-          end
-
-          people.first
+        people = Rails.cache.fetch("person_#{fm_hash["person_hbx_id"]}", expires_in: 12.hour) do
+          Person.where(external_person_id: fm_hash["person_hbx_id"])
         end
+
+        if people.count > 1
+          raise "more than one person found"
+        end
+
+        people.first
       end
 
       def find_product(product_hash, year)
-        Rails.cache.fetch("product_#{product_hash["hios_id"]}", expires_in: 12.hour) do
-          result = Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
-          if result.success?
-            result.success
-          else
-            raise "product not found"
-          end
+        result = Rails.cache.fetch("product_#{product_hash["hios_id"]}", expires_in: 12.hour) do
+          Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
+        end
+
+        if result.success?
+          result.success
+        else
+          raise "product not found"
         end
       end
 
@@ -258,7 +261,7 @@ module Operations
       end
 
       def create_hbx_enrollment
-        hbx_enrollment = HbxEnrollment.new(sanitized_hash.except("hbx_enrollment_members"))
+        hbx_enrollment = HbxEnrollment.new(enrollment_hash.except("hbx_enrollment_members"))
         hbx_enrollment.hbx_enrollment_members = hbx_enrollment_members
         hbx_enrollment.generate_hbx_signature
         create_state_transition(hbx_enrollment)
@@ -270,21 +273,21 @@ module Operations
       end
 
       def hbx_enrollment_members
-        sanitized_hash["hbx_enrollment_members"].inject([]) do |members, hbx_enrollment_member|
+        enrollment_hash["hbx_enrollment_members"].inject([]) do |members, hbx_enrollment_member|
           members << HbxEnrollmentMember.new(hbx_enrollment_member)
         end
       end
 
       def check_duplicate_coverage(new_enrollment)
-        family =  Family.find(sanitized_hash["family_id"])
+        family =  Family.find(enrollment_hash["family_id"])
         hbx_enrollments = family.active_household.hbx_enrollments.where(
-           {:coverage_kind => sanitized_hash["coverage_kind"],
+           {:coverage_kind => enrollment_hash["coverage_kind"],
             :id => {"$ne" => new_enrollment.id},
             :aasm_state.in => ['coverage_selected', 'coverage_terminated'],
             :kind => "individual"}
         )
         overlapping_coverage = hbx_enrollments.select {|enrollment|
-         (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(sanitized_hash["effective_on"])
+         (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
         }
         overlapping_coverage.each do |enrollment|
           if new_enrollment.created_at >= enrollment.created_at
