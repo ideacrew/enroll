@@ -487,5 +487,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.tribal_state' => "Where is this person's tribe located?",
   :'en.insured.tribal_name' => "Which federally recognized tribe does this person belong to?",
   :'en.insured.tribal_state_alert' => 'Tribe state is required',
-  :'en.insured.tribal_name_alert' => 'Federally recognized tribe name is required'
+  :'en.insured.tribal_name_alert' => 'Federally recognized tribe name is required',
+  :'en.insured.individual_agreement_non_aptc' => "<h3> Agreement</h3>p> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. I can report changes by going online and logging into “My Account”, by calling %{contact_center_name} toll-free at %{contact_center_phone_number}, or by submitting information via mail or in-person at one of the Department of Human Services’ Service Centers.</p><p>I'm the person whose name appears in the signature line below. I understand that I’m submitting an application for health insurance and that information I provided will be used to decide eligibility for each member of my application group.</p><p>I've reviewed the information in this application, and I attest under penalty of perjury, that it’s accurate and complete to the best of my knowledge. I understand if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previously covered by the health insurance company.</p>"
+
 }.freeze
