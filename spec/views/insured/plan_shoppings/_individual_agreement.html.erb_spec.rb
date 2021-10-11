@@ -11,7 +11,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
   before :each do
     assign(:person, person)
     assign(:hbx_enrollment, hbx_enrollment)
-    render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: true, coverage_year: TimeKeeper.date_of_record.year.to_s} 
+    render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: true, coverage_year: TimeKeeper.date_of_record.year.to_s}
   end
 
   it "should display the title" do
