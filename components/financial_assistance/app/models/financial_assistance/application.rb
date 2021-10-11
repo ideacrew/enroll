@@ -144,6 +144,14 @@ module FinancialAssistance
     index({"relationships.applicant_id" => 1})
     index({"relationships.relative_id" => 1})
     index({"relationships.kind" => 1})
+    index({ hbx_id: 1 }, { unique: true })
+    index({ aasm_state: 1 })
+    index({ assistance_year: 1 })
+    index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
+
+    index({ "workflow_state_transitions.transition_at" => 1,
+            "workflow_state_transitions.to_state" => 1},
+            { name: "workflow_to_state" })
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
