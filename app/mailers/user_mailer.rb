@@ -222,4 +222,16 @@ class UserMailer < ApplicationMailer
       format.html { render "account_transfer_success_notification", :locals => { :person_name => person.full_name }}
     end
   end
+
+  def identity_verification_denial(email_address, first_name)
+    mail({to: email_address, subject: "Action needed to complete your #{site_short_name} application"}) do |format|
+      format.html { render "identity_verification_denial", :locals => { :first_name => first_name }}
+    end
+  end
+
+  def identity_verification_acceptance(email_address, first_name)
+    mail({to: email_address, subject: "Time to complete your #{site_short_name} application"}) do |format|
+      format.html { render "identity_verification_acceptance", :locals => { :first_name => first_name }}
+    end
+  end
 end
