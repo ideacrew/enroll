@@ -71,3 +71,5 @@ registry:
         settings:
           - key: :year
             item: 2021
+      - key: :include_external_enrollment_in_display_all_enrollments
+        is_enabled: :true
