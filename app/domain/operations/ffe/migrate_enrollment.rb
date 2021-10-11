@@ -156,7 +156,7 @@ module Operations
 
         hash["rating_area_id"] = rating_area(hash["rating_area"]).id
         hash.delete("rating_area")
-        hash["external_enrollment"] = false
+        hash["external_enrollment"] = true
 
         benefit_coverage_period = find_benefit_coverage_period(hash["effective_on"])
         hash["benefit_coverage_period_id"] = benefit_coverage_period.id

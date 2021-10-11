@@ -64,3 +64,8 @@ registry:
       - key: :state_based_language_preferences
         item: ["English", "Amharic", "Spanish"]
         is_enabled: true
+      - key: :gate_enrollments_to_edidb_for_year
+        is_enabled: false
+        settings:
+          - key: :year
+            item: 2021

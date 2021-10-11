@@ -66,3 +66,8 @@ registry:
              "Kirundi", "Lingala", "Somali", "Swahili", "Portuguese", "Vietnamese", "Khmer",
              "Thai", "Tagalog", "Russian", "German"]
         is_enabled: true
+      - key: :gate_enrollments_to_edidb_for_year
+        is_enabled: true
+        settings:
+          - key: :year
+            item: 2021
