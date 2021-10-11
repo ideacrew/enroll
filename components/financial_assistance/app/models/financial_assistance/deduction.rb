@@ -84,7 +84,7 @@ module FinancialAssistance
       end
 
       def dup_instance(source_instance)
-        rejected_attrs = ::FinancialAssistance::EXCLUDED_PARAMS
+        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
         new_deduction_params = source_instance.attributes.reduce({}) do |new_attrs, attr|
           new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
           new_attrs

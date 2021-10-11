@@ -2,7 +2,6 @@
 
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
-require "#{FinancialAssistance::Engine.root}/app/models/financial_assistance/financial_assistance"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
