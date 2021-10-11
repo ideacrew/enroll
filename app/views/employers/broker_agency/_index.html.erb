@@ -14,7 +14,7 @@
 
       <div id="advanced_options" style="display: none;">
            <div class="language_multi_select pull-right">
-             <%= select_tag(:languages_spoken, options_for_select(language_options, selected:'en'), { id: 'broker_agency_language_select', multiple: "multiple" } ) %>
+             <%= select_tag(:languages_spoken, options_for_select(language_options), { id: 'broker_agency_language_select', multiple: "multiple" } ) %>
           </div>
           <div>
             <label class="pull-right">
