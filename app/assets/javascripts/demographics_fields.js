@@ -424,7 +424,7 @@ var PersonValidations = (function(window, undefined) {
 
       if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
         if( !$("#person_phones_attributes_0_full_phone_number").val() ){
-          alert("ou must enter a mobile phone number to receive notices and updates by text.");
+          alert("You must enter a mobile phone number to receive notices and updates by text.");
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
