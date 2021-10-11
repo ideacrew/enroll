@@ -198,7 +198,8 @@ class Insured::PlanShoppingsController < ApplicationController
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
       @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
       session[:max_aptc] = @max_aptc
-      @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
+      default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+      @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
     else
       session[:max_aptc] = 0
       session[:elected_aptc] = 0
