@@ -89,7 +89,8 @@ module Operations
       end
 
       def return_success_case3
-        (enrollment_members.blank? || enrollment_members.any? { |mem| mem["applicant_id"].nil? }) && enrollment_hash["aasm_state"] != "coverage_selected"
+        members = enrollment_members
+        (members.blank? || members.any? { |mem| mem["applicant_id"].nil? }) && enrollment_hash["aasm_state"] != "coverage_selected"
       end
 
       def validate_enrollment_members
