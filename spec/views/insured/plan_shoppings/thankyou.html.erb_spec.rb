@@ -94,7 +94,7 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
     let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     let(:plan_decorator) do
-        double(
+      double(
         "PlanCostDecorator",
         title: product.title,
         premium_for: double("premium_for"),
@@ -131,7 +131,6 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
 
     it 'should show the proper translation' do
       render :template => "insured/plan_shoppings/thankyou.html.erb"
-      binding.irb
       expect(rendered).to match("I must file a federal income tax return")
     end
   end
