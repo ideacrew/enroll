@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require "#{FinancialAssistance::Engine.root}/app/models/financial_assistance/financial_assistance"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal, dbclean: :after_each do
   include Dry::Monads[:result, :do]

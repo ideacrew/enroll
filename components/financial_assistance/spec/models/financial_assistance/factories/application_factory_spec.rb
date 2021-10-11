@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require "#{FinancialAssistance::Engine.root}/app/models/financial_assistance/financial_assistance"
 
 RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model do
 

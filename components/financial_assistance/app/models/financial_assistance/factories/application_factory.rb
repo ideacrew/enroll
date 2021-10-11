@@ -201,10 +201,6 @@ module FinancialAssistance
            csr_percent_as_integer csr_eligibility_kind net_annual_income claimed_as_tax_dependent_by]
       end
 
-      def reject_embed_params
-        %w[_id created_at updated_at submitted_at employer_address employer_phone]
-      end
-
       def income_klass
         FinancialAssistance::Income
       end

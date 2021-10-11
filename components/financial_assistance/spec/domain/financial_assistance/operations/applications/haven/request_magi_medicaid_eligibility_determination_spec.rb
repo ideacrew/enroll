@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require "#{FinancialAssistance::Engine.root}/app/models/financial_assistance/financial_assistance"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMagiMedicaidEligibilityDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
@@ -211,7 +212,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   employer_name: 'Testing employer'
                                                 })
-        create_appli.incomes << inc
+        create_appli.incomes = [inc]
         create_appli.save!
       end
 

@@ -75,7 +75,7 @@ module FinancialAssistance
           Try() do
             ::FinancialAssistance::Factories::ApplicationFactory.new(application)
           end.bind do |renewal_application_factory|
-            renewal_application = renewal_application_factory.copy_application
+            renewal_application = renewal_application_factory.create_application
             family_members_changed = renewal_application_factory.family_members_changed
             calculated_renewal_base_year = calculate_renewal_base_year(application)
 
