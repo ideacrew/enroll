@@ -40,7 +40,6 @@ module BenefitSponsors
           expect(form.organization.profile.inbox).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::InboxForm)
           expect(form.organization.profile.office_locations.first).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::OfficeLocationForm)
           expect(form.staff_roles.first).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm)
-          expect(form.organization.profile.language_options.first).to be_an_instance_of(LanguageList::LanguageInfo)
         end
       end
     end
