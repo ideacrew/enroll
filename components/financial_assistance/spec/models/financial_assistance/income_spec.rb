@@ -86,4 +86,12 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
       end
     end
   end
+
+  # describe 'dup_instance' do
+  #   context 'where income has both employer_address and employer_phone' do
+  #   end
+
+  #   context 'where income does not have both employer_address and employer_phone' do
+  #   end
+  # end
 end

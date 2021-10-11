@@ -66,3 +66,15 @@ registry:
              "Kirundi", "Lingala", "Somali", "Swahili", "Portuguese", "Vietnamese", "Khmer",
              "Thai", "Tagalog", "Russian", "German"]
         is_enabled: true
+      - key: :extended_aptc_individual_agreement_message
+        item: :extended_aptc_individual_agreement_message
+        is_enabled: true
+      - key: :application_type_options
+        item: ["Phone", "Paper", "State Medicaid Agency"]
+        is_enabled: true
+      - key: :curam_application_type
+        item: "State Medicaid Agency"
+        is_enabled: true
+      - key: :verification_reasons
+        item: ["Document in EnrollApp", "Electronic data source", "State Medicaid Agency"]
+        is_enabled: true

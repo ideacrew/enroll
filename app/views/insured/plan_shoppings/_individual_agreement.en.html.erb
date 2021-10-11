@@ -8,13 +8,9 @@
       <tr>
 
         <td>
-          <h3>Agreement</h3>
-          I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. I can report changes by going online and logging into “My Account”, by calling <%= contact_center_name %> toll-free at <%= contact_center_phone_number %>, or by submitting information via mail or in-person at one of the Department of Human Services’ Service Centers.
-          <br/><br/>
-          I'm the person whose name appears in the signature line below. I understand that I’m submitting an application for health insurance and that information I provided will be used to decide eligibility for each member of my application group.
-          <br/><br/>
-          I've reviewed the information in this application, and I attest under penalty of perjury, that it’s accurate and complete to the best of my knowledge. I understand if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previously covered by the health insurance company.
-          <br/>
+           <% translation_key = EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present? ? "insured.individual_agreement_aptc_present" : "insured.individual_agreement_non_aptc" %>
+           <%= l10n(translation_key, site_short_name: site_short_name, coverage_year: locals[:coverage_year], contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number).html_safe %>
+           <br>
           <%= check_box_tag 'terms_check_thank_you' %> <h4 class="agree">I Agree</h4>
           <br/><br/>
         </td>

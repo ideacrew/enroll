@@ -173,7 +173,7 @@ registry:
           - key: :staging_tax_info_url
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :statewide_area
-            item: "Maine"
+            item: "Maine/Regional"
           - key: :standard_plan_label
             item: "CLEAR CHOICE PLAN"
           - key: :exchange_name
@@ -306,6 +306,8 @@ registry:
                     {"2022-02-01": '2022,1,12'},
                     {"2022-03-01": '2022,2,14'},
                   ]
+          - key: :default_aptc_percentage
+            item: 100
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true

@@ -26,6 +26,7 @@ module FinancialAssistance
 
           private
 
+          # TODO: Refactor code to use :hbx_id instead of :_id
           def find_application(params)
             return Failure("Input params is not a hash: #{params}") unless params.is_a?(Hash)
             return Failure('Missing application_id key') unless params.key?(:_id)
