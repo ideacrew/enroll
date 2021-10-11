@@ -106,8 +106,7 @@ RSpec.describe UserMailer do
       l10n(
         site_short_name: site_short_name,
         contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-        first_name: person_with_work_email.first_name,
-        site_short_name: EnrollRegistry[:enroll_app].setting(:site_short_name).item,
+        first_name: person_with_work_email.first_name
       ).html_safe
 
     end
