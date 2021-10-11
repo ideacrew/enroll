@@ -65,8 +65,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
             eligibility_request_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
             assistance_year: TimeKeeper.date_of_record.year,
             renewal_base_year: TimeKeeper.date_of_record.year,
-            effective_date: TimeKeeper.date_of_record.next_month.beginning_of_month,
-            assistance_year: TimeKeeper.date_of_record.year }
+            effective_date: TimeKeeper.date_of_record.next_month.beginning_of_month }
         end
 
         before do

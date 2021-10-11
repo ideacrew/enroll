@@ -7,10 +7,9 @@ module FinancialAssistance
       attr_accessor :source_application, :applicants, :family_members_changed
 
       APPLICANT_EVIDENCES = [:incomes, :benefits, :deductions].freeze
-      EXCLUDED_PARAMS = %w[_id created_at updated_at submitted_at employer_address employer_phone]
 
       def initialize(source_application)
-        @source_application =  source_application
+        @source_application = source_application
         @family_members_changed = false
         @new_application = nil
         set_applicants
@@ -86,16 +85,12 @@ module FinancialAssistance
       def detect_applicant_changes(family_members)
         # ADDS: family members that are not applicants
         add_members = family_members.reduce([]) do |ids, family_member|
-          unless @new_application.applicants.where(family_member_id: family_member[:family_member_id]).present?
-            ids << family_member[:family_member_id]
-          end
+          ids << family_member[:family_member_id] unless @new_application.applicants.where(family_member_id: family_member[:family_member_id]).present?
           ids
         end
         # DROPS: applicants that are not family members
         drop_members = applicants.reduce([]) do |ids, applicant|
-          unless family_members.any? { |family_member| family_member[:family_member_id] == applicant.family_member_id }
-            ids << applicant.family_member_id
-          end
+          ids << applicant.family_member_id unless family_members.any? { |family_member| family_member[:family_member_id] == applicant.family_member_id }
           ids
         end
         { add_members: add_members, drop_members: drop_members }
