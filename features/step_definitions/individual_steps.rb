@@ -65,7 +65,7 @@ And 'I select a effective date from list' do
 end
 
 And(/the user sees Your Information page$/) do
-  expect(page).to have_content YourInformation.your_information_text
+  expect(page).to have_content(l10n('your_information'))
   find(YourInformation.continue_btn).click
 end
 

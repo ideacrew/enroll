@@ -3,6 +3,14 @@
 # benefit_sponsors/profiles/registrations/new?profile_type=broker_agency
 class BrokerRegistration
 
+  def self.alphanumeric_npn
+    'ABC123DE'
+  end
+
+  def self.alphabetic_npn
+    "124534256"
+  end
+
   def self.broker_registration_form
     '#broker_registration_form'
   end

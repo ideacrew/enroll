@@ -306,6 +306,8 @@ registry:
                     {"2022-02-01": '2022,1,12'},
                     {"2022-03-01": '2022,2,14'},
                   ]
+          - key: :default_aptc_percentage
+            item: 100
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true
@@ -623,6 +625,3 @@ registry:
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
-      - key: :expanded_npn_duplicate
-        item: :expanded_npn_duplicate
-        is_enabled: true

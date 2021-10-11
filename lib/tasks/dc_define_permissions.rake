@@ -173,6 +173,11 @@ namespace :dc_permissions do
   DcDefinePermissions.define_task :assign_current_permissions => :environment
 end
 
+namespace :dc_permissions do
+  desc 'assign the most current permissions'
+  DcDefinePermissions.define_task :hbx_admin_can_change_username_and_email => :environment
+end
+
 #rake dc_permissions:hbx_admin_can_reset_password
 
 #rake dc_permissions:hbx_admin_access_new_consumer_application_sub_tab

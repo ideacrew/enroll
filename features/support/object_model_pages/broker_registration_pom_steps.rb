@@ -1,5 +1,15 @@
 # frozen_string_literal: true
 
+And(/broker with a specific NPN already exists/) do
+  # Must satisfy this
+  # Person.where("broker_role.npn" => npn).any?
+  person = FactoryBot.build(:person)
+  person.build_broker_role(
+    npn: EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn) ? BrokerRegistration.alphanumeric_npn : BrokerRegistration.alphabetic_npn,
+    provider_kind: 'broker'
+  ).save!
+end
+
 When(/a Primary Broker visits the HBX Broker Registration form POM/) do
   visit '/'
   find(HomePage.broker_registration_btn, wait: 10).click
@@ -9,12 +19,33 @@ Then(/Primary Broker should see the New Broker Agency form POM/) do
   expect(page).to have_css(BrokerRegistration.broker_registration_form)
 end
 
+Then(/Primary Broker should see the NPN already taken message/) do
+  expect(page).to have_content(
+    l10n(
+      "broker_agencies.profiles.npn_taken_error",
+      main_web_address: EnrollRegistry[:enroll_app].setting(:main_web_address).item,
+      site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item,
+      website_url: EnrollRegistry[:enroll_app].setting(:website_url).item,
+      contact_center_short_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+      contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item
+    )
+  )
+end
+
 When(/Primary Broker enters personal information POM/) do
   fill_in BrokerRegistration.first_name, with: 'This is a POM'
   fill_in BrokerRegistration.last_name, with: 'example'
   fill_in BrokerRegistration.broker_dob, with: '02/02/1989'
   fill_in BrokerRegistration.email, with: 'pomexample@gmail.com'
-  fill_in BrokerRegistration.npn, with: '124534256'
+  if EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn)
+    # Maine allows Alphanumeric
+    fill_in BrokerRegistration.npn, with: BrokerRegistration.alphanumeric_npn
+    # Assures the javascript didn't block the full NPN
+    input = page.all('input').detect { |input_element| input_element[:id] == 'inputNPN' }
+    expect(input.value).to eq(BrokerRegistration.alphanumeric_npn)
+  else
+    fill_in BrokerRegistration.npn, with: BrokerRegistration.alphabetic_npn
+  end
 end
 
 And(/Primary Broker enters broker agency information POM/) do

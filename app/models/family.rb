@@ -42,6 +42,8 @@ class Family
   field :status, type: String, default: "" # for aptc block
   field :min_verification_due_date, type: Date, default: nil
   field :vlp_documents_status, type: String
+  # Used for recording changes of relevant attributes
+  field :relevant_previous_changes, type: Array
 
   belongs_to  :person, optional: true
   has_many :hbx_enrollments

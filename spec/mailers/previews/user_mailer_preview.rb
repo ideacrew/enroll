@@ -103,4 +103,10 @@ class UserMailerPreview < ActionMailer::Preview
     plan_decorator = UnassistedPlanCostDecorator.new(enrollment.product, enrollment)
     UserMailer.plan_shopping_completed(user, enrollment, plan_decorator)
   end
+
+  def new_client_notification; end
+
+  def broker_pending_completed_training_missing_carrier; end
+
+  def reset_password_instructions; end
 end
