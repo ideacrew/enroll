@@ -53,6 +53,7 @@ module Operations
       def import_enrollment
         return Success(policy_tracking_id) if skip_enrollment_migration
 
+        validate_enrollment_members
         @sanitized_hash = sanitize_enrollment_hash(enrollment_hash)
         enrollment = create_hbx_enrollment
         print "."
@@ -88,16 +89,30 @@ module Operations
       end
 
       def return_success_case3
-        enrollment_hash["hbx_enrollment_members"] = enrollment_members
-        enrollment_hash["hbx_enrollment_members"].nil?
+        (enrollment_members.blank? || enrollment_members.any? { |mem| mem["applicant_id"].nil? }) && enrollment_hash["aasm_state"] != "coverage_selected"
+      end
+
+      def validate_enrollment_members
+
+        if enrollment_members.blank?
+          raise "no enrollment member"
+        end
+
+        if enrollment_members.any? { |mem| mem["applicant_id"].nil? }
+          raise "family member not found"
+        end
+
+        coverage_household = family.active_household.immediate_family_coverage_household
+        enrollment_members.each do |mem|
+          unless coverage_household.coverage_household_members.any? { |c_mem| c_mem.family_member_id == mem["applicant_id"] }
+            raise "coverage household not found"
+          end
+        end
       end
 
       def enrollment_members
         family = find_family(enrollment_hash["family_hbx_id"])
-        if enrollment_hash["aasm_state"] != "coverage_selected"
-          return sanitize_enrollment_member_hash(family, enrollment_hash["hbx_enrollment_members"]) rescue nil
-        end
-        sanitize_enrollment_member_hash(family, enrollment_hash["hbx_enrollment_members"])
+        enrollment_hash["hbx_enrollment_members"] = sanitize_enrollment_member_hash(family, enrollment_hash["hbx_enrollment_members"])
       end
 
       def sanitize_enrollment_hash(hash)
@@ -157,10 +172,10 @@ module Operations
       end
 
       def sanitize_enrollment_member_hash(family, member_hash)
-        eliigble_members = member_hash.reject {|mem|  mem["coverage_end_on"] == mem["coverage_start_on"]}
-        eliigble_members.inject([]) do |members, m_hash|
+        eligible_members = member_hash.reject {|mem|  mem["coverage_end_on"] == mem["coverage_start_on"]}
+        eligible_members.inject([]) do |members, m_hash|
           applicant = find_family_member(family, m_hash)
-          m_hash["applicant_id"] = applicant.id
+          m_hash["applicant_id"] = applicant.try(:id)
           m_hash["coverage_end_on"] = nil
           m_hash.delete("family_member_reference")
           members << m_hash
@@ -191,17 +206,9 @@ module Operations
           ssn_dob_match?(mem.person, fm_hash) || info_match?(mem.person,fm_hash) || ext_id_match?(mem.person, fm_hash)
         end
 
-        unless family_member
-          raise "family member not found"
-        end
-
-        coverage_household = family.active_household.immediate_family_coverage_household
-        unless coverage_household.coverage_household_members.any? {|c_mem| c_mem.family_member_id == family_member.id}
-          raise "coverage household not found"
-        else
-          family_member.person.update_attribute(:is_tobacco_user, m_hash["tobacco_use"])
-          family_member
-        end
+        return unless family_member
+        family_member.person.update_attribute(:is_tobacco_user, m_hash["tobacco_use"])
+        family_member
       end
 
       def ssn_dob_match?(person, fm_hash)
@@ -218,7 +225,7 @@ module Operations
       end
 
       def ext_id_match?(person, fm_hash)
-        person.id == person_by_external_id(fm_hash).id
+        person.id == person_by_external_id(fm_hash).try(:id)
       end
 
       def person_by_external_id(fm_hash)
