@@ -26,7 +26,13 @@ module Operations
       def validate(params)
         return Failure('Missing Family') if params[:family].blank?
         return Failure('Missing Effective Date') if params[:effective_date].blank?
+        return Failure("Unable to find rating addresses for at least one family member for given family with id: #{params[:family].id}") unless all_members_have_valid_address?(params[:family])
         Success(params)
+      end
+
+      # Return a failure monad if there are no rating addresses for any members
+      def all_members_have_valid_address?(family)
+        family.family_members.all? { |family_member| family_member.rating_address.present? }
       end
 
       def find_addresses(family)

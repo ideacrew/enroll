@@ -941,6 +941,33 @@ module FinancialAssistance
       end
     end
 
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def applicants_have_valid_addresses?
+      applicants.all? { |applicant| applicant.has_valid_address? }
+    end
+
+    def is_application_valid?
+      application_attributes_validity = self.valid?(:submission) ? true : false
+
+      if relationships_complete?
+        relationships_validity = true
+      else
+        self.errors[:base] << "You must have a complete set of relationships defined among every member."
+        relationships_validity = false
+      end
+
+      if applicants_have_valid_addresses?
+        addresses_validity = true
+      else
+        self.errors[:base] << 'You must have a valid addresses for every applicant.'
+        addresses_validity = false
+      end
+
+      application_attributes_validity && relationships_validity && addresses_validity
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1124,19 +1151,6 @@ module FinancialAssistance
 
     def before_attestation_validity
       validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
-    end
-
-    def is_application_valid?
-      application_attributes_validity = self.valid?(:submission) ? true : false
-
-      if relationships_complete?
-        relationships_validity = true
-      else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
-        relationships_validity = false
-      end
-
-      application_attributes_validity && relationships_validity
     end
 
     def is_application_ready_for_attestation?
