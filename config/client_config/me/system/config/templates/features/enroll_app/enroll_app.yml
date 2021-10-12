@@ -375,6 +375,14 @@ registry:
             item: ""
           - key: :mailing_address_zip
             item: ""
+      - key: :ivl_enrollment_renewal_begin_date
+        item: :enrollment_renewal_date
+        is_enabled: true
+        settings:
+          - key: :ivl_enrollment_renewal_begin_effective_day
+            item: 24
+          - key: :ivl_enrollment_renewal_begin_effective_month
+            item: 10
   - namespace:
       - :pay_now_feature
     features:
