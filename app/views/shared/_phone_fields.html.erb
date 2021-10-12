@@ -17,7 +17,7 @@
         <%= phone.hidden_field :kind %>
         <%= phone.hidden_field :_destroy %>
         <% unless kind == 'FAX' && params[:action] == "personal" %>
-          <%= phone.text_field :full_phone_number, placeholder: "#{kind} PHONE", class: "#{required} number textfield floatlabel phone_number form-control" %>
+          <%= phone.text_field :full_phone_number, placeholder: "#{kind} PHONE", class: "#{required} number textfield floatlabel phone_number form-control #{kind.downcase}-phone-number" %>
         <% end %>
       </div>
     </div>
