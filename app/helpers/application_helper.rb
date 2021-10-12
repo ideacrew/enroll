@@ -23,12 +23,12 @@ module ApplicationHelper
       options_array << ["Paper", "Paper"]
       options_array
     end
-    selected = if @consumer_role.person.primary_family.e_case_id.present? && !(@consumer_role.person.primary_family.e_case_id.include? "curam_landing")
+    selected = if person.primary_family.e_case_id.present? && !(person.primary_family.e_case_id.include? "curam_landing")
                  'Curam'
                else
                  person.primary_family.application_type
                end
-    [options_array, {selected: selected}]
+    [options_array.uniq, {selected: selected}]
   end
 
   def seed_url_helper(row)

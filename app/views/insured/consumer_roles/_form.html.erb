@@ -15,7 +15,7 @@
           </div>
           <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 form-group form-group-lg no-pd">
             <%= f.fields_for :family do |f| %>
-              <%= f.select(:application_type, options_for_select(*consumer_role_application_type_options(@person)[0], selected: consumer_role_application_type_options(@person)[1][:selected]), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
+              <%= f.select(:application_type, options_for_select(*consumer_role_application_type_options(@person)), {include_blank: @person.primary_family.e_case_id.present? ? nil : "choose *"}, required: !@person.primary_family.e_case_id.present?, id:'application_type_id' ) %>
             <% end %>
           </div>
         </div>
