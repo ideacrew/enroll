@@ -24,11 +24,11 @@ module ApplicationHelper
       options_array
     end
     selected = if @consumer_role.person.primary_family.e_case_id.present? && !(@consumer_role.person.primary_family.e_case_id.include? "curam_landing")
-      'Curam'
-    else
-      ''
-    end
-    [options_array, selected: selected]
+                 'Curam'
+               else
+                 person.primary_family.application_type
+               end
+    [options_array, {selected: selected}]
   end
 
   def seed_url_helper(row)
