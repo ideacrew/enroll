@@ -945,7 +945,7 @@ module FinancialAssistance
     # Case2: Invalid Address - No addresses matching the state
     # Case3: Unable to get rating area(home_address || mailing_address)
     def applicants_have_valid_addresses?
-      applicants.all? { |applicant| applicant.has_valid_address? }
+      applicants.all?(&:has_valid_address?)
     end
 
     def is_application_valid?

@@ -1062,7 +1062,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.ensure_relationship_with_primary(applicant3, 'child')
       application.add_or_update_relationships(applicant2, applicant3, 'parent')
       application.applicants.each do |appl|
-        appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'home', :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item, :zip => '20001', county: '')]
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
         appl.save!
       end
       application.save!
@@ -1139,7 +1148,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.ensure_relationship_with_primary(applicant3, 'child')
       application.add_or_update_relationships(applicant2, applicant3, 'parent')
       application.applicants.each do |appl|
-        appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'home', :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item, :zip => '20001', county: '')]
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
         appl.save!
       end
       application.save!
@@ -1312,7 +1330,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'with valid home addresses' do
       before do
         application.applicants.each do |appl|
-          appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'home', :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item, :zip => '20001', county: '')]
+          appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                             :address_1 => '1111 Awesome Street NE',
+                                             :address_2 => '#111',
+                                             :address_3 => '',
+                                             :city => 'Washington',
+                                             :country_name => '',
+                                             :kind => 'home',
+                                             :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                             :zip => '20001',
+                                             county: '')]
           appl.save!
         end
       end
@@ -1325,7 +1352,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'with work addresses only' do
       before do
         application.applicants.each do |appl|
-          appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'work', :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item, :zip => '20001', county: '')]
+          appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                             :address_1 => '1111 Awesome Street NE',
+                                             :address_2 => '#111',
+                                             :address_3 => '',
+                                             :city => 'Washington',
+                                             :country_name => '',
+                                             :kind => 'work',
+                                             :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                             :zip => '20001',
+                                             county: '')]
           appl.save!
         end
       end
@@ -1338,7 +1374,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'only one applicant valid home address' do
       before do
         first_applicant = application.applicants.first
-        first_applicant.addresses = [FactoryBot.build(:financial_assistance_address, :address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'home', :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item, :zip => '20001', county: '')]
+        first_applicant.addresses = [FactoryBot.build(:financial_assistance_address,
+                                                      :address_1 => '1111 Awesome Street NE',
+                                                      :address_2 => '#111',
+                                                      :address_3 => '',
+                                                      :city => 'Washington',
+                                                      :country_name => '',
+                                                      :kind => 'home',
+                                                      :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                                      :zip => '20001',
+                                                      county: '')]
         first_applicant.save!
       end
 
