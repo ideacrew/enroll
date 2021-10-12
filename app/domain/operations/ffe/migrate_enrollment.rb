@@ -101,9 +101,12 @@ module Operations
           raise "family member not found"
         end
 
-        coverage_household = family.active_household.immediate_family_coverage_household
-        members.each do |mem|
-          unless coverage_household.coverage_household_members.any? { |c_mem| c_mem.family_member_id == mem["applicant_id"] }
+        family.active_household.coverage_households.each do |mem|
+          result = coverage_households.any? do |coverage_household|
+            coverage_household.coverage_household_members.detect { |c_mem| c_mem.family_member_id == mem["applicant_id"] }
+          end
+
+          unless result
             raise "coverage household not found"
           end
         end
