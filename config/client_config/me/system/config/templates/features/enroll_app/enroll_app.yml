@@ -380,9 +380,9 @@ registry:
         is_enabled: true
         settings:
           - key: :ivl_enrollment_renewal_begin_effective_day
-            item: 1
+            item: 24
           - key: :ivl_enrollment_renewal_begin_effective_month
-            item: 11
+            item: 10
   - namespace:
       - :pay_now_feature
     features:
