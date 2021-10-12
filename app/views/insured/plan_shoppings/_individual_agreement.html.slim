@@ -3,8 +3,8 @@ table.table.table-border.table-responsive
     tr
       td
         = l10n("insured.individual_agreement_non_aptc", site_short_name: site_short_name, coverage_year: coverage_year, contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number).html_safe
-        = l10n("insured.individual_agreement_aptc_present" site_short_name: site_short_name, coverage_year: coverage_year, contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number).html_safe if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present?
-
+        - if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present?
+          = l10n("insured.individual_agreement_aptc_present", site_short_name: site_short_name, coverage_year: coverage_year, contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number).html_safe 
         = check_box_tag 'terms_check_thank_you'
         h4.agree I Agree
     tr
