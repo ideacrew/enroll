@@ -10,5 +10,10 @@ module Publishers
     register_event 'second_verifications_reminder'
     register_event 'third_verifications_reminder'
     register_event 'fourth_verifications_reminder'
+    register_event 'qhp_eligible_on_reverification'
+    register_event 'aqhp_eligible_on_reverification'
+    register_event 'uqhp_eligible_on_reverification'
+    register_event 'medicaid_eligible_on_reverification'
+    register_event 'expired_consent_during_reverification'
   end
 end
