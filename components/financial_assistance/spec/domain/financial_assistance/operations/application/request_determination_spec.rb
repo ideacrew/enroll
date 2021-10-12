@@ -6,7 +6,20 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
 
   let!(:application) do
     application = FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: BSON::ObjectId.new, aasm_state: 'draft', effective_date: TimeKeeper.date_of_record)
-    application.applicants.each { |applicant| applicant.update_attributes!(citizen_status: 'alien_lawfully_present')}
+    application.applicants.each do |appl|
+      appl.citizen_status = 'alien_lawfully_present'
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: '')]
+      appl.save!
+    end
     application
   end
   let(:create_elibility_determinations) do
