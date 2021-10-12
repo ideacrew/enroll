@@ -34,9 +34,7 @@ module Operations
       private
 
       def existing_policy
-        result = Rails.cache.fetch("enrollment_#{policy_tracking_id}", expires_in: 12.hour) do
-          Operations::HbxEnrollments::Find.new.call({external_id: policy_tracking_id })
-        end
+        result = Operations::HbxEnrollments::Find.new.call({external_id: policy_tracking_id })
         result.success? ? Failure("Enrollment already migrated: #{policy_tracking_id}") : Success(policy_tracking_id)
       end
 
@@ -195,7 +193,7 @@ module Operations
           Operations::Families::Find.new.call(external_app_id: external_id)
         end
 
-        if result.success?
+        if result && result.success?
           result.success
         else
           raise "family not found"
@@ -235,6 +233,10 @@ module Operations
           Person.where(external_person_id: fm_hash["person_hbx_id"])
         end
 
+        unless people.present?
+          raise "person not found"
+        end
+
         if people.count > 1
           raise "more than one person found"
         end
@@ -247,7 +249,7 @@ module Operations
           Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
         end
 
-        if result.success?
+        if result && result.success?
           result.success
         else
           raise "product not found"
