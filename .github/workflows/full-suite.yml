@@ -187,7 +187,6 @@ jobs:
     strategy:
       matrix:
         group: [1, 2, 3, 4, 5]
-      fail-fast: false
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -246,7 +245,6 @@ jobs:
     needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         group:
           [
@@ -320,7 +318,6 @@ jobs:
     needs: [rubocop, view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         group:
           [
@@ -397,18 +394,15 @@ jobs:
       - name: Run tests
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   quality-workbench:
-    needs:
-      [
-        rubocop,
-        view_linter,
-        brakeman,
-        build-assets,
-        engines,
-        benefit-sponsors,
-        rspec,
-        cucumber,
-      ]
+    needs: [engines, benefit-sponsors, rspec, cucumber]
+    if: always()
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        check: [engines, benefit-sponsors, rspec, cucumber]
     steps:
-      - name: Check each job has passed
-        run: echo "All jobs have passed"
+      - name: Check build matrix status
+        env:
+          CHECK: ${{ matrix.check }}
+        if: needs[env.CHECK].result != 'success'
+        run: exit 1
