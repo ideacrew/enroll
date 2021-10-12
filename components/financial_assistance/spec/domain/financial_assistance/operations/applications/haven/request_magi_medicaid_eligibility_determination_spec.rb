@@ -211,7 +211,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   employer_name: 'Testing employer'
                                                 })
-        create_appli.incomes << inc
+        create_appli.incomes = [inc]
         create_appli.save!
       end
 

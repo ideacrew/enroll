@@ -87,6 +87,8 @@ module FinancialAssistance
       'None of these'
     ].freeze
 
+    EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
