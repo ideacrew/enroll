@@ -4,7 +4,7 @@ module Events
   module Individual
     module Notices
       # This class will register event
-      class ExpiredConsetDuringReverification < EventSource::Event
+      class ExpiredConsentDuringReverification < EventSource::Event
         publisher_path 'publishers.notices_publisher'
       end
     end
