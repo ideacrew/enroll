@@ -1,6 +1,36 @@
 module ApplicationHelper
   include FloatHelper
 
+  # Returns an array wth the appropriate application type items
+  # used in app/views/insured/consumer_roles/_form.html.erb
+  # _application_types_list.html.erb
+  def consumer_role_application_type_options(person)
+    options_array = []
+    if person.primary_family.e_case_id.present? && !(person.primary_family.e_case_id.include? "curam_landing")
+      options_array << [EnrollRegistry[:curam_application_type].item, EnrollRegistry[:curam_application_type].item]
+      options_array
+    elsif pundit_allow(ConsumerRole, :can_view_application_types?)
+      options_array = EnrollRegistry[:application_type_options].item.map do |option|
+        if option == 'State Medicaid Agency'
+          ['State Medicaid Agency', 'Curam']
+        else
+          [option, option]
+        end
+      end
+      options_array << ['In Person', 'In Person'] if EnrollRegistry.feature_enabled?(:in_person_application_enabled)
+    else
+      options_array << ["Phone", "Phone"]
+      options_array << ["Paper", "Paper"]
+      options_array
+    end
+    selected = if person.primary_family.e_case_id.present? && !(person.primary_family.e_case_id.include? "curam_landing")
+                 'Curam'
+               else
+                 person.primary_family.application_type
+               end
+    [options_array.uniq, {selected: selected}]
+  end
+
   def seed_url_helper(row)
     case row.record_class_name
     when nil
