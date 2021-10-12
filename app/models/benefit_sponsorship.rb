@@ -104,7 +104,10 @@ class BenefitSponsorship
       end
 
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-      if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date && !Rails.env.test?
+      oe_month = EnrollRegistry[:ivl_enrollment_renewal_begin_date].setting(:ivl_enrollment_renewal_begin_effective_month).item
+      oe_day_of_month = EnrollRegistry[:ivl_enrollment_renewal_begin_date].setting(:ivl_enrollment_renewal_begin_effective_day).item
+      renewal_oe_date = Date.new(TimeKeeper.date_of_record.year, oe_month, oe_day_of_month)
+      if renewal_benefit_coverage_period.present? && renewal_oe_date == new_date && !Rails.env.test?
         oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
         oe_begin.process_renewals
       end
