@@ -633,7 +633,7 @@ Then(/CSR clicks on Resume Application via phone/) do
   click_link "Assist Customer"
 end
 
-When(/I click on the header link to return to CSR page/) do
+When(/CSR clicks on the header link to return to CSR page/) do
   expect(page).to have_content "I'm a Trained Expert", :wait => 10
   find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").click
 end
