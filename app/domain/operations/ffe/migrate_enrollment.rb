@@ -101,8 +101,8 @@ module Operations
           raise "family member not found"
         end
 
-        family.active_household.coverage_households.each do |mem|
-          result = coverage_households.any? do |coverage_household|
+        members.each do |mem|
+          result = family.active_household.coverage_households.any? do |coverage_household|
             coverage_household.coverage_household_members.detect { |c_mem| c_mem.family_member_id == mem["applicant_id"] }
           end
 
