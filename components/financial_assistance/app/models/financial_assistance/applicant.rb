@@ -1093,6 +1093,16 @@ module FinancialAssistance
       end
     end
 
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def has_valid_address?
+      addresses.where(
+        state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+        :kind.in => ['home', 'mailing']
+      ).present?
+    end
+
     private
 
     def date_ranges_overlap?(range_a, range_b)
