@@ -24,7 +24,7 @@ module VlpDoc
         return false
       elsif result.failure? && source == 'dependent'
         invalid_key = result.errors.to_h.keys.first
-        add_document_errors_to_dependent(dependent, ['"Please fill in your information for #{invalid_field(invalid_key).to_s.titlecase} ."])
+        add_document_errors_to_dependent(dependent, ["Please fill in your information for #{invalid_field(invalid_key).to_s.titlecase} ."])
         return false
       end
     end
