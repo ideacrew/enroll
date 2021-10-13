@@ -125,14 +125,14 @@ class VlpDocument < Document
 
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
-  validates :alien_number, length: { is: 9 }, :allow_blank => true, if: FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields)
-  validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true
-  validates :i94_number, length: { is: 11 }, :allow_blank => true
-  validates :naturalization_number, length: { in: 6..12 }, :allow_blank => true
+  validates :alien_number, length: { is: 9 }, :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields)
+  validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields)
+  validates :i94_number, length: { is: 11 }, :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields)
+  validates :naturalization_number, length: { in: 6..12 }, :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields)
   validates :passport_number, length: { in: 6..12 }, :allow_blank => true
-  validates :sevis_id, length: { is: 10 } , :allow_blank => true #first char is N
-  validates :visa_number, length: { in: 8..12 }, :allow_blank => true
-  validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
+  validates :sevis_id, length: { is: 10 } , :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) #first char is N
+  validates :visa_number, length: { is: 8..12 }, :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields)
+  validates :receipt_number, length: { is: 13}, :allow_blank => true, if: !FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) #first 3 alpha, remaining 10 string
   validates :card_number, length: { is: 13 }, :allow_blank => true, if: FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields) #first 3 alpha, remaining 10 numeric
 
   # hash of doc type and necessary fields
@@ -187,7 +187,7 @@ class VlpDocument < Document
 
   private
   def document_required_fields
-    if FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields)
+    if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields)
      required_fields[self.subject.to_sym].each do |field|
        errors.add(:base, "#{field} value is required") unless self.send(field).present?
      end 
