@@ -404,6 +404,7 @@ var PersonValidations = (function(window, undefined) {
   // client specific feature for ME, validates that a contact method is selected
   function validationForContactMethod(e) {
     if( $(".contact-method").length ){
+      console.log("Contact methods present.")
       var isChecked = false;
       $( ".contact-method input" ).each(function( i ,el ){
         if($(el).prop("checked")){
@@ -423,7 +424,7 @@ var PersonValidations = (function(window, undefined) {
       }
 
       if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
-        if( !$("#person_phones_attributes_0_full_phone_number").val() ){
+        if(document.querySelector(".mobile-phone-number").value.length < 1){
           alert("You must enter a mobile phone number to receive notices and updates by text.");
           PersonValidations.restoreRequiredAttributes(e);
         }
