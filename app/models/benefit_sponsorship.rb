@@ -104,6 +104,7 @@ class BenefitSponsorship
       end
 
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+      return unless EnrollRegistry.feature_enabled?(:ivl_enrollment_renewal_begin_date)
       oe_month = EnrollRegistry[:ivl_enrollment_renewal_begin_date].setting(:ivl_enrollment_renewal_begin_effective_month).item
       oe_day_of_month = EnrollRegistry[:ivl_enrollment_renewal_begin_date].setting(:ivl_enrollment_renewal_begin_effective_day).item
       renewal_oe_date = Date.new(TimeKeeper.date_of_record.year, oe_month, oe_day_of_month)
