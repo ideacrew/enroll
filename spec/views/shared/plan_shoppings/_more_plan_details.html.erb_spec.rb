@@ -52,8 +52,7 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
     end
     context "links disabled" do
       before do
-        allow(view).to receive(:add_external_links_enabled?).and_return(false)
-        allow(view).to receive(:plan_shopping_enabled?).and_return(false)
+        EnrollRegistry[:go_to_plan_compare_link].feature.stub(:is_enabled).and_return(false)
         allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
         allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
         allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)
