@@ -308,6 +308,8 @@ registry:
                   ]
           - key: :default_aptc_percentage
             item: 100
+          - key: :child_age_limit
+            item: 20
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true
