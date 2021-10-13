@@ -1,6 +1,14 @@
 module ApplicationHelper
   include FloatHelper
 
+  def add_external_links_enabled?
+    EnrollRegistry[:add_external_links].feature.is_enabled
+  end
+
+  def plan_shopping_enabled?
+    add_external_links_enabled? && EnrollRegistry[:add_external_links].setting(:plan_shopping_display).item
+  end
+
   # Returns an array wth the appropriate application type items
   # used in app/views/insured/consumer_roles/_form.html.erb
   # _application_types_list.html.erb

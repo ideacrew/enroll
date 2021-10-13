@@ -1,4 +1,10 @@
 <div class="module shopping-data">
+  <% if add_external_links_enabled? && plan_shopping_enabled? %>
+    <%= button_to find_your_doctor_url, class: 'btn btn-primary btn-large', form: {target: '_blank'}  do %>
+      <%= l10n('find_your_doctor') %> &nbsp;<i class='fa fa-external-link-alt' aria-hidden='true'></i>
+    <% end %>
+  <% end %>
+
   <br/>
   <div class="pull-left">
     <span class="ttu lg twelve">Coverage For:</span>
@@ -21,3 +27,4 @@
   </div>
   <br/>
 </div>
+
