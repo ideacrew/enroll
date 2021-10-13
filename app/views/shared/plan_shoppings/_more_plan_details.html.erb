@@ -1,5 +1,5 @@
 <div class="module shopping-data">
-  <% if add_external_links_enabled? && plan_shopping_enabled? %>
+  <% if EnrollRegistry.feature_enabled?(:go_to_plan_compare_link) %>
     <%= link_to l10n("go_to_plan_compare") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
   <% end %>
 
