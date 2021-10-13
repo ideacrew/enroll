@@ -46,6 +46,7 @@ module Operations
         financial_application = fetch_application(family)
 
         return Success('qhp_eligible_on_reverification') if financial_application.nil?
+        return Success('expired_consent_during_reverification') unless financial_application.determined?
 
         applicants = financial_application.applicants
 
@@ -136,7 +137,7 @@ module Operations
         financial_application = fetch_application(family)
 
         entity =
-          if financial_application.present? && financial_application.eligibility_response_payload.present?
+          if financial_application&.determined? && financial_application.eligibility_response_payload.present?
             ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(
               JSON.parse(financial_application.eligibility_response_payload, :symbolize_name => true)
             )
