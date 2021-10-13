@@ -115,6 +115,7 @@ Then(/^.+ sees form to enter personal information$/) do
   find_all(IvlPersonalInformation.select_state_dropdown).first.click
   find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
   # screenshot("personal_form")
 end
