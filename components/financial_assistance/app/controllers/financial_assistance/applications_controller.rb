@@ -57,6 +57,7 @@ module FinancialAssistance
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
+              mec_check(@application.id) if EnrollRegistry.feature_enabled?(:mec_check)
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
@@ -174,7 +175,7 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-      @application.rt_transfer
+      @application.rt_transfer if params.keys.include?('cur')
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
@@ -220,6 +221,10 @@ module FinancialAssistance
     end
 
     private
+
+    def mec_check(application_id)
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id)
+    end
 
     def haven_determination_is_enabled?
       FinancialAssistanceRegistry.feature_enabled?(:haven_determination)

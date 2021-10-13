@@ -6,7 +6,7 @@ class RidpDocument < Document
   ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject"]
 
   # reasons admin can provide when verifying type
-  VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+  VERIFICATION_REASONS = EnrollRegistry[:verification_reasons].item
 
   # reasons admin can provide when returning for deficiency verification type
   RETURNING_FOR_DEF_REASONS = ["Illegible Document", "Member Data Change", "Document Expired", "Additional Document Required", "Other"]

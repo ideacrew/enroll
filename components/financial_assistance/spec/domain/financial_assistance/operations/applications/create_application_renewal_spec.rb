@@ -46,6 +46,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
     allow(operation_instance.class).to receive(:new).and_return(operation_instance)
     allow(operation_instance).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
+    application.applicants.each do |appl|
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: '')]
+      appl.save!
+    end
   end
 
   context 'success' do
@@ -96,8 +109,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
             expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
           end
 
-          it 'should return application with years_to_renew one less than previous application' do
-            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew.pred)
+          it 'should return application with years_to_renew same as previous application' do
+            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew)
           end
         end
 
@@ -332,6 +345,71 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
   end
 
   context 'failure' do
+
+    context 'Renewal Application applicants update required' do
+      let!(:person_11) { FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_11')}
+      let!(:person_12) do
+        per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_12')
+        person_11.ensure_relationship_with(per, 'spouse')
+        per
+      end
+      let!(:family_11) { FactoryBot.create(:family, :with_primary_family_member, person: person_11)}
+      let!(:family_member_12) { FactoryBot.create(:family_member, person: person_12, family: family_11)}
+      let!(:application_11) { FactoryBot.create(:financial_assistance_application, family_id: family_11.id, aasm_state: 'submitted', hbx_id: "111000", effective_date: TimeKeeper.date_of_record) }
+      let!(:applicant_11) do
+        FactoryBot.create(:applicant,
+                          application: application_11,
+                          first_name: person_11.first_name,
+                          dob: TimeKeeper.date_of_record - 40.years,
+                          is_primary_applicant: true,
+                          person_hbx_id: person_11.hbx_id,
+                          family_member_id: family_11.primary_applicant.id)
+      end
+      let!(:applicant_12) do
+        FactoryBot.create(:applicant,
+                          application: application_11,
+                          first_name: person_12.first_name,
+                          dob: TimeKeeper.date_of_record - 10.years,
+                          person_hbx_id: person_12.hbx_id,
+                          is_claimed_as_tax_dependent: true,
+                          claimed_as_tax_dependent_by: applicant_11.id,
+                          family_member_id: family_member_12.id)
+      end
+      let!(:relationships) do
+        application_11.ensure_relationship_with_primary(applicant_12, 'spouse')
+      end
+
+      context 'New Family member added without corresponding applicant' do
+        let!(:person_13) do
+          per = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_13')
+          person_11.ensure_relationship_with(per, 'child')
+          per
+        end
+        let!(:family_member_13) { FactoryBot.create(:family_member, person: person_13, family: family_11)}
+
+        before do
+          @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
+        end
+
+        it 'should return failure and set renewal application state to applicants_update_required' do
+          expect(@result.failure?).to eq true
+          expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
+        end
+      end
+
+      context 'New Family member dropped with corresponding applicant' do
+        before do
+          family_11.remove_family_member(family_member_12.person)
+          family_11.save!
+          @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
+        end
+
+        it 'should return failure and set renewal application state to applicants_update_required' do
+          expect(@result.failure?).to eq true
+          expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
+        end
+      end
+    end
     context 'missing keys' do
       context 'missing family_id' do
         before do

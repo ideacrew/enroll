@@ -25,6 +25,7 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
+      subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, app_hbx_id: #{payload[:hbx_id]}, error message: #{e.message}, backtrace: #{e.backtrace}"
       logger.info "ApplicationRenewalCreatedSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end

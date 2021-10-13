@@ -63,6 +63,9 @@ class UsersController < ApplicationController
   def change_username_and_email
     authorize User, :change_username_and_email?
     @user_id = params[:user_id]
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "You are not authorized for this action."
+    render inline: "location.reload();"
   end
 
   def confirm_change_username_and_email

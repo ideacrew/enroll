@@ -122,6 +122,7 @@ module BenefitSponsors
           return self if organization_validity_failed?(existing_org)
           self.organization = init_profile_organization(existing_org, attributes)
           return self if broker_agency_profile_validity_failed?
+          return self if invalid_npn_format?
           unless self.valid?
             errors.add(:organization, self.errors.full_messages.join(', '))
             return self
@@ -549,9 +550,32 @@ module BenefitSponsors
           npn_already_taken?(npn) || !valid_office_location_kinds?
         end
 
+        def invalid_npn_format?
+          return unless is_broker_profile?
+          alphanumeric_chars = ('a'..'z').to_a + ('A'..'Z').to_a + (0..9).to_a.map(&:to_s)
+          npn_chars = npn.split("")
+          none_alphanumeric_characters_present = npn_chars.any? { |ch| !ch.in?(alphanumeric_chars) }
+          return unless EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn) && none_alphanumeric_characters_present
+          errors.add(
+            :organization,
+            l10n("broker_agencies.profiles.npn_alphanumeric_error")
+          )
+          true
+        end
+
         def npn_already_taken?(npn)
           if is_broker_profile? && Person.where("broker_role.npn" => npn).any?
-            errors.add(:organization, l10n("broker_agencies.profiles.npn_taken_error"))
+            errors.add(
+              :organization,
+              l10n(
+                "broker_agencies.profiles.npn_taken_error",
+                main_web_address: EnrollRegistry[:enroll_app].setting(:main_web_address).item,
+                site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item,
+                website_url: EnrollRegistry[:enroll_app].setting(:website_url).item,
+                contact_center_short_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+                contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item
+              ).html_safe
+            )
             return true
           end
           false

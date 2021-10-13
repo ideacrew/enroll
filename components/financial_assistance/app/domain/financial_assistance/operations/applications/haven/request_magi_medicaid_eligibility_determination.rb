@@ -18,14 +18,13 @@ module FinancialAssistance
           def call(params)
             application = yield find_application(params)
             payload = yield renew_application(application)
-            event  = yield build_event(payload)
-            publish(event)
 
             Success(application)
           end
 
           private
 
+          # TODO: Refactor code to use :hbx_id instead of :_id
           def find_application(params)
             return Failure("Input params is not a hash: #{params}") unless params.is_a?(Hash)
             return Failure('Missing application_id key') unless params.key?(:_id)
@@ -35,19 +34,18 @@ module FinancialAssistance
           end
 
           def renew_application(application)
-            application.set_renewal_base_year
             if application.have_permission_to_renew?
-              if application.may_submit?
+              if application.may_submit? && application.is_application_valid?
                 application.submit!
                 request_result = request_determination(application)
-                application.unsubmit! if request_result.failure?
+                application.set_magi_medicaid_eligibility_request_errored! if request_result.failure?
                 request_result
               else
-                application.fail_submission!
                 Rails.logger.error "Unable to submit the application for given application hbx_id: #{application.hbx_id}"
-                Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}")
+                Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
               end
             else
+              application.set_income_verification_extension_required!
               Rails.logger.error "Expired Submission is failed for hbx_id: #{application.hbx_id}"
               Failure("Expired Submission is failed for hbx_id: #{application.hbx_id}")
             end
@@ -69,16 +67,6 @@ module FinancialAssistance
 
           def is_medicaid_gateway_determination_enabled?
             FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
-          end
-
-          def build_event(payload)
-            event("events.iap.applications.haven_magi_medicaid_eligibility_determination_requested", attributes: {determination: payload})
-          end
-
-          def publish(event)
-            event.publish
-
-            Success("Successfully published the payload for event: 'haven_magi_medicaid_eligibility_determination_requested'")
           end
         end
       end

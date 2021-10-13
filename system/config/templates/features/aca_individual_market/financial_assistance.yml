@@ -74,6 +74,8 @@ registry:
       - key: :primary_caregiver_other_question
         item: :primary_caregiver_other_question
         is_enabled: false
+      - key: :mec_check
+        is_enabled: false
   - namespace:
     - :request_determination
     features:
@@ -85,11 +87,11 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: false
+      is_enabled: true
     - key: :batch_transfer
-      is_enabled: false
+      is_enabled: true
     - key: :transfer_service
-      is_enabled: false
+      is_enabled: true
       item: "curam"
   - namespace:
     - :documents
@@ -222,7 +224,7 @@ registry:
     - :renewals
     features:
     - key: :create_renewals_on_date_change
-      is_enabled: false
+      is_enabled: true
       settings:
         - key: :renewals_creation_month
           item: 10

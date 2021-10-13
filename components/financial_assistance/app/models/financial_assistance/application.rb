@@ -28,7 +28,7 @@ module FinancialAssistance
     REQUEST_KINDS     = %w[].freeze
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
-    SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
+    SUBMITTED_STATUS = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
     CLOSED_STATUSES = %w[cancelled terminated].freeze
 
@@ -102,6 +102,13 @@ module FinancialAssistance
 
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
+    # Account was transferred to medicaid service via atp
+    field :account_transferred, type: Boolean, default: false
+
+    # Transfer ID of to be set if the application was transferred into Enroll via ATP
+    field :transfer_id, type: String
+
+    field :has_mec_check_response, type: Boolean, default: false
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
@@ -137,6 +144,14 @@ module FinancialAssistance
     index({"relationships.applicant_id" => 1})
     index({"relationships.relative_id" => 1})
     index({"relationships.kind" => 1})
+    index({ hbx_id: 1 }, { unique: true })
+    index({ aasm_state: 1 })
+    index({ assistance_year: 1 })
+    index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
+
+    index({ "workflow_state_transitions.transition_at" => 1,
+            "workflow_state_transitions.to_state" => 1 },
+          { name: "workflow_to_state" })
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
@@ -312,7 +327,7 @@ module FinancialAssistance
     end
 
     def is_rt_transferrable?
-      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer)
+      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer) && self.account_transferred == false
       is_transferrable?
     end
 
@@ -323,8 +338,13 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
       end
+    end
+
+    def has_mec_check?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.has_mec_check_response
     end
 
     def update_application(error_message, status_code)
@@ -485,13 +505,27 @@ module FinancialAssistance
       # :renewal_draft State where the previous year's application is renewed
       # :renewal_draft state is the initial state for a renewal application
       state :renewal_draft
-      # :submission_pending is a state where some corrective action is required
-      # :submission_pending is a state where we are unable to submit the application for some reason
-      state :submission_pending
+      # :income_verification_extension_required is a state where some corrective action is required
+      # to extend income verification year.
+      state :income_verification_extension_required
       state :submitted
       state :determination_response_error
       state :determined
       state :imported
+      state :applicants_update_required
+      # states when request build fails(to generate request for Haven/Mitc)
+      state :mitc_magi_medicaid_eligibility_request_errored
+      state :haven_magi_medicaid_eligibility_request_errored
+
+      event :set_magi_medicaid_eligibility_request_errored, :after => :record_transition do
+        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          transitions from: :submitted, to: :haven_magi_medicaid_eligibility_request_errored
+        elsif FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+          transitions from: :submitted, to: :mitc_magi_medicaid_eligibility_request_errored
+        else
+          raise NoMagiMedicaidEngine
+        end
+      end
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
@@ -547,8 +581,8 @@ module FinancialAssistance
       end
 
       # Currently, this event will be used during renewal generations
-      event :fail_submission, :after => :record_transition do
-        transitions from: :renewal_draft, to: :submission_pending
+      event :set_income_verification_extension_required, :after => :record_transition do
+        transitions from: :renewal_draft, to: :income_verification_extension_required
       end
 
       event :import, :after => [:record_transition] do
@@ -898,6 +932,42 @@ module FinancialAssistance
       update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
     end
 
+    def calculate_renewal_base_year
+      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
+      if is_renewal_authorized.present?
+        ass_year + YEARS_TO_RENEW_RANGE.max
+      elsif is_renewal_authorized.is_a?(FalseClass)
+        ass_year + (years_to_renew || 0)
+      end
+    end
+
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def applicants_have_valid_addresses?
+      applicants.all?(&:has_valid_address?)
+    end
+
+    def is_application_valid?
+      application_attributes_validity = self.valid?(:submission) ? true : false
+
+      if relationships_complete?
+        relationships_validity = true
+      else
+        self.errors[:base] << "You must have a complete set of relationships defined among every member."
+        relationships_validity = false
+      end
+
+      if applicants_have_valid_addresses?
+        addresses_validity = true
+      else
+        self.errors[:base] << 'You must have a valid addresses for every applicant.'
+        addresses_validity = false
+      end
+
+      application_attributes_validity && relationships_validity && addresses_validity
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -964,15 +1034,6 @@ module FinancialAssistance
       missing_relationships
     end
 
-    def calculate_renewal_base_year
-      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
-      if is_renewal_authorized.present?
-        ass_year + YEARS_TO_RENEW_RANGE.max
-      elsif is_renewal_authorized.is_a?(FalseClass)
-        ass_year + years_to_renew
-      end
-    end
-
     def check_parent_living_out_of_home_terms
       (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
         parent_living_out_of_home_terms.is_a?(FalseClass)
@@ -1034,10 +1095,11 @@ module FinancialAssistance
     end
 
     def set_assistance_year
+      return unless assistance_year.blank?
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      ) if assistance_year.blank?
+      )
     end
 
     def set_effective_date
@@ -1089,19 +1151,6 @@ module FinancialAssistance
 
     def before_attestation_validity
       validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
-    end
-
-    def is_application_valid?
-      application_attributes_validity = self.valid?(:submission) ? true : false
-
-      if relationships_complete?
-        relationships_validity = true
-      else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
-        relationships_validity = false
-      end
-
-      application_attributes_validity && relationships_validity
     end
 
     def is_application_ready_for_attestation?
