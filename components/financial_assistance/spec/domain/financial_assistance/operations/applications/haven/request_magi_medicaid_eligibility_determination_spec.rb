@@ -45,6 +45,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                              gender: 'male',
                              ethnicity: [],
                              dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day))
+    appli.addresses = [FactoryBot.build(:financial_assistance_address,
+                                        :address_1 => '1111 Awesome Street NE',
+                                        :address_2 => '#111',
+                                        :address_3 => '',
+                                        :city => 'Washington',
+                                        :country_name => '',
+                                        :kind => 'home',
+                                        :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                        :zip => '20001',
+                                        county: '')]
     application10.applicants.destroy_all
     application10.applicants = [appli]
     application10.save!
@@ -54,15 +64,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
   let(:event) { Success(double) }
   let(:obj) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
   let(:obj2) { ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new }
-  let(:obj3) { described_class.new }
 
   before do
     allow(obj.class).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(obj2.class).to receive(:new).and_return(obj2)
     allow(obj2).to receive(:build_event).and_return(event)
-    allow(obj3.class).to receive(:new).and_return(obj3)
-    allow(obj3).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
   end
 
@@ -211,7 +218,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   employer_name: 'Testing employer'
                                                 })
-        create_appli.incomes << inc
+        create_appli.incomes = [inc]
         create_appli.save!
       end
 

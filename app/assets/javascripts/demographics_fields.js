@@ -401,6 +401,37 @@ var PersonValidations = (function(window, undefined) {
     }
   }
 
+  // client specific feature for ME, validates that a contact method is selected
+  function validationForContactMethod(e) {
+    if( $(".contact-method").length ){
+      console.log("Contact methods present.")
+      var isChecked = false;
+      $( ".contact-method input" ).each(function( i ,el ){
+        if($(el).prop("checked")){
+          isChecked = true;
+        } 
+      })
+      if( isChecked == false ){
+        alert('Warning: You must select at least one contact method.');
+        PersonValidations.restoreRequiredAttributes(e);
+      }
+
+      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-email").prop('checked') ){
+        if( !$("#person_emails_attributes_0_address").val() ){
+          alert("You must enter an email address to receive notices and updates by email.");
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+      }
+
+      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
+        if(document.querySelector(".mobile-phone-number").value.length < 1){
+          alert("You must enter a mobile phone number to receive notices and updates by text.");
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+      }
+    }
+  }
+
   // explicitly return public methods when this object is instantiated
   return {
     manageRequiredValidations: manageRequiredValidations,
@@ -410,6 +441,7 @@ var PersonValidations = (function(window, undefined) {
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
+    validationForContactMethod: validationForContactMethod,
     restoreRequiredAttributes: restoreRequiredAttributes
 
   };
@@ -431,6 +463,7 @@ function demographicValidations(){
     PersonValidations.validationForIncarcerated(e);
     PersonValidations.validationForTobaccoUser(e);
     PersonValidations.validationForVlpDocuments(e);
+    PersonValidations.validationForContactMethod(e);
   });
 
   isApplyingCoverage("person");

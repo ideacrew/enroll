@@ -87,6 +87,8 @@ module FinancialAssistance
       'None of these'
     ].freeze
 
+    EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -1089,6 +1091,16 @@ module FinancialAssistance
         applications = ::FinancialAssistance::Application.where("applicants._id" => bson_id)
         applications.size == 1 ? applications.first.applicants.find(bson_id) : nil
       end
+    end
+
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def has_valid_address?
+      addresses.where(
+        state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+        :kind.in => ['home', 'mailing']
+      ).present?
     end
 
     private

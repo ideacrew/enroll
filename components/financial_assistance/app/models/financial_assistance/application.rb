@@ -28,7 +28,7 @@ module FinancialAssistance
     REQUEST_KINDS     = %w[].freeze
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
-    SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
+    SUBMITTED_STATUS = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
     CLOSED_STATUSES = %w[cancelled terminated].freeze
 
@@ -102,6 +102,11 @@ module FinancialAssistance
 
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
+    # Account was transferred to medicaid service via atp
+    field :account_transferred, type: Boolean, default: false
+
+    # Transfer ID of to be set if the application was transferred into Enroll via ATP
+    field :transfer_id, type: String
 
     field :has_mec_check_response, type: Boolean, default: false
 
@@ -139,6 +144,14 @@ module FinancialAssistance
     index({"relationships.applicant_id" => 1})
     index({"relationships.relative_id" => 1})
     index({"relationships.kind" => 1})
+    index({ hbx_id: 1 }, { unique: true })
+    index({ aasm_state: 1 })
+    index({ assistance_year: 1 })
+    index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
+
+    index({ "workflow_state_transitions.transition_at" => 1,
+            "workflow_state_transitions.to_state" => 1 },
+          { name: "workflow_to_state" })
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
@@ -314,7 +327,7 @@ module FinancialAssistance
     end
 
     def is_rt_transferrable?
-      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer)
+      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer) && self.account_transferred == false
       is_transferrable?
     end
 
@@ -928,6 +941,33 @@ module FinancialAssistance
       end
     end
 
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def applicants_have_valid_addresses?
+      applicants.all?(&:has_valid_address?)
+    end
+
+    def is_application_valid?
+      application_attributes_validity = self.valid?(:submission) ? true : false
+
+      if relationships_complete?
+        relationships_validity = true
+      else
+        self.errors[:base] << "You must have a complete set of relationships defined among every member."
+        relationships_validity = false
+      end
+
+      if applicants_have_valid_addresses?
+        addresses_validity = true
+      else
+        self.errors[:base] << 'You must have a valid addresses for every applicant.'
+        addresses_validity = false
+      end
+
+      application_attributes_validity && relationships_validity && addresses_validity
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1055,10 +1095,11 @@ module FinancialAssistance
     end
 
     def set_assistance_year
+      return unless assistance_year.blank?
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      ) if assistance_year.blank?
+      )
     end
 
     def set_effective_date
@@ -1110,19 +1151,6 @@ module FinancialAssistance
 
     def before_attestation_validity
       validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
-    end
-
-    def is_application_valid?
-      application_attributes_validity = self.valid?(:submission) ? true : false
-
-      if relationships_complete?
-        relationships_validity = true
-      else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
-        relationships_validity = false
-      end
-
-      application_attributes_validity && relationships_validity
     end
 
     def is_application_ready_for_attestation?

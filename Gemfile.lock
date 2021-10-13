@@ -10,7 +10,7 @@ GIT
   revision: 359a687d2c57736cbd31434c4476bdbdf2cd73bd
   branch: mcr_enrollment_fix
   specs:
-    aca_entities (0.8.0)
+    aca_entities (0.9.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)

@@ -87,7 +87,7 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :batch_transfer
       is_enabled: true
     - key: :transfer_service
@@ -200,7 +200,7 @@ registry:
       is_enabled: true
       settings:
         - key: :name
-          item: "MaineCare or CubCare"
+          item: "MaineCare or Cub Care"
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:

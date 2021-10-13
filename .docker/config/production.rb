@@ -45,8 +45,9 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = false
 
+=begin
   config.content_security_policy do |policy|
     policy.default_src :self, :https
     policy.font_src :self, :https, :data, "*.gstatic.com  *.fontawesome.com"
@@ -54,7 +55,8 @@ Rails.application.configure do
     policy.script_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://apps.usw2.pure.cloud *.fontawesome.com *.google-analytics.com"
     policy.style_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com *.fontawesome.com"
   end
-  
+=end
+
   config.static_cache_control = 'public, max-age=31536000'
   config.public_file_server.headers = {
     'Cache-Control' => 'public, max-age=31536000',

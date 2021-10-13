@@ -65,7 +65,7 @@ class VlpDocument < Document
   ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject", "View History", "Call HUB", "Extend"]
 
   # reasons admin can provide when verifying type
-  VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+  VERIFICATION_REASONS = EnrollRegistry[:verification_reasons].item
 
   # reasons admin can provide when rejecting verification type. these reasons applied for all verification types
   ALL_TYPES_REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person"]

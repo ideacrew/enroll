@@ -46,6 +46,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateApplicatio
     allow(operation_instance.class).to receive(:new).and_return(operation_instance)
     allow(operation_instance).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
+    application.applicants.each do |appl|
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: '')]
+      appl.save!
+    end
   end
 
   context 'success' do

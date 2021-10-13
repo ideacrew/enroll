@@ -23,7 +23,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let(:payload_params) do
     {
       application: BSON::ObjectId('614cd09ca54d7584cbc9532d'),
-      family_id: "10000",
+      family_id: family.hbx_assigned_id.to_s,
       people: [],
       type: "application"
     }

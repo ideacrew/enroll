@@ -126,6 +126,7 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false)
       allow(Settings.site).to receive(:key).and_return(:dc)
       allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
@@ -303,6 +304,7 @@ module BenefitSponsors
             # allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_approval_period).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false) if profile_type == 'broker_agency'
             BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
             BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop if profile_type == 'general_agency'
             site.benefit_markets.first.save!

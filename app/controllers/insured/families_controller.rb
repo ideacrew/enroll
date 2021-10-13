@@ -50,6 +50,7 @@ class Insured::FamiliesController < FamiliesController
 
       respond_to do |format|
         format.html
+        format.any { head :ok }
       end
     end
   end

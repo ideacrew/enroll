@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: e8d0bc5f7eecaaa53fbc34828693d784aa451539
-  branch: trunk
+  revision: 91d993ac24740e48536db9056782f78b08e33969
+  branch: release_0.9.0
   specs:
-    aca_entities (0.8.0)
+    aca_entities (0.9.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -13,6 +13,7 @@ GIT
       iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
+      rbnacl (~> 7.1)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -351,7 +352,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.13.8)
+    oj (3.13.9)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
@@ -407,6 +408,8 @@ GEM
       thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
     rake (13.0.1)
+    rbnacl (7.1.1)
+      ffi
     redis (4.4.0)
     redis-namespace (1.8.1)
       redis (>= 3.0.4)
