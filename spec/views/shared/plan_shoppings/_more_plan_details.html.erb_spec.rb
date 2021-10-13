@@ -42,7 +42,7 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
         allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
         allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)
         allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
-        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two ])
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two])
         assign(:hbx_enrollment, hbx_enrollment)
         render "shared/plan_shoppings/more_plan_details", person: person
       end
@@ -59,7 +59,7 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
         allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
         allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)
         allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
-        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two ])
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two])
         assign(:hbx_enrollment, hbx_enrollment)
         render "shared/plan_shoppings/more_plan_details", person: person
       end
