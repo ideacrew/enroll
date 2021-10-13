@@ -70,5 +70,22 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       expect(value.is_a?(Hash)).to eq true
       expect(value[[person.hbx_id]].keys.include?(:health_only)).to eq true
     end
+
+    context 'all members without rating area' do
+      before do
+        family.family_members.each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'work') }
+        end
+        @result = subject.call(params)
+      end
+
+      it 'should return a failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should return failure with a message' do
+        expect(@result.failure).to eq("Unable to find rating addresses for at least one family member for given family with id: #{family.id}")
+      end
+    end
   end
 end
