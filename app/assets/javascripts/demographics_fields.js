@@ -407,6 +407,9 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
+    if ($('#immigration_doc_type').val() == '') {
+      $('#showWarning').removeClass('hidden');
+    }
     if ($('#vlp_documents_container').is(':visible')) {
       // if ($("")) #this is where you are going to check document field
       $('.vlp_doc_area input.doc_fields').each(function () {
@@ -449,35 +452,44 @@ var PersonValidations = (function (window, undefined) {
 
         if ($(this).attr('placeholder') == 'Document Description') {
           if ($(this).val().length < 1) {
-            alert(
-              'Please fill in your information for ' +
-                $(this).attr('placeholder') +
-                '.'
-            );
-            PersonValidations.restoreRequiredAttributes(e);
-          } else {
+            if ($(this).hasClass('required')) {
+              alert(
+                'Please fill in your information for ' +
+                  $(this).attr('placeholder') +
+                  '.'
+              );
+              PersonValidations.restoreRequiredAttributes(e);
+            } else {
+              $('#showWarning').removeClass('hidden');
+            }
           }
         }
         if ($(this).attr('placeholder') == 'Card Number') {
           if ($(this).val().length < 1) {
-            alert(
-              'Please fill in your information for ' +
-                $(this).attr('placeholder') +
-                '.'
-            );
-            PersonValidations.restoreRequiredAttributes(e);
-          } else {
+            if ($(this).hasClass('required')) {
+              alert(
+                'Please fill in your information for ' +
+                  $(this).attr('placeholder') +
+                  '.'
+              );
+              PersonValidations.restoreRequiredAttributes(e);
+            } else {
+              $('#showWarning').removeClass('hidden');
+            }
           }
         }
         if ($(this).attr('placeholder') == 'Naturalization Number') {
           if ($(this).val().length < 1) {
-            alert(
-              'Please fill in your information for ' +
-                $(this).attr('placeholder') +
-                '.'
-            );
-            PersonValidations.restoreRequiredAttributes(e);
-          } else {
+            if ($(this).hasClass('required')) {
+              alert(
+                'Please fill in your information for ' +
+                  $(this).attr('placeholder') +
+                  '.'
+              );
+              PersonValidations.restoreRequiredAttributes(e);
+            } else {
+              $('#showWarning').removeClass('hidden');
+            }
           }
         }
         if (
@@ -493,25 +505,31 @@ var PersonValidations = (function (window, undefined) {
         } else {
           if ($(this).attr('placeholder') == 'Passport Number') {
             if ($(this).val().length < 1) {
-              alert(
-                'Please fill in your information for ' +
-                  $(this).attr('placeholder') +
-                  '.'
-              );
-              PersonValidations.restoreRequiredAttributes(e);
-            } else {
+              if ($(this).hasClass('required')) {
+                alert(
+                  'Please fill in your information for ' +
+                    $(this).attr('placeholder') +
+                    '.'
+                );
+                PersonValidations.restoreRequiredAttributes(e);
+              } else {
+                $('#showWarning').removeClass('hidden');
+              }
             }
           }
         }
         if ($(this).attr('placeholder') == 'I-766 Expiration Date') {
           if ($(this).val().length != 10) {
-            alert(
-              'Please fill in your information for ' +
-                $(this).attr('placeholder') +
-                ' with a MM/DD/YYYY format.'
-            );
-            PersonValidations.restoreRequiredAttributes(e);
-          } else {
+            if ($(this).hasClass('required')) {
+              alert(
+                'Please fill in your information for ' +
+                  $(this).attr('placeholder') +
+                  ' with a MM/DD/YYYY format.'
+              );
+              PersonValidations.restoreRequiredAttributes(e);
+            } else {
+              $('#showWarning').removeClass('hidden');
+            }
           }
         }
         //        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
@@ -528,13 +546,16 @@ var PersonValidations = (function (window, undefined) {
         ) {
           if ($(this).attr('placeholder') == 'Passport Expiration Date') {
             if ($(this).val().length != 10) {
-              alert(
-                'Please fill in your information for ' +
-                  $(this).attr('placeholder') +
-                  ' with a MM/DD/YYYY format.'
-              );
-              PersonValidations.restoreRequiredAttributes(e);
-            } else {
+              if ($(this).hasClass('required')) {
+                alert(
+                  'Please fill in your information for ' +
+                    $(this).attr('placeholder') +
+                    ' with a MM/DD/YYYY format.'
+                );
+                PersonValidations.restoreRequiredAttributes(e);
+              } else {
+                $('#showWarning').removeClass('hidden');
+              }
             }
           }
         }
@@ -548,13 +569,16 @@ var PersonValidations = (function (window, undefined) {
         } else {
           if ($(this).attr('placeholder') == 'I 94 Number') {
             if ($(this).val().length < 1) {
-              alert(
-                'Please fill in your information for ' +
-                  $(this).attr('placeholder') +
-                  '.'
-              );
-              PersonValidations.restoreRequiredAttributes(e);
-            } else {
+              if ($(this).hasClass('required')) {
+                alert(
+                  'Please fill in your information for ' +
+                    $(this).attr('placeholder') +
+                    '.'
+                );
+                PersonValidations.restoreRequiredAttributes(e);
+              } else {
+                $('#showWarning').removeClass('hidden');
+              }
             }
           }
         }
@@ -567,13 +591,16 @@ var PersonValidations = (function (window, undefined) {
         ) {
           if ($(this).attr('placeholder') == 'SEVIS ID') {
             if ($(this).val().length < 1) {
-              alert(
-                'Please fill in your information for ' +
-                  $(this).attr('placeholder') +
-                  '.'
-              );
-              PersonValidations.restoreRequiredAttributes(e);
-            } else {
+              if ($(this).hasClass('required')) {
+                alert(
+                  'Please fill in your information for ' +
+                    $(this).attr('placeholder') +
+                    '.'
+                );
+                PersonValidations.restoreRequiredAttributes(e);
+              } else {
+                $('#showWarning').removeClass('hidden');
+              }
             }
           }
         } else {
