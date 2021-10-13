@@ -1,8 +1,6 @@
 <div class="module shopping-data">
   <% if add_external_links_enabled? && plan_shopping_enabled? %>
-    <%= button_to find_your_doctor_url, class: 'btn btn-primary btn-large', form: {target: '_blank'}  do %>
-      <%= l10n('find_your_doctor') %> &nbsp;<i class='fa fa-external-link-alt' aria-hidden='true'></i>
-    <% end %>
+    <%= link_to l10n("go_to_plan_compare") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
   <% end %>
 
   <br/>

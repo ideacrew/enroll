@@ -2,7 +2,7 @@ module ApplicationHelper
   include FloatHelper
 
   def add_external_links_enabled?
-    EnrollRegistry[:add_external_links].feature.is_enabled
+    EnrollRegistry.feature_enabled?(:add_external_links)
   end
 
   def plan_shopping_enabled?

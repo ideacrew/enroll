@@ -14,6 +14,18 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see both dependent and primary
 
+  Scenario: Find Your Doctor Button
+    Given EnrollRegistry add_external_links feature is enabled
+    And EnrollRegistry add_external_links feature is enabled
+
+    Given Patrick Doe has active individual market role and verified identity
+    And Patrick Doe logged into the consumer portal
+    When Patrick Doe click the "Married" in qle carousel
+    And Patrick Doe selects a past qle date
+    When Patrick Doe clicks continue from qle
+    Then Patrick Doe should see family members page and clicks continue
+    And Patrick Doe should see the group selection page
+
   Scenario: when IVL purchase plan only for dependent
     Given a consumer exists
     And the consumer is logged in
