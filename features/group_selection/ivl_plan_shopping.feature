@@ -15,9 +15,6 @@ Feature: IVL plan purchase
     Then consumer should see both dependent and primary
 
   Scenario: Find Your Doctor Button
-    Given EnrollRegistry add_external_links feature is enabled
-    And EnrollRegistry add_external_links feature is enabled
-
     Given Patrick Doe has active individual market role and verified identity
     And Patrick Doe logged into the consumer portal
     When Patrick Doe click the "Married" in qle carousel
