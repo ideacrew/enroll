@@ -151,7 +151,8 @@ module Operations
           hash["terminated_on"] = nil
         end
 
-        hash["consumer_role_id"] = family.primary_person.consumer_role.id
+        subscriber = hash["hbx_enrollment_members"].detect {|hbx_m| hbx_m["is_subscriber"] == true}
+        hash["consumer_role_id"] = family.family_members.detect {|fm| fm.id == subscriber["applicant_id"]}.person.consumer_role.id
         hash["household_id"] = family.active_household.id
 
         hash["coverage_household_id"] = family.active_household.immediate_family_coverage_household.id
