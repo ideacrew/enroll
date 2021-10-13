@@ -87,7 +87,7 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :batch_transfer
       is_enabled: true
     - key: :transfer_service
