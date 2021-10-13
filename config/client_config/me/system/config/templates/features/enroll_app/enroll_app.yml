@@ -633,3 +633,6 @@ registry:
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
+      - key: :email_validation_notifications
+        item: :email_validation_notifications
+        is_enabled: true

@@ -64,6 +64,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     let(:mock_person_user) { instance_double("User") }
     let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
     let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, agent?: false) }
+    let(:email) { double(:address => 'test@test.com') }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }
     let(:mock_response_description_text) { double }
@@ -76,6 +77,8 @@ describe Insured::InteractiveIdentityVerificationsController do
 
     before :each do
       sign_in(mock_user)
+      allow(mock_person).to receive(:emails).and_return([email])
+      allow(mock_person).to receive(:first_name).and_return("john")
       allow(::IdentityVerification::InteractiveVerification).to receive(:new).with(expected_params).and_return(mock_session)
     end
 
@@ -162,6 +165,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     let(:mock_person_user) { instance_double("User") }
     let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
     let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, agent?: false) }
+    let(:email) { double(:address => 'test@test.com') }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }
     let(:mock_response_description_text) { double }
@@ -176,6 +180,8 @@ describe Insured::InteractiveIdentityVerificationsController do
 
     before :each do
       sign_in(mock_user)
+      allow(mock_person).to receive(:emails).and_return([email])
+      allow(mock_person).to receive(:first_name).and_return("john")
       allow(::IdentityVerification::InteractiveVerificationService).to receive(:new).and_return(mock_service)
       allow(controller).to receive(:render_to_string).with(
         "events/identity_verification/interactive_verification_override",
@@ -205,6 +211,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     end
 
     describe "when verification is successful" do
+      # let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:service_succeeded) { true }
       it "should redirect the user" do
         allow(TimeKeeper).to receive(:date_of_record).and_return(mock_today)

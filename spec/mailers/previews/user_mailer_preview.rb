@@ -104,6 +104,12 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.plan_shopping_completed(user, enrollment, plan_decorator)
   end
 
+  def verification_denied
+    email_address = "test@test.com"
+    first_name = "test"
+    UserMailer.identity_verification_denial(email_address, first_name)
+  end
+
   def new_client_notification; end
 
   def broker_pending_completed_training_missing_carrier; end
