@@ -408,6 +408,7 @@ var PersonValidations = (function (window, undefined) {
 
   function validationForVlpDocuments(e) {
     if ($('#vlp_documents_container').is(':visible')) {
+      // if ($("")) #this is where you are going to check document field
       $('.vlp_doc_area input.doc_fields').each(function () {
         if ($(this).attr('placeholder') == 'Certificate Number') {
           if ($(this).val().length < 1) {
