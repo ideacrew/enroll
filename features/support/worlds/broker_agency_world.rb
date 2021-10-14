@@ -156,7 +156,6 @@ end
 Then(/^Hbx Admin clicks on the current broker applicant show button$/) do
   wait_for_ajax
   find_all('.interaction-click-control-broker-show').first.click
-  expect(page).to have_content("HBX")
 end
 
 And(/^person record exists for (.*?)$/) do |name|
