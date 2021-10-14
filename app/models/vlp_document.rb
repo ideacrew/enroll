@@ -131,7 +131,7 @@ class VlpDocument < Document
   validates :naturalization_number, length: { in: 6..12 }, :allow_blank => true
   validates :passport_number, length: { in: 6..12 }, :allow_blank => true
   validates :sevis_id, length: { is: 10 } , :allow_blank => true #first char is N
-  validates :visa_number, length: { is: 8 }, :allow_blank => true
+  validates :visa_number, length: { in: 8..12 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
   validates :card_number, length: { is: 13 }, :allow_blank => true#first 3 alpha, remaining 10 numeric
 

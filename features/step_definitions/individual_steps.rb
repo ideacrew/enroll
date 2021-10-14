@@ -20,7 +20,11 @@ When(/^.+ visits the Consumer portal during open enrollment$/) do
   BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
 
-
+Then(/^\w+ should see Go To Plan Compare button$/) do
+  expect(page).to have_content(l10n("go_to_plan_compare"))
+  click_link(l10n("go_to_plan_compare"))
+  expect(page).to have_content("CHECKBOOK")
+end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
@@ -485,6 +489,10 @@ And(/^.+ click on purchase button on confirmation page/) do
   #fill_in 'last_name_thank_you', :with => (@u.find :last_name)
   # screenshot("purchase")
   click_link "Confirm"
+end
+
+Then(/^.+ should see the extended APTC confirmation message/) do
+  expect(page).to have_content("I must file a federal income tax return")
 end
 
 And(/^.+ clicks on the Continue button to go to the Individual home page/) do

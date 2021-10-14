@@ -8,5 +8,6 @@
       site_home_business_url: site_home_business_url,
       site_user_sign_in_url: EnrollRegistry[:enroll_app].setting(:user_sign_in_url).item,
       contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
-      site_title: EnrollRegistry[:enroll_app].setting(:site_title).item
+      site_title: EnrollRegistry[:enroll_app].setting(:site_title).item,
+      invitation_url: claim_invitation_url(invitation)
 ).html_safe %>

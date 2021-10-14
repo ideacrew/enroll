@@ -8,7 +8,7 @@ module Subscribers
     include ::EventSource::Subscriber[amqp: 'magi_medicaid.atp.enroll']
 
     # event_source branch: release_0.5.2
-    subscribe(:on_magi_medicaid_atp_enroll) do |delivery_info, _metadata, response|
+    subscribe(:on_transfer_in) do |delivery_info, _metadata, response|
       logger.info "AtpSubscriber: invoked on_magi_medicaid_atp_enroll with delivery_info: #{delivery_info}, response: #{response}"
       payload = JSON.parse(response, :symbolize_names => true)
       result = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn.new.call(payload)
@@ -26,7 +26,7 @@ module Subscribers
       else
         transfer_details[:result] = "Failed"
         transfer_details[:failure] = "Unsucessfully ingested by Enroll - #{result.failure}"
-        errors = result.failure.errors.to_h
+        errors = result.failure
         nack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: nacked with failure, errors: #{errors}"
       end
