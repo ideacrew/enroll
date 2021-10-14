@@ -30,7 +30,7 @@
             <%= render "insured/plan_shoppings/coverage_information" %>
           <% else %>
             <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate: true} %>
-            <%= render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: @enrollment&.applied_aptc_amount&.present? && @enrollment&.applied_aptc_amount > 0, coverage_year: @enrollment.effective_on.year.to_s} %>
+            <%= render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: @elected_aptc.present?, coverage_year: @enrollment.effective_on.year.to_s} %>
           <% end %>
 
           <% if @enrollment.is_cobra_status? %>

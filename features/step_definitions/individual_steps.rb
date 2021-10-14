@@ -487,6 +487,11 @@ And(/^.+ click on purchase button on confirmation page/) do
   click_link "Confirm"
 end
 
+Then(/^.+ should see the extended APTC confirmation message/) do
+  binding.irb
+  expect(page).to have_content("I must file a federal income tax return")
+end
+
 And(/^.+ clicks on the Continue button to go to the Individual home page/) do
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
