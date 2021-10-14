@@ -5148,4 +5148,7 @@ describe ".propogate_cancel" do
       expect(active_coverage.aasm_state).to eq "coverage_canceled"
     end
   end
+
+  context 'exclude_child_only_offering' do
+  end
 end
