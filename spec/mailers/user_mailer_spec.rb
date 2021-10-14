@@ -100,8 +100,9 @@ RSpec.describe UserMailer do
   end
 
   context "#identity_verification_denial" do
+    let(:hbx_id) { rand(10_000)}
     let(:identity_verification_denial) do
-      UserMailer.identity_verification_denial(person_with_work_email, person_with_work_email.first_name)
+      UserMailer.identity_verification_denial(person_with_work_email, person_with_work_email.first_name, hbx_id)
     end
     let(:identity_verification_denial_translation) do
       l10n(
