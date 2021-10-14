@@ -32,7 +32,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def large_family_factor(member)
-    if (age_of(member) > 20) || (kind == :dental)
+    zero_permium_policy_disabled = EnrollRegistry[:zero_permium_policy].disabled?
+
+    if (age_of(member) > 20) || (kind == :dental && zero_permium_policy_disabled)
       1.00
     elsif child_index(member) > 2
       0.00

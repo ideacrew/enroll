@@ -646,3 +646,5 @@ registry:
       - key: :go_to_plan_compare_link
         item: :go_to_plan_compare
         is_enabled: true
+      - key: :zero_permium_policy
+        is_enabled: true
