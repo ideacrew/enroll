@@ -27,7 +27,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def child_index(member)
     child_age_limit = EnrollRegistry[:enroll_app].setting(:child_age_limit).item
-    @children = members.select {|mem| age_of(mem) < child_age_limit} unless defined?(@children)
+    @children = members.select {|mem| age_of(mem) <= child_age_limit} unless defined?(@children)
     @children.index(member)
   end
 
