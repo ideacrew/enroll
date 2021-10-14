@@ -61,7 +61,7 @@ module Validators
     end
 
     rule(:alien_number) do
-      key.failure(message(values[:subject])) if ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank? && FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields)
     end
 
     rule(:i94_number) do

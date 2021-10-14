@@ -2,7 +2,7 @@
   <% description = (name == 'certificate_citizenship' || name == 'naturalization_certificate') ? l10n("insured.consumer_roles.docs_shared.certificate_alien_number_req") : l10n("insured.consumer_roles.docs_shared.alien_number_req") %>
   <%= v.text_field :alien_number, :placeholder => l10n("insured.consumer_roles.docs_shared.alien_number"),
                    :pattern => "\\d{9}",
-                   :class => "doc_fields",
+                   :class => "#{FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields) ? "required" : "" }doc_fields",
                    :title => description.gsub("-li-", "") %>
   <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: description} %>
 </div>
