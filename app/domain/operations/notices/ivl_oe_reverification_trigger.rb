@@ -16,7 +16,7 @@ module Operations
 
       def call(params)
         _values = yield validate(params)
-        event_name = yield determine_event_name(params[:family])
+        event_name = yield determine_eligibility(params[:family])
         payload = yield build_payload(params[:family])
         event = yield build_event(payload, event_name)
         result = yield publish_response(event)
@@ -41,27 +41,31 @@ module Operations
         applications.max_by(&:created_at)
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
-      def determine_event_name(family)
+      def event_name(financial_application)
+        applicants = financial_application.applicants
+
+        if applicants.all?(&:is_ia_eligible)
+          'aqhp_eligible_on_reverification'
+        elsif applicants.all? { |applicant| applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid }
+          'medicaid_eligible_on_reverification'
+        elsif applicants.all?(&:is_without_assistance)
+          'uqhp_eligible_on_reverification'
+        elsif applicants.all?(&:is_totally_ineligible)
+          nil # do not have an event defined yet
+        else
+          'mixed_determination_on_reverification'
+        end
+      end
+
+      def determine_eligibility(family)
         financial_application = fetch_application(family)
 
         return Success('qhp_eligible_on_reverification') if financial_application.nil?
         return Success('expired_consent_during_reverification') unless financial_application.determined?
 
-        applicants = financial_application.applicants
-
-        event_name =
-          if applicants.all?(&:is_ia_eligible)
-            'aqhp_eligible_on_reverification'
-          elsif applicants.all? { |applicant| applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid }
-            'medicaid_eligible_on_reverification'
-          elsif applicants.all?(&:is_without_assistance)
-            'uqhp_eligible_on_reverification'
-          end
-
+        event_name = event_name(financial_application)
         event_name.present? ? Success(event_name) : Failure("Unable to determine event for the given family id: #{family.id}")
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def build_addresses(person)
         address = person.mailing_address
@@ -101,12 +105,31 @@ module Operations
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
+              consumer_role: build_consumer_role(person.consumer_role),
               addresses: build_addresses(person)
             }
           }
           member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
           member_hash
         end
+      end
+
+      def build_consumer_role(consumer_role)
+        {
+          is_applying_coverage: consumer_role.is_applying_coverage,
+          five_year_bar: consumer_role.five_year_bar,
+          requested_coverage_start_date: consumer_role.requested_coverage_start_date,
+          aasm_state: consumer_role.aasm_state,
+          is_applicant: consumer_role.is_applicant,
+          is_state_resident: consumer_role.is_state_resident,
+          identity_validation: consumer_role.identity_validation,
+          identity_update_reason: consumer_role.identity_update_reason,
+          application_validation: consumer_role.application_validation,
+          application_update_reason: consumer_role.application_update_reason,
+          identity_rejected: consumer_role.identity_rejected,
+          application_rejected: consumer_role.application_rejected,
+          lawful_presence_determination: {}
+        }
       end
 
       def build_household_hash(family)
