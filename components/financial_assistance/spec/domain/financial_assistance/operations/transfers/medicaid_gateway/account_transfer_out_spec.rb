@@ -73,9 +73,13 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     }
   end
 
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:premiums_double) { double(:success => premiums_hash) }
+  let(:slcsp_double) { double(:success => slcsp_info) }
+  let(:lcsp_double) { double(:success => lcsp_info) }
+
+  let(:fetch_double) { double(:new => double(call: premiums_double))}
+  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
+  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
 
   let(:obj)  { FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount.new }
   let(:event) { Success(double) }
@@ -97,6 +101,9 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(premiums_double).to receive(:failure?).and_return(false)
+    allow(slcsp_double).to receive(:failure?).and_return(false)
+    allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
 
