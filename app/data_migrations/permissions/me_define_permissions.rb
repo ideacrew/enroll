@@ -391,7 +391,7 @@ class MeDefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes!(can_access_pay_now: true)
   end
 
-  def hbx_admin_change_username_and_email
+  def hbx_admin_can_change_username_and_email
     Permission.hbx_staff.update_attributes!(can_change_username_and_email: true)
     Permission.super_admin.update_attributes!(can_change_username_and_email: true)
     Permission.hbx_tier3.update_attributes!(can_change_username_and_email: true)

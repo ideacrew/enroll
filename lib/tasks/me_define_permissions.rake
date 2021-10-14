@@ -167,11 +167,13 @@ namespace :me_permissions do
   MeDefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
 end
 
+# RAILS_ENV=production bundle exec rake me_permissions:assign_current_permissions
 namespace :me_permissions do
   desc 'assign the most current permissions'
   MeDefinePermissions.define_task :assign_current_permissions => :environment
 end
 
+# RAILS_ENV=production bundle exec rake me_permissions:hbx_admin_can_change_username_and_email
 namespace :me_permissions do
   desc 'assign the most current permissions'
   MeDefinePermissions.define_task :hbx_admin_can_change_username_and_email => :environment

@@ -89,7 +89,8 @@ RSpec.describe UserMailer do
         first_name: person_with_work_email.first_name,
         contact_center_short_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
         state_name: state_name,
-        training_link: EnrollRegistry[:broker_training_link].item
+        training_link: EnrollRegistry[:broker_training_link].item,
+        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
       ).html_safe
 
     end
