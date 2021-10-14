@@ -1385,7 +1385,7 @@ module FinancialAssistance
 
     def create_eligibility_determinations
       ## Remove  when copy method is fixed to exclude copying Tax Household
-      active_applicants.each { |applicant| applicant.update_attributes!(eligibility_determination_id: nil)  }
+      active_applicants.each { |applicant| applicant.write_attribute(:eligibility_determination_id, nil)  }
 
       non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
       tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
@@ -1393,20 +1393,20 @@ module FinancialAssistance
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
           applicant.eligibility_determination = applicant.eligibility_determination_of_spouse
-          applicant.update_attributes!(tax_filer_kind: 'tax_filer')
+          applicant.write_attribute(:tax_filer_kind, 'tax_filer')
         else
           # Create a new THH and assign it to the applicant
           # Need THH for Medicaid cases too
           applicant.eligibility_determination = eligibility_determinations.create!
-          applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
+          applicant.write_attribute(:tax_filer_kind, applicant.tax_filing? ? 'tax_filer' : 'non_filer')
         end
       end
 
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
-        applicant.update_attributes!(tax_filer_kind: 'dependent')
-        applicant.update_attributes!(tax_filer_kind: 'dependent')
+        applicant.write_attribute(:tax_filer_kind, 'dependent')
+        applicant.write_attribute(:tax_filer_kind, 'dependent')
       end
 
       empty_ed = eligibility_determinations.select do |ed|
@@ -1419,22 +1419,32 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
+    def family
+      @family ||= Family.find(family_id) rescue nil
+    end
+
     def create_verification_documents
       active_applicants.each do |applicant|
         applicant.verification_types =
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
-        family_record = Family.where(id: family_id.to_s).first
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-           family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-          family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
+            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+          family_member_record = family.family_members.where(id: applicant.family_member_id).first
           next if family_member_record.blank?
           person_record = family_member_record.person
           next if person_record.blank?
           person_record.add_new_verification_type('Income')
         end
-        applicant.move_to_pending!
+        from_state = applicant.aasm_state
+        # TODO revisit
+        applicant.write_attribute(:aasm_state, 'verification_pending')
+        applicant.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: from_state,
+            to_state: 'verification_pending',
+            event: 'move_to_pending!'
+        )
       end
     end
 
