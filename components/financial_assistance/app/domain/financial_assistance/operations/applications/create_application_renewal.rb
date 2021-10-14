@@ -46,12 +46,16 @@ module FinancialAssistance
 
           application = applications_by_family.by_year(validated_params[:renewal_year].pred).renewal_eligible.created_asc.last
 
-          if application.present?
+          if application
             Success(application)
           else
             Rails.logger.error "Could not find any applications that are renewal eligible: #{validated_params}."
             Failure("Could not find any applications that are renewal eligible: #{validated_params}.")
           end
+        rescue => e
+          Rails.logger.error "Critical Error: Unable to find application from database"
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
         end
 
         def renew_application(application, validated_params)
