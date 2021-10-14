@@ -34,6 +34,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:rate_schedule_date) {TimeKeeper.date_of_record}
   let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
 
+  before do
+    EnrollRegistry[:extended_aptc_individual_agreement_message].feature.stub(:is_enabled).and_return(false)
+  end
+
   context "POST checkout", :dbclean => :around_each do
     before do
       allow(BenefitMarkets::Products::Product).to receive(:find).with("plan_id").and_return(product)
