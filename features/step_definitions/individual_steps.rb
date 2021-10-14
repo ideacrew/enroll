@@ -488,7 +488,6 @@ And(/^.+ click on purchase button on confirmation page/) do
 end
 
 Then(/^.+ should see the extended APTC confirmation message/) do
-  binding.irb
   expect(page).to have_content("I must file a federal income tax return")
 end
 
