@@ -40,7 +40,7 @@ module VlpDoc
     return true if consumer_role.blank?
     return true if params[source][:is_applying_coverage] == "false"
     return false unless validate_vlp_params(params, source, consumer_role, dependent)
-
+    pp params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
@@ -58,6 +58,7 @@ module VlpDoc
 
       doc_params = params.require(source).permit(*vlp_doc_params_list)
       vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
+      puts vlp_doc_attribute
       if vlp_doc_attribute
         document = consumer_role.find_document(vlp_doc_attribute[:subject])
         document.update_attributes(vlp_doc_attribute)

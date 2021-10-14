@@ -57,7 +57,7 @@ module Validators
     end
 
     rule(:subject) do
-      key.failure('Invalid VLP Document type') unless ::VlpDocument::VLP_DOCUMENT_KINDS.include?(value)
+      key.failure('Invalid VLP Document type') unless ::VlpDocument::VLP_DOCUMENT_KINDS.include?(value) && value.blank? && FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields)
     end
 
     rule(:alien_number) do

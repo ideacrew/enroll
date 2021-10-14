@@ -190,7 +190,7 @@ class VlpDocument < Document
     if FinancialAssistanceRegistry.feature_enabled?(:immigration_document_fields)
      required_fields[self.subject.to_sym].each do |field|
        errors.add(:base, "#{field} value is required") unless self.send(field).present?
-     end
+     end 
     end
   end
 
