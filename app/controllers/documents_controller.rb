@@ -88,7 +88,7 @@ class DocumentsController < ApplicationController
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
     if (RidpDocument::VERIFICATION_REASONS + RidpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
-      verification_result = @person.consumer_role.admin_ridp_verification_action(admin_action, ridp_type, update_reason)
+      verification_result = @person.consumer_role.admin_ridp_verification_action(admin_action, ridp_type, update_reason, @person)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
     else

@@ -1129,12 +1129,13 @@ class ConsumerRole
     end
   end
 
-  def admin_ridp_verification_action(admin_action, ridp_type, update_reason)
+  def admin_ridp_verification_action(admin_action, ridp_type, update_reason, person)
     case admin_action
       when 'verify'
         update_ridp_verification_type(ridp_type, update_reason)
       when 'return_for_deficiency'
         return_ridp_doc_for_deficiency(ridp_type, update_reason)
+        UserMailer.identity_verification_denial(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && @person.emails.present?
     end
   end
 

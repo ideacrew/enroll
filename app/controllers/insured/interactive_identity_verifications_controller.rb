@@ -34,7 +34,6 @@ module Insured
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
       @person.consumer_role.move_identity_documents_to_outstanding
-      UserMailer.identity_verification_denial(@person.emails.first.address, @person.first_name, @person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && @person.emails.present?
       render "failed_validation"
     end
 
