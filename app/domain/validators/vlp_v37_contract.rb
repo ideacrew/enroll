@@ -61,39 +61,39 @@ module Validators
     end
 
     rule(:alien_number) do
-      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:i94_number) do
-      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && I94_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && I94_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:passport_number) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && PASSPORT_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && PASSPORT_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:sevis_id) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && SEVIS_ID_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && SEVIS_ID_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:naturalization_number) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && NATURALIZATION_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && NATURALIZATION_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:citizenship_number) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && CITIZENSHIP_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && CITIZENSHIP_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:card_number) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && CARD_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && CARD_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:expiration_date) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && EXPIRATION_DATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && EXPIRATION_DATE_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     rule(:description) do
-      key.failure(message(values[:subject])) unless FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) && DESCRIPTION_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && DESCRIPTION_REQUIRED_SUBJECTS.include?(values[:subject])
     end
 
     private
