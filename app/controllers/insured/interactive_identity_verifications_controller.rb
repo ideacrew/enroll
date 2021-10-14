@@ -97,7 +97,6 @@ module Insured
         consumer_user.identity_verified_date = TimeKeeper.date_of_record
         consumer_user.save!
       end
-      UserMailer.identity_verification_acceptance(@person.emails.first.address, @person.first_name).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications)
       consumer_role.move_identity_documents_to_verified
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => consumer_role.id)
       consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
