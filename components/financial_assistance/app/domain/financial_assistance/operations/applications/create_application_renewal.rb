@@ -52,7 +52,7 @@ module FinancialAssistance
             Rails.logger.error "Could not find any applications that are renewal eligible: #{validated_params}."
             Failure("Could not find any applications that are renewal eligible: #{validated_params}.")
           end
-        rescue => e
+        rescue SystemStackError => e
           Rails.logger.error "Critical Error: Unable to find application from database"
           Rails.logger.error e.message
           Rails.logger.error e.backtrace.join("\n")

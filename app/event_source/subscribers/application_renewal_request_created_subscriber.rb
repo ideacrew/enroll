@@ -20,8 +20,7 @@ module Subscribers
 
       logger.info "ApplicationRenewalRequestCreatedSubscriber on_submit_renewal_draft payload: #{payload}"
       result =
-        ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal
-          .new.call(payload)
+        ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(payload)
 
       if result.success?
         subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, success: app_hbx_id: #{result.success.hbx_id}"

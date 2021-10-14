@@ -19,8 +19,7 @@ module Subscribers
 
       payload = JSON.parse(response, symbolize_names: true)
       result =
-        FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination
-          .new.call(payload)
+        FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
 
       if result.success?
         logger.info "DeterminationSubscriber: acked with success: #{result.success}"
