@@ -26,7 +26,7 @@ module Subscribers
       else
         transfer_details[:result] = "Failed"
         transfer_details[:failure] = "Unsucessfully ingested by Enroll - #{result.failure}"
-        errors = result.failure.errors.to_h
+        errors = result.failure
         nack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: nacked with failure, errors: #{errors}"
       end
