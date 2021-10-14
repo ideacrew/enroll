@@ -81,9 +81,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     }
   end
 
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:premiums_double) { double(:success => premiums_hash) }
+  let(:slcsp_double) { double(:success => slcsp_info) }
+  let(:lcsp_double) { double(:success => lcsp_info) }
+
+  let(:fetch_double) { double(:new => double(call: premiums_double))}
+  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
+  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
 
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
@@ -99,6 +103,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
+    allow(premiums_double).to receive(:failure?).and_return(false)
+    allow(slcsp_double).to receive(:failure?).and_return(false)
+    allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
   context 'When connection is available' do

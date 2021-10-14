@@ -20,8 +20,14 @@ module Subscribers
         subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, success: app_hbx_id: #{result.success.hbx_id}"
         logger.info "ApplicationRenewalRequestCreatedSubscriber: acked, SuccessResult: #{result.success}"
       else
-        subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, failure: #{result.failure}"
-        logger.info "ApplicationRenewalRequestCreatedSubscriber: acked, FailureResult: #{result.failure}"
+        errors = if result.failure.is_a?(Dry::Validation::Result)
+                   result.failure.errors.to_h
+                 else
+                   result.failure
+                 end
+
+        subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, failure: #{errors}"
+        logger.info "ApplicationRenewalRequestCreatedSubscriber: acked, FailureResult: #{errors}"
       end
 
       ack(delivery_info.delivery_tag)
