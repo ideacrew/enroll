@@ -200,7 +200,7 @@ module Operations
         if result && result.success?
           result.success
         else
-          raise "family not found"
+          raise "family not found #{external_id}"
         end
       end
 
@@ -238,7 +238,7 @@ module Operations
         end
 
         unless people.present?
-          raise "person not found"
+          raise "person not found #{fm_hash["person_hbx_id"]}"
         end
 
         if people.count > 1
@@ -285,6 +285,7 @@ module Operations
       end
 
       def check_duplicate_coverage(new_enrollment)
+        return unless new_enrollment.coverage_selected?
         family =  Family.find(enrollment_hash["family_id"])
         hbx_enrollments = family.active_household.hbx_enrollments.where(
            {:coverage_kind => enrollment_hash["coverage_kind"],
@@ -293,6 +294,7 @@ module Operations
             :kind => "individual"}
         )
         overlapping_coverage = hbx_enrollments.select {|enrollment|
+          enrollment.subscriber.hbx_id == new_enrollment.subscriber.hbx_id &&
          (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
         }
         overlapping_coverage.each do |enrollment|

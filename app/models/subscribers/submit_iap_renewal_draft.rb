@@ -40,19 +40,31 @@ end
 # include Acapi::Notifiers
 # ::FinancialAssistance::Application.by_year(2022).renewal_draft.each do |application|
 #   payload = {_id: application.id.to_s}
-#   notify("acapi.info.events.mcr.submit_mcr_iap_renewal_draft", {:body => JSON.dump(payload)})
+#   notify("acapi.info.events.mcr.submit_iap_renewal_draft", {:body => JSON.dump(payload)})
 # end
-
+#
 # FinancialAssistance::Application.by_year(2022).renewal_draft.each do |application|
 #   if application.have_permission_to_renew?
-#     if application.may_submit? && application.is_application_valid?
-#       application.submit!
+#     if application.may_submit?
+#
+#       puts "starting ******************************************************"
+#       result = Benchmark.ms {
+#         application.submit!
+#       }
+#       puts "ending  ***********************#{result}*******************************"
 #     else
 #       puts "application not valid #{application.id}"
 #     end
 #   else
 #     application.set_income_verification_extension_required!
 #     puts "income verification required #{application.id}"
+#   end
+# end
+#
+# result_aggregate.each do |result_agg|
+#   dup_hbx_id = result_agg["_id"]["hbx_id"]
+#   if FinancialAssistance::Application.where(hbx_id: dup_hbx_id).count > 1
+#     FinancialAssistance::Application.where(hbx_id: dup_hbx_id).last.delete
 #   end
 # end
 
