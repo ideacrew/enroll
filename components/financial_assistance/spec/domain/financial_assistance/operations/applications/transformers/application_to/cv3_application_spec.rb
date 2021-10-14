@@ -72,9 +72,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     }
   end
 
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:premiums_double) { double(:success => premiums_hash) }
+  let(:slcsp_double) { double(:success => slcsp_info) }
+  let(:lcsp_double) { double(:success => lcsp_info) }
+
+  let(:fetch_double) { double(:new => double(call: premiums_double))}
+  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
+  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
@@ -86,6 +90,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(premiums_double).to receive(:failure?).and_return(false)
+    allow(slcsp_double).to receive(:failure?).and_return(false)
+    allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
   describe 'When Application in draft state is passed' do

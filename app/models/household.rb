@@ -101,9 +101,13 @@ class Household
         submitted_at: verified_tax_household.submitted_at
       )
 
+      latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+      csr_percent = latest_eligibility_determination.csr_percent == 'limited' ? '-1' : latest_eligibility_determination.csr_percent
+
       th.tax_household_members.build(
         family_member: primary_family_member,
         is_subscriber: true,
+        csr_percent_as_integer: csr_percent,
         is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
       )
 
@@ -127,8 +131,6 @@ class Household
 
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
-      latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
-      csr_percent = latest_eligibility_determination.csr_percent == 'limited' ? '-1' : latest_eligibility_determination.csr_percent
       th.eligibility_determinations.build(
         source: 'Curam',
         e_pdc_id: latest_eligibility_determination.id,

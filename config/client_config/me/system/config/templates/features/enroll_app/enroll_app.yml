@@ -557,6 +557,8 @@ registry:
         is_enabled: false
       - key: :display_county
         is_enabled: true
+      - key: :has_bqt
+        is_enabled: false
       - key: :moving_to_state
         is_enabled: false
       - key: :living_outside_state
@@ -635,4 +637,10 @@ registry:
         is_enabled: false
       - key: :email_validation_notifications
         item: :email_validation_notifications
+        is_enabled: true
+      - key: :find_my_doctor_options
+        item: :find_my_doctor_options
+        is_enabled: false
+      - key: :go_to_plan_compare_link
+        item: :go_to_plan_compare
         is_enabled: true
