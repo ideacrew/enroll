@@ -99,7 +99,7 @@ module FinancialAssistance
               inclusion: { in: RELATIONSHIPS, message: "%{value} is not a valid kind" },
               allow_blank: false
 
-    # after_create :propagate_applicant
+    after_create :propagate_applicant
 
     def applicant
       return @applicant if defined? @applicant
