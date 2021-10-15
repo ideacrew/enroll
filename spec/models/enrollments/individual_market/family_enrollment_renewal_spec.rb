@@ -17,7 +17,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
 
     let!(:family) do
-      primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob)
+      primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, is_tobacco_user: 'y')
       FactoryBot.create(:family, :with_primary_family_member, :person => primary)
     end
 
@@ -27,7 +27,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     let!(:spouse_rec) do
-      FactoryBot.create(:person, dob: spouse_dob)
+      FactoryBot.create(:person, dob: spouse_dob, is_tobacco_user: 'y')
     end
 
     let!(:spouse) do
@@ -236,6 +236,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             renewal = subject.renew
             expect(renewal.aasm_state).to eq "coverage_selected"
             expect(renewal.effective_on).to eq renewal_benefit_coverage_period.start_on
+          end
+
+          it 'Renewal enrollment members should have the tobacco_use populated from person record.' do
+            renewal_members = subject.clone_enrollment_members
+            expect(renewal_members.pluck(:tobacco_use)).to include('y')
           end
         end
       end
