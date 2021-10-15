@@ -10,6 +10,7 @@ class HbxEnrollmentMember
 
   field :applicant_id, type: BSON::ObjectId
   field :carrier_member_id, type: String
+  field :external_id, type: String
   field :is_subscriber, type: Boolean, default: false
 
   field :premium_amount, type: Money
