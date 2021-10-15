@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require 'aca_entities'
 require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/ffe/operations/mcr_to/enrollment'
 require 'aca_entities/ffe/transformers/mcr_to/enrollment'
-
+# rubocop:disable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 module Operations
   module Ffe
     # operation to transform mcr data to enroll format
@@ -93,22 +94,16 @@ module Operations
 
       def validate_enrollment_members
         members = enrollment_hash["hbx_enrollment_members"]
-        if members.blank?
-          raise "no enrollment member"
-        end
+        raise "no enrollment member" if members.blank?
 
-        if members.any? { |mem| mem["applicant_id"].nil? }
-          raise "family member not found"
-        end
+        raise "family member not found" if members.any? { |mem| mem["applicant_id"].nil? }
 
         members.each do |mem|
           result = family.active_household.coverage_households.any? do |coverage_household|
             coverage_household.coverage_household_members.detect { |c_mem| c_mem.family_member_id == mem["applicant_id"] }
           end
 
-          unless result
-            raise "coverage household not found"
-          end
+          raise "coverage household not found" unless result
         end
       end
 
@@ -147,9 +142,7 @@ module Operations
         hash["family_id"] = family.id
         hash.delete("family_hbx_id")
 
-        if hash["aasm_state"] == "coverage_selected"
-          hash["terminated_on"] = nil
-        end
+        hash["terminated_on"] = nil if hash["aasm_state"] == "coverage_selected"
 
         subscriber = hash["hbx_enrollment_members"].detect {|hbx_m| hbx_m["is_subscriber"] == true}
         hash["consumer_role_id"] = family.family_members.detect {|fm| fm.id == subscriber["applicant_id"]}.person.consumer_role.id
@@ -188,7 +181,7 @@ module Operations
       def find_benefit_coverage_period(effective_on)
         Rails.cache.fetch("benefit_coverage_period_2021", expires_in: 12.hour) do
           sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
-          sponsorship.benefit_coverage_periods.detect{ |bcp| bcp.start_on ==  effective_on.beginning_of_year }
+          sponsorship.benefit_coverage_periods.detect{ |bcp| bcp.start_on == effective_on.beginning_of_year }
         end
       end
 
@@ -197,7 +190,7 @@ module Operations
           Operations::Families::Find.new.call(external_app_id: external_id)
         end
 
-        if result && result.success?
+        if result&.success?
           result.success
         else
           raise "family not found #{external_id}"
@@ -217,15 +210,15 @@ module Operations
 
       def ssn_dob_match?(person, fm_hash)
         fm_hash["ssn"] &&
-        fm_hash["dob"] &&
-        person.ssn == fm_hash["ssn"] &&
-        person.dob == fm_hash["dob"]
+          fm_hash["dob"] &&
+          person.ssn == fm_hash["ssn"] &&
+          person.dob == fm_hash["dob"]
       end
 
       def info_match?(person,fm_hash)
         fm_hash["last_name"].downcase.strip == person.last_name.downcase.strip &&
-        fm_hash["first_name"].downcase.strip == person.first_name.downcase.strip &&
-        fm_hash["dob"] == person.dob
+          fm_hash["first_name"].downcase.strip == person.first_name.downcase.strip &&
+          fm_hash["dob"] == person.dob
       end
 
       def ext_id_match?(person, fm_hash)
@@ -233,27 +226,25 @@ module Operations
       end
 
       def person_by_external_id(fm_hash)
-        people = Rails.cache.fetch("person_#{fm_hash["person_hbx_id"]}", expires_in: 12.hour) do
+        people = Rails.cache.fetch("person_#{fm_hash['person_hbx_id']}", expires_in: 12.hour) do
           Person.where(external_person_id: fm_hash["person_hbx_id"])
         end
 
-        unless people.present?
-          raise "person not found #{fm_hash["person_hbx_id"]}"
-        end
+        raise "person not found #{fm_hash['person_hbx_id']}" unless people.present?
 
-        if people.count > 1
-          raise "more than one person found"
-        end
+        raise "more than one person found" if people.count > 1
 
         people.first
       end
 
       def find_product(product_hash, year)
-        result = Rails.cache.fetch("product_#{product_hash["hios_id"]}", expires_in: 12.hour) do
+        result = Rails.cache.fetch("product_#{product_hash['hios_id']}", expires_in: 12.hour) do
           Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
         end
 
-        if result && result.success?
+        raise "product not found" unless result&.success?
+
+        if result&.success?
           result.success
         else
           raise "product not found"
@@ -286,17 +277,17 @@ module Operations
 
       def check_duplicate_coverage(new_enrollment)
         return unless new_enrollment.coverage_selected?
-        family =  Family.find(enrollment_hash["family_id"])
+        family = Family.find(enrollment_hash["family_id"])
         hbx_enrollments = family.active_household.hbx_enrollments.where(
-           {:coverage_kind => enrollment_hash["coverage_kind"],
-            :id => {"$ne" => new_enrollment.id},
-            :aasm_state.in => ['coverage_selected', 'coverage_terminated'],
-            :kind => "individual"}
+          {:coverage_kind => enrollment_hash["coverage_kind"],
+           :id => {"$ne" => new_enrollment.id},
+           :aasm_state.in => ['coverage_selected', 'coverage_terminated'],
+           :kind => "individual"}
         )
-        overlapping_coverage = hbx_enrollments.select {|enrollment|
+        overlapping_coverage = hbx_enrollments.select do |enrollment|
           enrollment.subscriber.hbx_id == new_enrollment.subscriber.hbx_id &&
-         (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
-        }
+            (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
+        end
         overlapping_coverage.each do |enrollment|
           if new_enrollment.created_at >= enrollment.created_at
             if enrollment.may_cancel_coverage?
@@ -304,12 +295,10 @@ module Operations
             else
               cancel_term_coverage(enrollment)
             end
+          elsif new_enrollment.may_cancel_coverage?
+            new_enrollment.cancel_coverage!
           else
-            if new_enrollment.may_cancel_coverage?
-              new_enrollment.cancel_coverage!
-            else
-              cancel_term_coverage(new_enrollment)
-            end
+            cancel_term_coverage(new_enrollment)
           end
         end
       end
@@ -326,10 +315,11 @@ module Operations
       def create_state_transition(enrollment)
         enrollment.workflow_state_transitions << WorkflowStateTransition.new(
           from_state: "shopping",
-          comment:"external enrollments",
+          comment: "external enrollments",
           to_state: enrollment.aasm_state
         )
       end
     end
   end
 end
+# rubocop:enable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

@@ -351,16 +351,14 @@ class HbxEnrollment
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
-  scope :family_home_page_hidden_external_enrollments, ->(family) do
-    where(
-        :family_id => family.id,
-        :aasm_state.nin => ["shopping"],
-        :external_enrollment => true,
-        :product_id.nin => [nil]
-    ).order(
-        effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
-    )
-  end
+  scope :family_home_page_hidden_external_enrollments, lambda { |family|
+    where(:family_id => family.id,
+          :aasm_state.nin => ["shopping"],
+          :external_enrollment => true,
+          :product_id.nin => [nil]).order(
+            effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+          )
+  }
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }

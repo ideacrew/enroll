@@ -15,7 +15,7 @@ module Operations
       # @return [Dry::Monads::Result]
       def call(params)
         application = yield find_application(params)
-        payload = yield renew_application(application)
+        _payload = yield renew_application(application)
 
         Success(application)
       end

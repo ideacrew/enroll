@@ -7,9 +7,9 @@ module Subscribers
 
     def self.worker_specification
       Acapi::Amqp::WorkerSpecification.new(
-          :queue_name => "migrate_mcr_enrollment",
-          :kind => :direct,
-          :routing_key => "info.events.migration.mcr_enrollment_payload"
+        :queue_name => "migrate_mcr_enrollment",
+        :kind => :direct,
+        :routing_key => "info.events.migration.mcr_enrollment_payload"
       )
     end
 
@@ -37,7 +37,7 @@ module Subscribers
                                    :policy_tracking_id => policy_tracking_id,
                                    :payload => payload,
                                    :result => result
-                                  })
+                                 })
             }
           )
         end
@@ -52,7 +52,7 @@ module Subscribers
                                  :error => e.inspect,
                                  :message => e.message,
                                  :backtrace => e.backtrace
-                              })
+                               })
           }
         )
       end

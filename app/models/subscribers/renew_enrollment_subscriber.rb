@@ -7,9 +7,9 @@ module Subscribers
 
     def self.worker_specification
       Acapi::Amqp::WorkerSpecification.new(
-          :queue_name => "ivl_enrollment_renewal_subscriber",
-          :kind => :direct,
-          :routing_key => "info.events.enrollments.renew_enrollment"
+        :queue_name => "ivl_enrollment_renewal_subscriber",
+        :kind => :direct,
+        :routing_key => "info.events.enrollments.renew_enrollment"
       )
     end
 
@@ -24,7 +24,7 @@ module Subscribers
         current_bcp = current_bs.current_benefit_coverage_period
         query = kollection(HbxEnrollment::COVERAGE_KINDS, current_bcp)
 
-        enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
+        enrollments = family.active_household.hbx_enrollments.where(query).order(:effective_on.desc)
         enrollments.each do |enrollment|
           result = ::Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
                                                                       effective_on: renewal_bcp.start_on)
@@ -34,7 +34,7 @@ module Subscribers
             notify("acapi.info.events.enrollments.renew_enrollment_failure", {:body => JSON.dump({:family_id => family_id})})
           end
         end
-      rescue StandardError => e
+      rescue StandardError => _e
         notify("acapi.info.events.enrollments.renew_enrollment_exception", {:body => JSON.dump({:family_id => family_id})})
       end
       :ack

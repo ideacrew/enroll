@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'aca_entities/ffe/operations/mcr_to/enrollment'
 require 'aca_entities/ffe/transformers/mcr_to/enrollment'
 # RAILS_ENV=production bundle exec rails db:migrate:up dir="directory_path" VERSION="20210521151722"
@@ -21,7 +22,7 @@ class MigrateMcrEnrollment < Mongoid::Migration
           notify("acapi.info.events.migration.mcr_enrollment_payload", {:body => JSON.dump(payload)})
         end
       rescue StandardError => e
-        puts "Error: #{payload[:policyTrackingNumber]}"
+        puts "Error: #{payload[:policyTrackingNumber]} -- #{e}"
       end
     end
 

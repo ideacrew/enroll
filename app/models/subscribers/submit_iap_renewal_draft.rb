@@ -8,9 +8,9 @@ module Subscribers
 
     def self.worker_specification
       Acapi::Amqp::WorkerSpecification.new(
-          :queue_name => "submit_mcr_iap_renewal_draft",
-          :kind => :direct,
-          :routing_key => "info.events.mcr.submit_iap_renewal_draft"
+        :queue_name => "submit_mcr_iap_renewal_draft",
+        :kind => :direct,
+        :routing_key => "info.events.mcr.submit_iap_renewal_draft"
       )
     end
 
@@ -25,11 +25,10 @@ module Subscribers
         end
       rescue SystemStackError, StandardError => e
         notify("acapi.info.events.mcr.submit_iap_application_exception", {:body => JSON.dump({:payload => payload,
-                                                                                       :result => result,
-                                                                                       :error => e.inspect,
-                                                                                       :message => e.message,
-                                                                                       :backtrace => e.backtrace
-                                                                                      })})
+                                                                                              :result => result,
+                                                                                              :error => e.inspect,
+                                                                                              :message => e.message,
+                                                                                              :backtrace => e.backtrace})})
       end
       :ack
     end

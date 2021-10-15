@@ -77,12 +77,12 @@ module Operations
           calculated_renewal_base_year = calculate_renewal_base_year(application)
 
           renewal_application.assign_attributes(
-              aasm_state: family_members_changed ? 'applicants_update_required' : 'renewal_draft',
-              assistance_year: validated_params[:renewal_year],
-              years_to_renew: application.years_to_renew || 0,
-              renewal_base_year: calculated_renewal_base_year,
-              predecessor_id: application.id,
-              effective_date: Date.new(validated_params[:renewal_year])
+            aasm_state: family_members_changed ? 'applicants_update_required' : 'renewal_draft',
+            assistance_year: validated_params[:renewal_year],
+            years_to_renew: application.years_to_renew || 0,
+            renewal_base_year: calculated_renewal_base_year,
+            predecessor_id: application.id,
+            effective_date: Date.new(validated_params[:renewal_year])
           )
 
           renewal_application.save!

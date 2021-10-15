@@ -259,7 +259,7 @@ module FinancialAssistance
     index({"applicants.is_veteran_or_active_military" => 1})
     index({"applicants.is_vets_spouse_or_child" => 1})
     index({"applicants.need_help_paying_bills" => 1})
-    index({"applicants.eligibility_determination_id"=> 1})
+    index({"applicants.eligibility_determination_id" => 1})
 
     # verification_types index
     index({"applicants.verification_types._id" => 1})
@@ -1158,6 +1158,16 @@ module FinancialAssistance
       application_attributes_validity && relationships_validity && addresses_validity
     end
 
+    # rubocop:disable Lint/EmptyRescueClause
+    def family
+      @family ||= begin
+        Family.find(family_id)
+      rescue StandardError => _e
+        nil
+      end
+    end
+    # rubocop:enable Lint/EmptyRescueClause
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1424,10 +1434,6 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    def family
-      @family ||= Family.find(family_id) rescue nil
-    end
-
     def create_verification_documents
       active_applicants.each do |applicant|
         applicant.verification_types =
@@ -1435,7 +1441,7 @@ module FinancialAssistance
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+           family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
           family_member_record = family.family_members.where(id: applicant.family_member_id).first
           next if family_member_record.blank?
           person_record = family_member_record.person
@@ -1443,12 +1449,12 @@ module FinancialAssistance
           person_record.add_new_verification_type('Income')
         end
         from_state = applicant.aasm_state
-        # TODO revisit
+        # TODO: revisit
         applicant.write_attribute(:aasm_state, 'verification_pending')
         applicant.workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: from_state,
-            to_state: 'verification_pending',
-            event: 'move_to_pending!'
+          from_state: from_state,
+          to_state: 'verification_pending',
+          event: 'move_to_pending!'
         )
       end
     end
