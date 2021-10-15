@@ -12,9 +12,9 @@ module FinancialAssistance
     # belongs_to :family, class_name: "Family"
 
     before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
-    validates :application_submission_validity, presence: true, on: :submission
-    validates :before_attestation_validity, presence: true, on: :before_attestation
-    validate  :attestation_terms_on_parent_living_out_of_home
+    validate :application_submission_validity, on: :submission
+    validate :before_attestation_validity, on: :before_attestation
+    validate :attestation_terms_on_parent_living_out_of_home
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
 
@@ -499,7 +499,12 @@ module FinancialAssistance
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"}) : true
+      if result.success?
+        rt_transfer
+        true
+      else
+        log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
+      end
     end
 
     def rt_transfer
@@ -523,7 +528,7 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
       end
     end
 

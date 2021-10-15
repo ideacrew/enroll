@@ -37,7 +37,7 @@ RSpec.describe UserMailer do
 
     it "should render new client's information" do
       expect(new_client_email.body).to match("Client New")
-      expect(new_client_email.body).to match("client@new.com")
+      expect(new_client_email.subject).to match("client@new.com")
     end
   end
 
@@ -89,12 +89,31 @@ RSpec.describe UserMailer do
         first_name: person_with_work_email.first_name,
         contact_center_short_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
         state_name: state_name,
-        training_link: EnrollRegistry[:broker_training_link].item
+        training_link: EnrollRegistry[:broker_training_link].item,
+        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
       ).html_safe
 
     end
     it "should render the email with the proper text" do
       expect(broker_confirmation_email.body.raw_source).to include(person_with_work_email.first_name)
+    end
+  end
+
+  context "#identity_verification_denial" do
+    let(:hbx_id) { rand(10_000)}
+    let(:identity_verification_denial) do
+      UserMailer.identity_verification_denial(person_with_work_email, person_with_work_email.first_name, hbx_id)
+    end
+    let(:identity_verification_denial_translation) do
+      l10n(
+        site_short_name: site_short_name,
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+        first_name: person_with_work_email.first_name
+      ).html_safe
+
+    end
+    it "should render the email with the proper text" do
+      expect(identity_verification_denial.body.raw_source).to include(person_with_work_email.first_name)
     end
   end
 end

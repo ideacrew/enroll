@@ -41,7 +41,7 @@ module Validators
       required(:subject).filled(:string)
       optional(:alien_number).filled(:string).value(size?: 9)
       optional(:i94_number).filled(:string).value(size?: 11)
-      optional(:visa_number).filled(:string).value(size?: 8)
+      optional(:visa_number).filled(:string).value(size?: 8..12)
       optional(:passport_number).filled(:string).value(size?: 6..12)
       optional(:sevis_id).filled(:string).value(size?: 10)
       optional(:naturalization_number).filled(:string).value(size?: 6..12)

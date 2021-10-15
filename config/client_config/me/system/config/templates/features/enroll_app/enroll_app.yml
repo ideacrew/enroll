@@ -308,6 +308,8 @@ registry:
                   ]
           - key: :default_aptc_percentage
             item: 100
+          - key: :child_age_limit
+            item: 20
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true
@@ -557,6 +559,8 @@ registry:
         is_enabled: false
       - key: :display_county
         is_enabled: true
+      - key: :has_bqt
+        is_enabled: false
       - key: :moving_to_state
         is_enabled: false
       - key: :living_outside_state
@@ -633,3 +637,14 @@ registry:
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
+      - key: :email_validation_notifications
+        item: :email_validation_notifications
+        is_enabled: true
+      - key: :find_my_doctor_options
+        item: :find_my_doctor_options
+        is_enabled: false
+      - key: :go_to_plan_compare_link
+        item: :go_to_plan_compare
+        is_enabled: true
+      - key: :zero_permium_policy
+        is_enabled: true

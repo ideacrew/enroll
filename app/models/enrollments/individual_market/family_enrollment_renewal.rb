@@ -131,12 +131,17 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def assisted_renewal_product
     # TODO: Make sure tax households create script treats 0 as 100
-    if @aptc_values[:csr_amt].present? && @enrollment.product.metal_level == "silver"
-      csr_variant = fetch_csr_variant
-      product = fetch_product(csr_variant)
-      return product.id if product
+    if @aptc_values[:csr_amt].present?
+      eligible_csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
+      if @enrollment.product.metal_level == "silver" || ['02', '03'].include?(eligible_csr_variant)
+        csr_variant = fetch_csr_variant
+        product = fetch_product(csr_variant)
+        return product.id if product
 
-      fetch_product("01").id
+        fetch_product("01").id
+      else
+        @enrollment.product.renewal_product_id
+      end
     else
       @enrollment.product.renewal_product_id
     end
@@ -197,7 +202,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       members << HbxEnrollmentMember.new({ applicant_id: hbx_enrollment_member.applicant_id,
                                            eligibility_date: renewal_coverage_start,
                                            coverage_start_on: renewal_coverage_start,
-                                           is_subscriber: hbx_enrollment_member.is_subscriber })
+                                           is_subscriber: hbx_enrollment_member.is_subscriber,
+                                           tobacco_use: hbx_enrollment_member&.person&.is_tobacco_user})
     end
   end
 

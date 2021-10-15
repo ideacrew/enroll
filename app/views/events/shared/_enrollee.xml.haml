@@ -17,11 +17,12 @@
       %is_primary_applicant= hbx_enrollment_member.family_member.is_primary_applicant
     - unless hbx_enrollment_member.family_member.is_coverage_applicant.blank?
       %is_coverage_applicant= hbx_enrollment_member.family_member.is_coverage_applicant
-    %person_health
-      - unless hbx_enrollment_member.tobacco_use.blank?
-        %is_tobacco_user= hbx_enrollment_member.tobacco_use_value_for_edi
-      - unless hbx_enrollment_member.person.is_disabled.blank?
-        %is_disabled= hbx_enrollment_member.person.is_disabled
+    - unless hbx_enrollment_member.person.is_disabled.blank? && hbx_enrollment_member.tobacco_use.blank?
+      %person_health
+        - unless hbx_enrollment_member.tobacco_use.blank?
+          %is_tobacco_user= hbx_enrollment_member.tobacco_use_value_for_edi
+        - unless hbx_enrollment_member.person.is_disabled.blank?
+          %is_disabled= hbx_enrollment_member.person.is_disabled
   %is_subscriber= hbx_enrollment_member.is_subscriber
   %benefit
     %premium_amount= (hbx_enrollment.is_ivl_by_kind? ? hbx_enrollment.premium_for(hbx_enrollment_member): (hbx_enrollment.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == hbx_enrollment_member.id }).product_price).to_f.round(2)

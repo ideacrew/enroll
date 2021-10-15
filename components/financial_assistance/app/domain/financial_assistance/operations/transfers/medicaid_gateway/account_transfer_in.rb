@@ -26,7 +26,7 @@ module FinancialAssistance
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
             applicants = yield fill_applicants_form(payload["family"]['magi_medicaid_applications'].first, application)
-            Success(applicants)
+            Success(application)
           end
 
           private
@@ -58,7 +58,6 @@ module FinancialAssistance
 
           def build_family(family_hash)
             found_families = find_family(family_hash)
-
             @family = if found_families.any?
                         found_families.first
                       else
@@ -67,10 +66,10 @@ module FinancialAssistance
                       end
 
             family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
-              create_member(family_member_hash)
+              fm_result = create_member(family_member_hash)
+              return fm_result unless fm_result.success?
             end
             @family.save!
-
             Success(@family)
           end
 
@@ -83,14 +82,13 @@ module FinancialAssistance
           def create_member(family_member_hash)
             person_params = sanitize_person_params(family_member_hash)
             person_result = create_or_update_person(person_params)
-
             if person_result.success?
               @person = person_result.success
               @family_member = create_or_update_family_member(@person, @family, family_member_hash)
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
             else
-              @person
+              person_result
             end
           end
 
@@ -147,11 +145,11 @@ module FinancialAssistance
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
             sanitize_params = []
-            iap_hash['applicants'].each do |applicant_hash|
+            applicants = iap_hash['applicants']
+            applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
                 fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
               end.first
-
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
               foster_info = applicant_hash['foster_care']
 
