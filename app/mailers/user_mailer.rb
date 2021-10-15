@@ -229,9 +229,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def identity_verification_acceptance(email_address, first_name)
+  def identity_verification_acceptance(email_address, first_name, hbx_id)
     mail({to: email_address, subject: "Time to complete your #{site_short_name} application"}) do |format|
-      format.html { render "identity_verification_acceptance", :locals => { :first_name => first_name }}
+      format.html { render "identity_verification_acceptance", :locals => { :first_name => first_name, :hbx_id => hbx_id }}
     end
   end
 end
