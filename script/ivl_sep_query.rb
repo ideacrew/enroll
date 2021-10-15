@@ -85,6 +85,10 @@ puts terms.count
 purchase_event = "acapi.info.events.hbx_enrollment.coverage_selected"
 purchases.each do |rec|
   pol_id = rec["_id"]
+  if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_year)
+    enrollment = HbxEnrollment.where(hbx_id: pol_id).first
+    next if enrollment.coverage_year == EnrollRegistry[:gate_enrollments_to_edidb_for_year].setting(:year).item
+  end
   Rails.logger.info "-----publishing #{pol_id}"
 
   if rec["enrollment_state"] == 'auto_renewing' || is_retro_renewal_enrollment?(pol_id)
@@ -97,6 +101,10 @@ end
 term_event = "acapi.info.events.hbx_enrollment.terminated"
 terms.each do |rec|
   pol_id = rec["_id"]
+  if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_a_year)
+    enrollment = HbxEnrollment.where(hbx_id: pol_id).first
+    next if enrollment.coverage_year == EnrollRegistry[:gate_enrollments_to_edidb_for_year].setting(:year).item
+  end
   Rails.logger.info "-----publishing #{pol_id}"
   IvlEnrollmentsPublisher.publish_action(term_event, pol_id, "urn:openhbx:terms:v1:enrollment#terminate_enrollment")
 end
