@@ -107,7 +107,8 @@ class UserMailerPreview < ActionMailer::Preview
   def verification_denied
     email_address = "test@test.com"
     first_name = "test"
-    UserMailer.identity_verification_denial(email_address, first_name)
+    hbx_id = "12345678"
+    UserMailer.identity_verification_denial(email_address, first_name, hbx_id)
   end
 
   def new_client_notification; end
