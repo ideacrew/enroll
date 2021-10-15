@@ -941,9 +941,7 @@ def employer_poc
   def setting_params
     params.require(:setting).permit(:name, :value)
   end
-  
-  # This needs to be configured into a translation
-  #  Yep
+
   def agent_assistance_messages(params, agent, role)
     # TODO: Why do we not always have the person_id?
     # Need to figure this out
@@ -954,35 +952,35 @@ def employer_poc
       last_name = insured.last_name
       name = insured.full_name
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
-      root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
+      root = "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{params[:person]}&original_application_type:"
       body = l10n(
-               "inbox.agent_assistance_messages_person_present",
-               first_name: first_name,
-               last_name: last_name,
-               insured_email: insured_email,
-               href_root: root,
-               insured_phone_number: insured_phone_number,
-               site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
-               site_short_name: site_short_name,
-               contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-               contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
-             )
+        "inbox.agent_assistance_messages_person_present",
+        first_name: first_name,
+        last_name: last_name,
+        insured_email: insured_email,
+        href_root: root,
+        insured_phone_number: insured_phone_number,
+        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+        site_short_name: site_short_name,
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+      )
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
       name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
       body = l10n(
-               "inbox.agent_assistance_messages_person_not_present",
-               first_name: first_name,
-               last_name: last_name,
-               insured_email: insured_email,
-               insured_phone_number: insured_phone_number,
-               site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
-               site_short_name: site_short_name,
-               contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-               contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
-             )
+        "inbox.agent_assistance_messages_person_not_present",
+        first_name: first_name,
+        last_name: last_name,
+        insured_email: insured_email,
+        insured_phone_number: insured_phone_number,
+        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+        site_short_name: site_short_name,
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+      )
     end
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
@@ -998,7 +996,7 @@ def employer_poc
     result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
     result.deliver_now
     puts result.to_s if Rails.env.development?
-   end
+  end
 
   def find_hbx_profile
     @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
