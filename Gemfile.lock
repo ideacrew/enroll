@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 7a55f360cad669d7b895615c1b149fa1c4499672
-  branch: mcr_enrollment_fix
+  revision: a9912d3ff235cad7e8ce4691dc2c23c0aa2d7680
+  branch: release_0.9.0
   specs:
     aca_entities (0.9.0)
       deep_merge
