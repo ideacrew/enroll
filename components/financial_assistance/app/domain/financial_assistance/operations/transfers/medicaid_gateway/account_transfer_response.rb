@@ -16,19 +16,19 @@ module FinancialAssistance
 
           # Pass the payload from the subscriber
           # Return the result of publishing the identifiers back to MG
-          def call(transfer_id)
-            application         = yield find_application(transfer_id)
+          def call(app_id)
+            application         = yield find_application(app_id)
             family              = yield find_family(application)
             construct_payload(application, family)
           end
 
           private
 
-          def find_application(transfer_id)
-            application = FinancialAssistance::Application.find_by(transfer_id: transfer_id)
+          def find_application(app_id)
+            application = FinancialAssistance::Application.find(app_id)
             Success(application)
           rescue Mongoid::Errors::DocumentNotFound
-            Failure("Unable to find Application by Transfer ID.")
+            Failure("Unable to find Application by ID.")
           end
 
           def find_family(application)
