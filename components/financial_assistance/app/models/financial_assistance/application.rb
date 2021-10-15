@@ -317,7 +317,7 @@ module FinancialAssistance
       if result.success?
         rt_transfer
         true
-      else 
+      else
         log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
       end
     end
