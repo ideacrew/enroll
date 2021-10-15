@@ -291,6 +291,8 @@ registry:
                   ]
           - key: :default_aptc_percentage
             item: 85
+          - key: :child_age_limit
+            item: 20
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
@@ -628,4 +630,6 @@ registry:
         is_enabled: true
       - key: :go_to_plan_compare_link
         item: :go_to_plan_compare_link
+        is_enabled: false
+      - key: :zero_permium_policy
         is_enabled: false

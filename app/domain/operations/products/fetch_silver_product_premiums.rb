@@ -63,7 +63,7 @@ module Operations
                 age = max_age if age > max_age
                 tuple = premium_table.premium_tuples.where(age: age).first
               end
-              result << { cost: tuple.cost, product_id: product.id, member_identifier: hbx_id, monthly_premium: tuple.cost } if tuple.present?
+              result << { cost: (tuple.cost * product.ehb).round(2), product_id: product.id, member_identifier: hbx_id, monthly_premium: (tuple.cost * product.ehb).round(2) } if tuple.present?
               result
             end
           member_result[hbx_id] = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}

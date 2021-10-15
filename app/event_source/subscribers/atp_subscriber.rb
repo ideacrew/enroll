@@ -16,7 +16,7 @@ module Subscribers
       details = payload["family"]["magi_medicaid_applications"][0]["transfer_id"]
       transfer_details[:transfer_id] = details || payload
       if result.success?
-        transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(transfer_details[:transfer_id])
+        transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(result.value!)
         transfer_failure = {}
         transfer_failure[:result] = "Failed"
         transfer_failure[:failure] = "Unsucessfully ingested by Enroll - #{transfer_response.failure}"
