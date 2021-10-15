@@ -23,7 +23,7 @@ module Subscribers
         else
           notify("acapi.info.events.mcr.iap_application_failure", {:body => JSON.dump({payload: payload})})
         end
-      rescue StandardError => e
+      rescue SystemStackError, StandardError => e
         notify("acapi.info.events.mcr.iap_application_exception", {:body => JSON.dump({:payload => payload,
                                                                                            :result => result,
                                                                                            :error => e.inspect,

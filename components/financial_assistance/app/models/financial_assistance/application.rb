@@ -138,7 +138,7 @@ module FinancialAssistance
                                     message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                   }
 
-    index({"_id" => 1}, { unique: true, sparse: true })
+    index({"_id" => 1})
     index({"is_renewal_authorized" => 1})
     index({"family_id" => 1})
     index({"years_to_renew" => 1})
@@ -163,12 +163,12 @@ module FinancialAssistance
             "workflow_state_transitions.to_state" => 1 },
           { name: "workflow_to_state" })
 
-    index({"relationships._id" => 1 }, { unique: true, sparse: true })
+    index({"relationships._id" => 1 })
     index({"relationships.applicant_id" => 1})
     index({"relationships.relative_id" => 1})
     index({"relationships.kind" => 1})
 
-    index({"eligibility_determinations._id" => 1}, { unique: true, sparse: true })
+    index({"eligibility_determinations._id" => 1})
     index({"eligibility_determinations.max_aptc" => 1})
     index({"eligibility_determinations.csr_percent_as_integer" => 1})
     index({"eligibility_determinations.source" => 1})
@@ -181,7 +181,7 @@ module FinancialAssistance
     index({"eligibility_determinations.determined_at" => 1})
 
     # applicant index
-    index({ "applicants._id" => 1 }, { unique: true, sparse: true })
+    index({ "applicants._id" => 1 })
     index({"applicants.no_ssn" => 1})
     index({"applicants.is_tobacco_user" => 1})
     index({"applicants.assisted_income_validation" => 1})
@@ -262,7 +262,7 @@ module FinancialAssistance
     index({"applicants.eligibility_determination_id"=> 1})
 
     # verification_types index
-    index({"applicants.verification_types._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.verification_types._id" => 1})
     index({"applicants.verification_types.type_name" => 1})
     index({"applicants.verification_types.validation_status" => 1})
     index({"applicants.verification_types.update_reason" => 1})
@@ -271,18 +271,18 @@ module FinancialAssistance
     index({"applicants.verification_types.due_date" => 1})
     index({"applicants.verification_types.due_date_type" => 1})
 
-    index({"applicants.addresses._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.addresses._id" => 1})
     index({"applicants.addresses.kind" => 1})
 
-    index({"applicants.phones._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.phones._id" => 1})
     index({"applicants.phones.kind" => 1})
     index({"applicants.phones.primary" => 1})
 
-    index({"applicants.emails._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.emails._id" => 1})
     index({"applicants.emails.kind" => 1})
 
     # incomes index
-    index({"applicants.incomes._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.incomes._id" => 1})
     index({"applicants.incomes.title" => 1})
     index({"applicants.incomes.kind" => 1})
     index({"applicants.incomes.wage_type" => 1})
@@ -296,15 +296,15 @@ module FinancialAssistance
     index({"applicants.incomes.employer_id" => 1})
     index({"applicants.incomes.submitted_at" => 1})
 
-    index({"applicants.incomes.employer_address._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.incomes.employer_address._id" => 1})
     index({"applicants.incomes.employer_address.kind" => 1})
 
-    index({"applicants.incomes.employer_phone._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.incomes.employer_phone._id" => 1})
     index({"applicants.incomes.employer_phone.kind" => 1})
     index({"applicants.incomes.employer_phone.primary" => 1})
 
     # deduction index
-    index({"applicants.deductions._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.deductions._id" => 1})
     index({"applicants.deductions.title" => 1})
     index({"applicants.deductions.kind" => 1})
     index({"applicants.deductions.amount" => 1})
@@ -314,7 +314,7 @@ module FinancialAssistance
     index({"applicants.deductions.submitted_at" => 1})
 
     # benefit index
-    index({"applicants.benefits._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.benefits._id" => 1})
     index({"applicants.benefits.title" => 1})
     index({"applicants.benefits.kind" => 1})
     index({"applicants.benefits.esi_covered" => 1})
@@ -331,10 +331,10 @@ module FinancialAssistance
     index({"applicants.benefits.employer_name" => 1})
     index({"applicants.benefits.employer_id" => 1})
 
-    index({"applicants.benefits.employer_address._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.benefits.employer_address._id" => 1})
     index({"applicants.benefits.employer_address.kind" => 1})
 
-    index({"applicants.benefits.employer_phone._id" => 1}, { unique: true, sparse: true })
+    index({"applicants.benefits.employer_phone._id" => 1})
     index({"applicants.benefits.employer_phone.kind" => 1})
     index({"applicants.benefits.employer_phone.primary" => 1})
 
@@ -1371,7 +1371,7 @@ module FinancialAssistance
       set_assistance_year
       set_effective_date
       create_eligibility_determinations
-      create_verification_documents
+      # create_verification_documents
       set_renewal_base_year
     end
 

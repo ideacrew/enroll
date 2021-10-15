@@ -33,7 +33,7 @@ module Operations
 
       def renew_application(application)
         if application.have_permission_to_renew?
-          if application.may_submit? && application.is_application_valid?
+          if application.may_submit?
             application.submit!
             Success(application)
           else
