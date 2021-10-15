@@ -68,9 +68,9 @@ RSpec.describe ::Operations::Products::DetermineSlcspForTaxHouseholdMember, dbcl
       expect(result.success?).to eq true
     end
 
-    it 'should return premium amount for the member' do
+    it 'should return ehb premium amount for the member' do
       result = subject.call(params)
-      expect(result.success[:cost]).to eq 200.0
+      expect(result.success[:cost]).to eq 198.86
     end
 
     it 'should return slscp for the member' do
