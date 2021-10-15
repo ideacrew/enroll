@@ -20,11 +20,11 @@ module VlpDoc
       result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
       if result.failure? && source == 'person'
         invalid_key = result.errors.to_h.keys.first
-        add_document_errors_to_consumer_role(consumer_role, ['Please fill in your information for', invalid_field(invalid_key).to_s.titlecase + '.'])
+        add_document_errors_to_consumer_role(consumer_role, ['Please fill in your information for', "#{invalid_field(invalid_key).to_s.titlecase}."])
         return false
       elsif result.failure? && source == 'dependent'
         invalid_key = result.errors.to_h.keys.first
-        add_document_errors_to_dependent(dependent, ['Please fill in your information for', invalid_field(invalid_key).to_s.titlecase + '.'])
+        add_document_errors_to_dependent(dependent, ['Please fill in your information for', "#{invalid_field(invalid_key).to_s.titlecase}."])
         return false
       end
     end
