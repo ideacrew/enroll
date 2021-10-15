@@ -1386,7 +1386,7 @@ module FinancialAssistance
       set_assistance_year
       set_effective_date
       create_eligibility_determinations
-      # create_verification_documents
+      create_verification_documents
       set_renewal_base_year
     end
 
