@@ -48,6 +48,8 @@ module Operations
           # age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
           product_hash =
             products.inject([]) do |result, product|
+              variant_id = product.hios_id.split('-')[1]
+              next result if variant_id.present? && variant_id != '01'
               premium_table = product.premium_tables.where({
                                                              :rating_area_id => rating_area_id,
                                                              :'effective_period.min'.lte => effective_date,
