@@ -3,13 +3,14 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   include FloatHelper
 
-  attr_reader :hbx_enrollment, :elected_aptc, :tax_household
+  attr_reader :hbx_enrollment, :elected_aptc, :tax_household, :child_age_limit
 
   def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
     super(plan)
     @hbx_enrollment = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
     @tax_household = tax_household
+    @child_age_limit = EnrollRegistry[:enroll_app].setting(:child_age_limit).item
     @can_round_cents = can_round_cents?
   end
 
@@ -26,7 +27,6 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def child_index(member)
-    child_age_limit = EnrollRegistry[:enroll_app].setting(:child_age_limit).item
     @children = members.select {|mem| age_of(mem) <= child_age_limit} unless defined?(@children)
     @children.index(member)
   end
@@ -34,7 +34,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def large_family_factor(member)
     zero_permium_policy_disabled = EnrollRegistry[:zero_permium_policy].disabled?
 
-    if (age_of(member) > 20) || (kind == :dental && zero_permium_policy_disabled)
+    if (age_of(member) > child_age_limit) || (kind == :dental && zero_permium_policy_disabled)
       1.00
     elsif child_index(member) > 2
       0.00
