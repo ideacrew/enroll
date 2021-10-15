@@ -1408,12 +1408,12 @@ module FinancialAssistance
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
           applicant.eligibility_determination = applicant.eligibility_determination_of_spouse
-          applicant.update_attribues(tax_filer_kind: 'tax_filer')
+          applicant.update_attributes(tax_filer_kind: 'tax_filer')
         else
           # Create a new THH and assign it to the applicant
           # Need THH for Medicaid cases too
           applicant.eligibility_determination = eligibility_determinations.create!
-          applicant.update_attribues(:tax_filer_kind, applicant.tax_filing? ? 'tax_filer' : 'non_filer')
+          applicant.update_attributes(:tax_filer_kind, applicant.tax_filing? ? 'tax_filer' : 'non_filer')
         end
       end
 
@@ -1421,7 +1421,7 @@ module FinancialAssistance
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
-        applicant.update_attribues(:tax_filer_kind, 'dependent')
+        applicant.update_attributes(:tax_filer_kind, 'dependent')
       end
 
       empty_ed = eligibility_determinations.select do |ed|
