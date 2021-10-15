@@ -43,7 +43,7 @@ RSpec.describe UserMailer do
 
   context "#account_transfer_success_notification" do
     let(:account_transfer_email) do
-      UserMailer.account_transfer_success_notification(person, "johnanderson@fake.com")
+      UserMailer.account_transfer_success_notification(person, "johnanderson@fake.com", "123456")
     end
 
     let(:person) { FactoryBot.create(:person) }
