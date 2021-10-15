@@ -188,7 +188,7 @@ module FinancialAssistance
         %w[_id created_at updated_at submitted_at workflow_state_transitions applicants relationships
            determination_http_status_code has_eligibility_response eligibility_response_payload eligibility_request_payload
            predecessor_id renewal_base_year effective_date has_mec_check_response transfer_requested account_transferred
-           hbx_id aasm_state assistance_year determination_error_message]
+           hbx_id aasm_state assistance_year determination_error_message eligibility_determinations]
       end
 
       # Do not exclude is_claimed_as_tax_dependent. If you want to exclude is_claimed_as_tax_dependent,
@@ -198,7 +198,8 @@ module FinancialAssistance
            medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
            magi_medicaid_monthly_household_income is_without_assistance is_ia_eligible is_medicaid_chip_eligible
            is_totally_ineligible is_eligible_for_non_magi_reasons is_non_magi_medicaid_eligible
-           csr_percent_as_integer csr_eligibility_kind net_annual_income claimed_as_tax_dependent_by]
+           csr_percent_as_integer csr_eligibility_kind net_annual_income claimed_as_tax_dependent_by
+           eligibility_determination_id]
       end
 
       def income_klass
