@@ -187,3 +187,7 @@ group :production do
   gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'
 end
+
+gem 'pry-rails'
+gem 'pry-byebug'
+gem 'pry-stack_explorer'

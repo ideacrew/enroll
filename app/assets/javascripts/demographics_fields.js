@@ -673,6 +673,7 @@ function demographicValidations() {
       PersonValidations.validationForVlpDocuments(e);
       PersonValidations.validationForContactMethod(e);
       if (
+        $('#showWarning').length &&
         !$('#showWarning').hasClass('hidden') &&
         !$('#showWarning').hasClass('shown')
       ) {
