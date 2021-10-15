@@ -111,7 +111,21 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.identity_verification_denial(email_address, first_name, hbx_id)
   end
 
-  def new_client_notification; end
+  def account_transfer_success_notification
+    full_name = "John Smith"
+    email_address = 'test@test.com'
+    hbx_id = '123456'
+    UserMailer.account_transfer_success_notification(email_address, full_name, hbx_id)
+  end
+
+  def new_client_notification
+    agent_email = "test@test.com"
+    name = "test one"
+    role = "agent"
+    insured_email = "test@insured.com"
+    hbx_id = "12345678"
+    UserMailer.new_client_notification(agent_email, name, role, insured_email, hbx_id)
+  end
 
   def broker_pending_completed_training_missing_carrier; end
 
