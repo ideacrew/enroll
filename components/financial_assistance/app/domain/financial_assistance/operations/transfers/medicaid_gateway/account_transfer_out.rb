@@ -18,10 +18,10 @@ module FinancialAssistance
           # add comment here
           def call(application_id:)
             application           = yield find_application(application_id)
+            _record               = yield record(application)
             family                = yield find_family(application)
             payload_params        = yield construct_payload(family, application)
             payload               = yield publish(payload_params)
-            _record               = yield record(application)
             Success(payload)
           end
 
