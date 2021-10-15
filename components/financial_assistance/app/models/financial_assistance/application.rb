@@ -1385,7 +1385,7 @@ module FinancialAssistance
 
     def create_eligibility_determinations
       ## Remove  when copy method is fixed to exclude copying Tax Household
-      active_applicants.each { |applicant| applicant.write_attribute(:eligibility_determination_id, nil)  }
+      active_applicants.update_all(eligibility_determination_id: nil)
 
       non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
       tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
