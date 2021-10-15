@@ -314,8 +314,12 @@ module FinancialAssistance
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"}) : true
-      rt_transfer if result.success?
+      if result.success?
+        rt_transfer
+        true
+      else 
+        log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
+      end
     end
 
     def rt_transfer
