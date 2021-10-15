@@ -941,8 +941,13 @@ def employer_poc
   def setting_params
     params.require(:setting).permit(:name, :value)
   end
-
+  
+  # This needs to be configured into a translation
+  #  Yep
   def agent_assistance_messages(params, agent, role)
+    # TODO: Why do we not always have the person_id?
+    # Need to figure this out
+    # The translations secure message may want things like the person's phone/email
     if params[:person].present?
       insured = Person.find(params[:person])
       first_name = insured.first_name
@@ -950,17 +955,34 @@ def employer_poc
       name = insured.full_name
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
-      body =
-        "Please contact #{insured.first_name} #{insured.last_name}. <br> " +
-        "Plan shopping help has been requested by #{insured_email}<br>" +
-        "<a href='" + root+"phone'>Assist Customer</a>  <br>"
+      body = l10n(
+               "inbox.agent_assistance_messages_person_present",
+               first_name: first_name,
+               last_name: last_name,
+               insured_email: insured_email,
+               href_root: root,
+               insured_phone_number: insured_phone_number,
+               site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+               site_short_name: site_short_name,
+               contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+               contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+             )
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
       name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
-      body =  "Please contact #{first_name} #{last_name}. <br>" +
-        "Plan shopping help has been requested by #{insured_email}<br>"
+      body = l10n(
+               "inbox.agent_assistance_messages_person_not_present",
+               first_name: first_name,
+               last_name: last_name,
+               insured_email: insured_email,
+               insured_phone_number: insured_phone_number,
+               site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+               site_short_name: site_short_name,
+               contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+               contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+             )
     end
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
@@ -968,9 +990,9 @@ def employer_poc
       parent_message_id: hbx_profile.id,
       from: 'Plan Shopping Web Portal',
       to: "Agent Mailbox",
-      subject: "Please contact #{first_name} #{last_name}. ",
-      body: body,
-      }
+      subject: "Please contact #{first_name} #{last_name}",
+      body: body
+    }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
     result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
