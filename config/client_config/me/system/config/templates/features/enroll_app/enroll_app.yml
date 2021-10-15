@@ -648,3 +648,6 @@ registry:
         is_enabled: true
       - key: :zero_permium_policy
         is_enabled: true
+      - key: :send_secure_purchase_confirmation_email
+        item: :send_secure_purchase_confirmation_email
+        is_enabled: false
