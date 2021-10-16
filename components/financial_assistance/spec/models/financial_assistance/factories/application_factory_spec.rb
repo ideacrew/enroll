@@ -508,4 +508,23 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
       expect(@new_applicant.deductions.first.kind).to eq(applicant.deductions.first.kind)
     end
   end
+
+  describe 'with eligibility_determinations' do
+    let!(:eligibility_determination) do
+      ed = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
+      application.applicants.each { |applicant| applicant.write_attribute(:eligibility_determination_id, ed.id) }
+    end
+
+    before do
+      @new_application = described_class.new(application).create_application
+    end
+
+    it 'should not create eligibility determination objects for newly created application' do
+      expect(@new_application.eligibility_determinations.present?).to be_falsy
+    end
+
+    it 'should not set eligibilitydetermination_id for new applicants' do
+      expect(@new_application.applicants.pluck(:eligibility_determination_id).compact).to be_empty
+    end
+  end
 end
