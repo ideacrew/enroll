@@ -31,6 +31,7 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 # Local components/engines
 #######################################################
+gem 'pry'
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'release_0.9.0'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'release_0.5.5'
@@ -118,6 +119,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+# gem 'fast_jsonparser'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
 gem 'puma',                   '~> 3.12.4'
