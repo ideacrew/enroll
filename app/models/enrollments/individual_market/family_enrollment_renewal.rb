@@ -203,6 +203,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
                                            eligibility_date: renewal_coverage_start,
                                            coverage_start_on: renewal_coverage_start,
                                            is_subscriber: hbx_enrollment_member.is_subscriber,
+                                           carrier_member_id: hbx_enrollment_member.carrier_member_id,
+                                           external_id: hbx_enrollment_member.external_id,
                                            tobacco_use: hbx_enrollment_member&.person&.is_tobacco_user})
     end
   end
