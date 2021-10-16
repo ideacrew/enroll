@@ -1408,20 +1408,20 @@ module FinancialAssistance
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
           applicant.eligibility_determination = applicant.eligibility_determination_of_spouse
-          applicant.update_attributes(tax_filer_kind: 'tax_filer')
+          active_applicants.where(id: applicant.id).update_all(tax_filer_kind: 'tax_filer', eligibility_determination_id: applicant.eligibility_determination_of_spouse.id)
         else
           # Create a new THH and assign it to the applicant
           # Need THH for Medicaid cases too
-          applicant.eligibility_determination = eligibility_determinations.create!
-          applicant.update_attributes(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
+          determination = eligibility_determinations.create!
+          applicant.eligibility_determination = determination
+          active_applicants.where(id: applicant.id).update_all(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer', eligibility_determination_id: determination.id)
         end
       end
-
 
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
-        applicant.update_attributes(tax_filer_kind: 'dependent')
+        active_applicants.where(id: applicant.id).update_all(tax_filer_kind: 'dependent', eligibility_determination_id: thh_of_claimer&.id)
       end
 
       empty_ed = eligibility_determinations.select do |ed|
