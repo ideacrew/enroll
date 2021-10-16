@@ -44,7 +44,7 @@
             <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
               <td><%= application.assistance_year %></td>
             <% end %>
-            <td><%= application.aasm_state == 'terminated' ? 'Closed' : application.aasm_state.humanize %></td>
+            <td><%= application_state_for_display(application) %></td>
             <td><%=to_est application.created_at%></td>
             <td><%=to_est application.submitted_at%></td>
             <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
