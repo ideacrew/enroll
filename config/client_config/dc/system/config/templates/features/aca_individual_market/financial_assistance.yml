@@ -87,11 +87,11 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :batch_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :transfer_service
-      is_enabled: true
+      is_enabled: false
       item: "curam"
   - namespace:
     - :documents
@@ -197,6 +197,9 @@ registry:
       is_enabled: false
     - key: :display_medicaid_question
       item: :display_medicaid_question
+      is_enabled: false
+    - key: :optional_document_fields
+      item: :optional_document_fields
       is_enabled: false
     - key: :fa_send_to_external_verification
       is_enabled: false

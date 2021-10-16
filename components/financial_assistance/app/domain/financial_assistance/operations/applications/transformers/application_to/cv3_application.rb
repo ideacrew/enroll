@@ -661,7 +661,7 @@ module FinancialAssistance
                 result << lcsp_info.success[person_hbx_id][:health_only_lcsp_premiums]
               end
 
-              Success({ health_only_lcsp_premiums: slcsp_member_premiums, health_only_slcsp_premiums: lcsp_member_premiums })
+              Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
