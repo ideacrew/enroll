@@ -49,7 +49,7 @@ class QhpRateBuilder
     end
     if @action == "new"
       find_qhp_and_create_premium_tables
-      find_plan_and_create_premium_tables
+      find_plan_and_create_premium_tables if EnrollRegistry.feature_enabled?(:has_bqt)
       find_product_and_create_premium_tables
     else
       find_plan_and_update_premium_tables
@@ -162,7 +162,7 @@ class QhpRateBuilder
       v.each_pair do |pt_age, pt_cost|
         cost, tobacco_cost = pt_cost.split(";")
         premium_tuples_params = {age: pt_age, cost: cost}
-        premium_tuples_params.merge(tobacco_cost: tobacco_cost) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+        premium_tuples_params.merge!(tobacco_cost: tobacco_cost) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
         premium_tuples << ::BenefitMarkets::Products::PremiumTuple.new(premium_tuples_params)
       end
 

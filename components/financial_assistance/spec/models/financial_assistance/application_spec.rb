@@ -911,20 +911,20 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context 'submission_pending' do
-      context 'event: fail_submission' do
+    context 'income_verification_extension_required' do
+      context 'event: set_income_verification_extension_required' do
         before do
           application.update_attributes!(aasm_state: 'renewal_draft')
         end
 
-        context 'from renewal_draft to submission_pending' do
+        context 'from renewal_draft to income_verification_extension_required' do
           before do
             allow(application).to receive(:is_application_valid?).and_return(true)
-            application.fail_submission!
+            application.set_income_verification_extension_required!
           end
 
-          it 'should transition application to submission_pending' do
-            expect(application.reload.submission_pending?).to be_truthy
+          it 'should transition application to income_verification_extension_required' do
+            expect(application.reload.income_verification_extension_required?).to be_truthy
           end
         end
       end
@@ -1061,6 +1061,19 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.ensure_relationship_with_primary(applicant2, 'spouse')
       application.ensure_relationship_with_primary(applicant3, 'child')
       application.add_or_update_relationships(applicant2, applicant3, 'parent')
+      application.applicants.each do |appl|
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
+        appl.save!
+      end
       application.save!
     end
 
@@ -1134,6 +1147,19 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.ensure_relationship_with_primary(applicant2, 'spouse')
       application.ensure_relationship_with_primary(applicant3, 'child')
       application.add_or_update_relationships(applicant2, applicant3, 'parent')
+      application.applicants.each do |appl|
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
+        appl.save!
+      end
       application.save!
     end
 
@@ -1281,5 +1307,95 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
+  end
+
+  describe 'set_magi_medicaid_eligibility_request_errored' do
+    context 'NoMagiMedicaidEngine' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
+        application.update_attributes!(aasm_state: 'submitted')
+      end
+
+      it 'should not raise error NoMagiMedicaidEngine' do
+        expect(FinancialAssistanceRegistry.feature_enabled?(:haven_determination)).to be_falsey
+        expect(FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)).to be_falsey
+        expect(application.set_magi_medicaid_eligibility_request_errored).to be_truthy
+      end
+    end
+  end
+
+  describe 'applicants_have_valid_addresses?' do
+    context 'with valid home addresses' do
+      before do
+        application.applicants.each do |appl|
+          appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                             :address_1 => '1111 Awesome Street NE',
+                                             :address_2 => '#111',
+                                             :address_3 => '',
+                                             :city => 'Washington',
+                                             :country_name => '',
+                                             :kind => 'home',
+                                             :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                             :zip => '20001',
+                                             county: '')]
+          appl.save!
+        end
+      end
+
+      it 'should return true' do
+        expect(application.applicants_have_valid_addresses?).to eq(true)
+      end
+    end
+
+    context 'with work addresses only' do
+      before do
+        application.applicants.each do |appl|
+          appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                             :address_1 => '1111 Awesome Street NE',
+                                             :address_2 => '#111',
+                                             :address_3 => '',
+                                             :city => 'Washington',
+                                             :country_name => '',
+                                             :kind => 'work',
+                                             :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                             :zip => '20001',
+                                             county: '')]
+          appl.save!
+        end
+      end
+
+      it 'should return false' do
+        expect(application.applicants_have_valid_addresses?).to eq(false)
+      end
+    end
+
+    context 'only one applicant valid home address' do
+      before do
+        first_applicant = application.applicants.first
+        first_applicant.addresses = [FactoryBot.build(:financial_assistance_address,
+                                                      :address_1 => '1111 Awesome Street NE',
+                                                      :address_2 => '#111',
+                                                      :address_3 => '',
+                                                      :city => 'Washington',
+                                                      :country_name => '',
+                                                      :kind => 'home',
+                                                      :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                                      :zip => '20001',
+                                                      county: '')]
+        first_applicant.save!
+      end
+
+      it 'should return false' do
+        expect(application.applicants_have_valid_addresses?).to eq(false)
+      end
+    end
+
+    context 'without valid addresses' do
+      it 'should return false' do
+        expect(application.applicants_have_valid_addresses?).to eq(false)
+      end
+    end
   end
 end

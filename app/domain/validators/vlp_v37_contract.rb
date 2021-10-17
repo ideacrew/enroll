@@ -38,10 +38,10 @@ module Validators
                                      'Other (With I-94 Number)'].freeze
 
     params do
-      required(:subject).filled(:string)
+      optional(:subject).filled(:string)
       optional(:alien_number).filled(:string).value(size?: 9)
       optional(:i94_number).filled(:string).value(size?: 11)
-      optional(:visa_number).filled(:string).value(size?: 8)
+      optional(:visa_number).filled(:string).value(size?: 8..12)
       optional(:passport_number).filled(:string).value(size?: 6..12)
       optional(:sevis_id).filled(:string).value(size?: 10)
       optional(:naturalization_number).filled(:string).value(size?: 6..12)
@@ -57,43 +57,43 @@ module Validators
     end
 
     rule(:subject) do
-      key.failure('Invalid VLP Document type') unless ::VlpDocument::VLP_DOCUMENT_KINDS.include?(value)
+      key.failure('Invalid VLP Document type') if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && !::VlpDocument::VLP_DOCUMENT_KINDS.include?(value)
     end
 
     rule(:alien_number) do
-      key.failure(message(values[:subject])) if ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:i94_number) do
-      key.failure(message(values[:subject])) if I94_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (I94_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:passport_number) do
-      key.failure(message(values[:subject])) if PASSPORT_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (PASSPORT_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:sevis_id) do
-      key.failure(message(values[:subject])) if SEVIS_ID_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (SEVIS_ID_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:naturalization_number) do
-      key.failure(message(values[:subject])) if NATURALIZATION_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (NATURALIZATION_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:citizenship_number) do
-      key.failure(message(values[:subject])) if CITIZENSHIP_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (CITIZENSHIP_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:card_number) do
-      key.failure(message(values[:subject])) if CARD_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (CARD_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:expiration_date) do
-      key.failure(message(values[:subject])) if EXPIRATION_DATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (EXPIRATION_DATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     rule(:description) do
-      key.failure(message(values[:subject])) if DESCRIPTION_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if (!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) || value.present?) && (DESCRIPTION_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?)
     end
 
     private

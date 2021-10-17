@@ -47,6 +47,22 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = false
 
+=begin
+  config.content_security_policy do |policy|
+    policy.default_src :self, :https
+    policy.font_src :self, :https, :data, "*.gstatic.com  *.fontawesome.com"
+    policy.img_src :self, :https, :data, "*.google-analytics.com *.gstatic.com *.googletagmanager.com"
+    policy.script_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://apps.usw2.pure.cloud *.fontawesome.com *.google-analytics.com"
+    policy.style_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com *.fontawesome.com"
+  end
+=end
+
+  config.static_cache_control = 'public, max-age=31536000'
+  config.public_file_server.headers = {
+    'Cache-Control' => 'public, max-age=31536000',
+    'Expires' => 1.year.from_now.to_formatted_s(:rfc822)
+  }
+
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :debug

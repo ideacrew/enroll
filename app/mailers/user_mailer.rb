@@ -204,8 +204,8 @@ class UserMailer < ApplicationMailer
 
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
-    subject_prefix = broker_role.training || broker_role.training == true ? "Action Needed - Broker License for #{site_short_name} for Business" : "Action Needed - Complete Broker Training for #{site_short_name} for Business"
-    subject="#{subject_prefix}"
+    subject_translation_key = broker_role.training || broker_role.training == true ? "user_mailer.broker_pending_completed_training.subject" : "user_mailer.broker_pending_training.subject"
+    subject = l10n(subject_translation_key, site_short_name: site_short_name)
     mail({to: broker_role.email_address, subject: subject}) do |format|
       if broker_role.training && unchecked_carriers.present?
         format.html { render "broker_pending_completed_training_missing_carrier", :locals => { :applicant_name => broker_role.person.full_name ,:unchecked_carriers => unchecked_carriers}}
@@ -214,6 +214,24 @@ class UserMailer < ApplicationMailer
       elsif !broker_role.training && unchecked_carriers.present?
         format.html { render "broker_pending_missing_training_and_carrier", :locals => { :applicant_name => broker_role.person.full_name , :unchecked_carriers => unchecked_carriers}}
       end
+    end
+  end
+
+  def account_transfer_success_notification(person, email_address)
+    mail({to: email_address, subject: "Action needed to get covered on #{site_short_name}"}) do |format|
+      format.html { render "account_transfer_success_notification", :locals => { :person_name => person.full_name }}
+    end
+  end
+
+  def identity_verification_denial(email_address, first_name, hbx_id)
+    mail({to: email_address, subject: "Action needed to complete your #{site_short_name} application"}) do |format|
+      format.html { render "identity_verification_denial", :locals => { :first_name => first_name, :hbx_id => hbx_id }}
+    end
+  end
+
+  def identity_verification_acceptance(email_address, first_name, hbx_id)
+    mail({to: email_address, subject: "Time to complete your #{site_short_name} application"}) do |format|
+      format.html { render "identity_verification_acceptance", :locals => { :first_name => first_name, :hbx_id => hbx_id }}
     end
   end
 end

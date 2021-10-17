@@ -17,7 +17,7 @@
       %is_primary_applicant= hbx_enrollment_member.family_member.is_primary_applicant
     - unless hbx_enrollment_member.family_member.is_coverage_applicant.blank?
       %is_coverage_applicant= hbx_enrollment_member.family_member.is_coverage_applicant
-    - unless hbx_enrollment_member.person.is_disabled.blank? && hbx_enrollment_member.person.is_tobacco_user.blank?
+    - unless hbx_enrollment_member.person.is_disabled.blank? && hbx_enrollment_member.tobacco_use.blank?
       %person_health
         - unless hbx_enrollment_member.tobacco_use.blank?
           %is_tobacco_user= hbx_enrollment_member.tobacco_use_value_for_edi

@@ -45,6 +45,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                              gender: 'male',
                              ethnicity: [],
                              dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day))
+    appli.addresses = [FactoryBot.build(:financial_assistance_address,
+                                        :address_1 => '1111 Awesome Street NE',
+                                        :address_2 => '#111',
+                                        :address_3 => '',
+                                        :city => 'Washington',
+                                        :country_name => '',
+                                        :kind => 'home',
+                                        :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                        :zip => '20001',
+                                        county: '')]
     application10.applicants.destroy_all
     application10.applicants = [appli]
     application10.save!
@@ -54,15 +64,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
   let(:event) { Success(double) }
   let(:obj) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
   let(:obj2) { ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new }
-  let(:obj3) { described_class.new }
 
   before do
     allow(obj.class).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(obj2.class).to receive(:new).and_return(obj2)
     allow(obj2).to receive(:build_event).and_return(event)
-    allow(obj3.class).to receive(:new).and_return(obj3)
-    allow(obj3).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
   end
 
@@ -123,6 +130,44 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         expect(@renewed_app.assistance_year).to eq(application10.assistance_year.next)
       end
     end
+
+    # Predecessor Application:
+    #   assistance_year: 2021
+    #   renewal_base_year: 2022
+    context "predecessor_application’s renewal_base_year equals to renewal_application’s assistance_year" do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+        application10.update_attributes!({ is_renewal_authorized: false, years_to_renew: 1, renewal_base_year: nil })
+        application10.set_renewal_base_year
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
+          { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
+        ).success
+        @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
+        @renewed_app = @result.success
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should return renewal application with renewal_base_year same as assistance_year' do
+        expect(@renewed_app.renewal_base_year).to eq(@renewed_app.assistance_year)
+        expect(@renewed_app.renewal_base_year).to eq(application10.assistance_year + application10.years_to_renew)
+      end
+
+      it 'should return application' do
+        expect(@renewed_app).to be_a(::FinancialAssistance::Application)
+      end
+
+      it 'should return application with submitted' do
+        expect(@renewed_app.submitted?).to be_truthy
+      end
+
+      it 'should return application with assistance_year' do
+        expect(@renewed_app.assistance_year).to eq(application10.assistance_year.next)
+      end
+    end
   end
 
   context 'failure' do
@@ -157,6 +202,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         it 'should return failure with error message' do
           expect(@result.failure).to eq("Expired Submission is failed for hbx_id: #{@renewal_draft.hbx_id}")
         end
+
+        it 'should transition application to income_verification_extension_required state' do
+          expect(@renewal_draft.reload.income_verification_extension_required?).to be_truthy
+        end
       end
     end
 
@@ -169,24 +218,28 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   employer_name: 'Testing employer'
                                                 })
-        create_appli.incomes << inc
+        create_appli.incomes = [inc]
         create_appli.save!
       end
 
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
-        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
+        @renewal_app = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
-        income = @renewal_draft.applicants.first.incomes.first
+        income = @renewal_app.applicants.first.incomes.first
         income.assign_attributes(kind: 'test')
         income.save(validate: false)
-        @result = subject.call(@renewal_draft.serializable_hash.deep_symbolize_keys)
+        @result = subject.call(@renewal_app.serializable_hash.deep_symbolize_keys)
       end
 
       it 'should return failure' do
         expect(@result).to be_failure
+      end
+
+      it 'should transition the application to magi_medicaid_eligibility_request_errored' do
+        expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
       end
 
       it 'should return failure with a message' do

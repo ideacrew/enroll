@@ -619,11 +619,24 @@ RSpec.describe Plan, dbclean: :after_each do
       let(:plan2) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
       let(:plan3) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
       let(:plan4) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
-      let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94"), tax_household_members: double(where: [])) }
-      let(:hbx_enrollment) { double(hbx_enrollment_members: []) }
+      let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
+      let!(:person) { family.primary_person }
+      let(:household) {create(:household, family: family)}
+      let!(:tax_household) {create(:tax_household, household: household)}
+      let!(:tax_household_member) {tax_household.tax_household_members.create!(is_ia_eligible: true, csr_eligibility_kind: "csr_94")}
+
+      let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: person.primary_family.family_members[0].id) }
+      let(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_product,
+                          family: family,
+                          household: household,
+                          hbx_enrollment_members: [hbx_enrollment_member],
+                          coverage_kind: "health")
+      end
 
       before :each do
         Plan.delete_all
+        tax_household.tax_household_members.first.update_attributes!(applicant_id: family.family_members.first.id)
       end
 
       it "should return dental plans" do
@@ -637,8 +650,9 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should return health plans" do
+        tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_94")
         plans = [plan2]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household, hbx_enrollment: hbx_enrollment).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind: 'health', active_year: TimeKeeper.date_of_record.year, tax_household: tax_household, hbx_enrollment: hbx_enrollment).to_a).to eq plans
       end
     end
   end

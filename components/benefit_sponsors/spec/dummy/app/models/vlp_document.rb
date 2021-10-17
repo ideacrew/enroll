@@ -174,8 +174,9 @@ class VlpDocument < Document
 
   private
   def document_required_fields
-    required_fields[self.subject.to_sym].each do |field|
-      errors.add(:base, "#{field} value is required") unless self.send(field).present?
+    
+      required_fields[self.subject.to_sym].each do |field|
+        errors.add(:base, "#{field} value is required") unless self.send(field).present?
     end
   end
 

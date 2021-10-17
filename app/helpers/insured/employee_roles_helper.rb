@@ -38,4 +38,9 @@ module Insured::EmployeeRolesHelper
       'Individual'
     end
   end
+
+  def show_metal_level_by_enrollment(plan)
+    return '' unless plan.present?
+    plan&.kind == :dental ? plan.dental_level.capitalize : plan&.metal_level_kind&.capitalize
+  end
 end

@@ -95,7 +95,7 @@ class ConsumerRole
   # should land next after completing RIDP or Identify Verifications.
   field :admin_bookmark_url, type: String, default: nil
 
-  field :contact_method, type: String, default: "Paper and Electronic communications"
+  field :contact_method, type: String, default: EnrollRegistry.feature_enabled?(:contact_method_via_dropdown) ? "Paper and Electronic communications" : "Paper, Electronic and Text Message communications"
   field :language_preference, type: String, default: "English"
 
   field :ssn_validation, type: String, default: "pending" #move to verification type
@@ -999,7 +999,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name(LOCATION_RESIDENCY).first.validation_status != "attested"
+    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types&.by_name(LOCATION_RESIDENCY)&.first&.validation_status != "attested"
   end
 
   def residency_denied?
@@ -1129,12 +1129,14 @@ class ConsumerRole
     end
   end
 
-  def admin_ridp_verification_action(admin_action, ridp_type, update_reason)
+  def admin_ridp_verification_action(admin_action, ridp_type, update_reason, person)
     case admin_action
       when 'verify'
+        UserMailer.identity_verification_acceptance(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
         update_ridp_verification_type(ridp_type, update_reason)
       when 'return_for_deficiency'
         return_ridp_doc_for_deficiency(ridp_type, update_reason)
+        UserMailer.identity_verification_denial(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
     end
   end
 

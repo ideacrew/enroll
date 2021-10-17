@@ -10,7 +10,7 @@
 </div>
 <br/>
 <div>
-  You are now able to plan shop for insurance that will start on <%= census_employee.coverage_effective_on.to_date.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= Settings.site.short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
+  You are now able to plan shop for insurance that will start on <%= census_employee.coverage_effective_on(shop_under_current: true).to_date.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= Settings.site.short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
   <br/>
   <br/>
   <b> What is New Hire Open Enrollment? </b>

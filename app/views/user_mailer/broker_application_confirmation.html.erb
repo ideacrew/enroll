@@ -1,55 +1,15 @@
-<% case EnrollRegistry[:enroll_app].settings(:site_key).item.to_s.downcase %>
-  <% when 'dc' %> 
-    <html>
-      <body>
-        <div>
-          Dear <%= person.full_name.titleize %>,
-        </div>
-        <br />
-        <% if EnrollRegistry.feature_enabled?(:broker_approval_period) %>
-          <div>Thank you for submitting your broker application to <%= site_short_name %>. Please allow 7-10 business days for <%= site_short_name %> to review your application.</div>
-          <br />
-          <div><%= l10n("broker_agencies.broker_application_confirm.outstanding_reqs", {site_noreply_email_address: site_noreply_email_address}) %></div>
-          <br />
-          <div> <%= l10n("broker_agencies.broker_application_confirm.broker_reqs", {site_short_name: site_short_name}) %>
-          </div>
-          <br />
-          <div><%= l10n("broker_agencies.broker_application_confirm.more_info", {site_broker_registration_guide: site_broker_registration_guide}) %><a/></div>
-          <br />
-          <div><%= l10n("broker_agencies.broker_application_confirm.any_questions", {site_short_name: site_short_name, site_producer_email_address: site_producer_email_address}) %></div>
-        <% else %>
-          <div>
-            <%= l10n("broker_agencies.broker_invitation.broker_app_submission") %>
-          </div>
-          <br />
-          <div>
-            <strong><%= l10n("broker_agencies.broker_invitation.another_email") %></strong>
-          </div>
-          <br />
-          <div>
-            <%= l10n("broker_agencies.broker_invitation.broker_portal_access") %>
-          </div>
-          <br />
-          <div>
-            <%= l10n("broker_agencies.broker_invitation.broker_steps") %>
-          </div>
-          <br />
-          <div>
-            <%= l10n("broker_agencies.broker_invitation.broker_questions") %>
-          </div>
-          <br />
-          <div>
-            <%= l10n("broker_agencies.broker_invitation.thank_you_footer") %>
-          </div>
-          <br />
-          <div>
-            <%= site_title %>
-          </div>
-          <br />
-        <% end %>
-      </body>
-    </html>
-  <% when 'me' %>
-    <%= l10n("user_mailer.broker_application_confirmation.full_text", contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s, first_name: person.first_name, site_short_name: site_short_name, contact_center_short_name: contact_center_name, state_name: state_name,
-      training_link: EnrollRegistry[:broker_training_link].item).html_safe%>
-<% end %>
+<%= l10n(
+      EnrollRegistry.feature_enabled?(:broker_approval_period) ? "user_mailer.broker_application_confirmation.full_text" : "user_mailer.broker_invitation.broker_app_submission",
+      site_noreply_email_address: site_noreply_email_address,
+      site_short_name: site_short_name,
+      site_broker_registration_guide: site_broker_registration_guide,
+      site_producer_email_address: site_producer_email_address,
+      contact_center_phone_number:  EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+      first_name: person.first_name,
+      contact_center_short_name: contact_center_name,
+      state_name: state_name,
+      training_link: EnrollRegistry[:broker_training_link].item,
+      contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
+).html_safe %>
+    
+    

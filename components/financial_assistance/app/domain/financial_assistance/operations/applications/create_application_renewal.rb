@@ -46,20 +46,24 @@ module FinancialAssistance
 
           application = applications_by_family.by_year(validated_params[:renewal_year].pred).renewal_eligible.created_asc.last
 
-          if application.present?
+          if application
             Success(application)
           else
             Rails.logger.error "Could not find any applications that are renewal eligible: #{validated_params}."
             Failure("Could not find any applications that are renewal eligible: #{validated_params}.")
           end
+        rescue SystemStackError => e
+          Rails.logger.error "Critical Error: Unable to find application from database"
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
         end
 
         def renew_application(application, validated_params)
           application = create_renewal_draft_application(application, validated_params)
 
           if application.failure?
-            Rails.logger.error "Unable to create renewal application #{application.failure.errors} with #{validated_params}"
-            return Failure("Unable to create renewal application #{application.failure.errors} with #{validated_params}")
+            Rails.logger.error "Unable to create renewal application #{application.failure} with #{validated_params}"
+            return Failure("Unable to create renewal application #{application.failure} with #{validated_params}")
           end
 
           application
@@ -73,29 +77,34 @@ module FinancialAssistance
           # In our context we want to create new application from the existing application
           # that is sent from this Operation.
           Try() do
-            ::FinancialAssistance::Factories::ApplicationFactory.new(application).copy_application
-          end.bind do |renewal_application|
-            years_to_renew = calculate_years_to_renew(application)
+            ::FinancialAssistance::Factories::ApplicationFactory.new(application)
+          end.bind do |renewal_application_factory|
+            renewal_application = renewal_application_factory.create_application
+            family_members_changed = renewal_application_factory.family_members_changed
+            calculated_renewal_base_year = calculate_renewal_base_year(application)
 
             renewal_application.assign_attributes(
-              aasm_state: 'renewal_draft',
+              aasm_state: family_members_changed ? 'applicants_update_required' : 'renewal_draft',
               assistance_year: validated_params[:renewal_year],
-              years_to_renew: years_to_renew,
-              renewal_base_year: application.renewal_base_year,
+              years_to_renew: application.years_to_renew || 0,
+              renewal_base_year: calculated_renewal_base_year,
               predecessor_id: application.id,
               effective_date: Date.new(validated_params[:renewal_year])
             )
 
             renewal_application.save!
-            Success(renewal_application)
+            if renewal_application.renewal_draft?
+              Success(renewal_application)
+            else
+              Failure("Renewal Application Applicants Update required - #{renewal_application.hbx_id}")
+            end
           end.to_result
         end
         # rubocop:enable Style/MultilineBlockChain
 
-        # Deduct one year from years_to_renew as this is a renewal application(application for prospective year)
-        def calculate_years_to_renew(application)
-          return 0 if application.years_to_renew.nil? || !application.years_to_renew.positive?
-          application.years_to_renew.pred
+        def calculate_renewal_base_year(application)
+          return application.renewal_base_year if application.renewal_base_year.present?
+          application.calculate_renewal_base_year
         end
 
         def build_event(application)

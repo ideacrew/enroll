@@ -19,7 +19,7 @@
             <strong><%= @plan.issuer_profile.legal_name %> <%= @plan.title %></strong><br>
             <%= l10n("benefit") %>: <%= @enrollment.coverage_kind.capitalize %><br>
             <!-- #TODO: FIX me  -->
-            <%= l10n("metal_level") %>: <%= @plan.metal_level_kind.capitalize %><br>
+            <%= l10n("metal_level") %>: <%= show_metal_level_by_enrollment @plan %><br>
             <%= l10n("market") %>: <%= show_market_name_by_enrollment @enrollment %>
 
           </p>
@@ -30,7 +30,7 @@
             <%= render "insured/plan_shoppings/coverage_information" %>
           <% else %>
             <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate: true} %>
-            <%= render "insured/plan_shoppings/individual_agreement" %>
+            <%= render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: @any_aptc_present.present?, coverage_year: @enrollment.effective_on.year.to_s} %>
           <% end %>
 
           <% if @enrollment.is_cobra_status? %>

@@ -54,7 +54,7 @@ Feature: Insured Plan Shopping on Individual market
     When Individual selects eligible immigration status
     And Individual selects applying for coverage
     And Individual click continue button
-    Then Individual should see error message Document Type cannot be blank
+    Then Individual should see error message Document Type: cannot be blank
    
   Scenario: Dependents should see document errors when proceeds without uploading document
     When Individual click continue button

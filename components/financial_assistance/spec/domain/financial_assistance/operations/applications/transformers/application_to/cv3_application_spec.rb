@@ -11,6 +11,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
+                                  :with_student_information,
                                   first_name: person.first_name,
                                   last_name: person.last_name,
                                   dob: person.dob,
@@ -71,9 +72,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     }
   end
 
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:premiums_double) { double(:success => premiums_hash) }
+  let(:slcsp_double) { double(:success => slcsp_info) }
+  let(:lcsp_double) { double(:success => lcsp_info) }
+
+  let(:fetch_double) { double(:new => double(call: premiums_double))}
+  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
+  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
@@ -85,6 +90,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(premiums_double).to receive(:failure?).and_return(false)
+    allow(slcsp_double).to receive(:failure?).and_return(false)
+    allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
   describe 'When Application in draft state is passed' do
@@ -1307,6 +1315,32 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should not return nil for prior_insurance_end_date' do
         expect(@applicant.prior_insurance_end_date).not_to be_nil
         expect(@applicant.prior_insurance_end_date).to eq(applicant.benefits.first.end_on)
+      end
+    end
+  end
+
+  describe 'had_prior_insurance & prior_insurance_end_date' do
+    context 'success' do
+      before do
+        result = subject.call(application)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @student = @entity_init.success.applicants.first.student
+      end
+
+      it 'should populate is_student for student' do
+        expect(@student.is_student).to eq(applicant.is_student)
+      end
+
+      it 'should populate student_kind for student' do
+        expect(@student.student_kind).to eq('full_time')
+      end
+
+      it 'should populate student_school_kind for student' do
+        expect(@student.student_school_kind).to eq('graduate_school')
+      end
+
+      it 'should populate student_school_kind for student' do
+        expect(@student.student_status_end_on).to eq(TimeKeeper.date_of_record.end_of_month)
       end
     end
   end

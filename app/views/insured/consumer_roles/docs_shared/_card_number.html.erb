@@ -3,7 +3,7 @@
   <% description = name == 'I-766' ? l10n("insured.consumer_roles.docs_shared.i_766_card_number_req") : l10n("insured.consumer_roles.docs_shared.card_number_req") %>
   <%= v.text_field :card_number, :placeholder => l10n("insured.consumer_roles.docs_shared.card_number"),
                    :pattern => "[a-zA-Z0-9]{13}",
-                   :class => "doc_fields",
+                   :class => "#{FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required" } doc_fields",
                    :title => description.gsub("-li-", "") %>
   <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: description} %>
 </div>

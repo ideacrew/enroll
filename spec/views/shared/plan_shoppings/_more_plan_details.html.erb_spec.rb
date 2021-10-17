@@ -33,6 +33,41 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
   #   expect(rendered).to match /.*#{hbx_enrollment.humanized_dependent_summary} dependent*/m
   # end
 
+  context "add_external_links features" do
+    context "links enabled" do
+      before do
+        EnrollRegistry[:go_to_plan_compare_link].feature.stub(:is_enabled).and_return(true)
+        allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
+        allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
+        allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)
+        allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two])
+        assign(:hbx_enrollment, hbx_enrollment)
+        render "shared/plan_shoppings/more_plan_details", person: person
+      end
+
+      it "should show the go to compare plan button" do
+        expect(rendered).to match(l10n("go_to_plan_compare"))
+      end
+    end
+    context "links disabled" do
+      before do
+        EnrollRegistry[:go_to_plan_compare_link].feature.stub(:is_enabled).and_return(false)
+        allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
+        allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
+        allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)
+        allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two])
+        assign(:hbx_enrollment, hbx_enrollment)
+        render "shared/plan_shoppings/more_plan_details", person: person
+      end
+
+      it "should show the go to compare plan button" do
+        expect(rendered).to_not match(l10n("go_to_plan_compare"))
+      end
+    end
+  end
+
   context "with a primary subscriber and one dependent" do
     before :each do
       allow(hbx_enrollment_member_one).to receive(:person).and_return(person)

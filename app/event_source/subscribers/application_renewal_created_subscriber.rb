@@ -19,12 +19,19 @@ module Subscribers
         subscriber_logger.info "application hbx_id: #{payload[:hbx_id]} processed successfully"
         logger.info "ApplicationRenewalCreatedSubscriber: acked, SuccessResult: #{result.success}"
       else
-        subscriber_logger.info "application hbx_id: #{payload[:hbx_id]} failed!!, FailureResult: #{result.failure}"
-        logger.info "ApplicationRenewalCreatedSubscriber: acked, FailureResult: #{result.failure}"
+        errors = if result.failure.is_a?(Dry::Validation::Result)
+                   result.failure.errors.to_h
+                 else
+                   result.failure
+                 end
+
+        subscriber_logger.info "application hbx_id: #{payload[:hbx_id]} failed!!, FailureResult: #{errors}"
+        logger.info "ApplicationRenewalCreatedSubscriber: acked, FailureResult: #{errors}"
       end
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
+      subscriber_logger.info "ApplicationRenewalRequestCreatedSubscriber, app_hbx_id: #{payload[:hbx_id]}, error message: #{e.message}, backtrace: #{e.backtrace}"
       logger.info "ApplicationRenewalCreatedSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end

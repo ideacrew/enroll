@@ -37,7 +37,7 @@ module FinancialAssistance
       end
 
       def copy!
-        new(submitted_app).copy_application
+        new(submitted_app).create_application
       end
 
       def new(application)

@@ -563,8 +563,8 @@ class Plan
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
         shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
-        csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
-        csr_kind = tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_0' : csr_kind rescue nil
+        # picks csr_kind based on individual level
+        csr_kind = tax_household&.eligibile_csr_kind(shopping_family_member_ids)
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else

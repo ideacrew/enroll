@@ -20,7 +20,11 @@ When(/^.+ visits the Consumer portal during open enrollment$/) do
   BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
 
-
+Then(/^\w+ should see Go To Plan Compare button$/) do
+  expect(page).to have_content(l10n("go_to_plan_compare"))
+  click_link(l10n("go_to_plan_compare"))
+  expect(page).to have_content("CHECKBOOK")
+end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
@@ -65,7 +69,7 @@ And 'I select a effective date from list' do
 end
 
 And(/the user sees Your Information page$/) do
-  expect(page).to have_content YourInformation.your_information_text
+  expect(page).to have_content(l10n('your_information'))
   find(YourInformation.continue_btn).click
 end
 
@@ -115,6 +119,7 @@ Then(/^.+ sees form to enter personal information$/) do
   find_all(IvlPersonalInformation.select_state_dropdown).first.click
   find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
   # screenshot("personal_form")
 end
@@ -486,6 +491,10 @@ And(/^.+ click on purchase button on confirmation page/) do
   click_link "Confirm"
 end
 
+Then(/^.+ should see the extended APTC confirmation message/) do
+  expect(page).to have_content("I must file a federal income tax return")
+end
+
 And(/^.+ clicks on the Continue button to go to the Individual home page/) do
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
@@ -633,7 +642,7 @@ Then(/CSR clicks on Resume Application via phone/) do
   click_link "Assist Customer"
 end
 
-When(/I click on the header link to return to CSR page/) do
+When(/CSR clicks on the header link to return to CSR page/) do
   expect(page).to have_content "I'm a Trained Expert", :wait => 10
   find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").click
 end

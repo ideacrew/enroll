@@ -94,4 +94,21 @@ RSpec.describe Insured::EmployeeRolesHelper, :type => :helper do
       expect(helper.show_market_name_by_enrollment(nil)).to eq ''
     end
   end
+
+
+  describe "#show_metal_level_by_enrollment" do
+
+    let(:dental_plan){ FactoryBot.create(:benefit_markets_products_dental_products_dental_product, dental_level: 'high') }
+    let(:health_plan){ FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :bronze) }
+    context "for shop" do
+
+      it "under employer_sponsored_cobra" do
+        expect(helper.show_metal_level_by_enrollment(dental_plan)).to eq :High
+      end
+
+      it "under employer_sponsored" do
+        expect(helper.show_metal_level_by_enrollment(health_plan)).to eq :Bronze
+      end
+    end
+  end
 end

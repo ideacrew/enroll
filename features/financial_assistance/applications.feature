@@ -11,6 +11,12 @@ Feature: Start a new Financial Assistance Application
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
 
+  Scenario: A consumer is subject to a successful MEC check
+    Given the MEC check feature configuration is enabled
+    And the consumer has received a successful MEC check response
+    When a consumer visits the Get Help Paying for coverage page
+    Then they should see the MedicaidCurrently Enrolled warning text
+   
   Scenario: A consumer enters tax information for an application's applicant
     Given the consumer has started a financial assistance application
     When they view the financial assistance application
