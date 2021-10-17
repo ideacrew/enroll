@@ -633,3 +633,15 @@ registry:
         is_enabled: false
       - key: :zero_permium_policy
         is_enabled: false
+  - namespace:
+      - :person_matching_feature
+    features:
+      - key: :person_match_policy
+        is_enabled: true
+        settings:
+          - key: :ssn_present
+            item: ['first_name', 'last_name', 'dob', 'ssn']
+          - key: :dob_present
+            item: ['first_name', 'last_name', 'dob']
+          - key: :name_present
+            item: ['first_name', 'last_name']
