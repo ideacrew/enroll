@@ -973,9 +973,16 @@ def employer_poc
       }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
-    result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
-    result.deliver_now
-    puts result.to_s if Rails.env.development?
+    person = Person.where(_id: params[:person]).first
+    hbx_id = person&.hbx_id || ""
+    agent_email = find_email(agent,role)
+    if agent_email.present?
+      result = UserMailer.new_client_notification(agent_email, name, role, insured_email, hbx_id)
+      result.deliver_now
+      puts result.to_s if Rails.env.development?
+    else
+      Rails.logger.warn("No email found for #{name}")
+    end
    end
 
   def find_hbx_profile

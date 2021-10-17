@@ -42,7 +42,8 @@ module FinancialAssistance
           def send_successful_account_transfer_email(family)
             primary_person = family.primary_person
             email_address = primary_person.emails.first.address
-            UserMailer.account_transfer_success_notification(primary_person, email_address).deliver_now
+            hbx_id = primary_person&.hbx_id || ""
+            UserMailer.account_transfer_success_notification(primary_person, email_address, hbx_id).deliver_now
           end
 
           def construct_payload(application, family)
