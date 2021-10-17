@@ -190,7 +190,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def eligible_enrollment_members
     @enrollment.hbx_enrollment_members.reject do |member|
-      member.person.is_disabled || !eligible_to_get_covered?(member)
+      !eligible_to_get_covered?(member)
     end
   end
 
