@@ -13,12 +13,14 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let(:issuer) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
+    let(:aasm_state) { 'coverage_selected' }
     let(:enrollment) do
       FactoryBot.create(
         :hbx_enrollment,
         :with_enrollment_members,
         :individual_unassisted,
         family: family,
+        aasm_state: aasm_state,
         product_id: product.id,
         applied_aptc_amount: Money.new(44_500),
         consumer_role_id: person.consumer_role.id,
@@ -47,6 +49,15 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       it 'should return success' do
         result = subject.call(params)
         expect(result.success?).to be_truthy
+      end
+
+      context 'when an auto renewing enrollment is present' do
+        let(:aasm_state) { 'auto_renewing' }
+
+        it 'should return sucess' do
+          result = subject.call(params)
+          expect(result.success?).to be_truthy
+        end
       end
     end
 
