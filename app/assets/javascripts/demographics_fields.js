@@ -407,7 +407,10 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
-    if ($('#immigration_doc_type').val() == '') {
+    if (
+      $('#immigration_doc_type').val() == '' &&
+      document.getElementById('person_us_citizen_false').checked == true
+    ) {
       $('#showWarning').removeClass('hidden');
     }
     if ($('#vlp_documents_container').is(':visible')) {
@@ -611,29 +614,41 @@ var PersonValidations = (function (window, undefined) {
 
   // client specific feature for ME, validates that a contact method is selected
   function validationForContactMethod(e) {
-    if( $(".contact-method").length ){
-      console.log("Contact methods present.")
+    if ($('.contact-method').length) {
+      console.log('Contact methods present.');
       var isChecked = false;
-      $( ".contact-method input" ).each(function( i ,el ){
-        if($(el).prop("checked")){
+      $('.contact-method input').each(function (i, el) {
+        if ($(el).prop('checked')) {
           isChecked = true;
-        } 
-      })
-      if( isChecked == false ){
+        }
+      });
+      if (isChecked == false) {
         alert('Warning: You must select at least one contact method.');
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-email").prop('checked') ){
-        if( !$("#person_emails_attributes_0_address").val() ){
-          alert("You must enter an email address to receive notices and updates by email.");
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email'
+        ).prop('checked')
+      ) {
+        if (!$('#person_emails_attributes_0_address').val()) {
+          alert(
+            'You must enter an email address to receive notices and updates by email.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
-        if(document.querySelector(".mobile-phone-number").value.length < 1){
-          alert("You must enter a mobile phone number to receive notices and updates by text.");
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text'
+        ).prop('checked')
+      ) {
+        if (document.querySelector('.mobile-phone-number').value.length < 1) {
+          alert(
+            'You must enter a mobile phone number to receive notices and updates by text.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
@@ -651,7 +666,7 @@ var PersonValidations = (function (window, undefined) {
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
     validationForContactMethod: validationForContactMethod,
-    restoreRequiredAttributes: restoreRequiredAttributes
+    restoreRequiredAttributes: restoreRequiredAttributes,
   };
 })(window);
 
