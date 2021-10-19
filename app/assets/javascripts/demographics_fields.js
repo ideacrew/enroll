@@ -406,10 +406,29 @@ var PersonValidations = (function (window, undefined) {
     }
   }
 
+  // function validation_for_person_or_dependent() {
+  //   if (!document.getElementById('dependents_info_wrapper')) {
+  //     console.log("I'm up here");
+  //     return (
+  //       document.getElementById('person_us_citizen_false').checked ||
+  //       document.getElementById('person_naturalized_citizen_true').checked
+  //     );
+  //   } else {
+  //     console.log("I'm here");
+  //     return (
+  //       document.getElementById('dependent_us_citizen_false').checked ||
+  //       document.getElementById('dependent_naturalized_citizen_true').checked
+  //     );
+  //   }
+  // }
+
   function validationForVlpDocuments(e) {
+    console.log(validation_for_person_or_dependent());
     if (
-      $('#immigration_doc_type').val() == '' &&
-      document.getElementById('person_us_citizen_false').checked == true
+      $(
+        document.getElementById('immigration_doc_type').value == '' &&
+          document.getElementById('person_us_citizen_false').checked
+      )
     ) {
       $('#showWarning').removeClass('hidden');
     }

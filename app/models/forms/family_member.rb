@@ -35,11 +35,16 @@ module Forms
     validate :ssn_validation
 
     attr_reader :dob
+    attr_accessor :immigration_doc_statuses
 
     HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
 
     def self.human_attribute_name(attr, options={})
       HUMANIZED_ATTRIBUTES[attr.to_sym] || super
+    end
+
+    def immigration_doc_statuses
+      
     end
 
     def consumer_fields_validation
