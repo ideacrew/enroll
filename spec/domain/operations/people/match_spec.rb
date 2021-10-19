@@ -76,36 +76,38 @@ RSpec.describe Operations::People::Match, type: :model, dbclean: :after_each do
       end
     end
 
-    # context 'when querying without ssn' do
-    #   let(:params) do
-    #     {:first_name => "ivl206",
-    #      :last_name => "216",
-    #      :dob => "1986-09-04"}
-    #   end
+    context 'when querying without ssn' do
+      let(:params) do
+        {:first_name => "ivl206",
+         :last_name => "206",
+         :dob => "1986-09-04"}
+      end
 
-    #   context 'and with DC config' do
-    #     before :each do
-    #       allow(EnrollRegistry[:person_match_policy].setting(:ssn_present)).to receive(:item).and_return(['dob', 'ssn'])
-    #     end
+      context 'and with any state based config' do
+        it 'should match record and return matching criteria' do
+          query_criteria, records, _error = subject.call(params)
 
-    #     it 'should match record and return matching criteria' do
-    #       query_criteria, records, _error = subject.call(params)
-    #       expect(query_criteria).to eq :name_ssn_dob
-    #       expect(records.count).to eq 1
-    #     end
-    #   end
+          expect(query_criteria).to eq :name_dob
+          expect(records.count).to eq 1
+        end
+      end
+    end
 
-    #   context 'and with ME config' do
-    #     before :each do
-    #       allow(EnrollRegistry[:person_match_policy].setting(:ssn_present)).to receive(:item).and_return(['first_name', 'last_name', 'dob', 'ssn'])
-    #     end
-    #     it 'should match record and return matching criteria with error' do
-    #       query_criteria, records, error = subject.call(params)
-    #       expect(query_criteria).to eq :site_specific_ssn_dob
-    #       expect(records.count).to eq 1
-    #       expect(error.present?).to eq true
-    #     end
-    #   end
-    # end
+    context 'when querying without ssn and different last_name' do
+      let(:params) do
+        {:first_name => "ivl206",
+         :last_name => "206",
+         :dob => "1986-09-04"}
+      end
+
+      context 'and with any state based config' do
+        it 'should match record and return matching criteria' do
+          query_criteria, records, _error = subject.call(params)
+
+          expect(query_criteria).to eq nil
+          expect(records.count).to eq 0
+        end
+      end
+    end
   end
 end

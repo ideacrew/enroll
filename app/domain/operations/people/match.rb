@@ -51,7 +51,7 @@ module Operations
           @first_name = params[:first_name]
           @last_name = params[:last_name]
           @dob = params[:dob].to_date
-          @ssn = params[:ssn].delete('^0-9')
+          @ssn = params[:ssn]&.delete('^0-9')
           Success("")
         else
           Failure("invalid params")
