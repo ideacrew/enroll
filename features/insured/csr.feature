@@ -13,7 +13,7 @@ Feature: CSR finishes shopping for Individual
     And Individual sees form to enter personal information
     And Individual clicks on continue
     And Individual asks for help
-    And Individual logs out
+    And Individual clicks on logout
     Then Devops can verify session logs
     When CSR logs on to the HBX portal
     Then CSR should see the Agent Portal

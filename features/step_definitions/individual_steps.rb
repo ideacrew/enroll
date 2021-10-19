@@ -1010,3 +1010,8 @@ end
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   click_button 'CONTINUE', :wait => 10
 end
+
+And(/Individual clicks on logout$/) do
+  sleep 2
+  find('.interaction-click-control-logout').click
+end
