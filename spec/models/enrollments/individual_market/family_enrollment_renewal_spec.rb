@@ -244,7 +244,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'Renewal enrollment members should have the tobacco_use populated NA for unknown.' do
-            spouse_rec.update_attributes(is_tobacco_user: "unknown")
+            spouse_rec.update_attributes(is_tobacco_user: 'unknown')
             renewal_members = subject.clone_enrollment_members
             expect(renewal_members.pluck(:tobacco_use)).not_to include('unknown')
           end
