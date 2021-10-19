@@ -52,7 +52,7 @@ function setGroupSelectionHandlers(){
       setPrimaryForIvl();
     }
     if ( $('#market_kind_coverall').is(':checked') ) {
-     
+
     }
 
     $('#market_kind_individual').on('change', function() {
@@ -129,11 +129,11 @@ function hideShopErrors() {
 }
 
 function hideIvlErrors() {
-  $('#coverage-household tr td.ivl_errors').hide();
+  $('#coverage-household tr div.ivl_errors').hide();
 }
 
 function showIvlErrors() {
-  $('#coverage-household tr td.ivl_errors').show();
+  $('#coverage-household tr div.ivl_errors').show();
 }
 
 
