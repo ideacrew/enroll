@@ -15,7 +15,7 @@ RSpec.describe UserMailer do
     let(:hbx_id) { rand(10_000)}
     let(:file){ Rails.root.join("spec","mailers","user_mailer_spec.rb").to_s }
     let(:email){UserMailer.generic_notice_alert('john', hbx_id, 'john@dc.gov', {"file_name" => file})}
-    let(:new_client_email){UserMailer.new_client_notification("agent@email.com", "Client New", "Consumer", "client@new.com", "123456")}
+    let(:new_client_email){UserMailer.new_client_notification("agent@email.com", "Client", "Consumer", "client@new.com", "123456")}
 
     it 'should not allow a reply' do
       expect(email.from).to match(["no-reply@individual.#{site_domain_name}"])
@@ -36,7 +36,7 @@ RSpec.describe UserMailer do
     end
 
     it "should render new client's information" do
-      expect(new_client_email.body).to match("Client New")
+      expect(new_client_email.body).to match("Client")
       expect(new_client_email.subject).to match("client@new.com")
     end
   end
