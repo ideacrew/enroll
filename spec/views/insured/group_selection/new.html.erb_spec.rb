@@ -42,7 +42,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     let(:person) { FactoryBot.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
-    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }    
+    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
     let(:benefit_group) { current_benefit_package }
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:family_member1) { double("family member 1", id: "family_member", primary_relationship: "self", dob: Date.new(1990, 10, 10), full_name: "member", person: person) }
@@ -124,7 +124,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       it "should have two checked checkbox option and two checked radio button one for benefit_type and other for employer" do
-        expect(rendered).to have_selector("input[checked='checked']", count: 4)
+        expect(rendered).to have_selector("input[checked='checked'][value=health]")
+        expect(rendered).to have_selector("input[checked='checked'][name=employee_role_id]")
       end
 
       it "should have a disabled checkbox option" do
@@ -137,7 +138,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       it "should have a 'not eligible'" do
-        expect(rendered).to have_selector('td', text: 'Employer sponsored coverage is not available', count: 2)
+        expect(rendered).to have_selector('div', text: 'Employer sponsored coverage is not available')
       end
     end
   end
