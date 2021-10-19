@@ -40,7 +40,7 @@ module Operations
             @has_dob = validate_dob(v)
             true
           when :ssn
-            @has_ssn = v.delete('^0-9').present?
+            @has_ssn = v&.delete('^0-9').present?
             true
           else
             v.to_s.scan(SPECIAL_CHAR).blank?
@@ -66,7 +66,7 @@ module Operations
         Success(keys_with_ssn.each_with_object({}) do |k, collect|
           hash = case k
                  when :ssn
-                   {encrypted_ssn: Person.encrypt_ssn(params[k]).gsub("\n", '')}
+                   {encrypted_ssn: Person.encrypt_ssn(params[k])}
                  when :dob
                    {"#{k}": params[k]}
                  else
@@ -89,8 +89,8 @@ module Operations
       def match_person(_hash = {})
         result = if ssn.present?
                    records = query({:dob => dob,
-                                    :encrypted_ssn => Person.encrypt_ssn(ssn).gsub("\n", '')}).success
-                   records.nil? ? match_dob : [:ssn_dob, records]
+                                    :encrypted_ssn => Person.encrypt_ssn(ssn)}).success
+                   records.count == 0 ? match_dob : [:ssn_dob, records]
                  elsif dob.present?
                    [:name_dob, query({:dob => dob,
                                       :last_name => /^#{last_name}$/i,
