@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'pry'
 
 RSpec.describe Operations::People::Match, type: :model, dbclean: :after_each do
 
@@ -25,7 +26,7 @@ RSpec.describe Operations::People::Match, type: :model, dbclean: :after_each do
   context 'when there is one record present in db' do
     let!(:person) do
       FactoryBot.create(:person, :first_name => "ivl206",
-                                 :last_name => "206", :dob => "1986-09-04", encrypted_ssn: "S7Stew0QwQqIurdLhw5FnQ==")
+                                 :last_name => "206", :dob => "1986-09-04", :ssn => "763-81-2636")
     end
 
     context 'when querying with same values' do
@@ -104,8 +105,8 @@ RSpec.describe Operations::People::Match, type: :model, dbclean: :after_each do
         it 'should match record and return matching criteria' do
           query_criteria, records, _error = subject.call(params)
 
-          expect(query_criteria).to eq nil
-          expect(records.count).to eq 0
+          expect(query_criteria).to eq :name_dob
+          expect(records.count).to eq 1
         end
       end
     end
