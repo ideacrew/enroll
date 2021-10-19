@@ -7,26 +7,29 @@ module Operations
   module People
     # this class uses different creterias for person match
     class Match
-      include Dry::Monads[:result, :do]
+      send(:include, Dry::Monads[:result, :do])
+      send(:include, Dry::Monads[:try])
       # include Ssn
       attr_reader :first_name, :last_name, :dob, :ssn, :keys_with_ssn, :keys_with_dob, :has_ssn, :has_dob
 
-      SPECIAL_CHAR = %r([!@#$%^&*()_+{}\[\]:;'"\/\\?><.,]).freeze
+      SPECIAL_CHAR = %r([!@#$%^&*()_+{}\[\]:;'"/\\?><.,]).freeze
 
       def call(params)
         yield validate(params)
         yield fetch_config_items
         query_params = yield query_builder(params)
-        result = yield match_person(query_params)
-
-        Success(result)
+        person_records = yield match_person(query_params)
+        yield build_result(person_records)
       end
 
       private
 
       def validate_dob(dob)
-        result = dob.nil? ? false : Date.strptime(v, "%Y-%m-%d") rescue nil
-        result.nil? ? false : result
+        if dob.nil?
+          false
+        else
+          (dob.to_date.present? ? true : false)
+        end
       end
 
       def validate(params)
@@ -47,7 +50,8 @@ module Operations
         if result
           @first_name = params[:first_name]
           @last_name = params[:last_name]
-          @dob = params[:dob]
+          @dob = params[:dob].to_date
+          @ssn = params[:ssn]
           Success("")
         else
           Failure("invalid params")
@@ -82,25 +86,61 @@ module Operations
         end
       end
 
-      def match_person(query_params = {})
+      def match_person(_hash = {})
         result = if ssn.present?
-                   Person.where(query_params).first || match_ssn_employer_person
+                   records = query({:dob => dob,
+                                    :encrypted_ssn => Person.encrypt_ssn(ssn).gsub("\n", '')}).success
+                   records.nil? ? match_dob : [:ssn_dob, records]
+                 elsif dob.present?
+                   [:name_dob, query({:dob => dob,
+                                      :last_name => /^#{last_name}$/i,
+                                      :first_name => /^#{first_name}$/i}).success]
                  else
-                   Person.where({:dob => dob,
-                                 :last_name => /^#{last_name}$/i,
-                                 :first_name => /^#{first_name}$/i
-                                }).first
+                   [:name, query({
+                                   :last_name => /^#{last_name}$/i,
+                                   :first_name => /^#{first_name}$/i
+                                 }).success]
                  end
+
         Success(result)
       end
 
-      def match_ssn_employer_person
-        existing_person = Person.where({:dob => dob,
-                                        :last_name => /^#{last_name}$/i,
-                                        :first_name => /^#{first_name}$/i
-                                       }).first
-        return existing_person if existing_person.present? && existing_person.employer_staff_roles?
-        nil
+      def match_dob
+        [:name_dob, query({:dob => dob,
+                           :last_name => /^#{last_name}$/i,
+                           :first_name => /^#{first_name}$/i}).success]
+      end
+
+      def build_result(person_records)
+        query_criteria, records = person_records
+
+        if records.count > 1
+          Success([nil,records,"More than one person record found"])
+        elsif records.count == 1
+          person = records.first
+          case query_criteria
+          when :ssn_dob
+            if keys_with_ssn.all?{|k| person.send(k) == self.send(k)}
+              Success([:name_ssn_dob, records])
+            else
+              Success([:site_specific_ssn_dob,
+                       records,
+                       "ssn is already affiliated with another account."])
+            end
+          when :name_dob
+            Success([:name_dob, records])
+          else
+            Success([:ssn_dob, records])
+          end
+        else
+          Success([nil,records])
+        end
+      end
+
+      def query(hash)
+        Try() do
+          Person.where(hash)
+        end.to_result
       end
     end
   end
