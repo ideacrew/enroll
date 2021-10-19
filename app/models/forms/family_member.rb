@@ -5,7 +5,7 @@ module Forms
     include Config::AcaModelConcern
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :is_tobacco_user,
-                  :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded
+                  :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded, :immigration_doc_statuses
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -35,16 +35,11 @@ module Forms
     validate :ssn_validation
 
     attr_reader :dob
-    attr_accessor :immigration_doc_statuses
 
     HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
 
     def self.human_attribute_name(attr, options={})
       HUMANIZED_ATTRIBUTES[attr.to_sym] || super
-    end
-
-    def immigration_doc_statuses
-      
     end
 
     def consumer_fields_validation
