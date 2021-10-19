@@ -191,7 +191,7 @@ function applyFaaListeners() {
   });
 }
 
-function validationForIndianTribeMember() {
+function validationForIndianTribeMember(e) {
   if ($('#indian_tribe_area').length == 0) {
     return false;
   };
@@ -437,17 +437,17 @@ var ApplicantValidations = (function(window, undefined) {
     validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
-    restoreRequiredAttributes: restoreRequiredAttributes
-
+    restoreRequiredAttributes: restoreRequiredAttributes,
+    validationForIndianTribeMember: validationForIndianTribeMember
   };
 
 })(window);
 
 $(document).on('turbolinks:load', function () {
   applyFaaListeners();
-  validationForIndianTribeMember();
 
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
+    ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForUsCitizenOrUsNational(e);
     ApplicantValidations.validationForNaturalizedCitizen(e);
     ApplicantValidations.validationForEligibleImmigrationStatuses(e);
