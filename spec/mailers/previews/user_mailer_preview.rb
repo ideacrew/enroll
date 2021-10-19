@@ -120,11 +120,11 @@ class UserMailerPreview < ActionMailer::Preview
 
   def new_client_notification
     agent_email = "test@test.com"
-    name = "test one"
+    first_name = "John"
     role = "agent"
     insured_email = "test@insured.com"
     hbx_id = "12345678"
-    UserMailer.new_client_notification(agent_email, name, role, insured_email, hbx_id)
+    UserMailer.new_client_notification(agent_email, first_name, role, insured_email, hbx_id)
   end
 
   def broker_pending_completed_training_missing_carrier; end

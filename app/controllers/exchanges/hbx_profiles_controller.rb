@@ -977,7 +977,7 @@ def employer_poc
     hbx_id = person&.hbx_id || ""
     agent_email = find_email(agent,role)
     if agent_email.present?
-      result = UserMailer.new_client_notification(agent_email, name, role, insured_email, hbx_id)
+      result = UserMailer.new_client_notification(agent_email, first_name, role, insured_email, hbx_id)
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else
