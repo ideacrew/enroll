@@ -9,10 +9,12 @@ RSpec.describe Operations::People::Match, type: :model, dbclean: :after_each do
   end
 
   context 'create person' do
-    let(:params) {{:first_name=>"ivl206",
-        :last_name=>"206",
-        :dob=>"1986-09-04",
-        :ssn=>"763-81-2636"}}
+    let(:params) do
+      {:first_name => "ivl206",
+       :last_name => "206",
+       :dob => "1986-09-04",
+       :ssn => "763-81-2636"}
+    end
 
     it 'should be a container-ready operation' do
       expect(subject.call(params)).to be_truthy
