@@ -42,7 +42,12 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     let(:person) { FactoryBot.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
-    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
+  let(:census_employee) do
+    FactoryBot.create(:census_employee, :with_active_assignment,
+                      benefit_sponsorship: benefit_sponsorship,
+                      employer_profile: benefit_sponsorship.profile,
+                      benefit_group: current_benefit_package)
+  end
     let(:benefit_group) { current_benefit_package }
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:family_member1) { double("family member 1", id: "family_member", primary_relationship: "self", dob: Date.new(1990, 10, 10), full_name: "member", person: person) }
