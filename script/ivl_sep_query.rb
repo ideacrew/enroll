@@ -101,7 +101,7 @@ end
 term_event = "acapi.info.events.hbx_enrollment.terminated"
 terms.each do |rec|
   pol_id = rec["_id"]
-  if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_a_year)
+  if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_year)
     enrollment = HbxEnrollment.where(hbx_id: pol_id).first
     next if enrollment.coverage_year == EnrollRegistry[:gate_enrollments_to_edidb_for_year].setting(:year).item
   end

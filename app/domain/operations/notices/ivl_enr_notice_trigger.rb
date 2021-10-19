@@ -92,7 +92,7 @@ module Operations
 
       def build_household_hash(family, year)
         household_hash = family.households.collect do |household|
-          enrollments = household.hbx_enrollments.enrolled.with_product.by_year(year)
+          enrollments = household.hbx_enrollments.enrolled_and_renewal.with_product.by_year(year)
           {
             start_date: household.effective_starting_on,
             is_active: household.is_active,
