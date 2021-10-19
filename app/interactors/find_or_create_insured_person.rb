@@ -3,12 +3,8 @@ class FindOrCreateInsuredPerson
 
   def call
     user = context.user
-    people = Person.match_by_id_info(
-      ssn: context.ssn,
-      dob: context.dob,
-      last_name: context.last_name,
-      first_name: context.first_name
-      )
+    people = match_person
+
     person, is_new = nil, nil
     case people.count
     when 1
@@ -72,5 +68,28 @@ class FindOrCreateInsuredPerson
     end
     context.person = person
     context.is_new = is_new
+  end
+
+  private
+
+  def match_person
+    raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if context.ssn.blank? && (context.dob.blank? || context.last_name.blank? || context.first_name.blank?)
+
+    matches = []
+    unless context.ssn.blank?
+      query_criteria, people, _error = Operations::People::Match.new.call({:dob => context.dob,
+                                                                           :last_name => context.last_name,
+                                                                           :first_name => context.first_name,
+                                                                           :ssn => context.ssn})
+    end
+
+    matches.concat people.to_a if query_criteria == :name_ssn_dob
+
+    query_criteria, people, _error = Operations::People::Match.new.call({:dob => context.dob,
+                                                                         :last_name => context.last_name,
+                                                                         :first_name => context.first_name})
+
+    matches.concat(people.to_a.select{|person| person.ssn.blank? || context.ssn.blank?}) if query_criteria == :name_dob
+    matches.uniq
   end
 end

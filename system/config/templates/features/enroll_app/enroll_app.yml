@@ -640,7 +640,7 @@ registry:
         is_enabled: true
         settings:
           - key: :ssn_present
-            item: ['first_name', 'last_name', 'dob', 'ssn']
+            item: ['dob', 'ssn']
           - key: :dob_present
             item: ['first_name', 'last_name', 'dob']
           - key: :name_present
