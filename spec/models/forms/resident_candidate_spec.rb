@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 describe Forms::ResidentCandidate, "asked to match a person", dbclean: :after_each do
 
