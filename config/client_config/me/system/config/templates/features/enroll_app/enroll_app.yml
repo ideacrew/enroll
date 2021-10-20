@@ -385,6 +385,9 @@ registry:
             item: 24
           - key: :ivl_enrollment_renewal_begin_effective_month
             item: 10
+      - key: :exclude_child_only_offering
+        item: :exclude_child_only_offering
+        is_enabled: true
   - namespace:
       - :pay_now_feature
     features:

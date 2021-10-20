@@ -1,8 +1,4 @@
 {
-  "cSpell.words": [
-    "nanasess",
-    "serializers",
-    "wbari"
-  ],
+  "cSpell.words": ["interactors", "nanasess", "serializers", "wbari"],
   "git.ignoreLimitWarning": true
 }
