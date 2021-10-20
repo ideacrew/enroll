@@ -423,7 +423,6 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
-    console.log(validation_for_person_or_dependent());
     if (validation_for_person_or_dependent()) {
       $('#showWarning').removeClass('hidden');
     }
