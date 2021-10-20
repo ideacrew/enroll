@@ -1,8 +1,8 @@
 name: full check suite
 on:
-  # push:
-  #   branches-ignore:
-  #     - hotfix*
+  push:
+    branches-ignore:
+      - hotfix*
 
   schedule:
     - cron: '0 6 * * *'
