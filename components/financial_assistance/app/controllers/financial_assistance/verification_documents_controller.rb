@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
+  # controller for cost saving documents
   class VerificationDocumentsController < FinancialAssistance::ApplicationController
     include ApplicationHelper
     include VerificationHelper
@@ -17,9 +20,9 @@ module FinancialAssistance
               add_verification_history(file)
               flash[:notice] = "File Saved"
             else
-              flash[:error] = "Could not save file. " + @doc_errors.join(". ")
+              flash[:error] = "Could not save file. #{@doc_errors.join('. ')}"
               redirect_to(:back)
-              return
+              break
             end
           else
             flash[:error] = "Could not save file"
@@ -47,7 +50,7 @@ module FinancialAssistance
       update_reason = params[:verification_reason]
       admin_action = params[:admin_action]
       reasons_list = FinancialAssistance::Document::VERIFICATION_REASONS + FinancialAssistance::Document::REJECT_REASONS
-      if (reasons_list).include? (update_reason)
+      if reasons_list.include?(update_reason)
         verification_result = admin_verification_action(admin_action, @evidence, update_reason)
         message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
         flash[:success] =  message
@@ -79,6 +82,7 @@ module FinancialAssistance
     end
 
     private
+
     def updateable?
       authorize Family, :updateable?
     end
@@ -92,11 +96,12 @@ module FinancialAssistance
 
     def fetch_applicant
       @applicant = if params[:applicant_id]
-        ::FinancialAssistance::Applicant.find(params[:applicant_id])
-      elsif current_user.try(:person).try(:agent?) && session[:person_id].present?
-        ::FinancialAssistance::Applicant.find(session[:person_id])
-      end
-      redirect_to maain_app.logout_saml_index_path if !fetch_applicant_succeeded?
+                     FinancialAssistance::Applicant.find(params[:applicant_id])
+                   elsif current_user.try(:person).try(:agent?) && session[:person_id].present?
+                     FinancialAssistance::Applicant.find(session[:person_id])
+                   end
+
+      redirect_to maain_app.logout_saml_index_path unless fetch_applicant_succeeded?
     end
 
     def fetch_applicant_succeeded?
@@ -107,8 +112,8 @@ module FinancialAssistance
       message[:user_id] = current_user.id
       message[:oim_id] = current_user.oim_id
       message[:url] = request.original_url
-      log(message, :severity=>'error')
-      return false
+      log(message, :severity => 'error')
+      false
     end
 
     def find_docs_owner
@@ -131,7 +136,7 @@ module FinancialAssistance
 
     def update_documents(title, file_uri)
       document = @evidence.documents.build
-      success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+      success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
       @evidence.update_attributes(:rejected => false, :eligibility_status => "review", :update_reason => "document uploaded")
       @doc_errors = document.errors.full_messages unless success
       @docs_owner.save!

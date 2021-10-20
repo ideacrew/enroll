@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # document model using for faa document
   class Document
     include Mongoid::Document
     include Mongoid::Timestamps
     include Mongoid::Attributes::Dynamic
 
 
-    ACCESS_RIGHTS = %w(public pii_restricted)
+    ACCESS_RIGHTS = %w[public pii_restricted].freeze
 
-    ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject"]
+    ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject"].freeze
 
     VERIFICATION_REASONS = EnrollRegistry[:verification_reasons].item
 
-    REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "4 weeks", "Too old"]
+    REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "4 weeks", "Too old"].freeze
 
     # Enable polymorphic associations
     embedded_in :documentable, polymorphic: true
@@ -72,8 +73,8 @@ module FinancialAssistance
     validates_presence_of :title, :creator, :publisher, :type, :format, :source, :language
 
     validates :rights,
-      allow_blank: true,
-      inclusion: { in: ACCESS_RIGHTS, message: "%{value} is not a valid access right" }
+              allow_blank: true,
+              inclusion: { in: ACCESS_RIGHTS, message: "%{value} is not a valid access right" }
 
   end
 end
