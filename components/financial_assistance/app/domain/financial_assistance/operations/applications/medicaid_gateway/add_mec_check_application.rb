@@ -15,66 +15,45 @@ module FinancialAssistance
           # @param [Hash] opts The options to add eligibility determination to Application(persistence object)
           # @return [Dry::Monads::Result]
           def call(params)
-            application = yield find_application(params[:application_identifier])
-            people = yield get_people(application)
-            _application = yield update_application(application)
-            result = yield update_people(people, params)
-
+            application_entity = yield initialize_application_entity(params)
+            application = yield find_application(application_entity)
+            result = yield update_applicant(application_entity, application)
             Success(result)
           end
 
           private
 
-          def get_people(application)
-            person_ids = application.applicants.map(&:person_hbx_id)
-            people = person_ids.map do |id|
-              person = find_person(id)
-              return person if person.failure?
-              person.value!
+          def initialize_application_entity(params)
+            ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(params)
+          end
+
+          def find_application(application_entity)
+            application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
+            application.present? ? Success(application) : Failure("Could not find application with given hbx_id: #{application_entity.hbx_id}")
+          end
+
+          def update_applicant(response_app_entity, application)
+            response_app_entity.applicants.each do |response_applicant_entity|
+              applicant = find_matching_applicant(application, response_applicant_entity)
+              update_applicant_verifications(applicant, response_applicant_entity)
             end
-            Success(people)
+            Success('Successfully updated Applicant with evidences and verifications')
           end
 
-          def find_person(person_id)
-            person = ::Person.find_by(hbx_id: person_id)
-
-            Success(person)
-          rescue Mongoid::Errors::DocumentNotFound
-            Failure("Unable to find Person with ID #{person_id}.")
-          end
-
-          def update_people(people, params)
-            people.each do |person|
-              response = params[:applicant_responses][person.hbx_id.to_sym]
-              result = update_person(person, response)
-              return result if result.failure?
+          def find_matching_applicant(application, res_applicant_entity)
+            application.applicants.detect do |applicant|
+              applicant.person_hbx_id == res_applicant_entity.person_hbx_id
             end
-            Success("MEC check added for all applicants.")
           end
 
-          def update_person(person, response)
-            result = person.update_attributes!({
-                                                 mec_check_response: response,
-                                                 mec_check_date: DateTime.now
-                                               })
-            result ? Success("Updated person MEC check.") : Failure("Failed to update person MEC check.")
-          end
+          def update_applicant_verifications(applicant, response_applicant_entity)
+            response_evidence = response_applicant_entity.evidences.detect{|evi| evi.key == :aces_mec}
 
-          def find_application(application_id)
-            application = FinancialAssistance::Application.find(application_id)
-
-            Success(application)
-          rescue Mongoid::Errors::DocumentNotFound
-            Failure("Unable to find Application with ID #{application_id}.")
-          end
-
-          def update_application(application)
-            application.assign_attributes({ has_mec_check_response: true })
-            if application.save
-              Success(application)
-            else
-              Failure("Unable to update application with hbx_id: #{application.hbx_id}.")
-            end
+            applicant_evidence = applicant.evidences.by_name(:aces_mec).first
+            applicant_evidence.update_attributes(eligibility_status: response_evidence.eligibility_status)
+            applicant_evidence.eligibility_results << FinancialAssistance::EligibilityResult.new(response_evidence.eligibility_results.first.to_h) if response_evidence.eligibility_results.present?
+            applicant.save!
+            Success(applicant)
           end
         end
       end

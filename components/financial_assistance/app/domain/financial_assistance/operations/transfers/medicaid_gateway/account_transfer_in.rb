@@ -6,6 +6,7 @@ require 'aca_entities/magi_medicaid/libraries/iap_library'
 require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
+require 'aca_entities/operations/encryption/decrypt'
 
 module FinancialAssistance
   module Operations
@@ -25,7 +26,7 @@ module FinancialAssistance
             payload = yield load_data(params)
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
-            applicants = yield fill_applicants_form(payload["family"]['magi_medicaid_applications'].first, application)
+            _applicants = yield fill_applicants_form(payload, application)
             Success(application)
           end
 
@@ -33,7 +34,26 @@ module FinancialAssistance
 
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
+            payload = decrypt_ssns(payload)
             Success(payload)
+          end
+
+          def decrypt_ssn(ssn)
+            return unless ssn
+            result = AcaEntities::Operations::Encryption::Decrypt.new.call({ value: ssn })
+            result.success? ? result.value! : ''
+          end
+
+          def decrypt_ssns(payload)
+            payload["family"]["family_members"].each_with_index do |fm, i|
+              ssn = fm["person"]["person_demographics"]["ssn"]
+              payload["family"]["family_members"][i]["person"]["person_demographics"]["ssn"] = decrypt_ssn(ssn) if ssn
+              fm["person"]["person_relationships"].each_with_index do |relationship, ii|
+                rssn = relationship["relative"]["ssn"]
+                payload["family"]["family_members"][i]["person"]["person_relationships"][ii]["relative"]["ssn"] = decrypt_ssn(rssn) if rssn
+              end
+            end
+            payload
           end
 
           def find_family(family_hash)
@@ -145,6 +165,7 @@ module FinancialAssistance
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
             sanitize_params = []
+
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
@@ -173,7 +194,7 @@ module FinancialAssistance
                 is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
                 is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
                 same_with_primary: same_address_with_primary(family_member, primary),
-                is_incarcerated: applicant_hash['attestation']['is_incarcerated'],
+                is_incarcerated: applicant_hash["is_incarcerated"],
                 is_physically_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_blind: applicant_hash['attestation']['is_self_attested_blind'],
@@ -302,7 +323,8 @@ module FinancialAssistance
             no_ssn_value ? '1' : '0'
           end
 
-          def fill_applicants_form(applications, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+          def fill_applicants_form(payload, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+            applications = payload["family"]['magi_medicaid_applications'].first
             application = FinancialAssistance::Application.where(id: app_id).first
 
             applications[:applicants].each do |applicant|

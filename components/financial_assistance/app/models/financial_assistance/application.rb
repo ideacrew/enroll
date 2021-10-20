@@ -758,7 +758,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls] do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
         transitions from: :submitted, to: :determined
       end
 
@@ -898,6 +898,11 @@ module FinancialAssistance
 
     def trigger_fdhs_calls
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+    end
+
+    def trigger_aces_call
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id)
     end
 
     def total_incomes_by_year
@@ -1458,6 +1463,7 @@ module FinancialAssistance
     # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
       types = []
+      types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
       types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
