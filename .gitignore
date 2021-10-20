@@ -104,7 +104,6 @@ rubocop
 coverage
 
 .env
-.vscode
 
 # Ignore HUGO output dirs
 hugo/public
