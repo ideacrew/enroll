@@ -32,18 +32,7 @@ module Forms
                                                                            :last_name => last_name,
                                                                            :first_name => first_name,
                                                                            :ssn => ssn})
-      # if !ssn.blank?
-      #   Person.where({
-      #                  :dob => dob,
-      #                  :encrypted_ssn => Person.encrypt_ssn(ssn)
-      #              }).first || match_ssn_employer_person
-      # else
-      #   Person.where({
-      #                  :dob => dob,
-      #                  :last_name => /^#{last_name}$/i,
-      #                  :first_name => /^#{first_name}$/i,
-      #              }).first
-      # end
+
       error.present? ? errors.add(:base, error) : nil
       return nil if records.count == 0
 
@@ -53,16 +42,6 @@ module Forms
         records.first
       end
     end
-
-    # def match_ssn_employer_person
-    #   potential_person = Person.where({
-    #                    :dob => dob,
-    #                    :last_name => /^#{last_name}$/i,
-    #                    :first_name => /^#{first_name}$/i,
-    #                }).first
-    #   return potential_person if potential_person.present? && potential_person.employer_staff_roles?
-    #   nil
-    # end
 
     def uniq_ssn
       return true if ssn.blank?

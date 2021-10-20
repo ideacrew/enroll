@@ -69,7 +69,7 @@ RSpec.describe Operations::People::Match, type: :model, dbclean: :after_each do
         end
         it 'should match record and return matching criteria with error' do
           query_criteria, records, error = subject.call(params)
-          expect(query_criteria).to eq :site_specific_ssn_dob
+          expect(query_criteria).to eq :site_specific_policy
           expect(records.count).to eq 1
           expect(error.present?).to eq true
         end
