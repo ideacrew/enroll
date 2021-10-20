@@ -407,14 +407,14 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validation_for_person_or_dependent() {
-    if (!document.getElementById('dependents_info_wrapper')) {
-      console.log("I'm up here");
+    const immigration_field =
+      document.getElementById('immigration_doc_type').value == '';
+    if (!document.getElementById('dependent_ul') && immigration_field) {
       return (
         document.getElementById('person_us_citizen_false').checked ||
         document.getElementById('person_naturalized_citizen_true').checked
       );
-    } else {
-      console.log("I'm here");
+    } else if (immigration_field) {
       return (
         document.getElementById('dependent_us_citizen_false').checked ||
         document.getElementById('dependent_naturalized_citizen_true').checked
@@ -423,10 +423,7 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
-    if (
-      $('#immigration_doc_type').val() == '' &&
-      validation_for_person_or_dependent()
-    ) {
+    if (validation_for_person_or_dependent()) {
       $('#showWarning').removeClass('hidden');
     }
     if ($('#vlp_documents_container').is(':visible')) {
@@ -630,7 +627,6 @@ var PersonValidations = (function (window, undefined) {
   // client specific feature for ME, validates that a contact method is selected
   function validationForContactMethod(e) {
     if ($('.contact-method').length) {
-      console.log('Contact methods present.');
       var isChecked = false;
       $('.contact-method input').each(function (i, el) {
         if ($(el).prop('checked')) {
