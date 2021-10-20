@@ -5168,9 +5168,9 @@ describe ".propogate_cancel" do
         EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(false)
       end
 
-      context 'when members greater than 19 exists' do
+      context 'when members greater than 18 exists' do
         before do
-          allow(enrollment).to receive(:any_member_greater_than_19?).and_return true
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
         end
 
         it 'should not exclude child only offering' do
@@ -5178,9 +5178,9 @@ describe ".propogate_cancel" do
         end
       end
 
-      context 'when all the members are < 19' do
+      context 'when all the members are < 18' do
         before do
-          allow(enrollment).to receive(:any_member_greater_than_19?).and_return false
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
         end
 
         it 'should not exclude child only offering' do
@@ -5194,9 +5194,9 @@ describe ".propogate_cancel" do
         EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(true)
       end
 
-      context 'when members greater than 19 exists' do
+      context 'when members greater than 18 exists' do
         before do
-          allow(enrollment).to receive(:any_member_greater_than_19?).and_return true
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
         end
 
         it 'should exclude child only offering' do
@@ -5204,9 +5204,9 @@ describe ".propogate_cancel" do
         end
       end
 
-      context 'when all the members are < 19' do
+      context 'when all the members are < 18' do
         before do
-          allow(enrollment).to receive(:any_member_greater_than_19?).and_return false
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
         end
 
         it 'should not exclude child only offering' do

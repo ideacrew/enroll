@@ -1522,13 +1522,13 @@ class HbxEnrollment
     tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
 
-    elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_19?
+    elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
 
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
-  def any_member_greater_than_19?
-    hbx_enrollment_members.any? { |member| member.age_on_effective_date >= 19 }
+  def any_member_greater_than_18?
+    hbx_enrollment_members.any? { |member| member.age_on_effective_date > 18 }
   end
 
   def calculate_costs_for_plans(elected_plans)
