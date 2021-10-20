@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Operations::Accounts::Find, type: :request do
   subject { described_class.new }
+  include_context 'account'
 
   context 'scope_name is :by_username' do
     let(:username) { 'black_window' }
@@ -26,7 +27,9 @@ RSpec.describe Operations::Accounts::Find, type: :request do
       ::Operations::Accounts::Create.new.call(account: account).success
     end
 
-    before { target_account }
+    before { create_avenger_accounts }
+
+    # before { target_account }
     after { Operations::Accounts::Delete.new.call(login: username) }
 
     context 'it should find an account by user login' do
