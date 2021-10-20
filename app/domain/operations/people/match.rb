@@ -49,6 +49,7 @@ module Operations
             @has_dob = validate_dob(v)
           when :ssn
             @has_ssn = v&.delete('^0-9').present?
+            true
           else
             # v.to_s.scan(SPECIAL_CHAR).blank?
             true
@@ -56,7 +57,7 @@ module Operations
         end
 
         if result
-          Success({first_name: params[:first_name],last_name: params[:last_name], dob: params[:dob].to_date, encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))})
+          Success({first_name: /^#{params[:first_name]}$/i, last_name: /^#{params[:last_name]}$/i, dob: params[:dob].to_date, encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))})
         else
           Failure("invalid params")
         end

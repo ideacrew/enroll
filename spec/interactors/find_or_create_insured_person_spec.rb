@@ -42,7 +42,7 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
   end
 
   context "given a person who does not exist but SSN is already taken" do
-    let(:found_person) {  FactoryBot.create(:person, ssn: ssn) }
+    let!(:found_person) {  FactoryBot.create(:person, ssn: ssn) }
     let(:context_arguments) {
       { :first_name => first_name,
         :last_name => last_name,
@@ -50,10 +50,6 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
         :ssn => ssn
       }
     }
-
-    before :each do
-      allow(Person).to receive(:where).and_return [found_person]
-    end
 
     it "should just return" do
       expect(result.person).to eq nil
