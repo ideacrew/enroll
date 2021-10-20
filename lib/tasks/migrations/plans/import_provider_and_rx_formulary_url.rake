@@ -43,22 +43,6 @@ namespace :import do
               hios_id = row_info[@headers["hios/standard component id"]].squish
               provider_directory_url = row_info[@headers["provider directory url"] || @headers["provider network url"]]
 
-              plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
-              plans.each do |plan|
-                plan.name = row_info[@headers["plan name"]]
-                plan.nationwide, plan.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
-                plan.dc_in_network, plan.nationwide = [true, false] if DC_IN_NETWORK.include?(row_info[@headers["network"]])
-                plan.provider_directory_url = provider_directory_url
-                if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
-                  rx_formulary_url = row_info[@headers["rx formulary url"]]
-                  plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
-                  if sheet_name == "IVL" && year > 2017
-                    plan.is_standard_plan = row_info[@headers["standard plan?"]]
-                  end
-                end
-                plan.save
-              end
-
               products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
               products.each do |product|
                 product.title = row_info[@headers["plan name"]]
