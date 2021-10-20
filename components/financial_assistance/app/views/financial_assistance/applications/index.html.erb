@@ -25,9 +25,7 @@
         <thead class="form-heading">
           <tr>
             <th class="form-heading">ID</th>
-            <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-              <th class="form-heading">APPLICATION YEAR</th>
-            <% end %>
+            <th class="form-heading">APPLICATION YEAR</th>
             <th class="form-heading">STATUS</th>
             <th class="form-heading">STARTED ON</th>
             <th class="form-heading">SUBMITTED ON</th>
@@ -41,9 +39,7 @@
           <% @applications.each do |application| %>
           <tr>
             <td><%=application.hbx_id%></td>
-            <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-              <td><%= application.assistance_year %></td>
-            <% end %>
+            <td><%= application.assistance_year %></td>
             <td><%= application.aasm_state == 'terminated' ? 'Closed' : application.aasm_state.humanize %></td>
             <td><%=to_est application.created_at%></td>
             <td><%=to_est application.submitted_at%></td>
