@@ -409,10 +409,7 @@ var PersonValidations = (function (window, undefined) {
   function validation_for_person_or_dependent() {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
-    if (
-      !document.getElementById('dependents_info_wrapper') &&
-      immigration_field
-    ) {
+    if (!document.getElementById('dependent_ul') && immigration_field) {
       return (
         document.getElementById('person_us_citizen_false').checked ||
         document.getElementById('person_naturalized_citizen_true').checked
@@ -426,6 +423,7 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
+    console.log(validation_for_person_or_dependent());
     if (validation_for_person_or_dependent()) {
       $('#showWarning').removeClass('hidden');
     }
