@@ -633,6 +633,9 @@ registry:
         is_enabled: false
       - key: :zero_permium_policy
         is_enabled: false
+      - key: :send_secure_purchase_confirmation_email
+        item: :send_secure_purchase_confirmation_email
+        is_enabled: true        
   - namespace:
       - :person_matching_feature
     features:
