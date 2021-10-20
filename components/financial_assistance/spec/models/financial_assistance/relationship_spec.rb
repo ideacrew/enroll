@@ -17,7 +17,7 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
   describe '.Constants' do
     let(:class_constants)  { described_class.constants }
 
-    it 'should have years to renew range constant' do
+    it 'should have relationships for UI display as a constant' do
       expect(class_constants.include?(:RELATIONSHIPS_UI)).to be_truthy
       expect(described_class::RELATIONSHIPS_UI).to eq([
         'spouse',
