@@ -445,8 +445,6 @@ var ApplicantValidations = (function(window, undefined) {
 
 function applicantDemographicValidations() {
   applyFaaListeners();
-  console.log("Financial Assistance demographic validators loaded.");
-
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
     ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForUsCitizenOrUsNational(e);
@@ -454,7 +452,6 @@ function applicantDemographicValidations() {
     ApplicantValidations.validationForEligibleImmigrationStatuses(e);
     ApplicantValidations.validationForIncarcerated(e);
     ApplicantValidations.validationForVlpDocuments(e);
-    console.log("Hitting the applicant.")
     if (
       $('#showWarning').length &&
       !$('#showWarning').hasClass('hidden') &&
