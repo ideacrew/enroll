@@ -427,3 +427,5 @@ ci/rspec/**/*.json
 .local/share/gem/specs/rubygems.org%443/latest_specs.4.8
 .local/share/gem/specs/rubygems.org%443/prerelease_specs.4.8
 .local/share/pry/pry_history
+.bash_history
+.vscode/settings.json
