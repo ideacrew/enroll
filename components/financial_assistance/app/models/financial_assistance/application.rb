@@ -1452,6 +1452,7 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
       types = []
       types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
@@ -1481,6 +1482,7 @@ module FinancialAssistance
         )
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def delete_verification_documents
       active_applicants.each do |applicant|

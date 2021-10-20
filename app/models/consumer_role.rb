@@ -894,8 +894,12 @@ class ConsumerRole
     verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
   end
 
+  def residency_verification_enabled?
+    EnrollRegistry.feature_enabled?(:location_residency_verification_type)
+  end
+
   def can_start_residency_verification? # initial trigger check for coverage purchase
-    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18
+    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18 && residency_verification_enabled?
   end
 
   def invoke_residency_verification!
@@ -1019,14 +1023,20 @@ class ConsumerRole
   end
 
   def residency_pending?
+    return true unless residency_verification_enabled?
+
     (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types&.by_name(LOCATION_RESIDENCY)&.first&.validation_status != "attested"
   end
 
   def residency_denied?
+    return true unless residency_verification_enabled?
+
     (!is_state_resident.nil?) && (!is_state_resident)
   end
 
   def residency_verified?
+    return true unless residency_verification_enabled?
+
     is_state_resident? || residency_attested?
   end
 

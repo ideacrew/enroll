@@ -15,6 +15,44 @@ module FinancialAssistance
       status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     end
 
+    def admin_verification_action(admin_action, evidence, update_reason)
+      case admin_action
+      when "verify"
+        evidence.update!(eligibility_status: 'attested', update_reason: update_reason)
+      when "return_for_deficiency"
+        evidence.update!(eligibility_status: 'outstanding', update_reason: update_reason, rejected: true)
+      end
+    end
+
+    def admin_actions_on_faa_documents(evidence)
+      options_for_select(build_actions_list(evidence))
+    end
+
+    def build_actions_list(evidence)
+      if evidence.eligibility_status == "outstanding"
+        FinancialAssistance::Document::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
+      else
+        FinancialAssistance::Document::ADMIN_VERIFICATION_ACTIONS
+      end
+    end
+
+    def env_bucket_name(bucket_name)
+      aws_env = ENV['AWS_ENV'] || "qa"
+      subdomain = EnrollRegistry[:enroll_app].setting(:subdomain).item
+      "#{subdomain}-enroll-#{bucket_name}-#{aws_env}"
+    end
+
+    def display_evidence_type(evidence)
+      case evidence
+      when "ESI MEC"
+        "Coverage from a job"
+      when "Non ESI MEC"
+        "Coverage from another program"
+      when "Income"
+        "Income"
+      end
+    end
+
     def verification_status_class(status)
       case status
       when "verified"
