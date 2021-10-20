@@ -443,8 +443,9 @@ var ApplicantValidations = (function(window, undefined) {
 
 })(window);
 
-$(document).on('turbolinks:load', function () {
+function applicantDemographicValidations() {
   applyFaaListeners();
+  console.log("Financial Assistance demographic validators loaded.");
 
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
     ApplicantValidations.validationForIndianTribeMember(e);
@@ -453,6 +454,7 @@ $(document).on('turbolinks:load', function () {
     ApplicantValidations.validationForEligibleImmigrationStatuses(e);
     ApplicantValidations.validationForIncarcerated(e);
     ApplicantValidations.validationForVlpDocuments(e);
+    console.log("Hitting the applicant.")
     if (
       $('#showWarning').length &&
       !$('#showWarning').hasClass('hidden') &&
@@ -465,4 +467,4 @@ $(document).on('turbolinks:load', function () {
   });
 
   isApplyingCoverage("applicant");
-});
+};
