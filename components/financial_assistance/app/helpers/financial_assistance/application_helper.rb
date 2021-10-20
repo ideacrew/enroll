@@ -311,5 +311,12 @@ module FinancialAssistance
     def all_applications_closed?(applications)
       applications.count == applications.closed.count
     end
+
+    def application_state_for_display(application)
+      return 'IRS Consent' if application.income_verification_extension_required?
+      return 'Submission Error' if application.mitc_magi_medicaid_eligibility_request_errored?
+
+      application.aasm_state.titleize
+    end
   end
 end
