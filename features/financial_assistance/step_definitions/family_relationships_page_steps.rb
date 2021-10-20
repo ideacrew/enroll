@@ -10,16 +10,16 @@ When(/user clicks the Add New Person Button$/) do
 end
 
 And(/user enters applicant info WITHOUT tribal member us citizen or naturalization status and submits form$/) do
-  fill_in 'applicant[first_name]', :with => 'johnson'
-  fill_in 'applicant[last_name]', :with => 'smith'
-  fill_in 'jq_datepicker_ignore_applicant[dob]', :with => '10/10/1984'
+  fill_in FinancialAssistance::ApplicantForm.applicant_first_name, :with => 'johnson'
+  fill_in FinancialAssistance::ApplicantForm.applicant_last_name, :with => 'smith'
+  fill_in FinancialAssistance::ApplicantForm.applicant_form_dob, :with => '10/10/1984'
   #click_link(10)
   click_outside_datepicker(l10n('family_information'))
-  fill_in 'applicant[ssn]', :with => '123456543'
+  fill_in FinancialAssistance::ApplicantForm.applicant_form_ssn, :with => '123456543'
   find("span", :text => "choose").click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
-  find(:xpath, '//label[@for="radio_male"]').click
-  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+  find(:xpath, FinancialAssistance::ApplicantForm.applicant_spouse_select).click
+  find(:xpath, FinancialAssistance::ApplicantForm.applicant_form_gender_select_male).click
+  find(:xpath, FinancialAssistance::ApplicantForm.is_applying_coverage_true).click
   # choose('radio_incarcerated_no', allow_label_click: true)
   # choose('indian_tribe_member_no', allow_label_click: true)
   # choose('applicant_us_citizen_true', allow_label_click: true)
@@ -42,10 +42,10 @@ Then(/the applicant should have been created successfully$/) do
 end
 
 And(/user fills in the missing fields and clicks submit$/) do
-  choose('radio_incarcerated_no', allow_label_click: true)
-  choose('indian_tribe_member_no', allow_label_click: true)
-  choose('applicant_us_citizen_true', allow_label_click: true)
-  choose('applicant_naturalized_citizen_false', allow_label_click: true)
+  choose(FinancialAssistance::ApplicantForm.radio_incarcerated_no, allow_label_click: true)
+  choose(FinancialAssistance::ApplicantForm.indian_tribe_no, allow_label_click: true)
+  choose(FinancialAssistance::ApplicantForm.us_citizen_true, allow_label_click: true)
+  choose(FinancialAssistance::ApplicantForm.naturalized_citizen_false, allow_label_click: true)
   find(".btn", text: "CONFIRM MEMBER").click
 end
 
