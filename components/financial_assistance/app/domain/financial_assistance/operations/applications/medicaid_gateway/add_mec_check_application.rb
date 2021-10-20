@@ -48,11 +48,18 @@ module FinancialAssistance
 
           def update_applicant_verifications(applicant, response_applicant_entity)
             response_evidence = response_applicant_entity.evidences.detect{|evi| evi.key == :aces_mec}
-
+            puts "initial applicant:"
+            p applicant
             applicant_evidence = applicant.evidences.by_name(:aces_mec).first
+            puts "response_evidence.eligibility_results"
+            p response_evidence.eligibility_results
             applicant_evidence.update_attributes(eligibility_status: response_evidence.eligibility_status)
             applicant_evidence.eligibility_results << FinancialAssistance::EligibilityResult.new(response_evidence.eligibility_results.first.to_h) if response_evidence.eligibility_results.present?
+            puts "applicant_evidence.eligibility_results:"
+            p applicant_evidence.eligibility_results
             applicant.save!
+            puts "\n\n\n\n\napplicant updated? "
+            p applicant
             Success(applicant)
           end
         end

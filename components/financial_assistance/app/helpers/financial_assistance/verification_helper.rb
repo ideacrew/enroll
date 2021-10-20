@@ -46,6 +46,8 @@ module FinancialAssistance
       case evidence
       when "ESI MEC"
         "Coverage from a job"
+      when "ACES MEC"
+        "Coverage from... MEC Check"
       when "Non ESI MEC"
         "Coverage from another program"
       when "Income"
