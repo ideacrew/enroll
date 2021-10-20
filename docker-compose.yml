@@ -12,7 +12,7 @@ services:
     container_name: enroll_local
     depends_on:
       - mongodb
-      - amqp
+      - rabbitmq
       - redis
     ports:
       - "3000:3000"
@@ -95,7 +95,7 @@ services:
   #     - 5672:5672
   #     - 15672:15672
 
-  amqp:
+  rabbitmq:
     build:
       context: ./.docker/development/rabbitmq
       dockerfile: Dockerfile

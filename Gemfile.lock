@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 2ef5f4430d223269fcb5c7e97706052120d20824
-  branch: release_0.9.0
+  revision: ff6b31ca53f293480c96779b3dedf31493517528
+  branch: release_0.10.0
   specs:
-    aca_entities (0.8.0)
+    aca_entities (0.9.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -34,11 +34,11 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 3d69618c16fbbe09912eeba097aedac47d1abc15
-  branch: release_0.5.5
+  revision: 29393ebb04df8f57ccb536da4635087c8c8bde0b
+  branch: trunk
   specs:
     event_source (0.5.5)
-      bunny (~> 2.14)
+      bunny (>= 2.14)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
       dry-inflector (~> 0.2)
@@ -594,7 +594,7 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
-    faraday_middleware (1.1.0)
+    faraday_middleware (1.2.0)
       faraday (~> 1.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
@@ -1132,6 +1132,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-19
+  x86_64-linux
 
 DEPENDENCIES
   aasm (~> 4.8)
@@ -1275,4 +1276,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.12
+   2.2.29

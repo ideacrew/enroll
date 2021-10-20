@@ -43,9 +43,10 @@ COPY . $HOME
 # && gem install --source "https://rubygems.org" bundler --version '1.16.6' \
 # && gem install --source "https://rubygems.org" bundler --version '2.2.29' \
 RUN cd $HOME \
+  && gem update system \
   && gem install bundler \
-  && bundle install \
-  && bundle binstubs bundler
+  && bundle install
+# && bundle binstubs bundler
 
 RUN cd $HOME && yarn install --check-files
 
