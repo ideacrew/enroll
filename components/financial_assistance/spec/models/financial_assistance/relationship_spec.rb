@@ -14,6 +14,30 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
       relative_id: applicant2.id }
   end
 
+  describe '.Constants' do
+    let(:class_constants)  { described_class.constants }
+
+    it 'should have years to renew range constant' do
+      expect(class_constants.include?(:RELATIONSHIPS_UI)).to be_truthy
+      expect(described_class::RELATIONSHIPS_UI).to eq([
+        'spouse',
+        'domestic_partner',
+        'child',
+        'parent',
+        'sibling',
+        'unrelated',
+        'aunt_or_uncle',
+        'nephew_or_niece',
+        'grandchild',
+        'grandparent',
+        'father_or_mother_in_law',
+        'daughter_or_son_in_law',
+        'brother_or_sister_in_law',
+        'cousin'
+      ])
+    end
+  end
+
   describe 'persist relationship' do
     context 'with valid params for father_or_mother_in_law' do
       let(:relationship_kind) { 'father_or_mother_in_law' }

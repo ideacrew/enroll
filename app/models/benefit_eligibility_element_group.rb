@@ -34,6 +34,9 @@ class BenefitEligibilityElementGroup
       nephew_or_niece
       grandchild
       grandparent
+      father_or_mother_in_law
+      daughter_or_son_in_law
+      brother_or_sister_in_law
     )
 
   SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
