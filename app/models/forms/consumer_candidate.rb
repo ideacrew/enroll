@@ -43,17 +43,16 @@ module Forms
     end
 
     def match_person
-      query_criteria, records, error = Operations::People::Match.new.call({:dob => dob,
-                                                                           :last_name => last_name,
-                                                                           :first_name => first_name,
-                                                                           :ssn => ssn})
+      match_criteria, records = Operations::People::Match.new.call({:dob => dob,
+                                                                    :last_name => last_name,
+                                                                    :first_name => first_name,
+                                                                    :ssn => ssn})
 
-      error.present? ? errors.add(:base, error) : nil
       return nil if records.count == 0
 
-      if (query_criteria == :name_dob && ssn.present? && records.first.employer_staff_roles?) ||
-         (query_criteria == :name_dob && ssn.blank?) ||
-         query_criteria == :name_ssn_dob
+      if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
+         (match_criteria == :dob_present && ssn.blank?) ||
+         match_criteria == :ssn_present
         records.first
       end
     end

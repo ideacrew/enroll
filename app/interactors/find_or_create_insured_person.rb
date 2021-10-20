@@ -76,20 +76,20 @@ class FindOrCreateInsuredPerson
     raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if context.ssn.blank? && (context.dob.blank? || context.last_name.blank? || context.first_name.blank?)
 
     matches = []
-    unless context.ssn.blank?
-      query_criteria, people, _error = Operations::People::Match.new.call({:dob => context.dob,
-                                                                           :last_name => context.last_name,
-                                                                           :first_name => context.first_name,
-                                                                           :ssn => context.ssn})
+    if context.ssn.present?
+      query_criteria, people = Operations::People::Match.new.call({:dob => context.dob,
+                                                                   :last_name => context.last_name,
+                                                                   :first_name => context.first_name,
+                                                                   :ssn => context.ssn})
     end
 
-    matches.concat people.to_a if query_criteria == :name_ssn_dob
+    matches.concat people.to_a if query_criteria == :ssn_present
 
-    query_criteria, people, _error = Operations::People::Match.new.call({:dob => context.dob,
-                                                                         :last_name => context.last_name,
-                                                                         :first_name => context.first_name})
+    query_criteria, people = Operations::People::Match.new.call({:dob => context.dob,
+                                                                 :last_name => context.last_name,
+                                                                 :first_name => context.first_name})
 
-    matches.concat(people.to_a.select{|person| person.ssn.blank? || context.ssn.blank?}) if query_criteria == :name_dob
+    matches.concat(people.to_a.select{|person| person.ssn.blank? || context.ssn.blank?}) if query_criteria == :dob_present
     matches.uniq
   end
 end

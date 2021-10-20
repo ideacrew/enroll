@@ -9,8 +9,7 @@ module Operations
     class Match
       send(:include, Dry::Monads[:result, :do])
       send(:include, Dry::Monads[:try])
-      # include Ssn
-      attr_reader :first_name, :last_name, :dob, :ssn, :keys_with_ssn, :keys_with_dob, :has_ssn, :has_dob
+      attr_reader :has_ssn, :has_dob
 
       SPECIAL_CHAR = %r([!@#$%^&*()_+{}\[\]:;'"/\\?><.,]).freeze
 
@@ -22,19 +21,11 @@ module Operations
       ### :first_name, :last_name, :dob is used for both the states
       # If no records found using first_name, last_name and dob combination
       ### :first_name, :last_name is used as a generic search, but this result is not used in the current scenarios
-      # @result [query_criteria, records, error], below are possible responses send back
-      # [nil,records,"More than one person record found"]
-      # [:name_ssn_dob, records, nil]
-      # [:site_specific_policy, records, "record found with the given ssn, but state based policy to match with with name failed."]
-      # [:name_dob, records, nil]
-      # [:name, records, nil]
-      # [nil,records, nil]
+      # @result [query_criteria, records], below are possible responses send back
       def call(params)
-        yield validate(params)
-        yield fetch_config_items
-        # query_params = yield query_builder(params)
-        person_records = yield match_person
-        yield build_result(person_records)
+        valid_params = yield validate(params)
+        configuration = yield fetch_configuration
+        yield match_person(valid_params, configuration)
       end
 
       private
@@ -56,99 +47,59 @@ module Operations
           case k
           when :dob
             @has_dob = validate_dob(v)
-            true
           when :ssn
             @has_ssn = v&.delete('^0-9').present?
-            true
           else
-            v.to_s.scan(SPECIAL_CHAR).blank?
+            # v.to_s.scan(SPECIAL_CHAR).blank?
+            true
           end
         end
 
         if result
-          @first_name = params[:first_name]
-          @last_name = params[:last_name]
-          @dob = params[:dob].to_date
-          @ssn = params[:ssn]&.delete('^0-9')
-          Success("")
+          Success({first_name: params[:first_name],last_name: params[:last_name], dob: params[:dob].to_date, encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))})
         else
           Failure("invalid params")
         end
       end
 
-      def fetch_config_items
+      def fetch_configuration
         if EnrollRegistry[:person_match_policy].enabled?
-          @keys_with_ssn = EnrollRegistry[:person_match_policy].settings(:ssn_present).item.map(&:to_sym)
-          @keys_with_dob = EnrollRegistry[:person_match_policy].settings(:dob_present).item.map(&:to_sym)
-          Success("")
+          configuration = EnrollRegistry[:person_match_policy].settings.map(&:to_h).each_with_object({}) do |s,c|
+            c.merge!(s[:key] => s[:item])
+          end
+          Success(configuration)
         else
           Failure("person_match_policy is disabled")
         end
       end
 
-      # This method queries db as per the availability of the values
-      def match_person
-        result = if ssn.present?
-                   records = query({:dob => dob,
-                                    :encrypted_ssn => Person.encrypt_ssn(ssn)}).success
-                   records.count == 0 ? match_dob : [:ssn_dob, records]
-                 elsif dob.present?
-                   match_dob
-                 else
-                   [:name, query({
-                                   :last_name => /^#{last_name}$/i,
-                                   :first_name => /^#{first_name}$/i
-                                 }).success]
-                 end
+      def match_person(params, configuration)
+        records, match_criteria  = if params[:encrypted_ssn].present?
+                                     match_criteria = :ssn_present
+                                     output = query_by_criteria(params, configuration[match_criteria].map(&:to_sym))
 
-        Success(result)
+                                     if output.success.empty?
+                                       match_criteria = :dob_present
+                                       [query_by_criteria(params, configuration[match_criteria].map(&:to_sym)), match_criteria]
+                                     else
+                                       [output, match_criteria]
+                                     end
+                                   elsif params[:dob].present?
+                                     match_criteria = :dob_present
+                                     [query_by_criteria(params, configuration[match_criteria].map(&:to_sym)), match_criteria]
+                                   else
+                                     match_criteria = :name_present
+                                     [query_by_criteria(params, configuration[match_criteria].map(&:to_sym)), match_criteria]
+                                   end
+
+        Success([match_criteria, records.success])
       end
 
-      def match_dob
-        [:name_dob, query({:dob => dob,
-                           :last_name => /^#{last_name}$/i,
-                           :first_name => /^#{first_name}$/i}).success]
-      end
+      def query_by_criteria(params, query_params)
+        query_expression = params.slice(*query_params)
 
-      # This method returns array of 3
-      # arr[0] is query criteria used to fetch the record
-      # arr[1] records in mongo criteria
-      # arr[2] error if any
-      #
-      # @example
-      #   build_result([initial_query_criteria, records])
-      #   # => Object
-      #
-      # @return [query_criteria, records, error]
-      def build_result(person_records)
-        query_criteria, records = person_records
-
-        if records.count > 1
-          Success([nil,records,"More than one person record found"])
-        elsif records.count == 1
-          person = records.first
-          case query_criteria
-          when :ssn_dob
-            if keys_with_ssn.all?{|k| person.send(k) == self.send(k)}
-              Success([:name_ssn_dob, records, nil])
-            else
-              Success([:site_specific_policy,
-                       records,
-                       "record found with the given ssn, but state based policy to match with name failed."])
-            end
-          when :name_dob
-            Success([:name_dob, records, nil])
-          else
-            Success([:name, records, nil])
-          end
-        else
-          Success([nil,records, nil])
-        end
-      end
-
-      def query(hash)
         Try() do
-          Person.where(hash)
+          Person.where(query_expression)
         end.to_result
       end
     end

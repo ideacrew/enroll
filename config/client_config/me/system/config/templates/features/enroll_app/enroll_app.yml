@@ -658,7 +658,7 @@ registry:
         is_enabled: true
         settings:
           - key: :ssn_present
-            item: ['first_name', 'last_name', 'dob', 'ssn']
+            item: ['first_name', 'last_name', 'dob', 'encrypted_ssn']
           - key: :dob_present
             item: ['first_name', 'last_name', 'dob']
           - key: :name_present
