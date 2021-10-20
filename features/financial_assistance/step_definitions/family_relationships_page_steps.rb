@@ -37,6 +37,7 @@ end
 
 Then(/the applicant should have been created successfully$/) do
   # Do this step better but you get the point
+  sleep 2
   application.reload
   expect(application.applicants.where(first_name: "johnson", last_name: "smith").present?).to eq(true)
 end
