@@ -13,7 +13,7 @@ namespace :xml do
       xml = Nokogiri::XML(File.open(@file_path))
       result = Parser::PlanCrossWalkListParser.parse(xml.root.canonicalize, :single => true)
       cross_walks = result.to_hash[:crosswalks]
-      process_plans(cross_walks) if EnrollRegistry.feature_enabled?(:has_bqt)
+      process_plans(cross_walks)
       process_products(cross_walks)
     end
   end
