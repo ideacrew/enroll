@@ -78,7 +78,7 @@ describe PersonRelationship, dbclean: :after_each do
       end
 
       it "consumer relationships displayed on UI should match" do
-        expect(BenefitEligibilityElementGroup::Relationships_UI).to eq PersonRelationship::Relationships_UI
+        expect(BenefitEligibilityElementGroup::Relationships_UI - ['self']).to eq PersonRelationship::Relationships_UI
       end
 
       it "should be valid if kind is present in person_relationship" do
