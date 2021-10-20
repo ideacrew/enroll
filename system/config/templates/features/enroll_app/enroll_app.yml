@@ -635,7 +635,7 @@ registry:
         is_enabled: false
       - key: :send_secure_purchase_confirmation_email
         item: :send_secure_purchase_confirmation_email
-        is_enabled: true        
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:
