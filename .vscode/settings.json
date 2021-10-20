@@ -1,4 +1,12 @@
 {
-  "cSpell.words": ["interactors", "nanasess", "serializers", "wbari"],
+  "cSpell.words": [
+    "getong",
+    "interactors",
+    "nanasess",
+    "rabbitmq",
+    "serializers",
+    "vhost",
+    "wbari"
+  ],
   "git.ignoreLimitWarning": true
 }
