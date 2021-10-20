@@ -15,7 +15,6 @@ jobs:
             'controllers',
             'data_migrations',
             'domain',
-            'event_source',
             'helpers',
             'interactors',
             'invoices',
