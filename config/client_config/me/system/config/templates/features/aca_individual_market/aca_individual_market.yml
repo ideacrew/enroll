@@ -66,6 +66,13 @@ registry:
              "Kirundi", "Lingala", "Somali", "Swahili", "Portuguese", "Vietnamese", "Khmer",
              "Thai", "Tagalog", "Russian", "German"]
         is_enabled: true
+      - key: :gate_enrollments_to_edidb_for_year
+        is_enabled: true
+        settings:
+          - key: :year
+            item: 2021
+      - key: :include_external_enrollment_in_display_all_enrollments
+        is_enabled: :true
       - key: :extended_aptc_individual_agreement_message
         item: :extended_aptc_individual_agreement_message
         is_enabled: true

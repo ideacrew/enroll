@@ -368,6 +368,9 @@ registry:
             item: 1
           - key: :ivl_enrollment_renewal_begin_effective_month
             item: 11
+      - key: :exclude_child_only_offering
+        item: :exclude_child_only_offering
+        is_enabled: false
   - namespace:
       - :pay_now_feature
     features:
@@ -633,3 +636,6 @@ registry:
         is_enabled: false
       - key: :zero_permium_policy
         is_enabled: false
+      - key: :send_secure_purchase_confirmation_email
+        item: :send_secure_purchase_confirmation_email
+        is_enabled: true

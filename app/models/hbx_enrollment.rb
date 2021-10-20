@@ -110,6 +110,7 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
   field :external_id, type: String
+  field :external_group_identifiers, type: Array
   field :special_enrollment_period_id, type: BSON::ObjectId
   field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String
@@ -290,6 +291,7 @@ class HbxEnrollment
   index({"family_id" => 1})
   index({"writing_agent_id" => 1}, { sparse: true })
   index({"hbx_id" => 1})
+  index({"external_id" => 1})
   index({"kind" => 1})
   index({"submitted_at" => 1})
   index({"effective_on" => 1})
@@ -343,11 +345,20 @@ class HbxEnrollment
     where(
       :family_id => family.id,
       :aasm_state => "coverage_canceled",
+      :external_enrollment => false,
       :product_id.nin => [nil]
     ).order(
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
+  scope :family_home_page_hidden_external_enrollments, lambda { |family|
+    where(:family_id => family.id,
+          :aasm_state.nin => ["shopping"],
+          :external_enrollment => true,
+          :product_id.nin => [nil]).order(
+            effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+          )
+  }
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
@@ -1498,7 +1509,7 @@ class HbxEnrollment
     end
   end
 
-  def decorated_elected_plans(coverage_kind, market=nil)
+  def decorated_elected_plans(coverage_kind, market = nil)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
@@ -1510,7 +1521,14 @@ class HbxEnrollment
 
     tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
+
+    elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
+
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+  end
+
+  def any_member_greater_than_18?
+    hbx_enrollment_members.any? { |member| member.age_on_effective_date > 18 }
   end
 
   def calculate_costs_for_plans(elected_plans)
@@ -1545,6 +1563,11 @@ class HbxEnrollment
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
+  def self.family_external_enrollments(family)
+    external_enrollments = HbxEnrollment.family_home_page_hidden_external_enrollments(family)
+    external_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

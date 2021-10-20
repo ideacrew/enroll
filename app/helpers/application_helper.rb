@@ -336,6 +336,7 @@ module ApplicationHelper
   def render_flash
     rendered = []
     flash.each do |type, messages|
+      next if messages.respond_to?(:include?) && messages&.include?("nil is not a symbol nor a string")
       if messages.respond_to?(:each)
         messages.each do |m|
           rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => m}) unless m.blank?
