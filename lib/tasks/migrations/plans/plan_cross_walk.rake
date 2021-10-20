@@ -33,6 +33,7 @@ namespace :xml do
 
       is_this_plan_catastrophic_or_child_only_plan = row[:is_this_plan_catastrophic_or_child_only_plan]&.squish&.downcase
       cat_hios_id = row["plan_id_#{@current_year}_for_enrollees_aging_off_catastrophic_or_child_only_plan".to_sym]&.squish
+      cat_hios_id ||= row[:plan_id_for_enrollees_aging_off_catastrophic_or_child_only_plan_fy]
       new_plans =  Plan.where(hios_id: /#{new_hios_id}/, active_year: @current_year)
       # to handle cases when business provides us with a renewal mapping
       # and then updates the template to say that the old plan got retired with no new mapping.
