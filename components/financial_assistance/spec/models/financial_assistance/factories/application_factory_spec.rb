@@ -236,11 +236,11 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         before do
           applicant.evidences << FinancialAssistance::Evidence.new(key: :esi, title: "MEC", eligibility_status: "Verified")
           factory = described_class.new(application)
-          duplicate_application = factory.duplicate
+          duplicate_application = factory.create_application
           @duplicate_applicant = duplicate_application.applicants.first
         end
 
-        it 'should not hbae evidences' do
+        it 'should not have evidences' do
           expect(@duplicate_applicant.evidences).to eq []
         end
       end

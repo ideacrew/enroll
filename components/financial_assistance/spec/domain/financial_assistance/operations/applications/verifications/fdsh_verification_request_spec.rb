@@ -75,9 +75,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::F
     }
   end
 
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash, :failure? => false, :success => premiums_hash)))}
+  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info, :failure? => false, :success => slcsp_info)))}
+  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info, :failure? => false, :success => lcsp_info)))}
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
