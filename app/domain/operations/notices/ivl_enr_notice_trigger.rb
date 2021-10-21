@@ -77,7 +77,7 @@ module Operations
             person: {
               hbx_id: person.hbx_id,
               person_name: { first_name: person.first_name, last_name: person.last_name },
-              person_demographics: { ssn: person.ssn, gender: person.gender, dob: person.dob, is_incarcerated: person.is_incarcerated },
+              person_demographics: { ssn: person.ssn, gender: person.gender, dob: person.dob, is_incarcerated: person.is_incarcerated || false },
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
