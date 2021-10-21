@@ -87,7 +87,7 @@ module Operations
       # rubocop:enable Style/MultilineBlockChain
 
       def map_attributes(keycloak_attributes)
-        Operatios::Aaccounts::MapAttributes.new.call(keycloak_attributes)
+        Operations::Accounts::MapAttributes.new.call(keycloak_attributes)
       end
     end
   end

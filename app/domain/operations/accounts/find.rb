@@ -60,11 +60,10 @@ module Operations
       end
 
       def search(values)
-        require 'pry'
-        binding.pry
-
         # rubocop:disable Style/MultilineBlockChain
         Try() do
+          require 'pry'
+          binding.pry
           query_params = search_scope(values).merge(pagiation(values))
           Keycloak::Admin.get_users(query_params)
         end.bind { |result| result ? Success(result) : Failure(result) }
