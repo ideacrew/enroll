@@ -45,13 +45,13 @@ module FinancialAssistance
     def display_evidence_type(evidence)
       case evidence
       when "ESI MEC"
-        "Coverage from a job"
+        l10n("en.faa.evidence_type_aces")
       when "ACES MEC"
-        "Coverage from MaineCare and Cub Care"
+        l10n("en.faa.evidence_type_esi")
       when "Non ESI MEC"
-        "Coverage from another program"
+        l10n("en.faa.evidence_type_non_esi")
       when "Income"
-        "Income"
+        l10n( "en.faa.evidence_type_income")
       end
     end
 
