@@ -187,6 +187,7 @@ Feature: Consumer RIDP verification process
     Given an HBX admin exists
     And an uploaded Identity verification in VERIFIED status is present on failed experian screen
     And HBX admin clicks continue after approving Identity document
+    And HBX admin does not apply for assistance and clicks continue
     And HBX admin click on continue button on household info form
     When HBX admin click on none of the situations listed above apply checkbox
     And HBX admin click on back to my account button

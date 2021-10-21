@@ -212,6 +212,7 @@ end
 
 And(/^HBX admin clicks continue after approving Identity document$/) do
   find(IvlVerifyIdentity.continue_btn).click
+  sleep 2
 end
 
 When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
