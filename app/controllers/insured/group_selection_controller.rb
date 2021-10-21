@@ -229,7 +229,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def permitted_group_selection_params
-    params_temp = params.permit(
+    group_selection_params = params.permit(
       :change_plan, :consumer_role_id, :market_kind, :qle_id,
       :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
       :employee_role_id, :resident_role_id, :person_id,
@@ -241,14 +241,14 @@ class Insured::GroupSelectionController < ApplicationController
       family_member_ids: {}
     )
 
-    params_2 = if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
-                 params_temp[:family_member_ids]&.to_h&.each_with_object({}) do |(_index, family_member_id), collect|
-                   collect.merge!(params.permit("is_tobacco_user_#{family_member_id}".to_sym))
-                 end
-               else
-                 {}
-               end
-    params_temp.merge!(params_2)
+    tobacco_user_params = if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+                            group_selection_params[:family_member_ids]&.to_h&.each_with_object({}) do |(_index, family_member_id), collect|
+                              collect.merge!(params.permit("is_tobacco_user_#{family_member_id}".to_sym))
+                            end
+                          else
+                            {}
+                          end
+    group_selection_params.merge!(tobacco_user_params)
   end
 
   def update_person_tobacco_field(permitted_params)
