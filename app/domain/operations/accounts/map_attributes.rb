@@ -6,12 +6,12 @@ require 'dry/monads/do'
 module Operations
   module Accounts
     # Create a new Keycloak Account
-    class MapAtttributes
+    class MapAttributes
       include Dry::Monads[:result, :do, :try]
 
       def call(params)
-        values = yield validate(params)
-        attributes = yield map_attributes(values)
+        # values = yield validate(params)
+        attributes = yield map_attributes(params)
 
         Success(attributes)
       end
@@ -20,7 +20,7 @@ module Operations
 
       def validate(params)
         AcaEntities::Accounts::Contracts::AccountContract.new.call(
-          params[:account]
+          params
         )
       end
 

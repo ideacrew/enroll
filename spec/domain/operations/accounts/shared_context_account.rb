@@ -49,10 +49,10 @@ RSpec.shared_context 'account' do
   end
 
   def create_avenger_accounts
-    avengers.each { |k, v| Operations::Accounts::Create.new.call(v) }
+    avengers.each { |k, v| Operations::Accounts::Create.new.call(account: v) }
   end
 
   def delete_avenger_accounts
-    avengers.each { |k, v| Operations::Accounts::Delete.new.call(v) }
+    avengers.each { |k, v| Operations::Accounts::Delete.new.call(login: v[:username]) }
   end
 end

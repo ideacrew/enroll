@@ -32,7 +32,7 @@ module Operations
         keycloak_attrs = yield create(values)
         account_attrs = yield map_attributes(keycloak_attrs)
 
-        Success(account)
+        Success(account_attrs)
       end
 
       private
@@ -59,35 +59,38 @@ module Operations
       # rubocop:disable Style/MultilineBlockChain
       def create(values)
         Try() do
-          after_insert =
-            lambda do |user, new_user|
-              return { 'user' => user, 'new_user' => new_user }
-            end
+            after_insert =
+              lambda do |user, new_user|
+                return { user: user, new_user: new_user }
+              end
 
-          args = values.to_h
-          Keycloak::Internal.create_simple_user(
-            args[:username] || args[:email],
-            args[:password],
-            args[:email],
-            args[:first_name],
-            args[:last_name],
-            args[:realm_roles] || [], # realm roles
-            [], # client roles
-            after_insert
-          )
-        end.to_result.bind do |response|
-          if response['new_user']
-            Success(map_attributes(response))
-          else
-            Failure(map_attributes(response))
-          end
-        end
+            args = values.to_h
+            Keycloak::Internal.create_simple_user(
+              args[:username] || args[:email],
+              args[:password],
+              args[:email],
+              args[:first_name],
+              args[:last_name],
+              args[:realm_roles] || [], # realm roles
+              [], # client roles
+              after_insert
+            )
+          end.to_result
       end
 
       # rubocop:enable Style/MultilineBlockChain
-
       def map_attributes(keycloak_attributes)
-        Operations::Accounts::MapAttributes.new.call(keycloak_attributes)
+        user_attributes =
+          Operations::Accounts::MapAttributes.new.call(
+            keycloak_attributes[:user]
+          )
+
+        if user_attributes.success?
+          keycloak_attributes[:user] = user_attributes.success
+          keycloak_attributes[:new_user] ? Success(keycloak_attributes) : Failure(keycloak_attributes)
+        else
+          user_attributes
+        end
       end
     end
   end
