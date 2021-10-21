@@ -154,6 +154,7 @@ group :development, :test do
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
+  gem 'mongoid-rspec',          '~> 4'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'pry-byebug'
   gem 'rails-controller-testing'
@@ -171,7 +172,6 @@ group :test do
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
-  gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
