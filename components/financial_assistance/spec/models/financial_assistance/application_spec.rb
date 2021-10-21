@@ -20,6 +20,32 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: BSON::ObjectId.new) }
   let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination3.id, application: application, family_member_id: BSON::ObjectId.new) }
 
+  let(:create_instate_addresses) do
+    application.applicants.each do |appl|
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: '')]
+      appl.save!
+    end
+    application.save!
+  end
+
+  let(:create_relationships) do
+    application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
+    application.ensure_relationship_with_primary(applicant2, 'spouse')
+    application.ensure_relationship_with_primary(applicant3, 'child')
+    application.add_or_update_relationships(applicant2, applicant3, 'parent')
+    application.build_relationship_matrix
+    application.save!
+  end
+
   describe '.modelFeilds' do
     it { is_expected.to have_field(:hbx_id).of_type(String) }
     it { is_expected.to have_field(:external_id).of_type(String) }
@@ -1406,6 +1432,38 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'without valid addresses' do
       it 'should return false' do
         expect(application.applicants_have_valid_addresses?).to eq(false)
+      end
+    end
+  end
+
+  describe 'set_magi_medicaid_eligibility_request_errored' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(haven_determination)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(medicaid_gateway_determination)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
+      create_instate_addresses
+      create_relationships
+      application.update_attributes!(aasm_state: app_state)
+      application.submit!
+    end
+
+    context 'haven_determination' do
+      let(:haven_determination) { true }
+      let(:medicaid_gateway_determination) { false }
+      let(:app_state) { 'haven_magi_medicaid_eligibility_request_errored' }
+
+      it 'should transition application to submitted' do
+        expect(application.reload.submitted?).to be_truthy
+      end
+    end
+
+    context 'medicaid_gateway_determination' do
+      let(:haven_determination) { false }
+      let(:medicaid_gateway_determination) { true }
+      let(:app_state) { 'mitc_magi_medicaid_eligibility_request_errored' }
+
+      it 'should transition application to submitted' do
+        expect(application.reload.submitted?).to be_truthy
       end
     end
   end
