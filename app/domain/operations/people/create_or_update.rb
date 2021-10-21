@@ -85,13 +85,14 @@ module Operations
         person = Person.by_hbx_id(params[:hbx_id]).first
         return person if person.present?
 
-        match_criteria, records = Operations::People::Match.new.call({:dob => person_params[:dob],
-                                                                      :last_name => person_params[:last_name],
-                                                                      :first_name => person_params[:first_name],
-                                                                      :ssn => person_params[:ssn]})
+        match_criteria, records = Operations::People::Match.new.call({:dob => params[:dob],
+                                                                      :last_name => params[:last_name],
+                                                                      :first_name => params[:first_name],
+                                                                      :ssn => params[:ssn]})
 
+        return [] unless records.present?
         return [] unless [:ssn_present, :dob_present].include?(match_criteria)
-        return [] if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
+        return [] if match_criteria == :dob_present && params[:ssn].present? && records.first.ssn != params[:ssn]
 
         records.first
       end
