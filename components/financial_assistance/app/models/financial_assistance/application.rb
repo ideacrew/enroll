@@ -901,8 +901,12 @@ module FinancialAssistance
     end
 
     def trigger_aces_call
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+    end
+
+    def is_aces_mec_checkable?
       return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id)
+      self.active_applicants.any?(&:is_ia_eligible?)
     end
 
     def total_incomes_by_year
@@ -1460,7 +1464,7 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     def create_evidences
       types = []
       types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
@@ -1471,6 +1475,7 @@ module FinancialAssistance
         applicant.evidences =
           types.collect do |type|
             key, title = type
+            next if key == :aces_mec && applicant.non_ia_eligible?
             FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
@@ -1491,7 +1496,7 @@ module FinancialAssistance
         )
       end
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
     def delete_verification_documents
       active_applicants.each do |applicant|
