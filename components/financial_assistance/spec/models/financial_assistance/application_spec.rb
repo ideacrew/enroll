@@ -606,6 +606,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
     let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
+    before do
+      allow(valid_app).to receive(:trigger_fdhs_calls).and_return(true)
+    end
+
     it 'should allow a sucessful state transition for valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
       expect(valid_app.submit).to be_truthy
@@ -648,18 +652,25 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe '.create_verification_documents' do
+  describe '.create_evidences' do
 
-    it 'should create income and mec verification types' do
-      application.send(:create_verification_documents)
-      expect(applicant1.verification_types.count).to eq 2
-      expect(applicant2.verification_types.count).to eq 2
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+    end
+
+    it 'should create MEC evidences' do
+      application.send(:create_evidences)
+      expect(applicant1.evidences.count).to eq 3
+      expect(applicant2.evidences.count).to eq 3
     end
 
     it 'should have both income and mec in pending state' do
       application.active_applicants.each do |applicant|
-        applicant.verification_types.each do |type|
-          expect(type.validation_status).to eq('pending')
+        applicant.evidences.each do |type|
+          expect(type.eligibility_status).to eq('attested')
         end
       end
     end
@@ -671,7 +682,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.send(:create_verification_documents)
     end
 
-    it 'should delete income and mec verification types' do
+    xit 'should delete income and mec verification types' do
       expect(applicant1.verification_types.count).to eq 2
       application.send(:delete_verification_documents)
       application.active_applicants.each do |applicant|
