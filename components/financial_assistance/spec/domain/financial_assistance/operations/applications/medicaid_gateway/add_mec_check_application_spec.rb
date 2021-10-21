@@ -31,8 +31,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       before do
         @applicant = application.applicants.first
         @applicant.evidences << FinancialAssistance::Evidence.new(key: :aces_mec, title: "ACES MEC")
-        p response_payload
-        @result = subject.call(payload: response_payload)
+        @result = subject.call(response_payload)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
