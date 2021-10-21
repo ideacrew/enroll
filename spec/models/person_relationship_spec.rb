@@ -38,20 +38,6 @@ describe PersonRelationship, dbclean: :after_each do
         "grandparent"
       ] }
 
-    let(:relationships_UI)  { [
-      "self",
-      "spouse",
-      "domestic_partner",
-      "child",
-      "parent",
-      "sibling",
-      "unrelated",
-      "aunt_or_uncle",
-      "nephew_or_niece",
-      "grandchild",
-      "grandparent"
-    ] }
-
     let(:kinds) {  [
       "spouse",
       "life_partner",
@@ -92,7 +78,7 @@ describe PersonRelationship, dbclean: :after_each do
       end
 
       it "consumer relationships displayed on UI should match" do
-        expect(BenefitEligibilityElementGroup::Relationships_UI).to eq relationships_UI
+        expect(BenefitEligibilityElementGroup::Relationships_UI - ['self']).to eq PersonRelationship::Relationships_UI
       end
 
       it "should be valid if kind is present in person_relationship" do
