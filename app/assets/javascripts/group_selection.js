@@ -52,7 +52,7 @@ function setGroupSelectionHandlers(){
       setPrimaryForIvl();
     }
     if ( $('#market_kind_coverall').is(':checked') ) {
-     
+
     }
 
     $('#market_kind_individual').on('change', function() {
