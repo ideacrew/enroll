@@ -627,7 +627,7 @@ module FinancialAssistance
       # BrotherOrSisterInLaw Rule: brother_or_sister_in_law
       missing_relationships = execute_brother_or_sister_in_law_rule(missing_relationships)
 
-      # CousinLaw Rule: cousin
+      # Cousin Rule: cousin
       missing_relationships = execute_cousin_rule(missing_relationships)
 
       matrix
@@ -718,7 +718,10 @@ module FinancialAssistance
       end
 
       event :submit, :after => [:record_transition, :set_submit] do
-        transitions from: [:draft, :renewal_draft], to: :submitted do
+        transitions from: [:draft,
+                           :renewal_draft,
+                           :haven_magi_medicaid_eligibility_request_errored,
+                           :mitc_magi_medicaid_eligibility_request_errored], to: :submitted do
           guard do
             is_application_valid?
           end
