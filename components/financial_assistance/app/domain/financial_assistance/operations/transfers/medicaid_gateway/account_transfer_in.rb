@@ -39,11 +39,11 @@ module FinancialAssistance
           def find_family(family_hash)
             person_params = sanitize_person_params(family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first)
             # candidate = PersonCandidate.new(person_params[:ssn], person_params[:dob], person_params[:first_name], person_params[:last_name])
-            match_criteria, records = Operations::People::Match.new.call({:dob => person_params[:dob],
-                                                                          :last_name => person_params[:last_name],
-                                                                          :first_name => person_params[:first_name],
-                                                                          :ssn => person_params[:ssn]})
-
+            match_criteria, records = ::Operations::People::Match.new.call({:dob => person_params[:dob],
+                                                                            :last_name => person_params[:last_name],
+                                                                            :first_name => person_params[:first_name],
+                                                                            :ssn => person_params[:ssn]})
+            return [] unless records.present?
             return [] unless [:ssn_present, :dob_present].include?(match_criteria)
             return [] if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
 
