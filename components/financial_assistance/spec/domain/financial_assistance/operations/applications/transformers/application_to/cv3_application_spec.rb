@@ -1344,4 +1344,20 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe 'is_pregnant without pregnancy_due_on' do
+    context 'success' do
+      before do
+        application.applicants.each do |applicant|
+          applicant.update_attributes!({ is_pregnant: true, pregnancy_due_on: nil })
+        end
+        result = subject.call(application)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      end
+
+      it 'should should return success' do
+        expect(@entity_init.success?).to be_truthy
+      end
+    end
+  end
 end
