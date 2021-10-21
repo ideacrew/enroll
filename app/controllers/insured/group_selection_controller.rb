@@ -86,6 +86,8 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
+    update_person_tobacco_field if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if @market_kind == 'shop' || @market_kind == 'fehb'
 
@@ -238,6 +240,13 @@ class Insured::GroupSelectionController < ApplicationController
       :shop_under_current, :shop_under_future,
       family_member_ids: {}
     )
+  end
+
+  def update_person_tobacco_field
+    params[:family_member_ids].values.collect do |id|
+      permitted_param = params.permit("is_tobacco_user_#{id}".to_sym)
+      @adapter.update_member(id, permitted_param)
+    end
   end
 
   def set_change_plan
