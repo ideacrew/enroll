@@ -71,22 +71,22 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
-    permitted_params = permitted_group_selection_params
-    keep_existing_plan = @adapter.keep_existing_plan?(permitted_params)
-    @market_kind = @adapter.create_action_market_kind(permitted_params)
+    keep_existing_plan = @adapter.keep_existing_plan?(permitted_group_selection_params)
+    @market_kind = @adapter.create_action_market_kind(permitted_group_selection_params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
       raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime('%m/%d/%Y')} to enroll for coverage." if new_hire_enrollment_period.begin.to_date > TimeKeeper.date_of_record
     end
 
-    unless @adapter.is_waiving?(permitted_params)
+    unless @adapter.is_waiving?(permitted_group_selection_params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
       family_member_ids = params[:family_member_ids].values.collect do |family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
-    update_person_tobacco_field(permitted_params) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+
+    update_person_tobacco_field if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if @market_kind == 'shop' || @market_kind == 'fehb'
@@ -99,7 +99,7 @@ class Insured::GroupSelectionController < ApplicationController
               ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + census_effective_on.strftime('%m/%d/%Y')
       end
 
-      if @adapter.is_waiving?(permitted_params)
+      if @adapter.is_waiving?(permitted_group_selection_params)
         raise "Waive Coverage Failed" unless hbx_enrollment.save
 
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
@@ -108,7 +108,7 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-    if @adapter.keep_existing_plan?(permitted_params) && @adapter.previous_hbx_enrollment.present?
+    if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
       hbx_enrollment.special_enrollment_period_id = sep.id if sep.present?
@@ -229,7 +229,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def permitted_group_selection_params
-    group_selection_params = params.permit(
+    params.permit(
       :change_plan, :consumer_role_id, :market_kind, :qle_id,
       :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
       :employee_role_id, :resident_role_id, :person_id,
@@ -240,23 +240,12 @@ class Insured::GroupSelectionController < ApplicationController
       :shop_under_current, :shop_under_future,
       family_member_ids: {}
     )
-
-    tobacco_user_params = if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
-                            group_selection_params[:family_member_ids]&.to_h&.each_with_object({}) do |(_index, family_member_id), collect|
-                              collect.merge!(params.permit("is_tobacco_user_#{family_member_id}".to_sym))
-                            end
-                          else
-                            {}
-                          end
-    group_selection_params.merge!(tobacco_user_params)
   end
 
-  def update_person_tobacco_field(permitted_params)
+  def update_person_tobacco_field
     params[:family_member_ids].values.collect do |id|
-      is_tobacco_user_value = permitted_params["is_tobacco_user_#{id}"]
-      member_person = @family.family_members.find(id)&.person
-      next unless is_tobacco_user_value.present? && member_person.present?
-      member_person.update(is_tobacco_user: is_tobacco_user_value)
+      permitted_param = params.permit("is_tobacco_user_#{id}".to_sym)
+      @adapter.update_member(id, permitted_param)
     end
   end
 

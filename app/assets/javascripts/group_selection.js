@@ -129,11 +129,11 @@ function hideShopErrors() {
 }
 
 function hideIvlErrors() {
-  $('#coverage-household tr div.ivl_errors').hide();
+  $('#coverage-household tr td.ivl_errors').hide();
 }
 
 function showIvlErrors() {
-  $('#coverage-household tr div.ivl_errors').show();
+  $('#coverage-household tr td.ivl_errors').show();
 }
 
 
