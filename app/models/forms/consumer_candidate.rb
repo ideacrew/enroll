@@ -6,11 +6,7 @@ module Forms
 
     include PeopleNames
     include SsnField
-    attr_accessor :gender
-    attr_accessor :user_id
-    attr_accessor :no_ssn
-    attr_accessor :dob_check #hidden input filed for one time DOB warning
-    attr_accessor :is_applying_coverage
+    attr_accessor :gender, :user_id, :no_ssn, :dob_check, :is_applying_coverage #hidden input filed for one time DOB warning
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -47,28 +43,18 @@ module Forms
     end
 
     def match_person
-      if !ssn.blank?
-        Person.where({
-                       :dob => dob,
-                       :encrypted_ssn => Person.encrypt_ssn(ssn)
-                   }).first || match_ssn_employer_person
-      else
-        Person.where({
-                       :dob => dob,
-                       :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
-      end
-    end
+      match_criteria, records = Operations::People::Match.new.call({:dob => dob,
+                                                                    :last_name => last_name,
+                                                                    :first_name => first_name,
+                                                                    :ssn => ssn})
 
-    def match_ssn_employer_person
-      potential_person = Person.where({
-                       :dob => dob,
-                       :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
-      return potential_person if potential_person.present? && potential_person.employer_staff_roles?
-      nil
+      return nil if records.count == 0
+
+      if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
+         (match_criteria == :dob_present && ssn.blank?) ||
+         match_criteria == :ssn_present
+        records.first
+      end
     end
 
     def uniq_ssn
