@@ -27,10 +27,12 @@ FinancialAssistance::Engine.routes.draw do
     resources :relationships
 
     resources :applicants do
-      put :step, on: :member
-      put ':step/:step', on: :member, action: 'step'
-      post :step, on: :collection
-      get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+      get 'verification_documents/upload', to: 'verification_documents#upload'
+      post 'verification_documents/upload', to: 'verification_documents#upload'
+      get 'verification_documents/download/:key', to: 'verification_documents#download'
+      get 'verification_documents/update_evidence', to: 'verification_documents#update_evidence'
+      put 'verification_documents/update_evidence', to: 'verification_documents#update_evidence'
+      delete 'verification_documents/destroy', to: 'verification_documents#destroy'
       get :age_of_applicant
       get :primary_applicant_has_spouse
       get :applicant_is_eligible_for_joint_filing
@@ -39,6 +41,10 @@ FinancialAssistance::Engine.routes.draw do
       get :immigration_document_options, on: :collection
       post :update, on: :member
       delete :destroy, on: :member
+      put :step, on: :member
+      post :step, on: :collection
+      get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+      put ':step/:step', on: :member, action: 'step'
 
       resources :incomes do
         get 'other', on: :collection

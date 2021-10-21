@@ -1,5 +1,6 @@
 module ApplicationHelper
   include FloatHelper
+  include ::FinancialAssistance::VerificationHelper
 
   def add_external_links_enabled?
     EnrollRegistry.feature_enabled?(:add_external_links)

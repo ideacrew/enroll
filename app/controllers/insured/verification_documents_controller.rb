@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::VerificationDocumentsController < ApplicationController
   include ApplicationHelper
 
