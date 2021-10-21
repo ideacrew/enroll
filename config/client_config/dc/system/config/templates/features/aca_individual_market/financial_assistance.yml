@@ -83,6 +83,12 @@ registry:
       is_enabled: true
     - key: :medicaid_gateway_determination
       is_enabled: false
+    - key: :esi_mec_determination
+      is_enabled: false
+    - key: :non_esi_mec_determination
+      is_enabled: false
+    - key: :ifsv_determination
+      is_enabled: false
   - namespace:
     - :account_transfer
     features:

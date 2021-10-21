@@ -111,15 +111,18 @@ module FinancialAssistance
               ::Family.find(family_id)
             end
 
-            # rubocop:disable Metrics/CyclomaticComplexity
+            def encrypt(value)
+              return nil unless value
+              AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
+            end
+
             # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
             def applicants(application, benchmark_premiums)
               application.applicants.inject([]) do |result, applicant|
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
-                           identifying_information: {has_ssn: applicant.no_ssn,
-                                                     encrypted_ssn: applicant.encrypted_ssn},
+                           identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
@@ -190,13 +193,13 @@ module FinancialAssistance
                            benchmark_premium: benchmark_premiums,
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant),
+                           evidences: applicant.evidences.serializable_hash.map(&:symbolize_keys),
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: calculate_if_applicant_is_required_to_file_taxes(applicant)}
                 result
               end
             end
-            # rubocop:enable Metrics/CyclomaticComplexity
-            # rubocop:enable Metrics/AbcSize
+                        # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
 
             def native_american_information(applicant)
@@ -761,11 +764,13 @@ module FinancialAssistance
             end
 
             def applicant_reference(applicant)
-              {first_name: applicant.first_name,
-               last_name: applicant.last_name,
-               dob: applicant.dob,
-               person_hbx_id: applicant.person_hbx_id,
-               encrypted_ssn: applicant.encrypted_ssn}
+              {
+                first_name: applicant.first_name,
+                last_name: applicant.last_name,
+                dob: applicant.dob,
+                person_hbx_id: applicant.person_hbx_id,
+                encrypted_ssn: encrypt(applicant.ssn)
+              }
             end
 
             def application_relationships(application)
