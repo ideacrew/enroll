@@ -25,12 +25,7 @@
 
           <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) && @coverage_household.coverage_household_members %>
             <div id="coverage-household" class='row no-buffer'>
-              <div class="module group-selection-table">
-                <div class="table-responsive table-border" style="background-color: #fff">
-                  <% @show_residency_alert = false %>
-                  <%= render 'coverage_household' %>
-                </div>
-              </div>
+              <%= render 'coverage_household' %>
             </div>
           <% end %>
 
