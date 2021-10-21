@@ -201,6 +201,9 @@ registry:
     - key: :optional_document_fields
       item: :optional_document_fields
       is_enabled: false
+    - key: :disable_employer_address_fields
+      item: :disable_employer_address_fields
+      is_enabled: false
     - key: :fa_send_to_external_verification
       is_enabled: false
     - key: :medicaid_or_chip_program_short_name
