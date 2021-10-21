@@ -542,8 +542,6 @@ registry:
         is_enabled: true
       - key: :display_county
         is_enabled: false
-      - key: :has_bqt
-        is_enabled: false
       - key: :moving_to_state
         is_enabled: false
       - key: :living_outside_state
