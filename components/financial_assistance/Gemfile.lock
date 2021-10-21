@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 2745a058201236201e04b69a5b1d2b269a2ceca6
-  branch: release_0.9.0
+  revision: acccd54c96e8d9ef48e239a56ecd2b6536e88ff2
+  branch: release_0.10.0
   specs:
     aca_entities (0.9.0)
       deep_merge
@@ -371,7 +371,7 @@ GEM
       multi_json
       redis
     raabro (1.4.0)
-    racc (1.5.2)
+    racc (1.6.0)
     rack (2.2.3)
     rack-protection (2.1.0)
       rack
