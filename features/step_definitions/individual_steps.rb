@@ -1022,3 +1022,14 @@ end
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   click_button 'CONTINUE', :wait => 10
 end
+
+And(/Individual signed in to resume enrollment$/) do
+  visit '/'
+  click_link('Consumer/Family Portal', wait: 10)
+  sleep 2
+  find('.btn-link', :text => 'Sign In', wait: 5).click
+  sleep 5
+  fill_in "user[login]", :with => "testflow@test.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  find('.sign-in-btn').click
+end
