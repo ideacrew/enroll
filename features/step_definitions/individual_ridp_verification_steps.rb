@@ -3,7 +3,7 @@ Given(/^that the consumer has navigated to the AUTH & CONSENT page$/) do
 end
 
 When(/^the consumer selects “I Disagree”$/) do
-    find(IvlAuthorizationAndConsent.i_disagree_radiobtn).click
+  find(IvlAuthorizationAndConsent.i_disagree_radiobtn).click
 end
 
 When(/^the consumer clicks CONTINUE$/) do
@@ -16,9 +16,9 @@ Then(/^the consumer will be directed to the DOCUMENT UPLOAD page$/) do
 end
 
 Given(/^that the consumer has “Disagreed” to AUTH & CONSENT$/) do
-	visit 'insured/consumer_role/ridp_agreement'
+  visit 'insured/consumer_role/ridp_agreement'
   find(IvlAuthorizationAndConsent.i_disagree_radiobtn).click
-	click_link "Continue"
+  click_link "Continue"
 end
 
 And(/^the consumer is on the DOCUMENT UPLOAD page$/) do
@@ -68,7 +68,7 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
-	find(IvlVerifyIdentity.upload_identity_docs_btn).click
+  find(IvlVerifyIdentity.upload_identity_docs_btn).click
   find(IvlVerifyIdentity.select_file_to_upload_btn).click
 	within '#select_upload_identity' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
