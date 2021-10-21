@@ -6,15 +6,14 @@ require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/in
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let!(:person) { FactoryBot.create(:person, hbx_id: 4378657346576) }
+  let!(:person) { FactoryBot.create(:person, hbx_id: 4_378_657_346_576) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, hbx_assigned_id: "10028") }
   let(:application_id) { "614cd09ca54d7584cbc9532d" }
   let!(:application) do
     FactoryBot.create(:financial_assistance_application,
                       family_id: family.id,
                       id: application_id,
-                      effective_date: DateTime.new(2021,1,1,4,5,6)
-                     )
+                      effective_date: DateTime.new(2021,1,1,4,5,6))
   end
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
@@ -93,7 +92,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
-  
+
 
   context 'Given invalid data' do
     it 'should fail when the application does not exist' do
