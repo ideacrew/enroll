@@ -26,12 +26,11 @@ module ApplicationHelper
           [option, option]
         end
       end
-      options_array << ['In Person', 'In Person'] if EnrollRegistry.feature_enabled?(:in_person_application_enabled)
-    else
-      options_array << ["Phone", "Phone"]
-      options_array << ["Paper", "Paper"]
-      options_array
     end
+    options_array << ['In Person', 'In Person'] if EnrollRegistry.feature_enabled?(:in_person_application_enabled)
+    # Phone and Paper should always display
+    options_array << ["Phone", "Phone"]
+    options_array << ["Paper", "Paper"]
     selected = if person.primary_family.e_case_id.present? && !(person.primary_family.e_case_id.include? "curam_landing")
                  'Curam'
                else
