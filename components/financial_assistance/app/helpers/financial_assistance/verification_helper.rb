@@ -47,7 +47,7 @@ module FinancialAssistance
       when "ESI MEC"
         "Coverage from a job"
       when "ACES MEC"
-        "Coverage from... MEC Check"
+        "Coverage from MaineCare and Cub Care"
       when "Non ESI MEC"
         "Coverage from another program"
       when "Income"
