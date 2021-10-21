@@ -47,20 +47,22 @@
                 </div>
               </div>
 
-              <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless ::EnrollRegistry.feature_enabled?(:tobacco_cost) %> tobacco_user_container">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-buffer pb-1">
-                  <label class="required no-pd"><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>
+              <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
+                <div class="row row-form-wrapper no-buffer tobacco_user_container">
+                  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-buffer pb-1">
+                    <label class="required no-pd"><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>
+                  </div>
+                  <% member_person = @family.family_members.where(id: family_member.id).first&.person %>
+                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 top-buffer pb-1">
+                    <input class=" " id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member_person&.is_tobacco_user == 'Y' %>>
+                    <label class="radio-label" for="is_tobacco_user_Y_<%= index %>"><span>Yes</span></label>
+                  </div>
+                  <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1 top-buffer pb-1">
+                    <input class=" " id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member_person&.is_tobacco_user != 'Y' %>>
+                    <label class="radio-label" for="is_tobacco_user_N_<%= index %>" ><span>No</span></label>
+                  </div>
                 </div>
-                <% member_person = @family.family_members.find(family_member.id)&.person %>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 top-buffer pb-1">
-                  <input class=" " id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member_person&.is_tobacco_user == 'Y' %>>
-                  <label class="radio-label" for="is_tobacco_user_Y_<%= index %>"><span>Yes</span></label>
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1 top-buffer pb-1">
-                  <input class=" " id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member_person&.is_tobacco_user != 'Y' %>>
-                  <label class="radio-label" for="is_tobacco_user_N_<%= index %>" ><span>No</span></label>
-                </div>
-              </div>
+              <% end %>
             </td>
           </tr>
         </tbody>
