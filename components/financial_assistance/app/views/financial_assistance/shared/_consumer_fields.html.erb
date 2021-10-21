@@ -1,4 +1,7 @@
 <div id="consumer_fields" class="focus_effect">
+  <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
+    <%= render :partial => 'shared/optional_field_warning' %>
+  <% end %>
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
       <label>Are you a US Citizen or US National? *</label>
