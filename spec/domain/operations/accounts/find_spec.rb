@@ -14,7 +14,7 @@ RSpec.describe Operations::Accounts::Find, type: :request do
     context 'scope_name is :all' do
       it 'should return all accounts limited by default page_size' do
         response = subject.call(scope_name: :all)
-        binding.pry
+
         expect(response.success?).to be_truthy
         expect(response.success.count).to eq avengers.keys.count
       end
@@ -26,8 +26,6 @@ RSpec.describe Operations::Accounts::Find, type: :request do
 
       context 'it should find an account by user login' do
         it 'should find the account' do
-          binding.pry
-
           response =
             subject.call(
               scope_name: :by_username,
@@ -41,14 +39,21 @@ RSpec.describe Operations::Accounts::Find, type: :request do
 
       context 'it should find an account by email' do
         it 'should find the account' do
-          require 'pry'
-          binding.pry
-
           response =
             subject.call(scope_name: :by_email, criterion: black_widow_email)
+
           expect(response.success?).to be_truthy
           expect(response.success.first[:username]).to eq black_widow_username
         end
+      end
+    end
+
+    context 'scope_name is :by_any' do
+      it 'should return all accounts limited by default page_size' do
+        response = subject.call(scope_name: :by_any, criterion: 'avengers')
+
+        expect(response.success?).to be_truthy
+        expect(response.success.count).to eq avengers.keys.count
       end
     end
   end

@@ -31,7 +31,7 @@ module Operations
             if v.is_a? Hash
               map.merge!(k.underscore.to_sym => map_attributes(v))
             elsif k == 'createdTimestamp'
-              map.merge!(created_at: epoch_to_time(v))
+              map.merge!(created_at: epoch_to_time(v).to_s)
             else
               map.merge!(k.underscore.to_sym => v)
             end

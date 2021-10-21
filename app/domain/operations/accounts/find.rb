@@ -72,16 +72,6 @@ module Operations
       def map_attributes(keycloak_attributes)
         json_attrs = JSON(keycloak_attributes)
         Operations::Accounts::MapAttributes.new.call(json_attrs)
-        binding.pry
-
-        #  accounts =
-        #   json_attrs.reduce([]) do |list, account|
-        #     list <<
-        #       Operations::Accounts::MapAttributes
-        #         .new
-        #         .call(account[:user])
-        #         .success
-        #   end
       end
 
       def transform(account)
