@@ -11,21 +11,22 @@ module Operations
 
       def call(params)
         # values = yield validate(params)
-        attributes = yield map_attributes(params)
+        values = yield transform(params)
 
-        Success(attributes)
+        Success(values)
       end
 
       private
 
-      def validate(params)
-        AcaEntities::Accounts::Contracts::AccountContract.new.call(
-          params
-        )
+      def transform(attributes)
+        values = map_attributes(attributes)
+        values.blank? ? Failure(values) : Success(values)
       end
 
       def map_attributes(attributes)
-        attrs =
+        if attributes.is_a? Array
+          attributes.collect { |h| map_attributes(h) }
+        else
           attributes.reduce({}) do |map, (k, v)|
             if v.is_a? Hash
               map.merge!(k.underscore.to_sym => map_attributes(v))
@@ -35,8 +36,7 @@ module Operations
               map.merge!(k.underscore.to_sym => v)
             end
           end
-
-        Success(attrs)
+        end
       end
 
       def epoch_to_time(value)

@@ -20,14 +20,14 @@ RSpec.shared_context 'account' do
       captain_america: {
         username: 'captain_america',
         password: '$3cr3tP@55w0rd',
-        email: 'captain_americak@avengers.org',
+        email: 'captain_america@avengers.org',
         first_name: 'Steve',
         last_name: 'Rodgers'
       },
       black_widow: {
-        username: 'black_window',
+        username: 'black_widow',
         password: '$3cr3tP@55w0rd',
-        email: 'black_window@avengers.org',
+        email: 'black_widow@avengers.org',
         first_name: 'Natasha',
         last_name: 'Romanoff'
       },
@@ -53,6 +53,8 @@ RSpec.shared_context 'account' do
   end
 
   def delete_avenger_accounts
-    avengers.each { |k, v| Operations::Accounts::Delete.new.call(login: v[:username]) }
+    avengers.each do |k, v|
+      Operations::Accounts::Delete.new.call(login: v[:username])
+    end
   end
 end

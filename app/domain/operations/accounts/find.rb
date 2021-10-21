@@ -26,9 +26,10 @@ module Operations
       def call(params)
         values = yield validate(params)
         _token_proc = yield cookie_token(values)
-        users = yield search(values)
+        keycloak_attributes = yield search(values)
+        account_attributes = yield map_attributes(keycloak_attributes)
 
-        Success(users)
+        Success(account_attributes)
       end
 
       private
@@ -62,12 +63,29 @@ module Operations
       def search(values)
         # rubocop:disable Style/MultilineBlockChain
         Try() do
-          require 'pry'
-          binding.pry
-          query_params = search_scope(values).merge(pagiation(values))
+          query_params = search_scope(values).merge(pagination(values))
           Keycloak::Admin.get_users(query_params)
         end.bind { |result| result ? Success(result) : Failure(result) }
         # rubocop:enable Style/MultilineBlockChain
+      end
+
+      def map_attributes(keycloak_attributes)
+        json_attrs = JSON(keycloak_attributes)
+        Operations::Accounts::MapAttributes.new.call(json_attrs)
+        binding.pry
+
+        #  accounts =
+        #   json_attrs.reduce([]) do |list, account|
+        #     list <<
+        #       Operations::Accounts::MapAttributes
+        #         .new
+        #         .call(account[:user])
+        #         .success
+        #   end
+      end
+
+      def transform(account)
+        Operations::Accounts::MapAttributes.new.call(account[:user]).success
       end
 
       def search_scope(params)
@@ -87,7 +105,7 @@ module Operations
         end
       end
 
-      def pagiation(values)
+      def pagination(values)
         { first: values[:page_number] || 0, max: values[:page_size] || 100 }
       end
     end
