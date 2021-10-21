@@ -1,28 +1,23 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require_relative 'shared_context_account'
 
 RSpec.describe Operations::Accounts::Find, type: :request do
   subject { described_class.new }
   include_context 'account'
 
-  context 'scope_name is :by_username' do
-    let(:username) { 'black_window' }
-    let(:password) { '$3cr3tP@55w0rd' }
-    let(:email) { 'scarlettk@avengers.org' }
-    let(:first_name) { 'Natasha' }
-    let(:last_name) { 'Romanoff' }
-
-    let(:account) do
-      {
-        username: username,
-        password: password,
-        email: email,
-        first_name: first_name,
-        last_name: last_name
-      }
+  context 'scope_name is :all' do
+    it 'should return all accounts limited by default page_size' do
+      response = subject.call(scope_name: :all)
+      require 'pry'
+      binding.pry
+      expect(response.success?).to be_truthy
+      expect(response.success.count).to eq avengers.count
     end
+  end
 
+  context 'scope_name is :by_username' do
     let(:target_account) do
       ::Operations::Accounts::Create.new.call(account: account).success
     end

@@ -29,7 +29,8 @@ module Operations
       def call(params)
         values = yield validate(params)
         _token_proc = yield cookie_token(values)
-        account = yield create(values)
+        keycloak_attrs = yield create(values)
+        account_attrs = yield map_attributes(keycloak_attrs)
 
         Success(account)
       end
@@ -85,20 +86,8 @@ module Operations
 
       # rubocop:enable Style/MultilineBlockChain
 
-      def map_attributes(attributes)
-        attributes.reduce({}) do |map, (k, v)|
-          if v.is_a? Hash
-            map.merge!(k.underscore.to_sym => map_attributes(v))
-          elsif k == 'createdTimestamp'
-            map.merge!(created_at: epoch_to_time(v))
-          else
-            map.merge!(k.underscore.to_sym => v)
-          end
-        end
-      end
-
-      def epoch_to_time(value)
-        Time.at(value / 1000)
+      def map_attributes(keycloak_attributes)
+        Operatios::Aaccounts::MapAttributes.new.call(keycloak_attributes)
       end
     end
   end
