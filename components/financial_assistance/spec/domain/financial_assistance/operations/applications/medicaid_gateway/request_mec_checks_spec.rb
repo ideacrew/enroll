@@ -8,7 +8,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   before :all do
     DatabaseCleaner.clean
   end
-  
+
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: 4_378_657_346_576) }
