@@ -119,7 +119,7 @@ module Operations
         return Success(external_application_id) if Family.where(external_app_id: external_application_id).present?
 
         build_family
-        if family_hash['magi_medicaid_applications']  # update this
+        if family_hash['magi_medicaid_applications'].present?
           @tax_household_params = family_hash["households"][0]["tax_households"]
           application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp))
 
