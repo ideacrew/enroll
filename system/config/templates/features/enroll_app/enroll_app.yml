@@ -651,3 +651,10 @@ registry:
             item: ['first_name', 'last_name', 'dob']
           - key: :name_present
             item: ['first_name', 'last_name']
+  - namespace:
+      - :features
+      - :enroll_app
+      - :relationships
+    features:
+      - key: :mitc_relationships
+        is_enabled: false
