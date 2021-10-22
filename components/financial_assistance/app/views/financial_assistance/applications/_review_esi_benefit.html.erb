@@ -3,33 +3,34 @@
     <div class="col-md-6">Employer Name</div>
     <div class="col-md-6"><%= benefit.employer_name %></div>
   </div>
-
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
-    <div class="col-md-6"><%= benefit.employer_address.address_1 %></div>
-  </div>
-
-  <% if benefit.employer_address.address_2.present? %>
+  <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
     <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
-      <div class="col-md-6"><%= benefit.employer_address.address_2 %></div>
+      <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
+      <div class="col-md-6"><%= benefit.employer_address.address_1 %></div>
+    </div>
+
+    <% if benefit.employer_address.address_2.present? %>
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
+        <div class="col-md-6"><%= benefit.employer_address.address_2 %></div>
+      </div>
+    <% end %>
+
+    <div class="row ptb no-buffer row-height">
+      <div class="col-md-6">CITY</div>
+      <div class="col-md-6"><%= benefit.employer_address.city %></div>
+    </div>
+
+    <div class="row ptb no-buffer row-height">
+      <div class="col-md-6">STATE</div>
+      <div class="col-md-6"><%= benefit.employer_address.state %></div>
+    </div>
+
+    <div class="row ptb no-buffer row-height">
+      <div class="col-md-6">ZIP</div>
+      <div class="col-md-6"><%= benefit.employer_address.zip %></div>
     </div>
   <% end %>
-
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6">CITY</div>
-    <div class="col-md-6"><%= benefit.employer_address.city %></div>
-  </div>
-
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6">STATE</div>
-    <div class="col-md-6"><%= benefit.employer_address.state %></div>
-  </div>
-
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6">ZIP</div>
-    <div class="col-md-6"><%= benefit.employer_address.zip %></div>
-  </div>
 
   <div class="row ptb no-buffer row-height">
     <div class="col-md-6">EMPLOYER PHONE</div>

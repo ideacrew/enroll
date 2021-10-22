@@ -27,7 +27,6 @@ module Operations
           payload = {
             hbx_id: family.hbx_assigned_id.to_s,
             family_members: transform_family_members(family.family_members),
-            households: transform_households(family.households), # TO DO
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
@@ -40,6 +39,8 @@ module Operations
             # updated_by: construct_updated_by(updated_by)
           }
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
+          payload.merge!(households: transform_households(family.households)) if family.households.present?
+
           Success(payload)
         end
 
@@ -184,6 +185,7 @@ module Operations
               coverage_households: transform_coverage_households(household.coverage_households)
             }
             household_data.merge(hbx_enrollments: transform_hbx_enrollments(household.hbx_enrollments)) if household.hbx_enrollments.present?
+            household_data
           end
         end
 

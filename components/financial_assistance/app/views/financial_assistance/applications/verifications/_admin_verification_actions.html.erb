@@ -1,0 +1,42 @@
+<!-- ***** Verification reason ***** -->
+<div class="row">
+  <div class="verification-update-reason col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}"%>>
+    <div class="col-md-6">
+      Provide verification reason:
+    </div>
+    <%= form_tag financial_assistance.application_applicant_verification_documents_update_evidence_path(application, applicant), method: :put do %>
+        <%= hidden_field_tag 'applicant_id', applicant.id  %>
+        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'admin_action', 'verify' %>
+        <div class="form-group col-md-3">
+          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Document::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
+        </div>
+        <div class="col-md-3">
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+        </div>
+    <%end%>
+  </div>
+</div>
+<!-- ==== verification reason ==== -->
+
+<!-- ***** Reject reason ***** -->
+<div class="row">
+  <div class="return-for-def-reason col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-return"%>>
+    <div class="col-md-6">
+      Reject reason:
+    </div>
+    <%= form_tag financial_assistance.application_applicant_verification_documents_update_evidence_path(application, applicant), method: :put do %>
+        <%= hidden_field_tag 'applicant_id', applicant.id  %>
+        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
+        <div class="form-group col-md-3">
+          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Document::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
+        </div>
+        <div class="col-md-3">
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+        </div>
+    <%end%>
+  </div>
+</div>
+<!-- ==== reject reason ==== -->
+

@@ -209,7 +209,7 @@ class GroupSelectionPrevaricationAdapter
 
   def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment, new_effective_date)
     if (select_market(params) == 'shop' || select_market(params) == 'fehb') && (@change_plan == 'change_by_qle') && enrollment.blank?
-      
+
       prev_enrollment = find_previous_enrollment_for(params, new_effective_date)
       if prev_enrollment
         yield prev_enrollment
@@ -252,7 +252,7 @@ class GroupSelectionPrevaricationAdapter
       possible_benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
       return possible_benefit_package if assigned_benefit_package && assigned_benefit_package.start_on != possible_benefit_package.start_on
     end
-    
+
     assigned_benefit_package
   end
 
@@ -417,8 +417,8 @@ class GroupSelectionPrevaricationAdapter
     benefit_group = get_benefit_group(@benefit_group, employee_role, qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
-    [ 
-      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start), 
+    [
+      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start),
       eligibility_checker(benefit_group, :dental).can_cover?(family_member, coverage_start)
     ]
   end
@@ -466,6 +466,12 @@ class GroupSelectionPrevaricationAdapter
     assignment = employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
     assignment.update(hbx_enrollment_id: enrollment.id)
     enrollment.update(benefit_group_assignment_id: assignment.id)
+  end
+
+  def update_member(id, permitted_param)
+    member_person = @family.family_members.where(id: id).first&.person
+    return unless member_person.present?
+    member_person.update(is_tobacco_user: permitted_param["is_tobacco_user_#{id}"])
   end
 
   protected

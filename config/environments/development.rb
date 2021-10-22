@@ -78,7 +78,17 @@ Rails.application.configure do
   config.wells_fargo_api_date_format = '%Y-%m-%dT%H:%M:%S.0000000%z'
   config.cartafact_document_base_url = 'http://localhost:3004/api/v1/documents'
 
+  config.acapi.publish_amqp_events = true
+  config.acapi.app_id = "enroll"
+  config.acapi.remote_broker_uri = "amqp://#{ENV['RABBITMQ_USERNAME']}:#{ENV['RABBITMQ_PASSWORD']}@#{ENV['RABBITMQ_HOST']}:#{ENV['RABBITMQ_PORT']}"
+  config.acapi.remote_request_exchange = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.e.fanout.requests"
+  config.acapi.remote_event_queue = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.q.application.enroll.inbound_events"
+  config.action_mailer.default_url_options = { :host => ENV['ENROLL_FQDN'].to_s }
+  config.acapi.hbx_id = ENV['HBX_ID'].to_s
+  config.acapi.environment_name = ENV['ENV_NAME'].to_s
 
+  # Cartafact config
+  config.cartafact_document_base_url = "http://#{ENV['CARTAFACT_HOST']}:3000/api/v1/documents"
 
   #Queue adapter
   config.active_job.queue_adapter = :resque
@@ -86,7 +96,6 @@ Rails.application.configure do
   HbxIdGenerator.slug!
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
-
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR
