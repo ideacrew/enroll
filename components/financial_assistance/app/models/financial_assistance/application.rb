@@ -12,9 +12,9 @@ module FinancialAssistance
     # belongs_to :family, class_name: "Family"
 
     before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
-    validates :application_submission_validity, presence: true, on: :submission
-    validates :before_attestation_validity, presence: true, on: :before_attestation
-    validate  :attestation_terms_on_parent_living_out_of_home
+    validate :application_submission_validity, on: :submission
+    validate :before_attestation_validity, on: :before_attestation
+    validate :attestation_terms_on_parent_living_out_of_home
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
 
@@ -28,13 +28,13 @@ module FinancialAssistance
     REQUEST_KINDS     = %w[].freeze
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
-    SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
+    SUBMITTED_STATUS = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
     CLOSED_STATUSES = %w[cancelled terminated].freeze
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
-    RENEWAL_ELIGIBLE_STATES = %w[submitted determined].freeze
+    RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
 
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
@@ -102,6 +102,13 @@ module FinancialAssistance
 
     # Flag for user requested ATP transfer
     field :transfer_requested, type: Boolean, default: false
+    # Account was transferred to medicaid service via atp
+    field :account_transferred, type: Boolean, default: false
+
+    # Transfer ID of to be set if the application was transferred into Enroll via ATP
+    field :transfer_id, type: String
+
+    field :has_mec_check_response, type: Boolean, default: false
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
@@ -131,12 +138,205 @@ module FinancialAssistance
                                     message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                   }
 
-    index({ 'family_id' => 1 })
-    index({ "relationships._id" => 1 })
-    index({ "applicants._id" => 1 })
+    index({"_id" => 1})
+    index({"is_renewal_authorized" => 1})
+    index({"family_id" => 1})
+    index({"years_to_renew" => 1})
+    index({"benchmark_product_id" => 1})
+    index({"has_eligibility_response" => 1})
+    index({"transfer_requested" => 1})
+    index({"applicant_kind" => 1})
+    index({"request_kind" => 1})
+    index({"motivation_kind" => 1})
+    index({"us_state" => 1})
+    index({"is_ridp_verified" => 1})
+    index({"renewal_base_year" => 1})
+    index({"account_transferred" => 1})
+    index({"has_mec_check_response" => 1})
+    index({"parent_living_out_of_home_terms" => 1})
+
+    index({ hbx_id: 1 }, { unique: true })
+    index({ aasm_state: 1 })
+    index({ assistance_year: 1 })
+    index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
+    index({ "workflow_state_transitions.transition_at" => 1,
+            "workflow_state_transitions.to_state" => 1 },
+          { name: "workflow_to_state" })
+
+    index({"relationships._id" => 1 })
     index({"relationships.applicant_id" => 1})
     index({"relationships.relative_id" => 1})
     index({"relationships.kind" => 1})
+
+    index({"eligibility_determinations._id" => 1})
+    index({"eligibility_determinations.max_aptc" => 1})
+    index({"eligibility_determinations.csr_percent_as_integer" => 1})
+    index({"eligibility_determinations.source" => 1})
+    index({"eligibility_determinations.aptc_csr_annual_household_income" => 1})
+    index({"eligibility_determinations.csr_annual_income_limit" => 1})
+    index({"eligibility_determinations.effective_starting_on" => 1})
+    index({"eligibility_determinations.effective_ending_on" => 1})
+    index({"eligibility_determinations.is_eligibility_determined" => 1})
+    index({"eligibility_determinations.hbx_assigned_id" => 1})
+    index({"eligibility_determinations.determined_at" => 1})
+
+    # applicant index
+    index({ "applicants._id" => 1 })
+    index({"applicants.no_ssn" => 1})
+    index({"applicants.is_tobacco_user" => 1})
+    index({"applicants.assisted_income_validation" => 1})
+    index({"applicants.assisted_mec_validation" => 1})
+    index({"applicants.aasm_state" => 1})
+    index({"applicants.is_active" => 1})
+    index({"applicants.has_fixed_address" => 1})
+    index({"applicants.tax_filer_kind" => 1})
+
+    index({"applicants.magi_as_percentage_of_fpl" => 1})
+    index({"applicants.age_left_foster_care" => 1})
+    index({"applicants.children_expected_count" => 1})
+    index({"applicants.csr_percent_as_integer" => 1})
+    index({"applicants.csr_eligibility_kind" => 1})
+
+    index({"applicants.is_primary_applicant" => 1})
+    index({"applicants.no_dc_address" => 1})
+    index({"applicants.is_homeless" => 1})
+    index({"applicants.is_temporarily_out_of_state" => 1})
+    index({"applicants.same_with_primary" => 1})
+    index({"applicants.is_consent_applicant" => 1})
+    index({"applicants.is_living_in_state" => 1})
+    index({"applicants.is_ia_eligible" => 1})
+    index({"applicants.is_medicaid_chip_eligible" => 1})
+    index({"applicants.is_non_magi_medicaid_eligible" => 1})
+    index({"applicants.is_totally_ineligible" => 1})
+    index({"applicants.is_without_assistance" => 1})
+    index({"applicants.has_income_verification_response" => 1})
+    index({"applicants.has_mec_verification_response" => 1})
+    index({"applicants.is_magi_medicaid" => 1})
+    index({"applicants.is_medicare_eligible" => 1})
+    index({"applicants.is_self_attested_disabled" => 1})
+    index({"applicants.is_self_attested_long_term_care" => 1})
+    index({"applicants.is_veteran" => 1})
+    index({"applicants.is_refugee" => 1})
+    index({"applicants.is_trafficking_victim" => 1})
+    index({"applicants.is_primary_caregiver" => 1})
+    index({"applicants.is_subject_to_five_year_bar" => 1})
+    index({"applicants.is_five_year_bar_met" => 1})
+    index({"applicants.is_forty_quarters" => 1})
+    index({"applicants.encrypted_ssn" => 1})
+    index({"applicants.family_member_id" => 1})
+    index({"applicants.person_hbx_id" => 1})
+    index({"applicants.is_incarcerated" => 1})
+    index({"applicants.indian_tribe_member" => 1})
+    index({"applicants.tribal_id" => 1})
+    index({"applicants.tribal_state" => 1})
+    index({"applicants.tribal_name" => 1})
+    index({"applicants.health_service_eligible" => 1})
+    index({"applicants.health_service_through_referral" => 1})
+    index({"applicants.citizen_status" => 1})
+    index({"applicants.is_consumer_role" => 1})
+    index({"applicants.is_applying_coverage" => 1})
+    index({"applicants.had_medicaid_during_foster_care" => 1})
+    index({"applicants.has_daily_living_help" => 1})
+    index({"applicants.has_deductions" => 1})
+    index({"applicants.has_eligibility_changed" => 1})
+    index({"applicants.has_eligible_health_coverage" => 1})
+    index({"applicants.has_eligible_medicaid_cubcare" => 1})
+    index({"applicants.has_enrolled_health_coverage" => 1})
+    index({"applicants.has_job_income" => 1})
+    index({"applicants.has_other_income" => 1})
+    index({"applicants.has_self_employment_income" => 1})
+    index({"applicants.has_unemployment_income" => 1})
+    index({"applicants.is_claimed_as_tax_dependent" => 1})
+    index({"applicants.is_filing_as_head_of_household" => 1})
+    index({"applicants.is_former_foster_care" => 1})
+    index({"applicants.is_joint_tax_filing" => 1})
+    index({"applicants.is_physically_disabled" => 1})
+    index({"applicants.is_post_partum_period" => 1})
+    index({"applicants.is_pregnant" => 1})
+    index({"applicants.is_required_to_file_taxes" => 1})
+    index({"applicants.is_self_attested_blind" => 1})
+    index({"applicants.is_student" => 1})
+    index({"applicants.is_veteran_or_active_military" => 1})
+    index({"applicants.is_vets_spouse_or_child" => 1})
+    index({"applicants.need_help_paying_bills" => 1})
+    index({"applicants.eligibility_determination_id" => 1})
+
+    # verification_types index
+    index({"applicants.verification_types._id" => 1})
+    index({"applicants.verification_types.type_name" => 1})
+    index({"applicants.verification_types.validation_status" => 1})
+    index({"applicants.verification_types.update_reason" => 1})
+    index({"applicants.verification_types.rejected" => 1})
+    index({"applicants.verification_types.external_service" => 1})
+    index({"applicants.verification_types.due_date" => 1})
+    index({"applicants.verification_types.due_date_type" => 1})
+
+    index({"applicants.addresses._id" => 1})
+    index({"applicants.addresses.kind" => 1})
+
+    index({"applicants.phones._id" => 1})
+    index({"applicants.phones.kind" => 1})
+    index({"applicants.phones.primary" => 1})
+
+    index({"applicants.emails._id" => 1})
+    index({"applicants.emails.kind" => 1})
+
+    # incomes index
+    index({"applicants.incomes._id" => 1})
+    index({"applicants.incomes.title" => 1})
+    index({"applicants.incomes.kind" => 1})
+    index({"applicants.incomes.wage_type" => 1})
+    index({"applicants.incomes.hours_per_week" => 1})
+    index({"applicants.incomes.amount" => 1})
+    index({"applicants.incomes.amount_tax_exempt" => 1})
+    index({"applicants.incomes.frequency_kind" => 1})
+    index({"applicants.incomes.start_on" => 1})
+    index({"applicants.incomes.end_on" => 1})
+    index({"applicants.incomes.employer_name" => 1})
+    index({"applicants.incomes.employer_id" => 1})
+    index({"applicants.incomes.submitted_at" => 1})
+
+    index({"applicants.incomes.employer_address._id" => 1})
+    index({"applicants.incomes.employer_address.kind" => 1})
+
+    index({"applicants.incomes.employer_phone._id" => 1})
+    index({"applicants.incomes.employer_phone.kind" => 1})
+    index({"applicants.incomes.employer_phone.primary" => 1})
+
+    # deduction index
+    index({"applicants.deductions._id" => 1})
+    index({"applicants.deductions.title" => 1})
+    index({"applicants.deductions.kind" => 1})
+    index({"applicants.deductions.amount" => 1})
+    index({"applicants.deductions.frequency_kind" => 1})
+    index({"applicants.deductions.start_on" => 1})
+    index({"applicants.deductions.end_on" => 1})
+    index({"applicants.deductions.submitted_at" => 1})
+
+    # benefit index
+    index({"applicants.benefits._id" => 1})
+    index({"applicants.benefits.title" => 1})
+    index({"applicants.benefits.kind" => 1})
+    index({"applicants.benefits.esi_covered" => 1})
+    index({"applicants.benefits.insurance_kind" => 1})
+    index({"applicants.benefits.hra_type" => 1})
+    index({"applicants.benefits.is_employer_sponsored" => 1})
+    index({"applicants.benefits.is_esi_waiting_period" => 1})
+    index({"applicants.benefits.is_esi_mec_met" => 1})
+    index({"applicants.benefits.employee_cost" => 1})
+    index({"applicants.benefits.employee_cost_frequency" => 1})
+    index({"applicants.benefits.start_on" => 1})
+    index({"applicants.benefits.end_on" => 1})
+    index({"applicants.benefits.submitted_at" => 1})
+    index({"applicants.benefits.employer_name" => 1})
+    index({"applicants.benefits.employer_id" => 1})
+
+    index({"applicants.benefits.employer_address._id" => 1})
+    index({"applicants.benefits.employer_address.kind" => 1})
+
+    index({"applicants.benefits.employer_phone._id" => 1})
+    index({"applicants.benefits.employer_phone.kind" => 1})
+    index({"applicants.benefits.employer_phone.primary" => 1})
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
@@ -148,6 +348,7 @@ module FinancialAssistance
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, -> { where(:aasm_state.in => ['submitted', 'determination_response_error', 'determined']) }
+    scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -169,7 +370,7 @@ module FinancialAssistance
 
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?
-        # Update relationship object only if the existing RelationshipKind is different some the incoming RelationshipKind.
+        # Update relationship object only if the existing RelationshipKind is different from the incoming RelationshipKind.
         relationship.update(kind: relation_kind) if relationship.kind != relation_kind
         return relationship
       end
@@ -298,7 +499,12 @@ module FinancialAssistance
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
-      result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
+      if result.success?
+        rt_transfer
+        true
+      else
+        log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
+      end
     end
 
     def rt_transfer
@@ -311,7 +517,7 @@ module FinancialAssistance
     end
 
     def is_rt_transferrable?
-      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer)
+      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer) && self.account_transferred == false
       is_transferrable?
     end
 
@@ -322,8 +528,13 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
       end
+    end
+
+    def has_mec_check?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.has_mec_check_response
     end
 
     def update_application(error_message, status_code)
@@ -484,13 +695,27 @@ module FinancialAssistance
       # :renewal_draft State where the previous year's application is renewed
       # :renewal_draft state is the initial state for a renewal application
       state :renewal_draft
-      # :submission_pending is a state where some corrective action is required
-      # :submission_pending is a state where we are unable to submit the application for some reason
-      state :submission_pending
+      # :income_verification_extension_required is a state where some corrective action is required
+      # to extend income verification year.
+      state :income_verification_extension_required
       state :submitted
       state :determination_response_error
       state :determined
       state :imported
+      state :applicants_update_required
+      # states when request build fails(to generate request for Haven/Mitc)
+      state :mitc_magi_medicaid_eligibility_request_errored
+      state :haven_magi_medicaid_eligibility_request_errored
+
+      event :set_magi_medicaid_eligibility_request_errored, :after => :record_transition do
+        if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+          transitions from: :submitted, to: :haven_magi_medicaid_eligibility_request_errored
+        elsif FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+          transitions from: :submitted, to: :mitc_magi_medicaid_eligibility_request_errored
+        else
+          raise NoMagiMedicaidEngine
+        end
+      end
 
       # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
@@ -546,8 +771,8 @@ module FinancialAssistance
       end
 
       # Currently, this event will be used during renewal generations
-      event :fail_submission, :after => :record_transition do
-        transitions from: :renewal_draft, to: :submission_pending
+      event :set_income_verification_extension_required, :after => :record_transition do
+        transitions from: :renewal_draft, to: :income_verification_extension_required
       end
 
       event :import, :after => [:record_transition] do
@@ -897,6 +1122,52 @@ module FinancialAssistance
       update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
     end
 
+    def calculate_renewal_base_year
+      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
+      if is_renewal_authorized.present?
+        ass_year + YEARS_TO_RENEW_RANGE.max
+      elsif is_renewal_authorized.is_a?(FalseClass)
+        ass_year + (years_to_renew || 0)
+      end
+    end
+
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def applicants_have_valid_addresses?
+      applicants.all?(&:has_valid_address?)
+    end
+
+    def is_application_valid?
+      application_attributes_validity = self.valid?(:submission) ? true : false
+
+      if relationships_complete?
+        relationships_validity = true
+      else
+        self.errors[:base] << "You must have a complete set of relationships defined among every member."
+        relationships_validity = false
+      end
+
+      if applicants_have_valid_addresses?
+        addresses_validity = true
+      else
+        self.errors[:base] << 'You must have a valid addresses for every applicant.'
+        addresses_validity = false
+      end
+
+      application_attributes_validity && relationships_validity && addresses_validity
+    end
+
+    # rubocop:disable Lint/EmptyRescueClause
+    def family
+      @family ||= begin
+        Family.find(family_id)
+      rescue StandardError => _e
+        nil
+      end
+    end
+    # rubocop:enable Lint/EmptyRescueClause
+
     private
 
     # If MemberA is parent to MemberB,
@@ -963,15 +1234,6 @@ module FinancialAssistance
       missing_relationships
     end
 
-    def calculate_renewal_base_year
-      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
-      if is_renewal_authorized.present?
-        ass_year + YEARS_TO_RENEW_RANGE.max
-      elsif is_renewal_authorized.is_a?(FalseClass)
-        ass_year + years_to_renew
-      end
-    end
-
     def check_parent_living_out_of_home_terms
       (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
         parent_living_out_of_home_terms.is_a?(FalseClass)
@@ -1033,13 +1295,15 @@ module FinancialAssistance
     end
 
     def set_assistance_year
+      return unless assistance_year.blank?
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      )  if assistance_year.blank?
+      )
     end
 
     def set_effective_date
+      return if effective_date.present?
       effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
       update_attribute(:effective_date, effective_date)
     end
@@ -1089,19 +1353,6 @@ module FinancialAssistance
       validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
     end
 
-    def is_application_valid?
-      application_attributes_validity = self.valid?(:submission) ? true : false
-
-      if relationships_complete?
-        relationships_validity = true
-      else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
-        relationships_validity = false
-      end
-
-      application_attributes_validity && relationships_validity
-    end
-
     def is_application_ready_for_attestation?
       self.valid?(:before_attestation) ? true : false
     end
@@ -1149,7 +1400,7 @@ module FinancialAssistance
 
     def create_eligibility_determinations
       ## Remove  when copy method is fixed to exclude copying Tax Household
-      active_applicants.each { |applicant| applicant.update_attributes!(eligibility_determination_id: nil)  }
+      active_applicants.update_all(eligibility_determination_id: nil)
 
       non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
       tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
@@ -1157,20 +1408,20 @@ module FinancialAssistance
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
           applicant.eligibility_determination = applicant.eligibility_determination_of_spouse
-          applicant.update_attributes!(tax_filer_kind: 'tax_filer')
+          applicant.update_attributes(tax_filer_kind: 'tax_filer')
         else
           # Create a new THH and assign it to the applicant
           # Need THH for Medicaid cases too
           applicant.eligibility_determination = eligibility_determinations.create!
-          applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
+          applicant.update_attributes(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
         end
       end
+
 
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
-        applicant.update_attributes!(tax_filer_kind: 'dependent')
-        applicant.update_attributes!(tax_filer_kind: 'dependent')
+        applicant.update_attributes(tax_filer_kind: 'dependent')
       end
 
       empty_ed = eligibility_determinations.select do |ed|
@@ -1189,16 +1440,22 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
-        family_record = Family.where(id: family_id.to_s).first
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-           family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-          family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
+           family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+          family_member_record = family.family_members.where(id: applicant.family_member_id).first
           next if family_member_record.blank?
           person_record = family_member_record.person
           next if person_record.blank?
           person_record.add_new_verification_type('Income')
         end
-        applicant.move_to_pending!
+        from_state = applicant.aasm_state
+        # TODO: revisit
+        applicant.write_attribute(:aasm_state, 'verification_pending')
+        applicant.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: from_state,
+          to_state: 'verification_pending',
+          event: 'move_to_pending!'
+        )
       end
     end
 
