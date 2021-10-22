@@ -346,7 +346,14 @@ module Operations
         end
 
         family_member.external_member_id = external_member_id
-        person.update_attributes(external_person_id: external_person_hbx_id(external_member_id)) unless person.external_person_id.present?
+        external_person_id = external_person_hbx_id(external_member_id)
+        existing_external_person = Person.where(external_person_id: external_person_id).first
+
+        if existing_external_person.present? && existing_external_person.hbx_id != person.hbx_id
+          person.update_attributes(external_person_id: "#{external_person_id}_#{external_application_id}")
+        else
+          person.update_attributes(external_person_id: external_person_id)
+        end
         family_member.save!
         @family.save!
 
@@ -582,7 +589,7 @@ module Operations
           last_name: person_hash['person_name']['last_name'],
           full_name: person_hash['person_name']['full_name'],
           ssn: person_hash['person_demographics']['ssn'],
-          no_ssn: person_hash['person_demographics']['no_ssn'] ? "1" : "0",
+          no_ssn: person_hash['person_demographics']['ssn'].nil? ? "1" : "0",
           gender: person_hash['person_demographics']['gender'],
           dob: person_hash['person_demographics']['dob'],
           date_of_death: person_hash['person_demographics']['date_of_death'],
