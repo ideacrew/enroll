@@ -95,10 +95,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     allow(premiums_double).to receive(:failure?).and_return(false)
     allow(slcsp_double).to receive(:failure?).and_return(false)
     allow(lcsp_double).to receive(:failure?).and_return(false)
-    allow(operation).to receive(:publish).with({}).and_return(Success())
+    allow(operation).to receive(:publish).and_return(Success())
   end
-
-
 
   context 'Given invalid data' do
     it 'should fail when the application does not exist' do
