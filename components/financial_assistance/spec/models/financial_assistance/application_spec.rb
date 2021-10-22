@@ -655,16 +655,17 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe '.create_evidences' do
 
     before do
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(applicant1).to receive(:is_ia_eligible?).and_return(true)
     end
 
-    it 'should create MEC evidences' do
+    it 'should create MEC evidences, ACES MEC check only if is_ia_eligible? not true' do
       application.send(:create_evidences)
-      expect(applicant1.evidences.count).to eq 3
+      expect(applicant1.evidences.count).to eq 4
       expect(applicant2.evidences.count).to eq 3
     end
 

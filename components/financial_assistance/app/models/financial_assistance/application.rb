@@ -1475,7 +1475,7 @@ module FinancialAssistance
         applicant.evidences =
           types.collect do |type|
             key, title = type
-            next if key == :aces_mec && applicant.non_ia_eligible?
+            next if key == :aces_mec && !applicant.is_ia_eligible?
             FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
