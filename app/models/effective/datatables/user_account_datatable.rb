@@ -4,13 +4,13 @@ module Effective
       include Config::SiteModelConcern
 
       datatable do
-        table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| row.oim_id }, :filter => false, :sortable => true
+        table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| find_account(row)[:username] || row.oim_id }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.person.dob) if row.person.present?}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.person.hbx_id if row.person.present?}, :filter => false, :sortable => false
-        table_column :email, :label => 'USER EMAIL', :proc => Proc.new { |row| row.email }, :filter => false, :sortable => false
-        table_column :status, :label => 'Status', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
-        table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| row.roles.join(', ') }, :filter => false, :sortable => false
+        table_column :email, :label => 'USER EMAIL', :proc => Proc.new { |row| find_account(row)[:email] || row.email }, :filter => false, :sortable => false
+        table_column :status, :label => 'Status', :proc => Proc.new { |row| find_account(row)[:status] || status(row) }, :filter => false, :sortable => false
+        table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| (row.roles || []).join(', ') }, :filter => false, :sortable => false
         table_column :permission, :label => 'Permission level', :proc => Proc.new { |row| permission_type(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
                                dropdown = [
@@ -32,7 +32,16 @@ module Effective
         unless (defined? @user_collection) && @user_collection.present? #memoize the wrapper class to persist @search_string
           @user_collection = Queries::UserDatatableQuery.new(attributes)
         end
+
         @user_collection
+      end
+
+      def find_account(user)
+        accounts.detect{|account| account[:id] == user.account_id} || {}
+      end
+
+      def accounts
+        @accounts ||= Operations::Accounts::Find.new.call(scope_name: :all, page: 1, page_size: 20).success
       end
 
       def status(row)
@@ -49,7 +58,7 @@ module Effective
       end
 
       def global_search_method
-        :datatable_search
+        :keycloak_account_search
       end
 
       def nested_filter_definition
