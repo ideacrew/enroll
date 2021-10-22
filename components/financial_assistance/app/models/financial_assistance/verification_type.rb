@@ -31,14 +31,6 @@ module FinancialAssistance
     # embeds_many :external_service_responses  -> needs datamigration
     embeds_many :type_history_elements, class_name: "::FinancialAssistance::TypeHistoryElement"
 
-
-    # embeds_many :vlp_documents, as: :documentable do
-    #   def uploaded
-    #     @target.select{|document| document.identifier }
-    #   end
-    # end
-
-
     def type_unverified?
       !type_verified?
     end

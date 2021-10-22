@@ -2,13 +2,16 @@
     <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
 <h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
+<h4 class="starter"><%= l10n("insured.verification_information") %></h4>
 <div class="documents-tab">
   <% if @person && @family_members.present? %>
-     <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
-
       <% if individual_market_is_enabled? %>
       	<%= render 'insured/families/verification/verification' %>
       <% end %>
+  <% end %>
+
+  <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
+    <%= render partial: "financial_assistance/applications/verifications/verification", locals: {family_id: @family.id} %>
   <% end %>
 </div>
 &nbsp;

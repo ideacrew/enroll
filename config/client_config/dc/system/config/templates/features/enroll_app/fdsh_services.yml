@@ -1,0 +1,13 @@
+---
+registry:
+  - namespace:
+      - :fdsh_services
+    features:
+      - key: :ridp_h139
+        is_enabled: false
+      - key: :paper_application_verification
+        is_enabled: true
+      - key: :vlp_h92
+        is_enabled: false
+      - key: :ssa_h3
+        is_enabled: false

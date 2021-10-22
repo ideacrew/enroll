@@ -83,6 +83,12 @@ registry:
       is_enabled: true
     - key: :medicaid_gateway_determination
       is_enabled: false
+    - key: :esi_mec_determination
+      is_enabled: false
+    - key: :non_esi_mec_determination
+      is_enabled: false
+    - key: :ifsv_determination
+      is_enabled: false
   - namespace:
     - :account_transfer
     features:
@@ -200,6 +206,9 @@ registry:
       is_enabled: false
     - key: :optional_document_fields
       item: :optional_document_fields
+      is_enabled: false
+    - key: :disable_employer_address_fields
+      item: :disable_employer_address_fields
       is_enabled: false
     - key: :fa_send_to_external_verification
       is_enabled: false
