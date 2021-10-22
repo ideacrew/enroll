@@ -1227,6 +1227,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'build_relationship_matrix' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+    end
+
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     let!(:applicant11) do
       FactoryBot.create(:financial_assistance_applicant,
@@ -1343,6 +1347,30 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         expect(
           application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant11.id).first.kind
         ).to eq('cousin')
+      end
+    end
+
+    context 'with valid case for DomesticPartnersChild' do
+      before do
+        application10.ensure_relationship_with_primary(applicant12, 'domestic_partner')
+        application10.add_or_update_relationships(applicant12, applicant13, 'parent')
+        application10.build_relationship_matrix
+      end
+
+      it 'should populate all the relationships' do
+        expect(application10.relationships_complete?).to be_truthy
+      end
+
+      it 'should create a relationship i.e., applicant11 is parents_domestic_partner to applicant13' do
+        expect(
+          application10.relationships.where(applicant_id: applicant11.id, relative_id: applicant13.id).first.kind
+        ).to eq('parents_domestic_partner')
+      end
+
+      it 'should create a relationship i.e., applicant13 is domestic_partners_child to applicant11' do
+        expect(
+          application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant11.id).first.kind
+        ).to eq('domestic_partners_child')
       end
     end
 
