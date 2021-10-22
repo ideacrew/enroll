@@ -758,7 +758,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls] do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
         transitions from: :submitted, to: :determined
       end
 
@@ -898,6 +898,15 @@ module FinancialAssistance
 
     def trigger_fdhs_calls
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+    end
+
+    def trigger_aces_call
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+    end
+
+    def is_aces_mec_checkable?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.active_applicants.any?(&:is_ia_eligible?)
     end
 
     def total_incomes_by_year
@@ -1455,9 +1464,10 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     def create_evidences
       types = []
+      types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
       types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
@@ -1465,6 +1475,7 @@ module FinancialAssistance
         applicant.evidences =
           types.collect do |type|
             key, title = type
+            next if key == :aces_mec && !applicant.is_ia_eligible?
             FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
@@ -1485,7 +1496,7 @@ module FinancialAssistance
         )
       end
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
     def delete_verification_documents
       active_applicants.each do |applicant|
