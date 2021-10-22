@@ -3,6 +3,8 @@ Feature: Hbx Admin as Phone Application for new consumer application
 Background: Hbx Admin navigates into the new consumer application with In Person application option and goes forward till DOCUMENT UPLOAD page
   Given an HBX admin exists
   And EnrollRegistry in_person_application_enabled feature is enabled
+  And EnrollRegistry tobacco_cost feature is disabled
+  And EnrollRegistry contact_method_via_dropdown feature is enabled
   And the HBX admin is logged in
   And admin has navigated into the NEW CONSUMER APPLICATION
   And the applicant with no e_case_id and visit personal information edit page
