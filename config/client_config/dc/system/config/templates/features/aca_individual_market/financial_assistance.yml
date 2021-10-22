@@ -15,7 +15,7 @@ registry:
           - key: :file_location
             item: 'db/documents/ivl_checklist.pdf'
       - key: :iap_year_selection
-        is_enabled: true
+        is_enabled: false
       - key: :iap_assistance_year_display
         is_enabled: true
       - key: :enrollment_dates
