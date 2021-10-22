@@ -346,7 +346,7 @@ module Operations
         end
 
         family_member.external_member_id = external_member_id
-        person.update_attributes(external_person_id: external_person_hbx_id(external_member_id))
+        person.update_attributes(external_person_id: external_person_hbx_id(external_member_id)) unless person.external_person_id.present?
         family_member.save!
         @family.save!
 
