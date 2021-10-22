@@ -4,6 +4,11 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks, dbclean: :after_each do
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+  
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: 4_378_657_346_576) }

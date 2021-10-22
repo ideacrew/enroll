@@ -45,13 +45,13 @@ module FinancialAssistance
     def display_evidence_type(evidence)
       case evidence
       when "ESI MEC"
-        l10n("en.faa.evidence_type_aces")
+        "en.faa.evidence_type_esi"
       when "ACES MEC"
-        l10n("en.faa.evidence_type_esi")
+        "en.faa.evidence_type_aces"
       when "Non ESI MEC"
-        l10n("en.faa.evidence_type_non_esi")
+        "en.faa.evidence_type_non_esi"
       when "Income"
-        l10n( "en.faa.evidence_type_income")
+        "en.faa.evidence_type_income"
       end
     end
 
