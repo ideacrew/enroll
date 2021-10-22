@@ -45,11 +45,13 @@ module FinancialAssistance
     def display_evidence_type(evidence)
       case evidence
       when "ESI MEC"
-        "Coverage from a job"
+        "en.faa.evidence_type_esi"
+      when "ACES MEC"
+        "en.faa.evidence_type_aces"
       when "Non ESI MEC"
-        "Coverage from another program"
+        "en.faa.evidence_type_non_esi"
       when "Income"
-        "Income"
+        "en.faa.evidence_type_income"
       end
     end
 

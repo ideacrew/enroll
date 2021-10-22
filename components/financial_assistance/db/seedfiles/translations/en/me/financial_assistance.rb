@@ -137,6 +137,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.application_for_coverage" => "Application for Coverage",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application."
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
+  # FAA display evidence type
+  "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
+  "en.faa.evidence_type_esi" => "Coverage from a job",
+  "en.faa.evidence_type_non_esi" => "Coverage from another program",
+  "en.faa.evidence_type_income" => "Income"
 }.freeze
 # rubocop:enable Layout/LineLength
