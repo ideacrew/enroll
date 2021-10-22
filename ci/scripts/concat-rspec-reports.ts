@@ -1,8 +1,7 @@
 import { promises as fs } from 'fs';
-import { FileWithRuntimeDictionary, RspecExample, RspecReport } from './models';
-import { createFileDictionary } from './util';
+import { RspecExample, RspecReport } from './models';
 
-async function getJson(): Promise<RspecReport[]> {
+async function getJson(): Promise<void> {
   console.log('Reading gha reports');
   const ghaDir: string[] = await fs.readdir('./ci/rspec');
 
@@ -18,18 +17,27 @@ async function getJson(): Promise<RspecReport[]> {
     rspecReports.push(report);
   }
 
-  return rspecReports;
+  const examples: RspecExample[] = rspecReports
+    .map((report) => report.examples)
+    .flat()
+    .filter((report) => report.status !== 'pending');
+
+  await fs.writeFile(
+    './ci/rspec/local-rspec-report.json',
+    JSON.stringify(examples)
+  );
 }
 
-export const runtimeDictionary =
-  async (): Promise<FileWithRuntimeDictionary> => {
-    console.log('Creating runtime dictionary');
-    const reports = await getJson();
+// export const runtimeDictionary =
+//   async (): Promise<FileWithRuntimeDictionary> => {
+//     console.log('Creating runtime dictionary');
+//     const reports = await getJson();
 
-    const examplesOnly: RspecExample[] = reports
-      .map((report) => report.examples)
-      .flat()
-      .filter((report) => report.status !== 'pending');
+//     const examplesOnly: RspecExample[] = reports
+//       .map((report) => report.examples)
+//       .flat()
+//       .filter((report) => report.status !== 'pending');
 
-    return createFileDictionary(examplesOnly);
-  };
+//     return createFileDictionary(examplesOnly);
+//   };
+getJson();

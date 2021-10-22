@@ -191,7 +191,7 @@ function applyFaaListeners() {
   });
 }
 
-function validationForIndianTribeMember() {
+function validationForIndianTribeMember(e) {
   if ($('#indian_tribe_area').length == 0) {
     return false;
   };
@@ -292,7 +292,26 @@ var ApplicantValidations = (function(window, undefined) {
     }
   }
 
+  function validation_for_person_or_dependent() {
+    const immigration_field =
+      document.getElementById('immigration_doc_type').value == '';
+    if (!document.getElementById('dependent_ul') && immigration_field) {
+      return (
+        document.getElementById('person_us_citizen_false').checked ||
+        document.getElementById('person_naturalized_citizen_true').checked
+      );
+    } else if (immigration_field) {
+      return (
+        document.getElementById('applicant_us_citizen_false').checked ||
+        document.getElementById('applicant_naturalized_citizen_true').checked
+      );
+    }
+  }
+
   function validationForVlpDocuments(e) {
+    if (validation_for_person_or_dependent()) {
+      $('#showWarning').removeClass('hidden');
+    }
     if ($('#vlp_documents_container').is(':visible')) {
       $('.vlp_doc_area input.doc_fields').each(function() {
         if ($(this).attr('placeholder') == 'Certificate Number') {
@@ -437,17 +456,16 @@ var ApplicantValidations = (function(window, undefined) {
     validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
-    restoreRequiredAttributes: restoreRequiredAttributes
-
+    restoreRequiredAttributes: restoreRequiredAttributes,
+    validationForIndianTribeMember: validationForIndianTribeMember
   };
 
 })(window);
 
-$(document).on('turbolinks:load', function () {
+function applicantDemographicValidations() {
   applyFaaListeners();
-  validationForIndianTribeMember();
-
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
+    ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForUsCitizenOrUsNational(e);
     ApplicantValidations.validationForNaturalizedCitizen(e);
     ApplicantValidations.validationForEligibleImmigrationStatuses(e);
@@ -465,4 +483,4 @@ $(document).on('turbolinks:load', function () {
   });
 
   isApplyingCoverage("applicant");
-});
+};

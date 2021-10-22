@@ -41,9 +41,9 @@ module Operations
         [
           {
             :kind => address.kind,
-            :address_1 => address.address_1,
-            :address_2 => address.address_2,
-            :address_3 => address.address_3,
+            :address_1 => address.address_1.presence,
+            :address_2 => address.address_2.presence,
+            :address_3 => address.address_3.presence,
             :state => address.state,
             :city => address.city,
             :zip => address.zip

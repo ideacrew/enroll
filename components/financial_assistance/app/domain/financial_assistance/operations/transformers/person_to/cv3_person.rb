@@ -11,9 +11,9 @@ module FinancialAssistance
       module PersonTo
         # Person params to be transformed.
         class Cv3Person
-
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
+          include Rails.application.routes.url_helpers
           require 'securerandom'
 
           def call(person)
@@ -44,7 +44,7 @@ module FinancialAssistance
               resident_role: construct_resident_role(person.resident_role),
               broker_role: construct_broker_role(person.broker_role),
               individual_market_transitions: transform_individual_market_transitions(person.individual_market_transitions),
-              verification_types: transform_verification_types(person.verification_types), # TODO
+              verification_types: transform_verification_types(person.verification_types),
               user: transform_user_params(person.user),
               addresses: transform_addresses(person.addresses),
               emails: transform_emails(person.emails),
@@ -320,6 +320,7 @@ module FinancialAssistance
 
           def construct_person_name(person)
             return if person.nil?
+
             {
               first_name: person.first_name,
               middle_name: person.middle_name,
@@ -333,7 +334,7 @@ module FinancialAssistance
 
           def construct_person_demographics(person)
             {
-              ssn: person.ssn,
+              encrypted_ssn: encrypt(person.ssn),
               no_ssn: person.no_ssn == "0" || person.ssn.present? ? false : true,
               gender: person.gender,
               dob: person.dob,
@@ -343,7 +344,7 @@ module FinancialAssistance
               ethnicity: person.ethnicity,
               race: person.race,
               tribal_id: person.tribal_id,
-              language_code: person.language_code || person.user&.preferred_language
+              language_code: person.language_code || person.user&.preferred_language || 'en'
             }
           end
 
@@ -357,17 +358,19 @@ module FinancialAssistance
                   first_name: relative.first_name,
                   middle_name: relative.middle_name,
                   last_name: relative.last_name,
-                  ssn: relative.ssn,
+                  encrypted_ssn: encrypt(relative.ssn),
                   no_ssn: (relative.no_ssn == "0" || relative.ssn.present?) ? false : true,
                   dob: relative.dob,
-                  gender: relative.gender
+                  gender: relative.gender,
+                  relationship_to_primary: rel.kind
                 }
               }
             end
           end
 
           def transform_user_params(user)
-            return if user.nil?
+            return {} unless user.present?
+
             {
               # attestations: construct_attestations,
               approved: user.approved,
@@ -388,6 +391,12 @@ module FinancialAssistance
               roles: user.roles,
               timestamps: {created_at: user.created_at.to_datetime, modified_at: user.updated_at.to_datetime}
             }
+          end
+
+          def encrypt(value)
+            return nil unless value
+
+            AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
           end
         end
       end

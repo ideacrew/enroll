@@ -943,39 +943,62 @@ def employer_poc
   end
 
   def agent_assistance_messages(params, agent, role)
+    # TODO: Why do we not always have the person_id?
+    # Need to figure this out
+    # The translations secure message may want things like the person's phone/email
+    insured = Person.where(_id: params[:person]).first
+    first_name = insured.first_name || params[:first_name]
+    last_name = insured.last_name || params[:last_name]
+    insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email) || params[:email]
+    insured_phone_number = insured&.phones&.first&.full_phone_number
     if params[:person].present?
-      insured = Person.find(params[:person])
-      first_name = insured.first_name
-      last_name = insured.last_name
-      name = insured.full_name
-      insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
-      root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
-      body =
-        "Please contact #{insured.first_name} #{insured.last_name}. <br> " +
-        "Plan shopping help has been requested by #{insured_email}<br>" +
-        "<a href='" + root+"phone'>Assist Customer</a>  <br>"
+      root = "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{params[:person]}&original_application_type:"
+      translation_key = "inbox.agent_assistance_messages_person_present"
+      translation_interpolated_keys = {
+        first_name: first_name,
+        last_name: last_name,
+        insured_email: insured_email,
+        href_root: root,
+        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+        site_short_name: site_short_name,
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+      }
     else
-      first_name = params[:first_name]
-      last_name = params[:last_name]
-      name = first_name.to_s + ' ' + last_name.to_s
-      insured_email = params[:email]
-      body =  "Please contact #{first_name} #{last_name}. <br>" +
-        "Plan shopping help has been requested by #{insured_email}<br>"
+      translation_key = "inbox.agent_assistance_messages_person_not_present"
+      translation_interpolated_keys = {
+        first_name: first_name,
+        last_name: last_name,
+        insured_email: insured_email,
+        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+        site_short_name: site_short_name,
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+      }
     end
+    translation_interpolated_keys.merge!(insured_phone_number: insured_phone_number) if insured_phone_number.present?
+    body = l10n(translation_key, translation_interpolated_keys).html_safe
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
       sender_id: hbx_profile.id,
       parent_message_id: hbx_profile.id,
       from: 'Plan Shopping Web Portal',
       to: "Agent Mailbox",
-      subject: "Please contact #{first_name} #{last_name}. ",
-      body: body,
-      }
+      subject: "Please contact #{first_name} #{last_name}.",
+      body: body
+    }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
-    result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
-    result.deliver_now
-    puts result.to_s if Rails.env.development?
+    hbx_id = insured&.hbx_id || ""
+    agent_email = find_email(agent,role)
+    full_name = "#{first_name} #{last_name}"
+    if agent_email.present?
+      result = UserMailer.new_client_notification(agent_email, first_name, role, insured_email, hbx_id)
+      result.deliver_now
+      puts result.to_s if Rails.env.development?
+    else
+      Rails.logger.warn("No email found for #{full_name} with hbx_id #{hbx_id}")
+    end
    end
 
   def find_hbx_profile

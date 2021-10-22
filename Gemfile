@@ -124,7 +124,6 @@ gem 'fast_jsonapi'
 # gem 'hashdiff'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
-gem 'puma',                   '~> 3.12.4'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'

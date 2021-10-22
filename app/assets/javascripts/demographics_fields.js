@@ -406,12 +406,27 @@ var PersonValidations = (function (window, undefined) {
     }
   }
 
+  function validation_for_person_or_dependent() {
+    const immigration_field =
+      document.getElementById('immigration_doc_type').value == '';
+    if (!document.getElementById('dependent_ul') && immigration_field) {
+      return (
+        document.getElementById('person_us_citizen_false').checked ||
+        document.getElementById('person_naturalized_citizen_true').checked
+      );
+    } else if (immigration_field) {
+      return (
+        document.getElementById('dependent_us_citizen_false').checked ||
+        document.getElementById('dependent_naturalized_citizen_true').checked
+      );
+    }
+  }
+
   function validationForVlpDocuments(e) {
-    if ($('#immigration_doc_type').val() == '') {
+    if (validation_for_person_or_dependent()) {
       $('#showWarning').removeClass('hidden');
     }
     if ($('#vlp_documents_container').is(':visible')) {
-      // if ($("")) #this is where you are going to check document field
       $('.vlp_doc_area input.doc_fields').each(function () {
         if ($(this).attr('placeholder') == 'Certificate Number') {
           if ($(this).val().length < 1) {
@@ -611,29 +626,40 @@ var PersonValidations = (function (window, undefined) {
 
   // client specific feature for ME, validates that a contact method is selected
   function validationForContactMethod(e) {
-    if( $(".contact-method").length ){
-      console.log("Contact methods present.")
+    if ($('.contact-method').length) {
       var isChecked = false;
-      $( ".contact-method input" ).each(function( i ,el ){
-        if($(el).prop("checked")){
+      $('.contact-method input').each(function (i, el) {
+        if ($(el).prop('checked')) {
           isChecked = true;
-        } 
-      })
-      if( isChecked == false ){
+        }
+      });
+      if (isChecked == false) {
         alert('Warning: You must select at least one contact method.');
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-email").prop('checked') ){
-        if( !$("#person_emails_attributes_0_address").val() ){
-          alert("You must enter an email address to receive notices and updates by email.");
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email'
+        ).prop('checked')
+      ) {
+        if (!$('#person_emails_attributes_0_address').val()) {
+          alert(
+            'You must enter an email address to receive notices and updates by email.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if( $(".interaction-choice-control-value-person-consumer-role-attributes-contact-method-text").prop('checked') ){
-        if(document.querySelector(".mobile-phone-number").value.length < 1){
-          alert("You must enter a mobile phone number to receive notices and updates by text.");
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text'
+        ).prop('checked')
+      ) {
+        if (document.querySelector('.mobile-phone-number').value.length < 1) {
+          alert(
+            'You must enter a mobile phone number to receive notices and updates by text.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
@@ -651,7 +677,7 @@ var PersonValidations = (function (window, undefined) {
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
     validationForContactMethod: validationForContactMethod,
-    restoreRequiredAttributes: restoreRequiredAttributes
+    restoreRequiredAttributes: restoreRequiredAttributes,
   };
 })(window);
 

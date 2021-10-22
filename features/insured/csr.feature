@@ -14,7 +14,6 @@ Feature: CSR finishes shopping for Individual
     And Individual clicks on continue
     And Individual asks for help
     And Individual logs out
-    Then Devops can verify session logs
     When CSR logs on to the HBX portal
     Then CSR should see the Agent Portal
     When CSR clicks on the Inbox tab

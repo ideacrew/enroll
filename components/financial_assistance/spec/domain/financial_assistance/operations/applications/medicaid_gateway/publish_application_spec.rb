@@ -6,7 +6,7 @@ require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/in
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let!(:person) { FactoryBot.create(:person, hbx_id: "732020") }
+  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:application) do
     FactoryBot.create(:financial_assistance_application,

@@ -627,7 +627,7 @@ module FinancialAssistance
       # BrotherOrSisterInLaw Rule: brother_or_sister_in_law
       missing_relationships = execute_brother_or_sister_in_law_rule(missing_relationships)
 
-      # CousinLaw Rule: cousin
+      # Cousin Rule: cousin
       missing_relationships = execute_cousin_rule(missing_relationships)
 
       matrix
@@ -717,9 +717,11 @@ module FinancialAssistance
         end
       end
 
-      # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
-        transitions from: [:draft, :renewal_draft], to: :submitted do
+        transitions from: [:draft,
+                           :renewal_draft,
+                           :haven_magi_medicaid_eligibility_request_errored,
+                           :mitc_magi_medicaid_eligibility_request_errored], to: :submitted do
           guard do
             is_application_valid?
           end
@@ -756,7 +758,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition] do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls] do
         transitions from: :submitted, to: :determined
       end
 
@@ -880,6 +882,22 @@ module FinancialAssistance
       alternate_benefit.start_date = TimeKeeper.date_of_record.beginning_of_year if alternate_benefit.start_date.blank?
       alternate_benefit.end_date =   TimeKeeper.date_of_record.end_of_year if alternate_benefit.end_date.blank?
       (alternate_benefit.start_date.year..alternate_benefit.end_date.year).include? TimeKeeper.date_of_record.year
+    end
+
+    def publish_esi_mec_request
+      return unless FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+
+      Operations::Applications::Esi::H14::EsiMecRequest.new.call(application_id: id)
+    end
+
+    def publish_non_esi_mec_request
+      return unless FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+
+      Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
+    end
+
+    def trigger_fdhs_calls
+      Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
     end
 
     def total_incomes_by_year
@@ -1386,8 +1404,12 @@ module FinancialAssistance
       set_assistance_year
       set_effective_date
       create_eligibility_determinations
-      create_verification_documents
       set_renewal_base_year
+    end
+
+    def trigger_fdsh_hub_calls
+      publish_esi_mec_request
+      publish_non_esi_mec_request
     end
 
     def unset_submit
@@ -1395,7 +1417,6 @@ module FinancialAssistance
       unset_assistance_year
       unset_effective_date
       delete_eligibility_determinations
-      delete_verification_documents
     end
 
     def create_eligibility_determinations
@@ -1434,11 +1455,17 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    def create_verification_documents
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def create_evidences
+      types = []
+      types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+      types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
       active_applicants.each do |applicant|
-        applicant.verification_types =
-          %w[Income MEC].collect do |type|
-            VerificationType.new(type_name: type, validation_status: 'pending')
+        applicant.evidences =
+          types.collect do |type|
+            key, title = type
+            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
@@ -1458,6 +1485,7 @@ module FinancialAssistance
         )
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def delete_verification_documents
       active_applicants.each do |applicant|
