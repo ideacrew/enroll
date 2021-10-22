@@ -146,7 +146,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def member_ehb_premium(member)
-    premium_for(member) * __getobj__.ehb
+    mem_premium = premium_for(member)
+    result = mem_premium * __getobj__.ehb
+    return result unless EnrollRegistry.feature_enabled?(:total_minimum_responsibility)
+    (mem_premium - result >= 1) ? result : (mem_premium - 1)
   end
 
   private
