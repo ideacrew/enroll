@@ -208,7 +208,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
                                            is_subscriber: hbx_enrollment_member.is_subscriber,
                                            carrier_member_id: hbx_enrollment_member.carrier_member_id,
                                            external_id: hbx_enrollment_member.external_id,
-                                           tobacco_use: hbx_enrollment_member&.person&.is_tobacco_user})
+                                           tobacco_use: tobacco_use})
     end
   end
 
