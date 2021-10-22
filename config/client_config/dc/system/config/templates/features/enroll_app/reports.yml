@@ -1,0 +1,11 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+  features:
+    - key: :preaudit_reports
+      item: :preaudit_reports
+      is_enabled: true
+      settings:
+        - key: :report_creation_day
+          item: 17
