@@ -188,7 +188,7 @@ module Operations
       end
 
       def sanitize_eligibility_params(params)
-        { "max_aptc" => {"cents"=>(100 * params.dig("eligibility_determinations", 0, "max_aptc")["cents"].to_r).to_f, "currency_iso"=>"USD"},
+        { "max_aptc" => {"cents" => (100 * params.dig("eligibility_determinations", 0, "max_aptc")["cents"].to_r).to_f, "currency_iso" => "USD"},
           "csr_percent_as_integer" => 0,
           "source" => "Ffe",
           "aptc_csr_annual_household_income" => Monetize.parse(params.dig("eligibility_determinations", 0, "aptc_csr_annual_household_income")).to_f,
@@ -283,7 +283,7 @@ module Operations
 
       def sanitize_tax_params(tax_household_hash)
         {
-          "allocated_aptc" => {"cents"=>(100 * tax_household_hash["allocated_aptc"]["cents"].to_r).to_f, "currency_iso"=>"USD"},
+          "allocated_aptc" => {"cents" => (100 * tax_household_hash["allocated_aptc"]["cents"].to_r).to_f, "currency_iso" => "USD"},
           "is_eligibility_determined" => tax_household_hash['is_eligibility_determined'],
           "effective_starting_on" => tax_household_hash['start_date'],
           "effective_ending_on" => tax_household_hash['end_date'],
@@ -297,7 +297,7 @@ module Operations
           end,
           "eligibility_determinations" =>
           tax_household_hash['eligibility_determinations'].collect do |ed|
-            { "max_aptc" => {"cents"=>(100 * ed["max_aptc"]["cents"].to_r).to_f, "currency_iso"=>"USD"} ,
+            { "max_aptc" => {"cents" => (100 * ed["max_aptc"]["cents"].to_r).to_f, "currency_iso" => "USD"},
               "csr_percent_as_integer" => 0,
               "source" => "Ffe",
               "aptc_csr_annual_household_income" => Monetize.parse(ed["aptc_csr_annual_household_income"]).to_f,
