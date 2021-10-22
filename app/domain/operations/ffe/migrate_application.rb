@@ -73,6 +73,14 @@ module Operations
         # "3706289263", "3656133587", "3743174122", "3743146491", "4062488565", "3747430017", "3656490078", "3743146491",
         # "3730462612", "3654745957", "3909927316", "4066027101", "3909927316", "3794924231", "4013144552", "4013144552",
         # "4062488565", "3653852422", "3878412998", "3795341920"]
+        # dups not in new list 10/18
+        # 4061853917
+        # 3656240817
+        # 3656791057
+        # 3809789830
+        # 3764290138
+        # 3725241030
+        # 4013177626
         dups = ["3653661530", "3653835451", "3655103341", "3654647425", "3655199651", "3655050863", "3655446385",
                 "3655845985", "3655473710", "3655221287", "3656379459", "3655195010", "3656281232", "3656308100",
                 "3654881326", "3679195400", "3655508494", "3656101873", "3694631216", "3691339160", "3699716118",
@@ -111,10 +119,9 @@ module Operations
         return Success(external_application_id) if Family.where(external_app_id: external_application_id).present?
 
         build_family
-
-        if family.primary_applicant.person.is_applying_for_assistance
+        if family_hash['magi_medicaid_applications']  # update this
           @tax_household_params = family_hash["households"][0]["tax_households"]
-          application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new))
+          application_result = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp))
 
           # Family.create_indexes  TODO: index
           # ::FinancialAssistance::Application.create_indexes #TODO: index
@@ -165,7 +172,7 @@ module Operations
       end
 
       def sanitize_eligibility_params(params)
-        { "max_aptc" => Monetize.parse(params.dig("eligibility_determinations", 0, "max_aptc")).to_f,
+        { "max_aptc" => {"cents"=>(100 * params.dig("eligibility_determinations", 0, "max_aptc")["cents"].to_r).to_f, "currency_iso"=>"USD"},
           "csr_percent_as_integer" => 0,
           "source" => "Ffe",
           "aptc_csr_annual_household_income" => Monetize.parse(params.dig("eligibility_determinations", 0, "aptc_csr_annual_household_income")).to_f,
@@ -260,7 +267,7 @@ module Operations
 
       def sanitize_tax_params(tax_household_hash)
         {
-          "allocated_aptc" => Monetize.parse(tax_household_hash["allocated_aptc"]).to_f,
+          "allocated_aptc" => {"cents"=>(100 * tax_household_hash["allocated_aptc"]["cents"].to_r).to_f, "currency_iso"=>"USD"},
           "is_eligibility_determined" => tax_household_hash['is_eligibility_determined'],
           "effective_starting_on" => tax_household_hash['start_date'],
           "effective_ending_on" => tax_household_hash['end_date'],
@@ -274,7 +281,7 @@ module Operations
           end,
           "eligibility_determinations" =>
           tax_household_hash['eligibility_determinations'].collect do |ed|
-            { "max_aptc" => Monetize.parse(ed["max_aptc"]).to_f,
+            { "max_aptc" => {"cents"=>(100 * ed["max_aptc"]["cents"].to_r).to_f, "currency_iso"=>"USD"} ,
               "csr_percent_as_integer" => 0,
               "source" => "Ffe",
               "aptc_csr_annual_household_income" => Monetize.parse(ed["aptc_csr_annual_household_income"]).to_f,
@@ -300,7 +307,7 @@ module Operations
           consumer_role.import!
           create_or_update_vlp_document(consumer_role_params["vlp_documents"], @person) if consumer_role_params["vlp_documents"].present?
         else
-          @person
+          raise "family member person not found"
         end
       end
 
