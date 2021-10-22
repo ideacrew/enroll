@@ -42,7 +42,6 @@ namespace :import do
               row_info = sheet_data.row(row_number)
               hios_id = row_info[@headers["hios/standard component id"]].squish
               provider_directory_url = row_info[@headers["provider directory url"] || @headers["provider network url"]]
-
               plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
               plans.each do |plan|
                 plan.name = row_info[@headers["plan name"]]
