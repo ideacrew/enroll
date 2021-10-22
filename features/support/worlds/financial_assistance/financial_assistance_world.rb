@@ -21,14 +21,35 @@ module FinancialAssistance
       @application ||= FactoryBot.create(:financial_assistance_application, *traits, attributes).tap do |application|
         application.update_attributes!(effective_date: TimeKeeper.date_of_record) if application.effective_date.blank?
         consumer.primary_family.family_members.each do |member|
-          applicant = application.applicants.create(first_name: member.first_name,
-                                                    last_name: member.last_name,
-                                                    gender: member.gender,
-                                                    dob: member.dob,
-                                                    is_primary_applicant: member.is_primary_applicant?,
-                                                    is_applying_coverage: true)
-
+          address_params = {
+            address_1: "101 Main Street",
+            city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
+            county: EnrollRegistry[:enroll_app].setting(:contact_center_county).item,
+            state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+            kind: 'home'
+          }
+          address_params.merge!(quadrant: "NORTHEAST") if EnrollRegistry.feature_enabled?(:validate_quadrant)
+          applicant = FinancialAssistance::Forms::Applicant.new(
+            first_name: member.first_name,
+            last_name: member.last_name,
+            gender: member.gender,
+            dob: "2015-01-01",
+            is_applying_coverage: true,
+            application_id: application.id,
+            relation_with_primary: 'child',
+            same_with_primary: member.is_primary_applicant?,
+            addresses_attributes: {address_1: address_params},
+            indian_tribe_member: false,
+            is_incarcerated: false,
+            is_consumer_role: member.is_primary_applicant?,
+            is_homeless: false,
+            is_temporarily_out_of_state: false,
+            citizen_status: 'us_citizen'
+          )
+          applicant.save
           next if member.is_primary_applicant?
+          raise("Family Member relationship blank!") if member.relationship.blank?
           application.ensure_relationship_with_primary(applicant, member.relationship)
         end
       end

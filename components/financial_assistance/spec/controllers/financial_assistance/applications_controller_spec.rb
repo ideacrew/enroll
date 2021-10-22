@@ -342,10 +342,28 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET eligibility_results" do
-    it 'should get eligibility results' do
-      get :eligibility_results, params: {:id => application.id, :cur => 1}
-      expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance_nav)
+    context "extended_eligiblity_results_enabled? disabled" do
+      before do
+        allow(controller).to receive(:extended_eligiblity_results_enabled?).and_return(false)
+      end
+      it 'should get eligibility results' do
+        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        expect(assigns(:application)).to eq application
+        expect(response).to render_template(:financial_assistance_nav)
+      end
+    end
+    context "extended_eligiblity_results_enabled? enabled" do
+      before do
+        allow(controller).to receive(:extended_eligiblity_results_enabled?).and_return(true)
+      end
+      it 'should get eligibility results' do
+        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        expect(assigns(:application)).to eq application
+        expect(response).to render_template(
+          "financial_assistance/applications/eligibility_results_extended_by_determination",
+          "layouts/financial_assistance_nav"
+        )
+      end
     end
   end
 

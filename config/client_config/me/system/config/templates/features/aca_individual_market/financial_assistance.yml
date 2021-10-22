@@ -76,6 +76,9 @@ registry:
         is_enabled: false
       - key: :mec_check
         is_enabled: true
+      - key: :eligibility_results_extended_by_determination
+        item: :eligibility_results_extended_by_determination
+        is_enabled: true
   - namespace:
     - :request_determination
     features:
@@ -255,5 +258,3 @@ registry:
           item: ["net_self_employment", "capital_gains", "farming_and_fishing", "rental_and_royalty", "other"]
     - key: :skip_zero_income_amount_validation
       is_enabled: :true
-# TODO eligibility engine connectivity(HAVEN) settings
-# TODO mec service connectivity settings

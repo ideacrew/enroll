@@ -24,8 +24,53 @@ Given(/^that a user with a family has a Financial Assistance application in the 
   login_as consumer, scope: :user
   visit financial_assistance.applications_path
   create_plan
-  application
-  application.update_attributes(:aasm_state => 'submitted')
+  application(aasm_state: "draft")
+  application.submit!
+  expect(application.complete?).to eq(true)
+end
+
+And(/^a user with a family with three depednents has a Financial Assistance application in the "submitted" state$/) do
+  login_as consumer, scope: :user
+  primary_family = consumer.person.primary_family
+  primary_person = consumer.person
+  primary_person.ensure_relationship_with(primary_person, 'self')
+  3.times do
+    params = {
+      dependent: {
+        first_name: FFaker::Name.send("first_name_male") + (1..100).to_a.sample.to_s,
+        last_name: primary_person.last_name,
+        dob: "2015-01-01",
+        ssn: SecureRandom.hex(100).tr('^0-9', '')[0..8].to_s,
+        family_id: primary_family.id,
+        gender: 'male',
+        relationship: 'child'
+      }
+    }
+    family_member = ::Forms::FamilyMember.new(params[:dependent])
+    family_member.save
+  end
+  primary_family.reload
+  expect(primary_family.family_members.count > 1).to eq(true)
+  visit financial_assistance.applications_path
+  create_plan
+  current_application = application
+  expect(current_application.applicants.count > 1).to eq(true)
+  # application.submit!
+  expect(current_application.complete?).to eq(true)
+end
+
+And(/application has multiple eligiblity determinations for different applicants$/) do
+    binding.irb
+    # eligibility_determination_id
+    application.eligibility_determinations.delete_all
+    application.eligibility_determinations.create({
+                                                    max_aptc: 0,
+                                                    csr_percent_as_integer: 0,
+                                                    aptc_csr_annual_household_income: 0,
+                                                    aptc_annual_income_limit: 0,
+                                                    csr_annual_income_limit: 0,
+                                                    hbx_assigned_id: 10_001
+                                                  })
 end
 
 When(/^clicks the "Action" dropdown corresponding to the "submitted" application$/) do
@@ -96,6 +141,7 @@ Given(/^clicks the "View Eligibility Determination" link$/) do
 end
 
 Then(/^the user will navigate to the Eligibility Determination page for that specific application$/) do
+  # binding.irb
   expect(page).to have_content('Eligibility Results')
 end
 

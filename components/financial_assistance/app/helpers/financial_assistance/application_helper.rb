@@ -7,6 +7,40 @@ module FinancialAssistance
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
     end
 
+    def csr_73_87_or_94_eligible_applicants_by_applicants(applicants)
+      full_names = applicants.select(&:is_csr_73_87_or_94?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def eligibile_applicants_by_eligibility_flag(applicants, eligibility_flag)
+      full_names = applicants.where(:is_active => true, eligibility_flag => true).map(&:full_name)
+      # capitalize each name of full name individually, as titleize will cause spacing issues if multiple capital letters already in applicant name
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def csr_100_eligible_applicants_by_applicants(applicants)
+      full_names = applicants.select(&:is_csr_100?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def csr_limited_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_limited?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def extended_applicants_by_tax_household(application_id)
+      eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
+      binding.irb
+      applicants_by_ed = {}
+      eds.each do |eligibility_determination|
+        applicants = eligibility_determination.applicants
+        next if applicants_by_ed.values.include?(applicants)
+        applicants_by_ed[eligibility_determination.id] = applicants
+      end
+      applicants_by_ed
+    end
+
     def total_aptc_across_eligibility_determinations(application_id)
       eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
       eds.map(&:max_aptc).flat_map(&:to_f).inject(:+)

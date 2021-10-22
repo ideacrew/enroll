@@ -54,6 +54,7 @@ module FinancialAssistance
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
               return
             end
+            binding.irb
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
@@ -174,7 +175,12 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-      render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
+      filename = if extended_eligiblity_results_enabled?
+                   "eligibility_results_extended_by_determination"
+                 else
+                   "eligibility_results"
+                 end
+      render filename, layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error
@@ -219,6 +225,14 @@ module FinancialAssistance
     end
 
     private
+
+    def extended_eligiblity_results_enabled?
+      FinancialAssistanceRegistry.feature_enabled?(:eligibility_results_extended_by_determination)
+    end
+
+    def mec_check(application_id)
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id)
+    end
 
     def haven_determination_is_enabled?
       FinancialAssistanceRegistry.feature_enabled?(:haven_determination)

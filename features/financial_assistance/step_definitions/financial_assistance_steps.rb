@@ -615,6 +615,13 @@ Then(/^the user should see the popup for the remove applicant confirmation$/) do
   expect(page).to have_content(popup_text)
 end
 
+And(/^all applicants are medicaid chip eligible and are non magi medicaid eligible$/) do
+  application.applicants.each do |applicant|
+    applicant.update_attributes(is_medicaid_chip_eligible: true)
+    applicant.update_attributes(is_non_magi_medicaid_eligible: true)
+  end
+end
+
 And(/^all applicants are not medicaid chip eligible and are non magi medicaid eligible$/) do
   application.applicants.each do |applicant|
     applicant.update_attributes(is_medicaid_chip_eligible: false)
