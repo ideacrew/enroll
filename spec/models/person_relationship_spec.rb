@@ -70,6 +70,47 @@ describe PersonRelationship, dbclean: :after_each do
       'cousin'
     ] }
 
+    describe 'domestic_partners_child, parents_domestic_partner' do
+      let!(:person2) { FactoryBot.create(:person) }
+      let(:rel_kinds) { ['domestic_partners_child', 'parents_domestic_partner'] }
+
+      context 'persistance' do
+        it 'should behave based on config for mitc_relationship' do
+          if EnrollRegistry.feature_enabled?(:mitc_relationships)
+            expect do
+              person.person_relationships.create!(relative_id: person2.id, kind: rel_kinds.sample)
+            end.not_to raise_error
+          else
+            expect do
+              person.person_relationships.create!(relative_id: person2.id, kind: rel_kinds.sample)
+            end.to raise_error(Mongoid::Errors::Validations, /is not a valid person relationship/)
+          end
+        end
+      end
+
+      context 'constants' do
+        context 'Relationships' do
+          it 'should behave based on config for mitc_relationship' do
+            if EnrollRegistry.feature_enabled?(:mitc_relationships)
+              expect(described_class::Relationships).to include(rel_kinds.sample)
+            else
+              expect(described_class::Relationships).not_to include(rel_kinds.sample)
+            end
+          end
+        end
+
+        context 'Relationships_UI' do
+          it 'should behave based on config for mitc_relationship' do
+            if EnrollRegistry.feature_enabled?(:mitc_relationships)
+              expect(described_class::Relationships_UI).to include(rel_kinds.sample)
+            else
+              expect(described_class::Relationships_UI).not_to include(rel_kinds.sample)
+            end
+          end
+        end
+      end
+    end
+
     context "consumer relationship dropdown list(family member page)" do
       let(:params){ valid_params.deep_merge!({kind: "other_tax_dependent"}) }
 
@@ -87,7 +128,7 @@ describe PersonRelationship, dbclean: :after_each do
     end
 
     it "relationships should be sorted" do
-      expect(PersonRelationship::Relationships).to eq kinds
+      expect(PersonRelationship::Relationships).to eq kinds unless EnrollRegistry.feature_enabled?(:mitc_relationships)
     end
 
     context "with no arguments" do

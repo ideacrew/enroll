@@ -621,6 +621,7 @@ module FinancialAssistance
       end
       # rubocop:enable Style/CombinableLoops
 
+      return matrix unless EnrollRegistry.feature_enabled?(:mitc_relationships)
       # FatherOrMotherInLaw/DaughterOrSonInLaw Rule: father_or_mother_in_law, daughter_or_son_in_law
       missing_relationships = execute_father_or_mother_in_law_rule(missing_relationships)
 
@@ -629,6 +630,9 @@ module FinancialAssistance
 
       # Cousin Rule: cousin
       missing_relationships = execute_cousin_rule(missing_relationships)
+
+      # DomesticPartnersChild Rule: domestic_partners_child
+      missing_relationships = execute_domestic_partners_child_rule(missing_relationships)
 
       matrix
     end
@@ -1255,6 +1259,28 @@ module FinancialAssistance
           cousin1 = applicants.where(id: each_relation.applicant_id).first
           cousin2 = applicants.where(id: other_applicant_id).first
           add_or_update_relationships(cousin1, cousin2, 'cousin')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
+
+    # If MemberA is domestic_partner to MemberB,
+    # and MemberB is parent to MemberC,
+    # then MemberA is parents_domestic_partner to MemberC
+    def execute_domestic_partners_child_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'domestic_partner')
+        applicant_relations.each do |each_relation|
+          # Do not continue if there are no missing relationships.
+          return missing_relationships if missing_relationships.blank?
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          child_relation = relationships.where(applicant_id: other_applicant_id, kind: 'child').first
+          next if child_relation.nil? || child_relation.relative_id != each_relation.relative_id
+          parents_domestic_partner = applicants.where(id: each_relation.applicant_id).first
+          domestic_partners_child = applicants.where(id: other_applicant_id).first
+          add_or_update_relationships(parents_domestic_partner, domestic_partners_child, 'parents_domestic_partner')
           missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
         end
       end
