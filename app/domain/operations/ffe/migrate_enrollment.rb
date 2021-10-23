@@ -230,8 +230,6 @@ module Operations
           Person.where(external_person_id: fm_hash["person_hbx_id"])
         end
 
-        raise "person not found #{fm_hash['person_hbx_id']}" unless people.present?
-
         raise "more than one person found" if people.count > 1
 
         people.first
@@ -286,7 +284,8 @@ module Operations
         )
         overlapping_coverage = hbx_enrollments.select do |enrollment|
           enrollment.subscriber.hbx_id == new_enrollment.subscriber.hbx_id &&
-            (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
+            ((enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(new_enrollment.effective_on) ||
+              (new_enrollment.effective_on < enrollment.effective_on && new_enrollment.coverage_selected? && enrollment.coverage_selected?))
         end
         overlapping_coverage.each do |enrollment|
           if new_enrollment.created_at >= enrollment.created_at
