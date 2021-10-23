@@ -193,7 +193,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       it "should navigate to another page which has information for user to signin/recover account" do
         post :match, params: { :person => person_parameters }
         expect(response).to redirect_to(ssn_taken_insured_consumer_role_index_path)
-        expect(flash[:alert]).to match(/The SSN entered is associated with an existing user/i)
+        expect(flash[:alert]).to match(/The Social Security number entered is associated with an existing user/i)
       end
     end
   end

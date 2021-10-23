@@ -131,9 +131,9 @@ class Insured::ConsumerRolesController < ApplicationController
       elsif @consumer_candidate.errors[:ssn_dob_taken].present?
         format.html { render 'search' }
       elsif @consumer_candidate.errors[:ssn_taken].present?
-        text = "The SSN entered is associated with an existing user. "
-        text += "Please #{view_context.link_to('Sign In', SamlInformation.iam_login_url)} with your user name and password "
-        text += "or #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+        text = "The Social Security number entered is associated with an existing user. "
+        text += "Please #{view_context.link_to('sign in', SamlInformation.iam_login_url)} with your username and password "
+        text += "or #{view_context.link_to('click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
         flash[:alert] = text
         format.html {redirect_to ssn_taken_insured_consumer_role_index_path}
       else
