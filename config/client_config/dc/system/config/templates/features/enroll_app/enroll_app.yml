@@ -372,7 +372,7 @@ registry:
         item: :exclude_child_only_offering
         is_enabled: false
       - key: :exclude_adult_and_child_only_offering
-        item: :exclude_child_only_offering
+        item: :exclude_adult_and_child_only_offering
         is_enabled: false
   - namespace:
       - :pay_now_feature
