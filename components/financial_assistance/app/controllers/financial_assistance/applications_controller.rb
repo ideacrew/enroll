@@ -57,7 +57,6 @@ module FinancialAssistance
             @application.submit! if @application.complete?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
-              mec_check(@application.id) if EnrollRegistry.feature_enabled?(:mec_check)
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
@@ -220,10 +219,6 @@ module FinancialAssistance
     end
 
     private
-
-    def mec_check(application_id)
-      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id)
-    end
 
     def haven_determination_is_enabled?
       FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
