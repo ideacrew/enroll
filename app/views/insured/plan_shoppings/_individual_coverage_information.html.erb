@@ -1,5 +1,5 @@
 <% calculate = (defined? calculate) ? calculate : true %>
-<% family_tier_eligible = @enrollment.product.family_based_rating? %>
+<% family_tier_eligible = @enrollment.product&.family_based_rating? %>
 <div class="table-border table-responsive">
   <table class="table table-striped">
     <thead>
