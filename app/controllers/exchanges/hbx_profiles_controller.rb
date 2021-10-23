@@ -968,7 +968,6 @@ def employer_poc
       translation_interpolated_keys = {
         first_name: first_name,
         last_name: last_name,
-        
         site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
         site_short_name: site_short_name,
         contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
