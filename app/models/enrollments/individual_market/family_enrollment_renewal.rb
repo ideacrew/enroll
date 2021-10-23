@@ -40,6 +40,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = @enrollment.kind
+    renewal_enrollment.external_id = @enrollment.external_id
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
@@ -205,6 +206,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
                                            eligibility_date: renewal_coverage_start,
                                            coverage_start_on: renewal_coverage_start,
                                            is_subscriber: hbx_enrollment_member.is_subscriber,
+                                           carrier_member_id: hbx_enrollment_member.carrier_member_id,
+                                           external_id: hbx_enrollment_member.external_id,
                                            tobacco_use: tobacco_use})
     end
   end

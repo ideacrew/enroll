@@ -194,13 +194,12 @@ module Operations
             accept_new_clients: broker_role.accept_new_clients,
             license: broker_role.license,
             training: broker_role.training,
-            broker_agency_reference: construct_broker_agency_reference(broker_role.broker_agency_reference),
+            broker_agency_reference: construct_broker_agency_reference(broker_role.broker_agency_profile),
             carrier_appointments: broker_role.carrier_appointments
           }
         end
 
-        def construct_broker_agency_reference(broker_agency)
-          agency = broker_agency.broker_agency_profile
+        def construct_broker_agency_reference(agency)
           {
             hbx_id: agency.hbx_id,
             market_kind: agency.market_kind,

@@ -14,56 +14,85 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
       relative_id: applicant2.id }
   end
 
-  describe 'persist relationship' do
-    context 'with valid params for father_or_mother_in_law' do
-      let(:relationship_kind) { 'father_or_mother_in_law' }
-
-      before do
-        application.relationships << described_class.new(valid_params)
-      end
-
-      it 'should create a valid relationship' do
-        expect(application.valid?).to be_truthy
+  describe '.Constants' do
+    let(:class_constants)  { described_class.constants }
+    let(:ui_rel_kinds) do
+      if EnrollRegistry.feature_enabled?(:mitc_relationships)
+        [
+          'spouse',
+          'domestic_partner',
+          'child',
+          'parent',
+          'sibling',
+          'unrelated',
+          'aunt_or_uncle',
+          'nephew_or_niece',
+          'grandchild',
+          'grandparent',
+          'father_or_mother_in_law',
+          'daughter_or_son_in_law',
+          'brother_or_sister_in_law',
+          'cousin',
+          'domestic_partners_child',
+          'parents_domestic_partner'
+        ]
+      else
+        ['spouse',
+         'domestic_partner',
+         'child',
+         'parent',
+         'sibling',
+         'unrelated',
+         'aunt_or_uncle',
+         'nephew_or_niece',
+         'grandchild',
+         'grandparent']
       end
     end
 
-    context 'with valid params for daughter_or_son_in_law' do
-      let(:relationship_kind) { 'daughter_or_son_in_law' }
+    it 'should have relationships for UI display as a constant' do
+      expect(class_constants.include?(:RELATIONSHIPS_UI)).to be_truthy
+      expect(described_class::RELATIONSHIPS_UI).to eq(ui_rel_kinds)
+    end
+  end
 
-      before do
-        application.relationships << described_class.new(valid_params)
-      end
+  describe 'domestic_partners_child, parents_domestic_partner' do
+    let!(:person2) { FactoryBot.create(:person) }
+    let(:relationship_kind) { ['domestic_partners_child', 'parents_domestic_partner'].sample }
 
-      it 'should create a valid relationship' do
-        expect(application.valid?).to be_truthy
+    context 'persistance' do
+      it 'should behave based on config for mitc_relationships' do
+        if EnrollRegistry.feature_enabled?(:mitc_relationships)
+          expect do
+            application.relationships.create!(valid_params)
+          end.not_to raise_error
+        else
+          expect do
+            application.relationships.create!(valid_params)
+          end.to raise_error(Mongoid::Errors::Validations, /Validation of FinancialAssistance::Relationship failed/)
+        end
       end
     end
 
-    context 'with valid params for brother_or_sister_in_law' do
-      let(:relationship_kind) { 'brother_or_sister_in_law' }
-
-      before do
-        application.relationships << described_class.new(valid_params)
+    context 'constants' do
+      context 'RELATIONSHIPS' do
+        it 'should behave based on config for mitc_relationships' do
+          if EnrollRegistry.feature_enabled?(:mitc_relationships)
+            expect(described_class::RELATIONSHIPS).to include(relationship_kind)
+          else
+            expect(described_class::RELATIONSHIPS).not_to include(relationship_kind)
+          end
+        end
       end
 
-      it 'should create a valid relationship' do
-        expect(application.valid?).to be_truthy
-      end
-    end
-
-    context 'with valid params for cousin' do
-      let(:relationship_kind) { 'cousin' }
-
-      before do
-        application.relationships << described_class.new(valid_params)
-      end
-
-      it 'should create a valid relationship' do
-        expect(application.valid?).to be_truthy
-      end
-
-      it 'should return relationship kind of applicant' do
-        expect(application.relationships.first.kind).to eq('cousin')
+      context 'RELATIONSHIPS_UI' do
+        it 'should behave based on config for mitc_relationships' do
+          if EnrollRegistry.feature_enabled?(:mitc_relationships)
+            expect(described_class::RELATIONSHIPS_UI).to include(relationship_kind)
+          else
+            expect(described_class::RELATIONSHIPS_UI).not_to include(relationship_kind)
+          end
+        end
       end
     end
   end
