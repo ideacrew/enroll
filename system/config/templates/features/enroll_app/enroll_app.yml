@@ -631,3 +631,25 @@ registry:
         is_enabled: false
       - key: :zero_permium_policy
         is_enabled: false
+      - key: :send_secure_purchase_confirmation_email
+        item: :send_secure_purchase_confirmation_email
+        is_enabled: true
+  - namespace:
+      - :person_matching_feature
+    features:
+      - key: :person_match_policy
+        is_enabled: true
+        settings:
+          - key: :ssn_present
+            item: ['dob', 'encrypted_ssn']
+          - key: :dob_present
+            item: ['first_name', 'last_name', 'dob']
+          - key: :name_present
+            item: ['first_name', 'last_name']
+  - namespace:
+      - :features
+      - :enroll_app
+      - :relationships
+    features:
+      - key: :mitc_relationships
+        is_enabled: false

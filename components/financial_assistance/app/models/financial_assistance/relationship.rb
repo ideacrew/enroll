@@ -40,7 +40,10 @@ module FinancialAssistance
       'stepson_or_stepdaughter',
       'cousin',
       'domestic_partner'
-    ].freeze
+    ]
+
+    RELATIONSHIPS += ['parents_domestic_partner', 'domestic_partners_child'] if EnrollRegistry.feature_enabled?(:mitc_relationships)
+    RELATIONSHIPS.freeze
 
     RELATIONSHIPS_UI = [
       "spouse",
@@ -52,8 +55,12 @@ module FinancialAssistance
       "aunt_or_uncle",
       "nephew_or_niece",
       "grandchild",
-      "grandparent"
-    ].freeze
+      'grandparent'
+    ]
+
+    RELATIONSHIPS_UI += ['father_or_mother_in_law', 'daughter_or_son_in_law', 'brother_or_sister_in_law', 'cousin', 'domestic_partners_child', 'parents_domestic_partner'] if EnrollRegistry.feature_enabled?(:mitc_relationships)
+
+    RELATIONSHIPS_UI.freeze
 
     INVERSE_MAP = {
       "child" => "parent",
@@ -70,6 +77,8 @@ module FinancialAssistance
       "daughter_or_son_in_law" => "father_or_mother_in_law",
       "guardian" => "ward",
       "ward" => "guardian",
+      'domestic_partners_child' => 'parents_domestic_partner',
+      'parents_domestic_partner' => 'domestic_partners_child',
 
       # bi directional
       "self" => "self",
