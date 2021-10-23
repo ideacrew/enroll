@@ -54,14 +54,16 @@ module Operations
       end
 
       def reset_password(values)
-        Try() do
-          Keycloak.proc_cookie_token = -> { cookies.permanent[:keycloak_token] }
-
+        # Try() do
+        binding.pry
+        result =
           Keycloak::Admin.reset_password(
-            values[:account][:id],
-            values[:account][:credentials]
+            values[:id],
+            values[:credentials].map(&:stringify_keys)
           )
-        end.to_result
+
+        # end.to_result
+        Success(result)
       end
     end
   end
