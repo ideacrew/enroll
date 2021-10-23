@@ -49,7 +49,7 @@ class QhpRateBuilder
     end
     if @action == "new"
       find_qhp_and_create_premium_tables
-      find_plan_and_create_premium_tables if EnrollRegistry.feature_enabled?(:has_bqt)
+      find_plan_and_create_premium_tables
       find_product_and_create_premium_tables
     else
       find_plan_and_update_premium_tables
