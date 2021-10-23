@@ -85,3 +85,5 @@ registry:
       - key: :verification_reasons
         item: ["Document in EnrollApp", "Electronic data source", "State Medicaid Agency"]
         is_enabled: true
+      - key: :total_minimum_responsibility
+        is_enabled: true

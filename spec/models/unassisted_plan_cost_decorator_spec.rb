@@ -50,6 +50,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       expect(plan_cost_decorator.premium_for(one)).to eq 20.0
     end
 
+
     it "should have a premium for two" do
       expect(plan_cost_decorator.premium_for(two)).to eq 18.0
     end
@@ -349,6 +350,30 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       it 'should return 0.00 when invalid information is given' do
         expect(@upcd_1.member_ehb_premium(hbx_enrollment_member2)).to eq 802.1383400000001
+      end
+    end
+
+    context 'total_minimum_responsibility' do
+      context 'feature is turned on' do
+        before do
+          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(true)
+          @upcd_1.update_attributes(ehb: 0.999)
+        end
+
+        it 'member ehb should be one dollar less than the mem premium' do
+          expect(@upcd_1.member_ehb_premium(hbx_enrollment_member2)).to eq 813.85
+        end
+      end
+
+      context 'feature is turned off' do
+        before do
+          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(false)
+          @upcd_1.update_attributes(ehb: 0.999)
+        end
+
+        it 'Should be mem premium mutliplied with ehb' do
+          expect(@upcd_1.member_ehb_premium(hbx_enrollment_member2)).to eq 814.03515
+        end
       end
     end
   end
