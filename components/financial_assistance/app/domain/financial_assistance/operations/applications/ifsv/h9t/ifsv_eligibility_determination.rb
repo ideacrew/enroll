@@ -38,8 +38,7 @@ module FinancialAssistance
 
             def update_applicant(response_app_entity, application)
               is_ifsv_eligible = response_app_entity.tax_households.first.is_ifsv_eligible
-
-              status = is_ifsv_eligible ? "attested" : "outstanding"
+              status = is_ifsv_eligible ? "verified" : "outstanding"
 
               application.eligibility_determinations.each do |ed|
                 ed.applicants.each do |applicant|

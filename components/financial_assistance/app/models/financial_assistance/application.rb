@@ -901,6 +901,8 @@ module FinancialAssistance
     end
 
     def trigger_fdhs_calls
+      return if predecessor_id.present?
+
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
     end
 
@@ -1490,22 +1492,21 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
+      return if predecessor_id.present?
+
       types = []
       types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
       types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
+
       active_applicants.each do |applicant|
-        applicant.evidences =
-          types.collect do |type|
-            key, title = type
-            next if key == :aces_mec && !applicant.is_ia_eligible?
-            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
-          end
+        applicant.evidences = build_evidences(types, applicant)
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+
           family_member_record = family.family_members.where(id: applicant.family_member_id).first
           next if family_member_record.blank?
           person_record = family_member_record.person
@@ -1522,7 +1523,23 @@ module FinancialAssistance
         )
       end
     end
-    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/CyclomaticComplexity
+
+    def build_evidences(types, applicant)
+      types.collect do |type|
+        key, title = type
+
+        next if applicant.evidences.by_name(key).present?
+        case key
+        when :aces_mec, :esi_mec, :non_esi_mec
+          next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
+          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
+        when :income
+          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
+          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "outstanding")
+        end
+      end
+    end
 
     def delete_verification_documents
       active_applicants.each do |applicant|

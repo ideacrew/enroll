@@ -417,7 +417,7 @@ module FinancialAssistance
     end
 
     def is_ia_eligible?
-      is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
+      is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && is_totally_ineligible
     end
 
     # Checks if applicant is eligible for 73, 87 or 94.
