@@ -8,13 +8,15 @@ module FinancialAssistance
   module Operations
     module Applications
       module Rrv
+        # operation to manually trigger rrv events.
+        # It will take families as input and find the determined application, add evidences and publish the group of applications
         class TriggerRrv
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging
 
           def call(params)
-            applications  = collect_applications_from_families(params[:families])
+            applications = collect_applications_from_families(params[:families])
             event = yield build_event(applications)
             result = yield publish(event)
 
@@ -26,9 +28,7 @@ module FinancialAssistance
           def fetch_application(family)
             ::FinancialAssistance::Application.where(family_id: family.id,
                                                      assistance_year: TimeKeeper.date_of_record.next_year.year,
-                                                     aasm_state: 'determined'
-                                                    ).max_by(&:created_at)
-
+                                                     aasm_state: 'determined').max_by(&:created_at)
           end
 
           def build_evidences(types, applicant)
@@ -76,10 +76,8 @@ module FinancialAssistance
 
               applications_with_evidences << cv3_application.to_h
               count += 1
-              if count % 100 == 0
-                rrv_logger.info("********************************* processed #{count}*********************************")
-              end
-            rescue
+              rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
+            rescue StandardError
               rrv_logger.info("failed to process fpr person with hbx_id #{family.primary_person.hbx_id}")
             end
 
