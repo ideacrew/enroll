@@ -957,7 +957,6 @@ def employer_poc
       translation_interpolated_keys = {
         first_name: first_name,
         last_name: last_name,
-        insured_email: insured_email,
         href_root: root,
         site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
         site_short_name: site_short_name,
@@ -969,14 +968,13 @@ def employer_poc
       translation_interpolated_keys = {
         first_name: first_name,
         last_name: last_name,
-        insured_email: insured_email,
         site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
         site_short_name: site_short_name,
         contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
         contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
       }
     end
-    translation_interpolated_keys.merge!(insured_phone_number: insured_phone_number) if insured_phone_number.present?
+    translation_interpolated_keys.merge!(insured_phone_number: insured_phone_number || '', insured_email: insured_email || '')
     body = l10n(translation_key, translation_interpolated_keys).html_safe
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
@@ -999,7 +997,7 @@ def employer_poc
     else
       Rails.logger.warn("No email found for #{full_name} with hbx_id #{hbx_id}")
     end
-   end
+  end
 
   def find_hbx_profile
     @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
