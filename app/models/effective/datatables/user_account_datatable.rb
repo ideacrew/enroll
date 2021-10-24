@@ -13,8 +13,16 @@ module Effective
         table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| (row.roles || []).join(', ') }, :filter => false, :sortable => false
         table_column :permission, :label => 'Permission level', :proc => Proc.new { |row| permission_type(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
-                               dropdown = [
-                                   # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+                                dropwdown = if account = find_account(row)[:id]
+                                  [
+                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+                                    ['Reset Password', users_account_reset_password_path(id: account[:id]), 'ajax'],
+                                    ['Unlock / Lock Account', user_account_lockable_path(user_id: row.id, account_id: account[:id], enabled: account[:enabled]), 'ajax'],
+                                    ['View Login History',login_history_user_path(id: row.id), 'ajax'],
+                                    ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax']
+                                  ]
+                                else
+                                  [
                                    if row.email.present?
                                      ['Reset Password', reset_password_user_path(row), 'ajax']
                                    else
@@ -23,9 +31,10 @@ module Effective
                                    ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
                                    ['View Login History',login_history_user_path(id: row.id), 'ajax'],
                                    ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax']
-                               ]
-                               render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
-                             }, :filter => false, :sortable => false
+                                  ]
+                                end
+                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
+                              }, :filter => false, :sortable => false
       end
 
       def collection

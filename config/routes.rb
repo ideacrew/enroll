@@ -61,6 +61,11 @@ Rails.application.routes.draw do
 
       post :unlock, :change_password
     end
+
+    resources :accounts, only: [] do
+      get :reset_password, :lockable, :confirm_lock
+      put :confirm_reset_password
+    end
   end
 
   resources :saml, only: [] do
