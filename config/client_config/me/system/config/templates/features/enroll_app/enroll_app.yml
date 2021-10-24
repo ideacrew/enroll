@@ -388,6 +388,9 @@ registry:
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
         is_enabled: true
+      - key: :exclude_adult_and_child_only_offering
+        item: :exclude_adult_and_child_only_offering
+        is_enabled: true
   - namespace:
       - :pay_now_feature
     features:
