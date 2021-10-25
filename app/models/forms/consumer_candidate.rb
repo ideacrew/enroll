@@ -6,6 +6,7 @@ module Forms
 
     include PeopleNames
     include SsnField
+    include ::L10nHelper
     attr_accessor :gender, :user_id, :no_ssn, :dob_check, :is_applying_coverage #hidden input filed for one time DOB warning
 
     validates_presence_of :first_name, :allow_blank => nil
@@ -23,6 +24,7 @@ module Forms
     validate :dob_not_in_future
     validate :ssn_or_checkbox
     validate :uniq_ssn, :uniq_ssn_dob
+    validate :uniq_name_ssn_dob, if: :state_based_policy_satisfied?
     validate :age_less_than_18
     attr_reader :dob
 
@@ -57,6 +59,29 @@ module Forms
       end
     end
 
+    def state_based_policy_satisfied?
+      @configuration = EnrollRegistry[:person_match_policy].settings.map(&:to_h).each_with_object({}) do |s,c|
+        c.merge!(s[:key] => s[:item])
+      end
+
+      ["first_name", "last_name"].all? { |e| @configuration[:ssn_present].include?(e) }
+    end
+
+    # rubocop:disable Style/GuardClause
+    def uniq_name_ssn_dob
+      return true if ssn.blank?
+
+      query_params = self.as_json.merge("encrypted_ssn" => Person.encrypt_ssn(ssn)).slice(*@configuration[:ssn_present])
+      person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
+      person_with_name_ssn_dob = Person.where(query_params).first
+
+      if person_with_ssn != person_with_name_ssn_dob
+        errors.add(:base, l10n("insured.consumer_roles.match.ssn_dob_name_error", state_abbreviation: EnrollRegistry[:enroll_app].settings(:state_abbreviation).item, contact_center_phone_number: Settings.contact_center.phone_number))
+        log("ERROR: unable to match or create Person record, SSN exists with different DOB and Name", {:severity => "error"})
+      end
+    end
+    # rubocop:enable Style/GuardClause
+
     def uniq_ssn
       return true if ssn.blank?
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
@@ -67,16 +92,17 @@ module Forms
       end
     end
 
+    # rubocop:disable Style/GuardClause
     def uniq_ssn_dob
       return true if ssn.blank?
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob
-        errors.add(:base,
-          "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
+        errors.add(:base, l10n("insured.consumer_roles.match.ssn_dob_error", state_abbreviation: EnrollRegistry[:enroll_app].settings(:state_abbreviation).item, contact_center_phone_number: Settings.contact_center.phone_number))
         log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end
+    # rubocop:enable Style/GuardClause
 
     def does_not_match_a_different_users_person
       matched_person = match_person
