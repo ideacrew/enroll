@@ -13,15 +13,14 @@ module Subscribers
       result = Operations::CreateDocumentAndNotifyRecipient.new.call(payload)
 
       if result.success?
-        ack(delivery_info.delivery_tag)
         logger.info "Enroll: enroll_document_meta_data_subscriber_info Result: #{result.success} for payload: #{payload}"
       else
-        nack(delivery_info.delivery_tag)
         logger.error "Enroll: enroll_document_meta_data_subscriber_error: #{result.failure.errors} for payload: #{payload}"
       end
-    rescue StandardError, SystemStackError => e
-      nack(delivery_info.delivery_tag)
+      ack(delivery_info.delivery_tag)
+    rescue StandardError => e
       logger.error "Enroll: enroll_document_meta_data_subscriber_error: #{e.backtrace} for payload: #{payload}"
+      ack(delivery_info.delivery_tag)
     end
   end
 end
