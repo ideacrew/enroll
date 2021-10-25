@@ -76,7 +76,6 @@ module Forms
         errors.add(:base, l10n("insured.ssn_configuration_warning", site_short_name: Settings.site.short_name, site_phone_number: Settings.contact_center.phone_number, site_tty_number: Settings.contact_center.tty_number))
         log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
-      #Settings.contact_center.phone_number
     end
 
     def does_not_match_a_different_users_person
