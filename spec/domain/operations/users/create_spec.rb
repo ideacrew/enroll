@@ -30,7 +30,7 @@ RSpec.describe Operations::Users::Create do
 
     context "and there's not an existing user account with same usernam" do
       it 'should create a new Keycloak Account and an associated User record' do
-        VCR.use_cassette('connection') do
+        VCR.use_cassette('users.add_new') do
           result = subject.call(new_account)
 
           expect(result.success?).to be_truthy
@@ -41,13 +41,16 @@ RSpec.describe Operations::Users::Create do
     end
 
     context 'and the user account does exist' do
-      after { Operations::Accounts::Delete.new.call(login: username) }
 
       it 'should return a failure monad' do
-        result = subject.call(new_account)
+        VCR.use_cassette('users.existing_user') do
+          result = subject.call(new_account)
 
-        expect(result.failure?).to be_truthy
-        expect(result.failure[:new_user]).to be_falsey
+          expect(result.failure?).to be_truthy
+          expect(result.failure[:new_user]).to be_falsey
+
+          Operations::Accounts::Delete.new.call(login: username)
+        end
       end
     end
   end
