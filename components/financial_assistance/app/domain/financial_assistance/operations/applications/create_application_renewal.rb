@@ -46,12 +46,16 @@ module FinancialAssistance
 
           application = applications_by_family.by_year(validated_params[:renewal_year].pred).renewal_eligible.created_asc.last
 
-          if application.present?
+          if application
             Success(application)
           else
             Rails.logger.error "Could not find any applications that are renewal eligible: #{validated_params}."
             Failure("Could not find any applications that are renewal eligible: #{validated_params}.")
           end
+        rescue SystemStackError => e
+          Rails.logger.error "Critical Error: Unable to find application from database"
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
         end
 
         def renew_application(application, validated_params)
@@ -75,7 +79,7 @@ module FinancialAssistance
           Try() do
             ::FinancialAssistance::Factories::ApplicationFactory.new(application)
           end.bind do |renewal_application_factory|
-            renewal_application = renewal_application_factory.copy_application
+            renewal_application = renewal_application_factory.create_application
             family_members_changed = renewal_application_factory.family_members_changed
             calculated_renewal_base_year = calculate_renewal_base_year(application)
 

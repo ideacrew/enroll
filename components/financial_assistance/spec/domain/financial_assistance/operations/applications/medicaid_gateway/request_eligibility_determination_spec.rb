@@ -6,7 +6,7 @@ require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/in
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
+  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
   let!(:applicant) do
@@ -74,9 +74,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     }
   end
 
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+  let(:premiums_double) { double(:success => premiums_hash) }
+  let(:slcsp_double) { double(:success => slcsp_info) }
+  let(:lcsp_double) { double(:success => lcsp_info) }
+
+  let(:fetch_double) { double(:new => double(call: premiums_double))}
+  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
+  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
 
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
@@ -92,6 +96,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(premiums_double).to receive(:failure?).and_return(false)
+    allow(slcsp_double).to receive(:failure?).and_return(false)
+    allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
   context 'success' do

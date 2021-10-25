@@ -14,9 +14,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   let(:transfer_id) { "tr123" }
 
   context 'success' do
-    context 'with valid transfer id' do
+    context 'with valid application id' do
       before do
         family = FactoryBot.create(:family, :with_primary_family_member)
+        family.primary_person.emails.create(kind: "home", address: "fakeemail@email.com")
         application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
         @expected_response =
           {
@@ -24,7 +25,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
             application_identifier: application.hbx_id,
             result: "Success"
           }
-        @result = subject.call(transfer_id)
+        @result = subject.call(application.id)
       end
 
       it 'should return success' do
@@ -48,14 +49,14 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       it 'should return expected error message' do
-        expect(@result.failure).to eq("Unable to find Application by Transfer ID.")
+        expect(@result.failure).to eq("Unable to find Application by ID.")
       end
     end
 
     context 'with missing family' do
       before do
         @application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: "missing")
-        @result = subject.call(transfer_id)
+        @result = subject.call(@application.id)
       end
 
       it 'should return failure' do

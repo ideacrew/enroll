@@ -6,6 +6,7 @@ require 'aca_entities/magi_medicaid/libraries/iap_library'
 require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
+require 'aca_entities/operations/encryption/decrypt'
 
 module FinancialAssistance
   module Operations
@@ -25,40 +26,53 @@ module FinancialAssistance
             payload = yield load_data(params)
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
-            applicants = yield fill_applicants_form(payload["family"]['magi_medicaid_applications'].first, application)
-            Success(applicants)
+            _applicants = yield fill_applicants_form(payload, application)
+            Success(application)
           end
 
           private
 
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
+            payload = decrypt_ssns(payload)
             Success(payload)
+          end
+
+          def decrypt_ssn(ssn)
+            return unless ssn
+            result = AcaEntities::Operations::Encryption::Decrypt.new.call({ value: ssn })
+            result.success? ? result.value! : ''
+          end
+
+          def decrypt_ssns(payload)
+            payload["family"]["family_members"].each_with_index do |fm, i|
+              ssn = fm["person"]["person_demographics"]["ssn"]
+              payload["family"]["family_members"][i]["person"]["person_demographics"]["ssn"] = decrypt_ssn(ssn) if ssn
+              fm["person"]["person_relationships"].each_with_index do |relationship, ii|
+                rssn = relationship["relative"]["ssn"]
+                payload["family"]["family_members"][i]["person"]["person_relationships"][ii]["relative"]["ssn"] = decrypt_ssn(rssn) if rssn
+              end
+            end
+            payload
           end
 
           def find_family(family_hash)
             person_params = sanitize_person_params(family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first)
-            candidate = PersonCandidate.new(person_params[:ssn], person_params[:dob], person_params[:first_name], person_params[:last_name])
-            person = if person_params[:no_ssn] == '1'
-                       Person.where(first_name: /^#{candidate.first_name}$/i, last_name: /^#{candidate.last_name}$/i,
-                                    dob: candidate.dob).first
-                     else
-                       Person.match_existing_person(candidate)
-                     end
-            return [] unless person
-            Family.where(
-              "family_members" => {
-                "$elemMatch" => {
-                  "is_primary_applicant" => true,
-                  "person_id" => BSON::ObjectId.from_string(person.id.to_s)
-                }
-              }, "is_active" => true
-            )
+            # candidate = PersonCandidate.new(person_params[:ssn], person_params[:dob], person_params[:first_name], person_params[:last_name])
+            match_criteria, records = ::Operations::People::Match.new.call({:dob => person_params[:dob],
+                                                                            :last_name => person_params[:last_name],
+                                                                            :first_name => person_params[:first_name],
+                                                                            :ssn => person_params[:ssn]})
+            return [] unless records.present?
+            return [] unless [:ssn_present, :dob_present].include?(match_criteria)
+            return [] if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
+
+            person = records.first
+            person.primary_family
           end
 
           def build_family(family_hash)
             found_families = find_family(family_hash)
-
             @family = if found_families.any?
                         found_families.first
                       else
@@ -67,10 +81,10 @@ module FinancialAssistance
                       end
 
             family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
-              create_member(family_member_hash)
+              fm_result = create_member(family_member_hash)
+              return fm_result unless fm_result.success?
             end
             @family.save!
-
             Success(@family)
           end
 
@@ -83,14 +97,13 @@ module FinancialAssistance
           def create_member(family_member_hash)
             person_params = sanitize_person_params(family_member_hash)
             person_result = create_or_update_person(person_params)
-
             if person_result.success?
               @person = person_result.success
               @family_member = create_or_update_family_member(@person, @family, family_member_hash)
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
             else
-              @person
+              person_result
             end
           end
 
@@ -147,11 +160,12 @@ module FinancialAssistance
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
             sanitize_params = []
-            iap_hash['applicants'].each do |applicant_hash|
+
+            applicants = iap_hash['applicants']
+            applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
                 fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
               end.first
-
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
               foster_info = applicant_hash['foster_care']
 
@@ -175,7 +189,7 @@ module FinancialAssistance
                 is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
                 is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
                 same_with_primary: same_address_with_primary(family_member, primary),
-                is_incarcerated: applicant_hash['attestation']['is_incarcerated'],
+                is_incarcerated: applicant_hash["is_incarcerated"],
                 is_physically_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_blind: applicant_hash['attestation']['is_self_attested_blind'],
@@ -304,7 +318,8 @@ module FinancialAssistance
             no_ssn_value ? '1' : '0'
           end
 
-          def fill_applicants_form(applications, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+          def fill_applicants_form(payload, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+            applications = payload["family"]['magi_medicaid_applications'].first
             application = FinancialAssistance::Application.where(id: app_id).first
 
             applications[:applicants].each do |applicant|

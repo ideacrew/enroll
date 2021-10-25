@@ -861,7 +861,7 @@ GEM
       rails (>= 5.2)
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
-    redis (4.4.0)
+    redis (4.5.1)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
       redis-rack (>= 2.1.0, < 3)

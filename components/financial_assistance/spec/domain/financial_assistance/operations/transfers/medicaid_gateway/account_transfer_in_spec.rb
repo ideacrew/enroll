@@ -14,17 +14,13 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   let(:transformed) { ::AcaEntities::Atp::Transformers::Cv::Family.transform(record.to_hash(identifier: true)) }
 
   context 'success' do
-    context 'with valid application' do
+    context 'with valid payload' do
       before do
         @result = subject.call(transformed)
       end
 
       it 'should return success' do
         expect(@result).to be_success
-      end
-
-      it 'should return success with message' do
-        expect(@result.success).to eq('Successfully transferred in account')
       end
     end
   end

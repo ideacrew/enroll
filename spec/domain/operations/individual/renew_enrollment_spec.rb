@@ -88,7 +88,8 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
   let!(:enrollment_member) do
     FactoryBot.create(:hbx_enrollment_member,
                       hbx_enrollment: enrollment,
-                      applicant_id: family_member.id)
+                      applicant_id: family_member.id,
+                      tobacco_use: "NA")
   end
 
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
@@ -132,6 +133,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
         context 'ehb premium is greater than the selected aptc' do
           before do
+            enrollment.hbx_enrollment_members.first.person.update_attributes(is_tobacco_user: "NA")
             eligibilty_determination.update_attributes!(max_aptc: 100.00)
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
           end
@@ -160,6 +162,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
         context 'current enrollment has some aptc applied' do
           before do
+            enrollment.hbx_enrollment_members.first.person.update_attributes(is_tobacco_user: "NA")
             enrollment.update_attributes!(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
             eligibilty_determination.update_attributes!(max_aptc: 100.00)
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
@@ -200,6 +203,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
         before do
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+          enrollment.hbx_enrollment_members.first.person.update_attributes(is_tobacco_user: "NA")
           tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
           tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
           tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_87")

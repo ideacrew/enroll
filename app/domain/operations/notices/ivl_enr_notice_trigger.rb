@@ -42,9 +42,9 @@ module Operations
         [
           {
             :kind => address.kind,
-            :address_1 => address.address_1,
-            :address_2 => address.address_2,
-            :address_3 => address.address_3,
+            :address_1 => address.address_1.presence,
+            :address_2 => address.address_2.presence,
+            :address_3 => address.address_3.presence,
             :state => address.state,
             :city => address.city,
             :zip => address.zip
@@ -92,7 +92,7 @@ module Operations
 
       def build_household_hash(family, year)
         household_hash = family.households.collect do |household|
-          enrollments = household.hbx_enrollments.enrolled.with_product.by_year(year)
+          enrollments = household.hbx_enrollments.enrolled_and_renewal.with_product.by_year(year)
           {
             start_date: household.effective_starting_on,
             is_active: household.is_active,
@@ -140,15 +140,16 @@ module Operations
 
       def special_enrollment_period_reference(enrollment)
         sep = enrollment.family.latest_active_sep
-        qle = sep.qualifying_life_event_kind
-        {
-          qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle),
+        qle = sep&.qualifying_life_event_kind
+        sep_hash = {
           qle_on: sep.qle_on,
           start_on: sep.start_on,
           end_on: sep.end_on,
           effective_on: sep.effective_on,
           submitted_at: sep.submitted_at
         }
+        sep_hash.merge!(qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle)) if qle.present?
+        sep_hash
       end
 
       def consumer_role_reference(consumer_role)

@@ -17,7 +17,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
 
     let!(:family) do
-      primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob)
+      primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, is_tobacco_user: 'y')
       FactoryBot.create(:family, :with_primary_family_member, :person => primary)
     end
 
@@ -27,7 +27,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     let!(:spouse_rec) do
-      FactoryBot.create(:person, dob: spouse_dob)
+      FactoryBot.create(:person, dob: spouse_dob, is_tobacco_user: 'y')
     end
 
     let!(:spouse) do
@@ -237,6 +237,17 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(renewal.aasm_state).to eq "coverage_selected"
             expect(renewal.effective_on).to eq renewal_benefit_coverage_period.start_on
           end
+
+          it 'Renewal enrollment members should have the tobacco_use populated from person record.' do
+            renewal_members = subject.clone_enrollment_members
+            expect(renewal_members.pluck(:tobacco_use)).to include('y')
+          end
+
+          it 'Renewal enrollment members should have the tobacco_use populated NA for unknown.' do
+            spouse_rec.update_attributes(is_tobacco_user: 'unknown')
+            renewal_members = subject.clone_enrollment_members
+            expect(renewal_members.pluck(:tobacco_use)).not_to include('unknown')
+          end
         end
       end
 
@@ -354,6 +365,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let!(:current_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_product_id: renewal_product.id) }
         let!(:csr_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
         let!(:csr_01_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
+        let!(:csr_02_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-02", hios_base_id: "11111111122302", csr_variant_id: "02") }
+        let!(:csr_03_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-03", hios_base_id: "11111111122302", csr_variant_id: "03") }
 
         context "and have different CSR amount for renewal product year" do
           let(:aptc_values) {{ csr_amt: "87" }}
@@ -386,6 +399,28 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should be renewed into same CSR variant product" do
             expect(subject.assisted_renewal_product).to eq renewal_product.id
+          end
+        end
+
+        context "when eligible CSR variant is 02 and 03 for renewal product year" do
+          before do
+            enrollment.product.update_attributes(metal_level_kind: 'gold')
+          end
+
+          context 'when eligible csr is 100' do
+            let(:aptc_values) {{ csr_amt: "100" }}
+
+            it "should be renewed into eligible CSR variant product" do
+              expect(subject.assisted_renewal_product).to eq csr_02_product.id
+            end
+          end
+
+          context 'when eligible csr is limited' do
+            let(:aptc_values) {{ csr_amt: "limited" }}
+
+            it "should be renewed into eligible CSR variant product" do
+              expect(subject.assisted_renewal_product).to eq csr_03_product.id
+            end
           end
         end
       end

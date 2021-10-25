@@ -64,7 +64,8 @@ module FinancialAssistance
               application     = yield validate(application)
               notice_options  = yield notice_options_for_app(application)
               oe_start_on     = yield fetch_oe_start_on(application)
-              request_payload = yield construct_payload(application, notice_options, oe_start_on)
+              benchmark_premiums = yield applicant_benchmark_premium(application)
+              request_payload = yield construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
 
               Success(request_payload)
             end
@@ -86,7 +87,7 @@ module FinancialAssistance
               ::Operations::Individual::OpenEnrollmentStartOn.new.call({date: application.effective_date.to_date})
             end
 
-            def construct_payload(application, notice_options, oe_start_on)
+            def construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
               payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
                          assistance_year: application.assistance_year,
                          aptc_effective_date: application.effective_date,
@@ -94,7 +95,7 @@ module FinancialAssistance
                          renewal_consent_through_year: application.years_to_renew,
                          is_ridp_verified: application.is_ridp_verified.present?,
                          is_renewal_authorized: application.is_renewal_authorized.present?,
-                         applicants: applicants(application),
+                         applicants: applicants(application, benchmark_premiums),
                          relationships: application_relationships(application),
                          tax_households: tax_households(application),
                          us_state: application.us_state,
@@ -110,15 +111,18 @@ module FinancialAssistance
               ::Family.find(family_id)
             end
 
-            # rubocop:disable Metrics/CyclomaticComplexity
+            def encrypt(value)
+              return nil unless value
+              AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
+            end
+
             # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
-            def applicants(application)
+            def applicants(application, benchmark_premiums)
               application.applicants.inject([]) do |result, applicant|
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
-                           identifying_information: {has_ssn: applicant.no_ssn,
-                                                     encrypted_ssn: applicant.encrypted_ssn},
+                           identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
@@ -186,16 +190,16 @@ module FinancialAssistance
                            hours_worked_per_week: applicant.total_hours_worked_per_week,
                            is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
                            is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
-                           benchmark_premium: applicant_benchmark_premium(application), #applicant_benchmark_premium(applicant.application),
+                           benchmark_premium: benchmark_premiums,
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant),
+                           evidences: applicant.evidences.serializable_hash.map(&:symbolize_keys),
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: calculate_if_applicant_is_required_to_file_taxes(applicant)}
                 result
               end
             end
-            # rubocop:enable Metrics/CyclomaticComplexity
-            # rubocop:enable Metrics/AbcSize
+                        # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
 
             def native_american_information(applicant)
@@ -642,19 +646,25 @@ module FinancialAssistance
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
               person_hbx_ids = application.applicants.pluck(:person_hbx_id)
+
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.value!).value!
-              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.value!).value!
+              return premiums if premiums.failure?
+
+              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
+              return slcsp_info if slcsp_info.failure?
+
+              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
+              return lcsp_info if lcsp_info.failure?
 
               slcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
-                result << slcsp_info[person_hbx_id][:health_only_slcsp_premiums]
+                result << slcsp_info.success[person_hbx_id][:health_only_slcsp_premiums]
               end
 
               lcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
-                result << lcsp_info[person_hbx_id][:health_only_lcsp_premiums]
+                result << lcsp_info.success[person_hbx_id][:health_only_lcsp_premiums]
               end
 
-              { health_only_lcsp_premiums: slcsp_member_premiums, health_only_slcsp_premiums: lcsp_member_premiums }
+              Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
@@ -670,13 +680,13 @@ module FinancialAssistance
                   adds << add_people_combination.keys.first
                 end
 
-                matching_existing_address = all_addresses.detect do |address|
+                matching_existing_address = all_addresses.compact.detect do |address|
                   address.matches_addresses?(home_address)
                 end
 
                 if matching_existing_address.present?
                   matched_combi = address_people_combinations.detect do |each_combi|
-                    each_combi.keys.first.matches_addresses?(home_address)
+                    each_combi.keys.first.matches_addresses?(home_address) if each_combi&.keys&.first
                   end
 
                   address_people_combinations.delete(matched_combi)
@@ -716,12 +726,21 @@ module FinancialAssistance
             end
 
             def tax_households(application)
-              application.eligibility_determinations.inject([]) do |result, ed|
-                result << {hbx_id: ed.hbx_assigned_id.to_s,
-                           max_aptc: ed.max_aptc,
-                           is_insurance_assistance_eligible: ed.is_eligibility_determined,
-                           annual_tax_household_income: ed.aptc_csr_annual_household_income,
-                           tax_household_members: get_thh_member(ed, application)}
+              application.eligibility_determinations.inject([]) do |result, determination|
+                # TODO: get rid-off the HBX ID generate statement after testing.
+                result << {hbx_id: (determination.hbx_assigned_id || FinancialAssistance::HbxIdGenerator.generate_member_id).to_s,
+                           max_aptc: determination.max_aptc,
+                           is_insurance_assistance_eligible: insurance_assistance_eligible_for(determination),
+                           annual_tax_household_income: determination.aptc_csr_annual_household_income,
+                           tax_household_members: get_thh_member(determination, application)}
+              end
+            end
+
+            def insurance_assistance_eligible_for(determination)
+              if determination.is_eligibility_determined.present?
+                determination.is_eligibility_determined ? 'Yes' : 'No'
+              else
+                'UnDetermined'
               end
             end
 
@@ -745,11 +764,13 @@ module FinancialAssistance
             end
 
             def applicant_reference(applicant)
-              {first_name: applicant.first_name,
-               last_name: applicant.last_name,
-               dob: applicant.dob,
-               person_hbx_id: applicant.person_hbx_id,
-               encrypted_ssn: applicant.encrypted_ssn}
+              {
+                first_name: applicant.first_name,
+                last_name: applicant.last_name,
+                dob: applicant.dob,
+                person_hbx_id: applicant.person_hbx_id,
+                encrypted_ssn: encrypt(applicant.ssn)
+              }
             end
 
             def application_relationships(application)

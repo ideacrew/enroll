@@ -36,6 +36,10 @@ class BenefitEligibilityElementGroup
       grandparent
     )
 
+  # rubocop:disable Naming/ConstantName
+  Relationships_UI += %w[father_or_mother_in_law daughter_or_son_in_law brother_or_sister_in_law cousin domestic_partners_child parents_domestic_partner] if EnrollRegistry.feature_enabled?(:mitc_relationships)
+  # rubocop:enable Naming/ConstantName
+
   SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
       self
       spouse

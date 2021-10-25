@@ -20,7 +20,11 @@ When(/^.+ visits the Consumer portal during open enrollment$/) do
   BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
 
-
+Then(/^\w+ should see Go To Plan Compare button$/) do
+  expect(page).to have_content(l10n("go_to_plan_compare"))
+  click_link(l10n("go_to_plan_compare"))
+  expect(page).to have_content("CHECKBOOK")
+end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
@@ -65,7 +69,7 @@ And 'I select a effective date from list' do
 end
 
 And(/the user sees Your Information page$/) do
-  expect(page).to have_content YourInformation.your_information_text
+  expect(page).to have_content(l10n('your_information'))
   find(YourInformation.continue_btn).click
 end
 
@@ -115,6 +119,7 @@ Then(/^.+ sees form to enter personal information$/) do
   find_all(IvlPersonalInformation.select_state_dropdown).first.click
   find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
   # screenshot("personal_form")
 end
@@ -486,6 +491,10 @@ And(/^.+ click on purchase button on confirmation page/) do
   click_link "Confirm"
 end
 
+Then(/^.+ should see the extended APTC confirmation message/) do
+  expect(page).to have_content("I must file a federal income tax return")
+end
+
 And(/^.+ clicks on the Continue button to go to the Individual home page/) do
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
@@ -626,6 +635,18 @@ end
 Then(/CSR opens the most recent Please Contact Message/) do
   expect(page).to have_content "Please contact"
   find(:xpath,'//*[@id="message_list_form"]/table/tbody/tr[2]/td[4]/a[1]').click
+  sleep 1
+  translation_interpolated_keys = {
+    first_name: consumer.person.first_name,
+    last_name: consumer.person.last_name,
+    insured_email: consumer.email,
+    href_root: "Assist Customer",
+    site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+    site_short_name: site_short_name,
+    contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+    contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+  }
+  expect(page).to have_content(l10n("inbox.agent_assistance_messages_person_present", translation_interpolated_keys).html_safe.to_s[0..10])
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
@@ -633,7 +654,7 @@ Then(/CSR clicks on Resume Application via phone/) do
   click_link "Assist Customer"
 end
 
-When(/I click on the header link to return to CSR page/) do
+When(/CSR clicks on the header link to return to CSR page/) do
   expect(page).to have_content "I'm a Trained Expert", :wait => 10
   find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").click
 end
@@ -1000,4 +1021,15 @@ end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   click_button 'CONTINUE', :wait => 10
+end
+
+And(/Individual signed in to resume enrollment$/) do
+  visit '/'
+  click_link('Consumer/Family Portal', wait: 10)
+  sleep 2
+  find('.btn-link', :text => 'Sign In', wait: 5).click
+  sleep 5
+  fill_in "user[login]", :with => "testflow@test.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  find('.sign-in-btn').click
 end

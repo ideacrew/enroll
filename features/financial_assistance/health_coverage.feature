@@ -55,7 +55,6 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the user saves the health coverage information
     Then the health coverage should be saved on the page
 
-  @flaky
   Scenario: User enters employer sponsored health coverage information (currently have access to coverage)
     Given the user answers yes to currently having access to other health coverage
     And the user checks a employer sponsored health coverage checkbox

@@ -5,10 +5,10 @@
 # rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
-     on Maine Cover ME. Please call Maine Cover ME at (800) 965-7476 to make updates to that application.
+     on Maine Cover ME. Please call Maine Cover ME at (866) 636-0355 to make updates to that application.
       If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid.
-     Please call Maine Cover ME at (800) 965-7476 to make updates to your case.
+     Please call Maine Cover ME at (866) 636-0355 to make updates to your case.
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
@@ -19,10 +19,10 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.incomes.job_income_note' => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
   "en.faa.eligibility_results" => "Eligibility Results",
   "en.faa.we_have_your_results" => "We have your results",
-  "en.faa.medicaid" => "MaineCare and CubCare",
+  "en.faa.medicaid" => "MaineCare and Cub Care",
   "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for ",
-  "en.faa.eligible_for_medicaid2" => "MaineCare (Medicaid) or CubCare (the Children's Health Insurance Program)",
-  "en.faa.dhs_decision" => "<span>Next step: The Office for Family Independence will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare and CubCare</span>.</span>",
+  "en.faa.eligible_for_medicaid2" => "MaineCare (Medicaid) or Cub Care (the Children's Health Insurance Program)",
+  "en.faa.dhs_decision" => "<span>Next step: The Office for Family Independence will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare and Cub Care</span>.</span>",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from OFI within 45 days, you may want to ask for an update by calling",
   "en.faa.referral" => "Special MaineCare Referral",
@@ -49,19 +49,19 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
   "en.faa.indian_health_service" => "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
   "en.faa.indian_health_service_eligible" => "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
-  "en.faa.medicaid_not_eligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) within the last 90 days? *",
-  "en.faa.medicaid_cubcare_end_date" => "When was this person denied MaineCare (Medicaid) or CubCare (Children's Health Insurance Program)? *",
-  "en.faa.change_eligibility_status" => "Did this person have MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility? *",
+  "en.faa.medicaid_not_eligible" => "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days? *",
+  "en.faa.medicaid_cubcare_end_date" => "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)? *",
+  "en.faa.change_eligibility_status" => "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility? *",
   "en.faa.household_income_changed" => "Has this person's household income or household size changed since they were told their coverage was ending? * ",
-  "en.faa.person_medicaid_last_day" => "What is the last day of this person’s MaineCare (Medicaid) or CubCare (CHIP) coverage? *",
-  "en.faa.medicaid_chip_ineligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) based on their immigration status since",
-  "en.faa.immigration_status_changed" => "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or CubCare (Children’s Health Insurance Program)",
+  "en.faa.person_medicaid_last_day" => "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage? *",
+  "en.faa.medicaid_chip_ineligible" => "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since",
+  "en.faa.immigration_status_changed" => "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)",
   "en.faa.has_dependent_with_coverage" => "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?*",
   "en.faa.dependent_job_end_on" => "What was the last day this person had coverage through the job?*",
   "en.faa.question.private_individual_and_family_coverage" => "Marketplace coverage",
   "en.faa.question.acf_refugee_medical_assistance" => "ACF Refugee Medical Assistance",
   "en.faa.question.americorps_health_benefits" => "AmeriCorps health benefits",
-  "en.faa.question.child_health_insurance_plan" => "CubCare (Children's Health Insurance Program)",
+  "en.faa.question.child_health_insurance_plan" => "Cub Care (Children's Health Insurance Program)",
   "en.faa.question.medicaid" => "MaineCare (Medicaid)",
   "en.faa.question.medicare" => "Medicare",
   "en.faa.question.medicare_advantage" => "Medicare Advantage",
@@ -71,16 +71,16 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.veterans_benefits" => "Veterans benefits",
   "en.faa.question.naf_health_benefit_program" => "NAF Health Benefits Program",
   "en.faa.question.health_care_for_peace_corp_volunteers" => "Health care for Peace Corps volunteers",
-  "en.faa.question.department_of_defense_non_appropriated_health_benefits" => "Department of Defense Nonappropriated Fund health benefits",
-  "en.faa.question.cobra" => "COBRA",
-  "en.faa.question.employer_sponsored_insurance" => "Coverage through a job",
+  "en.faa.question.department_of_defense_non_approprited_health_benefits" => "Department of Defense Nonappropriated Fund health benefits",
+  "en.faa.question.cobra" => "COBRA (Consolidated Omnibus Budget Reconciliation Act)",
+  "en.faa.question.employer_sponsored_insurance" => "Coverage through a Job (also known as Employer-Sponsored Health Insurance)",
   "en.faa.question.self_funded_student_health_coverage" => "Self-funded student health coverage",
   "en.faa.question.foreign_government_health_coverage" => "Foreign government health coverage",
   "en.faa.question.private_health_insurance_plan" => "Private health insurance plan",
   "en.faa.question.coverage_obtained_through_another_exchange" => "Coverage obtained through a non-#{Settings.site.short_name} marketplace",
   "en.faa.question.coverage_under_the_state_health_benefits_risk_pool" => "Coverage under the state health benefits risk pool",
   "en.faa.question.veterans_administration_health_benefits" => "Veterans Affairs (VA) Health Care Program",
-  "en.faa.question.peace_corps_health_benefits" => "Peace Corps health benefits",
+  "en.faa.question.peace_corps_health_benefits" => "Peace Corps Health Benefits",
   "en.faa.question.health_reimbursement_arrangement" => "Health Reimbursement Arrangement",
   "en.faa.question.retiree_health_benefits" => "Retiree Health Benefits",
   "en.faa.question.other_full_benefit_coverage" => "Other full benefit coverage",
@@ -109,8 +109,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.report_changes_2" => " or by submitting information via mail.",
   "en.faa.signature_line_below_1" => "I'm the person whose name appears in the signature line below. ",
   "en.faa.signature_line_below_2" => "I understand that I'm submitting an application for health insurance and that information that I provided will be used to decide eligibility for each member of my application group.",
-  "en.faa.i_understand_evaluation_1" => "I understand that my application will be used to evaluate eligibility for MaineCare (Medicaid) and CubCare (Children’s Health Insurance Program) ",
-  "en.faa.i_understand_evaluation_2" => "and will be sent to the Office for Family Independence for a final eligibility determination if anyone is likely to qualify for MaineCare or CubCare.  ",
+  "en.faa.i_understand_evaluation_1" => "I understand that my application will be used to evaluate eligibility for MaineCare (Medicaid) and Cub Care (Children’s Health Insurance Program) ",
+  "en.faa.i_understand_evaluation_2" => "and will be sent to the Office for Family Independence for a final eligibility determination if anyone is likely to qualify for MaineCare or Cub Care.  ",
   "en.faa.i_understand_evaluation_3" => "The Office for Family Independence will send you information about coverage and enrollment or contact you if they need more information.<br><br>",
   "en.faa.anyone_found_eligible_1" => "If anyone in my application group is found eligible for MaineCare, I am authorizing the Office for Family Independence to pursue and get any money from other health insurance, ",
   "en.faa.anyone_found_eligible_2" => "legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. ",
@@ -137,6 +137,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.application_for_coverage" => "Application for Coverage",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application."
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
+  # FAA display evidence type
+  "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
+  "en.faa.evidence_type_esi" => "Coverage from a job",
+  "en.faa.evidence_type_non_esi" => "Coverage from another program",
+  "en.faa.evidence_type_income" => "Income"
 }.freeze
 # rubocop:enable Layout/LineLength

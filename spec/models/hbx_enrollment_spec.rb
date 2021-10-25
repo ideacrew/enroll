@@ -5148,4 +5148,138 @@ describe ".propogate_cancel" do
       expect(active_coverage.aasm_state).to eq "coverage_canceled"
     end
   end
+
+  describe 'exclude_child_only_offering' do
+    let(:child_only_product) { double('Child Only Product', :allows_child_only_offering? => true, :allows_adult_and_child_only_offering? => false) }
+    let(:regular_product) { double('Product', :allows_child_only_offering? => false, :allows_adult_and_child_only_offering? => false) }
+    let(:elected_plans) { [child_only_product, regular_product] }
+    let(:enrollment) { FactoryBot.build(:hbx_enrollment, family: family)}
+
+    before do
+      allow_any_instance_of(BenefitCoveragePeriod).to receive(:elected_plans_by_enrollment_members).and_return(elected_plans)
+    end
+
+    subject do
+      enrollment.decorated_elected_plans(enrollment.coverage_kind)
+    end
+
+    context 'when disabled' do
+      before do
+        EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(false)
+      end
+
+      context 'when members greater than 18 exists' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
+        end
+
+        it 'should not exclude child only offering' do
+          expect(subject.size).to eq 2
+        end
+      end
+
+      context 'when all the members are < 18' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
+        end
+
+        it 'should not exclude child only offering' do
+          expect(subject.size).to eq 2
+        end
+      end
+    end
+
+    context 'when enabled' do
+      before do
+        EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(true)
+      end
+
+      context 'when members greater than 18 exists' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
+        end
+
+        it 'should exclude child only offering' do
+          expect(subject.size).to eq 1
+        end
+      end
+
+      context 'when all the members are < 18' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
+        end
+
+        it 'should not exclude child only offering' do
+          expect(subject.size).to eq 2
+        end
+      end
+    end
+  end
+
+  describe 'allows_adult_and_child_only_offering' do
+    let(:adult_and_child_product) { double('Adult & Child Product', :allows_adult_and_child_only_offering? => true, :allows_child_only_offering? => false) }
+    let(:regular_product) { double('Product', :allows_adult_and_child_only_offering? => false, :allows_child_only_offering? => false) }
+    let(:elected_plans) { [adult_and_child_product, regular_product] }
+    let(:enrollment) { FactoryBot.build(:hbx_enrollment, family: family)}
+
+    before do
+      allow_any_instance_of(BenefitCoveragePeriod).to receive(:elected_plans_by_enrollment_members).and_return(elected_plans)
+    end
+
+    subject do
+      enrollment.decorated_elected_plans(enrollment.coverage_kind)
+    end
+
+    context 'when disabled' do
+      before do
+        EnrollRegistry[:exclude_adult_and_child_only_offering].feature.stub(:is_enabled).and_return(false)
+      end
+
+      context 'when members greater than 18 exists' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
+        end
+
+        it 'should not exclude child & adult only offering' do
+          expect(subject.size).to eq 2
+        end
+      end
+
+      context 'when all the members are < 18' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
+        end
+
+        it 'should not exclude adult & child only offering' do
+          expect(subject.size).to eq 2
+        end
+      end
+    end
+
+    context 'when enabled' do
+      before do
+        EnrollRegistry[:exclude_adult_and_child_only_offering].feature.stub(:is_enabled).and_return(true)
+      end
+
+      context 'when members greater than 18 exists' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
+        end
+
+        it 'should not exclude adult & child only offering' do
+          expect(subject.size).to eq 2
+        end
+      end
+
+      context 'when all the members are < 18' do
+        before do
+          allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
+        end
+
+        it 'should exclude adult & child only offering' do
+          expect(subject.size).to eq 1
+        end
+      end
+    end
+  end
 end

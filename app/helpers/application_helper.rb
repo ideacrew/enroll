@@ -1,5 +1,43 @@
 module ApplicationHelper
   include FloatHelper
+  include ::FinancialAssistance::VerificationHelper
+
+  def add_external_links_enabled?
+    EnrollRegistry.feature_enabled?(:add_external_links)
+  end
+
+  def plan_shopping_enabled?
+    add_external_links_enabled? && EnrollRegistry[:add_external_links].setting(:plan_shopping_display).item
+  end
+
+  # Returns an array wth the appropriate application type items
+  # used in app/views/insured/consumer_roles/_form.html.erb
+  # _application_types_list.html.erb
+  def consumer_role_application_type_options(person)
+    options_array = []
+    if person.primary_family.e_case_id.present? && !(person.primary_family.e_case_id.include? "curam_landing")
+      options_array << [EnrollRegistry[:curam_application_type].item, EnrollRegistry[:curam_application_type].item]
+      options_array
+    elsif pundit_allow(ConsumerRole, :can_view_application_types?)
+      options_array = EnrollRegistry[:application_type_options].item.map do |option|
+        if option == 'State Medicaid Agency'
+          ['State Medicaid Agency', 'Curam']
+        else
+          [option, option]
+        end
+      end
+    end
+    options_array << ['In Person', 'In Person'] if EnrollRegistry.feature_enabled?(:in_person_application_enabled)
+    # Phone and Paper should always display
+    options_array << ["Phone", "Phone"]
+    options_array << ["Paper", "Paper"]
+    selected = if person.primary_family.e_case_id.present? && !(person.primary_family.e_case_id.include? "curam_landing")
+                 'Curam'
+               else
+                 person.primary_family.application_type
+               end
+    [options_array.uniq, {selected: selected}]
+  end
 
   def seed_url_helper(row)
     case row.record_class_name
@@ -298,6 +336,7 @@ module ApplicationHelper
   def render_flash
     rendered = []
     flash.each do |type, messages|
+      next if messages.respond_to?(:include?) && messages&.include?("nil is not a symbol nor a string")
       if messages.respond_to?(:each)
         messages.each do |m|
           rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => m}) unless m.blank?

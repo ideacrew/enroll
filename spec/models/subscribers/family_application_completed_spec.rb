@@ -502,7 +502,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "has 4 tax household members with primary person as primary tax household member" do
+          expect(tax_household_db.eligibility_determinations.first.csr_percent_as_integer).to eq 0
           expect(tax_household_db.tax_household_members.length).to eq 4
+          expect(tax_household_db.tax_household_members.first.csr_percent_as_integer).to eq 0
           expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false,false]
           expect(tax_household_db.tax_household_members.select(&:is_primary_applicant?).first.family_member).to eq person.primary_family.primary_family_member
         end

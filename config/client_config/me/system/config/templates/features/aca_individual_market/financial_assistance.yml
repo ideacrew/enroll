@@ -83,11 +83,17 @@ registry:
       is_enabled: false
     - key: :medicaid_gateway_determination
       is_enabled: true
+    - key: :esi_mec_determination
+      is_enabled: true
+    - key: :non_esi_mec_determination
+      is_enabled: true
+    - key: :ifsv_determination
+      is_enabled: true
   - namespace:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :batch_transfer
       is_enabled: true
     - key: :transfer_service
@@ -194,13 +200,19 @@ registry:
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
+    - key: :optional_document_fields
+      item: :optional_document_fields
+      is_enabled: true
+    - key: :disable_employer_address_fields
+      item: :disable_employer_address_fields
+      is_enabled: true
     - key: :fa_send_to_external_verification
       is_enabled: true
     - key: :medicaid_or_chip_program_short_name
       is_enabled: true
       settings:
         - key: :name
-          item: "MaineCare or CubCare"
+          item: "MaineCare or Cub Care"
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:

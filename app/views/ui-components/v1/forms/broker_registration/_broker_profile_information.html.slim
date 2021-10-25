@@ -8,7 +8,7 @@
 
   .col-md-3.mb-2
     label for="inputPracticeArea" Select Language(s)
-    = f.select(:languages_spoken, options_from_collection_for_select(LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name", selected:'en'), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "form-control mb-3" } )
+    = f.select(:languages_spoken, options_for_select(language_options, selected:'en'), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "form-control mb-3" } )
     small id="emailHelp" class="form-text text-muted" Hold Ctrl or Command (mac) to select multiple
 
   .col-md-6

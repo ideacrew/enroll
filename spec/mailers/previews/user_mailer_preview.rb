@@ -103,4 +103,31 @@ class UserMailerPreview < ActionMailer::Preview
     plan_decorator = UnassistedPlanCostDecorator.new(enrollment.product, enrollment)
     UserMailer.plan_shopping_completed(user, enrollment, plan_decorator)
   end
+
+  def verification_denied
+    email_address = "test@test.com"
+    first_name = "test"
+    hbx_id = "12345678"
+    UserMailer.identity_verification_denial(email_address, first_name, hbx_id)
+  end
+
+  def account_transfer_success_notification
+    full_name = "John Smith"
+    email_address = 'test@test.com'
+    hbx_id = '123456'
+    UserMailer.account_transfer_success_notification(email_address, full_name, hbx_id)
+  end
+
+  def new_client_notification
+    agent_email = "test@test.com"
+    first_name = "John"
+    role = "agent"
+    insured_email = "test@insured.com"
+    hbx_id = "12345678"
+    UserMailer.new_client_notification(agent_email, first_name, role, insured_email, hbx_id)
+  end
+
+  def broker_pending_completed_training_missing_carrier; end
+
+  def reset_password_instructions; end
 end

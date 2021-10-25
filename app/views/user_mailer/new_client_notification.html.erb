@@ -1,6 +1,10 @@
-<p>
-  <%= name %> has chosen you as their Assister. Email them at <%= email %> to find a time to help them apply and enroll.
-</p>
-<p>
-  The <%= site_short_name %> team.
-</p>
+<% content_for(:hbx_id) { hbx_id } %>
+<%= l10n(
+  "user_mailer.new_client_notification.full_text",
+  person_name: name,
+  site_short_name: site_short_name,
+  email: email,
+  contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
+  contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
+  site_home_business_url: site_home_business_url
+) %>

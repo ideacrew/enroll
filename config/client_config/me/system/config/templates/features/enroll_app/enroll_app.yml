@@ -173,7 +173,7 @@ registry:
           - key: :staging_tax_info_url
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :statewide_area
-            item: "Maine"
+            item: "Maine/Regional"
           - key: :standard_plan_label
             item: "CLEAR CHOICE PLAN"
           - key: :exchange_name
@@ -201,11 +201,11 @@ registry:
           - key: :social_media
             item: ''
           - key: :health_benefit_exchange_authority_phone_number
-            item: "1-800-965-7476"
+            item: "(866) 636-0355"
           - key: :contact_center_name
             item: "CoverME.gov Customer Assistance Center"
           - key: :contact_center_short_number
-            item: "(866) 636-0355 TTY: 711"
+            item: "(866) 636-0355"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
             item: "711"
           - key: :producer_advisory_committee_url
@@ -306,6 +306,10 @@ registry:
                     {"2022-02-01": '2022,1,12'},
                     {"2022-03-01": '2022,2,14'},
                   ]
+          - key: :default_aptc_percentage
+            item: 100
+          - key: :child_age_limit
+            item: 20
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true
@@ -373,6 +377,20 @@ registry:
             item: ""
           - key: :mailing_address_zip
             item: ""
+      - key: :ivl_enrollment_renewal_begin_date
+        item: :enrollment_renewal_date
+        is_enabled: true
+        settings:
+          - key: :ivl_enrollment_renewal_begin_effective_day
+            item: 24
+          - key: :ivl_enrollment_renewal_begin_effective_month
+            item: 10
+      - key: :exclude_child_only_offering
+        item: :exclude_child_only_offering
+        is_enabled: true
+      - key: :exclude_adult_and_child_only_offering
+        item: :exclude_adult_and_child_only_offering
+        is_enabled: true
   - namespace:
       - :pay_now_feature
     features:
@@ -617,6 +635,9 @@ registry:
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
         is_enabled: true
+      - key: :pii_match_success_message
+        item: :pii_match_success_message
+        is_enabled: true
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: true
@@ -625,4 +646,37 @@ registry:
         is_enabled: false
       - key: :keycloak_integration
         item: :keycloak_integration
+        is_enabled: true
+      - key: :email_validation_notifications
+        item: :email_validation_notifications
+        is_enabled: true
+      - key: :find_my_doctor_options
+        item: :find_my_doctor_options
+        is_enabled: false
+      - key: :go_to_plan_compare_link
+        item: :go_to_plan_compare
+        is_enabled: true
+      - key: :zero_permium_policy
+        is_enabled: true
+      - key: :send_secure_purchase_confirmation_email
+        item: :send_secure_purchase_confirmation_email
+        is_enabled: false
+  - namespace:
+      - :person_matching_feature
+    features:
+      - key: :person_match_policy
+        is_enabled: true
+        settings:
+          - key: :ssn_present
+            item: ['first_name', 'last_name', 'dob', 'encrypted_ssn']
+          - key: :dob_present
+            item: ['first_name', 'last_name', 'dob']
+          - key: :name_present
+            item: ['first_name', 'last_name']
+  - namespace:
+      - :features
+      - :enroll_app
+      - :relationships
+    features:
+      - key: :mitc_relationships
         is_enabled: true

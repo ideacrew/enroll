@@ -1,6 +1,8 @@
 class Users::PasswordsController < Devise::PasswordsController
   before_action :confirm_identity, only: [:create]
   layout 'bootstrap_4'
+  include ActionView::Helpers::TranslationHelper
+  include L10nHelper
 
   rescue_from 'Mongoid::Errors::DocumentNotFound', with: :user_not_found
   def create

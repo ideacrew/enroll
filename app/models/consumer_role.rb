@@ -74,6 +74,26 @@ class ConsumerRole
     ["Email"] => "Only Electronic communications"
   }.freeze
 
+  VLP_RESPONSE_ALIEN_LEGAL_STATES = %w[
+    CUBAN/HAITIAN ENTRANT - TEMPORARY EMPLOYMENT AUTHORIZED
+    INSTITUTE ADDITIONAL VERIFICATION
+    TEMPORARY EMPLOYMENT AUTHORIZED
+    NON-IMMIGRANT
+    REFUGEE - EMPLOYMENT AUTHORIZED
+    ASYLEE - EMPLOYMENT AUTHORIZED
+    TEMPORARY RESIDENT - TEMPORARY EMPLOYMENT AUTHORIZED
+    STUDENT STATUS TEMPORARY AUTHORIZED
+    NON-IMMIGRANT - TEMPORARY EMPLOYMENT AUTHORIZED
+    NON-IMMIGRANT - EMPLOYMENT AUTHORIZED CNMI ONLY
+    DACA - Employment Authorized
+    TEMPORARY PROTECTED STATUS - EMPLOYMENT AUTHORIZED
+    FAMILY UNITY TEMP EMPLOYMENT AUTHORIZED
+    CONDITIONAL RESIDENT
+    CONDITIONAL RESIDENT - EMPLOYMENT AUTHORIZED
+    PAROLEE
+    AMERICAN INDIAN BORN IN CANADA EMPLOYMENT AUTHORIZED
+  ].freeze
+
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
@@ -95,7 +115,7 @@ class ConsumerRole
   # should land next after completing RIDP or Identify Verifications.
   field :admin_bookmark_url, type: String, default: nil
 
-  field :contact_method, type: String, default: "Paper and Electronic communications"
+  field :contact_method, type: String, default: EnrollRegistry.feature_enabled?(:contact_method_via_dropdown) ? "Paper and Electronic communications" : "Paper, Electronic and Text Message communications"
   field :language_preference, type: String, default: "English"
 
   field :ssn_validation, type: String, default: "pending" #move to verification type
@@ -692,10 +712,10 @@ class ConsumerRole
 
   def is_tribe_member?
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      return false if tribal_state.nil? || tribal_name.nil?
-      !tribal_state.nil? && !tribal_name.nil?
+      return false if tribal_state.blank? || tribal_name.blank?
+      !tribal_state.blank? && !tribal_name.blank?
     else
-      return false if tribal_id.nil?
+      return false if tribal_id.blank?
       !tribal_id.empty?
     end
   end
@@ -874,8 +894,12 @@ class ConsumerRole
     verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
   end
 
+  def residency_verification_enabled?
+    EnrollRegistry.feature_enabled?(:location_residency_verification_type)
+  end
+
   def can_start_residency_verification? # initial trigger check for coverage purchase
-    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18
+    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18 && residency_verification_enabled?
   end
 
   def invoke_residency_verification!
@@ -999,14 +1023,20 @@ class ConsumerRole
   end
 
   def residency_pending?
-    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name(LOCATION_RESIDENCY).first.validation_status != "attested"
+    return true unless residency_verification_enabled?
+
+    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types&.by_name(LOCATION_RESIDENCY)&.first&.validation_status != "attested"
   end
 
   def residency_denied?
+    return true unless residency_verification_enabled?
+
     (!is_state_resident.nil?) && (!is_state_resident)
   end
 
   def residency_verified?
+    return true unless residency_verification_enabled?
+
     is_state_resident? || residency_attested?
   end
 
@@ -1129,12 +1159,14 @@ class ConsumerRole
     end
   end
 
-  def admin_ridp_verification_action(admin_action, ridp_type, update_reason)
+  def admin_ridp_verification_action(admin_action, ridp_type, update_reason, person)
     case admin_action
       when 'verify'
+        UserMailer.identity_verification_acceptance(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
         update_ridp_verification_type(ridp_type, update_reason)
       when 'return_for_deficiency'
         return_ridp_doc_for_deficiency(ridp_type, update_reason)
+        UserMailer.identity_verification_denial(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
     end
   end
 

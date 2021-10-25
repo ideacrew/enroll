@@ -87,6 +87,8 @@ module FinancialAssistance
       'None of these'
     ].freeze
 
+    EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -278,6 +280,7 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
+    embeds_many :evidences, class_name: "::FinancialAssistance::Evidence"
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -320,7 +323,7 @@ module FinancialAssistance
     before_save :generate_hbx_id
 
     # Responsible for updating family member  when applicant is created/updated
-    after_update :propagate_applicant
+    # after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
 
     def generate_hbx_id
@@ -1089,6 +1092,16 @@ module FinancialAssistance
         applications = ::FinancialAssistance::Application.where("applicants._id" => bson_id)
         applications.size == 1 ? applications.first.applicants.find(bson_id) : nil
       end
+    end
+
+    # Case1: Missing address - No address objects at all
+    # Case2: Invalid Address - No addresses matching the state
+    # Case3: Unable to get rating area(home_address || mailing_address)
+    def has_valid_address?
+      addresses.where(
+        state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+        :kind.in => ['home', 'mailing']
+      ).present?
     end
 
     private

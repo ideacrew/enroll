@@ -3,13 +3,14 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   include FloatHelper
 
-  attr_reader :hbx_enrollment, :elected_aptc, :tax_household
+  attr_reader :hbx_enrollment, :elected_aptc, :tax_household, :child_age_limit
 
   def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
     super(plan)
     @hbx_enrollment = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
     @tax_household = tax_household
+    @child_age_limit = EnrollRegistry[:enroll_app].setting(:child_age_limit).item
     @can_round_cents = can_round_cents?
   end
 
@@ -26,12 +27,14 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def child_index(member)
-    @children = members.select {|mem| age_of(mem) < 21} unless defined?(@children)
+    @children = members.select {|mem| age_of(mem) <= child_age_limit} unless defined?(@children)
     @children.index(member)
   end
 
   def large_family_factor(member)
-    if (age_of(member) > 20) || (kind == :dental)
+    zero_permium_policy_disabled = EnrollRegistry[:zero_permium_policy].disabled?
+
+    if (age_of(member) > child_age_limit) || (kind == :dental && zero_permium_policy_disabled)
       1.00
     elsif child_index(member) > 2
       0.00
@@ -143,7 +146,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def member_ehb_premium(member)
-    premium_for(member) * __getobj__.ehb
+    mem_premium = premium_for(member)
+    result = mem_premium * __getobj__.ehb
+    return result unless EnrollRegistry.feature_enabled?(:total_minimum_responsibility)
+    (mem_premium - result >= 1) ? result : (mem_premium - 1)
   end
 
   private

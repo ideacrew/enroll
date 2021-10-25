@@ -11,6 +11,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
   before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
+  before_action :sanitize_contact_method, only: [:update]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
@@ -130,9 +131,9 @@ class Insured::ConsumerRolesController < ApplicationController
       elsif @consumer_candidate.errors[:ssn_dob_taken].present?
         format.html { render 'search' }
       elsif @consumer_candidate.errors[:ssn_taken].present?
-        text = "The SSN entered is associated with an existing user. "
-        text += "Please #{view_context.link_to('Sign In', SamlInformation.iam_login_url)} with your user name and password "
-        text += "or #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+        text = "The Social Security number entered is associated with an existing user. "
+        text += "Please #{view_context.link_to('sign in', SamlInformation.iam_login_url)} with your username and password "
+        text += "or #{view_context.link_to('click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
         flash[:alert] = text
         format.html {redirect_to ssn_taken_insured_consumer_role_index_path}
       else
@@ -374,6 +375,14 @@ class Insured::ConsumerRolesController < ApplicationController
         format.js   { redirect_to destroy_user_session_path }
       end
     end
+  end
+
+  def sanitize_contact_method
+    contact_method = params.dig("person", "consumer_role_attributes", "contact_method")
+    return unless contact_method.is_a?(Array)
+    return if contact_method.empty?
+
+    params.dig("person", "consumer_role_attributes").merge!("contact_method" => ConsumerRole::CONTACT_METHOD_MAPPING[contact_method])
   end
 
   def person_parameters_list

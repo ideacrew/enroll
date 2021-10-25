@@ -98,6 +98,8 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+      # Used for determing whether or not to show the extended APTC message
+      @any_aptc_present = @enrollment.hbx_enrollment_members.any? { |member| @plan.aptc_amount(member) > 0 } if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message)
     end
 
     @family = @person.primary_family
@@ -198,7 +200,8 @@ class Insured::PlanShoppingsController < ApplicationController
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
       @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
       session[:max_aptc] = @max_aptc
-      @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
+      default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+      @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
     else
       session[:max_aptc] = 0
       session[:elected_aptc] = 0
@@ -376,6 +379,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def send_receipt_emails
     email = @person.work_email_or_best
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, email).deliver_now
+    return unless EnrollRegistry.feature_enabled?(:send_secure_purchase_confirmation_email)
     body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
     from_provider = HbxProfile.current_hbx
     message_params = {
