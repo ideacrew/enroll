@@ -86,7 +86,7 @@ module FinancialAssistance
           end
 
           def build_event(payload)
-            event('events.fdsh.iap.appliccations.magi_medicaid_applicationn_renewal_assistance_eligible', attributes: { applications: payload })
+            event('events.fdsh.iap.applications.magi_medicaid_application_renewal_assistance_eligible', attributes: { applications: payload })
           end
 
           def publish(event)
