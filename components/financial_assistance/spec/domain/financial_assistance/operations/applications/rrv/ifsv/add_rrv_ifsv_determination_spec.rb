@@ -49,7 +49,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:income).first.eligibility_status).to eq "attested"
+        expect(@applicant.evidences.by_name(:income).first.eligibility_status).to eq "verified"
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end
