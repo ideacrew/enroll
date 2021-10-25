@@ -3,6 +3,7 @@ module Forms
     include Acapi::Notifiers
     include ActiveModel::Model
     include ActiveModel::Validations
+    include ::L10nHelper
 
     include PeopleNames
     include SsnField
@@ -72,8 +73,7 @@ module Forms
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob
-        errors.add(:base,
-          "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
+        errors.add(:base, l10n("insured.ssn_configuration_warning", site_short_name: Settings.site.short_name, site_phone_number: Settings.contact_center.phone_number, site_tty_number: Settings.contact_center.tty_number))
         log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end
