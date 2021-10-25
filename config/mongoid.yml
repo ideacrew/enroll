@@ -66,7 +66,7 @@ test:
     default:
       database: enroll_test<%= ENV['TEST_ENV_NUMBER'] %>
       hosts:
-        - mongodb:27017
+        - localhost:27017
       options:
         # In the test environment we lower the retries and retry interval to
         # low amounts for fast failures.
