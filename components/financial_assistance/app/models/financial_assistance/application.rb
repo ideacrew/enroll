@@ -1153,7 +1153,8 @@ module FinancialAssistance
     # Case2: Invalid Address - No addresses matching the state
     # Case3: Unable to get rating area(home_address || mailing_address)
     def applicants_have_valid_addresses?
-      applicants.all?(&:has_valid_address?)
+      # As per pivotal ticket 180058812: only primary address validation is required
+      primary_applicant.has_valid_address?
     end
 
     def is_application_valid?

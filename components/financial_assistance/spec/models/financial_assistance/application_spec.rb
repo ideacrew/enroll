@@ -601,8 +601,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family_id) }
     let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
-    let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: valid_app) }
-    let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: invalid_app) }
+    let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, is_primary_applicant: true, application: valid_app) }
+    let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, is_primary_applicant: true, application: invalid_app) }
     let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
     let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
@@ -892,6 +892,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
           context 'guard failure' do
             before do
+              application.applicants[0].update_attributes(is_primary_applicant: true)
               application.submit!
             end
 
@@ -904,6 +905,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         context 'from renewal_draft to renewal_draft' do
           context 'guard success' do
             before do
+              application.applicants[0].update_attributes(is_primary_applicant: true)
               application.submit!
             end
 
@@ -1366,6 +1368,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'applicants_have_valid_addresses?' do
     context 'with valid home addresses' do
       before do
+        application.applicants[0].update_attributes(is_primary_applicant: true)
         application.applicants.each do |appl|
           appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                              :address_1 => '1111 Awesome Street NE',
@@ -1388,6 +1391,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'with work addresses only' do
       before do
+        application.applicants[0].update_attributes(is_primary_applicant: true)
         application.applicants.each do |appl|
           appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                              :address_1 => '1111 Awesome Street NE',
@@ -1408,9 +1412,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context 'only one applicant valid home address' do
+    context 'only primary applicant has home address and dependents with no address' do
       before do
         first_applicant = application.applicants.first
+        first_applicant.update_attributes(is_primary_applicant: true)
         first_applicant.addresses = [FactoryBot.build(:financial_assistance_address,
                                                       :address_1 => '1111 Awesome Street NE',
                                                       :address_2 => '#111',
@@ -1424,14 +1429,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         first_applicant.save!
       end
 
-      it 'should return false' do
-        expect(application.applicants_have_valid_addresses?).to eq(false)
-      end
-    end
-
-    context 'without valid addresses' do
-      it 'should return false' do
-        expect(application.applicants_have_valid_addresses?).to eq(false)
+      it 'should return true' do
+        expect(application.applicants_have_valid_addresses?).to eq(true)
       end
     end
   end
