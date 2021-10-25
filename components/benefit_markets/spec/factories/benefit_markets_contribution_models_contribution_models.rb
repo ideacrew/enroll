@@ -36,6 +36,7 @@ FactoryBot.define do
               name: "employee",
               display_name: "Employee",
               order: 0,
+              contribution_model: contribution_model,
               default_contribution_factor: contribution_factor,
               minimum_contribution_factor: contribution_factor,
               member_relationship_operator: :==),
@@ -44,6 +45,7 @@ FactoryBot.define do
               name: "spouse",
               display_name: "Spouse",
               order: 1,
+              contribution_model: contribution_model,
               default_contribution_factor: 0.0,
               minimum_contribution_factor: 0.0),
         build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
@@ -51,6 +53,7 @@ FactoryBot.define do
               name: "domestic_partner",
               display_name: "Domestic Partner",
               order: 2,
+              contribution_model: contribution_model,
               default_contribution_factor: 0.0,
               minimum_contribution_factor: 0.0),
         build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
@@ -58,6 +61,7 @@ FactoryBot.define do
               name: "dependent",
               display_name: "Child Under 26",
               order: 3,
+              contribution_model: contribution_model,
               default_contribution_factor: 0.0,
               minimum_contribution_factor: 0.0)
       ]
