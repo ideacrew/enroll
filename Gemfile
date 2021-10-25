@@ -169,7 +169,7 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               :require => false
+  gem 'cucumber-rails',               '1.8.0', :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
