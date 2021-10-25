@@ -8,15 +8,17 @@ RSpec.describe Operations::Accounts::Find, type: :request do
   include_context 'account'
 
   context 'given a set of accounts exist in keycloak' do
-    before { create_avenger_accounts }
-    after { delete_avenger_accounts }
-
     context 'scope_name is :all' do
       it 'should return all accounts limited by default page_size' do
-        response = subject.call(scope_name: :all)
+        VCR.use_cassette('account.find_all') do
+          create_avenger_accounts
 
-        expect(response.success?).to be_truthy
-        expect(response.success.count).to eq avengers.keys.count
+          response = subject.call(scope_name: :all)
+
+          expect(response.success?).to be_truthy
+          expect(response.success.count).to eq avengers.keys.count
+          delete_avenger_accounts
+        end
       end
     end
 
@@ -26,34 +28,46 @@ RSpec.describe Operations::Accounts::Find, type: :request do
 
       context 'it should find an account by user login' do
         it 'should find the account' do
-          response =
-            subject.call(
-              scope_name: :by_username,
-              criterion: black_widow_username
-            )
+          VCR.use_cassette('account.by_username') do
+            create_avenger_accounts
+            response =
+              subject.call(
+                scope_name: :by_username,
+                criterion: black_widow_username
+              )
 
-          expect(response.success?).to be_truthy
-          expect(response.success.first[:email]).to eq black_widow_email
+            expect(response.success?).to be_truthy
+            expect(response.success.first[:email]).to eq black_widow_email
+            delete_avenger_accounts
+          end
         end
       end
 
       context 'it should find an account by email' do
         it 'should find the account' do
-          response =
-            subject.call(scope_name: :by_email, criterion: black_widow_email)
+          VCR.use_cassette('account.by_email') do
+            create_avenger_accounts
+            response =
+              subject.call(scope_name: :by_email, criterion: black_widow_email)
 
-          expect(response.success?).to be_truthy
-          expect(response.success.first[:username]).to eq black_widow_username
+            expect(response.success?).to be_truthy
+            expect(response.success.first[:username]).to eq black_widow_username
+            delete_avenger_accounts
+          end
         end
       end
     end
 
     context 'scope_name is :by_any' do
       it 'should return all accounts limited by default page_size' do
-        response = subject.call(scope_name: :by_any, criterion: 'avengers')
+        VCR.use_cassette('account.by_any') do
+          create_avenger_accounts
+          response = subject.call(scope_name: :by_any, criterion: 'avengers')
 
-        expect(response.success?).to be_truthy
-        expect(response.success.count).to eq avengers.keys.count
+          expect(response.success?).to be_truthy
+          expect(response.success.count).to eq avengers.keys.count
+          delete_avenger_accounts
+        end
       end
     end
   end

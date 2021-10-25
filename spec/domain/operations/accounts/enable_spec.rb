@@ -7,10 +7,12 @@ RSpec.describe Operations::Accounts::Enable, type: :request do
 
   context 'Given a Keycloak client configuration with credentials and network-accessible Keycloak instance' do
     it 'should connect to the server' do
-      token = JSON(Keycloak::Client.get_token_by_client_credentials)
+      VCR.use_cassette('account.enable_spec.get_credentials') do
+        token = JSON(Keycloak::Client.get_token_by_client_credentials)
 
-      expect(token['access_token']).not_to be_nil
-      expect(token['token_type']).to eq 'Bearer'
+        expect(token['access_token']).not_to be_nil
+        expect(token['token_type']).to eq 'Bearer'
+      end
     end
   end
 
@@ -41,16 +43,13 @@ RSpec.describe Operations::Accounts::Enable, type: :request do
       }
     end
 
-    let!(:account_id) do
-      ::Operations::Accounts::Create.new.call(account: account_params).failure['user']['id']
-    end
-
-    let(:params) { { id: account_id } }
-
     it 'should enable the account' do
-      response = subject.call(params)
+      VCR.use_cassette('account.enable_spec.enable_by_id') do
+        account_id = ::Operations::Accounts::Create.new.call(account: account_params).failure[:user][:id]
+        response = subject.call({ id: account_id })
 
-      expect(response.success?).to be_truthy
+        expect(response.success?).to be_truthy
+      end
     end
   end
 
@@ -71,14 +70,16 @@ RSpec.describe Operations::Accounts::Enable, type: :request do
       }
     end
 
-    let!(:user) { ::Operations::Accounts::Create.new.call(account: account_params) }
 
     let(:params) { { login: username } }
 
     it 'should enable the account' do
-      response = subject.call(params)
+      VCR.use_cassette('account.enable_spec.enable_by_login') do
+        ::Operations::Accounts::Create.new.call(account: account_params)
+        response = subject.call(params)
 
-      expect(response.success?).to be_truthy
+        expect(response.success?).to be_truthy
+      end
     end
   end
 end

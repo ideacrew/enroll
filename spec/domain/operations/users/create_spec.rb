@@ -27,13 +27,16 @@ RSpec.describe Operations::Users::Create do
       }
     end
 
+
     context "and there's not an existing user account with same usernam" do
       it 'should create a new Keycloak Account and an associated User record' do
-        result = subject.call(new_account)
+        VCR.use_cassette('connection') do
+          result = subject.call(new_account)
 
-        expect(result.success?).to be_truthy
-        account_id = result.success[:account][:id]
-        expect(result.success[:user][:account_id]).to_not eq account_id
+          expect(result.success?).to be_truthy
+          account_id = result.success[:account][:id]
+          expect(result.success[:user][:account_id]).to_not eq account_id
+        end
       end
     end
 

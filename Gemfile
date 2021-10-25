@@ -181,6 +181,7 @@ group :test do
   gem 'watir',                        '~> 6.10.3'
   gem 'webdrivers', '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
+  gem 'vcr', '~> 3.0', '>= 3.0.1'
 end
 
 group :production do

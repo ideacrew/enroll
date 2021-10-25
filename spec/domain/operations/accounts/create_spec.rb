@@ -7,11 +7,13 @@ RSpec.describe Operations::Accounts::Create, type: :request do
 
   context 'Given a Keycloak client configuration with credentials and network-accessible Keycloak instance' do
     it 'should connect to the server' do
-      # Keycloak.proc_cookie_token = lambda { cookies[:keycloak_token] }
-      token = JSON(Keycloak::Client.get_token_by_client_credentials)
+      VCR.use_cassette('account.create_spec.get_credentials') do
+        # Keycloak.proc_cookie_token = lambda { cookies[:keycloak_token] }
+        token = JSON(Keycloak::Client.get_token_by_client_credentials)
 
-      expect(token['access_token']).not_to be_nil
-      expect(token['token_type']).to eq 'Bearer'
+        expect(token['access_token']).not_to be_nil
+        expect(token['token_type']).to eq 'Bearer'
+      end
     end
   end
 
@@ -33,15 +35,17 @@ RSpec.describe Operations::Accounts::Create, type: :request do
         }
       end
 
-      after { Operations::Accounts::Delete.new.call(login: username) }
-
       it 'should create the new user' do
-        response = subject.call(account: account)
+        VCR.use_cassette('account.create_spec.create_user') do
+          response = subject.call(account: account)
 
-        expect(response.success?).to be_truthy
-        expect(response.success[:user][:username]).to eq account[:username]
-        expect(response.success[:user][:email]).to eq account[:email]
-        expect(response.success[:user][:created_at]).to be_a Time
+          expect(response.success?).to be_truthy
+          expect(response.success[:user][:username]).to eq account[:username]
+          expect(response.success[:user][:email]).to eq account[:email]
+
+          # expect(response.success[:user][:created_at]).to be_a Time
+          Operations::Accounts::Delete.new.call(login: username)
+        end
       end
     end
   end
