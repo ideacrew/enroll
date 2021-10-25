@@ -666,7 +666,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should create MEC evidences, ACES MEC check only if is_ia_eligible? not true' do
       application.send(:create_evidences)
       expect(applicant1.evidences.count).to eq 4
-      expect(applicant2.evidences.count).to eq 3
+      expect(applicant2.evidences.count).to eq 4
     end
 
     it 'should have both income and mec in pending state' do
