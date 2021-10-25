@@ -1,0 +1,28 @@
+<% application = fetch_latest_determined_application(family_id) %>
+<% if application.present? %>
+  <h1> Cost Savings Documents </h1>
+  <div class="table table-sm">
+    <div class="module verification-process col-md-12">
+      <% applicants = application.applicants %>
+      <% applicants.each do |applicant| %>
+        <% next unless applicant.is_applying_coverage %>
+        <div class="row">
+          <div class="family-member col-md-12">
+            <div class="person">
+              <%= applicant.full_name %>
+            </div>
+            <div class="verification-types col-md-12">
+                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application} %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<script>
+    $(document).ready(function() {
+        Insured.custom_upload_init();
+    });
+</script>

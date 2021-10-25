@@ -32,8 +32,8 @@ gem 'database_cleaner',       '~> 1.7'
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'release_0.10.0'
-gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'release_0.5.5'
+gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
+gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
@@ -120,7 +120,6 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
-gem 'puma',                   '~> 3.12.4'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'

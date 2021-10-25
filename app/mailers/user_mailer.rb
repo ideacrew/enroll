@@ -130,11 +130,11 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def new_client_notification(agent_email, first_name, name, role, insured_email, is_person)
+  def new_client_notification(agent_email, name, role, insured_email, hbx_id)
     if agent_email.present?
-      subject = "New Client Notification -[#{name}] email provided - [#{insured_email}]"
+      subject = l10n("user_mailer.new_client_notification_subject.full_text", name: name, insured_email: insured_email, site_short_name: site_short_name)
       mail({to: agent_email, subject: subject, from: "no-reply@individual.#{site_domain_name}"}) do |format|
-        format.html { render "new_client_notification", :locals => { :role => role, name: name, email: insured_email }}
+        format.html { render "new_client_notification", :locals => { :role => role, name: name, hbx_id: hbx_id, email: insured_email }}
       end
     end
   end
@@ -217,9 +217,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def account_transfer_success_notification(person, email_address)
+  def account_transfer_success_notification(person, email_address, hbx_id)
     mail({to: email_address, subject: "Action needed to get covered on #{site_short_name}"}) do |format|
-      format.html { render "account_transfer_success_notification", :locals => { :person_name => person.full_name }}
+      format.html { render "account_transfer_success_notification", :locals => { :person_name => person.full_name, hbx_id: hbx_id }}
     end
   end
 

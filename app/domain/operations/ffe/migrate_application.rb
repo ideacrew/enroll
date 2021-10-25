@@ -104,7 +104,7 @@ module Operations
                 "3655429746", "3654370357", "3655797066", "3656791057", "4023970705", "3809789830", "3655485373",
                 "3654478431", "3654354357", "3654587217", "3654935600", "3655737145", "3764290138", "3654265734",
                 "3796431048", "3655895410", "3655646562", "3655967545", "3655656463", "3656865574", "3656327410",
-                "3725241030", "3883632840", "4013177626"]
+                "3725241030", "3883632840", "4013177626", "4013810941", "3905775367"]
         if dups.include?(external_application_id.to_s)
           raise "Duplicate Application: #{external_application_id}"
         else
@@ -602,6 +602,7 @@ module Operations
 
         {
           first_name: person_hash['person_name']['first_name'],
+          middle_name: person_hash['person_name']['middle_name'],
           last_name: person_hash['person_name']['last_name'],
           full_name: person_hash['person_name']['full_name'],
           ssn: person_hash['person_demographics']['ssn'],

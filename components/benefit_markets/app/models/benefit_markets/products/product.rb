@@ -372,17 +372,21 @@ module BenefitMarkets
       end
 
       def allows_child_only_offering?
-        child_only_offering.eql('Allows Child-Only')
+        child_only_offering.eql?('Allows Child-Only')
       end
 
       def allows_adult_and_child_only_offering?
-        child_only_offering.eql('Allows Adult and Child-Only')
+        child_only_offering.eql?('Allows Adult and Child-Only')
       end
 
       def child_only_offering
         Rails.cache.fetch("child_only_offering_#{id}_#{kind}", expires_in: 1.week) do
-          qhp_cost_share_variance.child_only_offering
+          qhp.child_only_offering
         end
+      end
+
+      def qhp
+        ::Products::Qhp.where(active_year: active_year, standard_component_id: hios_base_id).first
       end
 
       def qhp_cost_share_variance

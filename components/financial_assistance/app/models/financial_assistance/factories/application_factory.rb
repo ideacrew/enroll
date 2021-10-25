@@ -195,6 +195,7 @@ module FinancialAssistance
       # also refactor code for method update_claimed_as_tax_dependent_by.
       def reject_applicant_params
         %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types
+           evidences verification_status verification_history eligibility_results
            medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
            magi_medicaid_monthly_household_income is_without_assistance is_ia_eligible is_medicaid_chip_eligible
            is_totally_ineligible is_eligible_for_non_magi_reasons is_non_magi_medicaid_eligible
