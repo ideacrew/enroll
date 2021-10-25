@@ -62,9 +62,9 @@ Rails.application.routes.draw do
       post :unlock, :change_password
     end
 
-    resources :accounts, only: [] do
-      get :reset_password, :lockable, :confirm_lock
-      put :confirm_reset_password
+    resources :accounts, module: 'users', only: [] do
+      get :reset_password, :lockable, :confirm_lock, :change_username_and_email
+      put :confirm_reset_password, :confirm_change_username_and_email
     end
   end
 

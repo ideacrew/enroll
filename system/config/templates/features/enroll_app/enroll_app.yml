@@ -608,3 +608,6 @@ registry:
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
+      - key: :keycloak_integration
+        item: :keycloak_integration
+        is_enabled: false

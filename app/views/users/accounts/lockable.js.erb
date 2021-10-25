@@ -1,4 +1,4 @@
-var containing_row = $("#<%= @user_id %>").closest('TR');
+var containing_row = $("#user_action_<%= @user_id %>").closest('TR');
 var $parent_row = containing_row;
 if ( $('tr.child-row:visible').length > 0 ) {
     $('tr.child-row:visible').remove();

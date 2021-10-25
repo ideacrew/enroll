@@ -26,7 +26,7 @@ module Operations
         values = yield validate(params)
         _token_proc = yield cookie_token(values)
 
-        Success(account_attributes)
+        Success(values)
       end
 
       private

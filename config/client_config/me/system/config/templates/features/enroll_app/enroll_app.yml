@@ -623,3 +623,6 @@ registry:
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
+      - key: :keycloak_integration
+        item: :keycloak_integration
+        is_enabled: true
