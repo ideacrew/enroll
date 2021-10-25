@@ -191,13 +191,14 @@ module Operations
 
       def sanitize_enrollment_member_hash(family, member_hash)
         eligible_members = member_hash.reject {|mem|  mem["coverage_end_on"] == mem["coverage_start_on"]}
-        eligible_members.inject([]) do |members, m_hash|
+        member_result = eligible_members.inject([]) do |members, m_hash|
           applicant = find_family_member(family, m_hash)
           m_hash["applicant_id"] = applicant.try(:id)
           m_hash["coverage_end_on"] = nil
           m_hash.delete("family_member_reference")
           members << m_hash
         end
+        member_result.reject {|mem| mem["applicant_id"].nil? }
       end
 
       def find_benefit_coverage_period(effective_on)
