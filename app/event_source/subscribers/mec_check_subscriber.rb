@@ -7,11 +7,16 @@ module Subscribers
     include ::EventSource::Subscriber[amqp: 'magi_medicaid.mec_check']
 
     # event_source branch: release_0.5.2
-    subscribe(:on_magi_medicaid_mec_check) do |delivery_info, _metadata, response|
+    subscribe(:on_magi_medicaid_mec_check) do |delivery_info, metadata, response|
       logger.info "MecCheckSubscriber: invoked on_magi_medicaid_mec_check_enroll with delivery_info: #{delivery_info}, response: #{response}"
       payload = JSON.parse(response, :symbolize_names => true)
+      payload_type = metadata[:headers]["payload_type"]
 
-      result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheck.new.call(payload)
+      result = if payload_type == "person"
+                 FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckPerson.new.call(payload)
+               else
+                 FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckApplication.new.call(payload)
+               end
 
       if result.success?
         ack(delivery_info.delivery_tag)

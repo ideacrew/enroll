@@ -368,6 +368,12 @@ registry:
             item: 1
           - key: :ivl_enrollment_renewal_begin_effective_month
             item: 11
+      - key: :exclude_child_only_offering
+        item: :exclude_child_only_offering
+        is_enabled: false
+      - key: :exclude_adult_and_child_only_offering
+        item: :exclude_adult_and_child_only_offering
+        is_enabled: false
   - namespace:
       - :pay_now_feature
     features:
@@ -613,6 +619,9 @@ registry:
         is_enabled: false
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
+        is_enabled: false
+      - key: :pii_match_success_message
+        item: :pii_match_success_message
         is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget

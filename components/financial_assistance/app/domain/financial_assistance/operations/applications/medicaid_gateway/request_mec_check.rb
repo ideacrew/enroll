@@ -27,7 +27,6 @@ module FinancialAssistance
 
           def find_person(person_id)
             person = ::Person.find_by(hbx_id: person_id)
-
             Success(person)
           rescue Mongoid::Errors::DocumentNotFound
             Failure("Unable to find Person with ID #{person_id}.")
@@ -54,7 +53,7 @@ module FinancialAssistance
 
           # publish xml to medicaid gateway using event source
           def publish(payload)
-            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishMecCheck.new.call(payload)
+            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishMecCheck.new.call(payload, "person")
           end
         end
       end

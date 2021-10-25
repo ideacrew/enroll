@@ -635,6 +635,18 @@ end
 Then(/CSR opens the most recent Please Contact Message/) do
   expect(page).to have_content "Please contact"
   find(:xpath,'//*[@id="message_list_form"]/table/tbody/tr[2]/td[4]/a[1]').click
+  sleep 1
+  translation_interpolated_keys = {
+    first_name: consumer.person.first_name,
+    last_name: consumer.person.last_name,
+    insured_email: consumer.email,
+    href_root: "Assist Customer",
+    site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+    site_short_name: site_short_name,
+    contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+    contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+  }
+  expect(page).to have_content(l10n("inbox.agent_assistance_messages_person_present", translation_interpolated_keys).html_safe.to_s[0..10])
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
@@ -1009,4 +1021,15 @@ end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   click_button 'CONTINUE', :wait => 10
+end
+
+And(/Individual signed in to resume enrollment$/) do
+  visit '/'
+  click_link('Consumer/Family Portal', wait: 10)
+  sleep 2
+  find('.btn-link', :text => 'Sign In', wait: 5).click
+  sleep 5
+  fill_in "user[login]", :with => "testflow@test.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  find('.sign-in-btn').click
 end

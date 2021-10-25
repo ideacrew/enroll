@@ -1,4 +1,5 @@
 <% calculate = (defined? calculate) ? calculate : true %>
+<% family_tier_eligible = @enrollment.product&.family_based_rating? %>
 <div class="table-border table-responsive">
   <table class="table table-striped">
     <thead>
@@ -17,7 +18,11 @@
           <td><%= member.person.full_name %></td>
           <td><%= member.primary_relationship %></td>
           <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-          <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+          <% unless family_tier_eligible %>
+            <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+          <% else %>
+            <td> -- </td>
+          <% end %>
           <% if calculate %>
             <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
             <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>

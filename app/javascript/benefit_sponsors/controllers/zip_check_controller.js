@@ -37,11 +37,11 @@ export default class extends Controller {
         this.countySelectTarget.setAttribute('disabled', true);
         this.countySelectTarget.options.length = 0;
         let newOption = document.createElement("option")
-        newOption.text = "Zipcode outside of state";
-        newOption.value = "Zipcode outside of state";
+        newOption.text = null;
+        newOption.value = null;
         this.countySelectTarget.add(newOption)
         event.target.parentElement.classList.add('was-validated')
-        event.target.setCustomValidity("Zipcode outside of state")
+        event.target.setCustomValidity("")
       }
       if (this.countySelectTarget.parentElement.className == 'selectric-hide-select') {
         if( $.isFunction( $.fn.selectric ) ) {

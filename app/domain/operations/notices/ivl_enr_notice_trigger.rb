@@ -140,15 +140,16 @@ module Operations
 
       def special_enrollment_period_reference(enrollment)
         sep = enrollment.family.latest_active_sep
-        qle = sep.qualifying_life_event_kind
-        {
-          qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle),
+        qle = sep&.qualifying_life_event_kind
+        sep_hash = {
           qle_on: sep.qle_on,
           start_on: sep.start_on,
           end_on: sep.end_on,
           effective_on: sep.effective_on,
           submitted_at: sep.submitted_at
         }
+        sep_hash.merge!(qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle)) if qle.present?
+        sep_hash
       end
 
       def consumer_role_reference(consumer_role)

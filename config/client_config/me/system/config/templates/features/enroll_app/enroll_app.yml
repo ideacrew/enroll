@@ -201,7 +201,7 @@ registry:
           - key: :social_media
             item: ''
           - key: :health_benefit_exchange_authority_phone_number
-            item: "1-800-965-7476"
+            item: "(866) 636-0355"
           - key: :contact_center_name
             item: "CoverME.gov Customer Assistance Center"
           - key: :contact_center_short_number
@@ -385,6 +385,12 @@ registry:
             item: 24
           - key: :ivl_enrollment_renewal_begin_effective_month
             item: 10
+      - key: :exclude_child_only_offering
+        item: :exclude_child_only_offering
+        is_enabled: true
+      - key: :exclude_adult_and_child_only_offering
+        item: :exclude_adult_and_child_only_offering
+        is_enabled: true
   - namespace:
       - :pay_now_feature
     features:
@@ -628,6 +634,9 @@ registry:
         is_enabled: true
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
+        is_enabled: true
+      - key: :pii_match_success_message
+        item: :pii_match_success_message
         is_enabled: true
       - key: :live_chat_widget
         item: :live_chat_widget

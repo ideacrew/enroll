@@ -5,10 +5,10 @@
 # rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
-     on Maine Cover ME. Please call Maine Cover ME at (800) 965-7476 to make updates to that application.
+     on Maine Cover ME. Please call Maine Cover ME at (866) 636-0355 to make updates to that application.
       If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid.
-     Please call Maine Cover ME at (800) 965-7476 to make updates to your case.
+     Please call Maine Cover ME at (866) 636-0355 to make updates to your case.
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
@@ -137,6 +137,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.application_for_coverage" => "Application for Coverage",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application."
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
+  # FAA display evidence type
+  "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
+  "en.faa.evidence_type_esi" => "Coverage from a job",
+  "en.faa.evidence_type_non_esi" => "Coverage from another program",
+  "en.faa.evidence_type_income" => "Income"
 }.freeze
 # rubocop:enable Layout/LineLength
