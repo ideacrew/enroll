@@ -379,7 +379,7 @@ registry:
             item: ""
       - key: :ivl_enrollment_renewal_begin_date
         item: :enrollment_renewal_date
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :ivl_enrollment_renewal_begin_effective_day
             item: 24
