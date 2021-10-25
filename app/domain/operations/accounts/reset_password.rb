@@ -37,7 +37,7 @@ module Operations
 
       def validate(params)
         AcaEntities::Accounts::Contracts::KeycloakUserRepresentationContract.new
-          .call(params[:account])
+                                                                            .call(params[:account])
       end
 
       def cookie_token(values)
@@ -55,7 +55,6 @@ module Operations
 
       def reset_password(values)
         # Try() do
-        binding.pry
         result =
           Keycloak::Admin.reset_password(
             values[:id],

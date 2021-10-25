@@ -34,7 +34,6 @@ RSpec.describe Operations::Accounts::ResetPassword, type: :request do
       it 'should update the account password' do
         result = subject.call(account: new_password_params)
 
-        binding.pry
         expect(result.success?).to be_truthy
       end
     end

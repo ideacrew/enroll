@@ -105,11 +105,10 @@ class User
     self.idp_verified = true
     begin
       self.save!
-    rescue => e
+    rescue StandardError => e
       message = "SwitchToIdpException: #{e.message}; "
       message += "user_id: #{self.id}, "
-      message += "person_hbx_id: #{self.person.hbx_id}, " if self.person
-        .present?
+      message += "person_hbx_id: #{self.person.hbx_id}, " if self.person.present?
       message += "errors.full_messages: #{self.errors.full_messages}, "
       message += "stacktrace: #{e.backtrace}"
       log(message, { severity: 'error' })
@@ -123,14 +122,11 @@ class User
       return
     end
     invitation = Invitation.where(id: self.invitation_id).first
-    if !invitation.present?
+    unless invitation.present?
       errors.add(:base, 'There is no valid invitation for this account.')
       return
     end
-    if !invitation.may_claim?
-      errors.add(:base, 'There is no valid invitation for this account.')
-      return
-    end
+    errors.add(:base, 'There is no valid invitation for this account.') unless invitation.may_claim?
   end
 
   def idp_verified?
@@ -138,9 +134,7 @@ class User
   end
 
   def consumer_identity_verified?
-    if person&.consumer_role?
-      !identity_verified_date.nil? || person.consumer_role.identity_verified?
-    end
+    !identity_verified_date.nil? || person.consumer_role.identity_verified? if person&.consumer_role?
   end
 
   def permission
@@ -171,13 +165,12 @@ class User
   def is_benefit_sponsor_active_broker?(profile_id)
     profile_organization =
       BenefitSponsors::Organizations::Organization
-        .employer_profiles
-        .where("profiles._id": BSON::ObjectId.from_string(profile_id))
-        .first
-    if (
-         profile_organization && profile_organization.employer_profile &&
-           profile_organization.employer_profile.active_broker
-       )
+      .employer_profiles
+      .where('profiles._id': BSON::ObjectId.from_string(profile_id))
+      .first
+    if profile_organization&.employer_profile &&
+       profile_organization.employer_profile.active_broker
+
       person == profile_organization.employer_profile.active_broker
     end
   end
@@ -190,7 +183,7 @@ class User
     headless_users =
       headless_with_email + (headless_with_account_id || headless_with_oim_id)
     headless_users.each do |headless|
-      headless.destroy if !headless.person.present?
+      headless.destroy unless headless.person.present?
     end
   end
 
@@ -227,41 +220,28 @@ class User
     self.save
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def get_announcements_by_roles_and_portal(portal_path = '')
     announcements = []
 
-    case
-    when portal_path.include?('employers/employer_profiles')
-      if has_employer_staff_role?
-        announcements.concat(Announcement.current_msg_for_employer)
-      end
-    when portal_path.include?('families/home')
-      if has_employee_role? || (person && person.has_active_employee_role?)
-        announcements.concat(Announcement.current_msg_for_employee)
-      end
-      if has_consumer_role? || (person && person.is_consumer_role_active?)
-        announcements.concat(Announcement.current_msg_for_ivl)
-      end
-    when portal_path.include?('employee')
-      if has_employee_role? || (person && person.has_active_employee_role?)
-        announcements.concat(Announcement.current_msg_for_employee)
-      end
-    when portal_path.include?('consumer')
-      if has_consumer_role? || (person && person.is_consumer_role_active?)
-        announcements.concat(Announcement.current_msg_for_ivl)
-      end
-    when portal_path.include?('broker_agencies')
-      if has_broker_role?
-        announcements.concat(Announcement.current_msg_for_broker)
-      end
-    when portal_path.include?('general_agencies')
-      if has_general_agency_staff_role?
-        announcements.concat(Announcement.current_msg_for_ga)
-      end
+    if portal_path.include?('employers/employer_profiles')
+      announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
+    elsif portal_path.include?('families/home')
+      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || person&.has_active_employee_role?
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || person&.is_consumer_role_active?
+    elsif portal_path.include?('employee')
+      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || person&.has_active_employee_role?
+    elsif portal_path.include?('consumer')
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || person&.is_consumer_role_active?
+    elsif portal_path.include?('broker_agencies')
+      announcements.concat(Announcement.current_msg_for_broker) if has_broker_role?
+    elsif portal_path.include?('general_agencies')
+      announcements.concat(Announcement.current_msg_for_ga) if has_general_agency_staff_role?
     end
 
     announcements.uniq
   end
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   ### TODO Check this for keycloak ###
   class << self
@@ -339,7 +319,7 @@ class User
   def oim_id_rules
     return true unless oim_id.present?
 
-    if oim_id.present? && oim_id.match(%r{[;#%=|+,">< \\\/]})
+    if oim_id.present? && oim_id.match(%r{[;#%=|+,">< \\/]})
       errors.add :oim_id,
                  "cannot contain special characters ; # % = | + , \" > < \\ \/"
     elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH

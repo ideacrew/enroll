@@ -49,15 +49,16 @@ RSpec.shared_context 'account' do
   end
 
   def create_avenger_accounts
-    avengers.each { |k, v| Operations::Accounts::Create.new.call(account: v) }
+    avengers.each { |_k, v| Operations::Accounts::Create.new.call(account: v) }
   end
 
   def delete_avenger_accounts
-    avengers.each do |k, v|
+    avengers.each do |_k, v|
       Operations::Accounts::Delete.new.call(login: v[:username])
     end
   end
 
+  # rubocop:disable Metrics/MethodLength
   def find_all_stub
     [
       {
@@ -188,6 +189,7 @@ RSpec.shared_context 'account' do
       }
     ]
   end
+  # rubocop:enable Metrics/MethodLength
 
   # Actions
   # Lock/Unlock Account
@@ -195,13 +197,11 @@ RSpec.shared_context 'account' do
   # Forgot Password - set a flag in required actions
   # Edit User
   def ui_index_page_row_stub
-    accounts =
-      Operations::Accounts.Find(scope_name: :all, page: 1, page_size: 20)
-    users =
-      User.where(
-        :account_id.in =>
-          accounts.reduce([]) { |ids, account| ids << account[:id] }
-      )
+    accounts = Operations::Accounts.Find(scope_name: :all, page: 1, page_size: 20)
+    User.where(
+      :account_id.in =>
+        accounts.reduce([]) { |ids, account| ids << account[:id] }
+    )
 
     # {
     #     accounts = {

@@ -286,7 +286,7 @@ module Operations
         )
         overlapping_coverage = hbx_enrollments.select do |enrollment|
           enrollment.subscriber.hbx_id == new_enrollment.subscriber.hbx_id &&
-            (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
+            (enrollment.effective_on..(enrollment.terminated_on || Date.new(2021,12,31))).cover?(enrollment_hash["effective_on"])
         end
         overlapping_coverage.each do |enrollment|
           if new_enrollment.created_at >= enrollment.created_at

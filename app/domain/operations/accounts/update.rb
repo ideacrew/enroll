@@ -33,7 +33,7 @@ module Operations
 
       def validate(params)
         AcaEntities::Accounts::Contracts::KeycloakUserRepresentationContract.new
-          .call(params[:account])
+                                                                            .call(params[:account])
       end
 
       def cookie_token(values)
@@ -49,7 +49,7 @@ module Operations
         end
       end
 
-      def update(values)
+      def update(_values)
         Keycloak::Admin.update_user(id, user_representation)
         Keycloak::Admin.update_user(attributes)
       end

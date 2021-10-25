@@ -64,7 +64,7 @@ module Queries
                 if @search_string.present?
                   user_datatable_search(@search_string)
                 elsif @keycloak_string.present?
-                  keycloak_account_search(@keycloak_string)
+                  keycloak_account_datatable_search(@keycloak_string)
                 else
                   user.all
                 end
@@ -72,7 +72,7 @@ module Queries
       users
     end
 
-    def keycloak_account_search(query)
+    def keycloak_account_datatable_search(query)
       accounts = Operations::Accounts::Find.new.call(scope_name: :by_any, criterion: query.strip).success
       user_datatable_search(query).or(:account_id.in => accounts.map{|acc| acc[:id]})
     end

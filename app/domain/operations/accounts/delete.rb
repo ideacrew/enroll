@@ -45,7 +45,7 @@ module Operations
         end
       end
 
-      # rubocop:disable Layout/MultilineMethodCallIndentation
+      # rubocop:disable Style/MultilineBlockChain
       def delete(values)
         Try() do
           if values[:id]
@@ -57,7 +57,7 @@ module Operations
           response ? Success(true) : Failure(false)
         end
       end
-      # rubocop:enable Layout/MultilineMethodCallIndentation
+      # rubocop:enable Style/MultilineBlockChain
     end
   end
 end

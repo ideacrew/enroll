@@ -24,11 +24,9 @@ module Accounts
     private
 
     def validate(params)
-      if params.keys.include? %i[email password]
+      # if params.keys.include? %i[email password]
 
-      else
-
-      end
+      # end
       Accounts::AccountContract.new.call(params)
     end
 

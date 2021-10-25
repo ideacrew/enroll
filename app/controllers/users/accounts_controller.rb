@@ -17,7 +17,7 @@ module Users
     # PUT confirm_reset_password
     def confirm_reset_password
       authorize User, :reset_password?
-      @user_id  = params.require(:user_id)
+      @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
       @username = params.require(:username)
 
@@ -35,10 +35,9 @@ module Users
     # GET lockable
     def lockable
       authorize User, :lockable?
-      @user_id  = params.require(:user_id)
+      @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
       @enabled = params.require(:enabled) == 'true'
-
     rescue Pundit::NotAuthorizedError
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
     end
@@ -46,7 +45,7 @@ module Users
     # GET confirm_lock
     def confirm_lock
       authorize User, :lockable?
-      @user_id  = params.require(:user_id)
+      @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
       @enabled = params.require(:enabled) == 'true'
 
@@ -76,6 +75,7 @@ module Users
       render inline: "location.reload();"
     end
 
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     def confirm_change_username_and_email
       authorize User, :change_username_and_email?
       @user_id = params[:user_id]
@@ -111,5 +111,6 @@ module Users
         format.js { render "username_email_result"}
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
   end
 end

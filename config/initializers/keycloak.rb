@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Keycloak.installation_file = 'config/keycloak.json'
 # Set proxy to connect in keycloak server
 Keycloak.proxy = ''
