@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PeopleController, dbclean: :after_each do
@@ -36,9 +38,11 @@ RSpec.describe PeopleController, dbclean: :after_each do
     let(:vlp_documents_attributes) { {"1" => vlp_document.attributes.to_hash}}
     let(:consumer_role_attributes) { consumer_role.attributes.to_hash}
     let(:person_attributes) { person.attributes.to_hash}
-    let(:email_attributes) { {"0"=>{"kind"=>"home", "address"=>"test@example.com"}}}
-    let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
-        "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
+    let(:email_attributes) { {"0" => {"kind" => "home", "address" => "test@example.com"}}}
+    let(:addresses_attributes) do
+      {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "county" => "test", "id" => person.addresses[0].id.to_s},
+       "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "county" => "test", "id" => person.addresses[1].id.to_s} }
+    end
 
     before :each do
       allow(Person).to receive(:find).and_return(person)
@@ -48,7 +52,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(person).to receive(:employee_roles).and_return [employee_role]
       allow_any_instance_of(VlpDoc).to receive(:sensitive_info_changed?).and_return([false, false])
-      allow(person).to receive(:update_attributes).and_return(true)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       person_attributes[:addresses_attributes] = addresses_attributes
@@ -69,6 +72,10 @@ RSpec.describe PeopleController, dbclean: :after_each do
       it "should not empty the person's addresses on update" do
         expect(assigns(:valid_vlp)).to be_nil
         expect(person.addresses).not_to eq []
+      end
+
+      it "should update county" do
+        expect(person.addresses.first.county).to eq 'test'
       end
     end
 
