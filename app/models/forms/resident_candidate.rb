@@ -71,7 +71,10 @@ module Forms
       person_with_name_ssn_dob = Person.where(query_params).first
 
       if person_with_ssn != person_with_name_ssn_dob
-        errors.add(:base, l10n("insured.consumer_roles.match.ssn_dob_name_error", state_abbreviation: EnrollRegistry[:enroll_app].settings(:state_abbreviation).item, contact_center_phone_number: Settings.contact_center.phone_number))
+        errors.add(:base, l10n("insured.match_person.ssn_dob_name_error", state_abbreviation: EnrollRegistry[:enroll_app].settings(:state_abbreviation).item,
+                                                                          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
+                                                                          contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
+                                                                          contact_center_name: EnrollRegistry[:enroll_app].settings(:contact_center_name).item))
         log("ERROR: unable to match or create Person record, SSN exists with different DOB and Name", {:severity => "error"})
       end
     end
