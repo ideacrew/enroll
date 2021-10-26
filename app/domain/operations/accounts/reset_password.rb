@@ -18,11 +18,11 @@ module Operations
       # Operations::Accounts::ResetPassword.new.call(
       #   account: {
       #     id: '6304e375-c5f6-45c4-bd9c-da75b01d19f4',
-      #     credentials: {
+      #     credentials: [{
       #       type: 'password',
       #       temporary: false,
       #       value: '$3cr3tP@55w0rd'
-      #     }
+      #     }]
       #   }
       # )
       def call(params)

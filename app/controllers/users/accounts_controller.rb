@@ -4,7 +4,7 @@ module Users
   # class for Keycloak account actions
   class AccountsController < ApplicationController
     # GET reset_password
-    def reset_password
+    def forgot_password
       authorize User, :reset_password?
       @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
@@ -14,8 +14,8 @@ module Users
       render inline: "location.reload();"
     end
 
-    # PUT confirm_reset_password
-    def confirm_reset_password
+    # PUT confirm_forgot_password
+    def confirm_forgot_password
       authorize User, :reset_password?
       @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
@@ -32,35 +32,34 @@ module Users
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
     end
 
-
-    # GET change_password
-    def change_password
+    # GET reset_password
+    def reset_password
       authorize User, :reset_password?
       @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
     end
 
-    def confirm_change_password
+    def confirm_reset_password
       authorize User, :reset_password?
       @user_id = params.require(:user_id)
       @account_id = params.require(:account_id)
-      new_password = parmas.require(:new_password)
+      new_password = params.require(:new_password)
 
       result = Operations::Accounts::ResetPassword.new.call(
         account: {
           id: @account_id,
-          credentials: {
+          credentials: [{
             type: 'password',
-            temporary: false,
+            temporary: true,
             value: new_password
-          }
+          }]
         }
       )
 
       if result.success?
-        redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
+        redirect_to user_account_index_exchanges_hbx_profiles_url, flash: {notice: "Password is reset."}
       else
-        redirect_to user_account_index_exchanges_hbx_profiles_url, error: "Error resetting password."
+        redirect_to user_account_index_exchanges_hbx_profiles_url, flash: {error: "Error changing password."}
       end
     rescue Pundit::NotAuthorizedError
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
@@ -104,6 +103,9 @@ module Users
       @user_id = params[:user_id]
       @user = User.find(@user_id)
       @account_id = params.require(:account_id)
+      @username = params.require(:username)
+      @email = params.require(:email)
+
     rescue Pundit::NotAuthorizedError
       flash[:alert] = "You are not authorized for this action."
       render inline: "location.reload();"
@@ -115,33 +117,26 @@ module Users
       @user_id = params[:user_id]
       @user = User.find(@user_id)
       @account_id = params.require(:account_id)
+      
+      attributes = {id: @account_id}
+      attributes.merge!(username: params[:new_username].strip) unless params[:current_username] == params[:new_username].strip
+      attributes.merge!(email: params[:new_email].strip) unless params[:current_email] == params[:new_email].strip
 
-      @element_to_replace_id = params[:family_actions_id]
-      @email_taken = User.where(:email => params[:new_email].strip, :id.ne => @user_id).first if params[:new_email]
-      @username_taken = User.where(:oim_id => params[:new_oim_id].strip, :id.ne => @user_id).first if params[:new_oim_id]
-      if @email_taken.present? || @username_taken.present?
-        @matches = true
-      else
-        username = params[:new_oim_id] if params[:new_oim_id] != params[:current_oim_id]
-        email = params[:new_email] if params[:new_email] && (params[:new_email] != params[:current_email])
+      result = Operations::Accounts::Update.new.call(account: attributes)
 
-        result = Operations::Accounts::Update.new.call(account: {username: username, email: email})
-        if result.success?
-          begin
-            @user.oim_id = username
-            @user.email = email
-            @user.modifier = current_user
-            @user.save!
-          rescue StandardError
-            @errors = @user.errors.messages
-          end
-        else
-          flash[:error] = "Error updating account."
+      if result.failure?
+        if attributes.key?(:username)
+          @username_taken = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0]
         end
+
+        if attributes.key?(:email)
+          @email_taken = Operations::Accounts::Find.new.call(scope_name: :by_email, criterion: params[:new_email].strip).value_or([])[0]
+        end
+      else
+        @account = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0]
       end
 
       respond_to do |format|
-        format.js { render "change_username_and_email"} if @errors
         format.js { render "username_email_result"}
       end
     end

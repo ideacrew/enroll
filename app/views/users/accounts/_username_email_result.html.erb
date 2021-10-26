@@ -1,23 +1,23 @@
 <div class="container">
-  <%if @matches != true %>
+  <% if  @username_taken.blank? && @email_taken.blank? %>
     <h4 class="title text-center">User Account Updated Successfully</h4>
     <table class="table table-border">
       <thead></thead>
       <tbody>
       <tr>
         <td>
-          <h5><b>Name:</b> <%= @user.person.try(:full_name) %></h5>
+          <h5><b>First Name:</b> <%= @account[:first_name] %></h5>
         </td>
         <td>
-          <h5><b>HBX ID:</b> <%= @user.person.try(:hbx_id) %></h5>
+          <h5><b>Last Name:</b> <%= @account[:last_name] %></h5>
         </td>
       </tr>
       <tr>
         <td>
-          <h5><b>Username:</b> <%= @user.oim_id %></h5>
+          <h5><b>Username:</b> <%= @account[:user_name] %></h5>
         </td>
         <td>
-          <h5><b>User_Email:</b> <%= @user.email %></h5>
+          <h5><b>User_Email:</b> <%= @account[:email] %></h5>
         </td>
       </tr>
       </tbody>
@@ -27,16 +27,16 @@
     <h3 class="title text-center">User Account Update Failed</h3>
     <% if @username_taken.present? %>
       <h4>The username matches with the following user:</h4>
-      First Name :<b><%= @username_taken.person.first_name %></b> <br />
-      Last Name:  <b><%= @username_taken.person.last_name %></b>  <br />
-      HBX ID:     <b><%= @username_taken.person.hbx_id %></b>     <br />
+      First Name :<b><%= @username_taken[:first_name] %></b> <br />
+      Last Name:  <b><%= @username_taken[:last_name] %></b>  <br />
+      Email:     <b><%= @username_taken[:email] %></b>     <br />
     <% end %>
     <% if @email_taken.present? %>
       <h4>The email matches with the following user:</h4>
-      First Name :<b><%= @email_taken.person.first_name %></b> <br />
-      Last Name:  <b><%= @email_taken.person.last_name %></b>  <br />
-      HBX ID:     <b><%= @email_taken.person.hbx_id %></b>     <br />
+      First Name :<b><%= @email_taken[:first_name] %></b> <br />
+      Last Name:  <b><%= @email_taken[:last_name] %></b>  <br />
+      Username:     <b><%= @email_taken[:username] %></b>     <br />
     <% end %>
     <h5>Please resolve the match issue.</h5>
   <%end%>
-  </div>
+</div>
