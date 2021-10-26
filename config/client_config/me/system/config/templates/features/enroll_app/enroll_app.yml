@@ -28,7 +28,7 @@ registry:
           - key: :nondiscrimination_notice_url
             item: ""
           - key: :submit_docs_url
-            item: ""
+            item: "https://www.CoverME.gov/forms"
           - key: :state_residency
             item: "ME Residency"
           - key: :site_key
@@ -339,7 +339,7 @@ registry:
         is_enabled: true
       - key: :sep_carousel_message
         item: :sep_carousel
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>

@@ -13,7 +13,7 @@ registry:
         item: :ivl_application_checklist
         settings:
           - key: :file_location
-            item: 'db/documents/ivl_checklist.pdf'
+            item: 'db/documents/ivl_checklist_me.pdf'
       - key: :iap_year_selection
         is_enabled: false
       - key: :iap_assistance_year_display
