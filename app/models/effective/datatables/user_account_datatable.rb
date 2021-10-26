@@ -72,7 +72,11 @@ module Effective
       end
 
       def global_search_method
-        :keycloak_account_search
+        if EnrollRegistry.feature_enabled?(:keycloak_integration)
+          :keycloak_account_search
+        else
+          :datatable_search
+        end
       end
 
       def nested_filter_definition
