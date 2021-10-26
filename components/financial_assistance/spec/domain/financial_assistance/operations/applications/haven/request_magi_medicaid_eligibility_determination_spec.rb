@@ -31,7 +31,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                               parent_living_out_of_home_terms: false,
                               submission_terms: true,
                               full_medicaid_determination: true)
-    appli.submit!
     appli
   end
   let!(:create_appli) do
@@ -58,6 +57,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
     application10.applicants.destroy_all
     application10.applicants = [appli]
     application10.save!
+    application10.submit!
     appli
   end
 
