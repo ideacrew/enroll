@@ -1526,7 +1526,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   # add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
   describe 'add_relationship' do
-    context 'destroy_relation set to true' do
+    context 'destroy_relation set to true with different relationship kind' do
       before do
         create_relationships
         application.add_relationship(application.primary_applicant, applicant2, 'parent', true)
@@ -1534,6 +1534,17 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it 'should just have 4 relationships as it removes all the other relationships that are mapped to primary_applicant' do
         expect(application.reload.relationships.count).to eq(4)
+      end
+    end
+
+    context 'destroy_relation set to true with same relationship kind' do
+      before do
+        create_relationships
+        application.add_relationship(application.primary_applicant, applicant2, 'spouse', true)
+      end
+
+      it 'should not remove any relationships as same relationship kind was sent as i/p' do
+        expect(application.reload.relationships.count).to eq(6)
       end
     end
   end
