@@ -1497,4 +1497,44 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
   end
+
+  describe 'update_or_build_relationship' do
+    let(:create_individual_rels) do
+      application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
+      application.update_or_build_relationship(application.primary_applicant, applicant2, 'spouse')
+      application.update_or_build_relationship(applicant2, application.primary_applicant, 'spouse')
+      application.update_or_build_relationship(application.primary_applicant, applicant3, 'child')
+      application.update_or_build_relationship(applicant3, application.primary_applicant, 'parent')
+      application.update_or_build_relationship(applicant2, applicant3, 'parent')
+      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.save!
+    end
+
+    it 'should create specific number of relationship objects only' do
+      create_individual_rels
+      applicants_count = application.reload.applicants.count
+      expect(application.reload.relationships.count).to eq(applicants_count * (applicants_count - 1))
+    end
+
+    it 'should not create more number of relationship that the expected even if we try to call the creation multiple times' do
+      create_individual_rels
+      create_individual_rels
+      applicants_count = application.reload.applicants.count
+      expect(application.reload.relationships.count).to eq(applicants_count * (applicants_count - 1))
+    end
+  end
+
+  # add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
+  describe 'add_relationship' do
+    context 'destroy_relation set to true' do
+      before do
+        create_relationships
+        application.add_relationship(application.primary_applicant, applicant2, 'parent', true)
+      end
+
+      it 'should just have 4 relationships as it removes all the other relationships that are mapped to primary_applicant' do
+        expect(application.reload.relationships.count).to eq(4)
+      end
+    end
+  end
 end
