@@ -1,3 +1,9 @@
 $("<%=params[:applicant_id]%>_<%=params[:relative_id]%>").removeClass("missing_relation");
 $("#family-matrix").html("<%= escape_javascript(render '/financial_assistance/relationships/form', form_remote: false, missing_relationships: @missing_relationships, all_relationships: @all_relationships, relationship_kinds: @relationship_kinds, redirect_url: '') %>");
 $(".faa-status").html("<%= escape_javascript(render 'financial_assistance/shared/status', application: @application) %>");
+
+<% if @application.reload.find_missing_relationships(@application.build_relationship_matrix).present? %>
+  $('#btn-continue').addClass('disabled');
+<% else %>
+  $('#btn-continue').removeClass('disabled');
+<% end %>

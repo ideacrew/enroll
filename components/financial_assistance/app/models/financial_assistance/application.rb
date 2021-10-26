@@ -357,7 +357,7 @@ module FinancialAssistance
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
     end
 
-    # Created both relationships A to B, and B to A.
+    # Creates both relationships A to B, and B to A.
     # This way we do not have to call two methods to create relationships
     def add_or_update_relationships(applicant, applicant2, relation_kind)
       update_or_build_relationship(applicant, applicant2, relation_kind)
@@ -372,43 +372,36 @@ module FinancialAssistance
       if relationship.present?
         # Update relationship object only if the existing RelationshipKind is different from the incoming RelationshipKind.
         relationship.update(kind: relation_kind) if relationship.kind != relation_kind
-        return relationship
+      else
+        self.relationships << ::FinancialAssistance::Relationship.new(
+          {
+            kind: relation_kind,
+            applicant_id: applicant.id,
+            relative_id: relative.id
+          }
+        )
       end
-
-      self.relationships << ::FinancialAssistance::Relationship.new(
-        {
-          kind: relation_kind,
-          applicant_id: applicant.id,
-          relative_id: relative.id
-        }
-      )
     end
 
-    #TODO: start of work progress
     # Related to Relationship Matrix
     def add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
-      if same_relative_exists?(predecessor, successor)
-        direct_relationship = relationships.where(applicant_id: predecessor.id, relative_id: successor.id).first # Direct Relationship
+      self.reload
+      direct_relationship = relationships.where(applicant_id: predecessor.id, relative_id: successor.id).first # Direct Relationship
+      return if direct_relationship.present? && direct_relationship.kind == relationship_kind
 
+      if direct_relationship.present?
         # Destroying the relationships associated to the Person other than the new updated relationship.
-        if !direct_relationship.nil? && destroy_relation
-          other_relations = relationships.where(applicant_id: predecessor.id, :id.nin => [direct_relationship.id]).map(&:relative_id)
-          relationships.where(applicant_id: predecessor.id, :id.nin => [direct_relationship.id]).each(&:destroy)
-
-          other_relations.each do |otr|
-            otr_relation = relationships.where(applicant_id: otr, relative_id: predecessor.id).first
-            otr_relation.destroy unless otr_relation.blank?
-          end
+        if destroy_relation
+          predecessor_rels_except_current = relationships.where(applicant_id: predecessor.id, :id.ne => direct_relationship.id)
+          predecessor_relationships_relative_ids = predecessor_rels_except_current.pluck(:relative_id)
+          predecessor_rels_except_current.destroy_all
+          relationships.where(:applicant_id.in => predecessor_relationships_relative_ids, relative_id: predecessor.id).destroy_all
         end
 
         direct_relationship.update(kind: relationship_kind)
       elsif predecessor.id != successor.id
         update_or_build_relationship(predecessor, successor, relationship_kind) # Direct Relationship
       end
-    end
-
-    def same_relative_exists?(predecessor, successor)
-      relationships.where(applicant_id: predecessor.id, relative_id: successor.id).first.present?
     end
 
     #Used for RelationshipMatrix
@@ -510,6 +503,8 @@ module FinancialAssistance
     def rt_transfer
       return unless is_rt_transferrable?
       ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
+    rescue StandardError => e
+      Rails.logger.error { "FAA rt_transfer error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def transfer_account
@@ -911,13 +906,13 @@ module FinancialAssistance
 
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
     rescue StandardError => e
-      Rails.logger.error("unable to trigger fdsh call for #{id} due to #{e.inspect}")
+      Rails.logger.error { "FAA trigger_fdhs_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def trigger_aces_call
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
     rescue StandardError => e
-      Rails.logger.error("unable to trigger acces call for #{id} due to #{e.inspect}")
+      Rails.logger.error { "FAA trigger_aces_call error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def is_aces_mec_checkable?
@@ -1534,6 +1529,8 @@ module FinancialAssistance
       rescue StandardError => e
         Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
       end
+    rescue StandardError => e
+      Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
     # rubocop:enable Metrics/CyclomaticComplexity
 
