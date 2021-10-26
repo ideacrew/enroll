@@ -900,14 +900,24 @@ module FinancialAssistance
       Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
     end
 
+    def can_trigger_fdsh_calls?
+      FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination) ||
+        FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination) ||
+        FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
+    end
+
     def trigger_fdhs_calls
-      return if predecessor_id.present?
+      return unless predecessor_id.blank? && can_trigger_fdsh_calls?
 
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+    rescue StandardError => e
+      Logger.info{"unable to trigger fdsh call for #{id} due to #{e.inspect}"}
     end
 
     def trigger_aces_call
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+    rescue StandardError => e
+      Logger.info{"unable to trigger acces call for #{id} due to #{e.inspect}"}
     end
 
     def is_aces_mec_checkable?
@@ -1521,6 +1531,8 @@ module FinancialAssistance
           to_state: 'verification_pending',
           event: 'move_to_pending!'
         )
+      rescue StandardError => e
+        Logger.info{"unable to create evidences for #{id} due to #{e.inspect}"}
       end
     end
     # rubocop:enable Metrics/CyclomaticComplexity
