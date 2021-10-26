@@ -2,12 +2,6 @@ module Queries
   class UserDatatableQuery
     attr_reader :search_string, :custom_attributes
 
-
-    def keycloak_account_search(string)
-      @keycloak_string = string
-      self
-    end
-
     def datatable_search(string)
       @search_string = string
       self
@@ -63,18 +57,11 @@ module Queries
               else
                 if @search_string.present?
                   user_datatable_search(@search_string)
-                elsif @keycloak_string.present?
-                  keycloak_account_datatable_search(@keycloak_string)
                 else
                   user.all
                 end
               end
       users
-    end
-
-    def keycloak_account_datatable_search(query)
-      accounts = Operations::Accounts::Find.new.call(scope_name: :by_any, criterion: query.strip).success
-      user_datatable_search(query).or(:account_id.in => accounts.map{|acc| acc[:id]})
     end
 
     def user_datatable_search(query)
