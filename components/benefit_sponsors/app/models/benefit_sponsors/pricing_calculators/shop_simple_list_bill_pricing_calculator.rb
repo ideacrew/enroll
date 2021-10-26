@@ -69,6 +69,7 @@ module BenefitSponsors
         sorted_members = roster_entry.members.sort_by do |rm|
           begin
             coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
+            rm.relationship = "ward" if rm.relationship == "grandchild"
           rescue StandardError => e
             exception_message = "Error: #{e}"
             exception_message += "Unable to sort members for sponsored_benefit with ID: #{@sponsored_benefit&.id}"
