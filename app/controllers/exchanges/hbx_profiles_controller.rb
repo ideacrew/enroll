@@ -294,6 +294,7 @@ def employer_poc
 
   def request_help
     role = nil
+    consumer = nil
     if params[:type]
       cac_flag = params[:type] == 'CAC'
       match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
@@ -317,6 +318,7 @@ def employer_poc
     if role
       status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
       if find_email(agent, role)
+        params.merge!(consumer_person_id: consumer.id.to_s) if consumer.present?
         agent_assistance_messages(params,agent,role)
       else
 
@@ -947,16 +949,20 @@ def employer_poc
   end
 
   def agent_assistance_messages(params, agent, role)
-    # TODO: Why do we not always have the person_id?
-    # Need to figure this out
-    # The translations secure message may want things like the person's phone/email
-    insured = Person.where(_id: params[:person]).first
+    # Merged the consumer_person_id elsewhere
+    # To assure it doesn't acidentally confuse impersonation
+    insured = if params[:consumer_person_id].present?
+                Person.where(_id: params[:consumer_person_id]).first
+              else
+                Person.where(_id: params[:person]).first
+              end
     first_name = insured.first_name || params[:first_name]
     last_name = insured.last_name || params[:last_name]
     insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email) || params[:email]
     insured_phone_number = insured&.phones&.first&.full_phone_number
+    insured_id = insured&.id&.to_s || params[:person]
     if params[:person].present?
-      root = "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{params[:person]}&original_application_type:"
+      root = "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{insured_id}&original_application_type:"
       translation_key = "inbox.agent_assistance_messages_person_present"
       translation_interpolated_keys = {
         first_name: first_name,
@@ -995,7 +1001,8 @@ def employer_poc
     agent_email = find_email(agent,role)
     full_name = "#{first_name} #{last_name}"
     if agent_email.present?
-      result = UserMailer.new_client_notification(agent_email, first_name, role, insured_email, hbx_id)
+      agent_first_name = agent.first_name
+      result = UserMailer.new_client_notification(agent_email, agent_first_name, role, insured_email, hbx_id)
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else
