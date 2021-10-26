@@ -32,7 +32,6 @@ module Users
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
     end
 
-
     # GET change_password
     def change_password
       authorize User, :reset_password?
