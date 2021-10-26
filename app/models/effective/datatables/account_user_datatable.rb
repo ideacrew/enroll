@@ -22,7 +22,7 @@ module Effective
         table_column :actions, :width => '50px', :filter => false, :sortable => false
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def collection
         return @accounts_collection if defined?(@accounts_collection) && @accounts_collection.present?
 
@@ -60,7 +60,7 @@ module Effective
           @accounts_collection = [['None given']]
         end
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def permission_type(user)
         user&.person&.hbx_staff_role&.permission&.name || 'N/A'
