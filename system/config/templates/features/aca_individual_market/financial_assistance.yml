@@ -93,11 +93,11 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :batch_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :transfer_service
-      is_enabled: true
+      is_enabled: false
       item: "curam"
   - namespace:
     - :documents
