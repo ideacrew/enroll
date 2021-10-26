@@ -1459,8 +1459,84 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         first_applicant.save!
       end
 
+      it 'should return false' do
+        expect(application.applicants_have_valid_addresses?).to eq(false)
+      end
+    end
+
+    context 'only primary applicant has home address and dependents with an address' do
+      before do
+        first_applicant = application.applicants.first
+        first_applicant.update_attributes(is_primary_applicant: true)
+        first_applicant.addresses = [FactoryBot.build(:financial_assistance_address,
+                                                      :address_1 => '1111 Awesome Street NE',
+                                                      :address_2 => '#111',
+                                                      :address_3 => '',
+                                                      :city => 'Washington',
+                                                      :country_name => '',
+                                                      :kind => 'home',
+                                                      :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                                      :zip => '20001',
+                                                      county: '')]
+
+        dependents = application.applicants.where(is_primary_applicant: false)
+        dependents.each do |dependent|
+          dependent.addresses = [FactoryBot.build(:financial_assistance_address,
+                                                  :address_1 => '1111 Awesome Street NE',
+                                                  :address_2 => '#111',
+                                                  :address_3 => '',
+                                                  :city => 'test',
+                                                  :country_name => '',
+                                                  :kind => 'home',
+                                                  :state => 'co',
+                                                  :zip => '40001',
+                                                  county: '')]
+          dependent.save!
+        end
+        first_applicant.save!
+        application.save!
+      end
+
       it 'should return true' do
         expect(application.applicants_have_valid_addresses?).to eq(true)
+      end
+    end
+
+    context 'only primary applicant has home address and dependents with work address' do
+      before do
+        first_applicant = application.applicants.first
+        first_applicant.update_attributes(is_primary_applicant: true)
+        first_applicant.addresses = [FactoryBot.build(:financial_assistance_address,
+                                                      :address_1 => '1111 Awesome Street NE',
+                                                      :address_2 => '#111',
+                                                      :address_3 => '',
+                                                      :city => 'Washington',
+                                                      :country_name => '',
+                                                      :kind => 'home',
+                                                      :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                                      :zip => '20001',
+                                                      county: '')]
+
+        dependents = application.applicants.where(is_primary_applicant: false)
+        dependents.each do |dependent|
+          dependent.addresses = [FactoryBot.build(:financial_assistance_address,
+                                                  :address_1 => '1111 Awesome Street NE',
+                                                  :address_2 => '#111',
+                                                  :address_3 => '',
+                                                  :city => 'test',
+                                                  :country_name => '',
+                                                  :kind => 'work',
+                                                  :state => 'co',
+                                                  :zip => '40001',
+                                                  county: '')]
+          dependent.save!
+        end
+        first_applicant.save!
+        application.save!
+      end
+
+      it 'should return true' do
+        expect(application.applicants_have_valid_addresses?).to eq(false)
       end
     end
   end

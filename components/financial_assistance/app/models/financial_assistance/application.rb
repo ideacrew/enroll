@@ -1165,11 +1165,9 @@ module FinancialAssistance
     end
 
     # Case1: Missing address - No address objects at all
-    # Case2: Invalid Address - No addresses matching the state
-    # Case3: Unable to get rating area(home_address || mailing_address)
+    # Case2: Primary applicant should have a valid address
     def applicants_have_valid_addresses?
-      # As per pivotal ticket 180058812: only primary address validation is required
-      primary_applicant.has_valid_address?
+      applicants.all?{|applicant| applicant.addresses.where(:kind.in => ['home', 'mailing']).present?} && primary_applicant.has_valid_address?
     end
 
     def is_application_valid?
