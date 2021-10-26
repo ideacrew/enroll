@@ -911,13 +911,13 @@ module FinancialAssistance
 
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
     rescue StandardError => e
-      Logger.info{"unable to trigger fdsh call for #{id} due to #{e.inspect}"}
+      Rails.logger.error("unable to trigger fdsh call for #{id} due to #{e.inspect}")
     end
 
     def trigger_aces_call
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
     rescue StandardError => e
-      Logger.info{"unable to trigger acces call for #{id} due to #{e.inspect}"}
+      Rails.logger.error("unable to trigger acces call for #{id} due to #{e.inspect}")
     end
 
     def is_aces_mec_checkable?
@@ -1532,7 +1532,7 @@ module FinancialAssistance
           event: 'move_to_pending!'
         )
       rescue StandardError => e
-        Logger.info{"unable to create evidences for #{id} due to #{e.inspect}"}
+        Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
       end
     end
     # rubocop:enable Metrics/CyclomaticComplexity
