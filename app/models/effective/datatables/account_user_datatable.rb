@@ -48,7 +48,7 @@ module Effective
                 result_user&.person&.dob || 'Unknown',
                 result_user&.person&.hbx_id || 'Unknown',
                 result[:enabled] ? 'Unlocked' : 'Locked',
-                (result_user&.roles || ['None']).join(', ') ,
+                (result_user&.roles || ['None']).join(', '),
                 permission_type(result_user),
                 dropdown_html
               ]]

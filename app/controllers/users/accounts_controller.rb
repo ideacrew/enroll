@@ -105,19 +105,18 @@ module Users
       @account_id = params.require(:account_id)
       @username = params.require(:username)
       @email = params.require(:email)
-
     rescue Pundit::NotAuthorizedError
       flash[:alert] = "You are not authorized for this action."
       render inline: "location.reload();"
     end
 
-    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
     def confirm_change_username_and_email
       authorize User, :change_username_and_email?
       @user_id = params[:user_id]
       @user = User.find(@user_id)
       @account_id = params.require(:account_id)
-      
+
       attributes = {id: @account_id}
       attributes.merge!(username: params[:new_username].strip) unless params[:current_username] == params[:new_username].strip
       attributes.merge!(email: params[:new_email].strip) unless params[:current_email] == params[:new_email].strip
@@ -125,13 +124,9 @@ module Users
       result = Operations::Accounts::Update.new.call(account: attributes)
 
       if result.failure?
-        if attributes.key?(:username)
-          @username_taken = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0]
-        end
+        @username_taken = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0] if attributes.key?(:username)
 
-        if attributes.key?(:email)
-          @email_taken = Operations::Accounts::Find.new.call(scope_name: :by_email, criterion: params[:new_email].strip).value_or([])[0]
-        end
+        @email_taken = Operations::Accounts::Find.new.call(scope_name: :by_email, criterion: params[:new_email].strip).value_or([])[0] if attributes.key?(:email)
       else
         @account = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0]
       end
@@ -140,6 +135,6 @@ module Users
         format.js { render "username_email_result"}
       end
     end
-    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/AbcSize
   end
 end
