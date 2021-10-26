@@ -840,7 +840,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                             zip: '20001'
                                                           })
 
-      applicant.addresses << add
+      applicant.addresses = [add]
       applicant.save!
     end
 
@@ -855,7 +855,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                               zip: '20001'
                                                             })
 
-        applicant2.addresses << add
+        applicant2.addresses = [add]
         applicant2.save!
       end
 
@@ -889,7 +889,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                               zip: '20001'
                                                             })
 
-        applicant2.addresses << add
+        applicant2.addresses = [add]
         applicant2.save!
       end
 
@@ -934,7 +934,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                               zip: '20001'
                                                             })
 
-        applicant2.addresses << add
+        applicant2.addresses = [add]
         applicant2.save!
       end
 
@@ -984,7 +984,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                               zip: '20001'
                                                             })
 
-        applicant3.addresses << add
+        applicant3.addresses = [add]
         applicant3.save!
       end
 
