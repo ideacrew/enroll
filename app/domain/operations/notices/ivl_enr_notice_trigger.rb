@@ -19,7 +19,7 @@ module Operations
         household_hash = yield build_household_hash(family, values[:enrollment])
         payload = yield build_payload(fm_hash, household_hash, family, is_documents_needed(values[:enrollment]))
         validated_payload = yield validate_payload(payload)
-        entity_result = yield thorugh_entity(validated_payload)
+        entity_result = yield through_entity(validated_payload)
         event = yield build_event(entity_result)
         result = yield publish_response(event)
 
@@ -69,7 +69,7 @@ module Operations
       end
 
       def build_family_member_hash(enrollment)
-        members = enrollment.hbx_enrollment_members.map(&:family_member)
+        members = enrollment.family&.family_members || []
         family_members_hash = members.collect do |fm|
           person = fm.person
           outstanding_verification_types = person.consumer_role.types_include_to_notices
@@ -82,6 +82,7 @@ module Operations
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
+              consumer_role: build_consumer_role(person.consumer_role),
               addresses: build_addresses(person)
             }
           }
@@ -152,6 +153,24 @@ module Operations
         sep_hash
       end
 
+      def build_consumer_role(consumer_role)
+        {
+          is_applying_coverage: consumer_role.is_applying_coverage,
+          five_year_bar: consumer_role.five_year_bar,
+          requested_coverage_start_date: consumer_role.requested_coverage_start_date,
+          aasm_state: consumer_role.aasm_state,
+          is_applicant: consumer_role.is_applicant,
+          is_state_resident: consumer_role.is_state_resident,
+          identity_validation: consumer_role.identity_validation,
+          identity_update_reason: consumer_role.identity_update_reason,
+          application_validation: consumer_role.application_validation,
+          application_update_reason: consumer_role.application_update_reason,
+          identity_rejected: consumer_role.identity_rejected,
+          application_rejected: consumer_role.application_rejected,
+          lawful_presence_determination: {}
+        }
+      end
+
       def consumer_role_reference(consumer_role)
         {
           is_active: consumer_role.is_active,
@@ -216,7 +235,7 @@ module Operations
         Success(result.to_h)
       end
 
-      def thorugh_entity(payload)
+      def through_entity(payload)
         Success(AcaEntities::Families::Family.new(payload).to_h)
       end
 
