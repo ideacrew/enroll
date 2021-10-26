@@ -72,9 +72,9 @@ module FinancialAssistance
           end
 
           def build_family(family_hash)
-            found_families = find_family(family_hash)
-            @family = if found_families.any?
-                        found_families.first
+            found_family = find_family(family_hash)
+            @family = if found_family.present?
+                        found_family
                       else
                         ::Family.new(family_hash.except('hbx_id', 'foreign_keys', 'broker_accounts', 'magi_medicaid_applications', 'family_members',
                                                         'households', 'ext_app_id'))
