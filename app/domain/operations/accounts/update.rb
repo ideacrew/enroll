@@ -25,6 +25,7 @@ module Operations
       def call(params)
         values = yield validate(params)
         _token_proc = yield cookie_token(values)
+        yield update(values)
 
         Success(values)
       end
@@ -49,9 +50,17 @@ module Operations
         end
       end
 
-      def update(_values)
-        Keycloak::Admin.update_user(id, user_representation)
-        Keycloak::Admin.update_user(attributes)
+      def update(values)
+        result =
+          Try[RestClient::Conflict] do
+            Keycloak::Admin.update_user(
+              values.to_h[:id],
+              values.to_h.except(:id)
+            )
+          end.to_result
+
+        return Failure('Username or Email already exists') if result.failure?
+        result
       end
     end
   end
