@@ -88,4 +88,153 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       end
     end
   end
+
+  describe 'for non-rating area site' do
+    before do
+      allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('single')
+      allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('single')
+    end
+
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    let!(:person2) do
+      p2 = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person2')
+      person.ensure_relationship_with(p2, 'spouse')
+      p2
+    end
+    let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family)}
+
+    let(:effective_date) { TimeKeeper.date_of_record }
+    let(:params) do
+      {
+        family: family,
+        effective_date: effective_date
+      }
+    end
+
+    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+
+    let(:products) { ::BenefitMarkets::Products::Product.all }
+    let(:products_payload) do
+      {
+        rating_area_id: BSON::ObjectId.new,
+        products: products
+      }
+    end
+
+    context 'with one member having addresses in different state' do
+
+      before do
+        family.primary_applicant.person.addresses.first.update_attributes(state: 'dc')
+        family.family_members.where(is_primary_applicant: false).each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+        end
+
+        @result = subject.call(params)
+      end
+
+      it 'should return true' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should fetch one slcp for primary applicant' do
+        expect(@result.success.count).to eq 1
+      end
+    end
+
+    context 'with all members having addresses in different states' do
+
+      before do
+        family.primary_applicant.person.addresses.first.update_attributes(state: 'pa')
+        family.family_members.where(is_primary_applicant: false).each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001" )}
+        end
+
+        @result = subject.call(params)
+      end
+
+      it 'should return true' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should fetch one slcp for primary applicant' do
+        expect(@result.success.count).to eq 1
+      end
+    end
+  end
+
+  describe 'for rating area site' do
+    before do
+      allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+      allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+    end
+
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    let!(:person2) do
+      p2 = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person2')
+      person.ensure_relationship_with(p2, 'spouse')
+      p2
+    end
+    let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family)}
+
+    let(:effective_date) { TimeKeeper.date_of_record }
+    let(:params) do
+      {
+        family: family,
+        effective_date: effective_date
+      }
+    end
+
+    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+
+    let(:products) { ::BenefitMarkets::Products::Product.all }
+    let(:products_payload) do
+      {
+        rating_area_id: BSON::ObjectId.new,
+        products: products
+      }
+    end
+
+    context 'with one member having addresses in different state' do
+
+      before do
+        family.primary_applicant.person.addresses.first.update_attributes(state: 'me', zip: '04007', county: 'york')
+        family.family_members.where(is_primary_applicant: false).each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+        end
+        BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
+        ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'york',zip: "04007", state: "ME")
+        @result = subject.call(params)
+      end
+
+      it 'should return true' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should fetch one slcp for primary applicant' do
+        expect(@result.success.count).to eq 1
+      end
+    end
+
+    context 'with all members having addresses in different states' do
+
+      before do
+        family.primary_applicant.person.addresses.first.update_attributes(state: 'pa')
+        family.family_members.where(is_primary_applicant: false).each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+        end
+
+        BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
+        ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'york',zip: "04007", state: "ME")
+        @result = subject.call(params)
+      end
+
+      it 'should return false' do
+        expect(@result.failure?).to be_truthy
+      end
+    end
+  end
 end
