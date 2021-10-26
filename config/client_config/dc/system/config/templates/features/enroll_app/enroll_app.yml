@@ -623,6 +623,9 @@ registry:
       - key: :pii_match_success_message
         item: :pii_match_success_message
         is_enabled: false
+      - key: :disable_documents_we_accept_list
+        item: :disable_documents_we_accept_list
+        is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: false
