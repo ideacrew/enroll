@@ -20,6 +20,7 @@ module Effective
                                                                          [
                                                                            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                                                            ['Reset Password', user_account_reset_password_path(user_id: row.id, account_id: account[:id], username: account[:username]), 'ajax'],
+                                                                           ['Change Password', user_account_change_password_path(user_id: row.id, account_id: account[:id], username: account[:username]), 'ajax'],
                                                                            ['Unlock / Lock Account', user_account_lockable_path(user_id: row.id, account_id: account[:id], enabled: account[:enabled]), 'ajax'],
                                                                            ['View Login History',login_history_user_path(id: row.id), 'ajax'],
                                                                            ['Edit User', user_account_change_username_and_email_path(user_id: row.id, account_id: account[:id]), 'ajax']
@@ -52,7 +53,7 @@ module Effective
 
       def accounts
         if EnrollRegistry.feature_enabled?(:keycloak_integration)
-          @accounts ||= Operations::Accounts::Find.new.call(scope_name: :all, page: 1, page_size: 20).success
+          @accounts ||= Operations::Accounts::Find.new.call(scope_name: :all, page: 1, page_size: 100).success
         else
           []
         end

@@ -32,6 +32,40 @@ module Users
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
     end
 
+
+    # GET change_password
+    def change_password
+      authorize User, :reset_password?
+      @user_id = params.require(:user_id)
+      @account_id = params.require(:account_id)
+    end
+
+    def confirm_change_password
+      authorize User, :reset_password?
+      @user_id = params.require(:user_id)
+      @account_id = params.require(:account_id)
+      new_password = parmas.require(:new_password)
+
+      result = Operations::Accounts::ResetPassword.new.call(
+        account: {
+          id: @account_id,
+          credentials: {
+            type: 'password',
+            temporary: false,
+            value: new_password
+          }
+        }
+      )
+
+      if result.success?
+        redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
+      else
+        redirect_to user_account_index_exchanges_hbx_profiles_url, error: "Error resetting password."
+      end
+    rescue Pundit::NotAuthorizedError
+      redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
+    end
+
     # GET lockable
     def lockable
       authorize User, :lockable?
