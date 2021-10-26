@@ -377,79 +377,79 @@ registry:
           - key: :plan_shopping
             item: true
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Kaiser Permanente'
       - key: :delta_dental_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Delta Dental'
       - key: :dentegra_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Dentegra'
       - key: :dominion_national_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Dominion National'
       - key: :best_life_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'BEST Life'
       - key: :metlife_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'MetLife'
       - key: :carefirst_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'CareFirst'
       - key: :aetna_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Aetna'
       - key: :unitedhealthcare_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'UnitedHealthcare'
       - key: :northeast_delta_dental_pay_now
