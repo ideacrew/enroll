@@ -645,7 +645,7 @@ module FinancialAssistance
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
-              person_hbx_ids = application.applicants.pluck(:person_hbx_id)
+              person_hbx_ids = application.applicants.where(is_primary_applicant: true).pluck(:person_hbx_id)
 
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
               return premiums if premiums.failure?

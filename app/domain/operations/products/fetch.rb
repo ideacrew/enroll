@@ -38,15 +38,17 @@ module Operations
       def find_addresses(family)
         geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
 
+        members = family.family_members.where(is_primary_applicant: true, is_active: true)
+
         address_combinations = case geographic_rating_area_model
                                when 'single'
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.state]}
+                                 members.group_by {|fm| [fm.rating_address.state]}
                                when 'county'
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.county]}
+                                 members.group_by {|fm| [fm.rating_address.county]}
                                when 'zipcode'
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.zip]}
+                                 members.group_by {|fm| [fm.rating_address.zip]}
                                else
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.county, fm.rating_address.zip]}
+                                 members.group_by {|fm| [fm.rating_address.county, fm.rating_address.zip]}
                                end
 
         address_combinations = address_combinations.transform_values {|v| v.map(&:rating_address).compact }.values
