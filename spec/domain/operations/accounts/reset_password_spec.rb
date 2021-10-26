@@ -8,9 +8,6 @@ RSpec.describe Operations::Accounts::ResetPassword, type: :request do
   include_context 'account'
 
   context 'given a set of accounts exist in keycloak' do
-    before { create_avenger_accounts }
-
-    # after { delete_avenger_accounts }
 
     context 'and a new password credentials are posted' do
       let(:new_password) { '$uperP@ss11' }
@@ -32,10 +29,13 @@ RSpec.describe Operations::Accounts::ResetPassword, type: :request do
       end
 
       # getting 500 Internal Server Error
-      xit 'should update the account password' do
-        result = subject.call(account: new_password_params)
-
-        expect(result.success?).to be_truthy
+      it 'should update the account password' do
+        VCR.use_cassette('account.reset_password.update_account') do
+          create_avenger_accounts
+          result = subject.call(account: new_password_params)
+          expect(result.success?).to be_truthy
+          delete_avenger_accounts
+        end
       end
     end
   end

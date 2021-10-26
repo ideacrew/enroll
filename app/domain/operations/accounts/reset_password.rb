@@ -33,6 +33,7 @@ module Operations
         Success(result)
       end
 
+
       private
 
       def validate(params)
@@ -54,14 +55,12 @@ module Operations
       end
 
       def reset_password(values)
-        # Try() do
         result =
           Keycloak::Admin.reset_password(
             values[:id],
-            values[:credentials].map(&:stringify_keys)
+            values[:credentials][0]
           )
 
-        # end.to_result
         Success(result)
       end
     end

@@ -49,17 +49,13 @@ RSpec.shared_context 'account' do
   end
 
   def create_avenger_accounts
-    #  VCR.use_cassette('create_avenger_accounts') do
     avengers.each { |_k, v| Operations::Accounts::Create.new.call(account: v) }
-    # end
   end
 
   def delete_avenger_accounts
-    # VCR.use_cassette('delete_avenger_accounts') do
     avengers.each do |_k, v|
       Operations::Accounts::Delete.new.call(login: v[:username])
     end
-    # end
   end
 
   # rubocop:disable Metrics/MethodLength
