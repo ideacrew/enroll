@@ -29,9 +29,9 @@ module Subscribers
           result = ::Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
                                                                       effective_on: renewal_bcp.start_on)
           if result.success?
-            notify("acapi.info.events.enrollments.renew_enrollment_success", {:body => JSON.dump({:family_id => family_id})})
+            notify("acapi.info.events.enrollments.renew_enrollment_success", {:body => JSON.dump({:family_id => family_id, :enrollment_ext_id => enrollment.external_id})})
           else
-            notify("acapi.info.events.enrollments.renew_enrollment_failure", {:body => JSON.dump({:family_id => family_id})})
+            notify("acapi.info.events.enrollments.renew_enrollment_failure", {:body => JSON.dump({:family_id => family_id, :enrollment_ext_id => enrollment.external_id})})
           end
         end
       rescue StandardError => _e

@@ -84,14 +84,17 @@ module Operations
       def find_existing_person(params)
         person = Person.by_hbx_id(params[:hbx_id]).first
         return person if person.present?
-        candidate = PersonCandidate.new(params[:ssn], params[:dob], params[:first_name], params[:last_name])
 
-        if params[:no_ssn] == '1'
-          Person.where(first_name: /^#{candidate.first_name}$/i, last_name: /^#{candidate.last_name}$/i,
-                       dob: candidate.dob).first
-        else
-          Person.match_existing_person(candidate)
-        end
+        match_criteria, records = Operations::People::Match.new.call({:dob => params[:dob],
+                                                                      :last_name => params[:last_name],
+                                                                      :first_name => params[:first_name],
+                                                                      :ssn => params[:ssn]})
+
+        return [] unless records.present?
+        return [] unless [:ssn_present, :dob_present].include?(match_criteria)
+        return [] if match_criteria == :dob_present && params[:ssn].present? && records.first.ssn != params[:ssn]
+
+        records.first
       end
     end
   end

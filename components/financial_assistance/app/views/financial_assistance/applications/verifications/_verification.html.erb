@@ -5,6 +5,7 @@
     <div class="module verification-process col-md-12">
       <% applicants = application.applicants %>
       <% applicants.each do |applicant| %>
+        <% next unless applicant.is_applying_coverage %>
         <div class="row">
           <div class="family-member col-md-12">
             <div class="person">

@@ -10,12 +10,13 @@ module Operations
       include Dry::Monads[:result, :do]
       include EventSource::Command
       include EventSource::Logging
+      include ActionView::Helpers::NumberHelper
 
       def call(params)
         values = yield validate(params)
         family = yield fetch_family(values[:enrollment])
         fm_hash = yield build_family_member_hash(values[:enrollment])
-        household_hash = yield build_household_hash(family, values[:enrollment].effective_on.year)
+        household_hash = yield build_household_hash(family, values[:enrollment])
         payload = yield build_payload(fm_hash, household_hash, family, is_documents_needed(values[:enrollment]))
         validated_payload = yield validate_payload(payload)
         entity_result = yield thorugh_entity(validated_payload)
@@ -90,14 +91,13 @@ module Operations
         Success(family_members_hash)
       end
 
-      def build_household_hash(family, year)
+      def build_household_hash(family, enrollment)
         household_hash = family.households.collect do |household|
-          enrollments = household.hbx_enrollments.enrolled_and_renewal.with_product.by_year(year)
           {
             start_date: household.effective_starting_on,
             is_active: household.is_active,
             coverage_households: household.coverage_households.collect { |ch| {is_immediate_family: ch.is_immediate_family, coverage_household_members: ch.coverage_household_members.collect {|chm| {is_subscriber: chm.is_subscriber}}} },
-            hbx_enrollments: build_enrollments_hash(enrollments)
+            hbx_enrollments: build_enrollments_hash([enrollment])
           }
         end
         Success(household_hash)
@@ -140,15 +140,16 @@ module Operations
 
       def special_enrollment_period_reference(enrollment)
         sep = enrollment.family.latest_active_sep
-        qle = sep.qualifying_life_event_kind
-        {
-          qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle),
+        qle = sep&.qualifying_life_event_kind
+        sep_hash = {
           qle_on: sep.qle_on,
           start_on: sep.start_on,
           end_on: sep.end_on,
           effective_on: sep.effective_on,
           submitted_at: sep.submitted_at
         }
+        sep_hash.merge!(qualifying_life_event_kind_reference: qualifying_life_event_kind_reference(qle)) if qle.present?
+        sep_hash
       end
 
       def consumer_role_reference(consumer_role)
@@ -163,11 +164,12 @@ module Operations
       end
 
       def issuer_profile_reference(issuer)
+        phone_number = issuer.office_locations.where(is_primary: true).first&.phone&.full_phone_number
         {
           hbx_id: issuer.hbx_id,
           name: issuer.legal_name,
           abbrev: issuer.abbrev,
-          phone: issuer.office_locations.where(is_primary: true).first&.phone&.full_phone_number
+          phone: number_to_phone(phone_number, area_code: true)
         }
       end
 

@@ -27,7 +27,7 @@ registry:
         is_enabled: true
         settings:
           - key: :default_applied_aptc_percentage
-            item: 0.85
+            item: 1
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
         is_enabled: true
@@ -84,4 +84,6 @@ registry:
         is_enabled: true
       - key: :verification_reasons
         item: ["Document in EnrollApp", "Electronic data source", "State Medicaid Agency"]
+        is_enabled: true
+      - key: :total_minimum_responsibility
         is_enabled: true

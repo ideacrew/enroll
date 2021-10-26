@@ -13,10 +13,6 @@ describe "plan_cross_walk" do
   end
 
   context "passing scenarios" do
-    before do
-      EnrollRegistry[:has_bqt].feature.stub(:is_enabled).and_return(true)
-    end
-
     it "should run the rake" do
       expect(@plan_2017.renewal_plan_id).to eq nil
       expect(@product_2017.renewal_product_id).to eq nil
@@ -35,12 +31,11 @@ describe "plan_cross_walk" do
   end
 
   context "when plan renewing to the same hios id during renewal year scenario" do
-    before do
+    before :all do
       @plan_2017.update_attributes(renewal_plan_id: nil, hios_id: "42690MA1234503-01")
       @product_2017.update_attributes(renewal_product_id: nil, hios_id: "42690MA1234503-01")
       @plan_2018.update_attributes(renewal_plan_id: nil)
       @product_2018.update_attributes(renewal_product_id: nil)
-      EnrollRegistry[:has_bqt].feature.stub(:is_enabled).and_return(true)
     end
     it "should run the rake" do
       expect(@plan_2017.renewal_plan_id).to eq nil

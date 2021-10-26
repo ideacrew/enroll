@@ -621,6 +621,7 @@ module FinancialAssistance
       end
       # rubocop:enable Style/CombinableLoops
 
+      return matrix unless EnrollRegistry.feature_enabled?(:mitc_relationships)
       # FatherOrMotherInLaw/DaughterOrSonInLaw Rule: father_or_mother_in_law, daughter_or_son_in_law
       missing_relationships = execute_father_or_mother_in_law_rule(missing_relationships)
 
@@ -629,6 +630,9 @@ module FinancialAssistance
 
       # Cousin Rule: cousin
       missing_relationships = execute_cousin_rule(missing_relationships)
+
+      # DomesticPartnersChild Rule: domestic_partners_child
+      missing_relationships = execute_domestic_partners_child_rule(missing_relationships)
 
       matrix
     end
@@ -758,7 +762,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls] do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
         transitions from: :submitted, to: :determined
       end
 
@@ -897,7 +901,18 @@ module FinancialAssistance
     end
 
     def trigger_fdhs_calls
+      return if predecessor_id.present?
+
       Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+    end
+
+    def trigger_aces_call
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+    end
+
+    def is_aces_mec_checkable?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      self.active_applicants.any?(&:is_ia_eligible?)
     end
 
     def total_incomes_by_year
@@ -1253,6 +1268,28 @@ module FinancialAssistance
       missing_relationships
     end
 
+    # If MemberA is domestic_partner to MemberB,
+    # and MemberB is parent to MemberC,
+    # then MemberA is parents_domestic_partner to MemberC
+    def execute_domestic_partners_child_rule(missing_relationships)
+      missing_relationships.each do |rel|
+        applicant_ids = rel.to_a.flatten
+        applicant_relations = relationships.where(:applicant_id.in => applicant_ids, kind: 'domestic_partner')
+        applicant_relations.each do |each_relation|
+          # Do not continue if there are no missing relationships.
+          return missing_relationships if missing_relationships.blank?
+          other_applicant_id = (applicant_ids - [each_relation.applicant_id]).first
+          child_relation = relationships.where(applicant_id: other_applicant_id, kind: 'child').first
+          next if child_relation.nil? || child_relation.relative_id != each_relation.relative_id
+          parents_domestic_partner = applicants.where(id: each_relation.applicant_id).first
+          domestic_partners_child = applicants.where(id: other_applicant_id).first
+          add_or_update_relationships(parents_domestic_partner, domestic_partners_child, 'parents_domestic_partner')
+          missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+      missing_relationships
+    end
+
     def check_parent_living_out_of_home_terms
       (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
         parent_living_out_of_home_terms.is_a?(FalseClass)
@@ -1458,18 +1495,19 @@ module FinancialAssistance
 
     # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
+      return if predecessor_id.present?
+
       types = []
+      types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
       types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
+
       active_applicants.each do |applicant|
-        applicant.evidences =
-          types.collect do |type|
-            key, title = type
-            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
-          end
+        applicant.evidences = build_evidences(types, applicant)
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+
           family_member_record = family.family_members.where(id: applicant.family_member_id).first
           next if family_member_record.blank?
           person_record = family_member_record.person
@@ -1487,6 +1525,22 @@ module FinancialAssistance
       end
     end
     # rubocop:enable Metrics/CyclomaticComplexity
+
+    def build_evidences(types, applicant)
+      types.collect do |type|
+        key, title = type
+
+        next if applicant.evidences.by_name(key).present?
+        case key
+        when :aces_mec, :esi_mec, :non_esi_mec
+          next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
+          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
+        when :income
+          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
+          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "outstanding")
+        end
+      end
+    end
 
     def delete_verification_documents
       active_applicants.each do |applicant|

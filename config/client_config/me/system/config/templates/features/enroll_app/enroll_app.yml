@@ -379,7 +379,7 @@ registry:
             item: ""
       - key: :ivl_enrollment_renewal_begin_date
         item: :enrollment_renewal_date
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :ivl_enrollment_renewal_begin_effective_day
             item: 24
@@ -387,6 +387,9 @@ registry:
             item: 10
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
+        is_enabled: true
+      - key: :exclude_adult_and_child_only_offering
+        item: :exclude_adult_and_child_only_offering
         is_enabled: true
   - namespace:
       - :pay_now_feature
@@ -562,8 +565,6 @@ registry:
         is_enabled: false
       - key: :display_county
         is_enabled: true
-      - key: :has_bqt
-        is_enabled: false
       - key: :moving_to_state
         is_enabled: false
       - key: :living_outside_state
@@ -634,6 +635,9 @@ registry:
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
         is_enabled: true
+      - key: :pii_match_success_message
+        item: :pii_match_success_message
+        is_enabled: true
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: true
@@ -666,3 +670,10 @@ registry:
             item: ['first_name', 'last_name', 'dob']
           - key: :name_present
             item: ['first_name', 'last_name']
+  - namespace:
+      - :features
+      - :enroll_app
+      - :relationships
+    features:
+      - key: :mitc_relationships
+        is_enabled: true

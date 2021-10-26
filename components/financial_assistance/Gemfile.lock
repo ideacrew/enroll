@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: acccd54c96e8d9ef48e239a56ecd2b6536e88ff2
-  branch: release_0.10.0
+  revision: abd4c4e4bed30c5c1008479545df41d4f9e494b9
+  branch: trunk
   specs:
     aca_entities (0.9.0)
       deep_merge
@@ -240,7 +240,7 @@ GEM
     erubis (2.7.0)
     et-orbi (1.2.5)
       tzinfo
-    ethon (0.14.0)
+    ethon (0.15.0)
       ffi (>= 1.15.0)
     factory_bot (4.11.1)
       activesupport (>= 3.0.0)
@@ -260,7 +260,7 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
-    faraday_middleware (1.1.0)
+    faraday_middleware (1.2.0)
       faraday (~> 1.0)
     ffi (1.15.4)
     font-awesome-rails (4.7.0.5)
@@ -410,7 +410,7 @@ GEM
     rake (13.0.1)
     rbnacl (7.1.1)
       ffi
-    redis (4.4.0)
+    redis (4.5.1)
     redis-namespace (1.8.1)
       redis (>= 3.0.4)
     regexp_parser (1.7.1)
@@ -431,11 +431,11 @@ GEM
     resque-retry (1.7.6)
       resque (>= 1.25, < 3.0)
       resque-scheduler (~> 4.0)
-    resque-scheduler (4.4.0)
+    resque-scheduler (4.5.0)
       mono_logger (~> 1.0)
       redis (>= 3.3)
-      resque (>= 1.26)
-      rufus-scheduler (~> 3.2)
+      resque (>= 1.27)
+      rufus-scheduler (~> 3.2, < 3.7)
     rexml (3.2.4)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
@@ -475,7 +475,7 @@ GEM
     ruby2_keywords (0.0.5)
     ruby_parser (3.14.2)
       sexp_processor (~> 4.9)
-    rufus-scheduler (3.8.0)
+    rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)

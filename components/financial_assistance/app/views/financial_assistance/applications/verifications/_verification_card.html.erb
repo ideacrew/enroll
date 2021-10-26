@@ -1,16 +1,15 @@
 <% applicant.evidences.all.each do |evidence| %>
+  <% next if  evidence.key == :income && applicant.incomes.blank?   %>
   <% evidence_type = evidence.title %>
   <div class="row">
     <div class="v-type col-md-12">
       <div class="v-type-name col-md-2">
-        <%= display_evidence_type(evidence_type) %>
+        <%= l10n(display_evidence_type(evidence_type)) %>
       </div>
       <div class="v-type-status col-md-2 text-center">
-        <% if applicant.is_applying_coverage %>
-            <span class="label lb-md label-<%=verification_status_class(evidence.eligibility_status)%>">
-              <%= show_verification_status(evidence.eligibility_status, current_user.has_hbx_staff_role?) %>
-            </span>&nbsp;
-        <% end %>
+          <span class="label lb-md label-<%=verification_status_class(evidence.eligibility_status)%>">
+            <%= show_verification_status(evidence.eligibility_status, current_user.has_hbx_staff_role?) %>
+          </span>&nbsp;
       </div>
 
       <div class="v-type-due-date col-md-3">

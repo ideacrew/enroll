@@ -6,8 +6,7 @@ module FinancialAssistance
   module VerificationHelper
 
     def fetch_latest_determined_application(family_id)
-      FinancialAssistance::Application.where(family_id: family_id).determined.order_by(:created_at => 'desc').first ||
-      FinancialAssistance::Application.where(family_id: family_id).submitted.order_by(:created_at => 'desc').first
+      FinancialAssistance::Application.where(family_id: family_id).determined.order_by(:created_at => 'desc').first
     end
 
     def show_verification_status(status, admin = nil)
@@ -18,7 +17,7 @@ module FinancialAssistance
     def admin_verification_action(admin_action, evidence, update_reason)
       case admin_action
       when "verify"
-        evidence.update!(eligibility_status: 'attested', update_reason: update_reason)
+        evidence.update!(eligibility_status: 'verified', update_reason: update_reason)
       when "return_for_deficiency"
         evidence.update!(eligibility_status: 'outstanding', update_reason: update_reason, rejected: true)
       end
@@ -45,11 +44,13 @@ module FinancialAssistance
     def display_evidence_type(evidence)
       case evidence
       when "ESI MEC"
-        "Coverage from a job"
+        "faa.evidence_type_esi"
+      when "ACES MEC"
+        "faa.evidence_type_aces"
       when "Non ESI MEC"
-        "Coverage from another program"
+        "faa.evidence_type_non_esi"
       when "Income"
-        "Income"
+        "faa.evidence_type_income"
       end
     end
 

@@ -23,8 +23,6 @@ namespace :xml do
 
     qhp_import_product_hash.run
 
-    next unless EnrollRegistry.feature_enabled?(:has_bqt)
-
     qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
       puts file
       xml = Nokogiri::XML(File.open(file))

@@ -5,7 +5,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/ffe/operations/mcr_to/enrollment'
 require 'aca_entities/ffe/transformers/mcr_to/enrollment'
-# rubocop:disable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# rubocop:disable Metrics/AbcSize, Style/GuardClause, Metrics/CyclomaticComplexity
 module Operations
   module Ffe
     # operation to transform mcr data to enroll format
@@ -18,6 +18,28 @@ module Operations
       # api public
 
       attr_reader :payload, :policy_tracking_id, :enrollment_hash, :family
+
+      FAMILYMAP = { "3653661530" => "3654638599", "3653835451" => "3653545566", "3655103341" => "3655669235",
+                    "3654647425" => "3656048335", "3655199651" => "3655176192", "3655050863" => "3653739431",
+                    "3655446385" => "3654726512", "3655845985" => "3654917025", "3655473710" => "3656046449",
+                    "3655221287" => "3703540271", "3656379459" => "3654186542", "3655195010" => "3715498949",
+                    "3656281232" => "3720039656", "3656308100" => "3656296751", "3654881326" => "3736090550",
+                    "3679195400" => "3753262194", "3655508494" => "3698523219", "3656101873" => "3726489109",
+                    "3694631216" => "3752159826", "3691339160" => "3690953787", "3699716118" => "3789998132",
+                    "3655320635" => "3942246878", "3654199812" => "3783193340", "3655481814" => "3791987236",
+                    "3654189404" => "3814304009", "4061853917" => "4071973876", "3656064729" => "3922175933",
+                    "3656240817" => "3866859385", "3656394545" => "3789413969", "3653836120" => "4059628869",
+                    "3887243470" => "3921306099", "3656824321" => "4057512462", "3996525167" => "3963681631",
+                    "3763371082" => "3655447280", "3655120315" => "3793679309", "3655429746" => "3775505336",
+                    "3654370357" => "3770687752", "3655797066" => "3956526075", "3656791057" => "4064839169",
+                    "4023970705" => "4007554188", "3809789830" => "4023502228", "3655485373" => "3783529311",
+                    "3654478431" => "3747430017", "3654354357" => "3656133587", "3654587217" => "3743174122",
+                    "3654935600" => "3706289263", "3655737145" => "3654714693", "3764290138" => "3654745957",
+                    "3654265734" => "3878412998", "3796431048" => "3653852422", "3655895410" => "4066027101",
+                    "3655646562" => "3795341920", "3655967545" => "3794924231", "3655656463" => "3656490078",
+                    "3656865574" => "3730462612", "3656327410" => "3743146491", "3725241030" => "4062488565",
+                    "3883632840" => "3909927316", "4013177626" => "4013144552", "4013810941" => "4086876990",
+                    "3905775367" => "4110558923" }.freeze
 
       def call(payload)
         @payload = payload
@@ -169,13 +191,14 @@ module Operations
 
       def sanitize_enrollment_member_hash(family, member_hash)
         eligible_members = member_hash.reject {|mem|  mem["coverage_end_on"] == mem["coverage_start_on"]}
-        eligible_members.inject([]) do |members, m_hash|
+        member_result = eligible_members.inject([]) do |members, m_hash|
           applicant = find_family_member(family, m_hash)
           m_hash["applicant_id"] = applicant.try(:id)
           m_hash["coverage_end_on"] = nil
           m_hash.delete("family_member_reference")
           members << m_hash
         end
+        member_result.reject {|mem| mem["applicant_id"].nil? }
       end
 
       def find_benefit_coverage_period(effective_on)
@@ -187,12 +210,33 @@ module Operations
 
       def find_family(external_id)
         result = Rails.cache.fetch("family_#{external_id}", expires_in: 12.hour) do
-          Operations::Families::Find.new.call(external_app_id: external_id)
+          app_id = FAMILYMAP[external_id.to_s] || external_id
+          Operations::Families::Find.new.call(external_app_id: app_id)
         end
 
         if result&.success?
           result.success
         else
+          # subscriber = enrollment_hash["hbx_enrollment_members"].detect {|hbx_m| hbx_m["is_subscriber"] == true}
+          # ssn = subscriber["family_member_reference"]["ssn"]
+          # dob = subscriber["family_member_reference"]["dob"]
+          # fname = subscriber["family_member_reference"]["first_name"]
+          # lname = subscriber["family_member_reference"]["last_name"]
+          #
+          # people = if ssn.blank?
+          #            Person.where(first_name: /^#{fname}$/i, last_name: /^#{lname}$/i, dob: dob)
+          #          else
+          #            Person.where(:encrypted_ssn => SymmetricEncryption.encrypt(ssn), :dob => dob)
+          #          end
+          #
+          # if people.count == 1
+          #   person = people.first
+          #   families = person.families
+          # end
+          #
+          # if families.present? && families.count == 1
+          #   return families.first
+          # end
           raise "family not found #{external_id}"
         end
       end
@@ -229,8 +273,6 @@ module Operations
         people = Rails.cache.fetch("person_#{fm_hash['person_hbx_id']}", expires_in: 12.hour) do
           Person.where(external_person_id: fm_hash["person_hbx_id"])
         end
-
-        raise "person not found #{fm_hash['person_hbx_id']}" unless people.present?
 
         raise "more than one person found" if people.count > 1
 
@@ -286,10 +328,11 @@ module Operations
         )
         overlapping_coverage = hbx_enrollments.select do |enrollment|
           enrollment.subscriber.hbx_id == new_enrollment.subscriber.hbx_id &&
-            (enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(enrollment_hash["effective_on"])
+            ((enrollment.effective_on..enrollment.terminated_on || Date.new(2021,12,31)).cover?(new_enrollment.effective_on) ||
+              (new_enrollment.effective_on < enrollment.effective_on && new_enrollment.coverage_selected? && enrollment.coverage_selected?))
         end
         overlapping_coverage.each do |enrollment|
-          if new_enrollment.created_at >= enrollment.created_at
+          if new_enrollment.external_id > enrollment.external_id || new_enrollment.created_at >= enrollment.created_at
             if enrollment.may_cancel_coverage?
               enrollment.cancel_coverage!
             else
@@ -322,4 +365,4 @@ module Operations
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Style/GuardClause, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# rubocop:enable Metrics/AbcSize, Style/GuardClause, Metrics/CyclomaticComplexity
