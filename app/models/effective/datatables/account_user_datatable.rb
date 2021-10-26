@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module Effective
   module Datatables
+    # class for Keycloak AccountUserDatatable, used as an alternate to UserAccountDatatable
     class AccountUserDatatable < Effective::Datatable
       include Config::SiteModelConcern
       include Rails.application.routes.url_helpers
@@ -19,6 +22,7 @@ module Effective
         table_column :actions, :width => '50px', :filter => false, :sortable => false
       end
 
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       def collection
         return @accounts_collection if defined?(@accounts_collection) && @accounts_collection.present?
 
@@ -47,8 +51,7 @@ module Effective
                 (result_user&.roles || ['None']).join(', ') ,
                 permission_type(result_user),
                 dropdown_html
-              ]
-            ]
+              ]]
             else
               memo
             end
@@ -57,6 +60,7 @@ module Effective
           @accounts_collection = [['None given']]
         end
       end
+      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
       def permission_type(user)
         user&.person&.hbx_staff_role&.permission&.name || 'N/A'
