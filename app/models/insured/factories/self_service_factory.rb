@@ -157,9 +157,9 @@ module Insured
       end
 
       # Checks if case is eligible for 1/1 effective date for Prospective Year's enrollments.
-      def self.eligible_for_1_1_effective_date?(system_date, current_effective_on)
-        last_eligible_date_for_1_1_effective_date = Date.new(system_date.year, system_date.end_of_year.month, HbxProfile::IndividualEnrollmentDueDayOfMonth)
-        system_date.year > current_effective_on.year && HbxProfile.current_hbx.under_open_enrollment? && last_eligible_date_for_1_1_effective_date > system_date
+      def self.eligible_for_1_1_effective_date?(hbx_created_datetime, current_effective_on)
+        last_eligible_date_for_1_1_effective_date = Date.new(hbx_created_datetime.year, hbx_created_datetime.end_of_year.month, HbxProfile::IndividualEnrollmentDueDayOfMonth)
+        hbx_created_datetime.year > current_effective_on.year && HbxProfile.current_hbx.under_open_enrollment? && last_eligible_date_for_1_1_effective_date > hbx_created_datetime
       end
 
       private
