@@ -257,14 +257,14 @@ module Insured
       # prospective year enrollment effective_on date
       context "within OE before last month's IndividualEnrollmentDueDayOfMonth" do
         before do
-          current_year = TimeKeeper.date_of_record.year
+          current_year = Date.today.year
           system_date = rand(Date.new(current_year, 11, 1)..Date.new(current_year, 12, 1))
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
-          @result = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), system_date.next_year.beginning_of_year).to_date
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), system_date.next_year.beginning_of_year).to_date
         end
 
         it 'should return start of next year as effective date' do
-          expect(@result).to eq(TimeKeeper.date_of_record.next_year.beginning_of_year)
+          expect(@effective_date).to eq(Date.today.next_year.beginning_of_year)
         end
       end
     end
