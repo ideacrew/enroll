@@ -376,14 +376,48 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member2.update_attributes(csr_percent_as_integer: 0) # default value
         tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
-        plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
       end
 
       # removing condition to assign csr_kid by default to limited for all AI/AN members
       it 'should not return plans with csr_kind for limited' do
         allow(rule).to receive(:satisfied?).and_return [true, 'ok']
         elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).not_to include('02')
+        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).not_to include('03')
+      end
+    end
+
+    context 'When both tax_household members are AI/AN and not ia_eligible' do
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+        tax_household_member1.update_attributes(csr_percent_as_integer: 0, is_ia_eligible: false) # default value
+        tax_household_member2.update_attributes(csr_percent_as_integer: 0, is_ia_eligible: false) # default value
+        tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
+        tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
+        plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+      end
+
+      it 'should return plans with csr_kind for limited' do
+        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).to include('03')
+      end
+    end
+
+    context 'When tax_household members are AI/AN and one of them are not ia_eligible' do
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+        tax_household_member1.update_attributes(csr_percent_as_integer: 0, is_ia_eligible: true) # default value
+        tax_household_member2.update_attributes(csr_percent_as_integer: 0, is_ia_eligible: false) # default value
+        tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
+        tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
+        plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+      end
+
+      it 'should not return plans with csr_kind for limited' do
+        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).not_to include('03')
       end
     end
 
