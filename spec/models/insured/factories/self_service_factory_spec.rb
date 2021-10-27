@@ -260,7 +260,7 @@ module Insured
           current_year = Date.today.year
           system_date = rand(Date.new(current_year, 11, 1)..Date.new(current_year, 12, 1))
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
-          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), system_date.next_year.beginning_of_year).to_date
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 2, 1)).to_date
         end
 
         it 'should return start of next year as effective date' do
