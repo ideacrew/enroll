@@ -77,6 +77,7 @@ module FinancialAssistance
               applications_with_evidences << cv3_application.to_h
               count += 1
               rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
+              applications_with_evidences
             rescue StandardError
               rrv_logger.info("failed to process fpr person with hbx_id #{family.primary_person.hbx_id}")
             end
