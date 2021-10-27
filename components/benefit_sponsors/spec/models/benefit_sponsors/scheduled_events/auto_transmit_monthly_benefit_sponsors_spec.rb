@@ -458,7 +458,7 @@ module BenefitSponsors
               aasm_state: :active)
       end
       let!(:employer_H) do
-        build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_renewal_benefit_application,
+        create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_renewal_benefit_application, :with_service_areas,
               initial_application_state: :active,
               renewal_application_state: :enrollment_closed,
               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
@@ -700,7 +700,8 @@ module BenefitSponsors
         end
 
         it "should transmit only employer_H " do
-          allow_any_instance_of(BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:is_renewal_carrier_drop?).and_return(true)
+          allow(employer_H).to receive(:is_renewal_carrier_drop?).and_return(true)
+          allow(BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:may_transmit_renewal_enrollment?).and_return(double(no_timeout: [employer_H]))
           expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible",
                                                                             {employer_id: employer_H.profile.hbx_id,event_name: 'benefit_coverage_renewal_application_eligible'})
           expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped",
