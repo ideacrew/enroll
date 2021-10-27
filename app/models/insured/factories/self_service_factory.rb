@@ -141,6 +141,9 @@ module Insured
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
           month = current_enrollment_effective_on.month + offset_month
+        elsif eligible_for_1_1_effective_date?(hbx_created_datetime, current_enrollment_effective_on)
+          year += 1
+          month = day = 1
         else
           offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
           year = hbx_created_datetime.year
@@ -151,6 +154,12 @@ module Insured
           month -= 12
         end
         DateTime.new(year, month, day, hour, min, sec)
+      end
+
+      # Checks if case is eligible for 1/1 effective date for Prospective Year's enrollments.
+      def self.eligible_for_1_1_effective_date?(system_date, current_effective_on)
+        last_eligible_date_for_1_1_effective_date = Date.new(system_date.year, system_date.end_of_year.month, HbxProfile::IndividualEnrollmentDueDayOfMonth)
+        system_date.year > current_effective_on.year && HbxProfile.current_hbx.under_open_enrollment? && last_eligible_date_for_1_1_effective_date > system_date
       end
 
       private
