@@ -14,8 +14,8 @@ class MeDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true, can_add_sep: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true, manage_agency_staff: false,
-                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
-                          can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true, can_reset_password: true,
+                          can_update_ssn: true, can_lock_unlock: false, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
+                          can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false, can_reset_password: false,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true,
                           can_access_identity_verification_sub_tab: false, can_access_accept_reject_identity_documents: false, view_agency_staff: false,
                           can_access_accept_reject_paper_application_documents: false, can_delete_identity_application_documents: false, can_access_pay_now: false,
@@ -27,8 +27,8 @@ class MeDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_send_secure_message: true, can_add_sep: true,
                           send_broker_agency_message: true, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true, can_access_pay_now: false,
-                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
-                          can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true, can_reset_password: true, can_change_username_and_email: true,
+                          can_update_ssn: true, can_lock_unlock: false, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
+                          can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false, can_reset_password: false, can_change_username_and_email: true,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false, can_view_sep_history: true,
                           can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true)
@@ -37,8 +37,8 @@ class MeDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_access_pay_now: false,
                           send_broker_agency_message: true, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true, can_change_username_and_email: true,
-                          can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
-                          can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true, can_reset_password: true,
+                          can_update_ssn: true, can_lock_unlock: false, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
+                          can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false, can_reset_password: false,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false,
                           can_view_sep_history: true, can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true)
@@ -50,10 +50,10 @@ class MeDefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_staff')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: true, can_complete_resident_application: true,
-                          can_add_sep: true, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: true, modify_admin_tabs: true,
+                          can_add_sep: true, can_lock_unlock: false, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, can_change_username_and_email: true,
                           view_agency_staff: true, manage_agency_staff: true, can_access_pay_now: true, can_access_age_off_excluded: true,
-                          can_add_pdc: true, can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: true,
+                          can_add_pdc: true, can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_edit_aptc: true,
                           can_view_sep_history: true, can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true,
                           change_enrollment_end_date: true)
@@ -75,10 +75,10 @@ class MeDefinePermissions < MigrationTask
     Permission
       .find_or_initialize_by(name: 'hbx_tier3')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_change_username_and_email: true,
-                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_lock_unlock: true, modify_admin_tabs: true,
+                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_lock_unlock: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true,
                           manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true,
-                          view_login_history: true, can_reset_password: true, can_edit_aptc: true, can_view_sep_history: true, can_reinstate_enrollment: true,
+                          view_login_history: false, can_reset_password: false, can_edit_aptc: true, can_view_sep_history: true, can_reinstate_enrollment: true,
                           can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true, can_access_user_account_tab: true)
     Permission
       .find_or_initialize_by(name: 'developer')
@@ -197,12 +197,12 @@ class MeDefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_view_login_history
-    Permission.hbx_staff.update_attributes!(view_login_history: true)
+    Permission.hbx_staff.update_attributes!(view_login_history: false)
     Permission.super_admin.update_attributes!(view_login_history: true)
-    Permission.hbx_csr_supervisor.update_attributes!(view_login_history: true)
-    Permission.hbx_csr_tier2.update_attributes!(view_login_history: true)
-    Permission.hbx_csr_tier1.update_attributes!(view_login_history: true)
-    Permission.hbx_tier3.update_attributes!(view_login_history: true)
+    Permission.hbx_csr_supervisor.update_attributes!(view_login_history: false)
+    Permission.hbx_csr_tier2.update_attributes!(view_login_history: false)
+    Permission.hbx_csr_tier1.update_attributes!(view_login_history: false)
+    Permission.hbx_tier3.update_attributes!(view_login_history: false)
   end
 
   def hbx_admin_csr_view_personal_info_page
@@ -232,12 +232,12 @@ class MeDefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_lock_unlock
-    Permission.hbx_staff.update_attributes(can_lock_unlock: true)
+    Permission.hbx_staff.update_attributes(can_lock_unlock: false)
     Permission.super_admin.update_attributes(can_lock_unlock: true)
-    Permission.hbx_csr_supervisor.update_attributes(can_lock_unlock: true)
-    Permission.hbx_csr_tier2.update_attributes(can_lock_unlock: true)
-    Permission.hbx_csr_tier1.update_attributes(can_lock_unlock: true)
-    Permission.hbx_tier3.update_attributes(can_lock_unlock: true)
+    Permission.hbx_csr_supervisor.update_attributes(can_lock_unlock: false)
+    Permission.hbx_csr_tier2.update_attributes(can_lock_unlock: false)
+    Permission.hbx_csr_tier1.update_attributes(can_lock_unlock: false)
+    Permission.hbx_tier3.update_attributes(can_lock_unlock: false)
   end
 
   def hbx_admin_can_add_pdc
@@ -257,12 +257,12 @@ class MeDefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_reset_password
-    Permission.hbx_staff.update_attributes(can_reset_password: true)
+    Permission.hbx_staff.update_attributes(can_reset_password: false)
     Permission.super_admin.update_attributes(can_reset_password: true)
-    Permission.hbx_csr_supervisor.update_attributes(can_reset_password: true)
-    Permission.hbx_csr_tier2.update_attributes(can_reset_password: true)
-    Permission.hbx_csr_tier1.update_attributes(can_reset_password: true)
-    Permission.hbx_tier3.update_attributes(can_reset_password: true)
+    Permission.hbx_csr_supervisor.update_attributes(can_reset_password: false)
+    Permission.hbx_csr_tier2.update_attributes(can_reset_password: false)
+    Permission.hbx_csr_tier1.update_attributes(can_reset_password: false)
+    Permission.hbx_tier3.update_attributes(can_reset_password: false)
   end
 
   def hbx_admin_can_change_fein
