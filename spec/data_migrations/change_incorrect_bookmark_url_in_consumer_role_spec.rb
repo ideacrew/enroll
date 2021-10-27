@@ -35,9 +35,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         person.user.update_attributes(:idp_verified => true)
         person.user.ridp_by_payload!
         person.user.save
-        person.addresses.to_a.each do |add|
-          add.delete
-        end
+        person.addresses.to_a.each(&:delete)
         person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
         subject.migrate
         person.reload
