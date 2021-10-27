@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Reports
+    # Publish event to start preaudit report process
     class GeneratePreauditReconsilationReport
       include EventSource::Command
       send(:include, Dry::Monads[:result, :do])
