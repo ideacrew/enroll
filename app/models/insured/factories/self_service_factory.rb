@@ -136,15 +136,15 @@ module Insured
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
         # this condition is for self service APTC feature ONLY.
-        if current_enrollment_effective_on.year != hbx_created_datetime.year
+        if current_enrollment_effective_on.year == hbx_created_datetime.year
+          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          year = hbx_created_datetime.year
+          month = hbx_created_datetime.month + offset_month
+        else
           condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, 15)).include?(hbx_created_datetime.to_date)
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
           month = current_enrollment_effective_on.month + offset_month
-        else
-          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
-          year = hbx_created_datetime.year
-          month = hbx_created_datetime.month + offset_month
         end
         if month > 12
           year += 1
