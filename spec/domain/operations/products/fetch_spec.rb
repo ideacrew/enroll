@@ -138,8 +138,12 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         expect(@result.success?).to be_truthy
       end
 
-      it 'should fetch one slcp for primary applicant' do
+      it "should fetch products for primary applicant's address" do
         expect(@result.success.count).to eq 1
+      end
+
+      it "should fetch products mapped to all members" do
+        expect(@result.success.keys.flatten.count).to eq family.active_family_members.count
       end
     end
 
@@ -148,7 +152,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.primary_applicant.person.addresses.first.update_attributes(state: 'pa')
         family.family_members.where(is_primary_applicant: false).each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001" )}
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
         end
 
         @result = subject.call(params)
@@ -158,7 +162,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         expect(@result.success?).to be_truthy
       end
 
-      it 'should fetch one slcp for primary applicant' do
+      it "should fetch products for primary applicant's address" do
         expect(@result.success.count).to eq 1
       end
     end
@@ -166,7 +170,6 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
 
   describe 'for rating area site' do
     before do
-      allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
       allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
     end
 
@@ -214,8 +217,12 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         expect(@result.success?).to be_truthy
       end
 
-      it 'should fetch one slcp for primary applicant' do
+      it "should fetch products for primary applicant's address" do
         expect(@result.success.count).to eq 1
+      end
+
+      it "should fetch products mapped to all members" do
+        expect(@result.success.keys.flatten.count).to eq family.active_family_members.count
       end
     end
 
