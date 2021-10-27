@@ -70,5 +70,18 @@ RSpec.describe Operations::Accounts::Find, type: :request do
         end
       end
     end
+
+    context 'scope_name is :count_all' do
+      it 'should return total number of accounts' do
+        VCR.use_cassette('account.count_all') do
+          create_avenger_accounts
+          response = subject.call(scope_name: :count_all, criterion: 'avengers')
+
+          expect(response.success?).to be_truthy
+          expect(response.success).to be_an_instance_of(Integer)
+          delete_avenger_accounts
+        end
+      end
+    end
   end
 end

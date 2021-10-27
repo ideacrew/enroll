@@ -15,6 +15,7 @@ module Operations
         by_first_name
         by_last_name
         by_any
+        count_all
       ].freeze
 
       # @param [Hash] acct {AcaEntities::Accounts::Account}-related parameters
@@ -63,13 +64,18 @@ module Operations
       def search(values)
         # rubocop:disable Style/MultilineBlockChain
         Try() do
-          query_params = search_scope(values).merge(pagination(values))
-          Keycloak::Admin.get_users(query_params)
+          if values[:scope_name] == :count_all
+            Keycloak::Admin.count_users.to_i
+          else
+            query_params = search_scope(values).merge(pagination(values))
+            Keycloak::Admin.get_users(query_params)
+          end
         end.bind { |result| result ? Success(result) : Failure(result) }
         # rubocop:enable Style/MultilineBlockChain
       end
 
       def map_attributes(keycloak_attributes)
+        return Success(keycloak_attributes) unless keycloak_attributes.is_a?(String)
         json_attrs = JSON(keycloak_attributes)
         Operations::Accounts::MapAttributes.new.call(json_attrs)
       end
