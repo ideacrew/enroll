@@ -255,10 +255,12 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:plan3) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+    let(:plan6) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id], cost_sharing: 'csr_0')}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id], cost_sharing: 'csr_0')}
     let(:benefit_package3) {double(benefit_ids: [plan5.id], cost_sharing: 'csr_limited')}
-    let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3] }
+    let(:benefit_package4) {double(benefit_ids: [plan6.id], cost_sharing: 'csr_100')}
+    let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3, benefit_package4] }
     let(:rule) {double}
     let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
     let!(:tax_household_member1) { tax_household.tax_household_members.build(applicant_id: family.family_members.where(is_primary_applicant: true).first.id, csr_percent_as_integer: 87, is_ia_eligible: true) }
@@ -267,13 +269,14 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     before :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
       Plan.delete_all
-      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2, benefit_package3]
+      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2, benefit_package3, benefit_package4]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
       plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01', application_period: {"min" => Date.new(2018,0o1,0o1), "max" => Date.new(2018,12,31)})
       plan3.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan4.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan5.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+      plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
     end
 
     after do
@@ -353,8 +356,8 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
         tax_household_member1.update_attributes(csr_percent_as_integer: 100)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
       end
 
       it 'should return plans with csr_kind for limited' do
@@ -373,14 +376,13 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member2.update_attributes(csr_percent_as_integer: 0) # default value
         tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
       end
 
       it 'should return plans with csr_kind for limited' do
         allow(rule).to receive(:satisfied?).and_return [true, 'ok']
         elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).to include('03')
+        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).to include('02')
       end
     end
 
@@ -389,7 +391,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
         tax_household_member1.update_attributes(csr_percent_as_integer: 87)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
+        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
       end
 

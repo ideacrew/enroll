@@ -52,13 +52,23 @@ class TaxHousehold
 
     if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
       thh_members.map(&:family_member).each do |family_member|
-        thhm_appid_csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member
+        thhm_appid_csr_hash[family_member.id] = 'csr_100' if family_member.person.indian_tribe_member
       end
       family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
       thh_members = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
     end
     thh_m_eligibility_kinds = thhm_appid_csr_hash.values.uniq
-    (thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kinds)
+
+    if thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0
+      if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr) &&
+         thh_members.map(&:family_member).any?{ |fm| fm.person.indian_tribe_member }
+        'csr_limited'
+      else
+        'csr_0'
+      end
+    else
+      eligibile_csr_kind_for_shopping(thh_m_eligibility_kinds)
+    end
   end
 
   def eligible_csr_percent_as_integer(family_member_ids)
