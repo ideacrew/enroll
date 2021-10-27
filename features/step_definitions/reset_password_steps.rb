@@ -14,6 +14,10 @@ Then(/^Hbx Admin should see (.*?) link in action drop down$/) do |text|
   find_link(text).visible?
 end
 
+Then(/^Hbx Admin should not see (.*?) link in action drop down$/) do |text|
+  expect(page).to_not have_content(text)
+end
+
 When(/^Hbx Admin click on (.*?) link in action drop down$/) do |link|
   click_link(link)
   wait_for_ajax
