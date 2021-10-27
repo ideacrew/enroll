@@ -22,48 +22,65 @@ module Effective
         table_column :actions, :width => '50px', :filter => false, :sortable => false
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def collection
         return @accounts_collection if defined?(@accounts_collection) && @accounts_collection.present?
 
-        results = Operations::Accounts::Find.new.call(scope_name: :all, page: page, page_size: per_page).success
-        if results.present?
-          result_ids = results.map { |result| result[:id] }
-          users = User.where(:account_id.in => result_ids)
-          @accounts_collection = results.reduce([]) do |memo, result|
-            result_user = users.detect { |user| user.account_id == result[:id] }
-            if result_user
-              dropdown = [
-                ['Forgot Password', user_account_forgot_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
-                ['Reset Password', user_account_reset_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
-                ['Unlock / Lock Account', user_account_lockable_path(user_id: result_user.id, account_id: result[:id], enabled: result[:enabled]), 'ajax'],
-                ['View Login History',login_history_user_path(id: result_user.id), 'ajax'],
-                ['Edit User', user_account_change_username_and_email_path(user_id: result_user.id, account_id: result[:id], username: result[:username], email: result[:email]), 'ajax']
-              ]
-              dropdown_html = ApplicationController.new.render_to_string(partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{result_user.id}"}, formats: :html)
-              memo + [[
-                result[:username],
-                result[:email] || 'Unknown',
-                truncate(number_to_obscured_ssn(result_user&.person&.ssn)) || 'Unknown',
-                result_user&.person&.dob || 'Unknown',
-                result_user&.person&.hbx_id || 'Unknown',
-                result[:enabled] ? 'Unlocked' : 'Locked',
-                (result_user&.roles || ['None']).join(', '),
-                permission_type(result_user),
-                dropdown_html
-              ]]
-            else
-              memo
-            end
+        results = Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
+        @accounts_collection = if results.present?
+                                 render_table_rows(results)
+                               else
+                                 [['None given']]
+                               end
+      end
+
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      def render_table_rows(results)
+        result_ids = results.map { |result| result[:id] }
+        users = User.where(:account_id.in => result_ids)
+        results.reduce([]) do |memo, result|
+          result_user = users.detect { |user| user.account_id == result[:id] }
+          if result_user
+            dropdown = [
+              ['Forgot Password', user_account_forgot_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
+              ['Reset Password', user_account_reset_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
+              ['Unlock / Lock Account', user_account_lockable_path(user_id: result_user.id, account_id: result[:id], enabled: result[:enabled]), 'ajax'],
+              ['View Login History',login_history_user_path(id: result_user.id), 'ajax'],
+              ['Edit User', user_account_change_username_and_email_path(user_id: result_user.id, account_id: result[:id], username: result[:username], email: result[:email]), 'ajax']
+            ]
+            dropdown_html = ApplicationController.new.render_to_string(partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{result_user.id}"}, formats: :html)
+            memo + [[
+              result[:username],
+              result[:email] || 'Unknown',
+              truncate(number_to_obscured_ssn(result_user&.person&.ssn)) || 'Unknown',
+              result_user&.person&.dob || 'Unknown',
+              result_user&.person&.hbx_id || 'Unknown',
+              result[:enabled] ? 'Unlocked' : 'Locked',
+              (result_user&.roles || ['None']).join(', '),
+              permission_type(result_user),
+              dropdown_html
+            ]]
+          else
+            memo
           end
-        else
-          @accounts_collection = [['None given']]
         end
       end
       # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def permission_type(user)
         user&.person&.hbx_staff_role&.permission&.name || 'N/A'
+      end
+
+      def total_records
+        @total_records ||= Operations::Accounts::Find.new.call(scope_name: :count_all).success
+      end
+
+      def fetch_page_of_data
+        results = Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
+        render_table_rows(results)
+      end
+
+      def array_tool_paginate(_col)
+        fetch_page_of_data
       end
     end
   end

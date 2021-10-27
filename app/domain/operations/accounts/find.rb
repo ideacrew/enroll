@@ -96,7 +96,14 @@ module Operations
       end
 
       def pagination(values)
-        { first: values[:page_number] || 0, max: values[:page_size] || 100 }
+        max = values[:page_size] || 100
+        offset = if values[:page_number]
+                   (values[:page_number] - 1) * max
+                 else
+                   0
+                 end
+
+        { first: offset, max: max }
       end
     end
   end
