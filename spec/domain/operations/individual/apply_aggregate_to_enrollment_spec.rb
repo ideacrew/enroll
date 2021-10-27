@@ -168,7 +168,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
       allow(family).to receive(:active_household).and_return(household)
       tax_household.update_attributes!(effective_starting_on: Date.today.next_year.beginning_of_year)
-      hbx_with_aptc_1.update_attributes!(effective_on: Date.new(hbx_with_aptc_1.effective_on.next_year, 3, 1))
+      hbx_with_aptc_1.update_attributes!(effective_on: Date.new(hbx_with_aptc_1.effective_on.next_year.year, 3, 1))
       new_app_period = Date.today.next_year.beginning_of_year..Date.today.next_year.end_of_year
       ::BenefitMarkets::Products::Product.each do |product|
         product.update_attributes!(application_period: new_app_period)
