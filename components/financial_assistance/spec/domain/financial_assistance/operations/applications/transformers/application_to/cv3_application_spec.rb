@@ -4,9 +4,9 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
-  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
-  let!(:person2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }
-  let!(:person3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022") }
+  let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
+  let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
+  let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
   let!(:applicant) do
@@ -830,32 +830,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let!(:relationships) do
       application.add_relationship(applicant, applicant2, 'parent')
     end
+    let(:address_1_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
+    let(:address_2_params) { { kind: 'home', address_1: '2 Awesome Street', address_2: '#200', city: 'Washington', state: 'DC', zip: '20001' } }
+    let(:address_3_params) { { kind: 'home', address_1: '3 Awesome Street', address_2: '#300', city: 'Washington', state: 'DC', zip: '20001' } }
     let!(:home_address1) do
-      add = ::FinancialAssistance::Locations::Address.new({
-                                                            kind: 'home',
-                                                            address_1: '1 Awesome Street',
-                                                            address_2: '#100',
-                                                            city: 'Washington',
-                                                            state: 'DC',
-                                                            zip: '20001'
-                                                          })
-
-      applicant.addresses << add
-      applicant.save!
+      application.primary_applicant.addresses.destroy_all
+      application.primary_applicant.addresses.create!(address_1_params)
+      application.primary_applicant.save!
     end
 
     context 'same address for both applicants' do
       let!(:home_address2) do
-        add = ::FinancialAssistance::Locations::Address.new({
-                                                              kind: 'home',
-                                                              address_1: '1 Awesome Street',
-                                                              address_2: '#100',
-                                                              city: 'Washington',
-                                                              state: 'DC',
-                                                              zip: '20001'
-                                                            })
-
-        applicant2.addresses << add
+        applicant2.addresses.destroy_all
+        applicant2.addresses.create!(address_1_params)
         applicant2.save!
       end
 
@@ -880,16 +867,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'different address for both applicants' do
       let!(:home_address2) do
-        add = ::FinancialAssistance::Locations::Address.new({
-                                                              kind: 'home',
-                                                              address_1: '2 Awesome Street',
-                                                              address_2: '#200',
-                                                              city: 'Washington',
-                                                              state: 'DC',
-                                                              zip: '20001'
-                                                            })
-
-        applicant2.addresses << add
+        applicant2.addresses.destroy_all
+        applicant2.addresses.create!(address_2_params)
         applicant2.save!
       end
 
@@ -925,16 +904,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'child has same address as primary but spouse has a different address ' do
       let!(:home_address2) do
-        add = ::FinancialAssistance::Locations::Address.new({
-                                                              kind: 'home',
-                                                              address_1: '1 Awesome Street',
-                                                              address_2: '#100',
-                                                              city: 'Washington',
-                                                              state: 'DC',
-                                                              zip: '20001'
-                                                            })
-
-        applicant2.addresses << add
+        applicant2.addresses.destroy_all
+        applicant2.addresses.create!(address_1_params)
         applicant2.save!
       end
 
@@ -975,16 +946,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         application.add_relationship(applicant, applicant3, 'spouse')
       end
       let!(:home_address3) do
-        add = ::FinancialAssistance::Locations::Address.new({
-                                                              kind: 'home',
-                                                              address_1: '3 Awesome Street',
-                                                              address_2: '#300',
-                                                              city: 'Washington',
-                                                              state: 'DC',
-                                                              zip: '20001'
-                                                            })
-
-        applicant3.addresses << add
+        applicant3.addresses.destroy_all
+        applicant3.addresses.create!(address_3_params)
         applicant3.save!
       end
 

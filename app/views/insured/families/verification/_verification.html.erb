@@ -120,7 +120,7 @@
     <% end %>
   </div>
   <div class="col-xs-6">
-    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
+    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "none" : "collapse" %>  href=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item : "#docs-verification-faq" %> role="button" target=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "_blank" : "" %> >
       <%= l10n("insured.families.verification.documents_FAQ") %>
     </a>
   </div>

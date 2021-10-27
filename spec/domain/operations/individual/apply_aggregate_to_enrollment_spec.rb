@@ -137,14 +137,29 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
   context 'apply aggregate on eligible enrollments' do
     before(:each) do
       allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(start_on.year, 1, 26)
-      input_params = {eligibility_determination: eligibility_determination}
       allow(family).to receive(:active_household).and_return(household)
-      @result = subject.call(input_params)
     end
 
     it 'returns monthly aggregate amount' do
+      input_params = {eligibility_determination: eligibility_determination}
+      @result = subject.call(input_params)
       expect(@result.success).to eq "Aggregate amount applied on to enrollments"
       expect(family.hbx_enrollments.to_a.first.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
+    end
+
+    context 'enrollment the is auto-renewal enrollment' do
+      before do
+        hbx_with_aptc_1.update_attributes(aasm_state: 'auto_renewing')
+      end
+
+      it 'returns monthly aggregate amount' do
+        expect(family.hbx_enrollments.to_a.count).to eq 1
+        input_params = {eligibility_determination: eligibility_determination}
+        @result = subject.call(input_params)
+        expect(@result.success).to eq 'Aggregate amount applied on to enrollments'
+        family.reload
+        expect(family.hbx_enrollments.to_a.count).to eq 2
+      end
     end
   end
 end
