@@ -50,13 +50,6 @@ class TaxHousehold
       result
     end
 
-    if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
-      thh_members.map(&:family_member).each do |family_member|
-        thhm_appid_csr_hash[family_member.id] = 'csr_100' if family_member.person.indian_tribe_member
-      end
-      family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
-      thh_members = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
-    end
     thh_m_eligibility_kinds = thhm_appid_csr_hash.values.uniq
 
     if thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kinds.count == 0

@@ -379,10 +379,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         plan6.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
       end
 
-      it 'should return plans with csr_kind for limited' do
+      # removing condition to assign csr_kid by default to limited for all AI/AN members
+      it 'should not return plans with csr_kind for limited' do
         allow(rule).to receive(:satisfied?).and_return [true, 'ok']
         elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).to include('02')
+        expect(elected_plans_by_enrollment_members.pluck(:csr_variant_id)).not_to include('02')
       end
     end
 
