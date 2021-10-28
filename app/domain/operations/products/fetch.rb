@@ -56,7 +56,6 @@ module Operations
       end
 
       def fetch_silver_products(addresses, effective_date, family)
-        binding.pry
         silver_products = Operations::Products::FetchSilverProducts.new.call({address: addresses.flatten[0], effective_date: effective_date})
         return Failure("unable to fetch silver_products for - #{addresses.flatten[0]}") if silver_products.failure?
 
