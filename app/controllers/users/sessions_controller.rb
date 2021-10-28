@@ -5,6 +5,11 @@ class Users::SessionsController < Devise::SessionsController
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
 
+  def new
+    redirect_url = EnrollRegistry[:identity_management_settings].settings(:auth_url).item
+    (redirect_url.blank? && Rails.env.production?) ? super : redirect_to(redirect_url)
+  end
+
   def create
     self.resource = warden.authenticate!(auth_options)
     set_flash_message(:notice, :signed_in) if is_flashing_format?

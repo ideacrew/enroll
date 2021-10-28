@@ -9,7 +9,7 @@ registry:
         is_enabled: true
         settings:
           - key: :effective_period
-            item: <%= Date.new(2020,6,6)..Date.new(2021,5,20) %>
+            item: <%= Date.new(2020,6,6)..Date.new(2021,7,24) %>
       - key: :verification_sensitive_attributes
         item: :consumer_role_hub_call
         is_enabled: true
@@ -27,7 +27,7 @@ registry:
         is_enabled: true
         settings:
           - key: :default_applied_aptc_percentage
-            item: 0.85
+            item: 1
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
         is_enabled: true
@@ -52,36 +52,38 @@ registry:
                     "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
                     "Other (With Alien Number)", "Other (With I-94 Number)" ]
       - key: :indian_alaskan_tribe_details
-        is_enabled: false
+        is_enabled: true
       - key: :prior_plan_year_ivl_sep
         is_enabled: :false
       - key: :admin_ivl_end_date_changes
         is_enabled: :false
       - key: :display_external_id_in_family_datatable
-        is_enabled: :false
-      - key: :contact_method_via_dropdown
         is_enabled: :true
+      - key: :contact_method_via_dropdown
+        is_enabled: :false
       - key: :state_based_language_preferences
-        item: ["English", "Amharic", "Spanish"]
+        item: ["English", "Spanish", "French", "Chinese (Mandarin)", "Arabic",
+             "Kirundi", "Lingala", "Somali", "Swahili", "Portuguese", "Vietnamese", "Khmer",
+             "Thai", "Tagalog", "Russian", "German"]
         is_enabled: true
       - key: :gate_enrollments_to_edidb_for_year
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :year
             item: 2021
       - key: :include_external_enrollment_in_display_all_enrollments
-        is_enabled: :false
+        is_enabled: :true
       - key: :extended_aptc_individual_agreement_message
         item: :extended_aptc_individual_agreement_message
-        is_enabled: false
+        is_enabled: true
       - key: :application_type_options
-        item: ["Phone", "Paper", "Curam", "Mobile"]
+        item: ["Phone", "Paper", "State Medicaid Agency"]
         is_enabled: true
       - key: :curam_application_type
-        item: "Curam"
+        item: "State Medicaid Agency"
         is_enabled: true
       - key: :verification_reasons
-        item: ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+        item: ["Document in EnrollApp", "Electronic data source", "State Medicaid Agency"]
         is_enabled: true
       - key: :total_minimum_responsibility
-        is_enabled: false
+        is_enabled: true

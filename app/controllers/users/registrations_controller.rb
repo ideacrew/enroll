@@ -12,35 +12,47 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # POST /resource
   def create
-    build_resource(sign_up_params)
-#   Check for curam user email, if present then restrict the user.
-    if CuramUser.match_unique_login(resource.oim_id).first.present?
-      flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
-    end
+    if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+      result = Operations::Users::Create.new.call(account: {
+        email: sign_up_params[:oim_id],
+        password: sign_up_params[:password]
+      })
 
-    if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
-      flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
-    end
+      resource_saved = result.success?
+      resource = result.value_or(result.failure)[:user]
+    else
+      build_resource(sign_up_params)
+      # Check for curam user email, if present then restrict the user.
+      if CuramUser.match_unique_login(resource.oim_id).first.present?
+        flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+        render :new and return
+      end
 
-    headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
+      if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
+        flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+        render :new and return
+      end
 
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
+      headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
 
-    resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
-    resource.handle_headless_records
+      if headless.present? && !headless.person.present?
+        headless.destroy
+      end
 
-    resource_saved = resource.save
-    yield resource if block_given?
-    if resource_saved
+      resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
+      resource.handle_headless_records
+
+      resource_saved = resource.save
+      yield resource if block_given?
+
       # FIXME: DON'T EVER DO THIS!
       # HACK: DON'T EVER DO THIS!
       # NONONONOBAD: We are only doing this because the enterprise service
       #              can't accept a password with a standard hash.
       session["stashed_password"] = sign_up_params["password"]
+    end
+
+    if resource_saved
       if resource.active_for_authentication?
         set_flash_message :notice, :signed_up, site_name: Settings.site.short_name if is_flashing_format?
         sign_up(resource_name, resource)
