@@ -14,11 +14,7 @@ module Services
 
       applied_aptc_amt = calculate_applicable_aptc(aptc_values)
       @hbx_enrollment.applied_aptc_amount = applied_aptc_amt.round(2)
-      @hbx_enrollment.elected_aptc_pct = if applied_aptc_amt == aptc_values[:applied_aptc].to_f
-                                           (aptc_values[:applied_percentage].to_f / 100.0)
-                                         else
-                                           (applied_aptc_amt / aptc_values[:max_aptc].to_f)
-                                         end
+      @hbx_enrollment.elected_aptc_pct = applied_aptc_amt / aptc_values[:max_aptc].to_f
 
       @hbx_enrollment
     end

@@ -367,7 +367,11 @@ def employer_poc
 
   def user_account_index
     authorize HbxProfile, :can_access_user_account_tab?
-    @datatable = Effective::Datatables::UserAccountDatatable.new
+    @datatable = if EnrollRegistry.feature_enabled?(:keycloak_integration)
+                   Effective::Datatables::AccountUserDatatable.new
+                 else
+                   Effective::Datatables::UserAccountDatatable.new
+                 end
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/user_account_index_datatable.html.slim' }
     end
@@ -954,32 +958,24 @@ def employer_poc
               end
     first_name = insured.first_name || params[:first_name]
     last_name = insured.last_name || params[:last_name]
-    insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email) || params[:email]
+    insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email) || ""
     insured_phone_number = insured&.phones&.first&.full_phone_number
     insured_id = insured&.id&.to_s || params[:person]
-    if params[:person].present?
-      root = "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{insured_id}&original_application_type:"
-      translation_key = "inbox.agent_assistance_messages_person_present"
-      translation_interpolated_keys = {
-        first_name: first_name,
-        last_name: last_name,
-        href_root: root,
-        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
-        site_short_name: site_short_name,
-        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
-      }
-    else
-      translation_key = "inbox.agent_assistance_messages_person_not_present"
-      translation_interpolated_keys = {
-        first_name: first_name,
-        last_name: last_name,
-        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
-        site_short_name: site_short_name,
-        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
-      }
-    end
+    root = if insured_id
+             "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{insured_id}&original_application_type:"
+           else
+             ""
+           end
+    translation_key = "inbox.agent_assistance_secure_message"
+    translation_interpolated_keys = {
+      first_name: first_name,
+      last_name: last_name,
+      href_root: root,
+      site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+      site_short_name: site_short_name,
+      contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+      contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+    }
     translation_interpolated_keys.merge!(insured_phone_number: insured_phone_number || '', insured_email: insured_email || '')
     body = l10n(translation_key, translation_interpolated_keys).html_safe
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
