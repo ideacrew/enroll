@@ -136,11 +136,10 @@ module Insured
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
         # this condition is for self service APTC feature ONLY.
-        if current_enrollment_effective_on.year == hbx_created_datetime.year
-          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
-          year = hbx_created_datetime.year
-          month = hbx_created_datetime.month + offset_month
-        else
+        if eligible_for_1_1_effective_date?(hbx_created_datetime, current_enrollment_effective_on)
+          year = current_enrollment_effective_on.year
+          month = day = 1
+        elsif current_enrollment_effective_on.year != hbx_created_datetime.year
           condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, 15)).include?(hbx_created_datetime.to_date)
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
@@ -150,7 +149,14 @@ module Insured
           year += 1
           month -= 12
         end
+
         DateTime.new(year, month, day, hour, min, sec)
+      end
+
+      # Checks if case is eligible for 1/1 effective date for Prospective Year's enrollments.
+      def self.eligible_for_1_1_effective_date?(system_date, current_effective_on)
+        last_eligible_date_for_1_1_effective_date = Date.new(system_date.year, system_date.end_of_year.month, HbxProfile::IndividualEnrollmentDueDayOfMonth)
+        current_effective_on.year > system_date.year && HbxProfile.current_hbx.under_open_enrollment? && last_eligible_date_for_1_1_effective_date > system_date
       end
 
       private

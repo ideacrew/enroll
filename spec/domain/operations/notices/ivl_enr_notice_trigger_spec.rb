@@ -61,6 +61,17 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       end
     end
 
+    context '#build_family_member_hash' do
+      let(:person_2) { FactoryBot.create(:person, :with_consumer_role) }
+      let!(:family_member_2) { FactoryBot.create(:family_member, person: person_2, family: family)}
+      let(:family_members_hash) { Operations::Notices::IvlEnrNoticeTrigger.new.build_family_member_hash(enrollment.reload) }
+
+      it 'should include unerolled family members' do
+        expect(family_members_hash.success.count).to eq 2
+        expect(family_members_hash.success.any? { |member_hash| member_hash[:person][:person_name][:first_name] == person_2.first_name }).to be_truthy
+      end
+    end
+
     context 'when due date on outstanding verifications is nil' do
       before :each do
         person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: nil)}

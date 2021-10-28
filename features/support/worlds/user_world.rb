@@ -70,6 +70,17 @@ end
 
 World(UserWorld)
 
+And(/^(.*?) role permission (.*?) is set to (.*?)$/) do |permission_role, attribute, boolean|
+  boolean = boolean == 'true'
+  permission = Permission.where(name: permission_role).first
+  raise("No permission with #{permission_role} present") if permission.blank?
+  permission.update_attributes!(attribute.to_s => boolean)
+end
+
+And(/user visits user accounts path$/) do
+  visit user_account_index_exchanges_hbx_profiles_path
+end
+
 Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) logged in$/) do |type, subrole, logged_in|
   case type
   when "Employer"
@@ -83,6 +94,8 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
     user = employer_staff
   when 'Employee Role'
     user = employee_role
+  when 'HBX CSR Tier1'
+    user = admin('hbx_csr_tier1')
   else
     user = users_by_role(type)
   end
