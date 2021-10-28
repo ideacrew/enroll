@@ -144,6 +144,9 @@ module Insured
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
           month = current_enrollment_effective_on.month + offset_month
+        else
+          year = current_enrollment_effective_on.year
+          month = current_enrollment_effective_on.month
         end
         if month > 12
           year += 1
