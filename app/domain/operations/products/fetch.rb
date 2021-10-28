@@ -14,7 +14,7 @@ module Operations
 
       def call(params)
         values                     = yield validate(params)
-        addresses                  = yield find_address(values[:family])
+        addresses                  = yield find_addresses(values[:family])
         rating_silver_products     = yield fetch_silver_products(addresses, values[:effective_date], values[:family])
         member_premiums            = yield fetch_member_premiums(rating_silver_products, values[:family], values[:effective_date])
 
@@ -33,11 +33,6 @@ module Operations
       # Return a failure monad if there are no rating addresses for any members
       def all_members_have_valid_address?(family)
         family.family_members.all? { |family_member| family_member.rating_address.present? }
-      end
-
-      def find_address(family)
-        address = family.primary_family_member.rating_address
-        Success(address)
       end
 
       def find_addresses(family)
