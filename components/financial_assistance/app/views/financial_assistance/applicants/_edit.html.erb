@@ -111,7 +111,7 @@
               </label>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
               <div class="select-relation rs_selection">
-                <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
+                <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "required floatlabel form-control", :prompt => 'choose' %>
               </div>
               <label class="position-left">&nbsp;&nbsp;of</label>
               <div class="icon-rel">
