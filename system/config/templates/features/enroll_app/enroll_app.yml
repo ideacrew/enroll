@@ -623,12 +623,18 @@ registry:
       - key: :pii_match_success_message
         item: :pii_match_success_message
         is_enabled: false
+      - key: :disable_documents_we_accept_list
+        item: :disable_documents_we_accept_list
+        is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: false
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
+      - key: :keycloak_integration
+        item: :keycloak_integration
+        is_enabled: false
       - key: :email_validation_notifications
         item: :email_validation_notifications
         is_enabled: false

@@ -142,6 +142,10 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
   "en.faa.evidence_type_esi" => "Coverage from a job",
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
-  "en.faa.evidence_type_income" => "Income"
+  "en.faa.evidence_type_income" => "Income",
+  # FAA start new application page
+  "en.faa.start_new_application" => "Start New Application",
+  "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
+  "en.faa.cancel" => "Cancel"
 }.freeze
 # rubocop:enable Layout/LineLength

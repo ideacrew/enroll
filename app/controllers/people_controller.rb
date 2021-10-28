@@ -388,7 +388,7 @@ private
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county, :id, :_destroy] },
       { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
       { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :consumer_role_attributes => [:contact_method, :language_preference, :id]},

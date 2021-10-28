@@ -28,7 +28,7 @@ registry:
           - key: :nondiscrimination_notice_url
             item: ""
           - key: :submit_docs_url
-            item: ""
+            item: "https://www.CoverME.gov/forms"
           - key: :state_residency
             item: "ME Residency"
           - key: :site_key
@@ -339,7 +339,7 @@ registry:
         is_enabled: true
       - key: :sep_carousel_message
         item: :sep_carousel
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
@@ -638,12 +638,18 @@ registry:
       - key: :pii_match_success_message
         item: :pii_match_success_message
         is_enabled: true
+      - key: :disable_documents_we_accept_list
+        item: :disable_documents_we_accept_list
+        is_enabled: true
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: true
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
+      - key: :keycloak_integration
+        item: :keycloak_integration
+        is_enabled: true
       - key: :email_validation_notifications
         item: :email_validation_notifications
         is_enabled: true

@@ -294,6 +294,7 @@ def employer_poc
 
   def request_help
     role = nil
+    consumer = nil
     if params[:type]
       cac_flag = params[:type] == 'CAC'
       match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
@@ -317,6 +318,7 @@ def employer_poc
     if role
       status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
       if find_email(agent, role)
+        params.merge!(consumer_person_id: consumer.id.to_s) if consumer.present?
         agent_assistance_messages(params,agent,role)
       else
 
@@ -365,7 +367,11 @@ def employer_poc
 
   def user_account_index
     authorize HbxProfile, :can_access_user_account_tab?
-    @datatable = Effective::Datatables::UserAccountDatatable.new
+    @datatable = if EnrollRegistry.feature_enabled?(:keycloak_integration)
+                   Effective::Datatables::AccountUserDatatable.new
+                 else
+                   Effective::Datatables::UserAccountDatatable.new
+                 end
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/user_account_index_datatable.html.slim' }
     end
@@ -943,37 +949,33 @@ def employer_poc
   end
 
   def agent_assistance_messages(params, agent, role)
-    # TODO: Why do we not always have the person_id?
-    # Need to figure this out
-    # The translations secure message may want things like the person's phone/email
-    insured = Person.where(_id: params[:person]).first
+    # Merged the consumer_person_id elsewhere
+    # To assure it doesn't acidentally confuse impersonation
+    insured = if params[:consumer_person_id].present?
+                Person.where(_id: params[:consumer_person_id]).first
+              else
+                Person.where(_id: params[:person]).first
+              end
     first_name = insured.first_name || params[:first_name]
     last_name = insured.last_name || params[:last_name]
-    insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email) || params[:email]
+    insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email) || ""
     insured_phone_number = insured&.phones&.first&.full_phone_number
-    if params[:person].present?
-      root = "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{params[:person]}&original_application_type:"
-      translation_key = "inbox.agent_assistance_messages_person_present"
-      translation_interpolated_keys = {
-        first_name: first_name,
-        last_name: last_name,
-        href_root: root,
-        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
-        site_short_name: site_short_name,
-        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
-      }
-    else
-      translation_key = "inbox.agent_assistance_messages_person_not_present"
-      translation_interpolated_keys = {
-        first_name: first_name,
-        last_name: last_name,
-        site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
-        site_short_name: site_short_name,
-        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
-        contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
-      }
-    end
+    insured_id = insured&.id&.to_s || params[:person]
+    root = if insured_id
+             "http://#{request.env['HTTP_HOST']}/exchanges/agents/resume_enrollment?person_id=#{insured_id}&original_application_type:"
+           else
+             ""
+           end
+    translation_key = "inbox.agent_assistance_secure_message"
+    translation_interpolated_keys = {
+      first_name: first_name,
+      last_name: last_name,
+      href_root: root,
+      site_home_business_url: EnrollRegistry[:enroll_app].setting(:home_business_url).item,
+      site_short_name: site_short_name,
+      contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
+      contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
+    }
     translation_interpolated_keys.merge!(insured_phone_number: insured_phone_number || '', insured_email: insured_email || '')
     body = l10n(translation_key, translation_interpolated_keys).html_safe
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
@@ -991,7 +993,8 @@ def employer_poc
     agent_email = find_email(agent,role)
     full_name = "#{first_name} #{last_name}"
     if agent_email.present?
-      result = UserMailer.new_client_notification(agent_email, first_name, role, insured_email, hbx_id)
+      agent_first_name = agent.first_name
+      result = UserMailer.new_client_notification(agent_email, agent_first_name, role, insured_email, hbx_id)
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else

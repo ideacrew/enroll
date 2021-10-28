@@ -11,7 +11,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <%= l10n("support_texts.#{cell.support_text_key}") %>
+        <%= l10n("support_texts.#{cell.support_text_key}", application_applicable_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %>
       </div>
     </div>
   </div>

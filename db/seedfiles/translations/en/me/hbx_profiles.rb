@@ -32,7 +32,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.publish_application" => "Publish Application",
 	"en.hbx_profiles.force_publish_success" => "Force Publish Successful",
 	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review",
-	"en.financial_assistance.applications.cant_determine_eligibility" => "We’re sorry, but we can’t determine your eligibility right now. Please call %{site_short_name} at %{contact_center_phone_number} TTY: %{contact_center_tty_number} or email %{contact_center_email_address} to report this issue.",
+	"en.financial_assistance.applications.cant_determine_eligibility" => "We’re sorry, but we can’t determine your eligibility right now. Please call %{site_short_name} at %{contact_center_phone_number} TTY: %{contact_center_tty_number} to report this issue.",
 	"en.financial_assistance.applications.report_error" => "Report the error code %{determination_http_status_code} to help us fix the problem as soon as possible.",
 	"en.financial_assistance.applications.response_error" => "Eligibility Response Error"
 }

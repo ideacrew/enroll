@@ -15,7 +15,7 @@ module Operations
       def call(params)
         values                     = yield validate(params)
         addresses                  = yield find_addresses(values[:family])
-        rating_silver_products     = yield fetch_silver_products(addresses, values[:effective_date])
+        rating_silver_products     = yield fetch_silver_products(addresses, values[:effective_date], values[:family])
         member_premiums            = yield fetch_member_premiums(rating_silver_products, values[:family], values[:effective_date])
 
         Success(member_premiums)
@@ -37,16 +37,17 @@ module Operations
 
       def find_addresses(family)
         geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+        members = family.family_members.where(is_primary_applicant: true, is_active: true)
 
         address_combinations = case geographic_rating_area_model
                                when 'single'
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.state]}
+                                 members.group_by {|fm| [fm.rating_address.state]}
                                when 'county'
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.county]}
+                                 members.group_by {|fm| [fm.rating_address.county]}
                                when 'zipcode'
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.zip]}
+                                 members.group_by {|fm| [fm.rating_address.zip]}
                                else
-                                 family.family_members.active.group_by {|fm| [fm.rating_address.county, fm.rating_address.zip]}
+                                 members.group_by {|fm| [fm.rating_address.county, fm.rating_address.zip]}
                                end
 
         address_combinations = address_combinations.transform_values {|v| v.map(&:rating_address).compact }.values
@@ -54,14 +55,11 @@ module Operations
         Success(address_combinations)
       end
 
-      def fetch_silver_products(addresses, effective_date)
-        rating_silver_products = addresses.inject({}) do |result, address_combinations|
-          silver_products = Operations::Products::FetchSilverProducts.new.call({address: address_combinations.first, effective_date: effective_date})
-          return Failure("unable to fetch silver_products for - #{address_combinations}") if silver_products.failure?
-          result[address_combinations.map {|add| add.person.hbx_id }] = silver_products.value!
-          result
-        end
-        Success(rating_silver_products)
+      def fetch_silver_products(addresses, effective_date, family)
+        silver_products = Operations::Products::FetchSilverProducts.new.call({address: addresses.flatten[0], effective_date: effective_date})
+        return Failure("unable to fetch silver_products for - #{addresses.flatten[0]}") if silver_products.failure?
+
+        Success({family.active_family_members.collect{|fm| fm.person.hbx_id} => silver_products.value!})
       end
 
       def fetch_member_premiums(rating_silver_products, family, effective_date)
