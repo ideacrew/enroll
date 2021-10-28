@@ -35,7 +35,7 @@ module Effective
         self.display_records ||= total_records
 
         if col.kind_of?(Array)
-          col = array_tool.paginate(col)
+          col = array_tool_paginate(col)
         else
           col = table_tool.paginate(col)
           col = self.arrayize(col)
@@ -43,6 +43,10 @@ module Effective
 
         self.format(col)
         col = self.finalize(col)
+      end
+
+      def array_tool_paginate(col)
+        array_tool.paginate(col)
       end
 
       def arrayize(collection)
