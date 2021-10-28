@@ -51,8 +51,9 @@ class TaxHousehold
     end
 
     if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
-      thh_members.map(&:family_member).each do |family_member|
-        thhm_appid_csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member
+      thh_members.each do |thh_member|
+        family_member = thh_member.family_member
+        thhm_appid_csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member && !thh_member.is_ia_eligible
       end
       family_members_with_ai_an = thh_members.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
       thh_members = thh_members.where(:applicant_id.nin => family_members_with_ai_an.map(&:id))
