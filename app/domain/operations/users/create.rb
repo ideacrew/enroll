@@ -17,6 +17,7 @@ module Operations
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
+        puts values.inspect
         new_user = yield create_account(values)
 
         Success(new_user)
@@ -25,7 +26,7 @@ module Operations
       private
 
       def validate(params)
-        AcaEntities::Accounts::Contracts::AccountContract.new.call(params)
+        AcaEntities::Accounts::Contracts::AccountContract.new.call(params[:account])
       end
 
       # rubocop:disable Style/MultilineBlockChain
@@ -50,7 +51,7 @@ module Operations
             Success(
               {
                 account: account.success,
-                user: user.attributes.deep_symbolize_keys
+                user: user
               }
             )
           else
