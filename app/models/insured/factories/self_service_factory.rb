@@ -145,8 +145,9 @@ module Insured
           year = current_enrollment_effective_on.year
           month = current_enrollment_effective_on.month + offset_month
         else
-          year = current_enrollment_effective_on.year
-          month = current_enrollment_effective_on.month
+          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          year = hbx_created_datetime.year
+          month = hbx_created_datetime.month + offset_month
         end
         if month > 12
           year += 1
