@@ -87,6 +87,28 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
       end
     end
 
+    context 'where enrollment applied_aptc is same as max_aptc' do
+      let(:aptc_values) do
+        { applied_percentage: 1,
+          applied_aptc: 30.0,
+          csr_amt: 87,
+          max_aptc: 30.0 }
+      end
+
+      before do
+        eligibility_determination1.update_attributes!(max_aptc: 30.00)
+        @renewel_enrollment = subject.assign(aptc_values)
+      end
+
+      it 'should return applied_aptc_amount' do
+        expect(@renewel_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
+      end
+
+      it 'should return elected_aptc_pct' do
+        expect(@renewel_enrollment.elected_aptc_pct.to_f).to eq(1.0)
+      end
+    end
+
     it "should get min on given applied, ehb premium and available aptc" do
       expect(subject.send(:calculate_applicable_aptc, aptc_values).nil?).to eq false
     end
