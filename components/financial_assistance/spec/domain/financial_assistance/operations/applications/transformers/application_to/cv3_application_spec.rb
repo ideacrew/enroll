@@ -538,6 +538,52 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
 
+    if EnrollRegistry.feature_enabled?(:mitc_relationships)
+      context 'with parents_domestic_partner' do
+        before do
+          application.relationships.destroy_all
+          application.add_relationship(applicant, applicant2, 'parents_domestic_partner')
+          result = subject.call(application.reload)
+          @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+        end
+
+        it 'should populate mitc_relationships' do
+          expect(@mitc_relationships).not_to be_empty
+        end
+
+        it 'should populate correct relationship_code' do
+          expect(@mitc_relationships.first[:relationship_code]).to eq('17')
+        end
+
+        it 'should be able to successfully init Application Entity' do
+          expect(@entity_init).to be_success
+        end
+      end
+
+      context 'with domestic_partners_child' do
+        before do
+          application.relationships.destroy_all
+          application.add_relationship(applicant, applicant2, 'domestic_partners_child')
+          result = subject.call(application.reload)
+          @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+        end
+
+        it 'should populate mitc_relationships' do
+          expect(@mitc_relationships).not_to be_empty
+        end
+
+        it 'should populate correct relationship_code' do
+          expect(@mitc_relationships.first[:relationship_code]).to eq('70')
+        end
+
+        it 'should be able to successfully init Application Entity' do
+          expect(@entity_init).to be_success
+        end
+      end
+    end
+
     context 'mitc_relationships' do
       before do
         result = subject.call(application.reload)
