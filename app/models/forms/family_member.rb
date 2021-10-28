@@ -103,7 +103,13 @@ module Forms
         existing_inactive_family_member.reactivate!(self.relationship)
         return true if family.save && existing_inactive_family_member.save
       end
-      existing_person = Person.match_existing_person(self)
+
+      match_criteria, records = ::Operations::People::Match.new.call({:dob => person_params[:dob],
+                                                                      :last_name => person_params[:last_name],
+                                                                      :first_name => person_params[:first_name],
+                                                                      :ssn => person_params[:ssn]})
+      existing_person = records.first if match_criteria == :ssn_present
+
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
