@@ -104,10 +104,20 @@ module Forms
         return true if family.save && existing_inactive_family_member.save
       end
 
-      match_criteria, records = ::Operations::People::Match.new.call({:dob => person_params[:dob],
-                                                                      :last_name => person_params[:last_name],
-                                                                      :first_name => person_params[:first_name],
-                                                                      :ssn => person_params[:ssn]})
+      # Add other family existing person
+      # ME scenario1 with SSN:  with different last name - no records
+      # ME scenario2 with SSN:  with different first name - no records
+      # ME scenario3 with SSN:  with different dob - no records
+      # ME scenario4 with SSN:  with same(FN,LN,DOB,SSN) details - existing record
+      # ME scenario5 without SSN:  with different last name - no records
+      # ME scenario6 without SSN:  with different first name - no records
+      # ME scenario7 without SSN:  with different dob - no records
+      # ME scenario8 without SSN:  with same(FN,LN,DOB) details - existing record
+      match_criteria, records = ::Operations::People::Match.new.call({:dob => self.dob,
+                                                                      :last_name => self.last_name,
+                                                                      :first_name => self.first_name,
+                                                                      :ssn => self.ssn})
+      # Only fetch record with ssn
       existing_person = records.first if match_criteria == :ssn_present
 
       if existing_person
