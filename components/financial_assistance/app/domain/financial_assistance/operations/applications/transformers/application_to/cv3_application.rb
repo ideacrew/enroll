@@ -26,6 +26,8 @@ module FinancialAssistance
               'nephew_or_niece' => :nephew_or_niece,
               'grandchild' => :grandchild,
               'grandparent' => :grandparent,
+              'parents_domestic_partner' => :parents_domestic_partner,
+              'domestic_partners_child' => :domestic_partners_child,
               'father_or_mother_in_law' => :mother_in_law_or_father_in_law,
               'daughter_or_son_in_law' => :son_in_law_or_daughter_in_law,
               'brother_or_sister_in_law' => :brother_in_law_or_sister_in_law,
