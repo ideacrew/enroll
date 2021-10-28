@@ -14,8 +14,8 @@ module Operations
 
       def call(params)
         values                     = yield validate(params)
-        address                    = yield find_address(values[:family])
-        rating_silver_products     = yield fetch_silver_products(address, values[:effective_date], values[:family])
+        addresses                  = yield find_address(values[:family])
+        rating_silver_products     = yield fetch_silver_products(addresses, values[:effective_date], values[:family])
         member_premiums            = yield fetch_member_premiums(rating_silver_products, values[:family], values[:effective_date])
 
         Success(member_premiums)
@@ -40,9 +40,29 @@ module Operations
         Success(address)
       end
 
-      def fetch_silver_products(address, effective_date, family)
-        silver_products = Operations::Products::FetchSilverProducts.new.call({address: address, effective_date: effective_date})
-        return Failure("unable to fetch silver_products for - #{address}") if silver_products.failure?
+      def find_addresses(family)
+        geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+        members = family.family_members.where(is_primary_applicant: true, is_active: true)
+
+        address_combinations = case geographic_rating_area_model
+                               when 'single'
+                                 members.group_by {|fm| [fm.rating_address.state]}
+                               when 'county'
+                                 members.group_by {|fm| [fm.rating_address.county]}
+                               when 'zipcode'
+                                 members.group_by {|fm| [fm.rating_address.zip]}
+                               else
+                                 members.group_by {|fm| [fm.rating_address.county, fm.rating_address.zip]}
+                               end
+
+        address_combinations = address_combinations.transform_values {|v| v.map(&:rating_address).compact }.values
+
+        Success(address_combinations)
+      end
+
+      def fetch_silver_products(addresses, effective_date, family)
+        silver_products = Operations::Products::FetchSilverProducts.new.call({address: addresses, effective_date: effective_date})
+        return Failure("unable to fetch silver_products for - #{addresses}") if silver_products.failure?
 
         Success({family.active_family_members.collect{|fm| fm.person.hbx_id} => silver_products.value!})
       end
