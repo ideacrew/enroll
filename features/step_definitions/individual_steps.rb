@@ -646,7 +646,7 @@ Then(/CSR opens the most recent Please Contact Message/) do
     contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item.to_s,
     contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
   }
-  expect(page).to have_content(l10n("inbox.agent_assistance_messages_person_present", translation_interpolated_keys).html_safe.to_s[0..10])
+  expect(page).to have_content(l10n("inbox.agent_assistance_secure_message", translation_interpolated_keys).html_safe.to_s[0..10])
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
