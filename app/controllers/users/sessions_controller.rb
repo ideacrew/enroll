@@ -6,8 +6,8 @@ class Users::SessionsController < Devise::SessionsController
   before_action :set_ie_flash_by_announcement, only: [:new]
 
   def new
-    redirect_url = EnrollRegistry[:identity_management_settings].settings(:auth_url).item
-    (redirect_url.blank? && Rails.env.production?) ? super : redirect_to(redirect_url)
+    redirect_url = EnrollRegistry[:identity_management_config].settings(:auth_url).item
+    (redirect_url.blank? && !Rails.env.production?) ? super : redirect_to(redirect_url)
   end
 
   def create
