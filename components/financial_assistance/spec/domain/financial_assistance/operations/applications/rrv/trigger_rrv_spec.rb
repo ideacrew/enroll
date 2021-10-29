@@ -4,6 +4,7 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
@@ -17,6 +18,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
                       assistance_year: 2022,
                       effective_date: DateTime.new(2021,1,1,4,5,6))
   end
+
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -54,8 +56,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
 
-  # let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
-
   let(:premiums_hash) do
     {
       [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}},
@@ -91,6 +91,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
+  let(:event) { Success(double) }
+  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::TriggerRrv.new }
+
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
@@ -101,6 +104,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(FinancialAssistance::Operations::Applications::Rrv::TriggerRrv).to receive(:new).and_return(obj)
+    allow(obj).to receive(:build_event).and_return(event)
+    allow(event.success).to receive(:publish).and_return(true)
     allow(premiums_double).to receive(:failure?).and_return(false)
     allow(slcsp_double).to receive(:failure?).and_return(false)
     allow(lcsp_double).to receive(:failure?).and_return(false)
