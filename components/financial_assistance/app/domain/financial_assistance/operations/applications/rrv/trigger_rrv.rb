@@ -67,7 +67,7 @@ module FinancialAssistance
             count = 0
             rrv_logger = Logger.new("#{Rails.root}/log/rrv_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
-            families.no_timeout.each do |family|
+            families.each do |family|
               determined_application = fetch_application(family)
               next unless determined_application.present?
 
@@ -81,12 +81,11 @@ module FinancialAssistance
               rrv_logger.info("failed to process fpr person with hbx_id #{family.primary_person.hbx_id}")
             end
 
-
             applications_with_evidences
           end
 
           def build_event(payload)
-            event('events.fdsh.iap.applications.magi_medicaid_application_renewal_assistance_eligible', attributes: { applications: payload })
+            event('events.iap.applications.magi_medicaid_application_renewal_assistance_eligible', attributes: { applications: payload })
           end
 
           def publish(event)

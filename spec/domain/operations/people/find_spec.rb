@@ -13,15 +13,15 @@ RSpec.describe ::Operations::People::Find, dbclean: :after_each do
     it 'should return Person record' do
       result = subject.call(valid_params)
 
-      expect(result.success?).to be_truthy
-      expect(result.success).to be_a Person
+      expect(result.success?). to be_truthy
+      expect(result.success). to be_a Person
     end
 
     it 'should throw an error' do
       result = subject.call(invalid_params)
 
-      expect(result.success?).to be_falsey
-      expect(result.failure[:message]).to eq(["Person not found"])
+      expect(result.success?). to be_falsey
+      expect(result.failure[:message]). to eq(["Person not found"])
     end
   end
 end

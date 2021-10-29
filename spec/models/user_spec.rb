@@ -106,7 +106,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({password: "123456 6746464DDss"})}
       it 'does not contain valid complexity' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that's not a number, letter, or space."]
+        expect(User.create(**params).errors[:password]).to eq ["Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space."]
       end
     end
 

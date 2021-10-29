@@ -75,12 +75,15 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
     end
   end
 
+  # rubocop:disable Style/IdenticalConditionalBranches
   context 'valid date' do
     it 'Should process the request when configured annually' do
       result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
       expect(result.success).to eq('Successfully dropped dependents for SHOP market')
     end
   end
+  # rubocop:enable Style/IdenticalConditionalBranches
+
   context 'initialize logger' do
     it "Should initialize logger" do
       result = subject.initialize_logger("shop")

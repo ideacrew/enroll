@@ -480,8 +480,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person_db) { family_db.primary_applicant.person }
         let(:consumer_role_db) { person_db.consumer_role }
         let(:new_dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
-        let(:existing_dep_person_db) { Person.where(first_name: "Megan", last_name: "Zoo").first }
-        let(:existing_dep_consumer_role_db) { existing_dep_person_db.consumer_role }
+        let(:existing_dep_consumer_role_db) { Person.where(first_name: "Megan", last_name: "Zoo").first.consumer_role }
 
         before do
           person.primary_family.active_household.tax_households.new(effective_starting_on: Date.new(thh_year - 1), effective_ending_on: nil).save!
@@ -594,7 +593,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(existing_dep_consumer_role_db.residency_determined_at).to eq primary.created_at
             expect(existing_dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
             expect(existing_dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
-            expect(existing_dep_consumer_role_db.person.is_incarcerated).to be_falsey
+            expect(existing_dep_consumer_role_db.is_incarcerated).to eq nil
           end
 
           it "updates the address for the primary applicant's person" do
