@@ -71,16 +71,34 @@ module Effective
       end
 
       def total_records
-        @total_records ||= Operations::Accounts::Find.new.call(scope_name: :count_all).success
+        @total_records ||= count_total_records
       end
 
       def fetch_page_of_data
-        results = Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
+        results = if global_search_string.present?
+                    @total_records = count_total_records
+                    Operations::Accounts::Find.new.call(scope_name: :by_any, criterion: global_search_string.strip, page_number: page, page_size: per_page).success
+                  else
+                    Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
+                  end
+        
         render_table_rows(results)
       end
 
-      def array_tool_paginate(_col)
+      def array_tool_paginate(col)
         fetch_page_of_data
+      end
+
+      def count_total_records
+        if global_search_string.present?
+          Operations::Accounts::Find.new.call(scope_name: :by_any, criterion: global_search_string.strip).success.length
+        else
+          Operations::Accounts::Find.new.call(scope_name: :count_all).success
+        end
+      end
+
+      def global_search?
+        true
       end
     end
   end
