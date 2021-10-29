@@ -17,13 +17,15 @@ RSpec.describe Operations::Users::Create do
     let(:client_id) { 'polypress' }
 
     let(:new_account) do
-      {
-        username: username,
-        password: password,
-        email: email,
-        first_name: first_name,
-        last_name: last_name,
-        roles: roles
+      { account:
+        {
+          username: username,
+          password: password,
+          email: email,
+          first_name: first_name,
+          last_name: last_name,
+          roles: roles
+        }
       }
     end
 
@@ -44,6 +46,7 @@ RSpec.describe Operations::Users::Create do
 
       it 'should return a failure monad' do
         VCR.use_cassette('users.existing_user') do
+          described_class.new.call(new_account) # create existing
           result = subject.call(new_account)
 
           expect(result.failure?).to be_truthy

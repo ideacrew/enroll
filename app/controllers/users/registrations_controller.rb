@@ -24,9 +24,9 @@ module Users
                                                   })
 
       resource_saved = result.success?
-      resource = result.value_or(result.failure)[:user]
+      self.resource = result.value_or(result.failure)[:user]
     else
-      build_resource(sign_up_params)
+      self.resource = build_resource(sign_up_params)
       # Check for curam user email, if present then restrict the user.
       if CuramUser.match_unique_login(resource.oim_id).first.present?
         flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."

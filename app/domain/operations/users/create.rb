@@ -17,8 +17,7 @@ module Operations
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
-        puts values.inspect
-        new_user = yield create_account(values)
+        new_user = yield create_account(values.to_h)
 
         Success(new_user)
       end
@@ -33,21 +32,22 @@ module Operations
       # Create a Keycloak account with an associated {User} record
       def create_account(values)
         Try() do
-          Operations::Accounts::Create.new.call(account: values.to_h)
+          Operations::Accounts::Create.new.call(account: values)
         end.to_result.bind do |account|
-          return account unless account.success?
-          account_attrs = account.success
-          user =
-            User.create(
-              {
-                account_id: account_attrs[:user][:id],
-                oim_id: account_attrs[:user][:id],
-                roles: values.to_h[:roles],
-                password: values.to_h[:password]
-              }
-            )
+          user = User.new(
+            {
+              oim_id: values[:username],
+              roles: values[:roles],
+              password: values[:password]
+            }
+          )
 
+          return Failure(account: account, user: user) unless account.success?
+          account_attrs = account.success
+
+          user.account_id = account_attrs[:user][:id]
           if user.valid?
+            user.save!
             Success(
               {
                 account: account.success,
@@ -57,7 +57,8 @@ module Operations
           else
             Operations::Accounts::Delete.new.call(id: account_attrs[:user][:id])
             Failure(
-              "Error creating User: #{user}\n for account: #{account_attrs}"
+              message: "Error creating User: #{user}\n for account: #{account_attrs}",
+              user: user
             )
           end
         end
