@@ -59,15 +59,7 @@ module FinancialAssistance
             end
 
             update_http_code_and_aasm_state(application)
-            send_determination_to_enroll(application)
             Success('Successfully updated Application object with Full Eligibility Determination')
-          end
-
-          def send_determination_to_enroll(application)
-            # Send Determination to EA
-            application.send_determination_to_ea
-          rescue StandardError => e
-            Rails.logger.info "FAA: error raised in send_determination_to_ea, error: #{e.backtrace}"
           end
 
           def update_http_code_and_aasm_state(application)
