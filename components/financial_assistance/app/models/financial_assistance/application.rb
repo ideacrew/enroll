@@ -487,7 +487,6 @@ module FinancialAssistance
       ed_updated = FinancialAssistance::Operations::Applications::Haven::AddEligibilityDetermination.new.call(application: self, eligibility_response_payload: eligibility_response_payload)
       return if ed_updated.failure? || ed_updated.value! == false
       determine! # If successfully loaded ed's move the application to determined state
-      send_determination_to_ea
     end
 
     def send_determination_to_ea
@@ -498,6 +497,8 @@ module FinancialAssistance
       else
         log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
       end
+    rescue StandardError => e
+      Rails.logger.error { "FAA send_determination_to_ea error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def rt_transfer
@@ -757,7 +758,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
         transitions from: :submitted, to: :determined
       end
 
