@@ -228,7 +228,7 @@ module Operations
               aptc_annual_income_limit: determination.aptc_annual_income_limit.to_hash,
               csr_annual_income_limit: determination.csr_annual_income_limit.to_hash,
               determined_at: determination.determined_at,
-              source: determination.source
+              source: determination.source.titleize
             }
           end
         end
