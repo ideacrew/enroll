@@ -18,6 +18,7 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
   Scenario: Customer Service Representative without can_reset_password and can_lock_unlock cannot see reset password + Unlock / Lock Account
     Given a CCA site exists with a benefit market
     Given all permissions are present
+    And hbx_csr_tier1 role permission can_change_username_and_email is set to false
     And hbx_csr_tier1 role permission can_access_user_account_tab is set to true
     And hbx_csr_tier1 role permission can_reset_password is set to false
     And hbx_csr_tier1 role permission can_lock_unlock is set to false
@@ -26,4 +27,5 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     Then user will click on action tab
     Then Hbx Admin should not see Reset Password link in action drop down
     Then Hbx Admin should not see Unlock / Lock Account link in action drop down
+    Then Hbx Admin should not see Edit User link in action drop down
 
