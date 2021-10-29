@@ -149,6 +149,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.confirm_delete_msg' => "Are you sure you want to delete?",
   :'en.confirm' => "Are you sure?",
   :'en.insured.broker_name' => "Broker Name",
+  :'en.broker_search_placeholder' => "Name or Agency",
   :'en.phone_number' => "Phone Number",
   :'en.email_address' => "Email Address",
   :'en.personal_email_address' => 'Personal Email Address',
