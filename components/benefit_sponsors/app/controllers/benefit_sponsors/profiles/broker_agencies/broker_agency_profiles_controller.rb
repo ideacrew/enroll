@@ -58,9 +58,18 @@ module BenefitSponsors
           @page_alphabets = page_alphabets(@staff, "last_name")
           page_no = cur_page_no(@page_alphabets.first)
           @staff = if @q.nil?
-                     @staff.where(last_name: /^#{page_no}/i)
+                    @staff.where(last_name: /^#{page_no}/i)
+                   elsif @q.blank?
+                    @staff.uniq.sort_by { |name| name.last_name }
                    else
-                     @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
+                    broker_agency = BenefitSponsors::Organizations::Organization.where(legal_name: /^#{Regexp.escape(@q)}/i)
+                    broker_profiles = broker_agency.map { |agency| agency.profiles}.flatten
+                    broker_profile_ids = broker_profiles.map { |profile| profile.id }
+                    find_by_agency_name = @staff.where(:"broker_role.benefit_sponsors_broker_agency_profile_id".in => broker_profile_ids)
+                    find_by_last_name = @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
+                    find_by_first_name = @staff.where(first_name: /^#{Regexp.escape(@q)}/i)
+                    unsorted_search = find_by_agency_name + find_by_last_name + find_by_first_name
+                    unsorted_search.sort_by { |name| name.last_name }
                    end
         end
 
