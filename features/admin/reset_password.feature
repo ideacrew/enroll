@@ -26,4 +26,5 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     Then user will click on action tab
     Then Hbx Admin should not see Reset Password link in action drop down
     Then Hbx Admin should not see Unlock / Lock Account link in action drop down
+    Then Hbx Admin should not see Edit User link in action drop down
 

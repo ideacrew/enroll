@@ -17,7 +17,7 @@ module Effective
                                # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                current_user_permission = current_user&.person&.hbx_staff_role&.permission
                                dropdown << ['View Login History',login_history_user_path(id: row.id), 'ajax'] if current_user_permission&.view_login_history
-                               dropdown << ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax']
+                               dropdown << ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax'] if current_user_permission&.can_reset_password
                                if current_user_permission&.can_reset_password && row.email.present?
                                  dropdown << ['Reset Password', reset_password_user_path(row), 'ajax']
                                elsif current_user_permission&.can_reset_password
