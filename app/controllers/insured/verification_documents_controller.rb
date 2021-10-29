@@ -80,7 +80,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
     @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
     @doc_errors = document.errors.full_messages unless success
-    @docs_owner.save!
+    @docs_owner.save
   end
 
   def update_paper_application(title, file_uri)
