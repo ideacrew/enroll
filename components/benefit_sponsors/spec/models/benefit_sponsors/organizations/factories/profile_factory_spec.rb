@@ -581,5 +581,17 @@ module BenefitSponsors
         end
       end
     end
+
+    context 'match_or_create_person' do
+      context 'broker profile' do
+        context 'name and dob matches' do
+          let(:profile_factory) { profile_factory_class.new(valid_broker_params) }
+
+          it 'should return record' do
+            expect(profile_factory.match_or_create_person).to eq true
+          end
+        end
+      end
+    end
   end
 end

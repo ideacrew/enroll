@@ -523,12 +523,21 @@ module BenefitSponsors
         end
 
         def get_matched_people
-          if is_employer_profile? || is_broker_profile?
+          if is_employer_profile?
             Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
               dob: dob
             )
+          elsif is_broker_profile?
+            match_criteria, records = ::Operations::People::Match.new.call({:dob => dob,
+            :last_name => last_name,
+            :first_name => first_name})
+            if records.present? && records.first.ssn.blank? && match_criteria == :dob_present
+              records.first
+            else
+            []
+            end
           else
             Person.where(
               first_name: regex_for(first_name),
