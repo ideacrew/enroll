@@ -33,7 +33,7 @@ module Effective
                                end
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def render_table_rows(results)
         result_ids = results.map { |result| result[:id] }
         users = User.where(:account_id.in => result_ids)
@@ -64,7 +64,7 @@ module Effective
           end
         end
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def permission_type(user)
         user&.person&.hbx_staff_role&.permission&.name || 'N/A'
@@ -81,11 +81,11 @@ module Effective
                   else
                     Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
                   end
-        
+
         render_table_rows(results)
       end
 
-      def array_tool_paginate(col)
+      def array_tool_paginate(_col)
         fetch_page_of_data
       end
 

@@ -1,8 +1,12 @@
-class Users::RegistrationsController < Devise::RegistrationsController
-  include RecaptchaConcern
-  layout 'bootstrap_4'
-  before_action :configure_sign_up_params, only: [:create]
-  before_action :set_ie_flash_by_announcement, only: [:new]
+# frozen_string_literal: true
+
+module Users
+  # class for Registration actions
+  class RegistrationsController < Devise::RegistrationsController
+    include RecaptchaConcern
+    layout 'bootstrap_4'
+    before_action :configure_sign_up_params, only: [:create]
+    before_action :set_ie_flash_by_announcement, only: [:new]
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -10,13 +14,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   # POST /resource
   def create
     if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
       result = Operations::Users::Create.new.call(account: {
-        email: sign_up_params[:oim_id],
-        password: sign_up_params[:password]
-      })
+                                                    email: sign_up_params[:oim_id],
+                                                    password: sign_up_params[:password]
+                                                  })
 
       resource_saved = result.success?
       resource = result.value_or(result.failure)[:user]
@@ -35,9 +40,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
       headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
 
-      if headless.present? && !headless.person.present?
-        headless.destroy
-      end
+      headless.destroy if headless.present? && !headless.person.present?
 
       resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
       resource.handle_headless_records
@@ -67,12 +70,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
     else
       clean_up_passwords resource
       @validatable = devise_mapping.validatable?
-      if @validatable
-        @minimum_password_length = resource_class.password_length.min
-      end
+      @minimum_password_length = resource_class.password_length.min if @validatable
       respond_with resource
     end
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   # GET /resource/edit
   # def edit
@@ -98,12 +100,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
-  protected
+    protected
 
   # You can put the params you want to permit in the empty array.
-  def configure_sign_up_params
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:oim_id])
-  end
+    def configure_sign_up_params
+      devise_parameter_sanitizer.permit(:sign_up, keys: [:oim_id])
+    end
 
   # You can put the params you want to permit in the empty array.
   # def configure_account_update_params
@@ -120,4 +122,5 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
+  end
 end
