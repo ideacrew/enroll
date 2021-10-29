@@ -16,7 +16,7 @@ module FinancialAssistance
           include EventSource::Logging
 
           def call(params)
-            applications = collect_applications_from_families(params[:families])
+            applications = yield collect_applications_from_families(params[:families])
             event = yield build_event(applications)
             result = yield publish(event)
 
@@ -31,7 +31,8 @@ module FinancialAssistance
                                                      aasm_state: 'determined').max_by(&:created_at)
           end
 
-          def build_evidences(types, applicant)
+          # rubocop:disable Metrics/CyclomaticComplexity
+          def build_evidences(types, applicant, application)
             types.collect do |type|
               key, title = type
 
@@ -41,18 +42,19 @@ module FinancialAssistance
                 next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
                 FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
               when :income
-                next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
+                next unless application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
                 FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "outstanding")
               end
             end
           end
+           # rubocop:enable Metrics/CyclomaticComplexity
 
           def create_evidences(application)
             types = []
             types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
             types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
-            application.active_applicants.each { |app| app.evidences = build_evidences(types, app) }
+            application.active_applicants.each { |app| app.evidences = build_evidences(types, app, application) }
             application.save!
             application
           end
@@ -70,18 +72,16 @@ module FinancialAssistance
             families.each do |family|
               determined_application = fetch_application(family)
               next unless determined_application.present?
-
               application = create_evidences(determined_application)
               cv3_application = transform_and_construct(application)
-
               applications_with_evidences << cv3_application.to_h
               count += 1
               rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
             rescue StandardError
-              rrv_logger.info("failed to process fpr person with hbx_id #{family.primary_person.hbx_id}")
+              rrv_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id}")
             end
 
-            applications_with_evidences
+            applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Applications for given families")
           end
 
           def build_event(payload)
