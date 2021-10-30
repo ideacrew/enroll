@@ -31,7 +31,7 @@ module Operations
           def update_consumer_role(consumer_role, response)
             args = OpenStruct.new
             args.determined_at = Time.now
-            args.vlp_authority = 'fdsh'
+            args.vlp_authority = 'dhs'
             if response.dig(:ResponseMetadata, :ResponseCode) == "HS000000"
               individual_response = response.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first
               args.qualified_non_citizenship_result = individual_response.dig(:InitialVerificationIndividualResponseSet, :QualifiedNonCitizenCode)
@@ -47,7 +47,7 @@ module Operations
             elsif consumer_role.fail_dhs?
               consumer_role.fail_dhs!(args)
             end
-            consumer_role.save
+            consumer_role.save!
             Success(consumer_role)
           end
           # rubocop:enable Metrics/BlockNesting
