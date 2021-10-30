@@ -53,5 +53,12 @@ module Operations
     it "should pass" do
       expect(subject).to be_success
     end
+
+
+    it "consumer_role should be valid" do
+      subject
+      expect(person.reload.consumer_role.vlp_authority).to eq 'dhs'
+      expect(person.consumer_role.valid?).to be_truthy
+    end
   end
 end
