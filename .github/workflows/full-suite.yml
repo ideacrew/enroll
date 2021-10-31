@@ -14,6 +14,7 @@ env:
 
 jobs:
   rubocop:
+    if: contains(github.ref, 'release') == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
