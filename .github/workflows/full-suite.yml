@@ -244,7 +244,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [rubocop, view_linter, brakeman]
+    needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -318,7 +318,7 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [rubocop, view_linter, brakeman]
+    needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
