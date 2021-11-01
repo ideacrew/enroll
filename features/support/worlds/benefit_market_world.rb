@@ -1,5 +1,4 @@
 module BenefitMarketWorld
-
   def benefit_market
     @benefit_market ||= site.benefit_markets.first
   end
@@ -64,11 +63,11 @@ module BenefitMarketWorld
     @issuer_profiles[legal_name] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: legal_name, assigned_site: site)
   end
 
-  def issuer_profile(carrier=:default)
+  def issuer_profile(carrier = :default)
     @issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 
-  def dental_issuer_profile(carrier=:default)
+  def dental_issuer_profile(carrier = :default)
     @dental_issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 
@@ -126,17 +125,16 @@ module BenefitMarketWorld
                   issuer_name: issuer_name,
                   metal_level_kind: :gold)
 
-      if current_effective_date.month == 1
-        create_list(:benefit_markets_products_health_products_health_product,
-            3,
-            benefit_market_kind: benefit_market.kind,
-            application_period: ((current_effective_date - 1.month).beginning_of_year..(current_effective_date - 1.month).end_of_year),
-            product_package_kinds: [:single_issuer, :metal_level, :single_product],
-            service_area: previous_year_service_area,
-            issuer_profile_id: issuer_profiles(issuer_name).id,
-            issuer_name: issuer_name,
-            metal_level_kind: :gold)
-      end
+      next unless current_effective_date.month == 1
+      create_list(:benefit_markets_products_health_products_health_product,
+                  3,
+                  benefit_market_kind: benefit_market.kind,
+                  application_period: ((current_effective_date - 1.month).beginning_of_year..(current_effective_date - 1.month).end_of_year),
+                  product_package_kinds: [:single_issuer, :metal_level, :single_product],
+                  service_area: previous_year_service_area,
+                  issuer_profile_id: issuer_profiles(issuer_name).id,
+                  issuer_name: issuer_name,
+                  metal_level_kind: :gold)
     end
   end
 
@@ -149,16 +147,16 @@ module BenefitMarketWorld
                 service_area: service_area,
                 issuer_profile_id: dental_issuer_profile.id,
                 metal_level_kind: :dental)
-    if current_effective_date.month == 1
-      create_list(:benefit_markets_products_dental_products_dental_product,
-            5,
-            benefit_market_kind: benefit_market.kind,
-            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-            product_package_kinds: [:single_product],
-            service_area: previous_year_service_area,
-            issuer_profile_id: dental_issuer_profile.id,
-            metal_level_kind: :dental)
-    end
+
+    return unless current_effective_date.month == 1
+    create_list(:benefit_markets_products_dental_products_dental_product,
+                5,
+                benefit_market_kind: benefit_market.kind,
+                application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                product_package_kinds: [:single_product],
+                service_area: previous_year_service_area,
+                issuer_profile_id: dental_issuer_profile.id,
+                metal_level_kind: :dental)
   end
 
   def generate_initial_catalog_products_for(coverage_kinds)
@@ -170,28 +168,28 @@ module BenefitMarketWorld
 
   def renewal_health_products
     create_list(:benefit_markets_products_health_products_health_product,
-        5,
-        :with_renewal_product,
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-        product_package_kinds: [:single_issuer, :metal_level, :single_product],
-        service_area: service_area,
-        renewal_service_area: renewal_service_area,
-        issuer_profile_id: issuer_profile.id,
-        renewal_issuer_profile_id: issuer_profile.id,
-        metal_level_kind: :gold)
+                5,
+                :with_renewal_product,
+                application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                product_package_kinds: [:single_issuer, :metal_level, :single_product],
+                service_area: service_area,
+                renewal_service_area: renewal_service_area,
+                issuer_profile_id: issuer_profile.id,
+                renewal_issuer_profile_id: issuer_profile.id,
+                metal_level_kind: :gold)
   end
 
   def renewal_dental_products
-     create_list(:benefit_markets_products_dental_products_dental_product,
-        5,
-        :with_renewal_product,
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-        product_package_kinds: [:single_product],
-        service_area: service_area,
-        renewal_service_area: renewal_service_area,
-        issuer_profile_id: dental_issuer_profile.id,
-        renewal_issuer_profile_id: dental_issuer_profile.id,
-        metal_level_kind: :dental)
+    create_list(:benefit_markets_products_dental_products_dental_product,
+                5,
+                :with_renewal_product,
+                application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                product_package_kinds: [:single_product],
+                service_area: service_area,
+                renewal_service_area: renewal_service_area,
+                issuer_profile_id: dental_issuer_profile.id,
+                renewal_issuer_profile_id: dental_issuer_profile.id,
+                metal_level_kind: :dental)
   end
 
   def generate_renewal_catalog_products_for(coverage_kinds)
