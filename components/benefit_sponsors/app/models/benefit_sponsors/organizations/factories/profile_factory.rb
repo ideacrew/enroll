@@ -531,12 +531,12 @@ module BenefitSponsors
             )
           elsif is_broker_profile?
             match_criteria, records = ::Operations::People::Match.new.call({:dob => dob,
-            :last_name => last_name,
-            :first_name => first_name})
+                                                                            :last_name => last_name,
+                                                                            :first_name => first_name})
             if records.present? && records.first.ssn.blank? && match_criteria == :dob_present
-              records.first
+              records
             else
-            []
+              []
             end
           else
             Person.where(

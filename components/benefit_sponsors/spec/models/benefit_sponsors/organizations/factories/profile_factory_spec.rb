@@ -584,11 +584,44 @@ module BenefitSponsors
 
     context 'match_or_create_person' do
       context 'broker profile' do
-        context 'name and dob matches' do
-          let(:profile_factory) { profile_factory_class.new(valid_broker_params) }
+        let!(:profile_factory) { profile_factory_class.new(valid_broker_params) }
+        let!(:person) { FactoryBot.create(:person, :first_name => "Tyrion", :last_name => "Lannister", dob: dob) }
 
+        context 'name and dob matches with one record without user account' do
           it 'should return record' do
-            expect(profile_factory.match_or_create_person).to eq true
+            profile_factory.instance_variable_set(:@handler, BenefitSponsors::Organizations::Factories::ProfileFactory::BrokerAgency.new)
+            profile_factory.match_or_create_person
+            expect(profile_factory.person).to eq person
+          end
+        end
+
+        context 'name and dob matches with one record with user account' do
+          let(:current_user_2) { FactoryBot.create :user }
+          let(:person) { FactoryBot.create(:person, :first_name => "Tyrion", :last_name => "Lannister", dob: dob, user: current_user_2) }
+          it 'should return record' do
+            profile_factory.instance_variable_set(:@handler, BenefitSponsors::Organizations::Factories::ProfileFactory::BrokerAgency.new)
+            profile_factory.match_or_create_person
+            expect(profile_factory.person).to eq person
+          end
+        end
+
+        context 'name and dob matches with two records' do
+          let!(:person2) { FactoryBot.create(:person, :first_name => "Tyrion", :last_name => "Lannister", dob: dob) }
+
+          it 'should return error' do
+            profile_factory.instance_variable_set(:@handler, BenefitSponsors::Organizations::Factories::ProfileFactory::BrokerAgency.new)
+            profile_factory.match_or_create_person
+            expect(profile_factory.errors.messages[:staff_role]).to eq ["too many people match the criteria provided for your identity.  Please contact HBX."]
+          end
+        end
+
+        context 'no matching record with name and dob ' do
+          let!(:person) { FactoryBot.create(:person, :first_name => "Tyrion1", :last_name => "Lannister1", dob: dob) }
+
+          it 'should return error' do
+            profile_factory.instance_variable_set(:@handler, BenefitSponsors::Organizations::Factories::ProfileFactory::BrokerAgency.new)
+            profile_factory.match_or_create_person
+            expect(profile_factory.person).not_to eq person
           end
         end
       end
