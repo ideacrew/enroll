@@ -30,7 +30,7 @@ module Operations
           def update_consumer_role(consumer_role, response)
             args = OpenStruct.new
             args.determined_at = Time.now
-            args.vlp_authority = 'fdsh_ssa'
+            args.vlp_authority = 'ssa'
             response_code = response.dig(:ResponseMetadata, :ResponseCode)
             ssa_response = response.dig(:SSACompositeIndividualResponses, 0, :SSAResponse)
 
@@ -50,7 +50,7 @@ module Operations
             elsif consumer_role.may_ssn_invalid?
               consumer_role.ssn_invalid!(args)
             end
-            consumer_role.save
+            consumer_role.save!
             Success(consumer_role)
           end
 
