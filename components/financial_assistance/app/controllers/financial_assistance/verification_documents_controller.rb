@@ -21,7 +21,7 @@ module FinancialAssistance
               flash[:notice] = "File Saved"
             else
               flash[:error] = "Could not save file. #{@doc_errors.join('. ')}"
-              redirect_to(:back)
+              redirect_back(fallback_location: main_app.verification_insured_families_path)
               break
             end
           else
@@ -67,7 +67,7 @@ module FinancialAssistance
         @docs_owner.save!
 
         if (@evidence.documents - [@document]).empty?
-          @evidence.update_attributes(:validation_status => "outstanding", :update_reason => "all documents deleted")
+          @evidence.update_attributes(:eligibility_status => "outstanding", :update_reason => "all documents deleted")
           flash[:danger] = "All documents were deleted. Action needed"
         else
           flash[:success] = "Document deleted."
