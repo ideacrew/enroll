@@ -5,6 +5,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
   Background: User logs in and visits applicant's Job income page
     Given EnrollRegistry crm_update_family_save feature is disabled
     Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
+    Given FAA job_income_warning_message feature is disabled
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
@@ -106,4 +107,4 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Then the user should see the popup for the employer income question
     And the user closes the open income question modal
     When the user clicks the Not sure link next to the self employment income question
-    Then the user should see the popup for the self employment income question
+    Then the user should see the popup for the self employment income question    
