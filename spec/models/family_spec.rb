@@ -1441,6 +1441,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     end
     let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:dependent_person_2) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:dependent_person_3) { FactoryBot.create(:person, :with_consumer_role) }
     before do
       EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(true)
       test_person.person_relationships << PersonRelationship.new(relative: test_person, kind: "self")
@@ -1480,6 +1481,16 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       test_person.last_name = "Apples"
       test_person.save!
       expect(test_family.send(:trigger_crm_family_update_publish_after_save).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+      member_count = test_family.relevant_previous_changes.detect { |element| element.key?(:family_member_count) }[:family_member_count]
+      expect(member_count).to eq(3)
+      # Create new family member
+      test_person.person_relationships.create!(relative: dependent_person_3, kind: "child")
+      new_dependent = FactoryBot.build(:family_member, family: test_family, is_primary_applicant: false, is_active: true, person: dependent_person_3)
+      test_family.family_members << new_dependent
+      test_family.save!
+      test_family.reload
+      member_count = test_family.relevant_previous_changes.detect { |element| element.key?(:family_member_count) }[:family_member_count]
+      expect(member_count).to eq(4)
     end
   end
 end
