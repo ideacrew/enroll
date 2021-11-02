@@ -107,6 +107,11 @@ And(/^.+ sees quote for (.*) employer$/) do |employer_name|
   expect(page).to have_content("Quote for #{employer_name}")
 end
 
+And(/^.+ updates the start date$/) do
+  find(BrokerCreateQuotePage.select_start_on_dropdown).click
+  find('li', :text => (TimeKeeper.date_of_record + 2.months).strftime('%B %Y').to_s).click
+end
+
 And(/^.+ clicks on Select Health Benefits button$/) do
   find(BrokerCreateQuotePage.select_health_benefits_btn).click
 end

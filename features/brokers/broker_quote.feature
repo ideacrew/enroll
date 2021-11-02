@@ -51,6 +51,7 @@ Feature: Broker quote creation
     And Max Planck logs on to the Broker Agency Portal
     When Primary Broker clicks on the Employers tab
     And Primary broker clicks Actions dropdown and clicks Create Quote
+    And Primary Broker updates the start date
     And Primary Broker sees quote for Netflix employer
     And Primary broker clicks on Select Health Benefits button
     And Primary broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps
