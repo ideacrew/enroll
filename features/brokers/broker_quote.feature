@@ -13,7 +13,8 @@ Feature: Broker quote creation
     And Primary Broker clicks on the Add Prospect Employer button
     And Primary Broker creates new Prospect Employer with default_office_location
     Then Primary Broker should see successful message
-    
+
+    @nightly
   Scenario Outline: Roster does not populate even if employer has prior quotes with rosters completed
     Given prospect employer exist for District Brokers Inc
     And Max Planck logs on to the Broker Agency Portal
