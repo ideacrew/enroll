@@ -307,6 +307,7 @@ When(/^.+ clicks on the Continue button of the Family Information page$/) do
 end
 
 Then(/^.+ answers the questions of the Identity Verification page and clicks on submit/) do
+  sleep 10
   expect(page).to have_content IvlVerifyIdentity.verify_identity_text
   find(IvlVerifyIdentity.pick_answer_a).click
   find(IvlVerifyIdentity.pick_answer_c).click
@@ -948,7 +949,14 @@ When(/^\w+ checks? the Insured portal open enrollment dates$/) do
 end
 
 Then(/^.+should see a new renewing enrollment title on home page$/) do
-  expect(page).to have_content "Auto Renewing"
+  current_day = TimeKeeper.date_of_record
+  if (Date.new(current_day.year, 11, 1)..Date.new(current_day.year + 1, 1, 31)).include?(current_day)
+    year = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_period.start_on.year
+    expect(page).to have_content year
+    expect(page).not_to have_content "Auto Renewing"
+  else
+    expect(page).to have_content "Auto Renewing"
+  end
 end
 
 When(/^Incarcerated field is nil for the consumer$/) do

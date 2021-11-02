@@ -13,7 +13,7 @@ Feature: Broker quote creation
     And Primary Broker clicks on the Add Prospect Employer button
     And Primary Broker creates new Prospect Employer with default_office_location
     Then Primary Broker should see successful message
-    
+
     @nightly
   Scenario Outline: Roster does not populate even if employer has prior quotes with rosters completed
     Given prospect employer exist for District Brokers Inc
@@ -38,8 +38,7 @@ Feature: Broker quote creation
     And Primary Broker enters quote name
     And Primary broker clicks on Select Health Benefits button
     And Primary broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps
-    And Primary broker publishes the quote
-    Then Primary Broker should see successful message of published quote
+    And Primary broker publishes the quote and sees successful message of published quote
   
     Examples:
       | contribution_pct |
@@ -53,11 +52,11 @@ Feature: Broker quote creation
     And Max Planck logs on to the Broker Agency Portal
     When Primary Broker clicks on the Employers tab
     And Primary broker clicks Actions dropdown and clicks Create Quote
+    And Primary Broker updates the start date
     And Primary Broker sees quote for Netflix employer
     And Primary broker clicks on Select Health Benefits button
     And Primary broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps
-    And Primary broker publishes the quote
-    Then Primary Broker should see successful message of published quote
+    And Primary broker publishes the quote and sees successful message of published quote
     
     Examples:
       | contribution_pct |
