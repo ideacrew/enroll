@@ -595,6 +595,16 @@ module BenefitSponsors
           end
         end
 
+        context 'name and dob matches, no user account and ssn present' do
+          let!(:person) { FactoryBot.create(:person, :first_name => "Tyrion", :last_name => "Lannister", dob: dob, ssn: "985743457") }
+
+          it 'should create new record' do
+            profile_factory.instance_variable_set(:@handler, BenefitSponsors::Organizations::Factories::ProfileFactory::BrokerAgency.new)
+            profile_factory.match_or_create_person
+            expect(profile_factory.person).not_to eq person
+          end
+        end
+
         context 'name and dob matches with one record with user account' do
           let(:current_user_2) { FactoryBot.create :user }
           let(:person) { FactoryBot.create(:person, :first_name => "Tyrion", :last_name => "Lannister", dob: dob, user: current_user_2) }
