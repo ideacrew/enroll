@@ -28,6 +28,7 @@ module FinancialAssistance
           def fetch_application(family)
             ::FinancialAssistance::Application.where(family_id: family.id,
                                                      assistance_year: TimeKeeper.date_of_record.next_year.year,
+                                                     :"created_at".lte => Date.new(TimeKeeper.date_of_record.year, 11, 1),
                                                      aasm_state: 'determined').max_by(&:created_at)
           end
 
