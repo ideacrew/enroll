@@ -151,6 +151,21 @@ Then(/^the broker should see that the save benefits button is enabled$/) do
   expect(find("#submitPlanDesignProposal")[:class].include?('disabled')).to eql false
 end
 
+And(/^.+ publishes the quote and sees successful message of published quote$/) do
+  wait_for_ajax(3, 2)
+  find(BrokerHealthBenefitsPage.select_refrence_plan).click
+  wait_for_ajax(3, 2)
+  Capybara.ignore_hidden_elements = false
+  if page.find("#forms_plan_design_proposal_profile_benefit_sponsorship_benefit_application_benefit_group_relationship_benefits_attributes_0_premium_pct").value.to_i >= 50
+    find(BrokerHealthBenefitsPage.publish_quote_btn).click
+    wait_for_ajax(3, 2)
+    expect(page).to have_content("Quote Published")
+  else
+    expect(find(BrokerHealthBenefitsPage.publish_quote_btn).disabled?).to eql true
+  end
+  Capybara.ignore_hidden_elements = true
+end
+
 And(/^.+ should see successful message of published quote$/) do
   expect(page).to have_content("Quote Published")
 end
@@ -349,3 +364,4 @@ And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/)
   expect(page).to have_css('.btn.btn-xs', text: 'Assign General Agency')
   find(BrokerEmployersPage.assign_general_agency).click
 end
+
