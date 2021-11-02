@@ -146,8 +146,10 @@ end
 RSpec.shared_context "setup expired, active and renewing benefit applications", :shared_context => :metadata do
   include_context 'setup initial benefit application'
 
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+  let(:effective_period)   { current_effective_date..(current_effective_date.end_of_year) }
   let(:expired_benefit_application) do
-    initial_application.update_attributes(aasm_state: :expired)
+    initial_application.update_attributes(aasm_state: :expired, effective_period: effective_period)
     initial_application
   end
 
