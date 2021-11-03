@@ -10,7 +10,6 @@ function temporaryWarningAccepted(form_object_id) {
 
 // Add further validations here
 function setValidationFunction(form_type, form_object_id) {
-  console.log("form_object_id is " + form_object_id)
   if (form_type == 'income') {
     return validateIncomeForTemporaryMessage(form_object_id);
   }
@@ -40,7 +39,6 @@ function showTemporaryMessageDiv(form_object_id, form_type) {
   var temporary_warning_hidden_input = document.getElementById(temporary_warning_hidden_input_id);
   var warning_div = document.getElementById("temporary_warning_message_" + form_object_id);
   var validation_function = setValidationFunction(form_type, form_object_id);
-  console.log("temporary hidden input ID is " + temporary_warning_hidden_input_id);
   if (temporary_warning_hidden_input.value != 'true' && validation_function == true) {
     warning_div.classList.remove('hidden');
     window.event.preventDefault();
