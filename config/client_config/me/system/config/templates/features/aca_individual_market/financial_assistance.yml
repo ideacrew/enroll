@@ -255,5 +255,8 @@ registry:
           item: ["net_self_employment", "capital_gains", "farming_and_fishing", "rental_and_royalty", "other"]
     - key: :skip_zero_income_amount_validation
       is_enabled: :true
+    - key: :job_income_warning_message
+      item: :job_income_warning_message
+      is_enabled: true
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
