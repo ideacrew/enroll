@@ -22,7 +22,7 @@ module FinancialAssistance
             payload = yield load_data(params)
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
-            applicants = yield fill_applicants_form(payload, application)
+            _applicants = yield fill_applicants_form(payload, application)
             Success(application)
           end
 
@@ -117,7 +117,9 @@ module FinancialAssistance
             person_result = create_or_update_person(person_params)
             if person_result.success?
               @person = person_result.success
-              @family_member = create_or_update_family_member(@person, @family, family_member_hash)
+              fam_result = create_or_update_family_member(@person, @family, family_member_hash)
+              return fam_result unless fam_result.success?
+              @family_member = fam_result.value!
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
             else
