@@ -41,14 +41,14 @@
     <div id="job_income">
       <div class="incomes-list">
         <% @applicant.incomes.jobs.each do |income| %>
-        <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
+          <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
         <% end %>
       </div>
 
          <a class='new-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Job Income </a>
 
       <div class='new-income-form hidden'>
-        <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
+        <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
       </div>
     </div> <br>
 
@@ -83,7 +83,7 @@
       <a class="new-income"> <span class="fa-icon fa-stack plus-mr" aria-hidden='true'><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b>Add Another </b> Self-Employed Income </a>
 
       <div class='new-income-form hidden'>
-        <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build } %>
+        <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true} %>
       </div>
     </div>
     </br>
