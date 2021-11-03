@@ -425,7 +425,7 @@ module FinancialAssistance
               persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
-              persisted_applicant.save!
+              persisted_applicant.save(validate: false)
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
             end
             Success("Successfully transferred in account")
