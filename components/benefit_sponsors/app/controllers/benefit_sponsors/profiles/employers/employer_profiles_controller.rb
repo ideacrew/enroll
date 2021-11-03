@@ -50,7 +50,7 @@ module BenefitSponsors
               respond_to do |format|
                 format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
                 format.html
-                format.json { render nothing: true, :status => 404 }
+                format.any { head :ok }
               end
             when 'employees'
               @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
@@ -75,6 +75,7 @@ module BenefitSponsors
               respond_to do |format|
                 format.html
                 format.js
+                format.any { head :ok }
               end
             end
           end
