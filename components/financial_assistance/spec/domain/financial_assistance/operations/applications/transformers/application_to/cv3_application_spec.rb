@@ -373,7 +373,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it 'should add adjusted_gross_income' do
-        expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income)
+        expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income.to_f)
       end
     end
   end
@@ -1367,6 +1367,90 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should should return success' do
         expect(@entity_init.success?).to be_truthy
       end
+    end
+  end
+
+  describe 'mitc_income for prospective year application' do
+    let(:prospective_year) { TimeKeeper.date_of_record.next_year.year }
+    let(:create_job_income1) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: Date.new(prospective_year),
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let(:create_job_income2) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'monthly',
+                                                amount: 100.00,
+                                                start_on: Date.new(prospective_year, 2, 1) })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let(:create_job_income3) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'monthly',
+                                                amount: 2_500.00,
+                                                start_on: TimeKeeper.date_of_record,
+                                                end_on: TimeKeeper.date_of_record.end_of_year })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      applicant.incomes.destroy_all
+      create_job_income1
+      create_job_income2
+      create_job_income3
+      application.update_attributes!(assistance_year: prospective_year, effective_date: Date.new(prospective_year))
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should be able to successfully return mitc_income with amount' do
+      expect(@mitc_income[:amount]).to eq(30_000.00)
+    end
+
+    it 'should return taxable_interest for mitc_income as zero' do
+      expect(@mitc_income[:taxable_interest]).to be_zero
+    end
+
+    it 'should return alimony for mitc_income as zero' do
+      expect(@mitc_income[:alimony]).to be_zero
+    end
+
+    it 'should return capital_gain_or_loss for mitc_income as zero' do
+      expect(@mitc_income[:capital_gain_or_loss]).to be_zero
+    end
+
+    it 'should return pensions_and_annuities_taxable_amount for mitc_income as zero' do
+      expect(@mitc_income[:pensions_and_annuities_taxable_amount]).to be_zero
+    end
+
+    it 'should return farm_income_or_loss for mitc_income as zero' do
+      expect(@mitc_income[:farm_income_or_loss]).to be_zero
+    end
+
+    it 'should return unemployment_compensation for mitc_income as zero' do
+      expect(@mitc_income[:unemployment_compensation]).to be_zero
+    end
+
+    it 'should return other_income for mitc_income as zero' do
+      expect(@mitc_income[:other_income]).to be_zero
+    end
+
+    it 'should return adjusted_gross_income for mitc_income' do
+      expect(@mitc_income[:adjusted_gross_income]).to be_a Float
+      expect(@mitc_income[:adjusted_gross_income]).not_to be_a Money
     end
   end
 end
