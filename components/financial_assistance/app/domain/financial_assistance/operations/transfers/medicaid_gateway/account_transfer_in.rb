@@ -148,7 +148,7 @@ module FinancialAssistance
           def create_or_update_family_member(person, family, family_member_hash)
             family_member = family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
 
-            return family_member if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
+            return Success(family_member) if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
 
             fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
                         is_consent_applicant: family_member_hash['is_consent_applicant'],
