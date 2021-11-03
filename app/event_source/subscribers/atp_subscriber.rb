@@ -7,7 +7,6 @@ module Subscribers
     include EventSource::Logging
     include ::EventSource::Subscriber[amqp: 'magi_medicaid.atp.enroll']
 
-    # event_source branch: release_0.5.2
     subscribe(:on_transfer_in) do |delivery_info, _metadata, response|
       logger.info "AtpSubscriber: invoked on_magi_medicaid_atp_enroll with delivery_info: #{delivery_info}, response: #{response}"
       payload = JSON.parse(response, :symbolize_names => true)
@@ -16,11 +15,13 @@ module Subscribers
       details = payload["family"]["magi_medicaid_applications"][0]["transfer_id"]
       transfer_details[:transfer_id] = details || payload
       if result.success?
+        transfer_details[:result] = "Success"
+        transfer_details[:failure] = nil
         transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(result.value!)
-        transfer_failure = {}
-        transfer_failure[:result] = "Failed"
-        transfer_failure[:failure] = "Unsucessfully ingested by Enroll - #{transfer_response.failure}"
-        transfer_details = transfer_response.success? ? transfer_details.merge(transfer_response.value!) : transfer_details.merge(transfer_failure)
+        if transfer_response.failure?
+          transfer_details[:result] = "Failed"
+          transfer_details[:failure] = "Unsucessfully ingested by Enroll - #{transfer_response.failure}"
+        end
         ack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: acked with success: #{result.success}"
       else
