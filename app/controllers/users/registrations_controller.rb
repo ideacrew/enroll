@@ -10,19 +10,19 @@ module Users
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
-  def new
-    @relay_state = params.require(:relay_state)
-    super
-  end
+  # def new
+  #   super
+  # end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   # POST /resource
   def create
     if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+      invitation = Invitation.find(params.require(:invitation_id))
       result = Operations::Users::Create.new.call(account: {
                                                     email: sign_up_params[:oim_id],
                                                     password: sign_up_params[:password],
-                                                    relay_state: params.require(:relay_state)
+                                                    relay_state: invitation.role
                                                   })
 
       resource_saved = result.success?

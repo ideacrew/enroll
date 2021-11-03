@@ -50,7 +50,7 @@ class InvitationsController < ApplicationController
       redirect_to new_user_session_url(:invitation_id => params_hash[:id])
     elsif current_user.nil?
       session[:portal] = url_for(params_hash)
-      redirect_to new_user_registration_url(:invitation_id => params_hash[:id], relay_state: invitation.role)
+      redirect_to new_user_registration_url(:invitation_id => params_hash[:id], invitation_id: invitation.id)
     end
   end
 
