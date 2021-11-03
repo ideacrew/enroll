@@ -137,7 +137,8 @@ Given(/^they answer job income question and complete the form with incorrect dat
 end
 
 Then(/^I should see a JS alert$/) do
-  page.accept_alert
+  sleep 1
+  page.driver.browser.switch_to.alert.accept
 end
 
 Then(/^they should see the newly added Job income$/) do

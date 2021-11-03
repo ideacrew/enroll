@@ -107,6 +107,11 @@ And(/^.+ sees quote for (.*) employer$/) do |employer_name|
   expect(page).to have_content("Quote for #{employer_name}")
 end
 
+And(/^.+ updates the start date$/) do
+  find(BrokerCreateQuotePage.select_start_on_dropdown).click
+  find('li', :text => (TimeKeeper.date_of_record + 2.months).strftime('%B %Y').to_s).click
+end
+
 And(/^.+ clicks on Select Health Benefits button$/) do
   find(BrokerCreateQuotePage.select_health_benefits_btn).click
 end
@@ -149,6 +154,21 @@ end
 
 Then(/^the broker should see that the save benefits button is enabled$/) do
   expect(find("#submitPlanDesignProposal")[:class].include?('disabled')).to eql false
+end
+
+And(/^.+ publishes the quote and sees successful message of published quote$/) do
+  wait_for_ajax(3, 2)
+  find(BrokerHealthBenefitsPage.select_refrence_plan).click
+  wait_for_ajax(3, 2)
+  Capybara.ignore_hidden_elements = false
+  if page.find("#forms_plan_design_proposal_profile_benefit_sponsorship_benefit_application_benefit_group_relationship_benefits_attributes_0_premium_pct").value.to_i >= 50
+    find(BrokerHealthBenefitsPage.publish_quote_btn).click
+    wait_for_ajax(3, 2)
+    expect(page).to have_content("Quote Published")
+  else
+    expect(find(BrokerHealthBenefitsPage.publish_quote_btn).disabled?).to eql true
+  end
+  Capybara.ignore_hidden_elements = true
 end
 
 And(/^.+ should see successful message of published quote$/) do
@@ -349,3 +369,4 @@ And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/)
   expect(page).to have_css('.btn.btn-xs', text: 'Assign General Agency')
   find(BrokerEmployersPage.assign_general_agency).click
 end
+
