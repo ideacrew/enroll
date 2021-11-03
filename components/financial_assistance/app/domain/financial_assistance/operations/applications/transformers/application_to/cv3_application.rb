@@ -122,6 +122,7 @@ module FinancialAssistance
             # rubocop:disable Metrics/MethodLength
             def applicants(application, benchmark_premiums)
               application.applicants.inject([]) do |result, applicant|
+                mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
@@ -194,10 +195,10 @@ module FinancialAssistance
                            is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
                            benchmark_premium: benchmark_premiums,
                            is_homeless: applicant.is_homeless.present?,
-                           mitc_income: mitc_income(applicant),
+                           mitc_income: mitc_income(applicant, mitc_eligible_incomes),
                            evidences: applicant.evidences.serializable_hash.map(&:symbolize_keys),
                            mitc_relationships: mitc_relationships(applicant),
-                           mitc_is_required_to_file_taxes: calculate_if_applicant_is_required_to_file_taxes(applicant)}
+                           mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes)}
                 result
               end
             end
@@ -215,14 +216,14 @@ module FinancialAssistance
               end
             end
 
-            def calculate_if_applicant_is_required_to_file_taxes(applicant)
+            def applicant_is_required_to_file_taxes(applicant, eligible_incomes)
               return true if applicant.is_required_to_file_taxes
 
-              total_earned_income = applicant.current_month_earned_incomes.inject(0) do |tot, inc|
+              total_earned_income = mitc_eligible_earned_incomes(eligible_incomes).inject(0) do |tot, inc|
                 tot + inc.calculate_annual_income
               end.to_f
 
-              total_unearned_income = applicant.current_month_unearned_incomes.inject(0) do |tot, inc|
+              total_unearned_income = mitc_eligible_unearned_incomes(eligible_incomes).inject(0) do |tot, inc|
                 tot + inc.calculate_annual_income
               end.to_f
 
@@ -308,8 +309,7 @@ module FinancialAssistance
             end
 
             # All MitcIncome amounts must be expressed as annual amounts.
-            def mitc_income(applicant)
-              current_incomes = applicant.current_month_incomes
+            def mitc_income(applicant, current_incomes)
               { amount: wages_and_salaries(current_incomes),
                 taxable_interest: taxable_interest(current_incomes),
                 tax_exempt_interest: 0,
@@ -321,7 +321,7 @@ module FinancialAssistance
                 unemployment_compensation: unemployment_compensation(current_incomes),
                 other_income: other_income(current_incomes),
                 magi_deductions: magi_deductions(applicant),
-                adjusted_gross_income: applicant.net_annual_income || 0,
+                adjusted_gross_income: applicant.net_annual_income.to_f || 0,
                 deductible_part_of_self_employment_tax: deductible_part_of_self_employment_tax(applicant),
                 ira_deduction: ira_deduction(applicant),
                 student_loan_interest_deduction: student_loan_interest_deduction(applicant),
@@ -791,6 +791,39 @@ module FinancialAssistance
               end
             end
 
+            # Eligible month for selecting matching incomes
+            def month_date_range(assistance_year)
+              system_date = TimeKeeper.date_of_record
+              if assistance_year > system_date.year
+                start_of_year = Date.new(assistance_year).beginning_of_year
+                start_of_year..start_of_year.end_of_month
+              else
+                system_date.beginning_of_month..system_date.end_of_month
+              end
+            end
+
+            # Incomes will be selected matching Mitc needs.
+            def eligible_incomes_for_mitc(applicant)
+              assistance_year = applicant.application.assistance_year
+              applicant.incomes.select do |inc|
+                next inc unless assistance_year
+                end_on = inc.end_on || Date.new(assistance_year).end_of_year
+                income_date_range = (inc.start_on)..end_on
+                date_ranges_overlap?(income_date_range, month_date_range(assistance_year))
+              end
+            end
+
+            def date_ranges_overlap?(range_a, range_b)
+              range_b.begin <= range_a.end && range_a.begin <= range_b.end
+            end
+
+            def mitc_eligible_earned_incomes(eligible_incomes)
+              eligible_incomes.select { |inc| ::FinancialAssistance::Income::EARNED_INCOME_KINDS.include?(inc.kind) }
+            end
+
+            def mitc_eligible_unearned_incomes(eligible_incomes)
+              eligible_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
+            end
           end
         end
       end
