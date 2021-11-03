@@ -1,4 +1,7 @@
 <div id="<%= dom_id income %>" class="income">
+  <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
+    <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income.id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
+  <% end %>
   <div class="display-income">
     <div class="focus_effect_module">
       <div class="row row-form-wrapper no-buffer row-height">
