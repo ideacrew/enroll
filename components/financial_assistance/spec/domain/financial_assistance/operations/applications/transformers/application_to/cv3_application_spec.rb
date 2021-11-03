@@ -373,7 +373,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it 'should add adjusted_gross_income' do
-        expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income)
+        expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income.to_f)
       end
     end
   end
@@ -1372,7 +1372,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   describe 'mitc_income for prospective year application' do
     let(:prospective_year) { TimeKeeper.date_of_record.next_year.year }
-    let!(:create_job_income1) do
+    let(:create_job_income1) do
       inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
                                                 frequency_kind: 'yearly',
                                                 amount: 30_000.00,
@@ -1382,16 +1382,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       applicant.save!
     end
 
-    let!(:create_job_income2) do
+    let(:create_job_income2) do
       inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
                                                 frequency_kind: 'monthly',
                                                 amount: 100.00,
-                                                start_on: Date.new(prospective_year, rand(2..12), 1) })
+                                                start_on: Date.new(prospective_year, 2, 1) })
       applicant.incomes << inc
       applicant.save!
     end
 
-    let!(:create_job_income3) do
+    let(:create_job_income3) do
       inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
                                                 frequency_kind: 'monthly',
                                                 amount: 2_500.00,
@@ -1402,6 +1402,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      applicant.incomes.destroy_all
+      create_job_income1
+      create_job_income2
+      create_job_income3
       application.update_attributes!(assistance_year: prospective_year, effective_date: Date.new(prospective_year))
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -1413,7 +1417,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should be able to successfully return mitc_income with amount' do
-      expect(@mitc_income[:amount]).to eq(60_000.00)
+      expect(@mitc_income[:amount]).to eq(30_000.00)
     end
 
     it 'should return taxable_interest for mitc_income as zero' do
