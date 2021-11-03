@@ -1,4 +1,11 @@
 <%= income_form_for @application, @applicant, income do |f| %>
+  <% income_id = income.id %>
+  <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) && local_assigns[:new_form] %>
+    <% if income_id.blank? %>
+      <% income_id = BSON::ObjectId.new.to_s %>
+    <% end %>
+    <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income_id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
+  <% end %>
   <%= f.hidden_field :kind, value: 'net_self_employment' %>
   <div class="focus_effect_module row-edit-border">
     <div class="row row-form-wrapper no-buffer row-height">
@@ -16,11 +23,11 @@
       </div>
 
       <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income.id}", class: "datepicker-js floatlabel" %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel" %>
       </div>
 
       <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income.id}", class: "datepicker-js floatlabel" %>
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel" %>
       </div>
   </div>
   </div>
@@ -29,7 +36,7 @@
       <div class="col-md-3 pull-right cancel-save-mt">
         <a class="btn btn-default income-cancel">Cancel</a>
         <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
-          <% onclick_save_event = "showTemporaryMessageDiv('#{income.id}', 'income')" %>
+          <% onclick_save_event = raw "showTemporaryMessageDiv('#{income_id}', 'income')" %>
         <% else %>
           <% onclick_save_event = "" %>
         <% end %>

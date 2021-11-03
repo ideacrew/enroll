@@ -47,7 +47,7 @@
            <a class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
 
         <div class='new-unemployment-income-form hidden'>
-          <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false } %>
+          <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
         </div>
       </div> <br>
     <% end %>
@@ -108,7 +108,7 @@
           </div>
 
           <div class='new-other-income-form hidden <%= other_income_kind %>'>
-            <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true } %>
+            <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
           </div>
         </div>
       <% end %>
