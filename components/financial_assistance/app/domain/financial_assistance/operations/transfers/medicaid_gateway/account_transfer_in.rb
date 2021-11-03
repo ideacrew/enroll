@@ -430,7 +430,7 @@ module FinancialAssistance
             end
             Success("Successfully transferred in account")
           rescue Mongoid::Errors::Validations => e
-            Failure("build_family validation: #{e.summary}")
+            Failure("Fill applicant form validation: #{e.summary}")
           rescue StandardError => e
             Failure("Fill applicant form: #{e}")
           end
