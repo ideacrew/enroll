@@ -6,6 +6,7 @@ module FinancialAssistance
 
     before_action :set_current_person
 
+    include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     include FinancialAssistance::L10nHelper
@@ -282,12 +283,12 @@ module FinancialAssistance
 
     def generate_income_hash(applicant)
       income_hash = {
-        "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{@application.assistance_year}?" => human_boolean(applicant.has_job_income),
+        strip_tags(l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_job_income),
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
-        "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income)
+        strip_tags(l10n('faa.incomes.from_self_employment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_self_employment_income)
       }
-      income_hash.merge!("Did this person receive unemployment income at any point in #{@application.assistance_year}? *" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-      income_hash.merge!("Does this person expect to have income from other sources in #{@application.assistance_year}? *" => human_boolean(applicant.has_other_income))
+      income_hash.merge!(strip_tags(l10n('faa.other_incomes.unemployment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+      income_hash.merge!(strip_tags(l10n('faa.other_incomes.other_sources', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_other_income))
       income_hash
     end
 
