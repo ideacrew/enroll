@@ -1,4 +1,7 @@
 <div id="<%= dom_id deduction %>" class="deduction row-form-adjustment">
+  <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
+    <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: deduction.id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
+  <% end %>
   <div class="focus_effect_module deduction-show">
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
