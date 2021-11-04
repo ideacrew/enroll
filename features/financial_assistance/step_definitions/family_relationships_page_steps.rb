@@ -17,7 +17,7 @@ And(/user enters applicant info WITHOUT tribal member us citizen or naturalizati
   click_outside_datepicker(l10n('family_information'))
   fill_in FinancialAssistance::ApplicantForm.applicant_form_ssn, :with => '123456543'
   find("span", :text => "choose").click
-  # find(:xpath, FinancialAssistance::ApplicantForm.applicant_spouse_select).click
+  find(:xpath, FinancialAssistance::ApplicantForm.applicant_spouse_select).click
   find(:xpath, FinancialAssistance::ApplicantForm.applicant_form_gender_select_male).click
   find(:xpath, FinancialAssistance::ApplicantForm.is_applying_coverage_true).click
   # choose('radio_incarcerated_no', allow_label_click: true)
@@ -28,8 +28,6 @@ And(/user enters applicant info WITHOUT tribal member us citizen or naturalizati
 end
 
 And(/user will have to accept alert pop ups for missing fields$/) do
-  sleep 1
-  page.driver.browser.switch_to.alert.accept
   sleep 1
   page.driver.browser.switch_to.alert.accept
   sleep 1
@@ -47,11 +45,7 @@ And(/user fills in the missing fields and clicks submit$/) do
   choose(FinancialAssistance::ApplicantForm.radio_incarcerated_no, allow_label_click: true)
   choose(FinancialAssistance::ApplicantForm.indian_tribe_no, allow_label_click: true)
   choose(FinancialAssistance::ApplicantForm.us_citizen_true, allow_label_click: true)
-  # For some reason, using the step
-  # find(:xpath, FinancialAssistance::ApplicantForm.applicant_spouse_select).click
-  # only works on the initial "new" form
   choose(FinancialAssistance::ApplicantForm.naturalized_citizen_false, allow_label_click: true)
-  execute_script "document.getElementById('applicant_relationship').value = 'spouse'"
   find(".btn", text: "CONFIRM MEMBER").click
 end
 
