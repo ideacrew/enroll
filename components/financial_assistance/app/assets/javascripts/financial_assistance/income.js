@@ -49,7 +49,9 @@ document.addEventListener("turbolinks:load", function() {
 
         $('#unsavedIncomeChangesWarning').modal('show');
         $('.btn.btn-danger').click(function() {
-          faWindow.location.href = $(self).attr('href');
+          if (self != undefined && faWindow.location != undefined) {
+            faWindow.location.href = $(self).attr('href');
+          };
         });
 
         return false;

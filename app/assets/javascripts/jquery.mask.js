@@ -222,7 +222,7 @@
                     }
 
                     for (i = caretPosOld - 1; i >= 0; i--) {
-                        if (p.maskDigitPosMapOld[i]) {
+                        if (p.maskDigitPosMap[i]) {
                             maskDigitsBeforeCaretAllOld++;
                         }
                     }

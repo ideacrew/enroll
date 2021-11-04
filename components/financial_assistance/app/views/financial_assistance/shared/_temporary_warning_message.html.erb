@@ -1,0 +1,23 @@
+<!-- Temporary Warning Message Section. This can be activated to pop up on the DOM when a form is submitted. After it is closed, the message will not display itself again and allow the user to continue. Used for more informational popups that don't affect validation business logic -->
+
+<input type="hidden" id='temporary_warning_message_<%= raw "#{form_object_id}" %>_seen' value="false">
+<div class='row hidden' id="temporary_warning_message_<%= raw "#{form_object_id}" %>" >
+  <div class='col-md-12'>  
+    <div class="focus_effect_module income-warning-error">
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="row flash module">
+          <div class="alert alert-warning" style="!important;">
+            <div class="row">
+              <div class="col-xs-12" style="margin: auto;">
+                <a class="close" data-dismiss="alert" href="#" onclick="<%= raw("temporaryWarningAccepted('#{form_object_id}')") %>">×</a>
+                <div>
+                  <%= l10n(translation_key, translation_interpolation_keys) %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe "app/views/events/enrollment_event.xml.haml" do
+RSpec.describe "app/views/events/enrollment_event.xml.haml", dbclean: :around_each do
 
   let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }

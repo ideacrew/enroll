@@ -17,6 +17,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
   'en.faa.edit.remove_warning' => 'This cannot be undone.',
   'en.faa.incomes.job_income_note' => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
+  "en.faa.incomes.from_employer" => "Does this person have <strong>income from an employer</strong>?*",
+  "en.faa.incomes.from_self_employment" => "Does this person have <strong>self-employment income</strong>?*",
+  "en.faa.other_incomes.unemployment" => "Does this person receive <strong>unemployment compensation</strong>, or have they received it this year?*",
+  "en.faa.other_incomes.other_sources" => "Does this person have <strong>income from other sources</strong>?*",
+  "en.faa.deductions.income_adjustments" => "Does this person have <strong>adjustments to income</strong>?*",
   "en.faa.eligibility_results" => "Eligibility Results",
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "MaineCare and Cub Care",
@@ -46,7 +51,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in a plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
   "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
   "en.faa.next_step_medicaid_eligible" => "<b>Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:</b><ul><li>pick a plan, or</li><li>add or remove someone from your plan.</li>",
-  "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
+  "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to:</b><ul><li>See your plan options</li><li>Add or remove someone</li></ul>",
   "en.faa.indian_health_service" => "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
   "en.faa.indian_health_service_eligible" => "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
   "en.faa.medicaid_not_eligible" => "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days? *",
@@ -133,7 +138,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_oe_range_through" => " through ",
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
-  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
+  "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
@@ -146,6 +151,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # FAA start new application page
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
-  "en.faa.cancel" => "Cancel"
+  "en.faa.cancel" => "Cancel",
+  "en.faa.income_temporary_message" => "<ul><li><strong>Start Date: </strong>If this is income you currently have, you must enter the date you began receiving this income in the 'From' field, or 1/1/%{current_year} (if the income started before this year). Do not enter a date in the future (for example, 1/1/%{next_year}) unless this is income that has not started but you expect to have in the future.</li><li><strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.</li></ul>"
 }.freeze
 # rubocop:enable Layout/LineLength

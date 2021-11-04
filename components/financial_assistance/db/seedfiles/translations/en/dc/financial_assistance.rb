@@ -17,6 +17,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
   'en.faa.edit.remove_warning' => 'This cannot be undone.',
   'en.faa.incomes.job_income_note' => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
+  "en.faa.incomes.from_employer" => "Does this person have <strong> income from an employer</strong>(wages, tips, bonuses, etc.) in %{assistance_year}?*",
+  "en.faa.incomes.from_self_employment" => "Does this person expect to receive <strong>self-employment income</strong> in %{assistance_year}?*",
+  "en.faa.other_incomes.unemployment" => "Did this person receive <strong>Unemployment Income</strong> at any point in %{assistance_year}?*",
+  "en.faa.other_incomes.other_sources" => "Does this person expect to have <strong> income from other sources </strong> in %{assistance_year}?*",
+  "en.faa.deductions.income_adjustments" => "Does this person expect to have income adjustments in %{assistance_year}?*",
   "en.faa.eligibility_results" => "Eligibility Results",
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "Medicaid",
@@ -25,7 +30,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
-  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums of %{reduction_amount} per month </strong>.",
+  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums. The monthly premium reduction is %{reduction_amount} per month </strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
   "en.faa.qualify_for_lower_costs_1" => "They also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. ",
   "en.faa.qualify_for_csr_100" => "They also won’t pay anything for services they receive from an Indian Health Service provider.",
@@ -141,7 +146,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # FAA start new application page
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
-  "en.faa.cancel" => "Cancel"
+  "en.faa.cancel" => "Cancel",
+  "en.faa.income_temporary_message" => "<ul><li><strong>Start Date: </strong>If this is income you currently have, you must enter the date you began receiving this income in the 'From' field, or 1/1/%{current_year} (if the income started before this year). Do not enter a date in the future (for example, 1/1/%{next_year}) unless this is income that has not started but you expect to have in the future.</li><li><strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.</li></ul>"
 }.freeze
-
 # rubocop:enable Layout/LineLength

@@ -19,7 +19,7 @@
     <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color">Did this person receive <b>Unemployment Income</b> at any point in <%= @application.assistance_year %>? *</span>
+          <span class="fa-text-color"><%= l10n('faa.other_incomes.unemployment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %></span>
         </div>
         <div class='col-md-6 mt11'>
           <div class='col-md-3 no-padding'>
@@ -47,14 +47,14 @@
            <a class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
 
         <div class='new-unemployment-income-form hidden'>
-          <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false } %>
+          <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
         </div>
       </div> <br>
     <% end %>
 
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Does this person expect to have <b> income from other sources </b> in <%= FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s %>?&nbsp;*</span>
+        <span class="fa-text-color"><%= l10n('faa.other_incomes.other_sources', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %></span>
       </div>
       <div class='col-md-6 mt11'>
         <div class='col-md-3 no-padding'>
@@ -108,7 +108,7 @@
           </div>
 
           <div class='new-other-income-form hidden <%= other_income_kind %>'>
-            <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true } %>
+            <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
           </div>
         </div>
       <% end %>

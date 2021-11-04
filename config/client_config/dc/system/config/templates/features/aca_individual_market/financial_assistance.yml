@@ -15,7 +15,7 @@ registry:
           - key: :file_location
             item: 'db/documents/ivl_checklist.pdf'
       - key: :iap_year_selection
-        is_enabled: false
+        is_enabled: true
       - key: :iap_assistance_year_display
         is_enabled: true
       - key: :enrollment_dates
@@ -255,5 +255,11 @@ registry:
           item: ["net_self_employment", "capital_gains", "farming_and_fishing"]
     - key: :skip_zero_income_amount_validation
       is_enabled: :false
+    - key: :job_income_warning_message
+      item: :job_income_warning_message
+      is_enabled: false
+# TODO eligibility engine connectivity(HAVEN) settings
+# TODO mec service connectivity settings
+
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

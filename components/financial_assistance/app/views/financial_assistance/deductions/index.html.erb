@@ -18,7 +18,7 @@
     <!--income adjustment driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class="col-md-6 labelforcoverage">
-        <span class="fa-text-color">Does this person expect to have income adjustments in <%= FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s %>? *</span>
+        <span class="fa-text-color"><%= l10n('faa.deductions.income_adjustments', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %></span>
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
@@ -68,12 +68,13 @@
 
           <div class="deductions-list">
             <% @applicant.deductions.of_kind(deduction_kind).each do |deduction| %>
+
               <%= render partial: 'deduction', locals: { deduction: deduction } %>
             <% end %>
           </div>
 
           <div class='new-deduction-form hidden <%= deduction_kind %>'>
-            <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind} %>
+            <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
           </div>
           <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
              <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym]}".html_safe, "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>

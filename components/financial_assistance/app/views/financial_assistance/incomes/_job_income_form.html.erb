@@ -1,4 +1,11 @@
 <%= income_form_for @application, @applicant, income do |f| %>
+  <% income_id = income.id %>
+  <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) && local_assigns[:new_form] %>
+    <% if income.id.blank? %>
+      <% income_id = BSON::ObjectId.new.to_s %>
+    <% end %>
+    <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income_id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
+  <% end %>
   <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
   <div class="focus_effect_module row-edit-border">
     <div class="row row-form-wrapper no-buffer row-height">
@@ -21,10 +28,10 @@
         </div>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income.id}", class: "datepicker-js floatlabel" %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel" %>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income.id}", class: "datepicker-js floatlabel" %>
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel" %>
       </div>
     </div>
     <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
@@ -58,8 +65,7 @@
       <%= phone_fields.hidden_field :kind, value: "work" %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-12">
-          <% required = EnrollRegistry[:skip_employer_phone_validation].enabled? ? false : true %>
-          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: required, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
+          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
       </div>
     <% end %>
@@ -68,7 +74,12 @@
     <div class="row">
       <div class="col-md-3 pull-right cancel-save-mt">
         <a class="btn btn-default income-cancel">Cancel</a>
-        <%= f.submit 'Save', class: 'btn btn-danger', onclick: "checkDate('#{income.id}')" %>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
+         <% onclick_save_event = raw "showTemporaryMessageDiv('#{income_id}', 'income')" %>
+        <% else %>
+          <% onclick_save_event = "checkDate('#{income_id}')" %>
+        <% end %>
+        <%= f.submit 'Save', class: 'btn btn-danger', onclick: onclick_save_event %>
       </div>
     </div>
 <% end %>

@@ -2,25 +2,21 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
-require 'aca_entities/magi_medicaid/libraries/iap_library'
-require 'aca_entities/atp/transformers/cv/family'
-require 'aca_entities/atp/operations/family'
-require 'aca_entities/serializers/xml/medicaid/atp'
 require 'aca_entities/operations/encryption/decrypt'
 
 module FinancialAssistance
   module Operations
     module Transfers
       module MedicaidGateway
-        # This Operation adds the eligibility determination to the Application(persistence object)
-        # Operation receives the MagiMedicaidApplication with Full Determination
+        # This Operation creates a new family and application draft
+        # Operation receives ATP payload from medicaid gateway
         class AccountTransferIn
           include Dry::Monads[:result, :do]
 
           PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
 
           # @param [Hash] opts The options to transfer in a new Family & Application(persistence object)
-          # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params
+          # @option opts [Hash] :params Atp payload params
           # @return [Dry::Monads::Result]
           def call(params)
             payload = yield load_data(params)
@@ -34,45 +30,58 @@ module FinancialAssistance
 
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
-            payload = decrypt_ssns(payload)
-            Success(payload)
+            decrypt_ssns(payload)
           end
 
           def decrypt_ssn(ssn)
-            return unless ssn
-            result = AcaEntities::Operations::Encryption::Decrypt.new.call({ value: ssn })
-            result.success? ? result.value! : ''
+            return Success(nil) unless ssn
+            AcaEntities::Operations::Encryption::Decrypt.new.call({ value: ssn })
+          rescue StandardError => e
+            Failure("decrypt ssn #{e}")
           end
 
           def decrypt_ssns(payload)
             payload["family"]["family_members"].each_with_index do |fm, i|
               ssn = fm["person"]["person_demographics"]["ssn"]
-              payload["family"]["family_members"][i]["person"]["person_demographics"]["ssn"] = decrypt_ssn(ssn) if ssn
+              decryption_result = decrypt_ssn(ssn)
+              return decryption_result unless decryption_result.success?
+              decrypted_ssn = decryption_result.value!
+              payload["family"]["family_members"][i]["person"]["person_demographics"]["ssn"] = decrypted_ssn if decrypted_ssn.present?
               fm["person"]["person_relationships"].each_with_index do |relationship, ii|
                 rssn = relationship["relative"]["ssn"]
-                payload["family"]["family_members"][i]["person"]["person_relationships"][ii]["relative"]["ssn"] = decrypt_ssn(rssn) if rssn
+                rdecryption_result = decrypt_ssn(rssn)
+                return rdecryption_result unless rdecryption_result.success?
+                rdecrypted_ssn = rdecryption_result.value!
+                payload["family"]["family_members"][i]["person"]["person_relationships"][ii]["relative"]["ssn"] = rdecrypted_ssn if rdecrypted_ssn.present?
               end
             end
-            payload
+            Success(payload)
+          rescue StandardError => e
+            Failure("decrypt ssns #{e}")
           end
 
           def find_family(family_hash)
-            person_params = sanitize_person_params(family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first)
-            # candidate = PersonCandidate.new(person_params[:ssn], person_params[:dob], person_params[:first_name], person_params[:last_name])
+            person_params_result = sanitize_person_params(family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first)
+            return person_params_result if person_params_result.failure?
+            person_params = person_params_result.value!
             match_criteria, records = ::Operations::People::Match.new.call({:dob => person_params[:dob],
                                                                             :last_name => person_params[:last_name],
                                                                             :first_name => person_params[:first_name],
                                                                             :ssn => person_params[:ssn]})
-            return [] unless records.present?
-            return [] unless [:ssn_present, :dob_present].include?(match_criteria)
-            return [] if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
+            return Success(nil) unless records.present?
+            return Success(nil) unless [:ssn_present, :dob_present].include?(match_criteria)
+            return Success(nil) if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
 
             person = records.first
-            person.primary_family
+            Success(person.primary_family)
+          rescue StandardError => e
+            Failure("find family error #{e}")
           end
 
           def build_family(family_hash)
-            found_family = find_family(family_hash)
+            found_family_result = find_family(family_hash)
+            return found_family_result unless found_family_result.success?
+            found_family = found_family_result.value!
             @family = if found_family.present?
                         found_family
                       else
@@ -86,29 +95,44 @@ module FinancialAssistance
             end
             @family.save!
             Success(@family)
+          rescue Mongoid::Errors::Validations => e
+            Failure("build_family validation: #{e.summary}")
+          rescue StandardError => e
+            Failure("build_family: #{e}")
           end
 
           def build_application(payload, family)
             app_params = payload["family"]['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
             sanitize_iap_hash = sanitize_applicant_params(app_params, family.primary_person)
-            ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash)
+            return sanitize_iap_hash.failure unless sanitize_iap_hash.success?
+            ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash.value!)
+          rescue StandardError => e
+            Failure("build_application: #{e}")
           end
 
           def create_member(family_member_hash)
-            person_params = sanitize_person_params(family_member_hash)
+            person_params_result = sanitize_person_params(family_member_hash)
+            return person_params_result unless person_params_result.success?
+            person_params = person_params_result.value!
             person_result = create_or_update_person(person_params)
             if person_result.success?
               @person = person_result.success
-              @family_member = create_or_update_family_member(@person, @family, family_member_hash)
+              fam_result = create_or_update_family_member(@person, @family, family_member_hash)
+              return fam_result unless fam_result.success?
+              @family_member = fam_result.value!
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
             else
               person_result
             end
+          rescue StandardError => e
+            Failure("create_member: #{e}")
           end
 
           def create_or_update_person(person_params)
             ::Operations::People::CreateOrUpdate.new.call(params: person_params)
+          rescue StandardError => e
+            Failure("create_or_update_person: #{e}")
           end
 
           def create_or_update_consumer_role(applicant_params, family_member)
@@ -117,12 +141,14 @@ module FinancialAssistance
             params = applicant_params.except("lawful_presence_determination")
             merge_params = params.merge(citizen_status: applicant_params["lawful_presence_determination"]["citizen_status"])
             ::Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: merge_params, family_member: family_member })
+          rescue StandardError => e
+            Failure("create_or_update_consumer_role: #{e}")
           end
 
           def create_or_update_family_member(person, family, family_member_hash)
             family_member = family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
 
-            return family_member if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
+            return Success(family_member) if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
 
             fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
                         is_consent_applicant: family_member_hash['is_consent_applicant'],
@@ -132,30 +158,43 @@ module FinancialAssistance
             family_member = family.add_family_member(person, fm_attr)
 
             family_member.save!
-            create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+            rel_result = create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+            return rel_result unless rel_result.success?
             family.save!
-            family_member
+            Success(family_member)
+          rescue Mongoid::Errors::Validations => e
+            Failure("create_or_update_family_member validation: #{e.summary}")
+          rescue StandardError => e
+            Failure("create_or_update_family_member: #{e}")
           end
 
           def create_or_update_vlp_document(applicant_params, person)
             ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: applicant_params, person: person })
+          rescue StandardError => e
+            Failure("create_or_update_vlp_document: #{e}")
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
             exiting_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
-            return if exiting_relationship && exiting_relationship.kind == relationship_kind
+            return Success("checked relationship") if exiting_relationship && exiting_relationship.kind == relationship_kind
             family.primary_person.ensure_relationship_with(person, relationship_kind)
+            Success("created relationship")
+          rescue StandardError => e
+            Failure("create_or_update_family_member: #{e}")
           end
 
           def same_address_with_primary(family_member, primary)
             member = family_member.person
 
             compare_keys = ["address_1", "address_2", "city", "state", "zip"]
-            member.is_homeless? == primary.is_homeless? &&
+            sas = member.is_homeless? == primary.is_homeless? &&
               member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
               member.home_address.attributes.select {|k, _v| compare_keys.include? k} == primary.home_address.attributes.select do |k, _v|
                                                                                            compare_keys.include? k
                                                                                          end
+            Success(sas)
+          rescue StandardError => e
+            Failure("create_or_update_family_member: #{e}")
           end
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
@@ -168,7 +207,8 @@ module FinancialAssistance
               end.first
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
               foster_info = applicant_hash['foster_care']
-
+              address_result = same_address_with_primary(family_member, primary)
+              return address_result unless address_result.success?
               sanitize_params << {
                 family_member_id: family_member.id,
                 relationship: family_member.relationship,
@@ -188,7 +228,7 @@ module FinancialAssistance
                 race: applicant_hash['demographic']['race'],
                 is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
                 is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
-                same_with_primary: same_address_with_primary(family_member, primary),
+                same_with_primary: address_result.value!,
                 is_incarcerated: applicant_hash["is_incarcerated"],
                 is_physically_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
@@ -272,17 +312,22 @@ module FinancialAssistance
                 tribal_state: applicant_hash['tribal_state']
               }
             end
-            iap_hash.except!('applicants').merge!(applicants: sanitize_params)
+            result = iap_hash.except!('applicants').merge!(applicants: sanitize_params)
+            Success(result)
+          rescue StandardError => e
+            Failure("sanitize_applicant_params: #{e}")
           end
 
           def sanitize_person_params(family_member_hash)
             person_hash = family_member_hash['person']
             consumer_role_hash = person_hash["consumer_role"]
             build_person_hash(person_hash, consumer_role_hash)
+          rescue StandardError => e
+            Failure("sanitize_person_params: #{e}")
           end
 
           def build_person_hash(person_hash, consumer_role_hash)
-            {
+            phash = {
               first_name: person_hash['person_name']['first_name'],
               last_name: person_hash['person_name']['last_name'],
               full_name: person_hash['person_name']['full_name'],
@@ -312,6 +357,9 @@ module FinancialAssistance
               emails: person_hash['emails'],
               phones: person_hash['phones']
             }
+            Success(phash)
+          rescue StandardError => e
+            Failure("build person hash #{e}")
           end
 
           def transform_no_ssn(no_ssn_value)
@@ -377,10 +425,14 @@ module FinancialAssistance
               persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
-              persisted_applicant.save!
+              persisted_applicant.save(validate: false)
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
             end
             Success("Successfully transferred in account")
+          rescue Mongoid::Errors::Validations => e
+            Failure("Fill applicant form validation: #{e.summary}")
+          rescue StandardError => e
+            Failure("Fill applicant form: #{e}")
           end
         end
       end
