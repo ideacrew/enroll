@@ -15,32 +15,36 @@ class SamlController < ApplicationController
     sign_out current_user if current_user.present?
 
     if response.is_valid? && response.name_id.present?
-      username = response.name_id.downcase
-      oim_user = User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
+      user = if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+               User.where(account_id: response.attributes['id'])
+             else
+               username = response.name_id.downcase
+               User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
+             end
 
-      if oim_user.present?
-        oim_user.idp_verified = true
-        oim_user.oim_id = response.name_id
+      if user.present?
+        user.idp_verified = true
+        user.oim_id = response.name_id
 
-        unless oim_user.valid?
-          log("ERROR: #{oim_user.errors.messages}", {:severity => "error"})
+        unless user.valid?
+          log("ERROR: #{user.errors.messages}", {:severity => "error"})
           return redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
         end
 
-        oim_user.save!
+        user.save!
         ::IdpAccountManager.update_navigation_flag(
-          oim_user.oim_id,
+          user.oim_id,
           response.attributes['mail'],
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
-        sign_in(:user, oim_user)
+        sign_in(:user, user)
         if !relay_state.blank?
-          oim_user.update_attributes!(last_portal_visited: relay_state)
+          user.update_attributes!(last_portal_visited: relay_state)
           redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
-        elsif !oim_user.last_portal_visited.blank?
-          redirect_to URI.parse(oim_user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
+        elsif !user.last_portal_visited.blank?
+          redirect_to URI.parse(user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
         else
-          oim_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
+          user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
         end
       else
