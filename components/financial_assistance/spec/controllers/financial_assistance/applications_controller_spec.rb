@@ -48,6 +48,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(@new_application.family_id).to eq application.family_id
     end
 
+    it 'create duplicate application with assistance year' do
+      expect(@new_application.assistance_year).not_to eq nil
+    end
+
     it 'copies all the applicants' do
       expect(@new_application.applicants.count).to eq application.applicants.count
     end
