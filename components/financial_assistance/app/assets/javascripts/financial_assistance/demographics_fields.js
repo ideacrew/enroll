@@ -265,15 +265,6 @@ var ApplicantValidations = (function(window, undefined) {
     }
   }
 
-  function validationForPrimaryRelationship(e) {
-    var relationship_select = document.getElementById('applicant_relationship');
-    if (relationship_select.length > 0 && relationship_select.value != '') {
-      return true;
-    } else if (relationship_select.length > 0 && relationship_select.value == '') {
-      alert("Please select an option that best describes the applicants' relationship with primary applicant");
-    }
-  }
-
   function validationForIncarcerated(e) {
     if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
@@ -466,8 +457,7 @@ var ApplicantValidations = (function(window, undefined) {
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     restoreRequiredAttributes: restoreRequiredAttributes,
-    validationForIndianTribeMember: validationForIndianTribeMember,
-    validationForPrimaryRelationship: validationForPrimaryRelationship
+    validationForIndianTribeMember: validationForIndianTribeMember
   };
 
 })(window);
