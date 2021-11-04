@@ -874,7 +874,7 @@ Then(/^.+ should see plans filtered by Carrier/) do
 end
 
 And(/^.+ clicks Go To Plans link$/) do
-  click_link 'Go To Plan Compare'
+  click_link l10n("go_to_plan_compare")
 end
 
 Then(/^.+ should see the Plan Compare modal/) do
