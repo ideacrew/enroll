@@ -45,7 +45,7 @@ module Operations
           return Failure(account: account, user: user) unless account.success?
           account_attrs = account.success
 
-          user.account_id = account_attrs[:user][:id]
+          user.account_id = user.oim_id = account_attrs[:user][:id]
           if user.valid?
             user.save!
             Success(

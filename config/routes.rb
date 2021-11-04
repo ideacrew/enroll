@@ -51,7 +51,8 @@ Rails.application.routes.draw do
     post :authenticate, controller: 'security_question_responses', action: 'authenticate'
   end
 
-  resources :users do
+  resources :users, except: [:new, :create] do
+    post 'admin/create', on: :collection, to: 'users#create'
     resources :security_question_responses, controller: "users/security_question_responses"
     post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
 
