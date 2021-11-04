@@ -1168,6 +1168,12 @@ module FinancialAssistance
     end
     # rubocop:enable Lint/EmptyRescueClause
 
+    def set_assistance_year
+      return unless assistance_year.blank?
+      update_attribute(:assistance_year,
+                       FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1292,14 +1298,6 @@ module FinancialAssistance
 
     def set_submission_date
       update_attribute(:submitted_at, Time.current)
-    end
-
-    def set_assistance_year
-      return unless assistance_year.blank?
-      update_attribute(
-        :assistance_year,
-        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      )
     end
 
     def set_effective_date
