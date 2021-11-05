@@ -41,7 +41,7 @@ module Effective
           result_user = users.detect { |user| user.account_id == result[:id] }
           if result_user
             dropdown = [
-              ['Forgot Password', user_account_forgot_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
+              #['Forgot Password', user_account_forgot_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
               ['Reset Password', user_account_reset_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
               ['Unlock / Lock Account', user_account_lockable_path(user_id: result_user.id, account_id: result[:id], enabled: result[:enabled]), 'ajax'],
               ['View Login History',login_history_user_path(id: result_user.id), 'ajax'],
