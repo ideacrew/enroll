@@ -16,71 +16,71 @@ module Users
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   # POST /resource
-  def create
-    if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
-      invitation = Invitation.find_by(id: params[:user][:invitation_id]) if params.dig(:user, :invitation_id)
-      email = if invitation && Invitation::LOCKED_EMAILS_TYPES.include?(invitation&.role)
-                invitation.invitation_email
-              else
-                sign_up_params[:oim_id]
-              end
-      result = Operations::Users::Create.new.call(account: {
-                                                  email: email,
-                                                  password: sign_up_params[:password],
-                                                  relay_state: invitation&.role
-                                                })
+    def create
+      if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+        invitation = Invitation.find_by(id: params[:user][:invitation_id]) if params.dig(:user, :invitation_id)
+        email = if invitation && Invitation::LOCKED_EMAILS_TYPES.include?(invitation&.role)
+                  invitation.invitation_email
+                else
+                  sign_up_params[:oim_id]
+                end
+        result = Operations::Users::Create.new.call(account: {
+                                                      email: email,
+                                                      password: sign_up_params[:password],
+                                                      relay_state: invitation&.role
+                                                    })
 
-      resource_saved = result.success?
-      self.resource = result.value_or(result.failure)[:user]
-    else
-      self.resource = build_resource(sign_up_params)
-      # Check for curam user email, if present then restrict the user.
-      if CuramUser.match_unique_login(resource.oim_id).first.present?
-        flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-        render :new and return
-      end
-
-      if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
-        flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-        render :new and return
-      end
-
-      headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
-
-      headless.destroy if headless.present? && !headless.person.present?
-
-      resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
-      resource.handle_headless_records
-
-      resource_saved = resource.save
-      yield resource if block_given?
-
-      # FIXME: DON'T EVER DO THIS!
-      # HACK: DON'T EVER DO THIS!
-      # NONONONOBAD: We are only doing this because the enterprise service
-      #              can't accept a password with a standard hash.
-      session["stashed_password"] = sign_up_params["password"]
-    end
-
-    if resource_saved
-      if resource.active_for_authentication?
-        set_flash_message :notice, :signed_up, site_name: Settings.site.short_name if is_flashing_format?
-        sign_up(resource_name, resource)
-        location = after_sign_in_path_for(resource)
-        flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
-        respond_with resource, location: location
+        resource_saved = result.success?
+        self.resource = result.value_or(result.failure)[:user]
       else
-        set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
-        expire_data_after_sign_in!
-        respond_with resource, location: after_inactive_sign_up_path_for(resource)
+        self.resource = build_resource(sign_up_params)
+        # Check for curam user email, if present then restrict the user.
+        if CuramUser.match_unique_login(resource.oim_id).first.present?
+          flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+          render :new and return
+        end
+
+        if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
+          flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+          render :new and return
+        end
+
+        headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
+
+        headless.destroy if headless.present? && !headless.person.present?
+
+        resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
+        resource.handle_headless_records
+
+        resource_saved = resource.save
+        yield resource if block_given?
+
+        # FIXME: DON'T EVER DO THIS!
+        # HACK: DON'T EVER DO THIS!
+        # NONONONOBAD: We are only doing this because the enterprise service
+        #              can't accept a password with a standard hash.
+        session["stashed_password"] = sign_up_params["password"]
       end
-    else
-      clean_up_passwords resource
-      @validatable = devise_mapping.validatable?
-      @minimum_password_length = resource_class.password_length.min if @validatable
-      respond_with resource
+
+      if resource_saved
+        if resource.active_for_authentication?
+          set_flash_message :notice, :signed_up, site_name: Settings.site.short_name if is_flashing_format?
+          sign_up(resource_name, resource)
+          location = after_sign_in_path_for(resource)
+          flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
+          respond_with resource, location: location
+        else
+          set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
+          expire_data_after_sign_in!
+          respond_with resource, location: after_inactive_sign_up_path_for(resource)
+        end
+      else
+        clean_up_passwords resource
+        @validatable = devise_mapping.validatable?
+        @minimum_password_length = resource_class.password_length.min if @validatable
+        respond_with resource
+      end
     end
-  end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   # GET /resource/edit
