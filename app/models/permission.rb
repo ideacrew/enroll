@@ -82,4 +82,8 @@ class Permission
       Permission.where(name: 'super_admin').first
     end
   end
+
+  def humanize_name
+    name.humanize.titleize
+  end
 end
