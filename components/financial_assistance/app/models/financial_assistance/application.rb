@@ -1506,7 +1506,7 @@ module FinancialAssistance
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
       active_applicants.each do |applicant|
-        applicant.evidences = build_evidences(types, applicant)
+        applicant.evidences << build_evidences(types, applicant)
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
 
