@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 include Dry::Monads[:result]
@@ -91,9 +93,10 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
         }
 
         expect(operation).to have_received(:call).with(account: {
-          email: email,
-          password: password
-        })
+                                                         email: email,
+                                                         password: password,
+                                                         relay_state: nil
+                                                       })
       end
 
       context "with a dupe user" do
@@ -105,10 +108,41 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
             user: {
               oim_id: "test@example.com",
               password: password,
-              password_confirmation: password
+              password_confirmation: password,
+              relay_state: nil
             }
           }
           expect(response).to be_a_redirect
+        end
+      end
+
+      context "with a broker invitation" do
+        let(:user) { FactoryBot.create(:user, email: email, oim_id: email) }
+        let(:operation) { double(Operations::Users::Create, call: Success(user: user)) }
+        let(:invitation) { FactoryBot.create(:invitation, :broker_role) }
+
+        before do
+          allow(Operations::Users::Create).to receive(:new).and_return(operation)
+          allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :keycloak)))
+          allow(EnrollRegistry).to receive(:[]).and_call_original
+        end
+
+        it 'restricts the email to the one in the invite' do
+          post :create, params: {
+            user: {
+              invitation_id: invitation.id,
+              oim_id: "test@example.com",
+              password: password,
+              password_confirmation: password,
+              relay_state: nil
+            }
+          }
+
+          expect(operation).to have_received(:call).with(account: {
+                                                           email: invitation.invitation_email,
+                                                           password: password,
+                                                           relay_state: 'broker_role'
+                                                         })
         end
       end
     end

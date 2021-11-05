@@ -25,8 +25,7 @@ RSpec.describe Operations::Users::Create do
           first_name: first_name,
           last_name: last_name,
           roles: roles
-        }
-      }
+        }}
     end
 
 

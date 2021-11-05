@@ -18,12 +18,17 @@ module Users
   # POST /resource
   def create
     if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
-      invitation = Invitation.find(params.require(:invitation_id))
+      invitation = Invitation.find_by(id: params[:user][:invitation_id]) if params.dig(:user, :invitation_id)
+      email = if invitation && Invitation::LOCKED_EMAILS_TYPES.include?(invitation&.role)
+                invitation.invitation_email
+              else
+                sign_up_params[:oim_id]
+              end
       result = Operations::Users::Create.new.call(account: {
-                                                    email: sign_up_params[:oim_id],
-                                                    password: sign_up_params[:password],
-                                                    relay_state: invitation.role
-                                                  })
+                                                  email: email,
+                                                  password: sign_up_params[:password],
+                                                  relay_state: invitation&.role
+                                                })
 
       resource_saved = result.success?
       self.resource = result.value_or(result.failure)[:user]
