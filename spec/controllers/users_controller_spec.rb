@@ -19,8 +19,9 @@ describe UsersController, dbclean: :after_each do
     let!(:hbx_profile) { FactoryBot.create :hbx_profile }
 
     before do
-      allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :keycloak)))
       allow(EnrollRegistry).to receive(:[]).and_call_original
+      allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :keycloak)))
+      allow(user_policy).to receive(:change_username_and_email?).and_return(true)
       allow(UserPolicy).to receive(:new).with(admin, User).and_return(user_policy)
       allow(Operations::Accounts::Create).to receive(:new).and_return(keycloak_op)
       sign_in(admin)
