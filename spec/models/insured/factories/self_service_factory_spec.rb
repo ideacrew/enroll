@@ -121,6 +121,7 @@ module Insured
         subject.update_enrollment_for_apcts(enrollment, 2000)
         enrollment.reload
         expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
+        expect(enrollment.elected_aptc_pct).to eq 0.63722
       end
     end
     # rubocop:disable Lint/UselessAssignment
