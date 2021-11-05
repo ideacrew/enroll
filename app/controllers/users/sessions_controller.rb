@@ -7,7 +7,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def new
     redirect_url = SamlInformation.iam_login_url
-    (redirect_url.blank? && !Rails.env.production?) ? super : redirect_to(redirect_url)
+    (redirect_url.blank? || !Rails.env.production?) ? super : redirect_to(redirect_url)
   end
 
   def create
