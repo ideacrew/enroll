@@ -18,7 +18,7 @@ module Users
   # POST /resource
     def create
       if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
-        invitation = Invitation.find_by(id: params[:user][:invitation_id]) if params.dig(:user, :invitation_id)
+        invitation = Invitation.find_by(id: params[:user][:invitation_id]) if params.dig(:user, :invitation_id).present?
         email = if invitation && Invitation::LOCKED_EMAILS_TYPES.include?(invitation&.role)
                   invitation.invitation_email
                 else
