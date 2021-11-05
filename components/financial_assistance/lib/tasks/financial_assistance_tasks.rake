@@ -16,6 +16,6 @@ task :transfer_accounts => :environment do
                                     .map {|a| a.active_determined_eligibility_determinations.order_by(determined_at: :desc).first} \
                                     .select {|ed| !ed.nil? && range.include?(ed.determined_at) }.map(&:application) \
                                     .group_by(&:family_id).values.map(&:first) \
-                                    .select { |a| a.is_transferrable? || a.transfer_requested} \
+                                    .select { |a| a.is_transferrable? || a.transfer_requested } \
                                     .map(&:transfer_account)
 end
