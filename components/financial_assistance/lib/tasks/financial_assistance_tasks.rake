@@ -10,12 +10,12 @@ task :transfer_accounts => :environment do
   end_on = ENV['end_on'].present? ? Date.strptime(ENV['end_on'].to_s, "%m/%d/%Y") : Date.yesterday
   range = start_on.beginning_of_day..end_on.end_of_day
   assistance_year = FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
-  
+
 
   eligible_family_ids = ::FinancialAssistance::Application.determined.where(:submitted_at.gte => start_on, assistance_year: assistance_year).distinct(:family_id)
   eligible_family_ids.each do |family_id|
     application = FinancialAssistance::Application.where(family_id: family_id, assistance_year: assistance_year, aasm_state: 'determined').last
-    if application.present? && (application.transfer_requested || application.applicants.any?(&:is_medicaid_chip_eligible) || application.applicants.any?(&:is_eligible_for_non_magi_reasons) )
+    if application.present? && (application.transfer_requested || application.is_transferrable? )
       application.transfer_account
     end
   end
