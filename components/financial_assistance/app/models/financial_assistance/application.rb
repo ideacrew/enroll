@@ -509,7 +509,9 @@ module FinancialAssistance
     end
 
     def transfer_account
-      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
+    ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
+    rescue StandardError => e
+      Rails.logger.error { "FAA rt_transfer error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def is_rt_transferrable?
