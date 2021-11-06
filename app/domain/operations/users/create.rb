@@ -38,7 +38,8 @@ module Operations
             {
               oim_id: values[:username],
               roles: values[:roles],
-              password: values[:password]
+              password: values[:password],
+              email: values[:email]
             }
           )
 
