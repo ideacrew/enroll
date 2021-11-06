@@ -37,7 +37,7 @@ module Operations
           user = User.new(
             {
               oim_id: values[:username],
-              roles: values[:roles],
+              roles: values[:roles] || [],
               password: values[:password],
               email: values[:email]
             }
