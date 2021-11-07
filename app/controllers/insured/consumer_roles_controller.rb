@@ -159,6 +159,7 @@ class Insured::ConsumerRolesController < ApplicationController
         return
       end
     rescue Exception => e
+      Rails.logger.warn e.backtrace.join("\n")
       flash[:error] = set_error_message(e.message)
       redirect_to search_insured_consumer_role_index_path
       return
