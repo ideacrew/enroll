@@ -30,7 +30,6 @@ module Users
                                                       password: sign_up_params[:password],
                                                       relay_state: invitation&.role
                                                     })
-
         resource_saved = result.success?
         self.resource = result.value_or(result.failure)[:user]
       else
@@ -76,10 +75,15 @@ module Users
           respond_with resource, location: after_inactive_sign_up_path_for(resource)
         end
       else
-        clean_up_passwords resource
-        @validatable = devise_mapping.validatable?
-        @minimum_password_length = resource_class.password_length.min if @validatable
-        respond_with resource
+        if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak && result.failure?
+          flash[:error] = "Account already exists, click Sign In to try signing in."
+          render :new
+        else
+          clean_up_passwords resource
+          @validatable = devise_mapping.validatable?
+          @minimum_password_length = resource_class.password_length.min if @validatable
+          respond_with resource
+        end
       end
     end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
