@@ -37,6 +37,7 @@ module Effective
       def render_table_rows(results)
         result_ids = results.map { |result| result[:id] }
         users = User.where(:account_id.in => result_ids)
+        return [['None present']] if users.empty?
         results.reduce([]) do |memo, result|
           result_user = users.detect { |user| user.account_id == result[:id] }
           if result_user
