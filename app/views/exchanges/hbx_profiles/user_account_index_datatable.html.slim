@@ -2,7 +2,7 @@
 .container
   h1.heading-text Account Updates
 
-  -if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak && pundit_allow(User, :change_username_and_email?)
+  -if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
     #new_user.btn-primary.btn[onclick='this.classList.add("hidden"); document.getElementById("create_user").classList.remove("hidden")']
       | New User
 
