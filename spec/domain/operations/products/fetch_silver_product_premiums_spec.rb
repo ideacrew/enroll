@@ -25,11 +25,24 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-    let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 1, :silver) }
+    let!(:products) do
+      FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 1, :silver, :with_qhp)
+      ::BenefitMarkets::Products::Product.all
+    end
+
+    let(:product) { products.first }
+
     let(:premium_table) { products.first.premium_tables.first }
     let(:rating_area_id) { premium_table.rating_area_id }
 
     let(:effective_date) { TimeKeeper.date_of_record }
+
+    # let(:product_premium) do
+    #   age = person.age_on(effective_date)
+    #   pt = product.premium_tables.first
+    #   tuple = pt.premium_tuples.where(age: age).first
+    #   tuple.cost * product.ehb
+    # end
 
     let(:params) do
       {
@@ -68,6 +81,62 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
         result = subject.call(params)
         expect(result.value!.is_a?(Hash)).to eq true
         expect(result.value!.values.present?).to eq true
+      end
+    end
+
+    context 'with adjust_pediatric_premium set to true' do
+      let(:params) do
+        {
+          products: products,
+          family: family,
+          effective_date: effective_date,
+          rating_area_id: rating_area_id,
+          adjust_pediatric_premium: true
+        }
+      end
+
+      let(:second_lowest_dental_premium) { 100 }
+
+      before do
+        allow(subject).to receive(:second_lowest_dental_product_premium).and_return second_lowest_dental_premium
+      end
+
+      context 'when product does not covers pediatric' do
+
+        it 'should adjust premium value' do
+          result = subject.call(params)
+          expect(result.value!).to eq({
+                                        person.hbx_id => [
+                                          {
+                                            :cost => 198.86 + second_lowest_dental_premium,
+                                            :product_id => BSON::ObjectId(product.id),
+                                            :member_identifier => person.hbx_id,
+                                            :monthly_premium => 198.86 + second_lowest_dental_premium
+                                          }
+                                        ]
+                                      })
+        end
+      end
+
+      context 'when product covers pediatric' do
+
+        before :each do
+          allow_any_instance_of(product.class).to receive(:covers_pediatric_dental?).and_return true
+        end
+
+        it 'should not adjust premium value' do
+          result = subject.call(params)
+          expect(result.value!).to eq({
+                                        person.hbx_id => [
+                                          {
+                                            :cost => 198.86,
+                                            :product_id => BSON::ObjectId(product.id),
+                                            :member_identifier => person.hbx_id,
+                                            :monthly_premium => 198.86
+                                          }
+                                        ]
+                                      })
+        end
       end
     end
   end

@@ -65,7 +65,7 @@ module Operations
       def fetch_member_premiums(rating_silver_products, family, effective_date)
         member_premiums = {}
         min_age = family.family_members.map {|fm| fm.age_on(TimeKeeper.date_of_record) }.min
-        benchmark_product_model = EnrollRegistry[:enroll_app].setting(:benchmark_product_model).item
+        # benchmark_product_model = EnrollRegistry[:enroll_app].setting(:benchmark_product_model).item
 
         rating_silver_products.each_pair do |hbx_ids, payload|
           member_premiums[hbx_ids] = {}
@@ -76,18 +76,13 @@ module Operations
           return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
           member_premiums[hbx_ids][:health_only] = premiums.value!
 
-          if benchmark_product_model == :health_and_dental && min_age < 19
 
-            premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
+          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
 
-            return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
-            member_premiums[hbx_ids][:health_and_dental] = premiums.value!
-          end
+          return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
+          member_premiums[hbx_ids][:health_and_dental] = premiums.value!
 
-          next unless benchmark_product_model == :health_and_ped_dental && min_age < 19
-          health_and_ped_dental_products = payload[:products] # TODO: - filter child only ped dental products.
-
-          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_and_ped_dental_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
+          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id], adjust_pediatric_premium: true})
 
           return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
           member_premiums[hbx_ids][:health_and_ped_dental] = premiums.value!

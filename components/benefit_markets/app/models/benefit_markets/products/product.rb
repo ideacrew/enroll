@@ -371,6 +371,14 @@ module BenefitMarkets
         end
       end
 
+      def covers_pediatric_dental?
+        benefits = qhp.qhp_benefits
+
+        benefits.where(benefit_type_code: 'Dental Check-Up for Children').first&.is_benefit_covered == 'Covered' &&
+          benefits.where(benefit_type_code: 'Basic Dental Care - Child').first&.is_benefit_covered == 'Covered' &&
+          benefits.where(benefit_type_code: 'Major Dental Care - Child').first&.is_benefit_covered == 'Covered'
+      end
+
       def allows_child_only_offering?
         child_only_offering.eql?('Allows Child-Only')
       end

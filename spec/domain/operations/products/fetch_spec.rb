@@ -44,7 +44,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       }
     end
 
-    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver, :with_qhp) }
 
     let(:products) { ::BenefitMarkets::Products::Product.all }
     let(:products_payload) do
@@ -113,7 +113,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       }
     end
 
-    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver, :with_qhp) }
 
     let(:products) { ::BenefitMarkets::Products::Product.all }
     let(:products_payload) do

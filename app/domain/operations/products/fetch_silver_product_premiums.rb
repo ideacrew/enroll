@@ -14,7 +14,7 @@ module Operations
       def call(params)
         values            = yield validate(params)
         family_members    = yield fetch_family_members(values[:family], values[:family_member_id])
-        product_premiums  = yield fetch_product_premiums(values[:products], family_members, values[:effective_date], values[:rating_area_id].to_s)
+        product_premiums  = yield fetch_product_premiums(values[:products], family_members, values[:effective_date], values[:rating_area_id].to_s, values[:adjust_pediatric_premium])
 
         Success(product_premiums)
       end
@@ -41,10 +41,16 @@ module Operations
         end
       end
 
-      def fetch_product_premiums(products, family_members, effective_date, rating_area_id)
+      def fetch_product_premiums(products, family_members, effective_date, rating_area_id, adjust_pediatric_premium = nil)
+        if adjust_pediatric_premium
+          dental_products = products.where(kind: :dental)
+          products = products.where(kind: :health)
+        end
+
         member_premiums = family_members.inject({}) do |member_result, family_member|
           age = family_member.age_on(effective_date)
           hbx_id = family_member.hbx_id
+          sldp = second_lowest_dental_product_premium(dental_products, effective_date, rating_area_id, age) if adjust_pediatric_premium
           # age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
           product_hash =
             products.inject([]) do |result, product|
@@ -56,16 +62,13 @@ module Operations
                                                              :'effective_period.max'.gte => effective_date
                                                            }).first
 
-              tuple = premium_table.premium_tuples.where(age: age).first
-              if tuple.blank?
-                tuple_ages = premium_table.premium_tuples.map(&:age)
-                min_age = tuple_ages.min
-                max_age = tuple_ages.max
-                age = min_age if age < min_age
-                age = max_age if age > max_age
-                tuple = premium_table.premium_tuples.where(age: age).first
+              tuple = premium_table.premium_tuples.where(age: age).first || set_tuple(premium_table, age)
+
+              if tuple.present?
+                cost = product_premium(product, tuple, adjust_pediatric_premium, sldp)
+                result << { cost: cost, product_id: product.id, member_identifier: hbx_id, monthly_premium: cost }
               end
-              result << { cost: (tuple.cost * product.ehb).round(2), product_id: product.id, member_identifier: hbx_id, monthly_premium: (tuple.cost * product.ehb).round(2) } if tuple.present?
+
               result
             end
           member_result[hbx_id] = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}
@@ -73,6 +76,38 @@ module Operations
           member_result
         end
         Success(member_premiums)
+      end
+
+      def set_tuple(premium_table, age)
+        tuple_ages = premium_table.premium_tuples.map(&:age)
+        min_age = tuple_ages.min
+        max_age = tuple_ages.max
+        age = min_age if age < min_age
+        age = max_age if age > max_age
+        premium_table.premium_tuples.where(age: age).first
+      end
+
+      def product_premium(product, tuple, adjust_pediatric_premium, sldp)
+        if adjust_pediatric_premium && !product.covers_pediatric_dental?
+          ((tuple.cost * product.ehb) + sldp).round(2)
+        else
+          (tuple.cost * product.ehb).round(2)
+        end
+      end
+
+      def second_lowest_dental_product_premium(dental_products, effective_date, rating_area_id, age)
+        dental_products.inject([]) do |result, dental_product|
+          dpt = dental_product.premium_tables.where({
+                                                      :rating_area_id => rating_area_id,
+                                                      :'effective_period.min'.lte => effective_date,
+                                                      :'effective_period.max'.gte => effective_date
+                                                    }).first
+
+          dental_tuple = dpt.premium_tuples.where(age: age).first || set_tuple(dpt, age)
+
+          result << dental_tuple.cost * dental_product.ehb
+          result
+        end.sort[1].to_f
       end
     end
   end
