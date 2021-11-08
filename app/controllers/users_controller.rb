@@ -93,6 +93,7 @@ class UsersController < ApplicationController
 
   # POST admin_create_users_path
   # Used in users table create user
+  # rubocop:disable Metrics/AbcSize
   def create
     authorize User, :change_username_and_email?
     if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
@@ -128,6 +129,7 @@ class UsersController < ApplicationController
     flash[:alert] = "You are not authorized for this action."
     render inline: "location.reload();"
   end
+  # rubocop:enable Metrics/AbcSize
 
   def edit
   end

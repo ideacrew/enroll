@@ -7,16 +7,16 @@ module Users
     layout 'bootstrap_4'
     before_action :configure_sign_up_params, only: [:create]
     before_action :set_ie_flash_by_announcement, only: [:new]
-  # before_action :configure_account_update_params, only: [:update]
+    # before_action :configure_account_update_params, only: [:update]
 
-  # GET /resource/sign_up
-  def new
-    @invitation = Invitation.find_by(id: params[:invitation_id]) if params[:invitation_id].present?
-    super
-  end
+    # GET /resource/sign_up
+    def new
+      @invitation = Invitation.find_by(id: params[:invitation_id]) if params[:invitation_id].present?
+      super
+    end
 
-  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-  # POST /resource
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
+    # POST /resource
     def create
       if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
         invitation = Invitation.find_by(id: params[:user][:invitation_id]) if params.dig(:user, :invitation_id).present?
@@ -75,7 +75,7 @@ module Users
           respond_with resource, location: after_inactive_sign_up_path_for(resource)
         end
       else
-        if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak && result.failure?
+        if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak && result.failure? # rubocop:disable Style/IfInsideElse
           flash[:error] = "Account already exists, click Sign In to try signing in."
           render :new
         else
@@ -86,7 +86,7 @@ module Users
         end
       end
     end
-  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
 
   # GET /resource/edit
   # def edit
