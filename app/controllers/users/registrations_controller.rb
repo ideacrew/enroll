@@ -10,9 +10,10 @@ module Users
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
-  # def new
-  #   super
-  # end
+  def new
+    @invitation = Invitation.find_by(id: params[:invitation_id]) if params[:invitation_id].present?
+    super
+  end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   # POST /resource

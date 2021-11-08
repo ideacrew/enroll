@@ -14,9 +14,12 @@
         = f.hidden_field :referer, value: request.env["HTTP_REFERER"]
         .form-group
           = f.label :email_or_username
-          = f.text_field :oim_id, class: "form-control", required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.", target: 'signup.usernameField' }
-          .invalid-feedback
-            | You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
+          -if @invitation && @invitation.invitation_email && Invitation::LOCKED_EMAILS_TYPES.include?(@invitation.role)
+            = f.text_field :oim_id, class: "form-control disabled", required: true, disabled: true, value: @invitation.invitation_email
+          -else
+            = f.text_field :oim_id, class: "form-control", required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.", target: 'signup.usernameField' }
+            .invalid-feedback
+              | You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
         .form-group
           .row.pl-3.pr-3
             .col-8.p-0
