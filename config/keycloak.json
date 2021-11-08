@@ -1,11 +1,11 @@
 {
-    "realm": "sbe_business_operations",
+    "realm": "coverme",
     "auth-server-url": "http://keycloak:8080/auth",
     "ssl-required": "external",
-    "resource": "polypress",
+    "resource": "admin-client",
     "verify-token-audience": true,
     "credentials": {
-        "secret": "5277f8a7-bb5c-4d85-bd41-20ecb5103d03"
+        "secret": "47aa69b5-78a1-4f66-9511-7b1f35a11902"
     },
     "use-resource-role-mappings": true,
     "confidential-port": 0,

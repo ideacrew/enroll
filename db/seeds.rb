@@ -220,7 +220,7 @@ puts "::: complete :::"
 puts "*"*80
 
 puts "*"*80
-system "bundle exec rake permissions:initial_hbx"
+system "bundle exec rake me_permissions:initial_hbx"
 # TODO FIX This
 permission = Permission.hbx_staff
 Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}

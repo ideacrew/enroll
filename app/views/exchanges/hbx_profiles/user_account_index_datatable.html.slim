@@ -17,7 +17,7 @@
             =label_tag :password, 'Password', class: 'col-form-label'
         .row
           .col-md-4
-            =select_tag :permission_id, options_from_collection_for_select(Permission.all, 'id', 'humanize_name')
+            =select_tag :permission_id, permission_options(current_user.person.hbx_staff_role.permission)
           .col-md-4
             =text_field_tag :email, nil, class: 'col-3'
           .col-md-4

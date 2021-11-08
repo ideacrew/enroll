@@ -86,4 +86,8 @@ class Permission
   def humanize_name
     name.humanize.titleize
   end
+
+  def self.hierarchy_check(greater, than)
+    PERMISSION_KINDS.index(greater.name)&.>(PERMISSION_KINDS.index(than.name) || 0) || false
+  end
 end

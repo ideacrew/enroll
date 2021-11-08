@@ -99,12 +99,18 @@ class UsersController < ApplicationController
       result = Operations::Users::Create.new.call(account: {
                                                     email: params[:email],
                                                     password: params[:password],
+                                                    first_name: params[:first_name],
+                                                    last_name: params[:last_name],
+                                                    roles: ['hbx_staff'],
                                                     relay_state: 'hbx_staff'
                                                     #permission_id: params.require(:permission_id)
                                                   })
       @user = result.value_or(result.failure)[:user]
-      permission = Permission.find(params.require(:permission_id))
       @user.build_person(params.permit(:first_name, :last_name))
+
+      permission = Permission.find(params.require(:permission_id))
+      permission = Permission.find_by(name: Permission::PERMISSION_KINDS.first) unless Permission.hierarchy_check(current_user.person.hbx_staff_role.permission, permission)
+
       @user.person.build_hbx_staff_role(hbx_profile_id: HbxProfile.current_hbx._id, permission_id: permission.id, job_title: permission.name)
       @user.roles.push "hbx_staff"
 

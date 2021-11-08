@@ -24,4 +24,15 @@ module PermissionHelper
   def pundit_allow pundit_object, pundit_method
     result = policy_helper(pundit_object).send(pundit_method)
   end
+
+  def permission_options(current_permission=nil, selected_permission=nil)
+    options = (@permissions ||= Permission.all).map do |permission|
+      tag.option permission.name.humanize,
+        disabled: !Permission.hierarchy_check(current_permission, permission),
+        selected: permission.id == selected_permission&.id,
+        value: permission.id
+    end
+
+    options.join('\n').html_safe
+  end
 end
