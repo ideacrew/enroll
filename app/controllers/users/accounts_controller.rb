@@ -123,12 +123,14 @@ module Users
 
       result = Operations::Accounts::Update.new.call(account: attributes)
 
-      if result.failure?
-        @username_taken = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0] if attributes.key?(:username)
-
-        @email_taken = Operations::Accounts::Find.new.call(scope_name: :by_email, criterion: params[:new_email].strip).value_or([])[0] if attributes.key?(:email)
-      else
+      if result.success?
         @account = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0]
+        permission = Permission.find_by(id: params.require(:permission_id))
+        @user.person.hbx_staff_role.permission_id = permission.id if permission
+        @user.save
+      else
+        @username_taken = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: params[:new_username].strip).value_or([])[0] if attributes.key?(:username)
+        @email_taken = Operations::Accounts::Find.new.call(scope_name: :by_email, criterion: params[:new_email].strip).value_or([])[0] if attributes.key?(:email)
       end
 
       respond_to do |format|

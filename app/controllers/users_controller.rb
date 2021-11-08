@@ -105,7 +105,8 @@ class UsersController < ApplicationController
       @user = result.value_or(result.failure)[:user]
       permission = Permission.find(params.require(:permission_id))
       @user.build_person(params.permit(:first_name, :last_name))
-      @user.person.build_hbx_staff_role(hbx_profile_id: HbxProfile.current_hbx._id, permission_id: permission.id)
+      @user.person.build_hbx_staff_role(hbx_profile_id: HbxProfile.current_hbx._id, permission_id: permission.id, job_title: permission.name)
+      @user.roles.push "hbx_staff"
 
       if result.success? && @user.save
         flash[:notice] = "Created account for #{params.require(:first_name)} #{params.require(:last_name)}"
