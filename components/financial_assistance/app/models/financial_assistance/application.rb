@@ -510,6 +510,8 @@ module FinancialAssistance
 
     def transfer_account
       ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
+    rescue StandardError => e
+      Rails.logger.error { "FAA transfer_account error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def is_rt_transferrable?
@@ -1506,7 +1508,7 @@ module FinancialAssistance
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
       active_applicants.each do |applicant|
-        applicant.evidences = build_evidences(types, applicant)
+        applicant.evidences << build_evidences(types, applicant)
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
 

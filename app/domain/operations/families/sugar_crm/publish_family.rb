@@ -13,70 +13,60 @@ module Operations
         include EventSource::Command
         include EventSource::Logging
 
-        # @param [ Family] instance fo family
+        # @param [ Family] instance of family
         # @return Success result
         def call(family)
           transformed_family = yield construct_payload_hash(family)
-          # payload_value = yield validate_payload(transformed_family)
-          # payload_entity = yield create_payload_entity(payload_value)
           event = yield build_event(transformed_family)
           result = yield publish(event)
-          Success(result)
+          Success([result, transformed_family])
         end
 
         private
 
-        # CRM Gateway only needs a limited scope of data for
-        # the initialization of Accounts/Contacts
-        # Set them as blank arrays/hashes etc. here to skip optional Dry Validation in ACA Entities
-        def simplify_crm_family_payload(transformed_family)
-          transformed_family[:family_members].each do |fm_hash|
-            unnecessary_document_keys = %i[
-              vlp_documents
-              ridp_documents
-              verification_type_history_elements
-              local_residency_responses
-              local_residency_requests
+        # Updates should only be made to CRM gateway if critical attributes are changed
+        # or new family members are added/deleted
+        def send_to_gateway?(family, new_payload)
+          old_payload = family.cv3_payload
+          return true if old_payload.blank?
+          new_payload_changes = {}
+          old_payload_changes = {}
+          new_payload.to_h.with_indifferent_access[:family_members].each_with_index do |fm_hash, index_num|
+            fm_hash = fm_hash.with_indifferent_access
+            new_payload_changes[index_num] = [
+              {
+                encrypted_ssn: fm_hash.dig(:person, :person_demographics, :encrypted_ssn),
+                first_name: fm_hash.dig(:person, :person_demographics, :first_name),
+                last_name: fm_hash.dig(:person, :person_demographics, :last_name),
+                addresses: fm_hash.dig(:person, :addresses),
+                phones: fm_hash.dig(:person, :phones)
+              }
             ]
-            if fm_hash.dig(:person, :consumer_role)
-              unnecessary_document_keys.each do |sym_value|
-                fm_hash[:person][:consumer_role][sym_value] = []
-              end
-            end
-            fm_hash[:person][:individual_market_transitions] = []
-            fm_hash[:person][:verification_types] = []
           end
-          transformed_family.except(
-            :households,
-            :renewal_consent_through_year,
-            :special_enrollment_periods,
-            :payment_transactions,
-            :magi_medicaid_applications,
-            :documents
-          )
+          old_payload.to_h.with_indifferent_access[:family_members].each_with_index do |fm_hash, index_num|
+            fm_hash = fm_hash.with_indifferent_access
+            old_payload_changes[index_num] = [
+              {
+                encrypted_ssn: fm_hash.dig(:person, :person_demographics, :encrypted_ssn),
+                first_name: fm_hash.dig(:person, :person_demographics, :first_name),
+                last_name: fm_hash.dig(:person, :person_demographics, :last_name),
+                addresses: fm_hash.dig(:person, :addresses),
+                phones: fm_hash.dig(:person, :phones)
+              }
+            ]
+          end
+          new_payload_changes != old_payload_changes
         end
 
         def construct_payload_hash(family)
-          if family.is_a?(::Family)
-            Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
-          else
+          payload_hash = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+          if !family.is_a?(::Family)
             Failure("Invalid Family Object. Family class is: #{family.class}")
-          end
-        end
-
-        def validate_payload(transformed_family)
-          simplified_family_payload = simplify_crm_family_payload(transformed_family)
-          result = AcaEntities::Contracts::Families::FamilyContract.new.call(simplified_family_payload)
-          if result.success?
-            result
+          elsif send_to_gateway?(family, payload_hash.value!)
+            payload_hash
           else
-            hbx_id = transformed_family[:family_members].detect { |fm| fm[:is_primary_applicant] }[:hbx_id]
-            Failure("Person with hbx_id #{hbx_id} is not valid due to #{result.errors.to_h}.")
+            Failure("No critical changes made to family, no update needed to CRM gateway.")
           end
-        end
-
-        def create_payload_entity(payload_value)
-          Success(AcaEntities::Families::Family.new(payload_value.to_h))
         end
 
         def build_event(payload)

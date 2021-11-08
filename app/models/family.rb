@@ -44,6 +44,8 @@ class Family
   field :vlp_documents_status, type: String
   # Used for recording changes of relevant attributes
   field :relevant_previous_changes, type: Array
+  # Used for recording payloads sent to CRM Gateway
+  field :cv3_payload, type: Hash, default: {}
 
   belongs_to  :person, optional: true
   has_many :hbx_enrollments

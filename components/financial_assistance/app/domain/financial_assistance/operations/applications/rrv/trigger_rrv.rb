@@ -55,7 +55,7 @@ module FinancialAssistance
             types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
             types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
-            application.active_applicants.each { |app| app.evidences = build_evidences(types, app, application) }
+            application.active_applicants.each { |app| app.evidences << build_evidences(types, app, application) }
             application.save!
             application
           end
