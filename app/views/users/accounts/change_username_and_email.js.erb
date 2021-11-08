@@ -8,4 +8,5 @@ if ( $containing_row.next().hasClass('child-row') ) {
   $containing_row.after('<tr class="child-row"><td colspan="100"><%= j render partial: "username_email_form" %></td></tr>');
   $("li>a:contains('Collapse Form')").eq($containing_row.index()).removeClass('disabled');
   $('.dropdown.pull-right').removeClass('open');
+  $containing_row.find('select').selectric();
 }

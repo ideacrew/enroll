@@ -21,15 +21,19 @@
   <div class="field-error-block alert-danger hidden" style="margin-bottom:20px;">
   </div>
   <div class="row" style="padding-left: 150px;">
-    <div class="form-group col-sm-5">
+    <div class="form-group col-sm-4">
       <label for="inputNewUsername" class="col-form-label">New Username</label>
       <%= text_field_tag :new_username, @username, {class:"form-control", id:'inputNewUsername'} %>
     </div>
-    <div class="form-group col-sm-5">
+    <div class="form-group col-sm-4">
       <label for="inputNewEmail" class="col-form-label">New Email</label>
       <%= text_field_tag :new_email, @email, {class:"form-control", id:'inputNewEmail'} %>
       <%= hidden_field :family_actions_id, :value => "family_actions_#{@user.id.to_s}" %>
       <span class="help-block email-block hidden"></span>
+    </div>
+    <div class="form-group col-sm-4">
+      <label for="inputPermission" class="col-form-label">HBX Staff Role</label>
+      <%= select_tag :permission_id, options_from_collection_for_select(Permission.all, 'id', 'humanize_name', @user.person&.hbx_staff_role&.permission_id), include_blank: 'None' %>
     </div>
   </div>
   <br />
