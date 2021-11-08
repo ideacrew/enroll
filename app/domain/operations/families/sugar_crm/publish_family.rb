@@ -19,7 +19,7 @@ module Operations
           transformed_family = yield construct_payload_hash(family)
           event = yield build_event(transformed_family)
           result = yield publish(event)
-          [Success(result), transformed_family]
+          Success([result, transformed_family])
         end
 
         private
