@@ -19,7 +19,20 @@ module Effective
         table_column :status, :label => 'Status', :filter => false, :sortable => false
         table_column :role_type, :label => 'Role Type', :filter => false, :sortable => false
         table_column :permission, :label => 'Permission level', :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :filter => false, :sortable => false
+        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+            user = row.last[:user]
+            account = row.last[:account]
+            p "current_user....."
+            p current_user
+
+            dropdown = [
+              ['Reset Password', user_account_reset_password_path(user_id: user.id, account_id: account[:id], username: account[:username]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
+              ['Unlock / Lock Account', user_account_lockable_path(user_id: user.id, account_id: account[:id], enabled: account[:enabled]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
+              ['View Login History',login_history_user_path(id: user.id), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
+              ['Edit User', user_account_change_username_and_email_path(user_id: user.id, account_id: account[:id], username: account[:username], email: account[:email]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled']
+            ]
+            render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{user.id}"}, formats: :html
+        }, :filter => false, :sortable => false
       end
 
       def collection
@@ -41,14 +54,6 @@ module Effective
         results.reduce([]) do |memo, result|
           result_user = users.detect { |user| user.account_id == result[:id] }
           if result_user
-            dropdown = [
-              #['Forgot Password', user_account_forgot_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
-              ['Reset Password', user_account_reset_password_path(user_id: result_user.id, account_id: result[:id], username: result[:username]), 'ajax'],
-              ['Unlock / Lock Account', user_account_lockable_path(user_id: result_user.id, account_id: result[:id], enabled: result[:enabled]), 'ajax'],
-              ['View Login History',login_history_user_path(id: result_user.id), 'ajax'],
-              ['Edit User', user_account_change_username_and_email_path(user_id: result_user.id, account_id: result[:id], username: result[:username], email: result[:email]), 'ajax']
-            ]
-            dropdown_html = ApplicationController.new.render_to_string(partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{result_user.id}"}, formats: :html)
             memo + [[
               result[:username],
               result[:email] || 'Unknown',
@@ -58,7 +63,10 @@ module Effective
               result[:enabled] ? 'Unlocked' : 'Locked',
               (result_user&.roles || ['None']).join(', '),
               permission_type(result_user),
-              dropdown_html
+              {
+                user: result_user,
+                account: result
+              }
             ]]
           else
             memo
@@ -69,6 +77,10 @@ module Effective
 
       def permission_type(user)
         user&.person&.hbx_staff_role&.permission&.name || 'N/A'
+      end
+
+      def account_actions_access_enabled?(current_user, target_user)
+        Permission.has_permission_to_modify?(current_user, target_user)
       end
 
       def total_records

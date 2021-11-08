@@ -3,7 +3,7 @@ class Permission
   include SetCurrentUser
   include Mongoid::Timestamps
 
-  PERMISSION_KINDS = %w(hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
+  PERMISSION_KINDS = %w(hbx_read_only hbx_staff hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
 
   field :name, type: String
 
@@ -80,6 +80,13 @@ class Permission
     end
     def super_admin
       Permission.where(name: 'super_admin').first
+    end
+
+    def has_permission_to_modify?(current_user, target_user)
+      return false unless current_user&.person&.hbx_staff_role&.permission
+      return true unless current_user&.person&.hbx_staff_role&.permission
+
+      PERMISSION_KINDS.find_index(current_user.person.hbx_staff_role.permission.name) > PERMISSION_KINDS.find_index(target_user.person.hbx_staff_role.permission.name)
     end
   end
 

@@ -34,6 +34,7 @@ module Effective
 
         if col.kind_of?(Array)
           col = array_tool_paginate(col)
+          col = self.arrayize(col)
         else
           col = table_tool.paginate(col)
           col = self.arrayize(col)
@@ -203,8 +204,8 @@ module Effective
         return false unless aggregates.present?
 
         values = table_data.transpose
-
         aggregates.map do |name, options|
+
           (display_table_columns || table_columns).map.with_index do |(name, column), index|
 
             if column[:visible] != true
