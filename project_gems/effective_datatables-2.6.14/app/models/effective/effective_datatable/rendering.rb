@@ -34,11 +34,10 @@ module Effective
 
         if col.kind_of?(Array)
           col = array_tool_paginate(col)
-          col = self.arrayize(col)
         else
           col = table_tool.paginate(col)
-          col = self.arrayize(col)
         end
+        col = self.arrayize(col)
 
         self.display_records ||= total_records
 
