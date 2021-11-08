@@ -37,7 +37,6 @@ gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', 
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
-gem 'keycloak',    git: 'https://github.com/ideacrew/keycloak-client.git', branch: 'master'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
@@ -52,8 +51,8 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'mongoid',                  '7.0.2'
-gem 'mongo',                    '2.8.0'
+gem 'mongoid',                  '~> 7.0.2'
+gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
@@ -98,7 +97,6 @@ gem 'net-ssh',                  '= 4.2.0'
 gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
-gem 'puma',         '~> 3.12.4'
 gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
@@ -146,16 +144,13 @@ group :development, :test do
   gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
-  gem 'mongoid-rspec',          '4.0.1'
   gem 'parallel_tests',         '~> 2.26.2'
-  gem 'pry-byebug'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
@@ -169,8 +164,9 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               '1.8.0', :require => false
+  gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
+  gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
@@ -181,11 +177,11 @@ group :test do
   gem 'watir',                        '~> 6.10.3'
   gem 'webdrivers', '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
-  gem 'vcr', '~> 3.0', '>= 3.0.1'
 end
 
 group :production do
   gem 'eye',          '0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
+  gem 'puma',         '~> 3.12.4'
 end

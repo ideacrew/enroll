@@ -118,7 +118,7 @@ module AuthorizationConcern
 
     def password_complexity
       if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
-        errors.add :password, "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that's not a number, letter, or space."
+        errors.add :password, "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space."
       elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
         errors.add :password, "Password cannot contain username"
       elsif password.present? and password_repeated_chars_limit(password)

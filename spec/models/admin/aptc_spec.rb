@@ -161,7 +161,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "when open_enrollment after Dec 31st" do
         before :each do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(future_date)
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(future_date)
         end
 
         it "should return array without next year added as it is not under_open_enrollment" do
@@ -172,7 +172,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "when open_enrollment on or before Dec 31st" do
         before :each do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(past_date)
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(past_date)
         end
 
         it "should return array with next year added as it is under_open_enrollment" do

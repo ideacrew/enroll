@@ -16,25 +16,25 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
     context 'for success case' do
       let(:user) {FactoryBot.create(:user)}
       let(:qlek_create_params) do
-        { start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
-          end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
-          title: 'test title',
-          tool_tip: 'test tooltip',
-          pre_event_sep_in_days: '10',
-          is_self_attested: 'true',
-          reason: 'lost_access_to_mec',
-          post_event_sep_in_days: '88',
-          market_kind: 'individual',
-          effective_on_kinds: ['date_of_event'],
-          coverage_start_on: "#{TimeKeeper.date_of_record.year}-07-01",
-          coverage_end_on: "#{TimeKeeper.date_of_record.year}-08-01",
-          event_kind_label: 'event kind label',
-          qle_event_date_kind: 'qle_on',
-          is_visible: true,
-          updated_by: user.id.to_s,
-          published_by: user.id.to_s,
-          created_by: user.id.to_s,
-          date_options_available: true }
+        { 'start_on': TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+          'end_on': TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
+          'title': 'test title',
+          'tool_tip': 'test tooltip',
+          'pre_event_sep_in_days': '10',
+          'is_self_attested': 'true',
+          'reason': 'lost_access_to_mec',
+          'post_event_sep_in_days': '88',
+          'market_kind': 'individual',
+          'effective_on_kinds': ['date_of_event'],
+          'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
+          'coverage_end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+          'event_kind_label': 'event kind label',
+          'qle_event_date_kind': 'qle_on',
+          'is_visible': true,
+          'updated_by': user.id.to_s,
+          'published_by': user.id.to_s,
+          'created_by': user.id.to_s,
+          'date_options_available': true }
 
       end
 
@@ -66,7 +66,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
       context 'for publish' do
         context 'for success case', :dbclean => :after_each do
           before :each do
-            qlek_create_params.merge!({publish: 'Publish'})
+            qlek_create_params.merge!({'publish': 'Publish'})
             @result = subject.call(params: qlek_create_params)
           end
 
@@ -99,27 +99,27 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           let!(:q2) {FactoryBot.create(:qualifying_life_event_kind, title: 'test title', market_kind: 'individual', reason: 'lost_access_to_mec', aasm_state: :draft, is_active: false)}
 
           let(:qlek_publish_params) do
-            { start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
-              end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
-              title: q1.title,
-              tool_tip: 'test tooltip',
-              pre_event_sep_in_days: '10',
-              is_self_attested: 'true',
-              reason: q2.reason,
-              post_event_sep_in_days: '88',
-              market_kind: 'individual',
-              effective_on_kinds: ['date_of_event'],
-              coverage_start_on: "#{TimeKeeper.date_of_record.year}-07-01",
-              coverage_end_on: "#{TimeKeeper.date_of_record.year}-09-01",
-              event_kind_label: 'event kind label',
-              is_visible: true,
+            { 'start_on': TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+              'end_on': TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
+              'title': q1.title,
+              'tool_tip': 'test tooltip',
+              'pre_event_sep_in_days': '10',
+              'is_self_attested': 'true',
+              'reason': q2.reason,
+              'post_event_sep_in_days': '88',
+              'market_kind': 'individual',
+              'effective_on_kinds': ['date_of_event'],
+              'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
+              'coverage_end_on': "#{TimeKeeper.date_of_record.year}-09-01",
+              'event_kind_label': 'event kind label',
+              'is_visible': true,
               qle_event_date_kind: 'qle_on',
-              id: q2.id.to_s,
-              updated_by: '',
-              published_by: '',
-              created_by: '',
-              publish: 'Publish',
-              date_options_available: true }
+              'id': q2.id.to_s,
+              'updated_by': '',
+              'published_by': '',
+              'created_by': '',
+              'publish': 'Publish',
+              'date_options_available': true }
           end
 
           before do
@@ -159,9 +159,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           event_kind_label: 'event kind label',
           is_visible: true,
           qle_event_date_kind: 'qle_on',
-          updated_by: '',
-          published_by: '',
-          created_by: '',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           date_options_available: true }
       end
 
@@ -209,9 +209,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
-          updated_by: user.id.to_s,
-          published_by: user.id.to_s,
-          created_by: user.id.to_s,
+          'updated_by': user.id.to_s,
+          'published_by': user.id.to_s,
+          'created_by': user.id.to_s,
           'date_options_available' => true }
       end
 
@@ -259,9 +259,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
-          updated_by: '',
-          published_by: '',
-          created_by: '',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           'date_options_available' => true }
       end
 
