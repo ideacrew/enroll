@@ -130,6 +130,28 @@ while counter < number_of_iterations
   counter += 1
 end
 
+
+prev_day = TimeKeeper.date_of_record.yesterday
+start_at = prev_day.beginning_of_day
+end_at = prev_day.end_of_day
+families = Family.all.where(:created_at => { "$gte" => start_at, "$lte" => end_at }, external_app_id: nil)
+total_new_families_count = families.count
+families_per_iteration = 10_000.0
+number_of_iterations = (total_new_families_count / families_per_iteration).ceil
+counter = 0
+total_new_families_count = 0
+
+while counter < number_of_iterations
+  offset_count = families_per_iteration * counter
+  families.no_timeout.limit(10_000).offset(offset_count).each do |family|
+    person = family.primary_person
+    if person.present? && person.user.present?
+      total_new_families_count += 1
+    end
+  end
+  counter += 1
+end
+
 prev_day = TimeKeeper.date_of_record.yesterday
 start_at = prev_day.beginning_of_day
 end_at = prev_day.end_of_day
@@ -217,6 +239,7 @@ end
 
 puts "Number of Submitted Applications (gross). Total number of families in the system are: #{total_families_count}"
 puts "Number of Accounts created on a single day(Accounts Created). Total number of Users created yesterday: #{total_user_counter}"
+puts "Number of new Accounts created on a single day(No external app id). Total number of new accounts created yesterday: #{total_new_families_count}"
 puts "Applications Submitted, the combined total number of families created yesterday and number of applications submitted yesterday: #{total_family_or_iap_submitted_count}"
 puts "Consumers on Applications Submitted (gross). Count of people that are applying for coverage: #{people_applying_for_coverage}"
 puts "Consumers Determined Eligible for Medicaid/CHIP (gross). Total number of family members that are found eligible for MedicAid or CHIP are: #{total_member_eligible_medicaid_or_chip}"
@@ -235,6 +258,7 @@ CSV.open("#{Rails.root}/CMS_daily_report_summary.csv", "w", force_quotes: true) 
       ["","Automatic Re-enrollees (net)", total_auto_re_enrolles],
       ["","Number of Submitted Applications (gross)", total_families_count],
       ["","Number of Accounts created on a single day(Accounts Created)", total_user_counter],
+      ["","Number of New Accounts created on a single day(No external app id)", total_new_families_count],
       ["","Applications Submitted", total_family_or_iap_submitted_count],
       ["","Consumers on Applications Submitted (gross)", people_applying_for_coverage],
       ["","Consumers Determined Eligible for Medicaid/CHIP (gross)", total_member_eligible_medicaid_or_chip],
