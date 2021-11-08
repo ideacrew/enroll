@@ -1,7 +1,0 @@
-<% if @enabled %>
-  <% text = l10n("devise.lockable.admin.lock_user") %>
-<% else %>
-  <% text = l10n("devise.lockable.admin.unlock_user") %>
-<% end %>
-
-<%= link_to text, user_account_confirm_lock_path(user_id: @user_id, account_id: @account_id, enabled: @enabled), remote: true, class: 'btn btn-default lock-confirm-btn' %>

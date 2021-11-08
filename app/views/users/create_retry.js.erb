@@ -1,4 +1,0 @@
-// JS flash messages
-var div = document.createElement('div');
-div.innerHTML = "<%= escape_javascript(render_flash) %>".trim();
-document.querySelector('body .content').before(div);

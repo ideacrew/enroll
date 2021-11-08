@@ -1,0 +1,14 @@
+FROM rabbitmq:3.8-management
+
+WORKDIR /
+
+ADD .docker/rabbitmq.conf /etc/rabbitmq/
+ADD .docker/hbx_rabbit_definitions.json /etc/rabbitmq/
+
+ARG HBX_ID
+ARG ENV_NAME
+RUN sed -i -r "s/HBX_ID/$HBX_ID/g" /etc/rabbitmq/hbx_rabbit_definitions.json
+RUN sed -i -r "s/ENV_NAME/$ENV_NAME/g" /etc/rabbitmq/hbx_rabbit_definitions.json
+
+RUN chown rabbitmq:rabbitmq /etc/rabbitmq/rabbitmq.conf /etc/rabbitmq/hbx_rabbit_definitions.json
+

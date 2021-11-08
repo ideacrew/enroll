@@ -1,7 +1,5 @@
 require 'rails_helper'
 
-include Dry::Monads[:result]
-
 describe UsersController, dbclean: :after_each do
   let(:admin) { instance_double(User) }
   let(:user_policy) { instance_double(UserPolicy) }
@@ -11,41 +9,6 @@ describe UsersController, dbclean: :after_each do
 
   after :all do
     DatabaseCleaner.clean
-  end
-
-  describe '.create' do
-    let(:permission) { FactoryBot.create :permission }
-    let(:keycloak_op) { double(Operations::Accounts::Create, call: Success(user: { id: user_id})) }
-    let!(:hbx_profile) { FactoryBot.create :hbx_profile }
-
-    before do
-      allow(EnrollRegistry).to receive(:[]).and_call_original
-      allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :keycloak)))
-      allow(user_policy).to receive(:change_username_and_email?).and_return(true)
-      allow(UserPolicy).to receive(:new).with(admin, User).and_return(user_policy)
-      allow(Operations::Accounts::Create).to receive(:new).and_return(keycloak_op)
-      sign_in(admin)
-
-      post :create, params: params, format: 'js'
-    end
-
-    let(:params) do
-      {
-        first_name: 'New',
-        last_name: 'Admin',
-        email: 'new_admin@ideacrew.com',
-        password: 'P@$$w0rd',
-        permission_id: permission.id
-      }
-    end
-
-    it 'creates a user with the right account_id' do
-      expect(assigns(:user).account_id).to eql(user_id)
-    end
-
-    it 'has the right permission' do
-      expect(assigns(:user).person.hbx_staff_role.permission).to eql(permission)
-    end
   end
 
   describe '.change_password' do

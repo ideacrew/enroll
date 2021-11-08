@@ -51,8 +51,7 @@ Rails.application.routes.draw do
     post :authenticate, controller: 'security_question_responses', action: 'authenticate'
   end
 
-  resources :users, except: [:new, :create] do
-    post 'admin/create', on: :collection, to: 'users#create'
+  resources :users do
     resources :security_question_responses, controller: "users/security_question_responses"
     post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
 
@@ -61,17 +60,6 @@ Rails.application.routes.draw do
       put :confirm_reset_password, :confirm_change_username_and_email, :update
 
       post :unlock, :change_password
-    end
-
-    resources :accounts, module: 'users', only: [] do
-      get :forgot_password
-      get :lockable
-      get :confirm_lock
-      get :change_username_and_email
-      get :reset_password
-      put :confirm_forgot_password
-      put :confirm_change_username_and_email
-      put :confirm_reset_password
     end
   end
 

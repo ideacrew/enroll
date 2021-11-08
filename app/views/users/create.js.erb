@@ -1,7 +1,0 @@
-document.getElementById("new_user").classList.remove("hidden");
-document.getElementById("create_user").classList.add("hidden");
-
-// JS flash messages
-var div = document.createElement('div');
-div.innerHTML = "<%= escape_javascript(render_flash) %>".trim();
-document.querySelector('body .content').before(div);

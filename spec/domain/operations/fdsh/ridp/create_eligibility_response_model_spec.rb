@@ -8,9 +8,9 @@ module Operations
 
     let(:payload) do
       {
-        primary_member_hbx_id: "efa925ec29d4471580210ecefbbf5f7e",
-        event_kind: "primary",
-        metadata: [
+        "primary_member_hbx_id": "efa925ec29d4471580210ecefbbf5f7e",
+        "event_kind": "primary",
+        "metadata": [
           ["content_type", "application/json"],
           ["delivery_mode", 2],
           ["priority", 0],
@@ -19,30 +19,30 @@ module Operations
           ["type", "fdsh.eligibilities.ridp"],
           ["app_id", "fdsh_gateway"]
         ],
-        response: {
-          attestations: {
-            ridp_attestation: {
-              is_satisfied: false,
-              is_self_attested: true,
-              satisfied_at: 'null',
-              evidences: [{
-                primary_response: {
-                  Response: {
-                    ResponseMetadata: {
-                      ResponseCode: "HE000050",
-                      ResponseDescriptionText: "Cannot formulate questions for this consumer. Please reference Final Decision Code.",
-                      TDSResponseDescriptionText: 'null'
+        "response": {
+          "attestations": {
+            "ridp_attestation": {
+              "is_satisfied": false,
+              "is_self_attested": true,
+              "satisfied_at": 'null',
+              "evidences": [{
+                "primary_response": {
+                  "Response": {
+                    "ResponseMetadata": {
+                      "ResponseCode": "HE000050",
+                      "ResponseDescriptionText": "Cannot formulate questions for this consumer. Please reference Final Decision Code.",
+                      "TDSResponseDescriptionText": 'null'
                     },
-                    VerificationResponse: {
-                      SessionIdentification: "QEJF03OV2IYYOQY5FBXWSQ0M.pidd2v-210714120913412971074",
-                      DSHReferenceNumber: "3227-50-cc0c",
-                      FinalDecisionCode: "RF4",
-                      VerificationQuestions: {}
+                    "VerificationResponse": {
+                      "SessionIdentification": "QEJF03OV2IYYOQY5FBXWSQ0M.pidd2v-210714120913412971074",
+                      "DSHReferenceNumber": "3227-50-cc0c",
+                      "FinalDecisionCode": "RF4",
+                      "VerificationQuestions": {}
                     }
                   }
                 }
               }],
-              status: "in_progress"
+              "status": "in_progress"
             }
           }
         }
@@ -62,9 +62,9 @@ module Operations
 
     let(:payload) do
       {
-        primary_member_hbx_id: "87171b1921034e6399b15ff27c3e2b94",
-        event_kind: "secondary",
-        metadata: [
+        "primary_member_hbx_id": "87171b1921034e6399b15ff27c3e2b94",
+        "event_kind": "secondary",
+        "metadata": [
           ["content_type", "application/json"],
           ["delivery_mode", 2],
           ["priority", 0],
@@ -74,29 +74,29 @@ module Operations
           ["type", "fdsh.eligibilities.ridp"],
           ["app_id", "fdsh_gateway"]
         ],
-        response: {
-          attestations: {
-            ridp_attestation: {
-              is_satisfied: true,
-              is_self_attested: true,
-              satisfied_at: "2021-07-14T19:48:10.127-04:00",
-              evidences: [{
-                secondary_response: {
-                  Response: {
-                    ResponseMetadata: {
-                      ResponseCode: "HS000000",
-                      ResponseDescriptionText: "Successful",
-                      TDSResponseDescriptionText: nil
+        "response": {
+          "attestations": {
+            "ridp_attestation": {
+              "is_satisfied": true,
+              "is_self_attested": true,
+              "satisfied_at": "2021-07-14T19:48:10.127-04:00",
+              "evidences": [{
+                "secondary_response": {
+                  "Response": {
+                    "ResponseMetadata": {
+                      "ResponseCode": "HS000000",
+                      "ResponseDescriptionText": "Successful",
+                      "TDSResponseDescriptionText": nil
                     },
-                    VerificationResponse: {
-                      FinalDecisionCode: "ACC",
-                      DSHReferenceNumber: "481c-0e-520c",
-                      SessionIdentification: "UJANBKK16UBOZP2V5PNHJBMT.pidd1v-210714184544346087955"
+                    "VerificationResponse": {
+                      "FinalDecisionCode": "ACC",
+                      "DSHReferenceNumber": "481c-0e-520c",
+                      "SessionIdentification": "UJANBKK16UBOZP2V5PNHJBMT.pidd1v-210714184544346087955"
                     }
                   }
                 }
               }],
-              status: "success"
+              "status": "success"
             }
           }
         }
