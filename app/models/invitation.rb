@@ -15,7 +15,6 @@ class Invitation
   }
   ROLES = INVITE_TYPES.values
   SOURCE_KINDS = INVITE_TYPES.keys
-  LOCKED_EMAILS_TYPES = %w[broker_role broker_agency_staff_role assister_role csr_role hbx_staff_role].freeze
 
   field :role, type: String
   field :source_id, type: BSON::ObjectId

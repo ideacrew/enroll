@@ -29,7 +29,7 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
     end
 
     it 'should display broker widget for consumer' do
-      expect(rendered).to have_text("Your Broker")
+      expect(rendered).to have_text('h3', "Your Broker")
     end
 
     it 'should display brokers email' do
@@ -65,17 +65,17 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
     end
 
     it 'should display broker widget for consumer' do
-      expect(rendered).to have_text('Select a Broker or Assister')
+      expect(rendered).to have_text('h3', 'Select a Broker or Assister')
     end
 
     it 'should display get help signing up button' do
-      expect(rendered).to have_text('Get Help Signing Up')
+      expect(rendered).to have_text('a', 'Get Help Signing Up')
     end
 
     it 'should display get help signing up button' do
       # I know I'm flipping this test but when it was previously have_selector it wasn't working correctly
       # when broker_agency.present? returns false this should not be rendered, check the view, line 55
-      expect(rendered).to_not have_text('Find Assistance Another Way')
+      expect(rendered).to_not have_text('a', 'Find Assistance Another Way')
     end
   end
 end

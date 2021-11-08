@@ -13,9 +13,8 @@ module CrmGateway
       puts("Triggering CRM family update publish for family with mongo id #{self.id}")
       result = ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
       # Update column directly without callbacks
-      puts result[0].inspect
-      if result.is_a?(Array) && result[0].success?
-        family_payload = result[1]
+      if result.success?
+        family_payload = result.success.last
         self.set(cv3_payload: family_payload.to_h.with_indifferent_access)
         p family_payload if Rails.env.test?
       else

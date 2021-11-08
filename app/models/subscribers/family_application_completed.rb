@@ -93,11 +93,9 @@ module Subscribers
         consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
         consumer_role.is_state_resident = verified_verifications.is_lawfully_present
         consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
-        consumer_role.person.save!
         consumer_role.save!
         if consumer_role.person.user.present?
           consumer_role.person.user.ridp_by_payload!
-          consumer_role.person.user.save!
         end
       rescue => e
         if consumer_role&.errors.present?

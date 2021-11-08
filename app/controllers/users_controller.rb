@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :confirm_existing_password, only: [:change_password]
-  before_action :set_user, except: [:create, :confirm_lock, :unsupported_browser, :index, :show]
+  before_action :set_user, except: [:confirm_lock, :unsupported_browser, :index, :show]
 
   def index
     redirect_to root_path
@@ -89,37 +89,6 @@ class UsersController < ApplicationController
       format.js { render "change_username_and_email"} if @errors
       format.js { render "username_email_result"}
     end
-  end
-
-  # POST admin_create_users_path
-  # Used in users table create user
-  def create
-    authorize User, :change_username_and_email?
-    if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
-      result = Operations::Users::Create.new.call(account: {
-                                                    email: params[:email],
-                                                    password: params[:password],
-                                                    relay_state: 'hbx_staff'
-                                                    #permission_id: params.require(:permission_id)
-                                                  })
-      @user = result.value_or(result.failure)[:user]
-      permission = Permission.find(params.require(:permission_id))
-      @user.build_person(params.permit(:first_name, :last_name))
-      @user.person.build_hbx_staff_role(hbx_profile_id: HbxProfile.current_hbx._id, permission_id: permission.id)
-
-      if result.success? && @user.save
-        flash[:notice] = "Created account for #{params.require(:first_name)} #{params.require(:last_name)}"
-        render
-      else
-        flash[:error] = "Error creating account."
-        render 'create_retry'
-      end
-    else
-      head :ok
-    end
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
   end
 
   def edit

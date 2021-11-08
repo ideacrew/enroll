@@ -450,6 +450,7 @@ Then(/^.+ should see the plan year$/) do
 end
 
 When(/^.+ clicks? on publish plan year$/) do
+  sleep 3
   find('.interaction-click-control-publish-plan-year', wait: 5).click
 end
 
@@ -600,8 +601,9 @@ Then /^employer should see continue button disabled$/ do
 end
 
 And /^employer filled all the fields on benefit application form$/ do
-  find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div[2]/div/div[1]/div", wait: 20).click
-  find('li[data-index="2"]').click
+  find(EmployerAddBenefitPackage.select_start_on_dropdown, wait: 20).click
+  find('li[data-index="1"]').click
+  sleep 2
   fill_in EmployerAddBenefitPackage.full_time_employees, with: 5
   fill_in EmployerAddBenefitPackage.part_time_employees, with: 5
 end
