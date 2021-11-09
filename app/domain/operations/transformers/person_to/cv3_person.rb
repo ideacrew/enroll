@@ -165,12 +165,13 @@ module Operations
 
         def transform_ridp_documents(ridp_documents)
           ridp_documents.collect do |document|
-            {
+            ridp_documents_hash = {
               status: document.status,
               ridp_verification_type: document.ridp_verification_type,
-              comment: document.comment,
-              uploaded_at: document.uploaded_at
+              comment: document.comment
             }
+            ridp_documents_hash.merge!(uploaded_at: document.uploaded_at) if document.uploaded_at.present?
+            ridp_documents_hash
           end
         end
 
