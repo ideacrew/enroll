@@ -72,6 +72,7 @@ module Operations
             args[:last_name],
             args[:realm_roles] || [], # realm roles
             [], # client roles
+            args[:attributes],
             after_insert
           )
         end.to_result

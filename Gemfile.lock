@@ -60,8 +60,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/keycloak-client.git
-  revision: b707685c41c91937143aa55eb032021936d4bc09
-  branch: master
+  revision: 530448dbf88ec8ebbb8d5d21d84e3d5dc35661b9
+  branch: support_relay_state
   specs:
     keycloak (3.2.2)
       json (~> 2.5.0)
@@ -1010,7 +1010,6 @@ GEM
       rake
       serverengine (~> 2.0.5)
       thor
-      thread (~> 0.1.7)
     spring (2.1.1)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -1044,7 +1043,6 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     test-prof (1.0.7)
     thor (1.1.0)
-    thread (0.1.7)
     thread-local (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
@@ -1259,4 +1257,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.12
+   2.2.27

@@ -37,7 +37,7 @@ gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', 
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
-gem 'keycloak',    git: 'https://github.com/ideacrew/keycloak-client.git', branch: 'master'
+gem 'keycloak',    git: 'https://github.com/ideacrew/keycloak-client.git', branch: 'support_relay_state'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
