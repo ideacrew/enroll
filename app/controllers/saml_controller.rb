@@ -13,13 +13,18 @@ class SamlController < ApplicationController
 
     relay_state = params['RelayState'] || response.attributes['relay_state']
     sign_out current_user if current_user.present?
+
     if response.is_valid? && response.name_id.present?
-      username = response.name_id.downcase
-      oim_user = User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
+      oim_user = if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+                   User.where(account_id: response.name_id || response.attributes['id']).first
+                 else
+                   username = response.name_id.downcase
+                   User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
+                 end
 
       if oim_user.present?
         oim_user.idp_verified = true
-        oim_user.oim_id = response.name_id
+        oim_user.oim_id = response.name_id unless EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
 
         unless oim_user.valid?
           log("ERROR: #{oim_user.errors.messages}", {:severity => "error"})
