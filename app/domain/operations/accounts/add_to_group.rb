@@ -49,8 +49,6 @@ module Operations
       end
 
       def add_to_group(group_id, user_id)
-        puts group_id.inspect
-        puts user_id.inspect
         Try() do
           Keycloak::Admin.add_user_to_group(user_id, group_id)
         end.to_result.bind do |response|
