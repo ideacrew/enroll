@@ -37,6 +37,11 @@ Then(/form should not submit due to required relationship options popup$/) do
   find(:xpath, "//div[@class='selectric-scroll']")
 end
 
+Then(/form should not submit due to required relationship error$/) do
+  expect(page).to have_content 'Select relationship type'
+end
+
 And(/user fills in the missing relationship$/) do
+  find("span", :text => "choose").click
   find(:xpath, FinancialAssistance::ApplicantForm.applicant_spouse_select).click
 end
