@@ -47,18 +47,30 @@ module Operations
         end
         # rubocop:enable Metrics/CyclomaticComplexity
 
-
         def special_enrollment_period_reference(enrollment)
           sep = enrollment.family.latest_active_sep
           qle = sep.qualifying_life_event_kind
           {
-            qualifying_life_event_kind_reference: sep.qualifying_life_event_kind,
+            qualifying_life_event_kind_reference: construct_qle_reference(sep.qualifying_life_event_kind),
             qle_on: sep.qle_on,
             start_on: sep.start_on,
             end_on: sep.end_on,
             effective_on: sep.effective_on,
             submitted_at: sep.submitted_at
           }
+        end
+
+        def construct_qle_reference(qle)
+          return if qle.nil?
+
+          qle_hash = {
+            start_on: qle.start_on,
+            title: qle.title,
+            reason: qle.reason,
+            market_kind: qle.market_kind
+          }
+          qle_hash.merge!(end_on: qle.end_on) if qle.end_on.present?
+          qle_hash
         end
 
         def consumer_role_reference(consumer_role)
