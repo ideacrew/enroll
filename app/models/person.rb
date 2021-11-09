@@ -66,6 +66,10 @@ class Person
   VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   NON_SHOP_ROLES = ['Individual','Coverall']
+  IDENTITY_VALIDATION_SCOPE = {
+    pending_only: [:pending],
+    pending_and_outstanding: [:pending, :outstanding]
+  }.with_indifferent_access.freeze
 
   field :hbx_id, type: String
   field :external_person_id, type: String
@@ -321,8 +325,8 @@ class Person
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
   # scope :general_agency_primary_staff,     -> { where("general_agency_staff_roles.is_primary" => { "$eq" => true })}
 
-  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
-  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
+  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => IDENTITY_VALIDATION_SCOPE[EnrollRegistry[:enroll_app].setting(:identity_validation_scope).item]})}
+  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => IDENTITY_VALIDATION_SCOPE[EnrollRegistry[:enroll_app].setting(:identity_validation_scope).item]})}
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
 
 #  ViewFunctions::Person.install_queries
