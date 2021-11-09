@@ -24,7 +24,7 @@ module ConsumerRolesHelper
   def find_consumer_role_for_fields(obj)
     if obj.is_a? Person
       obj.consumer_role
-    elsif obj.persisted?
+    elsif obj.persisted? && obj.family_member.present?
       obj.family_member.person.consumer_role
     else
       ConsumerRole.new
