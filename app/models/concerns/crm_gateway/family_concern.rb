@@ -8,7 +8,10 @@ module CrmGateway
       after_save :trigger_crm_family_update_publish
     end
 
-    def trigger_crm_family_update_publish
+    # Any time after the family is saved, the CRM publish will only trigger if the family's family_member
+    # person records have any of the CRITICAL_CRM_ATTRIBUTES listed above changed from their previous values
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def trigger_crm_family_update_publish_after_save
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
       puts("Triggering CRM family update publish for family with mongo id #{self.id}")
       result = ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
@@ -21,5 +24,6 @@ module CrmGateway
         p result.failure
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
   end
 end
