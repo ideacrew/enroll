@@ -16,6 +16,7 @@ module BenefitMarkets
 
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Float,    default: 0.0
+      field :pediatric_ehb,               type: Float
 
       belongs_to  :renewal_product,
                   inverse_of: nil,

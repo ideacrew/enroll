@@ -123,6 +123,7 @@ class ProductBuilder
         dental_plan_kind: @qhp.plan_type.downcase,
         dental_level: @qhp.metal_level.downcase,
         product_package_kinds: [:multi_product, :single_issuer]
+        pediatric_ehb: @qhp.pediatric_ehb || 1.0
       }
     end.merge(shared_attributes)
   end

@@ -272,6 +272,7 @@ class QhpBuilder
               }.merge(shared_attributes))
             else
               new_product = ::BenefitMarkets::Products::DentalProducts::DentalProduct.new({
+                pediatric_ehb: set_pediatric_ehb,
                 product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
               }.merge(shared_attributes))
             end
@@ -288,6 +289,10 @@ class QhpBuilder
 
   def set_ehb
     @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0
+  end
+
+  def set_pediatric_ehb
+    @qhp.pediatric_ehb.present? ? @qhp.pediatric_ehb : 1.0
   end
 
   def get_issuer_profile_id

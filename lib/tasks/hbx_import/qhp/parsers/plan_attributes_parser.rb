@@ -45,6 +45,7 @@ module Parser
     element :summary_benefit_and_coverage_url, String, tag: 'summaryBenefitAndCoverageURL'
     element :enrollment_payment_url, String, tag: 'enrollmentPaymentURL'
     element :plan_brochure, String, tag: 'planBrochure'
+    element :pediatric_ehb, String, tag: 'ehbApportionmentForPediatricDental'
 
     def to_hash
       {
@@ -88,7 +89,8 @@ module Parser
         ehb_percent_premium: (ehb_percent_premium.present? ? ehb_percent_premium.gsub(/\n/,'').strip : ""),
         summary_benefit_and_coverage_url: (summary_benefit_and_coverage_url.gsub(/\n/,'').strip rescue ""),
         enrollment_payment_url: enrollment_payment_url.present? ? enrollment_payment_url.gsub(/\n/,'').strip : "",
-        plan_brochure: (plan_brochure.gsub(/\n/,'').strip rescue "")
+        plan_brochure: (plan_brochure.gsub(/\n/,'').strip rescue ""),
+        pediatric_ehb: (pediatric_ehb.present? ? pediatric_ehb.gsub(/\n/,'').strip : "")
       }
     end
   end

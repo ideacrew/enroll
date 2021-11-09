@@ -34,6 +34,7 @@ class Products::Qhp
   field :health_care_specialist_referral_type, type: String, default: ""
   field :insurance_plan_benefit_exclusion_text, type: String
   field :ehb_percent_premium, type: String
+  field :pediatric_ehb, type: String
 
   field :indian_plan_variation, type: String  # amount per enrollee
 
