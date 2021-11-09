@@ -103,7 +103,7 @@ class UsersController < ApplicationController
                                                     first_name: params[:first_name],
                                                     last_name: params[:last_name],
                                                     roles: ['hbx_staff'],
-                                                    relay_state: 'hbx_staff'
+                                                    attributes: { relay_state: exchanges_hbx_profiles_root_path }
                                                     #permission_id: params.require(:permission_id)
                                                   })
       @user = result.value_or(result.failure)[:user]
@@ -113,7 +113,7 @@ class UsersController < ApplicationController
       permission = Permission.find_by(name: Permission::PERMISSION_KINDS.first) unless Permission.hierarchy_check(current_user.person.hbx_staff_role.permission, permission)
 
       @user.person.build_hbx_staff_role(hbx_profile_id: HbxProfile.current_hbx._id, permission_id: permission.id, job_title: permission.name)
-      @user.roles.push "hbx_staff"
+      @user.roles.push "hbx_staff" unless @user.roles.include?("hbx_staff")
 
       if result.success? && @user.save
         flash[:notice] = "Created account for #{params.require(:first_name)} #{params.require(:last_name)}"

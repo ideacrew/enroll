@@ -93,7 +93,7 @@ class Permission
 
     def has_permission_to_modify?(current_user, target_user)
       return false unless current_user&.person&.hbx_staff_role&.permission
-      return true unless current_user&.person&.hbx_staff_role&.permission
+      return true unless target_user&.person&.hbx_staff_role&.permission
 
       PERMISSION_KINDS.find_index(current_user.person.hbx_staff_role.permission.name) > PERMISSION_KINDS.find_index(target_user.person.hbx_staff_role.permission.name)
     end

@@ -2,6 +2,7 @@ class Invitation
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include BenefitSponsors::Engine.routes.url_helpers
 
   INVITE_TYPES = {
     "census_employee" => "employee_role",
@@ -108,6 +109,7 @@ class Invitation
         user_obj.roles << "broker_agency_staff"
       end
       user_obj.save!
+      update_keycloak_relay_state(user_obj, profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile))
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
   end
@@ -121,6 +123,7 @@ class Invitation
       broker_agency_profile = staff_role.broker_agency_profile
       user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
       user_obj.save!
+      update_keycloak_relay_state(user_obj, profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile))
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
   end
@@ -182,6 +185,12 @@ class Invitation
     if result_type != self.role.downcase
       errors.add(:base, "a combination of source #{self.source_kind} and role #{self.role} is invalid")
     end
+  end
+
+  def update_keycloak_relay_state(user, url)
+    return unless EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+
+    Operations::Accounts::Update.new.call(account: { id: user.account_id, attributes: { relay_state: url }})
   end
 
   def send_invitation!(invitee_name)
