@@ -4,7 +4,7 @@
 # https://www.relishapp.com/rspec/rspec-rails/v/3-0/docs/view-specs/view-spec#passing-view-spec-that-stubs-a-helper-method
 module PermissionHelper
   def policy_helper pundit_object
-    policy(pundit_object) 
+    policy(pundit_object)
   end
 
   def pundit_span pundit_object, pundit_method

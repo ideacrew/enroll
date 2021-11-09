@@ -21,3 +21,5 @@ def load_dc_site_seed
     owner_org.save!
   end
 end
+
+load_dc_site_seed

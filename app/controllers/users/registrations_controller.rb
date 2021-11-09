@@ -27,10 +27,10 @@ module Users
                 end
         result = Operations::Users::Create.new.call(account: {
                                                       email: email,
-                                                      password: sign_up_params[:password],
-                                                      relay_state: invitation&.role
+                                                      password: sign_up_params[:password]
                                                     })
         resource_saved = result.success?
+
         self.resource = result.value_or(result.failure)[:user]
       else
         self.resource = build_resource(sign_up_params)

@@ -156,6 +156,8 @@ group :development, :test do
   gem 'mongoid-rspec',          '4.0.1'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'pry-stack_explorer'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'

@@ -52,7 +52,7 @@
             = l10n(".optional")
             | )
           = f.text_field :email, class: "form-control", data: {action: "focus->signup#hideTooltips click->signup#hideTooltips blur->signup#validateEmailFormat", target: 'signup.optionalEmail'}
-          = f.hidden_field :invitation_id, value: @invitation.id
+          = f.hidden_field :invitation_id, value: @invitation&.id
         .recaptcha-error.alert-error
         .recaptcha#captcha-widget
         .row.justify-content-md-center

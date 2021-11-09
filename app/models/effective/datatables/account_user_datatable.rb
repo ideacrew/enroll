@@ -22,8 +22,6 @@ module Effective
         table_column :actions, :width => '50px', :proc => proc { |row|
           user = row.last[:user]
           account = row.last[:account]
-          p "current_user....."
-          p current_user
 
           dropdown = [
             ['Reset Password', user_account_reset_password_path(user_id: user.id, account_id: account[:id], username: account[:username]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
