@@ -180,7 +180,7 @@ module FinancialAssistance
             family.primary_person.ensure_relationship_with(person, relationship_kind)
             Success("created relationship")
           rescue StandardError => e
-            Failure("create_or_update_family_member: #{e}")
+            Failure("create_or_update_relationship: #{e}")
           end
 
           def same_address_with_primary(family_member, primary)
@@ -194,7 +194,7 @@ module FinancialAssistance
                                                                                          end
             Success(sas)
           rescue StandardError => e
-            Failure("create_or_update_family_member: #{e}")
+            Failure("same_address_with_primary: #{e}")
           end
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
@@ -203,7 +203,8 @@ module FinancialAssistance
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
-                fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
+                fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
+                  fm.person.last_name.downcase == applicant_hash['name']['last_name'].downcase
               end.first
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
               foster_info = applicant_hash['foster_care']
