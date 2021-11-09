@@ -77,10 +77,10 @@ module Operations
           member_premiums[hbx_ids][:health_only] = premiums.value!
 
 
-          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
+          # premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
 
-          return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
-          member_premiums[hbx_ids][:health_and_dental] = premiums.value!
+          # return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
+          # member_premiums[hbx_ids][:health_and_dental] = premiums.value!
 
           premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id], adjust_pediatric_premium: true})
 
