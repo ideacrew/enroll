@@ -26,34 +26,38 @@ module Operations
       # @return [Dry::Monad] result
       def call(params)
         group_id = yield find_group_id(params[:group])
-        yield add_to_group(group_id, params[:user_id])
+
+        add_to_group(group_id, params[:user_id])
       end
 
       private
 
       def find_group_id(group_name)
+        # rubocop:disable Style/MultilineBlockChain
         Try() do
-          Keycloak.proc_cookie_token = -> { Keycloak::Client.get_token_by_client_credentials }
+          Keycloak.proc_cookie_token = lambda {
+            Keycloak::Client.get_token_by_client_credentials
+          }
           Keycloak::Admin.get_groups
-        end.to_result.bind do |response|
-          response = JSON.parse(response)
-          matching_group = response.find do |group|
-            group['name'] == group_name
-          end
-          if matching_group
-            Success(matching_group['id'])
-          else
-            Failure("Group not found")
-          end
         end
+          .to_result
+          .bind do |response|
+            response = JSON.parse(response)
+            matching_group =
+              response.find { |group| group['name'] == group_name }
+            if matching_group
+              Success(matching_group['id'])
+            else
+              Failure('Group not found')
+            end
+          end
+        # rubocop:enable Style/MultilineBlockChain
       end
 
       def add_to_group(group_id, user_id)
-        Try() do
-          Keycloak::Admin.add_user_to_group(user_id, group_id)
-        end.to_result.bind do |response|
-          Success(response)
-        end
+        Try() { Keycloak::Admin.add_user_to_group(user_id, group_id) }
+          .to_result
+          .bind { |response| Success(response) }
       end
     end
   end

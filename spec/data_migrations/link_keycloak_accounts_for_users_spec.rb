@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
-  #   before :all do
-  #     DatabaseCleaner.clean
-  #   end
+  before :all do
+    DatabaseCleaner.clean
+  end
 
   let(:given_task_name) { 'link_keycloak_accounts_for_users' }
   subject do
@@ -23,11 +23,13 @@ describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
 
   describe 'link existing user with keycloak' do
     context 'given the user not linked with keycloak' do
-      let!(:person) do
-        FactoryBot.create(:person, :with_consumer_role, user: user)
-      end
-
+      let!(:person) { FactoryBot.create(:person, :with_broker_role, user: user) }
       let(:user) { FactoryBot.create(:user, roles: ['broker']) }
+
+      before do
+        agency_profile = FactoryBot.create(:broker_agency_profile, primary_broker_role: user.person.broker_role)
+        person.broker_role.update(broker_agency_profile_id: agency_profile.id)
+      end
 
       it 'should change oim_id and account_id' do
         VCR.use_cassette('link_keycloak_accounts_for_users.new_account') do
@@ -36,26 +38,28 @@ describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
           expect(user.account_id).to be_present
           expect(user.account_id).to eq user.oim_id
 
-          Operations::Accounts::Delete.new.call(id: user.oim_id)
+          Operations::Accounts::Delete.new.call(id: user.account_id)
         end
       end
     end
 
     context 'given the user already linked with keycloak' do
-      let!(:person) do
-        FactoryBot.create(:person, :with_consumer_role, user: user)
+      let!(:person) { FactoryBot.create(:person, :with_broker_role, user: user) }
+      let(:user) { FactoryBot.create(:user, account_id: 'sample-account-id', roles: ['hbx_staff']) }
+
+      before do
+        agency_profile = FactoryBot.create(:broker_agency_profile, primary_broker_role: user.person.broker_role)
+        person.broker_role.update(broker_agency_profile_id: agency_profile.id)
       end
 
-      let(:user) { FactoryBot.create(:user, account_id: 'sample-account-id') }
-
-      it 'should change oim_id and account_id' do
+      it 'should update oim_id and account_id' do
         VCR.use_cassette('link_keycloak_accounts_for_users.existing_account') do
           subject.migrate
           user.reload
-          expect(user.account_id).to eq 'sample-account-id'
-          expect(user.account_id).not_to eq user.oim_id
+          expect(user.account_id).not_to eq 'sample-account-id'
+          expect(user.account_id).to eq user.oim_id
 
-          Operations::Accounts::Delete.new.call(id: user.oim_id)
+          Operations::Accounts::Delete.new.call(id: user.account_id)
         end
       end
     end

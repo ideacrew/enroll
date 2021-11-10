@@ -22,7 +22,8 @@ RSpec.shared_context 'account' do
         password: '$3cr3tP@55w0rd',
         email: 'captain_america@avengers.org',
         first_name: 'Steve',
-        last_name: 'Rodgers'
+        last_name: 'Rodgers',
+        realm_roles: ['hbx_staff']
       },
       black_widow: {
         username: 'black_widow',
@@ -43,7 +44,8 @@ RSpec.shared_context 'account' do
         password: '$3cr3tP@55w0rd',
         email: 'doctor_strange@avengers.org',
         first_name: 'Steven',
-        last_name: 'Strange'
+        last_name: 'Strange',
+        realm_roles: ['hbx_staff']
       }
     }
   end

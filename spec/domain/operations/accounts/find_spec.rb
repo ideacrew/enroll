@@ -83,5 +83,23 @@ RSpec.describe Operations::Accounts::Find, type: :request do
         end
       end
     end
+
+    context 'scope_name is :by_realm_role' do
+      it 'should return total number of accounts' do
+        VCR.use_cassette('account.by_realm_role') do
+          create_avenger_accounts
+          response = subject.call(scope_name: :by_realm_role, criterion: 'hbx_staff')
+
+          expect(response.success?).to be_truthy
+          expect(response.success).to be_an_instance_of(Array)
+
+          avengers.each do |name, avenger|
+            expect(response.success.any?{|user| user[:username] == name.to_s}).to be_truthy if avenger.key?(:realm_roles) && avenger[:realm_roles].include?('hbx_staff')
+          end
+
+          delete_avenger_accounts
+        end
+      end
+    end
   end
 end
