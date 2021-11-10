@@ -9,6 +9,7 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
   include Rails.application.routes.url_helpers
   include BenefitSponsors::Engine.routes.url_helpers
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize
   def migrate
     User.all.no_timeout.each do |user|
       user_values = {
@@ -32,16 +33,18 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
       if account_attrs.is_a?(Hash) && account_attrs.deep_symbolize_keys![:id]
         user.account_id = account_attrs[:id]
 
-        update =
-          Operations::Accounts::Update.new.call(
-            account: {
-              id: user.account_id,
-              attributes: {
+        unless account_attrs[:attributes]&.key?(:id) && account_attrs[:attributes]&.key?(:relay_state)
+          update =
+            Operations::Accounts::Update.new.call(
+              account: {
                 id: user.account_id,
-                relay_state: relay_state_for(user)
+                attributes: {
+                  id: user.account_id,
+                  relay_state: relay_state_for(user)
+                }
               }
-            }
-          ) unless account_attrs[:attributes]&.key?(:id) && account_attrs[:attributes]&.key?(:relay_state)
+            )
+        end
         update = Operations::Accounts::AddToRole.new.call(id: account_attrs[:id], roles: user.roles)
         if update.success?
           user.set(account_id: account_attrs[:id])
@@ -56,6 +59,7 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
       end
     end
   end
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize
 
   private
 

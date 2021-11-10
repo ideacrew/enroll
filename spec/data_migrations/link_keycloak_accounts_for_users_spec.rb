@@ -36,7 +36,6 @@ describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
           subject.migrate
           user.reload
           expect(user.account_id).to be_present
-          expect(user.account_id).to eq user.oim_id
 
           Operations::Accounts::Delete.new.call(id: user.account_id)
         end
@@ -56,8 +55,8 @@ describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
         VCR.use_cassette('link_keycloak_accounts_for_users.existing_account') do
           subject.migrate
           user.reload
+          expect(user.account_id).to be_present
           expect(user.account_id).not_to eq 'sample-account-id'
-          expect(user.account_id).to eq user.oim_id
 
           Operations::Accounts::Delete.new.call(id: user.account_id)
         end
