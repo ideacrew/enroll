@@ -26,6 +26,15 @@ Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
   find_link('Edit APTC / CSR').visible?
 end
 
+Then(/Hbx Admin clicks the Edit APTC CSR link/) do
+  click_link 'Edit APTC / CSR'
+end
+
+Then(/Hbx Admin should see individual level csr percent/) do
+  expect(page).to have_content("CSR % as Integer")
+  expect(page).to_not have_content("APTC Amount / Percent Ratio")
+end
+
 Given(/^User with tax household exists$/) do
   create_thh_for_family
 end
