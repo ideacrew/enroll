@@ -96,8 +96,8 @@ module Operations
         def transform_payment_transactions(payment_transactions)
           payment_transactions.collect do |transaction|
             {
-              enrollment_id: transaction.enrollment_id,
-              carrier_id: transaction.carrier_id,
+              enrollment_id: transaction.enrollment_id.to_s,
+              carrier_id: transaction.carrier_id.to_s,
               enrollment_effective_date: transaction.enrollment_effective_date,
               payment_transaction_id: transaction.payment_transaction_id,
               status: transaction.status
