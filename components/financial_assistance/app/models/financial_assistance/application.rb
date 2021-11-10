@@ -157,6 +157,7 @@ module FinancialAssistance
 
     index({ hbx_id: 1 }, { unique: true })
     index({ aasm_state: 1 })
+    index({ created_at: 1 })
     index({ assistance_year: 1 })
     index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
     index({ "workflow_state_transitions.transition_at" => 1,
@@ -364,7 +365,7 @@ module FinancialAssistance
     def self.families_with_latest_determined_outstanding_verification
       FinancialAssistance::Application.collection.aggregate([
         {"$match" => {"aasm_state" => "determined" } },
-        {"$sort" => {"family_id" => 1, "application.created_at" => 1}},
+        {"$sort" => {"family_id" => 1, "created_at" => 1}},
         {
           "$group" => {
             "_id" => "$family_id",
@@ -388,7 +389,7 @@ module FinancialAssistance
             "application_id" => {"$last" => "$application_id"}
           }
         }
-      ])
+      ], {allowDiskUse: true})
     end
 
     # Creates both relationships A to B, and B to A.
