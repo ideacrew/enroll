@@ -13,17 +13,24 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
     User.all.no_timeout.each do |user|
       user_values = {
         username: user.oim_id,
-        password: 'ChangeMe!!',
+        password: 'ChangeMe1!!',
         email: user.email,
         first_name: user&.person&.first_name,
         last_name: user&.person&.last_name,
         realm_roles: user.roles
       }
-
       result = Operations::Accounts::Create.new.call(account: user_values)
+      result = Operations::Accounts::GetUser.new.call(user.account_id) if result.failure? && user.account_id
+      result = Operations::Accounts::Find.new.call(scope_name: :by_username, criterion: user.oim_id) if result.failure?
+      result = Operations::Accounts::Find.new.call(scope_name: :by_email, criterion: user.email) if result.blank?
+
+      puts "Couldn't find or create a user for ID: #{user.id} #{user.email} #{user.oim_id}" unless result
+
       account_attrs = result.value_or(result.failure)
-      if account_attrs.is_a?(Hash) && account_attrs[:user][:id]
-        user.account_id = user.oim_id = account_attrs[:user][:id]
+      account_attrs = account_attrs.first if account_attrs.is_a?(Array) # result from line 26 or 27
+      account_attrs = account_attrs[:user] if account_attrs.key?(:user) # result from line 24
+      if account_attrs.is_a?(Hash) && account_attrs.deep_symbolize_keys![:id]
+        user.account_id = account_attrs[:id]
 
         update =
           Operations::Accounts::Update.new.call(
@@ -34,9 +41,10 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
                 relay_state: relay_state_for(user)
               }
             }
-          )
+          ) unless account_attrs[:attributes]&.key?(:id) && account_attrs[:attributes]&.key?(:relay_state)
+        update = Operations::Accounts::AddToRole.new.call(id: account_attrs[:id], roles: user.roles)
         if update.success?
-          user.save
+          user.set(account_id: account_attrs[:id])
           # add_user_to_keycloak_group(user)
         else
           Rails

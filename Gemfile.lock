@@ -60,7 +60,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/keycloak-client.git
-  revision: f0b0724ea42037693e69d1d583bee5ce3dd3a3bb
+  revision: a18d27ba97a873d7c036a433d024694733e67889
   branch: support_relay_state
   specs:
     keycloak (3.2.2)
