@@ -15,7 +15,6 @@ module FinancialAssistance
         #
         # @return [applicant]
         def call(params)
-          binding.irb
           params = yield validate(params)
           total_net_income = yield calculate_net_income(params)
           result = yield persist(params[:applicant], total_net_income)

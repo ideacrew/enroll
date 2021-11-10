@@ -239,8 +239,7 @@ module FinancialAssistance
     private
 
     def update_applicant_income
-      binding.irb
-      applicant.application.calculate_total_net_income_for_applicants if applicant && applicant.application
+      _parent.application.calculate_total_net_income_for_applicants if _parent.present?
     end
 
     def set_submission_timestamp

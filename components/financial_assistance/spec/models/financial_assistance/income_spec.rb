@@ -25,16 +25,17 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
   end
 
   context "update net income" do
+    let(:test_eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: test_application) }
+    let(:test_application) { FactoryBot.create(:application, family_id: family_id, assistance_year: Date.today.year) }
+    let(:test_applicant) {FactoryBot.create(:applicant, eligibility_determination_id: test_eligibility_determination.id, application: test_application, family_member_id: family_member_id)}
+
     before do
-      applicant.incomes.build(valid_params).save!
-      applicant.update_attributes(net_annual_income: 0)
-      applicant.reload
-      income.amount = 200
-      income.save!
-      applicant.reload
+      test_application
+      test_applicant.incomes.build(valid_params).save!
+      test_applicant.save!
     end
     it "should update the applications net income after save" do
-      expect(applicant.net_annual_income.to_s).to eq('200')
+      expect(test_applicant.net_annual_income.to_s).to eq("370.41")
     end
   end
 
