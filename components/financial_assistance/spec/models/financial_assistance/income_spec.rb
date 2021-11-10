@@ -24,6 +24,20 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
     }
   end
 
+  context "update net income" do
+    before do
+      applicant.incomes.build(valid_params).save!
+      applicant.update_attributes(net_annual_income: 0)
+      applicant.reload
+      income.amount = 200
+      income.save!
+      applicant.reload
+    end
+    it "should update the applications net income after save" do
+      expect(applicant.net_annual_income.to_s).to eq('200')
+    end
+  end
+
   context 'valid income' do
     it 'should save income step_1 and submit' do
       expect(income.valid?(:step_1)).to be_truthy
