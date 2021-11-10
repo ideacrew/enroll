@@ -63,7 +63,7 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
     if user.roles.include?('broker')
       broker_agency_profile = user.person.broker_role.broker_agency_profile
       profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile)
-    elsif user.roles.include?('hbx_staff')
+    elsif user.roles&.include?('hbx_staff')
       '/exchanges/hbx_profiles'
     end
   end
