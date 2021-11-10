@@ -1023,13 +1023,13 @@ class ConsumerRole
   end
 
   def residency_pending?
-    return true unless residency_verification_enabled?
+    return false unless residency_verification_enabled?
 
     (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types&.by_name(LOCATION_RESIDENCY)&.first&.validation_status != "attested"
   end
 
   def residency_denied?
-    return true unless residency_verification_enabled?
+    return false unless residency_verification_enabled?
 
     (!is_state_resident.nil?) && (!is_state_resident)
   end
