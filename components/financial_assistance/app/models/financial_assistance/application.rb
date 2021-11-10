@@ -338,6 +338,8 @@ module FinancialAssistance
     index({"applicants.benefits.employer_phone.kind" => 1})
     index({"applicants.benefits.employer_phone.primary" => 1})
 
+    index({"applicants.evidences.eligibility_status" => 1})
+
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
     scope :closed, ->{ any_in(aasm_state: CLOSED_STATUSES) }
@@ -350,11 +352,43 @@ module FinancialAssistance
     scope :submitted_and_after, -> { where(:aasm_state.in => ['submitted', 'determination_response_error', 'determined']) }
     scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
+    scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
+
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
 
     def ensure_relationship_with_primary(applicant, relation_kind)
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
+    end
+
+    def self.families_with_latest_determined_outstanding_verification
+      FinancialAssistance::Application.collection.aggregate([
+        {"$match" => {"aasm_state" => "determined" } },
+        {"$sort" => {"family_id" => 1, "application.created_at" => 1}},
+        {
+          "$group" => {
+            "_id" => "$family_id",
+            "applicants" => {"$last" => "$applicants"},
+            "application_id" => {"$last" => "$_id"},
+            "hbx_id" => {"$last" => "$hbx_id"}
+          }
+        },
+        { "$unwind" => "$applicants" },
+        { "$match" => {"applicants.is_active" => true} },
+        { "$unwind" => "$applicants.evidences" },
+        {
+          "$match" => {
+            "applicants.evidences.eligibility_status" => {"$in" => ["outstanding", "in_review"]}
+          }
+        },
+        {
+          "$group" => {
+            "_id" => "$_id",
+            "hbx_id" => {"$last" => "$hbx_id"},
+            "application_id" => {"$last" => "$application_id"}
+          }
+        }
+      ])
     end
 
     # Creates both relationships A to B, and B to A.
