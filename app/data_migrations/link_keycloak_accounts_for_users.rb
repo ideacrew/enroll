@@ -37,7 +37,7 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
           )
         if update.success?
           user.save
-          add_user_to_keycloak_group(user)
+          # add_user_to_keycloak_group(user)
         else
           Rails
             .logger.debug "Account update failed for user email #{user.email} due to #{update.failure}"
