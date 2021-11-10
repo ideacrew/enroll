@@ -102,9 +102,8 @@ class UsersController < ApplicationController
                                                     password: params[:password],
                                                     first_name: params[:first_name],
                                                     last_name: params[:last_name],
-                                                    roles: ['hbx_staff'],
+                                                    realm_roles: ['hbx_staff'],
                                                     attributes: { relay_state: exchanges_hbx_profiles_root_path }
-                                                    #permission_id: params.require(:permission_id)
                                                   })
       @user = result.value_or(result.failure)[:user]
       @user.build_person(params.permit(:first_name, :last_name))

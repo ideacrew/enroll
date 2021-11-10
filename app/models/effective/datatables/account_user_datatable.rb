@@ -34,9 +34,18 @@ module Effective
       end
 
       def collection
+        puts 'coming into collection'
+        puts "@accounts_collection: #{@accounts_collection.inspect}"
+
         return @accounts_collection if defined?(@accounts_collection) && @accounts_collection.present?
 
-        results = Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
+        results = case attributes[:roles]
+                  when 'hbx_staff'
+                    Operations::Accounts::Find.new.call(scope_name: :by_realm_role, criterion: 'hbx_staff').success
+                  else
+                    Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
+                  end
+
         @accounts_collection = if results.present?
                                  render_table_rows(results)
                                else
@@ -73,6 +82,10 @@ module Effective
       end
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
+      scopes do
+        scope :legal_name, "Hello"
+      end
+
       def permission_type(user)
         user&.person&.hbx_staff_role&.permission&.name || 'N/A'
       end
@@ -86,14 +99,13 @@ module Effective
       end
 
       def fetch_page_of_data
-        results = if global_search_string.present?
-                    @total_records = count_total_records
-                    Operations::Accounts::Find.new.call(scope_name: :by_any, criterion: global_search_string.strip, page_number: page, page_size: per_page).success
-                  else
-                    Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
-                  end
-
-        render_table_rows(results)
+        if global_search_string.present?
+          @total_records = count_total_records
+          results = Operations::Accounts::Find.new.call(scope_name: :by_any, criterion: global_search_string.strip, page_number: page, page_size: per_page).success
+          render_table_rows(results)
+        else
+          collection
+        end
       end
 
       def array_tool_paginate(_col)
@@ -110,6 +122,16 @@ module Effective
 
       def global_search?
         true
+      end
+
+      def nested_filter_definition
+        {
+          roles: [
+            #{scope: 'all', label: 'All'},
+            {scope: 'hbx_staff', label: 'HBX Staff'}
+          ],
+          top_scope: :roles
+        }
       end
     end
   end

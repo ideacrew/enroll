@@ -35,6 +35,7 @@ DT = (function() {
       hide_lower_levels(that)
       if ($(that).hasClass('active')) {
         $(that).removeClass('active')
+        $('.effective-datatable').DataTable().draw();
         return
       }
       $(that.parentElement.children).removeClass('active')
