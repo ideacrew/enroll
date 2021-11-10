@@ -389,7 +389,7 @@ module FinancialAssistance
             "application_id" => {"$last" => "$application_id"}
           }
         }
-      ], {allowDiskUse: true})
+      ], {allow_disk_use: true})
     end
 
     # Creates both relationships A to B, and B to A.
