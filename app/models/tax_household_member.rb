@@ -111,6 +111,7 @@ class TaxHouseholdMember
   end
 
   def benchmark_product_details_for(effective_date)
+    binding.pry
     result = Operations::Products::DetermineSlcspForTaxHouseholdMember.new.call(effective_date: effective_date, tax_household_member: self)
     raise result.failure unless result.success?
 

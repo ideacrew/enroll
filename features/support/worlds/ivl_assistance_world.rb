@@ -44,13 +44,15 @@ module IvlAssistanceWorld
       applicant_id: family.family_members[0].id,
       is_subscriber: true,
       is_ia_eligible: true,
-      is_medicaid_chip_eligible: false
+      is_medicaid_chip_eligible: false,
+      csr_eligibility_kind:  "csr_100"
       )
     tax_household.tax_household_members << TaxHouseholdMember.new(
       applicant_id: family.family_members[1].id,
       is_subscriber: false,
       is_ia_eligible: true,
-      is_medicaid_chip_eligible: false
+      is_medicaid_chip_eligible: false,
+      csr_eligibility_kind:  "csr_100"
       )
     tax_household.save!
     family.active_household.save!

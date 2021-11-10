@@ -335,8 +335,8 @@ end
 
 And(/Individual clicks on add member button/) do
   find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
-  expect(page).to have_content('Lives with primary subscriber')
-
+  #expect(page).to have_content('Lives with primary subscriber')
+  expect(page).to have_content('This person lives with primary subscriber')
   fill_in "dependent[first_name]", :with => @u.first_name
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
@@ -351,6 +351,7 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
   # screenshot("add_member")
   all(:css, ".mz").last.click
+  sleep 5
 end
 
 And(/Individual again clicks on add member button/) do

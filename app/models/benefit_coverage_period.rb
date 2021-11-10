@@ -167,6 +167,7 @@ class BenefitCoveragePeriod
                                     effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     market = market.nil? || market == 'coverall' ? 'individual' : market
+    #binding.pry
     product_entries({market: market, coverage_kind: coverage_kind, csr_kind: csr_kind, elected_product_ids: elected_product_ids, subcriber: subcriber, effective_on: hbx_enrollment.effective_on})
   end
 
@@ -261,6 +262,7 @@ class BenefitCoveragePeriod
   private
 
   def extract_csr_kind(tax_household, shopping_family_member_ids)
+    #binding.pry
     tax_household.eligibile_csr_kind(shopping_family_member_ids)
   end
 

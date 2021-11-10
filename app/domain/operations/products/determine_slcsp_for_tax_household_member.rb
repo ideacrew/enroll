@@ -79,6 +79,7 @@ module Operations
       end
 
       def fetch_silver_products(address, effective_date)
+        binding.pry
         silver_products = Operations::Products::FetchSilverProducts.new.call({address: address, effective_date: effective_date})
         if silver_products.success?
           silver_products

@@ -404,6 +404,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       else
+        #binding.pry
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
 
