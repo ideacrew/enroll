@@ -6,6 +6,7 @@
     "verify-token-audience": true,
     "credentials": {
         "secret": "47aa69b5-78a1-4f66-9511-7b1f35a11902"
+
     },
     "use-resource-role-mappings": true,
     "confidential-port": 0,

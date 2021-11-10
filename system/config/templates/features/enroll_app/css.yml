@@ -4,20 +4,17 @@ registry:
       - :css_components
     features:
       - key: :custom_email_templates
-        is_enabled: true
-        settings:
-          - key: :email_template
-            item: "email_template"
+        is_enabled: false
       - key: :application_font
         is_enabled: true
         settings:
           - key: :font_family
-            item: 'Barlow'
+            item: 'Open Sans'
       - key: :selectric_hover
         is_enabled: true
         settings:
           - key: :color
-            item: '#007bc4'
+            item: '#487ba2'
       - key: :qle_carousel
         is_enabled: true
         settings:
@@ -142,4 +139,4 @@ registry:
         is_enabled: true
         settings:
           - key: :color
-            item: "#487ba2"
+            item: "#333"
