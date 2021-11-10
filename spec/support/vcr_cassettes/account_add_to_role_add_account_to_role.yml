@@ -1,0 +1,893 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/realms/coverme/.well-known/openid-configuration
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate, no-transform, no-store
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5604'
+    body:
+      encoding: UTF-8
+      string: '{"issuer":"http://keycloak:8080/auth/realms/coverme","authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth","token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","end_session_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/logout","jwks_uri":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/certs","check_session_iframe":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/login-status-iframe.html","grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials","urn:ietf:params:oauth:grant-type:device_code","urn:openid:params:grant-type:ciba"],"response_types_supported":["code","none","id_token","token","id_token
+        token","code id_token","code token","code id_token token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"id_token_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"id_token_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"userinfo_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"request_object_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"response_modes_supported":["query","fragment","form_post","query.jwt","fragment.jwt","form_post.jwt","jwt"],"registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","token_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"token_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"introspection_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"introspection_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"authorization_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"claims_supported":["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"],"claim_types_supported":["normal"],"claims_parameter_supported":true,"scopes_supported":["openid","web-origins","email","microprofile-jwt","roles","address","phone","offline_access","profile"],"request_parameter_supported":true,"request_uri_parameter_supported":true,"require_request_uri_registration":true,"code_challenge_methods_supported":["plain","S256"],"tls_client_certificate_bound_access_tokens":true,"revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","revocation_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"revocation_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","backchannel_token_delivery_modes_supported":["poll","ping"],"backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth","backchannel_authentication_request_signing_alg_values_supported":["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"],"require_pushed_authorization_requests":false,"pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","mtls_endpoint_aliases":{"token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth"}}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token
+    body:
+      encoding: UTF-8
+      string: client_id=admin-client&client_secret=4678b693-352b-45c9-b4d5-b6cf8c250357&grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '103'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Set-Cookie:
+      - KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0;
+        Path=/auth/realms/coverme/; HttpOnly
+      X-Xss-Protection:
+      - 1; mode=block
+      Pragma:
+      - no-cache
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2000'
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiZGUwYzRiNTAtNDQ2Ni00NTBjLTg0NTctOGJjZTJjZTIyNmYwIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.cAmTrlcyLtt30mD-gLvx7BPwj7yFbmNvdP0n8Dr-DSW4_gYNuH7mvjQDqaGIWe9nYDNYT-6B2kSjKuQec1uPTeD2N8K8M30IuURas8wtEWIhaLuP0RrXol_f9tPaziI8_k1Pk7zbmGg_B70CW1VnFQ4WnTxMQFwbkQhS6K8YOvsfykMy4L4Pze5luJNSjq5ZX6-3CFOMjhHZw8J7DZoaidhJCemaEDQfyoMBEe3tbc178Qae3cOw1B2b_pXJxM69GC3KzqLZCmHlK9tt5fMGT4lhYmYOOi1r75wWMnYVv4QglhhTdvA7SDtI-4z5-MdZBXIFIp76nTTjPJmhDNxjzA","expires_in":300,"refresh_expires_in":0,"token_type":"Bearer","not-before-policy":0,"scope":"email
+        profile"}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/admin/realms/coverme/roles/hbx_staff/users?first=0&max=100
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiZGUwYzRiNTAtNDQ2Ni00NTBjLTg0NTctOGJjZTJjZTIyNmYwIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.cAmTrlcyLtt30mD-gLvx7BPwj7yFbmNvdP0n8Dr-DSW4_gYNuH7mvjQDqaGIWe9nYDNYT-6B2kSjKuQec1uPTeD2N8K8M30IuURas8wtEWIhaLuP0RrXol_f9tPaziI8_k1Pk7zbmGg_B70CW1VnFQ4WnTxMQFwbkQhS6K8YOvsfykMy4L4Pze5luJNSjq5ZX6-3CFOMjhHZw8J7DZoaidhJCemaEDQfyoMBEe3tbc178Qae3cOw1B2b_pXJxM69GC3KzqLZCmHlK9tt5fMGT4lhYmYOOi1r75wWMnYVv4QglhhTdvA7SDtI-4z5-MdZBXIFIp76nTTjPJmhDNxjzA
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2'
+    body:
+      encoding: UTF-8
+      string: "[]"
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/realms/coverme/.well-known/openid-configuration
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate, no-transform, no-store
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5604'
+    body:
+      encoding: UTF-8
+      string: '{"issuer":"http://keycloak:8080/auth/realms/coverme","authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth","token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","end_session_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/logout","jwks_uri":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/certs","check_session_iframe":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/login-status-iframe.html","grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials","urn:ietf:params:oauth:grant-type:device_code","urn:openid:params:grant-type:ciba"],"response_types_supported":["code","none","id_token","token","id_token
+        token","code id_token","code token","code id_token token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"id_token_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"id_token_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"userinfo_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"request_object_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"response_modes_supported":["query","fragment","form_post","query.jwt","fragment.jwt","form_post.jwt","jwt"],"registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","token_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"token_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"introspection_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"introspection_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"authorization_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"claims_supported":["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"],"claim_types_supported":["normal"],"claims_parameter_supported":true,"scopes_supported":["openid","web-origins","email","microprofile-jwt","roles","address","phone","offline_access","profile"],"request_parameter_supported":true,"request_uri_parameter_supported":true,"require_request_uri_registration":true,"code_challenge_methods_supported":["plain","S256"],"tls_client_certificate_bound_access_tokens":true,"revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","revocation_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"revocation_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","backchannel_token_delivery_modes_supported":["poll","ping"],"backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth","backchannel_authentication_request_signing_alg_values_supported":["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"],"require_pushed_authorization_requests":false,"pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","mtls_endpoint_aliases":{"token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth"}}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token
+    body:
+      encoding: UTF-8
+      string: client_id=admin-client&client_secret=4678b693-352b-45c9-b4d5-b6cf8c250357&grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '103'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Set-Cookie:
+      - KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0;
+        Path=/auth/realms/coverme/; HttpOnly
+      X-Xss-Protection:
+      - 1; mode=block
+      Pragma:
+      - no-cache
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2000'
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiODY3N2Y3N2QtYjhhYy00ZThlLThiYmYtODI0MTExNzUyYzU2IiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.DCjuQLGtsMRLUqqRyk5j9AkF8CQcZqEuSpml3uDhe38D2m81XhJLUsHSoYuXLyKR3KcmwFYr9NGrBeZBTjg40bG7qVNZZEMtKE_Ktm1ZPsBjwqWGMXb_IwX-T559bWOL6U2A43CuKndVexDh-JKxD-LVFE2oWj_JDdx_j4xhlJ2B27-zY8zV0lhFFLpcdqF7MDMW7CiqAZMViFwnke0tRQJd5yMudE5ZmeREoKKTPcSB5t2GeNgVet_qA2XsIP6P43wyjbDdwEJ5kdOEi08oWebyInWCevbgXaCRK7FTLYzFGAe4VIwcp5I3rwk5jIonWJEw9j_OtLScUzoXy7aucw","expires_in":300,"refresh_expires_in":0,"token_type":"Bearer","not-before-policy":0,"scope":"email
+        profile"}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/admin/realms/coverme/roles
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiODY3N2Y3N2QtYjhhYy00ZThlLThiYmYtODI0MTExNzUyYzU2IiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.DCjuQLGtsMRLUqqRyk5j9AkF8CQcZqEuSpml3uDhe38D2m81XhJLUsHSoYuXLyKR3KcmwFYr9NGrBeZBTjg40bG7qVNZZEMtKE_Ktm1ZPsBjwqWGMXb_IwX-T559bWOL6U2A43CuKndVexDh-JKxD-LVFE2oWj_JDdx_j4xhlJ2B27-zY8zV0lhFFLpcdqF7MDMW7CiqAZMViFwnke0tRQJd5yMudE5ZmeREoKKTPcSB5t2GeNgVet_qA2XsIP6P43wyjbDdwEJ5kdOEi08oWebyInWCevbgXaCRK7FTLYzFGAe4VIwcp5I3rwk5jIonWJEw9j_OtLScUzoXy7aucw
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '771'
+    body:
+      encoding: UTF-8
+      string: '[{"id":"bdb7a984-72f3-48d8-91a3-a847e03208ac","name":"offline_access","description":"${role_offline-access}","composite":false,"clientRole":false,"containerId":"coverme"},{"id":"6651d7ca-8e89-473c-a141-3ac02a227299","name":"hbx_staff","composite":false,"clientRole":false,"containerId":"coverme"},{"id":"5946417f-2b63-4961-96a1-0e4c25e4dd50","name":"default-roles-coverme","description":"${role_default-roles}","composite":true,"clientRole":false,"containerId":"coverme"},{"id":"cf505b4e-95cf-49a2-bb03-7570b8035eda","name":"uma_authorization","description":"${role_uma_authorization}","composite":false,"clientRole":false,"containerId":"coverme"},{"id":"e3b4a6ea-0c73-4adf-9329-b6abd0bde555","name":"broker","composite":false,"clientRole":false,"containerId":"coverme"}]'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/realms/coverme/.well-known/openid-configuration
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate, no-transform, no-store
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5604'
+    body:
+      encoding: UTF-8
+      string: '{"issuer":"http://keycloak:8080/auth/realms/coverme","authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth","token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","end_session_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/logout","jwks_uri":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/certs","check_session_iframe":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/login-status-iframe.html","grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials","urn:ietf:params:oauth:grant-type:device_code","urn:openid:params:grant-type:ciba"],"response_types_supported":["code","none","id_token","token","id_token
+        token","code id_token","code token","code id_token token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"id_token_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"id_token_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"userinfo_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"request_object_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"response_modes_supported":["query","fragment","form_post","query.jwt","fragment.jwt","form_post.jwt","jwt"],"registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","token_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"token_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"introspection_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"introspection_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"authorization_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"claims_supported":["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"],"claim_types_supported":["normal"],"claims_parameter_supported":true,"scopes_supported":["openid","web-origins","email","microprofile-jwt","roles","address","phone","offline_access","profile"],"request_parameter_supported":true,"request_uri_parameter_supported":true,"require_request_uri_registration":true,"code_challenge_methods_supported":["plain","S256"],"tls_client_certificate_bound_access_tokens":true,"revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","revocation_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"revocation_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","backchannel_token_delivery_modes_supported":["poll","ping"],"backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth","backchannel_authentication_request_signing_alg_values_supported":["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"],"require_pushed_authorization_requests":false,"pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","mtls_endpoint_aliases":{"token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth"}}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token
+    body:
+      encoding: UTF-8
+      string: client_id=admin-client&client_secret=4678b693-352b-45c9-b4d5-b6cf8c250357&grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '103'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Set-Cookie:
+      - KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0;
+        Path=/auth/realms/coverme/; HttpOnly
+      X-Xss-Protection:
+      - 1; mode=block
+      Pragma:
+      - no-cache
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2000'
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiNzM5NWFhOWMtYjhkOC00YWE3LWFjYjQtMTdhYjkxNzU1NTEwIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.ftslgY0_bzOvjCazNrHa2VpFhR4SQwfGsWuUoBeiBHvb6YQXSVY4h-QFFPxVvIoT27FW_3azHTevGc-z_trvkR3XiDovOfjqjb3kTAc223MdThZEdvIKZM2vRguGW2Noc-go7e1FwkrhKwcuRvyCecfAnh3ee8eB0xk7OKT-CrOYo9Hp_ArsTIynYuqXL7gpdGtcmlJSOyxUPpgT7CLp75fw-1JBfdxhTUos7sv4ICNRMVln2YCfYeCSSeuBSq0vfMXNrBy_xZITEvuDsuKh4dYOOOPh1func_qHqYCxz9vJ_Sg9JjhCeiBHOUEVGtb-B8Ta4U8PZhwM9cAt4b5wlg","expires_in":300,"refresh_expires_in":0,"token_type":"Bearer","not-before-policy":0,"scope":"email
+        profile"}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/admin/realms/coverme/users/ac0a4945-dfdf-423e-9eba-36b72dd92cb3/role-mappings/realm
+    body:
+      encoding: UTF-8
+      string: '[{"id":"6651d7ca-8e89-473c-a141-3ac02a227299","name":"hbx_staff","composite":false,"clientRole":false,"containerId":"coverme"}]'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiNzM5NWFhOWMtYjhkOC00YWE3LWFjYjQtMTdhYjkxNzU1NTEwIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.ftslgY0_bzOvjCazNrHa2VpFhR4SQwfGsWuUoBeiBHvb6YQXSVY4h-QFFPxVvIoT27FW_3azHTevGc-z_trvkR3XiDovOfjqjb3kTAc223MdThZEdvIKZM2vRguGW2Noc-go7e1FwkrhKwcuRvyCecfAnh3ee8eB0xk7OKT-CrOYo9Hp_ArsTIynYuqXL7gpdGtcmlJSOyxUPpgT7CLp75fw-1JBfdxhTUos7sv4ICNRMVln2YCfYeCSSeuBSq0vfMXNrBy_xZITEvuDsuKh4dYOOOPh1func_qHqYCxz9vJ_Sg9JjhCeiBHOUEVGtb-B8Ta4U8PZhwM9cAt4b5wlg
+      Content-Length:
+      - '127'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      X-Xss-Protection:
+      - 1; mode=block
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/realms/coverme/.well-known/openid-configuration
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate, no-transform, no-store
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5604'
+    body:
+      encoding: UTF-8
+      string: '{"issuer":"http://keycloak:8080/auth/realms/coverme","authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth","token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","end_session_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/logout","jwks_uri":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/certs","check_session_iframe":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/login-status-iframe.html","grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials","urn:ietf:params:oauth:grant-type:device_code","urn:openid:params:grant-type:ciba"],"response_types_supported":["code","none","id_token","token","id_token
+        token","code id_token","code token","code id_token token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"id_token_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"id_token_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"userinfo_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"request_object_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"response_modes_supported":["query","fragment","form_post","query.jwt","fragment.jwt","form_post.jwt","jwt"],"registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","token_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"token_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"introspection_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"introspection_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"authorization_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"claims_supported":["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"],"claim_types_supported":["normal"],"claims_parameter_supported":true,"scopes_supported":["openid","web-origins","email","microprofile-jwt","roles","address","phone","offline_access","profile"],"request_parameter_supported":true,"request_uri_parameter_supported":true,"require_request_uri_registration":true,"code_challenge_methods_supported":["plain","S256"],"tls_client_certificate_bound_access_tokens":true,"revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","revocation_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"revocation_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","backchannel_token_delivery_modes_supported":["poll","ping"],"backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth","backchannel_authentication_request_signing_alg_values_supported":["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"],"require_pushed_authorization_requests":false,"pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","mtls_endpoint_aliases":{"token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth"}}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token
+    body:
+      encoding: UTF-8
+      string: client_id=admin-client&client_secret=4678b693-352b-45c9-b4d5-b6cf8c250357&grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '103'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Set-Cookie:
+      - KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0;
+        Path=/auth/realms/coverme/; HttpOnly
+      X-Xss-Protection:
+      - 1; mode=block
+      Pragma:
+      - no-cache
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2000'
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiMzIxYzRjZTUtNGRjNy00ODcxLWJhNWYtYWJiMzkwYTdlNjhjIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.EOvYkppAgYJcYa-cwqr0re0uwkyoz_tl8fkJnyzHXJ-HX6lO_Frnd6OmjstdxvSkvUHkAfYZ2Ta2O_-C7VBpQTpZbrwEDZGpZyGQRKMJ8EdvIEwmK0XfRVESs9UOsVHEtHYGYZZebzD2rvAx-N2jXyJ4ikHnS9hTPnXYJ5qCQXYRN9HPIXm7UwjKOrQUQilORUbPbeD8qQODddqSSxa33mJNZ80zdR_tbjcBifP9rTbBfKn5dfeTrSFW_qFdDO7-Ck__vlsf_odUp7evL7ERP7wWs77etLe5MHNuXBXJqZkd4xgUPKeaGavn029p0veZ5xi2d_WAiFkA9JH5vhDxCg","expires_in":300,"refresh_expires_in":0,"token_type":"Bearer","not-before-policy":0,"scope":"email
+        profile"}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/admin/realms/coverme/roles/hbx_staff/users?first=0&max=100
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiMzIxYzRjZTUtNGRjNy00ODcxLWJhNWYtYWJiMzkwYTdlNjhjIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.EOvYkppAgYJcYa-cwqr0re0uwkyoz_tl8fkJnyzHXJ-HX6lO_Frnd6OmjstdxvSkvUHkAfYZ2Ta2O_-C7VBpQTpZbrwEDZGpZyGQRKMJ8EdvIEwmK0XfRVESs9UOsVHEtHYGYZZebzD2rvAx-N2jXyJ4ikHnS9hTPnXYJ5qCQXYRN9HPIXm7UwjKOrQUQilORUbPbeD8qQODddqSSxa33mJNZ80zdR_tbjcBifP9rTbBfKn5dfeTrSFW_qFdDO7-Ck__vlsf_odUp7evL7ERP7wWs77etLe5MHNuXBXJqZkd4xgUPKeaGavn029p0veZ5xi2d_WAiFkA9JH5vhDxCg
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '290'
+    body:
+      encoding: UTF-8
+      string: '[{"id":"ac0a4945-dfdf-423e-9eba-36b72dd92cb3","createdTimestamp":1636576700230,"username":"ironman","enabled":true,"totp":false,"emailVerified":false,"firstName":"Tony","lastName":"Stark","email":"tony.stark@avengers.org","disableableCredentialTypes":[],"requiredActions":[],"notBefore":0}]'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/realms/coverme/.well-known/openid-configuration
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate, no-transform, no-store
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5604'
+    body:
+      encoding: UTF-8
+      string: '{"issuer":"http://keycloak:8080/auth/realms/coverme","authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth","token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","end_session_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/logout","jwks_uri":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/certs","check_session_iframe":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/login-status-iframe.html","grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials","urn:ietf:params:oauth:grant-type:device_code","urn:openid:params:grant-type:ciba"],"response_types_supported":["code","none","id_token","token","id_token
+        token","code id_token","code token","code id_token token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"id_token_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"id_token_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"userinfo_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"request_object_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"response_modes_supported":["query","fragment","form_post","query.jwt","fragment.jwt","form_post.jwt","jwt"],"registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","token_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"token_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"introspection_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"introspection_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"authorization_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"claims_supported":["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"],"claim_types_supported":["normal"],"claims_parameter_supported":true,"scopes_supported":["openid","web-origins","email","microprofile-jwt","roles","address","phone","offline_access","profile"],"request_parameter_supported":true,"request_uri_parameter_supported":true,"require_request_uri_registration":true,"code_challenge_methods_supported":["plain","S256"],"tls_client_certificate_bound_access_tokens":true,"revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","revocation_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"revocation_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","backchannel_token_delivery_modes_supported":["poll","ping"],"backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth","backchannel_authentication_request_signing_alg_values_supported":["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"],"require_pushed_authorization_requests":false,"pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","mtls_endpoint_aliases":{"token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth"}}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token
+    body:
+      encoding: UTF-8
+      string: client_id=admin-client&client_secret=4678b693-352b-45c9-b4d5-b6cf8c250357&grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '103'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Set-Cookie:
+      - KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0;
+        Path=/auth/realms/coverme/; HttpOnly
+      X-Xss-Protection:
+      - 1; mode=block
+      Pragma:
+      - no-cache
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2000'
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiMTEwZDJhYTQtOWVhNS00ODg5LTk3MTItZjM2M2U4ODhiNjNmIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.VRHDYVfg_3TaKAtF-gwi2or9Tb5Yg1RA6MtRTWxRsn3TtuS-9G2CPQSOuVzW9tYgEDawALTHxlZaz5fSmMfWS3A50Q0nO7waEWSa4FW5k9IeG_owq_A__9GsM_ZmuqGSkwAmBgejUtfW3G4aLo8tpt_-emxXQlYZsZMhtE29YtgHH6cOjds_eZmpuMIKlk_g7uyQ4Cj59e-qbuK5ZZ73t-vxSjmCP8eJG26W499ZO7Q8l8Q6b7Cuuspj42sBb046yW-G6_pbpShnXWtSTfxUjsvWBD1KkJ2HKvlpA305QKYY0FKbApKA7zTe1aJElcOF2Kss0XGfW4ZwbmoyWpLw1Q","expires_in":300,"refresh_expires_in":0,"token_type":"Bearer","not-before-policy":0,"scope":"email
+        profile"}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/realms/coverme/.well-known/openid-configuration
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, must-revalidate, no-transform, no-store
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5604'
+    body:
+      encoding: UTF-8
+      string: '{"issuer":"http://keycloak:8080/auth/realms/coverme","authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth","token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","end_session_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/logout","jwks_uri":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/certs","check_session_iframe":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/login-status-iframe.html","grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials","urn:ietf:params:oauth:grant-type:device_code","urn:openid:params:grant-type:ciba"],"response_types_supported":["code","none","id_token","token","id_token
+        token","code id_token","code token","code id_token token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"id_token_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"id_token_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"userinfo_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512","none"],"request_object_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"request_object_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"response_modes_supported":["query","fragment","form_post","query.jwt","fragment.jwt","form_post.jwt","jwt"],"registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","token_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"token_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"introspection_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"introspection_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"authorization_encryption_alg_values_supported":["RSA-OAEP","RSA-OAEP-256","RSA1_5"],"authorization_encryption_enc_values_supported":["A256GCM","A192GCM","A128GCM","A128CBC-HS256","A192CBC-HS384","A256CBC-HS512"],"claims_supported":["aud","sub","iss","auth_time","name","given_name","family_name","preferred_username","email","acr"],"claim_types_supported":["normal"],"claims_parameter_supported":true,"scopes_supported":["openid","web-origins","email","microprofile-jwt","roles","address","phone","offline_access","profile"],"request_parameter_supported":true,"request_uri_parameter_supported":true,"require_request_uri_registration":true,"code_challenge_methods_supported":["plain","S256"],"tls_client_certificate_bound_access_tokens":true,"revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","revocation_endpoint_auth_methods_supported":["private_key_jwt","client_secret_basic","client_secret_post","tls_client_auth","client_secret_jwt"],"revocation_endpoint_auth_signing_alg_values_supported":["PS384","ES384","RS384","HS256","HS512","ES256","RS256","HS384","ES512","PS256","PS512","RS512"],"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","backchannel_token_delivery_modes_supported":["poll","ping"],"backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth","backchannel_authentication_request_signing_alg_values_supported":["PS384","ES384","RS384","ES256","RS256","ES512","PS256","PS512","RS512"],"require_pushed_authorization_requests":false,"pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","mtls_endpoint_aliases":{"token_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token","revocation_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/revoke","introspection_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token/introspect","device_authorization_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/auth/device","registration_endpoint":"http://keycloak:8080/auth/realms/coverme/clients-registrations/openid-connect","userinfo_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/userinfo","pushed_authorization_request_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/par/request","backchannel_authentication_endpoint":"http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/ext/ciba/auth"}}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: post
+    uri: http://keycloak:8080/auth/realms/coverme/protocol/openid-connect/token
+    body:
+      encoding: UTF-8
+      string: client_id=admin-client&client_secret=4678b693-352b-45c9-b4d5-b6cf8c250357&grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '103'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-store
+      Set-Cookie:
+      - KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0;
+        Path=/auth/realms/coverme/; HttpOnly
+      X-Xss-Protection:
+      - 1; mode=block
+      Pragma:
+      - no-cache
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2000'
+    body:
+      encoding: UTF-8
+      string: '{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiYjI3ODM1YjMtMWUxNy00N2Y1LTgwNDctOGVkOTZlNjNkOTYzIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.RCPCgY3q_GLi06c1ADiHQXgHvaH1kan_bPiF3-NkkuWLFJ2Bj9agu0_w1RVeu1coaorKRO-IfCI1wC-qV2shUUZzq1BAoPTa49Tyzln8AChkrDSEXRVD7gK5tNikh4tRya5w_IGK5lK5PIxoq2nK-TMEwfE-xSKRvqV6kh1wxBpDTQwrT31kWcOMM3JatWRBejr2wUSm0nx03GNQTnnYM3d78whBA6OIdwcEM3gPS6Qk88oUtIPWqSi_tAhYI9KS2yvKBf8_3p3THHUhDG_kVXtGXLO6QZW1boLNZXAr5K_-Zo14hQLaYNVAOMG2SOOR5lerhXgr6bo773YbTaJSUQ","expires_in":300,"refresh_expires_in":0,"token_type":"Bearer","not-before-policy":0,"scope":"email
+        profile"}'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: get
+    uri: http://keycloak:8080/auth/admin/realms/coverme/users?username=ironman
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiYjI3ODM1YjMtMWUxNy00N2Y1LTgwNDctOGVkOTZlNjNkOTYzIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.RCPCgY3q_GLi06c1ADiHQXgHvaH1kan_bPiF3-NkkuWLFJ2Bj9agu0_w1RVeu1coaorKRO-IfCI1wC-qV2shUUZzq1BAoPTa49Tyzln8AChkrDSEXRVD7gK5tNikh4tRya5w_IGK5lK5PIxoq2nK-TMEwfE-xSKRvqV6kh1wxBpDTQwrT31kWcOMM3JatWRBejr2wUSm0nx03GNQTnnYM3d78whBA6OIdwcEM3gPS6Qk88oUtIPWqSi_tAhYI9KS2yvKBf8_3p3THHUhDG_kVXtGXLO6QZW1boLNZXAr5K_-Zo14hQLaYNVAOMG2SOOR5lerhXgr6bo773YbTaJSUQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '391'
+    body:
+      encoding: UTF-8
+      string: '[{"id":"ac0a4945-dfdf-423e-9eba-36b72dd92cb3","createdTimestamp":1636576700230,"username":"ironman","enabled":true,"totp":false,"emailVerified":false,"firstName":"Tony","lastName":"Stark","email":"tony.stark@avengers.org","disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}]'
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+- request:
+    method: delete
+    uri: http://keycloak:8080/auth/admin/realms/coverme/users/ac0a4945-dfdf-423e-9eba-36b72dd92cb3
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin19.3.0 x86_64) ruby/2.5.1p57
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJobEVwME5KejBUUF9Ya2ZQc01fMVVtQ3pCWlhzVjZpRXJuRkZKRnhGdm1rIn0.eyJleHAiOjE2MzY1NzcwMDAsImlhdCI6MTYzNjU3NjcwMCwianRpIjoiMTEwZDJhYTQtOWVhNS00ODg5LTk3MTItZjM2M2U4ODhiNjNmIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvYXV0aC9yZWFsbXMvY292ZXJtZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiI3YWRhYWEyMC0zMGMzLTQzMzQtODA5Yi1lMDJmYzFkNDRjOTgiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGllbnQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1jb3Zlcm1lIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFkbWluLWNsaWVudCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsInJlYWxtLWFkbWluIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTcyLjE4LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJhZG1pbi1jbGllbnQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYWRtaW4tY2xpZW50IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xOC4wLjEifQ.VRHDYVfg_3TaKAtF-gwi2or9Tb5Yg1RA6MtRTWxRsn3TtuS-9G2CPQSOuVzW9tYgEDawALTHxlZaz5fSmMfWS3A50Q0nO7waEWSa4FW5k9IeG_owq_A__9GsM_ZmuqGSkwAmBgejUtfW3G4aLo8tpt_-emxXQlYZsZMhtE29YtgHH6cOjds_eZmpuMIKlk_g7uyQ4Cj59e-qbuK5ZZ73t-vxSjmCP8eJG26W499ZO7Q8l8Q6b7Cuuspj42sBb046yW-G6_pbpShnXWtSTfxUjsvWBD1KkJ2HKvlpA305QKYY0FKbApKA7zTe1aJElcOF2Kss0XGfW4ZwbmoyWpLw1Q
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - keycloak:8080
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - no-referrer
+      Content-Security-Policy:
+      - frame-src 'self'; frame-ancestors 'self'; object-src 'none';
+      Date:
+      - Wed, 10 Nov 2021 20:38:20 GMT
+      X-Robots-Tag:
+      - none
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version:
+  recorded_at: Wed, 10 Nov 2021 20:38:20 GMT
+recorded_with: VCR 3.0.3

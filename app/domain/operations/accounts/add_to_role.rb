@@ -9,11 +9,10 @@ module Operations
     class AddToRole
       include Dry::Monads[:result, :do, :try]
 
-      # @param [Hash] acct {AcaEntities::Accounts::Account}-related parameters
-      # @option acct [Symbol] :scope_name required
-      # @option opts [Hash] :criterion optional
-      # @option opts [Integer] :page_size optional
-      # @option opts [Integer] :page_number optional
+      # @param [Hash] opts the parameters to add role for {AcaEntities::Accounts::Account}
+      # @option acct [String] :id required
+      # @option opts [Array<String>] :roles required
+
       # @return [Dry::Monad] result
       def call(params)
         roles = yield map_roles(params[:roles])
