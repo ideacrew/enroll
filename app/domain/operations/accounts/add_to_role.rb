@@ -54,6 +54,7 @@ module Operations
       end
 
       def add_roles(roles, id)
+        return Failure("No roles found to add") if roles.empty?
         Try() { Keycloak::Admin.add_user_to_roles(id, roles) }
           .to_result
           .bind { |response| Success(response) }
