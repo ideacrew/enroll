@@ -33,26 +33,18 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
       if account_attrs.is_a?(Hash) && account_attrs.deep_symbolize_keys![:id]
         user.account_id = account_attrs[:id]
 
-        unless account_attrs[:attributes]&.key?(:id) && account_attrs[:attributes]&.key?(:relay_state)
-          update =
-            Operations::Accounts::Update.new.call(
-              account: {
-                id: user.account_id,
-                attributes: {
-                  id: user.account_id,
-                  relay_state: relay_state_for(user)
-                }
-              }
-            )
-        end
-        update = Operations::Accounts::AddToRole.new.call(id: account_attrs[:id], roles: user.roles)
-        if update.success?
-          user.set(account_id: account_attrs[:id])
-          # add_user_to_keycloak_group(user)
-        else
-          Rails
-            .logger.debug "Account update failed for user email #{user.email} due to #{update.failure}"
-        end
+        Operations::Accounts::Update.new.call(
+          account: {
+            id: user.account_id,
+            attributes: {
+              id: user.account_id,
+              relay_state: relay_state_for(user)
+            }
+          }
+        )
+        Operations::Accounts::AddToRole.new.call(id: account_attrs[:id], roles: user.roles) if user.roles
+        user.set(account_id: account_attrs[:id])
+        # add_user_to_keycloak_group(user)
       else
         Rails
           .logger.debug "Failed to create or find account for user oim_id: #{user.oim_id} email: #{user.email} due to #{result.failure}"
