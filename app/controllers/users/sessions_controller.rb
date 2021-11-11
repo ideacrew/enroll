@@ -6,8 +6,16 @@ class Users::SessionsController < Devise::SessionsController
   before_action :set_ie_flash_by_announcement, only: [:new]
 
   def new
-    redirect_url = SamlInformation.iam_login_url
-    (redirect_url.blank? || !Rails.env.production?) ? super : redirect_to(redirect_url)
+    session[:too_many_redirects] ||= 0
+    session[:too_many_redirects] += 1
+
+    if session[:too_many_redirects] > 3
+      redirect_url = SamlInformation.iam_login_url
+      (redirect_url.blank? || !Rails.env.production?) ? super : redirect_to(redirect_url)
+    else
+      session[:too_many_redirects] = 0
+      redirect_to root_url
+    end
   end
 
   def create
