@@ -32,8 +32,16 @@
             =text_field_tag :first_name, nil, class: 'col-3 form-control'
           .col-md-4
             =text_field_tag :last_name, nil, class: 'col-3 form-control'
-        .form-group
-          =submit_tag "Create Account", class: 'btn btn-primary'
+        .row
+          .col-md-1
+            a.btn.btn-info#cancelNewAccount Cancel
+          .col
+            =submit_tag "Create Account", class: 'btn btn-primary'
+    javascript:
+      document.querySelector('#cancelNewAccount').addEventListener('click', function(e) {
+        document.querySelector("#new_user").classList.remove('hidden');
+        document.querySelector("create_user").classList.add('hidden');
+      })
 
   = raw render_datatable(@datatable)
 

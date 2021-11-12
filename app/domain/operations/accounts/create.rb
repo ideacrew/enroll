@@ -57,25 +57,32 @@ module Operations
       end
 
       def create(values)
-        Try() do
-          after_insert =
-            lambda do |user, new_user|
-              return { user: user, new_user: new_user }
-            end
+        after_insert =
+          lambda do |user, new_user|
+            return { user: user, new_user: new_user }
+          end
 
-          args = values.to_h
-          Keycloak::Internal.create_simple_user(
-            args[:username] || args[:email],
-            args[:password],
-            args[:email],
-            args[:first_name],
-            args[:last_name],
-            args[:realm_roles] || [], # realm roles
-            args[:client_roles] || [], # client roles
-            args[:attributes],
-            after_insert
-          )
-        end.to_result
+        args = values.to_h
+        result = Keycloak::Internal.create_simple_user(
+          args[:username] || args[:email],
+          args[:password],
+          args[:email],
+          args[:first_name],
+          args[:last_name],
+          args[:realm_roles] || [], # realm roles
+          args[:client_roles] || [], # client roles
+          args[:attributes],
+          after_insert
+        )
+        Success(result)
+      rescue RestClient::BadRequest => e
+        if (e.http_body)
+          Failure(JSON.parse(e.http_body).deep_symbolize_keys)
+        else
+          Failure(e)
+        end
+      rescue StandardError => e
+        Failure(e)
       end
 
       def map_attributes(keycloak_attributes)

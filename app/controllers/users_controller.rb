@@ -118,7 +118,15 @@ class UsersController < ApplicationController
         flash[:notice] = "Created account for #{params.require(:first_name)} #{params.require(:last_name)}"
         render
       else
-        flash[:error] = "Error creating account."
+        flash[:error] = if result.failure && result.failure[:error]
+                          if result.failure.dig(:error, :user)
+                            "Email #{params[:email]} already registered."
+                          else
+                            result.failure.dig(:error, :error_description) || result.failure[:error]
+                          end
+                        else
+                          "Error creating account. #{result.failure}"
+                        end
         render 'create_retry'
       end
     else

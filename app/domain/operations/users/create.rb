@@ -43,7 +43,7 @@ module Operations
             }
           )
 
-          return Failure(account: account, user: user) unless account.success?
+          return Failure(error: account.failure, user: user) unless account.success?
           account_attrs = account.success
 
           user.account_id = account_attrs[:user][:id]
@@ -59,7 +59,7 @@ module Operations
           else
             Operations::Accounts::Delete.new.call(id: account_attrs[:user][:id])
             Failure(
-              message: "Error creating User: #{user}\n for account: #{account_attrs}",
+              error: "Error creating User: #{user}\n for account: #{account_attrs}",
               user: user
             )
           end
