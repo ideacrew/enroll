@@ -21,7 +21,8 @@ module FinancialAssistance
           def call(params)
             payload = yield load_data(params)
             family = yield build_family(payload["family"])
-            application = yield build_application(payload, family)
+            application_id = yield build_application(payload, family)
+            application = yield find_application(application_id)
             _applicants = yield fill_applicants_form(payload, application)
             Success(application)
           end
@@ -103,8 +104,9 @@ module FinancialAssistance
 
           def build_application(payload, family)
             app_params = payload["family"]['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
+            app_params["assistance_year"] = FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
             sanitize_iap_hash = sanitize_applicant_params(app_params, family.primary_person)
-            return sanitize_iap_hash.failure unless sanitize_iap_hash.success?
+            return sanitize_iap_hash unless sanitize_iap_hash.success?
             ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash.value!)
           rescue StandardError => e
             Failure("build_application: #{e}")
@@ -184,6 +186,7 @@ module FinancialAssistance
           end
 
           def same_address_with_primary(family_member, primary)
+            return Failure("No matching family member") unless family_member.present?
             member = family_member.person
 
             compare_keys = ["address_1", "address_2", "city", "state", "zip"]
@@ -199,7 +202,6 @@ module FinancialAssistance
 
           def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
             sanitize_params = []
-
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
@@ -367,10 +369,15 @@ module FinancialAssistance
             no_ssn_value ? '1' : '0'
           end
 
-          def fill_applicants_form(payload, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-            applications = payload["family"]['magi_medicaid_applications'].first
-            application = FinancialAssistance::Application.where(id: app_id).first
+          def find_application(id)
+            p id
+            applications = FinancialAssistance::Application.where(id: id)
+            return Failure("Application with id #{id} not found") unless applications.any?
+            Success(applications.first)
+          end
 
+          def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+            applications = payload["family"]['magi_medicaid_applications'].first
             applications[:applicants].each do |applicant|
               persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
