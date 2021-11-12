@@ -370,7 +370,6 @@ module FinancialAssistance
           end
 
           def find_application(id)
-            p id
             applications = FinancialAssistance::Application.where(id: id)
             return Failure("Application with id #{id} not found") unless applications.any?
             Success(applications.first)
