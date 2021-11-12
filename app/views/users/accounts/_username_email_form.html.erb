@@ -40,7 +40,7 @@
   <br />
   <div class="row" style="padding-left: 150px;">
     <div class="col-sm-1 col-sm-offset-4">
-      <%= button_tag "Reset", class:'btn btn-info', id: 'resetUsernameEmailFields' %>
+      <a class='btn btn-info' id='cancelEdit'>Cancel</a>
     </div>
     <div class="col-sm-1">
       <%= submit_tag "Submit", class:'btn btn-primary', data: {confirm: "Are you sure?"} %>
@@ -49,12 +49,7 @@
 <% end %>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        var resetButton = document.getElementById('resetUsernameEmailFields');
-        resetButton.addEventListener('click', function(event){
-            event.preventDefault();
-            document.getElementById('inputNewUsername').value="";
-            document.getElementById('inputNewEmail').value="";
-        });
-    });
+  document.querySelector('#cancelEdit').addEventListener('click', function(e) {
+    e.currentTarget.closest('.child-row').remove();
+  })
 </script>
