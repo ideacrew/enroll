@@ -35,7 +35,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
       test_applicant.save!
     end
     it "should update the applications net income after save" do
-      expect(test_applicant.net_annual_income.to_s).to eq("370.41")
+      expect(test_applicant.net_annual_income.to_s).to eq("356.16")
     end
   end
 
