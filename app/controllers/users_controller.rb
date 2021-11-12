@@ -81,7 +81,7 @@ class UsersController < ApplicationController
       begin
         @user.modifier = current_user
         @user.save!
-      rescue => e
+      rescue StandardError
         @errors = @user.errors.messages
       end
     end
@@ -93,7 +93,7 @@ class UsersController < ApplicationController
 
   # POST admin_create_users_path
   # Used in users table create user
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockNesting
   def create
     authorize User, :change_username_and_email?
     if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
@@ -136,7 +136,7 @@ class UsersController < ApplicationController
     flash[:alert] = "You are not authorized for this action."
     render inline: "location.reload();"
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockNesting
 
   def edit
   end

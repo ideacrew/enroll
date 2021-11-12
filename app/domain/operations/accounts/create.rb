@@ -76,7 +76,7 @@ module Operations
         )
         Success(result)
       rescue RestClient::BadRequest => e
-        if (e.http_body)
+        if e.http_body
           Failure(JSON.parse(e.http_body).deep_symbolize_keys)
         else
           Failure(e)

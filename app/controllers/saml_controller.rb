@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:navigate_to_assistance]
@@ -40,7 +42,7 @@ class SamlController < ApplicationController
         sign_in(:user, oim_user)
         if !relay_state.blank?
           oim_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to URI.parse(relay_state.gsub(/https?:\/\/[^\/]*/, '')).to_s, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(relay_state.gsub(%r{https?://[^/]*}, '')).to_s, flash: {notice: "Signed in Successfully."}
         elsif !oim_user.last_portal_visited.blank?
           redirect_to URI.parse(oim_user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
         else
@@ -88,7 +90,6 @@ class SamlController < ApplicationController
   # Going to curam during the initial flow is triggered differently.
   # What we do here is set the navigation flag and send to the right location.
   def navigate_to_assistance
-
     if current_user.present?
 
       ::IdpAccountManager.update_navigation_flag(
@@ -101,7 +102,6 @@ class SamlController < ApplicationController
     else
       redirect_to URI.parse(SamlInformation.iam_login_url).to_s
     end
-
   end
 
   def logout
@@ -110,7 +110,7 @@ class SamlController < ApplicationController
 
   def redirection_test
     response = OneLogin::RubySaml::Response.new(params[:SAMLResponse])
-    render json: {"SAMLresponse": response.response}
+    render json: {SAMLresponse: response.response}
   end
 
   private

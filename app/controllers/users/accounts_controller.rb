@@ -60,11 +60,7 @@ module Users
         flash[:notice] = "Password is reset."
       else
         error = @result.failure
-        if error[:error_description]
-          flash[:error] = error[:error_description]
-        else
-          flash[:error] = "Error changing password: #{error&.to_s}"
-        end
+        flash[:error] = (error[:error_description] || "Error changing password: #{error&.to_s}")
       end
 
       render 'password_reset_result'
