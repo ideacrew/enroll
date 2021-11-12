@@ -45,7 +45,7 @@ module Users
       @account_id = params.require(:account_id)
       new_password = params.require(:new_password)
 
-      result = Operations::Accounts::ResetPassword.new.call(
+      @result = Operations::Accounts::ResetPassword.new.call(
         account: {
           id: @account_id,
           credentials: [{
@@ -56,11 +56,18 @@ module Users
         }
       )
 
-      if result.success?
-        redirect_to user_account_index_exchanges_hbx_profiles_url, flash: {notice: "Password is reset."}
+      if @result.success?
+        flash[:notice] = "Password is reset."
       else
-        redirect_to user_account_index_exchanges_hbx_profiles_url, flash: {error: "Error changing password."}
+        error = @result.failure
+        if error[:error_description]
+          flash[:error] = error[:error_description]
+        else
+          flash[:error] = "Error changing password: #{error&.to_s}"
+        end
       end
+
+      render 'password_reset_result'
     rescue Pundit::NotAuthorizedError
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
     end

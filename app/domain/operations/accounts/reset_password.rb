@@ -27,10 +27,7 @@ module Operations
       # )
       def call(params)
         values = yield validate(params)
-        _token_proc = yield cookie_token(values)
-        result = yield reset_password(values.to_h)
-
-        Success(result)
+        reset_password(values.to_h)
       end
 
 
@@ -41,20 +38,11 @@ module Operations
                                                                             .call(params[:account])
       end
 
-      def cookie_token(values)
-        cookies =
-          values[:cookies] || {
-            keycloak_token: Keycloak::Client.get_token_by_client_credentials
-          }
-
-        if cookies.nil?
-          Failure('unable to set proc_cookie_token')
-        else
-          Success(Keycloak.proc_cookie_token = -> { cookies[:keycloak_token] })
-        end
-      end
-
       def reset_password(values)
+        Keycloak.proc_cookie_token = lambda {
+          Keycloak::Client.get_token_by_client_credentials
+        }
+
         result =
           Keycloak::Admin.reset_password(
             values[:id],
@@ -62,6 +50,14 @@ module Operations
           )
 
         Success(result)
+      rescue RestClient::BadRequest => e
+        if (e.http_body)
+          Failure(JSON.parse(e.http_body).deep_symbolize_keys)
+        else
+          Failure(e)
+        end
+      rescue StandardError => e
+        Failure(e)
       end
     end
   end
