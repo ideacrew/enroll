@@ -40,7 +40,7 @@ class SamlController < ApplicationController
         sign_in(:user, oim_user)
         if !relay_state.blank?
           oim_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(relay_state.gsub(/https?:\/\/[^\/]*/, '')).to_s, flash: {notice: "Signed in Successfully."}
         elsif !oim_user.last_portal_visited.blank?
           redirect_to URI.parse(oim_user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
         else
