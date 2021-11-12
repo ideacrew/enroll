@@ -27,7 +27,7 @@ module Operations
       def call(params)
         values = yield validate(params)
         _token_proc = yield cookie_token(values)
-        keycloak_attributes = yield search(values)
+            keycloak_attributes = yield search(values)
         account_attributes = yield map_attributes(keycloak_attributes)
 
         Success(account_attributes)
