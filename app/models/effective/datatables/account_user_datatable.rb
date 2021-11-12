@@ -128,7 +128,9 @@ module Effective
         {
           roles: [
             #{scope: 'all', label: 'All'},
-            {scope: 'hbx_staff', label: 'HBX Staff'}
+            {scope: 'hbx_staff', label: 'HBX Staff'},
+            {scope: 'broker', label: 'Brokers'},
+            {scope: 'consumer', label: 'Consumers'}
           ],
           top_scope: :roles
         }
