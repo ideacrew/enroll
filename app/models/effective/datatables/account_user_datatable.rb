@@ -27,21 +27,17 @@ module Effective
             ['Reset Password', user_account_reset_password_path(user_id: user.id, account_id: account[:id], username: account[:username]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
             ['Unlock / Lock Account', user_account_lockable_path(user_id: user.id, account_id: account[:id], enabled: account[:enabled]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
             ['View Login History',login_history_user_path(id: user.id), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled'],
-            ['Edit User', user_account_change_username_and_email_path(user_id: user.id, account_id: account[:id], username: account[:username], email: account[:email]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled']
+            ['Edit Account', user_account_change_username_and_email_path(user_id: user.id, account_id: account[:id], username: account[:username], email: account[:email]), account_actions_access_enabled?(current_user, user) ? 'ajax' : 'disabled']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{user.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
       def collection
-        puts 'coming into collection'
-        puts "@accounts_collection: #{@accounts_collection.inspect}"
-
         return @accounts_collection if defined?(@accounts_collection) && @accounts_collection.present?
 
-        results = case attributes[:roles]
-                  when 'hbx_staff'
-                    Operations::Accounts::Find.new.call(scope_name: :by_realm_role, criterion: 'hbx_staff').success
+        results = if attributes[:roles]
+                    Operations::Accounts::Find.new.call(scope_name: :by_realm_role, criterion: attributes[:roles]).success
                   else
                     Operations::Accounts::Find.new.call(scope_name: :all, page_number: page, page_size: per_page).success
                   end
