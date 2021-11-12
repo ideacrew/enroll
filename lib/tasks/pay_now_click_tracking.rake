@@ -16,7 +16,7 @@ namespace :paynow do
 
     # PaymentTransaction model to be updated with a list of locations later, will need to update/read from that when implemented
     location_count = {}
-    carrier_list = EnrollRegistry[:carrier_abbev_list].feature.item
+    carrier_list = EnrollRegistry[:carrier_abbrev_list].feature.item
 
     start_date = Date.strptime(args['start_date'],'%m/%d/%Y').to_date
     end_date   = Date.strptime(args['end_date'],'%m/%d/%Y').to_date

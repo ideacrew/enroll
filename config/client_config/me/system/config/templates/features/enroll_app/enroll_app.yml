@@ -511,7 +511,7 @@ registry:
             item: true
           - key: :carriers_long_name
             item: 'Community Health Options'
-      - key: :carrier_abbev_list
+      - key: :carrier_abbrev_list
         item: ["CHO", "HPHC", "ANTHM", "NEDD"]
         is_enabled: true
   - namespace:
