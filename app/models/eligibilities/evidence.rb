@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Eligibilities
-  # Evidence that contributes to determining whether an agent has access to a
-  # benefit resource
+  # A fact - usually obtained from an external service - that contributes to determining
+  # whether a subject is eligible to make use of a benefit resource
   class Evidence
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -19,9 +19,14 @@ module Eligibilities
     field :updated_by, type: String
 
     embedded_in :eligibility, class_name: 'Eligibilities::Eligibility'
+
+    # The service or aquthority that provided the fact
     embeds_one :evidence_source, class_name: 'Eligibilities::EvidenceSource'
 
     # embeds_many :eligibility_results, class_name: '::FinancialAssistance::EligibilityResult'
+
+    # embeds_one :evidence_exception_workflow, class_name: 'Eligibilities::EvidenceExceptionWorkflow'
+    # accepts_nested_attributes_for :evidence_exception_workflows
 
     # embeds_one :verification_status, class_name: '::FinancialAssistance::VerificationStatus'
     # embeds_many :verification_history, class_name: '::FinancialAssistance::VerificationHistory'
