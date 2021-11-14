@@ -9,6 +9,7 @@ module FinancialAssistance
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
+    include Eligibilities::Eligible
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -119,7 +120,6 @@ module FinancialAssistance
     field :is_resident_role, type: Boolean
     field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
-    field :is_consent_applicant, type: Boolean, default: false
     field :is_tobacco_user, type: String, default: 'unknown'
     field :vlp_document_id, type: String
 
@@ -329,6 +329,12 @@ module FinancialAssistance
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
+
+    # Use Visitor pattern to access eligibility evidences
+    def accept(visitor)
+      evidences.each { |evidence| evidence.accept(visitor) }
+    end
+
 
     def csr_percent_as_integer=(new_csr_percent)
       super
