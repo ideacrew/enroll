@@ -72,21 +72,6 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       end
     end
 
-    context 'when due date on outstanding verifications is nil' do
-      before :each do
-        person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: nil)}
-        allow_any_instance_of(Events::Individual::Enrollments::Submitted).to receive(:publish).and_return true
-      end
-
-      let(:params) {{enrollment: enrollment}}
-
-      it 'should update due date' do
-        result = subject.call(params)
-        expect(result.success?).to be_truthy
-        expect(person.consumer_role.reload.verification_types[0].due_date.present?).to be_truthy
-      end
-    end
-
     context 'with valid params when in special enrollment period' do
       let(:qualifying_life_event_kind) { FactoryBot.create(:qualifying_life_event_kind, start_on: Date.today.prev_day) }
       let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: qualifying_life_event_kind) }

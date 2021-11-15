@@ -21,6 +21,12 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
         expect(helper.find_consumer_role_for_fields(dependent).new_record?).to eq true
       end
 
+      it "should return new consumer_role without family member" do
+        allow(dependent).to receive(:persisted?).and_return true
+        allow(dependent).to receive(:family_member).and_return false
+        expect(helper.find_consumer_role_for_fields(dependent).new_record?).to eq true
+      end
+
       it "should return consumer_role from family_member" do
         allow(dependent).to receive(:family_member).and_return double(person: person)
         allow(dependent).to receive(:persisted?).and_return true
