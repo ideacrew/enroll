@@ -14,7 +14,7 @@
         = f.hidden_field :referer, value: request.env["HTTP_REFERER"]
         .form-group
           = f.label :email_or_username
-          -if @invitation && @invitation.invitation_email && Invitation::LOCKED_EMAILS_TYPES.include?(@invitation.role)
+          -if @invitation && @invitation.invitation_email && Invitation::LOCKED_EMAILS_TYPES.include?(@invitation.role) && EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
             = f.text_field :oim_id, class: "form-control disabled", required: true, disabled: true, value: @invitation.invitation_email
           -else
             = f.text_field :oim_id, class: "form-control", required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.", target: 'signup.usernameField' }
