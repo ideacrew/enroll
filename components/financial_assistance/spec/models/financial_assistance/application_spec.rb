@@ -1211,7 +1211,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         application.submit!
       end
 
-      it 'should not set value for net_annual_income again as there is existing value' do
+      it 'should set value for net_annual_income again as there is existing value' do
         expect(application.primary_applicant.reload.net_annual_income.to_f).to eq(500.00)
       end
     end
