@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :confirm_existing_password, only: [:change_password]
-  before_action :set_user, except: [:confirm_lock, :unsupported_browser, :index, :show]
+  before_action :set_user, except: [:create, :confirm_lock, :unsupported_browser, :index, :show]
 
   def index
     redirect_to root_path

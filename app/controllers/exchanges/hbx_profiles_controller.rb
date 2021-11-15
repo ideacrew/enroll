@@ -367,7 +367,7 @@ def employer_poc
 
   def user_account_index
     authorize HbxProfile, :can_access_user_account_tab?
-    @datatable = if EnrollRegistry.feature_enabled?(:keycloak_integration)
+    @datatable = if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
                    Effective::Datatables::AccountUserDatatable.new
                  else
                    Effective::Datatables::UserAccountDatatable.new
