@@ -44,6 +44,8 @@ module FinancialAssistance
             email_address = primary_person.emails&.first&.address
             hbx_id = primary_person&.hbx_id || ""
             UserMailer.account_transfer_success_notification(primary_person, email_address, hbx_id).deliver_now if email_address
+          rescue StandardError => e
+            Failure("send_successful_account_transfer_email: #{e}")
           end
 
           def construct_payload(application, family)
@@ -53,6 +55,8 @@ module FinancialAssistance
             response_hash[:application_identifier] = application.hbx_id
             response_hash[:result] = "Success"
             Success(response_hash)
+          rescue StandardError => e
+            Failure("construct response payload: #{e}")
           end
 
         end
