@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+include Dry::Monads[:result]
+
 describe UsersController, dbclean: :after_each do
   let(:admin) { instance_double(User) }
   let(:user_policy) { instance_double(UserPolicy) }
