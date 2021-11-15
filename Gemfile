@@ -78,7 +78,7 @@ gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
 gem 'devise-jwt', "~> 0.5.9"
-gem 'jwt', "~> 2.2.1"
+gem 'jwt'
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
