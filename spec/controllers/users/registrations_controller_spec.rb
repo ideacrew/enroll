@@ -144,7 +144,7 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
 
           expect(operation).to have_received(:call).with(account: {
                                                            email: invitation.invitation_email,
-                                                           password: password,
+                                                           password: password
                                                          })
         end
       end
