@@ -6,7 +6,6 @@ module FinancialAssistance
     include Mongoid::Timestamps
 
     before_create :set_submission_timestamp
-    after_save :update_applicant_income
 
     embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
     embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', validate: (EnrollRegistry[:skip_employer_address_validation].enabled? ? false : true), cascade_callbacks: true
@@ -237,10 +236,6 @@ module FinancialAssistance
     # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
     private
-
-    def update_applicant_income
-      FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: _parent.application.assistance_year, applicant: _parent}) if _parent.present? && self.valid?(:submission)
-    end
 
     def set_submission_timestamp
       write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?
