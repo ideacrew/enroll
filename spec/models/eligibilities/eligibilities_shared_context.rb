@@ -171,4 +171,111 @@ RSpec.shared_context 'eligibilities' do
       zip: '04101'
     }
   end
+
+  def faa_eligibility_sample
+    [
+      {
+        key: :aptc_financial_assistance_eligibility,
+        effective_date: Date.today,
+        application: application_id,
+        tax_households: [
+          {
+            id: household_id,
+            evidences: [
+              income_evidence: {
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :rrv_ifsv_service,
+                  value: {
+                    max_aptc: 400.00,
+                    csr: 94
+                  },
+                  event: event_id
+                }
+              },
+              aptc_financial_assistance_evidence: {
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :ideacrew_mitc_service,
+                  value: {
+                    max_aptc: 400.00,
+                    csr: 94
+                  },
+                  event: event_id
+                }
+              }
+            ]
+          }
+        ],
+        applicants: [
+          {
+            applicant: applicant_id,
+            evidences: [
+              {
+                key: :residency_evidence,
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :self_attested,
+                  value: {}
+                }
+              },
+              {
+                key: :lawful_presence_evidence,
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :fdsh_vlp_service,
+                  value: {},
+                  event: event_id
+                }
+              },
+              {
+                key: :immigration_evidence,
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :fdsh_xxxxxx_service,
+                  value: {},
+                  event: event_id
+                }
+              },
+              {
+                key: :non_incarcerated_evidence,
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :self_attested,
+                  value: true,
+                  event: event_id
+                }
+              },
+              {
+                key: :non_esi_evidence,
+                is_satisfied: true,
+                verification_outstanding: false,
+                aasm_state: 'determined',
+                evidence_source: {
+                  key: :rrv_fdsh_medicare_service,
+                  value: {},
+                  event: event_id
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+    # snapshot.member_eligibilities
+    # snapshot.unsatisfied_eligibilities
+    # snapshot.satisfied_eligibilities
+  end
 end

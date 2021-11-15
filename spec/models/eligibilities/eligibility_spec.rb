@@ -47,7 +47,7 @@ RSpec.describe Eligibilities::Eligibility do
       expect(subject.save).to be_truthy
 
       compare_keys = required_params.keys.reject { |a| a == :evidences }
-      compare_params = required_params.reject { |k, v| k == :evidences }
+      compare_params = required_params.reject { |k, _v| k == :evidences }
 
       expect(
         subject
