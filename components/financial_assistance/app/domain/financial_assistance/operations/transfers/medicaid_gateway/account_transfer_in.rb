@@ -23,8 +23,9 @@ module FinancialAssistance
             family = yield build_family(payload["family"])
             application_id = yield build_application(payload, family)
             application = yield find_application(application_id)
+            _apps = yield build_applicants(payload, application, family)
             _applicants = yield fill_applicants_form(payload, application)
-            Success(application)
+            Success(application_id)
           end
 
           private
@@ -32,6 +33,8 @@ module FinancialAssistance
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
             decrypt_ssns(payload)
+          rescue StandardError => e
+            Failure("load_data #{e}")
           end
 
           def decrypt_ssn(ssn)
@@ -102,12 +105,26 @@ module FinancialAssistance
             Failure("build_family: #{e}")
           end
 
+          def build_applicants(payload, application, family)
+            sanitize_iap_hash = sanitize_applicant_params(payload["family"]['magi_medicaid_applications'].first, family.primary_person)
+            return sanitize_iap_hash unless sanitize_iap_hash.success?
+            sanitized = sanitize_iap_hash.value!
+            payload["family"]['magi_medicaid_applications'].first.except!('applicants').merge!(applicants: sanitized)
+            applicants_results = sanitized.map do |applicant|
+              ::FinancialAssistance::Operations::Applicant::Build.new.call(params: applicant.merge(application: application))
+            end
+            applicants_results.map do |result|
+              return result if result.failure?
+              applicant = application.applicants.build
+              applicant.assign_attributes(result.success.to_h)
+            end
+            Success(application.applicants)
+          end
+
           def build_application(payload, family)
             app_params = payload["family"]['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
             app_params["assistance_year"] = FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
-            sanitize_iap_hash = sanitize_applicant_params(app_params, family.primary_person)
-            return sanitize_iap_hash unless sanitize_iap_hash.success?
-            ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash.value!)
+            ::FinancialAssistance::Operations::Application::Create.new.call(params: app_params.except('applicants').merge(applicants: []))
           rescue StandardError => e
             Failure("build_application: #{e}")
           end
@@ -315,8 +332,7 @@ module FinancialAssistance
                 tribal_state: applicant_hash['tribal_state']
               }
             end
-            result = iap_hash.except!('applicants').merge!(applicants: sanitize_params)
-            Success(result)
+            Success(sanitize_params)
           rescue StandardError => e
             Failure("sanitize_applicant_params: #{e}")
           end
@@ -378,9 +394,9 @@ module FinancialAssistance
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
             applications[:applicants].each do |applicant|
-              persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
+              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
+              return Failure("No matching applicant") unless persisted_applicant.present?
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
-              next if persisted_applicant.nil?
               persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
               persisted_applicant.is_self_attested_blind = applicant[:is_self_attested_blind]
               persisted_applicant.is_self_attested_disabled = applicant[:is_self_attested_disabled]
