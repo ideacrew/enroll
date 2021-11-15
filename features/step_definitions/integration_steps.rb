@@ -873,6 +873,14 @@ Then(/^.+ should see plans filtered by Carrier/) do
   end
 end
 
+And(/^.+ clicks Go To Plans link$/) do
+  click_link l10n("go_to_plan_compare")
+end
+
+Then(/^.+ should see the Plan Compare modal/) do
+  expect(page).to have_content(l10n("modal_onscreen"))
+end
+
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
   benefit_sponsorship = CensusEmployee.where(first_name: people[named_person][:first_name]).first.benefit_sponsorship
   # cannot select a SEP date from expired plan year on 31st.

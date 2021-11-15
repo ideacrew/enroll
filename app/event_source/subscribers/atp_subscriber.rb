@@ -20,7 +20,7 @@ module Subscribers
         transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(result.value!)
         if transfer_response.failure?
           transfer_details[:result] = "Failed"
-          transfer_details[:failure] = "Unsucessfully ingested by Enroll - #{transfer_response.failure}"
+          transfer_details[:failure] = "Unsucessfully built account transfer response by Enroll - #{transfer_response.failure}"
         end
         ack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: acked with success: #{result.success}"

@@ -34,7 +34,7 @@
 
   <div class="row ptb no-buffer row-height">
     <div class="col-md-6">EMPLOYER PHONE</div>
-    <div class="col-md-6"><%= format_phone(benefit.employer_phone.full_phone_number) %></div>
+    <div class="col-md-6"><%= format_phone(benefit&.employer_phone&.full_phone_number) %></div>
   </div>
 
   <div class="row ptb no-buffer row-height">

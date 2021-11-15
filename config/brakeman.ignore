@@ -21,6 +21,22 @@
       "note": ""
     },
     {
+      "warning_type": "Information Disclosure",
+      "warning_code": 61,
+      "fingerprint": "081f5d87a244b41d3cf1d5994cb792d2cec639cd70e4e306ffe1eb8abf0f32f7",
+      "check_name": "DetailedExceptions",
+      "message": "Detailed exceptions are enabled in production",
+      "file": "config/environments/production.rb",
+      "line": null,
+      "link": "https://brakemanscanner.org/docs/warning_types/information_disclosure/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "0836891a672e78c9c2a5cb8f0c7933fdd622f2e3c7dcd4953075d73dbe061ee0",
@@ -274,7 +290,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 184,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -446,7 +462,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 184,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -517,7 +533,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 493,
+          "line": 486,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -786,26 +802,6 @@
       "note": ""
     },
     {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "d8ecf1a164264f418a0db429e29612c5ffd6134709a9c517b4887eeb0ac7e083",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/users/sessions_controller.rb",
-      "line": 10,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(SamlInformation.iam_login_url)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Users::SessionsController",
-        "method": "new"
-      },
-      "user_input": "SamlInformation.iam_login_url",
-      "confidence": "High",
-      "note": "This is added a configuration item by devops."
-    },
-    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "ef486a2f648e540d2eb04ea78e5c6ba243cbaf21350fdec96467367fb1632736",
@@ -826,6 +822,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-11-04 20:43:39 -0400",
+  "updated": "2021-08-26 09:22:43 -0400",
   "brakeman_version": "5.1.1"
 }

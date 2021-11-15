@@ -17,6 +17,7 @@ RSpec.describe SamlController do
     end
 
     context "with invalid saml response" do
+
       it "should render a 403" do
         expect(subject).to receive(:log) do |arg1, arg2|
           expect(arg1).to match(/ERROR: SAMLResponse assertion errors/)
@@ -36,8 +37,6 @@ RSpec.describe SamlController do
       let(:attributes_double) { { 'mail' => user.email} }
 
       before do
-        allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :idm)))
-        allow(EnrollRegistry).to receive(:[]).and_call_original
         allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return( valid_saml_response )
       end
 
@@ -175,8 +174,6 @@ RSpec.describe SamlController do
 
   describe "GET navigate_to_assistance", db_clean: :after_each do
     before :each do
-      allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :idm)))
-      allow(EnrollRegistry).to receive(:[]).and_call_original
       EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
     end
 

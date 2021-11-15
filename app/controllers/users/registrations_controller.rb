@@ -112,12 +112,12 @@ module Users
   #   super
   # end
 
-    protected
+  protected
 
   # You can put the params you want to permit in the empty array.
-    def configure_sign_up_params
-      devise_parameter_sanitizer.permit(:sign_up, keys: [:oim_id])
-    end
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:oim_id])
+  end
 
   # You can put the params you want to permit in the empty array.
   # def configure_account_update_params
@@ -134,5 +134,4 @@ module Users
   #   super(resource)
   # end
 
-  end
 end

@@ -52,7 +52,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Build, dbclean: :afte
     end
 
     it 'should return failure with error messages' do
-      expect(result.failure.errors.to_h).to eq(:is_incarcerated => ['Incarceration question must be answered'])
+      expect(result.failure).to eq(:is_incarcerated => ['Incarceration question must be answered'])
     end
   end
 

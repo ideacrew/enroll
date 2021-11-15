@@ -6,6 +6,9 @@ Feature: Employee products sorted when employee click on Plan name, Premium Amou
     And Employee should be able to see available products and sorting enabled
 
   Background: Setup site, employer, and benefit application
+    Given EnrollRegistry crm_update_family_save feature is disabled
+    Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
+    Given EnrollRegistry go_to_plan_compare_link feature is enabled
     Given the shop market configuration is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
@@ -22,3 +25,5 @@ Feature: Employee products sorted when employee click on Plan name, Premium Amou
     Then Employee should see the list of plans
     When Employee filters plans by Carrier
     Then Employee should see plans filtered by Carrier
+    And user clicks Go To Plans link
+    Then user should see the Plan Compare modal

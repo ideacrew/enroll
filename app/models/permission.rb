@@ -5,6 +5,7 @@ class Permission
   include SetCurrentUser
   include Mongoid::Timestamps
 
+  # permission kinds order is used for hierarchy check
   PERMISSION_KINDS = %w[hbx_read_only hbx_staff hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin].freeze
 
   field :name, type: String

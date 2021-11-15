@@ -22,17 +22,15 @@ module FinancialAssistance
 
         def validate(params)
           result = FinancialAssistance::Validators::ApplicantContract.new.call(params)
-
           if result.success?
             Success(result.to_h)
           else
-            Failure(result)
+            Failure(result.errors.to_h)
           end
         end
 
         def build(values)
           applicant_entity = FinancialAssistance::Entities::Applicant.new(values)
-
           Success(applicant_entity)
         end
       end

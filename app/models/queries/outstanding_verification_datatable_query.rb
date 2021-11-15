@@ -20,7 +20,6 @@ module Queries
 
     def build_scope
       family = Family.outstanding_verification_datatable
-      person = Person
       family = family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
         family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from],@custom_attributes[:custom_datatable_date_to])
@@ -68,7 +67,13 @@ module Queries
     end
 
     def klass
-      Family.outstanding_verification_datatable
+      return @klass if defined? @klass
+
+      @klass = if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+                 Family.outstanding_verifications_including_faa_datatable
+               else
+                 Family.outstanding_verification_datatable
+               end
     end
 
     def size
