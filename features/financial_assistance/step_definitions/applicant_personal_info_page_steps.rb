@@ -38,10 +38,10 @@ Then(/form should not submit due to required relationship options popup$/) do
 end
 
 Then(/form should not submit due to required relationship error$/) do
-  expect(page).to have_content 'Select relationship type'
+  expect(page).to have_content "#{l10n('insured.family_members.relationship_error_message')}"
 end
 
 And(/user fills in the missing relationship$/) do
-  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric']").click
   find(:xpath, FinancialAssistance::ApplicantForm.applicant_spouse_select).click
 end
