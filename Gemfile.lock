@@ -1049,6 +1049,7 @@ GEM
       rack
       raindrops (~> 0.7)
     unidecoder (1.1.2)
+    vcr (3.0.3)
     vegas (0.1.11)
       rack (>= 1.0.0)
     virtus (1.0.5)
@@ -1220,6 +1221,7 @@ DEPENDENCIES
   uglifier (>= 4)
   ui_helpers!
   unicorn (~> 4.8)
+  vcr (~> 3.0, >= 3.0.1)
   virtus (~> 1.0)
   warden (~> 1.2.7)
   watir (~> 6.10.3)
