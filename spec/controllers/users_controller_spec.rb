@@ -14,7 +14,8 @@ describe UsersController, dbclean: :after_each do
   end
 
   describe '.create' do
-    let(:permission) { FactoryBot.create :permission }
+    let(:staff_permission) { FactoryBot.create :permission, :hbx_csr_tier1 }
+    let(:permission) { FactoryBot.create :permission, :hbx_staff }
     let(:keycloak_op) { double(Operations::Accounts::Create, call: Success(user: { id: user_id})) }
     let!(:hbx_profile) { FactoryBot.create :hbx_profile }
 
@@ -24,6 +25,8 @@ describe UsersController, dbclean: :after_each do
       allow(user_policy).to receive(:change_username_and_email?).and_return(true)
       allow(UserPolicy).to receive(:new).with(admin, User).and_return(user_policy)
       allow(Operations::Accounts::Create).to receive(:new).and_return(keycloak_op)
+      allow(Operations::Accounts::Update).to receive(:new).and_return(keycloak_op)
+      allow(admin).to receive_message_chain(:person, :hbx_staff_role, :permission).and_return(staff_permission)
       sign_in(admin)
 
       post :create, params: params, format: 'js'

@@ -94,8 +94,7 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
 
         expect(operation).to have_received(:call).with(account: {
                                                          email: email,
-                                                         password: password,
-                                                         relay_state: nil
+                                                         password: password
                                                        })
       end
 
@@ -112,7 +111,12 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
               relay_state: nil
             }
           }
-          expect(response).to be_a_redirect
+
+          if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+            expect(response).to render_template('new')
+          else
+            expect(response).to be_a_redirect
+          end
         end
       end
 
@@ -141,7 +145,6 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
           expect(operation).to have_received(:call).with(account: {
                                                            email: invitation.invitation_email,
                                                            password: password,
-                                                           relay_state: 'broker_role'
                                                          })
         end
       end

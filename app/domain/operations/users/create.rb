@@ -46,7 +46,9 @@ module Operations
           return Failure(error: account.failure, user: user) unless account.success?
           account_attrs = account.success
 
-          user.account_id = account_attrs[:user][:id]
+          # user.account_id = account_attrs[:user][:id]
+          user.account_id = user.oim_id = account_attrs[:user][:id]
+
           update = Operations::Accounts::Update.new.call(account: { id: user.account_id, attributes: { id: user.account_id }})
           if update.success? && user.valid?
             user.save!

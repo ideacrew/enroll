@@ -31,6 +31,7 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
       account_attrs = account_attrs.first if account_attrs.is_a?(Array) # result from line 26 or 27
       account_attrs = account_attrs[:user] if account_attrs.key?(:user) # result from line 24
       if account_attrs.is_a?(Hash) && account_attrs.deep_symbolize_keys![:id]
+        # user.account_id = account_attrs[:id]
         user.account_id = account_attrs[:id]
 
         Operations::Accounts::Update.new.call(
@@ -44,6 +45,8 @@ class LinkKeycloakAccountsForUsers < MongoidMigrationTask
         )
         Operations::Accounts::AddToRole.new.call(id: account_attrs[:id], roles: user.roles) if user.roles
         user.set(account_id: account_attrs[:id])
+        user.set(oim_id: account_attrs[:id])
+
         # add_user_to_keycloak_group(user)
       else
         Rails
