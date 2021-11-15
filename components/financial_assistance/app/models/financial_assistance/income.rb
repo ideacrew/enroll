@@ -239,7 +239,7 @@ module FinancialAssistance
     private
 
     def update_applicant_income
-      _parent.application.calculate_total_net_income_for_applicants if _parent.present? && _parent&.incomes&.detect {|income| income.valid?(:submission)}
+      _parent.application.calculate_total_net_income_for_applicants if _parent.present? && self.valid?(:submission)
     end
 
     def set_submission_timestamp

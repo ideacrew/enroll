@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMagiMedicaidEligibilityDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  before :all do
+  before do
+    allow_any_instance_of(FinancialAssistance::Income).to receive(:skip_zero_income_amount_validation).and_return true
     DatabaseCleaner.clean
   end
 
@@ -222,9 +223,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         create_appli.save!
       end
 
-      before do
+      before :each do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
         @renewal_app = ::FinancialAssistance::Operations::Applications::CreateApplicationRenewal.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
