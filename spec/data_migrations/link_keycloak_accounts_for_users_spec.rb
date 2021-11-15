@@ -22,9 +22,13 @@ describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
   end
 
   describe 'link existing user with keycloak' do
+    before do
+      allow(User).to receive(:all).and_return(double(:no_timeout => [user]))
+    end
+
     context 'given the user not linked with keycloak' do
       let!(:person) { FactoryBot.create(:person, :with_broker_role, user: user) }
-      let(:user) { FactoryBot.create(:user, roles: ['broker']) }
+      let(:user) { FactoryBot.create(:user, roles: ['broker'], oim_id: "greatgatsby") }
 
       before do
         agency_profile = FactoryBot.create(:broker_agency_profile, primary_broker_role: user.person.broker_role)
@@ -45,7 +49,7 @@ describe LinkKeycloakAccountsForUsers, dbclean: :after_each do
 
     context 'given the user already linked with keycloak' do
       let!(:person) { FactoryBot.create(:person, :with_broker_role, user: user) }
-      let(:user) { FactoryBot.create(:user, account_id: 'sample-account-id', roles: ['hbx_staff']) }
+      let(:user) { FactoryBot.create(:user, account_id: 'sample-account-id', roles: ['hbx_staff'], oim_id: "greatgatsby") }
 
       before do
         agency_profile = FactoryBot.create(:broker_agency_profile, primary_broker_role: user.person.broker_role)
