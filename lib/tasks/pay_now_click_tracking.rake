@@ -5,8 +5,7 @@
 require 'csv'
 namespace :paynow do
   desc 'Track date and feature location of outgoing clicks on the pay now links'
-  task :click_tracking, [:start_date, :end_date, :carrier] => [:environment] do |task, args|
-
+  task :click_tracking, [:start_date, :end_date, :carrier_abbrev] => [:environment] do |task, args|
     file_name = "#{Rails.root}/public/pay_now_click_tracking.csv"
     field_names  = %w(
       source
@@ -16,21 +15,26 @@ namespace :paynow do
     )
 
     # PaymentTransaction model to be updated with a list of locations later, will need to update/read from that when implemented
-    locations = ['plan_shopping', 'enrollment_tile']
     location_count = {}
-    carrier_list = ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
+    carrier_list = EnrollRegistry[:carrier_abbrev_list].feature.item
 
     start_date = Date.strptime(args['start_date'],'%m/%d/%Y').to_date
     end_date   = Date.strptime(args['end_date'],'%m/%d/%Y').to_date
-    carrier = BenefitSponsors::Organizations::IssuerProfile.find_by_abbrev(args['carrier'])
 
     if start_date > end_date
       puts "Exception: Start Date can not be after End Date."
       return
     end
 
-    if carrier.nil? && !carrier_list.include?(args['carrier'])
+    if args['carrier_abbrev'].nil? || !carrier_list.include?(args['carrier_abbrev'])
       puts "Exception: Issue with Carrier Name"
+      return
+    end
+
+    carrier = BenefitSponsors::Organizations::IssuerProfile.find_by_abbrev(args['carrier_abbrev'])
+
+    unless carrier.present?
+      puts "carrier profile was not found"
       return
     end
 

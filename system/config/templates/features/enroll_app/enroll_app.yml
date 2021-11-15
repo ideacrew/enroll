@@ -494,6 +494,9 @@ registry:
             item: false
           - key: :carriers_long_name
             item: 'Community Health Options'
+      - key: :carrier_abbrev_list
+        item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
+        is_enabled: true
   - namespace:
       - :features
       - :enroll_app
