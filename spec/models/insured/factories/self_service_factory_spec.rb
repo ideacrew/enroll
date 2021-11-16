@@ -221,6 +221,7 @@ module Insured
 
 
       before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11, 1))
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
         @product.update_attributes(ehb: 0.9844)
         premium_table = @product.premium_tables.first
