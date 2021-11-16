@@ -1,6 +1,7 @@
 Feature: Passive renewal should be updated when EE updates his current coverage
 
   Background: Setup site, employer, and benefit application
+    Given enable change tax credit button is enabled
     Given the shop market configuration is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
