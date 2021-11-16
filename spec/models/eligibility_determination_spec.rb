@@ -58,6 +58,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
     end
     let!(:hbx_enrollments) {[hbx_with_aptc_1]}
     before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11, 1))
       EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(true)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
       FactoryBot.create(:eligibility_determination, tax_household: tax_household)
