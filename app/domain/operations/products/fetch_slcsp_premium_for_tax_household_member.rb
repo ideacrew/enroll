@@ -34,6 +34,7 @@ module Operations
         product_hash = Operations::Products::FetchSilverProductPremiums.new.call(
           {
             products: products,
+            dental_products: [],
             family: tax_household_member.family,
             family_member_id: family_member.id,
             effective_date: effective_date,

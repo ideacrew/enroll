@@ -14,7 +14,7 @@ module Operations
       def call(params)
         values            = yield validate(params)
         family_members    = yield fetch_family_members(values[:family], values[:family_member_id])
-        product_premiums  = yield fetch_product_premiums(values[:products], family_members, values[:effective_date], values[:rating_area_id].to_s, values[:adjust_pediatric_premium])
+        product_premiums  = yield fetch_product_premiums({products: values[:products], dental_products: values[:dental_products], family_members: family_members, effective_date: values[:effective_date], rating_area_id: values[:rating_area_id].to_s})
 
         Success(product_premiums)
       end
@@ -41,31 +41,27 @@ module Operations
         end
       end
 
-      def fetch_product_premiums(products, family_members, effective_date, rating_area_id, adjust_pediatric_premium = nil)
-        if adjust_pediatric_premium
-          dental_products = products.where(kind: :dental)
-          products = products.where(kind: :health)
-        end
-
-        member_premiums = family_members.inject({}) do |member_result, family_member|
-          age = family_member.age_on(effective_date)
+      def fetch_product_premiums(attrs)
+        member_premiums = attrs[:family_members].inject({}) do |member_result, family_member|
+          age = family_member.age_on(attrs[:effective_date])
+          attrs[:slcsp_type] = :health_only if age > 18
           hbx_id = family_member.hbx_id
-          sldp = second_lowest_dental_product_premium(dental_products, effective_date, rating_area_id, age) if adjust_pediatric_premium
+          sldp = second_lowest_dental_product_premium(attrs[:dental_products], attrs[:effective_date], attrs[:rating_area_id], age)
           # age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
           product_hash =
-            products.inject([]) do |result, product|
+            attrs[:products].inject([]) do |result, product|
               variant_id = product.hios_id.split('-')[1]
               next result if variant_id.present? && variant_id != '01'
               premium_table = product.premium_tables.where({
-                                                             :rating_area_id => rating_area_id,
-                                                             :'effective_period.min'.lte => effective_date,
-                                                             :'effective_period.max'.gte => effective_date
+                                                             :rating_area_id => attrs[:rating_area_id],
+                                                             :'effective_period.min'.lte => attrs[:effective_date],
+                                                             :'effective_period.max'.gte => attrs[:effective_date]
                                                            }).first
 
               tuple = premium_table.premium_tuples.where(age: age).first || set_tuple(premium_table, age)
 
               if tuple.present?
-                cost = product_premium(product, tuple, adjust_pediatric_premium, sldp)
+                cost = product_premium(product, tuple, attrs[:slcsp_type], sldp)
                 result << { cost: cost, product_id: product.id, member_identifier: hbx_id, monthly_premium: cost }
               end
 
@@ -87,12 +83,10 @@ module Operations
         premium_table.premium_tuples.where(age: age).first
       end
 
-      def product_premium(product, tuple, adjust_pediatric_premium, sldp)
-        if adjust_pediatric_premium && !product.covers_pediatric_dental?
-          ((tuple.cost * product.ehb) + sldp).round(2)
-        else
-          (tuple.cost * product.ehb).round(2)
-        end
+      def product_premium(product, tuple, slcsp_type, sldp)
+        return ((tuple.cost * product.ehb) + sldp).round(2) if slcsp_type == :health_and_dental
+        return (tuple.cost * product.ehb).round(2) if slcsp_type == :health_only || product.covers_pediatric_dental?
+        ((tuple.cost * product.ehb) + sldp).round(2)
       end
 
       def second_lowest_dental_product_premium(dental_products, effective_date, rating_area_id, age)
@@ -105,7 +99,7 @@ module Operations
 
           dental_tuple = dpt.premium_tuples.where(age: age).first || set_tuple(dpt, age)
 
-          result << dental_tuple.cost * dental_product.ehb
+          result << dental_tuple.cost * dental_product.pediatric_ehb
           result
         end.sort[1].to_f
       end

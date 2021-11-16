@@ -37,16 +37,10 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
 
     let(:effective_date) { TimeKeeper.date_of_record }
 
-    # let(:product_premium) do
-    #   age = person.age_on(effective_date)
-    #   pt = product.premium_tables.first
-    #   tuple = pt.premium_tuples.where(age: age).first
-    #   tuple.cost * product.ehb
-    # end
-
     let(:params) do
       {
         products: products,
+        dental_products: [],
         family: family,
         effective_date: effective_date,
         rating_area_id: rating_area_id
@@ -85,36 +79,65 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
     end
 
     context 'with adjust_pediatric_premium set to true' do
+      let(:ped_dental_products) {[double]}
       let(:params) do
         {
           products: products,
+          dental_products: ped_dental_products,
           family: family,
           effective_date: effective_date,
-          rating_area_id: rating_area_id,
-          adjust_pediatric_premium: true
+          rating_area_id: rating_area_id
         }
       end
 
       let(:second_lowest_dental_premium) { 100 }
 
       before do
+        person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
         allow(subject).to receive(:second_lowest_dental_product_premium).and_return second_lowest_dental_premium
       end
 
       context 'when product does not covers pediatric' do
 
-        it 'should adjust premium value' do
-          result = subject.call(params)
-          expect(result.value!).to eq({
-                                        person.hbx_id => [
-                                          {
-                                            :cost => 198.86 + second_lowest_dental_premium,
-                                            :product_id => BSON::ObjectId(product.id),
-                                            :member_identifier => person.hbx_id,
-                                            :monthly_premium => 198.86 + second_lowest_dental_premium
-                                          }
-                                        ]
-                                      })
+        context 'when person age > 18' do
+
+          before do
+            person.update_attributes(dob: TimeKeeper.date_of_record - 25.years)
+          end
+
+          it 'should not adjust premium value' do
+            result = subject.call(params)
+            expect(result.value!).to eq({
+                                          person.hbx_id => [
+                                            {
+                                              :cost => 198.86,
+                                              :product_id => BSON::ObjectId(product.id),
+                                              :member_identifier => person.hbx_id,
+                                              :monthly_premium => 198.86
+                                            }
+                                          ]
+                                        })
+          end
+        end
+
+        context 'when person age < 18' do
+          before do
+            person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
+          end
+
+          it 'should adjust premium value' do
+            result = subject.call(params)
+            expect(result.value!).to eq({
+                                          person.hbx_id => [
+                                            {
+                                              :cost => 198.86 + second_lowest_dental_premium,
+                                              :product_id => BSON::ObjectId(product.id),
+                                              :member_identifier => person.hbx_id,
+                                              :monthly_premium => 198.86 + second_lowest_dental_premium
+                                            }
+                                          ]
+                                        })
+          end
         end
       end
 
