@@ -13,12 +13,11 @@ module Queries
     end
 
     def person_search search_string
-      Family.outstanding_verification_datatable if search_string.blank?
+      klass if search_string.blank?
     end
 
     def build_scope()
-
-      family = Family.outstanding_verification_datatable
+      family = klass
       person = Person
       family= family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
@@ -68,7 +67,13 @@ module Queries
     end
 
     def klass
-      Family.outstanding_verification_datatable
+      return @klass if defined? @klass
+
+      @klass = if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+                 Family.outstanding_verifications_including_faa_datatable
+               else
+                 Family.outstanding_verification_datatable
+               end
     end
 
     def size
