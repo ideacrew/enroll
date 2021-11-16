@@ -20,6 +20,7 @@ module BenefitMarkets
       INDIVIDUAL_MARKET_KINDS = %w[individual coverall].freeze
       AGE_BASED_RATING = 'Age-Based Rates'
       FAMILY_BASED_RATING = 'Family-Tier Rates'
+      COVERED = 'Covered'
 
       field :benefit_market_kind,   type: Symbol
 
@@ -374,9 +375,9 @@ module BenefitMarkets
       def covers_pediatric_dental?
         benefits = qhp.qhp_benefits
 
-        benefits.where(benefit_type_code: 'Dental Check-Up for Children').first&.is_benefit_covered == 'Covered' &&
-          benefits.where(benefit_type_code: 'Basic Dental Care - Child').first&.is_benefit_covered == 'Covered' &&
-          benefits.where(benefit_type_code: 'Major Dental Care - Child').first&.is_benefit_covered == 'Covered'
+        benefits.where(benefit_type_code: 'Dental Check-Up for Children').first&.is_benefit_covered == COVERED &&
+          benefits.where(benefit_type_code: 'Basic Dental Care - Child').first&.is_benefit_covered == COVERED &&
+          benefits.where(benefit_type_code: 'Major Dental Care - Child').first&.is_benefit_covered == COVERED
       end
 
       def allows_child_only_offering?
