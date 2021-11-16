@@ -238,6 +238,10 @@ module Insured
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
 
+      after do
+        allow(TimeKeeper).to receive(:date_of_record).and_call_original
+      end
+
       it 'should return default_tax_credit_value' do
         params = subject.find(enrollment.id, family.id)
         expect(params[:default_tax_credit_value]).to eq applied_aptc_amount

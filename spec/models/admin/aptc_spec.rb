@@ -129,6 +129,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(TimeKeeper).to receive(:datetime_of_record).and_return(DateTime.new(TimeKeeper.date_of_record.year, 11, 1))
       end
 
+      after do
+        allow(TimeKeeper).to receive(:date_of_record).and_call_original
+      end
+
       it "should create a new enrollment with a new hbx_id" do
         allow(family).to receive(:active_household).and_return household
         allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
