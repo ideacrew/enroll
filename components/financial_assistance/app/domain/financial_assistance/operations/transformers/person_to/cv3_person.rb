@@ -63,7 +63,7 @@ module FinancialAssistance
                 address_3: address.address_3,
                 city: address.city,
                 county: address.county,
-                county_fips: address.fetch_county_fips_code,
+                county_fips: (address.county.blank? || address.state.blank?) ? nil : address.fetch_county_fips_code,
                 state: address.state,
                 zip: address.zip,
                 country_name: "United States of America",
