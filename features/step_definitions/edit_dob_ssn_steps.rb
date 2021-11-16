@@ -25,12 +25,18 @@ When(/^Hbx Admin click Action button$/) do
   end
 end
 
-When("user enters an invalid SSN and clicks on update") do
-  find('#person_ssn').set("212-31-31")
-  sleep 1
+When(/^Hbx Admin enters an invalid SSN and clicks on update$/) do
+  sleep 2
+  fill_in AdminFamiliesPage.new_ssn, :with => '212-31-31'
+  sleep 2
   page.find_button("Update").click
+  sleep 2
   page.driver.browser.switch_to.alert.accept
-  sleep 1
+  sleep 2
+end
+
+When(/^Hbx Admin clicks Action for a person on families index page$/) do
+  find(AdminFamiliesPage.actions_drop_down_toggle, text: AdminFamiliesPage.actions_drop_down_text).click
 end
 
 Given("that a user with a HBX staff role with HBX Staff exists and is logged in") do
@@ -43,16 +49,12 @@ Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
 end
 
 # FIXME: Make this take a 'for' argument, that way we can select which user
-When(%r{^user clicks on edit DOB/SSN link$}) do
-  click_link('Edit DOB / SSN')
-end
-
-When(/^Hbx Admin enters an invalid SSN and clicks on update$/) do
-  fill_in 'person[ssn]', :with => '212-31-31'
-  page.find_button("Update").click
+When(/^.+ clicks on edit DOB\/SSN link$/) do
+  click_link(AdminFamiliesPage.edit_dob_ssn_text)
 end
 
 Then(/^Hbx Admin should see the edit form being rendered again with a validation error message$/) do
+  sleep 2
   expect(page).to have_content(/Edit DOB \/ SSN/i)
   expect(page).to have_content(/must have 9 digits/i)
 end
@@ -65,4 +67,10 @@ end
 
 Then(/^Hbx Admin should see the update partial rendered with update sucessful message$/) do
   expect(page).to have_content(/DOB \/ SSN Update Successful/i)
+end
+
+When(/^Hbx Admin clicks Families tab$/) do
+  visit exchanges_hbx_profiles_root_path
+  find(AdminHomepage.families_dropown, :wait => 10).click
+  find(AdminHomepage.families_btn, :wait => 10).click
 end

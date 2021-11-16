@@ -253,7 +253,7 @@ Then(/^the user will( not)? see the Force Publish button$/) do |visible|
   end
 end
 
-Then(/^the user will( not)? see the Edit DOB SSN button$/) do |visible|
+Then(/^.+ will( not)? see the Edit DOB SSN button$/) do |visible|
   if visible.blank?
     find_link('Edit DOB / SSN').visible?
   else
