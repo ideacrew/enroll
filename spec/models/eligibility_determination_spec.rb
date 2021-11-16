@@ -65,7 +65,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
     end
 
     it 'should call after create' do
-      expect(@enrollments.count).to eq(1)
+      expect(@enrollments.count).to eq(2)
     end
   end
 
