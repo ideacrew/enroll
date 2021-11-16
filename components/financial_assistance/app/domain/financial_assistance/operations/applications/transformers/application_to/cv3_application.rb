@@ -103,6 +103,7 @@ module FinancialAssistance
                          us_state: application.us_state,
                          hbx_id: application.hbx_id,
                          oe_start_on: oe_start_on,
+                         submitted_at: application.submitted_at,
                          notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
