@@ -77,7 +77,7 @@ registry:
       - key: :mec_check
         is_enabled: true
       - key: :include_faa_outstanding_verifications
-        is_enabled: true
+        is_enabled: false
   - namespace:
     - :request_determination
     features:
