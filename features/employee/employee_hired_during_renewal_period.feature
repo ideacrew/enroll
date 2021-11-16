@@ -7,6 +7,7 @@ Feature: Employee hired during renewal period
     And Employee should be able to purchase Insurance
 
   Background: Setup site, employer, and benefit application
+    Given enable change tax credit button is enabled
     Given the shop market configuration is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
