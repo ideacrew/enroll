@@ -1,6 +1,7 @@
 Feature: Employee while terminating active enrollment should able to see and pick termination on kinds dates to terminate
 
   Background: Setup site, employer, and benefit application
+    Given enable change tax credit button is enabled
     Given both shop and fehb market configurations are enabled
     Given all market kinds are enabled for user to select
     Given all announcements are enabled for user to select
