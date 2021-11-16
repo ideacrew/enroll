@@ -5,8 +5,7 @@ require 'rails_helper'
 RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMagiMedicaidEligibilityDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  before do
-    allow_any_instance_of(FinancialAssistance::Income).to receive(:skip_zero_income_amount_validation).and_return true
+  before :all do
     DatabaseCleaner.clean
   end
 
