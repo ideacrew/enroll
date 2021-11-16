@@ -188,6 +188,14 @@ class Family
   scope :outstanding_verification_datatable,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
+
+  scope :outstanding_verifications_including_faa_datatable, lambda {
+    where(
+      :_id.in => (HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id) +
+                     FinancialAssistance::Application.families_with_latest_determined_outstanding_verification.map {|record| record["_id"]})
+    )
+  }
+
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
       :"_id".in => HbxEnrollment.where(

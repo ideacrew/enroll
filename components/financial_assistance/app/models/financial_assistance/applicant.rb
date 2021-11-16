@@ -1104,6 +1104,11 @@ module FinancialAssistance
       ).present?
     end
 
+    #use this method to check what evidences needs to be included on notices
+    def unverified_evidences
+      evidences.find_all(&:type_unverified?)
+    end
+
     private
 
     def date_ranges_overlap?(range_a, range_b)
