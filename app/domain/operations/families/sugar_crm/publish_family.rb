@@ -69,6 +69,7 @@ module Operations
           end
         rescue StandardError => e
           # Likely failure constructing applications payload
+          Rails.logger.warn("Publish Family Exception: #{e}")
           Failure(e)
         end
 
