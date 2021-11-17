@@ -48,9 +48,10 @@ module Operations
         def transform_applications(primary_id)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
           applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(:aasm_state.in => ["submitted", "determined"])
-          applications.collect do |application|
-            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
+          results = applications.collect do |application|
+            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end
+          results.select(&:success?).map(&:success)
         end
 
         def transform_special_enrollment_periods(special_enrollment_periods)

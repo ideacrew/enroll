@@ -67,6 +67,9 @@ module Operations
           else
             Failure("No critical changes made to family, no update needed to CRM gateway.")
           end
+        rescue StandardError => e
+          # Likely failure constructing applications payload
+          Failure(e)
         end
 
         def build_event(payload)
