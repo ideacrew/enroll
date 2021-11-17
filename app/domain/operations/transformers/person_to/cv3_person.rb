@@ -30,8 +30,7 @@ module Operations
             hbx_id: person.hbx_id.to_s,
             person_name: construct_person_name(person),
             person_demographics: construct_person_demographics(person),
-            person_health: {is_tobacco_user: person.is_tobacco_user,
-                            is_physically_disabled: person.is_physically_disabled},
+            person_health: transform_person_health(person),
             no_dc_address: person.no_dc_address,
             no_dc_address_reason: person.no_dc_address_reason,
             is_homeless: person.is_homeless,
@@ -43,7 +42,6 @@ module Operations
             person_relationships: construct_person_relationships(person.person_relationships),
             consumer_role: construct_consumer_role(person.consumer_role),
             resident_role: construct_resident_role(person.resident_role),
-            broker_role: construct_broker_role(person.broker_role),
             individual_market_transitions: transform_individual_market_transitions(person.individual_market_transitions),
             verification_types: transform_verification_types(person.verification_types),
             user: transform_user_params(person.user),
@@ -54,6 +52,12 @@ module Operations
             timestamp: {created_at: person.created_at.to_datetime, modified_at: person.updated_at.to_datetime}
           }
           Success(payload)
+        end
+
+        def transform_person_health(person)
+          ph_hash = { is_physically_disabled: person.is_physically_disabled }
+          ph_hash.merge!(is_tobacco_user: person.is_tobacco_user) if person.is_tobacco_user.present?
+          ph_hash
         end
 
         def transform_consumer_role(consumer_role)
@@ -165,12 +169,13 @@ module Operations
 
         def transform_ridp_documents(ridp_documents)
           ridp_documents.collect do |document|
-            {
+            ridp_documents_hash = {
               status: document.status,
               ridp_verification_type: document.ridp_verification_type,
-              comment: document.comment,
-              uploaded_at: document.uploaded_at
+              comment: document.comment
             }
+            ridp_documents_hash.merge!(uploaded_at: document.uploaded_at) if document.uploaded_at.present?
+            ridp_documents_hash
           end
         end
 
@@ -184,36 +189,6 @@ module Operations
               submitted_at: transition.submitted_at
             }
           end
-        end
-
-        def construct_broker_role(broker_role)
-          return if broker_role.nil?
-          {
-            aasm_state: broker_role.aasm_state,
-            npn: broker_role.npn,
-            provider_kind: broker_role.provider_kind,
-            reason: broker_role.reason,
-            market_kind: broker_role.market_kind,
-            languages_spoken: broker_role.languages_spoken,
-            working_hours: broker_role.working_hours,
-            accept_new_clients: broker_role.accept_new_clients,
-            license: broker_role.license,
-            training: broker_role.training,
-            broker_agency_reference: construct_broker_agency_reference(broker_role.broker_agency_profile),
-            carrier_appointments: broker_role.carrier_appointments
-          }
-        end
-
-        def construct_broker_agency_reference(agency)
-          {
-            hbx_id: agency.hbx_id,
-            market_kind: agency.market_kind,
-            name: agency.legal_name,
-            dba: agency.dba,
-            # display_name: ,
-            fein: agency.fein,
-            corporate_npn: agency.corporate_npn
-          }
         end
 
         def construct_resident_role(resident_role)

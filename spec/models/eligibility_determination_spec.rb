@@ -58,10 +58,15 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
     end
     let!(:hbx_enrollments) {[hbx_with_aptc_1]}
     before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_month + 14.days)
       EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(true)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
       FactoryBot.create(:eligibility_determination, tax_household: tax_household)
       @enrollments = family.reload.hbx_enrollments
+    end
+
+    after do
+      allow(TimeKeeper).to receive(:date_of_record).and_call_original
     end
 
     it 'should call after create' do
