@@ -49,7 +49,7 @@ Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
 end
 
 # FIXME: Make this take a 'for' argument, that way we can select which user
-When(/^.+ clicks on edit DOB\/SSN link$/) do
+When(%r{^Hbx Admin clicks on edit DOB/SSN link$}) do
   click_link(AdminFamiliesPage.edit_dob_ssn_text)
 end
 

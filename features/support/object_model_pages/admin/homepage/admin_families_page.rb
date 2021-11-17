@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
+#admin/families tab
 class AdminFamiliesPage
-  
+
   def self.all_tab
     'div[id="Tab:all"]'
   end
@@ -65,7 +66,7 @@ class AdminFamiliesPage
   def self.view_username_email_text
     'View Username and Email'
   end
-  
+
   def self.collapse_form_text
     'Collapse Form'
   end
@@ -89,4 +90,4 @@ class AdminFamiliesPage
   def self.new_dob
     'jq_datepicker_ignore_person[dob]'
   end
-end    
+end
