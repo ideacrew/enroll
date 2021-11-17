@@ -362,31 +362,23 @@ module FinancialAssistance
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
     end
 
-    def self.families_with_latest_determined_outstanding_verification
-      FinancialAssistance::Application.collection.aggregate([
-        {
-          "$match" => {
-            "aasm_state" => "determined",
-            "applicants.evidences.eligibility_status" => {"$in" => ["outstanding", "in_review"]}
-          }
-        },
-        {"$sort" => {"family_id" => 1, "created_at" => 1}},
+    def families_with_latest_determined_outstanding_verification
+      states = ["outstanding", "in_review"]
+      application_ids = FinancialAssistance::Application.order_by(created_at: :asc).collection.aggregate([
+        {"$match" => {"aasm_state" => "determined"}},
+        {"$sort" => {"family_id" => 1}},
         {
           "$group" => {
             "_id" => "$family_id",
-            "applicants" => {"$last" => "$applicants"},
-            "application_id" => {"$last" => "$_id"},
-            "hbx_id" => {"$last" => "$hbx_id"}
-          }
-        },
-        {
-          "$group" => {
-            "_id" => "$_id",
-            "hbx_id" => {"$last" => "$hbx_id"},
-            "application_id" => {"$last" => "$application_id"}
+            "application_id" => {"$last" => "$_id"}
           }
         }
-      ], {allow_disk_use: true})
+      ],{allow_disk_use: true}).collect {|iap| iap["application_id"]}
+
+      FinancialAssistance::Application.where(:_id.in => application_ids,
+                                             :aasm_state => "determined",
+                                             :"applicants.is_active" => true,
+                                             :"applicants.evidences.eligibility_status".in => states)
     end
 
     # Creates both relationships A to B, and B to A.
