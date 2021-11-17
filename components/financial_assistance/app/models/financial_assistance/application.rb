@@ -364,7 +364,12 @@ module FinancialAssistance
 
     def self.families_with_latest_determined_outstanding_verification
       FinancialAssistance::Application.collection.aggregate([
-        {"$match" => {"aasm_state" => "determined" } },
+        {
+          "$match" => {
+            "aasm_state" => "determined",
+            "applicants.evidences.eligibility_status" => {"$in" => ["outstanding", "in_review"]}
+          }
+        },
         {"$sort" => {"family_id" => 1, "created_at" => 1}},
         {
           "$group" => {
@@ -372,14 +377,6 @@ module FinancialAssistance
             "applicants" => {"$last" => "$applicants"},
             "application_id" => {"$last" => "$_id"},
             "hbx_id" => {"$last" => "$hbx_id"}
-          }
-        },
-        { "$unwind" => "$applicants" },
-        { "$match" => {"applicants.is_active" => true} },
-        { "$unwind" => "$applicants.evidences" },
-        {
-          "$match" => {
-            "applicants.evidences.eligibility_status" => {"$in" => ["outstanding", "in_review"]}
           }
         },
         {
