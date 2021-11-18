@@ -47,6 +47,38 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
       subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
     end
+
+    context 'when document_reminder_notice_trigger is disabled' do
+      before do
+        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it 'should not trigger document reminder events to polypress' do
+        person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
+        family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
+        person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        hbx_enrollment.save!
+        expect(::Operations::Notices::IvlDocumentReminderNotice).not_to receive(:new)
+        subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+      end
+    end
+
+    context 'when document_reminder_notice_trigger is enabled' do
+      before do
+        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'should trigger document reminder events to polypress' do
+        person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
+        family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
+        person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        hbx_enrollment.save!
+        expect(::Operations::Notices::IvlDocumentReminderNotice).to receive(:new)
+        subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+      end
+    end
   end
 
   context ".expire_individual_market_enrollments" do
