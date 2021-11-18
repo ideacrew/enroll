@@ -97,7 +97,8 @@ namespace :migrations do
           end
 
           person.save if person.changed?
-          csv << [person.hbx_id, person.addresses.first.zip, "updated #{counters.inspect}"]
+          csv_comment = counters.to_s.gsub!(",", "")
+          csv << [person.hbx_id, person.addresses.first.zip, csv_comment]
           #rescue StandardError => e
           #  csv << [person.hbx_id, person_address&.zip, "StandardError: #{e}"]
           #end
