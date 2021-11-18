@@ -238,7 +238,7 @@ module FinancialAssistance
           def transform_tax_household_members(members)
             members.collect do |member|
               {
-                family_member_reference: member.family_member_id,
+                family_member_reference: member.family_member.hbx_id,
                 # product_eligibility_determination: member.product_eligibility_determination,
                 is_subscriber: member.is_subscriber,
                 reason: member.reason
