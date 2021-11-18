@@ -101,7 +101,7 @@
 
      <div>
       <% if @person.is_consumer_role_active? %>
-        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: @contact_preferences_mapping} %></br>
+        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil} %></br>
       <% elsif @person.is_resident_role_active? %>
       <!-- contact_preferences_mapping feature is only developed for consumer role, refactor for other roles where there is a requirement -->
         <%= render 'shared/contact_preferences', {f: f, role: :resident_role, contact_preferences_mapping: {}} %></br>

@@ -114,3 +114,6 @@ hugo/static
 ci/rspec/gha/*.json
 ci/cucumber/compressed-reports
 ci/rspec/**/*.json
+
+# For update county
+!update_county.csv
