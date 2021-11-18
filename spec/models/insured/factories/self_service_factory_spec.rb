@@ -123,6 +123,20 @@ module Insured
         expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
         expect(enrollment.elected_aptc_pct).to eq 0.63722
       end
+
+      it 'should correctly update applied aptc amount if elected aptc is higher than product premium' do
+        subject.update_enrollment_for_apcts(enrollment, 5000)
+        enrollment.reload
+        expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
+        expect(enrollment.elected_aptc_pct).to eq 0.63722
+      end
+
+      it 'should correctly update applied aptc amount if elected aptc is lower than product premium' do
+        subject.update_enrollment_for_apcts(enrollment, 500)
+        enrollment.reload
+        expect(enrollment.applied_aptc_amount.to_f).to eq 500
+        expect(enrollment.elected_aptc_pct).to eq 0.25
+      end
     end
     # rubocop:disable Lint/UselessAssignment
     describe "update enrollment for renewing enrollments" do
