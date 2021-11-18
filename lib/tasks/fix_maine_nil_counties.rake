@@ -40,15 +40,16 @@ namespace :migrations do
     end
 
     def address_fixer(address)
-      counties = county_finder(address.zip)
+      zip = address.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
+      counties = county_finder(zip)
       if counties.count == 1
         address.county = counties.first
         :fixed
       elsif counties.count == 0
-        puts "No county found for ZIP: #{address.zip} #{address.state}"
+        puts "No county found for ZIP: #{zip} #{address.state}"
         :no_county_found
       else
-        puts "Multiple counties found for ZIP: #{address.zip} #{address.state}"
+        puts "Multiple counties found for ZIP: #{zip} #{address.state}"
         :multiple_counties_found
       end
     end
