@@ -107,7 +107,7 @@ module Services
           IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name)
           @logger.info "Sent #{event_name} to #{person.hbx_id}" unless Rails.env.test?
         end
-      else
+      elsif EnrollRegistry[:document_reminder_notice_trigger].enabled?
         result = ::Operations::Notices::IvlDocumentReminderNotice.new.call(family: family)
         reminder_notice_logger(result, person, event_name)
       end
