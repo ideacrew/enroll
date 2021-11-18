@@ -77,8 +77,8 @@ class Products::QhpController < ApplicationController
 
   def set_kind_for_market_and_coverage
     @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
-    hbx_enrollment_id = @new_params[:hbx_enrollment_id]
-    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
+    hbx_enrollment_id = @new_params[:hbx_enrollment_id] || params[:id]
+    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id) unless hbx_enrollment_id.nil?
     if @hbx_enrollment.blank?
       error_message = {
         :error => {
