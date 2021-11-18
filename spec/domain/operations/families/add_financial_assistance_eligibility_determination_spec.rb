@@ -159,6 +159,28 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     end
   end
 
+  context 'creation of tax households for family' do
+    context 'applicant ineligible' do
+      before do
+        applicant = params[:applicants].first
+        applicant.merge!({:is_ia_eligible => false,
+                          :is_medicaid_chip_eligible => false,
+                          :is_totally_ineligible => false,
+                          :is_magi_medicaid => false,
+                          :is_non_magi_medicaid_eligible => false,
+                          :is_without_assistance => false})
+
+        @result = subject.call(params: params)
+        family.reload
+      end
+
+      it 'should not create a tax household for non applicant members' do
+        expect(family.active_household.tax_households.count).to eq(0)
+      end
+    end
+
+  end
+
   context 'csr_percent_as_integer' do
     let(:csr_params) do
       params[:applicants].first.merge!(appli_addnl_params)
