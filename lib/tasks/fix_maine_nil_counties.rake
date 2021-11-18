@@ -78,8 +78,6 @@ namespace :migrations do
             end
           end
 
-          person.save if person.changed?
-
           counters[:faa_apps] = { fixed: 0, no_county_found: 0, multiple_counties_found: 0, no_fix_needed: 0 }
           if person.primary_family.present?
             applications = FinancialAssistance::Application.where(family_id: person.primary_family.id, aasm_state: "draft")
@@ -97,6 +95,8 @@ namespace :migrations do
               application.save if application.changed?
             end
           end
+
+          person.save if person.changed?
           csv << [person.hbx_id, person.addresses.first.zip, "updated #{counters.inspect}"]
           #rescue StandardError => e
           #  csv << [person.hbx_id, person_address&.zip, "StandardError: #{e}"]
