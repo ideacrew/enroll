@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 Rake.application.rake_require "tasks/fix_maine_nil_counties"
 Rake::Task.define_task(:environment)
@@ -34,7 +36,7 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
           :zip => "20024",
           county: "Whateva county"
-          )
+        )
     ]
     applicant1.save!
     application.save!
@@ -72,7 +74,7 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
       family.save!
       create_instate_addresses
       expect(applicant2.addresses.first.county.blank?).to eq(true)
-      Rake::Task["migrations:fix_maine_nil_counties"].invoke 
+      Rake::Task["migrations:fix_maine_nil_counties"].invoke
     end
 
     it "update the applicants with nil county values" do
