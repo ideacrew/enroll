@@ -48,6 +48,7 @@ class Insured::FamilyMembersController < ApplicationController
       broker_role_id = @consumer_role.person.broker_role.try(:id)
       @family.hire_broker_agency(broker_role_id)
     end
+    @family = Family.find(params[:family_id]) if params[:family_id]
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
