@@ -46,6 +46,8 @@ module FinancialAssistance
 
           def construct_payload(application)
             FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+          rescue StandardError => e
+            Failure(e)
           end
 
           def update_application(application, payload_value)
