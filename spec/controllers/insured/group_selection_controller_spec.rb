@@ -776,7 +776,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     let(:new_aptc_amount) {250.0}
-    let(:new_aptc_pct) {'0.5'}
+    let(:new_aptc_pct) {'0.39772'}
 
     let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment_14.id.to_s}}
 
