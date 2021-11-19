@@ -52,7 +52,7 @@ module Operations
           end
         end
 
-        incomplete_results = results.find_all do |_hbx_id, premium_hash|
+        incomplete_results = result.find_all do |_hbx_id, premium_hash|
           premium_hash[:health_only_slcsp_premiums].blank? ||
             premium_hash[:health_and_dental_slcsp_premiums].blank? ||
             premium_hash[:health_and_ped_dental_slcsp_premiums].blank?
