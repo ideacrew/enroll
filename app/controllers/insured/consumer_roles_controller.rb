@@ -202,7 +202,6 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
-    @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
     respond_to do |format|
       format.js

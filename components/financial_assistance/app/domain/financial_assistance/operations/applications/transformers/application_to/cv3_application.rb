@@ -103,6 +103,7 @@ module FinancialAssistance
                          us_state: application.us_state,
                          hbx_id: application.hbx_id,
                          oe_start_on: oe_start_on,
+                         submitted_at: application.submitted_at,
                          notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
@@ -155,6 +156,7 @@ module FinancialAssistance
                            is_trafficking_victim: applicant.is_trafficking_victim.present?,
                            foster_care: foster(applicant),
                            pregnancy_information: pregnancy_information(applicant),
+                           is_primary_caregiver: applicant.is_primary_caregiver,
                            is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar.present?,
                            is_five_year_bar_met: applicant.is_five_year_bar_met.present?,
                            is_forty_quarters: applicant.is_forty_quarters.present?,
@@ -542,6 +544,7 @@ module FinancialAssistance
                            address_3: address.address_3,
                            city: address.city,
                            county: address.county,
+                           county_fips: (address.county.blank? || address.state.blank?) ? nil : address.fetch_county_fips_code,
                            state: address.state,
                            zip: address.zip,
                            country_name: address.country_name}

@@ -18,6 +18,7 @@ module CrmGateway
         self.set(cv3_payload: family_payload.to_h.with_indifferent_access)
         p family_payload if Rails.env.test?
       else
+        Rails.logger.warn("Publish Family Exception family_id: #{self.id}: #{result.failure}")
         p result.failure
       end
     end
