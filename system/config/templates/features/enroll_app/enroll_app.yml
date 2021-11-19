@@ -583,6 +583,8 @@ registry:
         is_enabled: false
       - key: :legacy_enrollment_trigger
         is_enabled: true
+      - key: :document_reminder_notice_trigger
+        is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: false
       - key: :show_download_tax_documents
