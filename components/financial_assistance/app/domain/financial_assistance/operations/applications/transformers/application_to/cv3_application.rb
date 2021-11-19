@@ -156,6 +156,7 @@ module FinancialAssistance
                            is_trafficking_victim: applicant.is_trafficking_victim.present?,
                            foster_care: foster(applicant),
                            pregnancy_information: pregnancy_information(applicant),
+                           is_primary_caregiver: applicant.is_primary_caregiver,
                            is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar.present?,
                            is_five_year_bar_met: applicant.is_five_year_bar_met.present?,
                            is_forty_quarters: applicant.is_forty_quarters.present?,
