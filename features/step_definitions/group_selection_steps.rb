@@ -582,14 +582,18 @@ Then(/^\w+ should not see able to see make changes for my new plan$/) do
   expect(page).not_to have_content("Make a first payment for my new plan")
 end
 
-When(/^\w+ clicks on the make changes to my coverage button/) do
+Given(/^enable change tax credit button is enabled$/) do
   enable_change_tax_credit_button
+end
+
+When(/^\w+ clicks on the make changes to my coverage button/) do
+  # enable_change_tax_credit_button
   page.execute_script("document.querySelector('#make-changes-btn').click()")
   wait_for_ajax
 end
 
 When(/^\w+ clicks on the active enrollment make changes to my coverage button/) do
-  enable_change_tax_credit_button
+  # enable_change_tax_credit_button
   page.execute_script("document.querySelectorAll('#make-changes-btn')[1].click()")
   wait_for_ajax
 end
@@ -599,7 +603,7 @@ Given(/^the automatic application of aptc on enrollment feature configuration is
 end
 
 When(/(.*) clicks on the make changes button/) do |_role|
-  enable_change_tax_credit_button
+  # enable_change_tax_credit_button
   page.all('a', text: 'Make changes to my coverage').first.click
   wait_for_ajax
 end

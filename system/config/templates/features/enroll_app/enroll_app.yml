@@ -583,6 +583,8 @@ registry:
         is_enabled: false
       - key: :legacy_enrollment_trigger
         is_enabled: true
+      - key: :document_reminder_notice_trigger
+        is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: false
       - key: :show_download_tax_documents
@@ -628,6 +630,9 @@ registry:
         is_enabled: false
       - key: :disable_documents_we_accept_list
         item: :disable_documents_we_accept_list
+        is_enabled: false
+      - key: :disable_sep_attestation_options
+        item: :disable_sep_attestation_options
         is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget

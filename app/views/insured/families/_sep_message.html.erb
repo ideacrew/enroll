@@ -6,7 +6,7 @@
         You are eligible to enroll or change coverage through <%= @active_sep.end_on %>.
         <!-- <i class="fa fa-lg fa-info-circle" data-toggle="tooltip" title="Your ‘<%=@active_sep.title%>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%=@active_sep.start_on%>"></i>-->
         &nbsp;&nbsp;&nbsp;
-        <%= build_link_for_sep_type(@active_sep) %>
+        <%= build_link_for_sep_type(@active_sep, nil, local_assigns[:family_id]) %>
       </strong>
     </div>
   </div>
