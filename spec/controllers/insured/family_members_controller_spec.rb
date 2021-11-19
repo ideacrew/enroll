@@ -269,6 +269,22 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         )
         expect(assigns(:dependent).errors[:base]).to include(alert_message)
       end
+
+      context "when readding the deleted dependent" do
+        before do
+          target_dependent.update_attributes(is_active: false)
+          allow(user).to receive(:person).and_return(test_person)
+          sign_in(user)
+          post :create, params: duplicate_dependent_attributes, :format => "js"
+        end
+
+        it "should not see the duplicate dependent error" do
+          alert_message = l10n('insured.family_members.duplicate_error_message',
+                               action: "add",
+                               contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)
+          expect(assigns(:dependent).errors[:base]).not_to include(alert_message)
+        end
+      end
     end
 
     describe "with a valid dependent" do
