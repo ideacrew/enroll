@@ -51,6 +51,44 @@ RSpec.describe ::Operations::Products::FetchSlcsp, dbclean: :after_each do
                 :product_id => BSON::ObjectId.new
               }
             ]
+          },
+          :health_and_dental => {
+            person.hbx_id => [
+              {
+                :monthly_premium => 200.0,
+                :member_identifier => person.hbx_id,
+                :product_id => BSON::ObjectId.new
+              },
+              {
+                :monthly_premium => 300.0,
+                :member_identifier => person.hbx_id,
+                :product_id => BSON::ObjectId.new
+              },
+              {
+                :monthly_premium => 400.0,
+                :member_identifier => person.hbx_id,
+                :product_id => BSON::ObjectId.new
+              }
+            ]
+          },
+          :health_and_ped_dental => {
+            person.hbx_id => [
+              {
+                :monthly_premium => 200.0,
+                :member_identifier => person.hbx_id,
+                :product_id => BSON::ObjectId.new
+              },
+              {
+                :monthly_premium => 300.0,
+                :member_identifier => person.hbx_id,
+                :product_id => BSON::ObjectId.new
+              },
+              {
+                :monthly_premium => 400.0,
+                :member_identifier => person.hbx_id,
+                :product_id => BSON::ObjectId.new
+              }
+            ]
           }
         }
       }
