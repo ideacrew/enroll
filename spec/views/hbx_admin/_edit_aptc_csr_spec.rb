@@ -15,6 +15,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       assign(:household_members, [{ person.id =>[102.0, 102.0] }] )
       assign(:year_options, [2016, 2017])
       assign(:current_year, 2016)
+      assign(:household_csrs, {person.id => 75})
       family = person.primary_family
       active_household = family.households.first
       hbx_enrollments = active_household.hbx_enrollments
@@ -50,8 +51,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         expect(rendered).to match(/AVAILABLE APTC/i)
         expect(rendered).to match(/CSR % AS INTEGER/i)
         expect(rendered).to match(/SLCSP/i)
-         expect(rendered).to match(/Household Member\(s\)/i)
-        expect(rendered).to match(/APTC Amount \/ Percent Ratio/i)
+        expect(rendered).to match(/Household Member\(s\)/i)
+        expect(rendered).to match(/CSR % as Integer/)
       end
     end
 
@@ -106,7 +107,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         expect(rendered).to match(/CSR % AS INTEGER/i)
         expect(rendered).to match(/SLCSP/i)
         expect(rendered).to match(/Household Member\(s\)/i)
-        expect(rendered).to match(/APTC Amount \/ Percent Ratio/i)
+        expect(rendered).to match(/CSR % as Integer/)
       end
     end
   end

@@ -9,7 +9,7 @@ class HbxAdminController < ApplicationController
   end
 
   def edit_aptc_csr
-    # raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
 
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)
