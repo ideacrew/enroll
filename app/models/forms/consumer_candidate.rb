@@ -51,7 +51,7 @@ module Forms
                                                                     :first_name => first_name,
                                                                     :ssn => ssn})
 
-      return nil if records.count == 0
+      return nil if records.nil? || records.none?
 
       if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
          (match_criteria == :dob_present && ssn.blank?) ||
