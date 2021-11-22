@@ -829,7 +829,7 @@ class Family
     hire_params = { family_id: id,
                     terminate_date: TimeKeeper.date_of_record,
                     broker_role_id: broker_role_id,
-                    start_date: TimeKeeper.datetime_of_record,
+                    start_date: TimeKeeper.datetime_local,
                     current_broker_account_id: current_broker_agency&.id }
     ::Operations::Families::HireBrokerAgency.new.call(hire_params)
   end

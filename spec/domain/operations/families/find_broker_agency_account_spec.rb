@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Operations::Families::BrokerAgencyAccount, dbclean: :after_each do
+RSpec.describe ::Operations::Families::FindBrokerAgencyAccount, dbclean: :after_each do
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}

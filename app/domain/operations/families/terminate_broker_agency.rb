@@ -25,7 +25,7 @@ module Operations
       end
 
       def find_broker_agency_account(params)
-        ::Operations::Families::BrokerAgencyAccount.new.call(params)
+        ::Operations::Families::FindBrokerAgencyAccount.new.call(params)
       end
 
       def terminate_broker_agency(account, params)

@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Families
     # Operation to find broker agency account for a given family
-    class BrokerAgencyAccount
+    class FindBrokerAgencyAccount
       send(:include, Dry::Monads[:result, :do])
 
       def call(params)

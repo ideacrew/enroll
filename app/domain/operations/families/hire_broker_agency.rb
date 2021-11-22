@@ -28,7 +28,7 @@ module Operations
 
       def find_broker_agency_account(params)
         return Success("") if params[:current_broker_account_id].blank?
-        ::Operations::Families::BrokerAgencyAccount.new.call({broker_account_id: params[:current_broker_account_id], family_id: params[:family_id]})
+        ::Operations::Families::FindBrokerAgencyAccount.new.call({broker_account_id: params[:current_broker_account_id], family_id: params[:family_id]})
       end
 
       def find_broker_role(valid_params)

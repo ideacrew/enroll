@@ -13,7 +13,7 @@ module Validators
 
       rule(:broker_account_id) do
         if key? && value
-          result = Operations::Families::BrokerAgencyAccount.new.call({family_id: values[:family_id], broker_account_id: values[:broker_account_id]})
+          result = Operations::Families::FindBrokerAgencyAccount.new.call({family_id: values[:family_id], broker_account_id: values[:broker_account_id]})
           key.failure(text: 'invalid broker_account_id', error: result.failure) if result&.failure?
         end
       end
