@@ -16,7 +16,7 @@ RSpec.describe ExceptionsController, :type => :controller, :dbclean => :after_ea
         end
 
         it "should redirect to custom exception view" do
-          expect(response).to render_template("exceptions/500")
+          expect(response).to render_template("exceptions/show")
         end
       end
 
