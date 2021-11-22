@@ -825,35 +825,22 @@ class Family
   end
 
   def hire_broker_agency(broker_role_id)
-    return unless broker_role_id
-    existing_agency = current_broker_agency
-    broker_role = BrokerRole.find(broker_role_id)
-
-    # Removed code which checks and assigns for old broker profile.
-    # Instead log missing new broker profile scenario and avoid the hire of broker by family.
-    if broker_role.benefit_sponsors_broker_agency_profile_id.present?
-      broker_agency_profile_id = broker_role.benefit_sponsors_broker_agency_profile_id
-    elsif Rails.env.production?
-      logger = Logger.new("#{Rails.root}/log/family_hire_broker_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-      logger.info "Unable to find benefit sponsor broker profile for broker role,
-                    broker_role_id: #{broker_role_id},
-                    broker_agency_profile_id: #{broker_role.broker_agency_profile_id},
-                    benefit sponsor broker_agency_profile_id: #{broker_role.benefit_sponsors_broker_agency_profile_id}"
-    end
-
-    terminate_broker_agency if existing_agency
-    start_on = Time.now
-    broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
-    self.save
+    hire_params = { family_id: id,
+                    terminate_date: TimeKeeper.date_of_record,
+                    broker_role_id: broker_role_id,
+                    start_date: TimeKeeper.datetime_of_record,
+                    current_broker_account_id: current_broker_agency&.id }
+    ::Operations::Families::HireBrokerAgency.new.call(hire_params)
   end
 
   # Terminate the active Broker agency for this family
   #
   # @param terminate_on [ Date ] Date to end broker engagement
   def terminate_broker_agency(terminate_on = TimeKeeper.date_of_record)
-    if current_broker_agency.present?
-      current_broker_agency.update_attributes!(end_on: (terminate_on.to_date - 1.day).end_of_day, is_active: false)
-    end
+    terminate_params = { family_id: id,
+                         terminate_date: terminate_on,
+                         broker_account_id: current_broker_agency&.id }
+    ::Operations::Families::TerminateBrokerAgency.new.call(terminate_params)
   end
 
   # Get the active {BrokerAgencyAccount} account for this family. New Individual market enrollments will include this

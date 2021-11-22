@@ -119,7 +119,8 @@ class Insured::GroupSelectionController < ApplicationController
     select_enrollment_members(hbx_enrollment, family_member_ids) if @market_kind == 'individual' || @market_kind == 'coverall'
 
     hbx_enrollment.generate_hbx_signature
-    @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
+    existing_active_broker_id = @adapter.family.current_broker_agency&.writing_agent&.id
+    @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id)) unless existing_active_broker_id != current_user.person.broker_role.try(:id)
     hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
