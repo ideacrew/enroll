@@ -375,11 +375,11 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     }
     context "when building ShopForPlan link" do
       it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
-        expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
+        expect(helper.build_link_for_sep_type(sep_with_date_options, family.id.to_s)).to include "class=\"existing-sep-item\""
       end
 
       it "should be a link to 'insured/family_members' for a QLE type without date options available" do
-        expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
+        expect(helper.build_link_for_sep_type(sep_without_date_options, family.id.to_s)).to include "href=\"/insured/family_members"
       end
     end
 

@@ -1,6 +1,7 @@
 Feature: Change Tax Credit button
 
   Background:
+    Given enable change tax credit button is enabled
     Given a consumer exists
     Given the FAA feature configuration is enabled
     Given the automatic application of aptc on enrollment feature configuration is disabled

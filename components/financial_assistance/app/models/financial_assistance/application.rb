@@ -362,34 +362,23 @@ module FinancialAssistance
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
     end
 
-    def self.families_with_latest_determined_outstanding_verification
-      FinancialAssistance::Application.collection.aggregate([
-        {"$match" => {"aasm_state" => "determined" } },
-        {"$sort" => {"family_id" => 1, "created_at" => 1}},
+    def families_with_latest_determined_outstanding_verification
+      states = ["outstanding", "in_review"]
+      application_ids = FinancialAssistance::Application.order_by(created_at: :asc).collection.aggregate([
+        {"$match" => {"aasm_state" => "determined"}},
+        {"$sort" => {"family_id" => 1}},
         {
           "$group" => {
             "_id" => "$family_id",
-            "applicants" => {"$last" => "$applicants"},
-            "application_id" => {"$last" => "$_id"},
-            "hbx_id" => {"$last" => "$hbx_id"}
-          }
-        },
-        { "$unwind" => "$applicants" },
-        { "$match" => {"applicants.is_active" => true} },
-        { "$unwind" => "$applicants.evidences" },
-        {
-          "$match" => {
-            "applicants.evidences.eligibility_status" => {"$in" => ["outstanding", "in_review"]}
-          }
-        },
-        {
-          "$group" => {
-            "_id" => "$_id",
-            "hbx_id" => {"$last" => "$hbx_id"},
-            "application_id" => {"$last" => "$application_id"}
+            "application_id" => {"$last" => "$_id"}
           }
         }
-      ], {allow_disk_use: true})
+      ],{allow_disk_use: true}).collect {|iap| iap["application_id"]}
+
+      FinancialAssistance::Application.where(:_id.in => application_ids,
+                                             :aasm_state => "determined",
+                                             :"applicants.is_active" => true,
+                                             :"applicants.evidences.eligibility_status".in => states)
     end
 
     # Creates both relationships A to B, and B to A.
@@ -1101,7 +1090,6 @@ module FinancialAssistance
 
     def calculate_total_net_income_for_applicants
       active_applicants.each do |applicant|
-        next applicant if applicant.net_annual_income.present?
         FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
       end
     end

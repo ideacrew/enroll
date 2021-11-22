@@ -145,6 +145,7 @@ end
 
 Then(/^the self employment information should be saved on the page$/) do
   expect(page).to have_content("23.3")
+  sleep 2
 end
 
 When(/^the Add Another Self Employment link appears$/) do

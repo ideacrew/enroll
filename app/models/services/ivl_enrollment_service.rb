@@ -101,14 +101,27 @@ module Services
     end
 
     def trigger_reminder_notices(family, event_name)
-      return unless event_name.present?
-
+      person = family.primary_person
       if EnrollRegistry[:legacy_enrollment_trigger].enabled?
-        person = family.primary_person
-        IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name)
-        @logger.info "Sent #{event_name} to #{person.hbx_id}" unless Rails.env.test?
+        if event_name.present?
+          IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name)
+          @logger.info "Sent #{event_name} to #{person.hbx_id}" unless Rails.env.test?
+        end
+      elsif EnrollRegistry[:document_reminder_notice_trigger].enabled?
+        result = ::Operations::Notices::IvlDocumentReminderNotice.new.call(family: family)
+        reminder_notice_logger(result, person, event_name)
+      end
+    rescue StandardError => e
+      @logger.info "Unable to trigger document reminder notice for hbx_id: #{person.hbx_id} due to #{e.inspect}"
+    end
+
+    def reminder_notice_logger(result, person, event_name)
+      return if Rails.env.test?
+
+      if result.success?
+        @logger.info "Sent DR notice event: #{event_name} to #{person.hbx_id}"
       else
-        ::Operations::Notices::IvlDocumentReminderNoticeTrigger.new.call(family: family, event_name: event_name) unless Rails.env.test?
+        @logger.info "Failed to send DR notice event: #{event_name} to #{person.hbx_id}"
       end
     end
 

@@ -301,12 +301,12 @@ module FinancialAssistance
       jobs.each do |job|
         job_hash[job.id] = {
           "Employer Name" => job.employer_name,
-          "EMPLOYER ADDRESSS LINE 1" => job.employer_address.address_1,
-          "EMPLOYER ADDRESSS LINE 2" => job.employer_address.address_2,
-          "CITY" => job.employer_address.city,
-          "STATE" => job.employer_address.state,
-          "ZIP" => job.employer_address.zip,
-          "EMPLOYER PHONE " => job.employer_phone.full_phone_number
+          "EMPLOYER ADDRESSS LINE 1" => job.employer_address&.address_1,
+          "EMPLOYER ADDRESSS LINE 2" => job.employer_address&.address_2,
+          "CITY" => job.employer_address&.city,
+          "STATE" => job.employer_address&.state,
+          "ZIP" => job.employer_address&.zip,
+          "EMPLOYER PHONE " => job.employer_phone&.full_phone_number
         }
       end
       job_hash
@@ -316,11 +316,11 @@ module FinancialAssistance
       addresses_hash = {}
       applicant.addresses.each do |address|
         addresses_hash["#{address.kind}_address"] = {
-          "ADDRESS LINE 1" => address.address_1,
-          "ADDRESS LINE 2" => address.address_2,
-          "CITY" => address.city,
-          "ZIP" => address.zip,
-          "STATE" => address.state
+          "ADDRESS LINE 1" => address&.address_1,
+          "ADDRESS LINE 2" => address&.address_2,
+          "CITY" => address&.city,
+          "ZIP" => address&.zip,
+          "STATE" => address&.state
         }
       end
       addresses_hash
