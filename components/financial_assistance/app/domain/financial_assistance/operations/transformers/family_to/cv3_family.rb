@@ -50,9 +50,8 @@ module FinancialAssistance
             applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
             applications.collect do |application|
               applicant_person_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              binding.irb
-              if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set 
-                appl = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)             
+              if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
+                appl = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
                 appl.success? ? appl.value! : {result: appl }
               end
             end.compact

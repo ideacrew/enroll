@@ -70,7 +70,7 @@ RSpec.describe ::Operations::Products::FetchSlcsp, dbclean: :after_each do
                 :product_id => BSON::ObjectId.new
               }
             ]
-          },
+          }
         }
       }
     end
