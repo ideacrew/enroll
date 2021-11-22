@@ -2,7 +2,7 @@
 
 module Operations
   module Products
-     # This class is to fetch second lowest cost silver plan.
+    # This class is to fetch second lowest cost silver plan.
     class FetchSlcsp
       include Dry::Monads[:result, :do]
       # @param [Hash of member premiums for silver plans] member_silver_product_premiums
@@ -51,6 +51,7 @@ module Operations
             result[hbx_id] = premium_hash
           end
         end
+
         Success(result)
       end
     end
