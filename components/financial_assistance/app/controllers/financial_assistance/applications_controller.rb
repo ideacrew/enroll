@@ -306,7 +306,7 @@ module FinancialAssistance
           "CITY" => job.employer_address&.city,
           "STATE" => job.employer_address&.state,
           "ZIP" => job.employer_address&.zip,
-          "EMPLOYER PHONE " => job.employer_phone.full_phone_number
+          "EMPLOYER PHONE " => job.employer_phone&.full_phone_number
         }
       end
       job_hash
