@@ -825,6 +825,7 @@ class Family
   end
 
   def hire_broker_agency(broker_role_id)
+    return unless broker_role_id
     hire_params = { family_id: id,
                     terminate_date: TimeKeeper.date_of_record,
                     broker_role_id: broker_role_id,
