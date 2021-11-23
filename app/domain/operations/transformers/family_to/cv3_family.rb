@@ -47,10 +47,12 @@ module Operations
 
         def transform_applications(primary_id)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
+          member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
           applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(:aasm_state.in => ["submitted", "determined"])
           applications.collect do |application|
-            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-          end
+            applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
+            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value! if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
+          end.compact
         end
 
         def transform_special_enrollment_periods(special_enrollment_periods)

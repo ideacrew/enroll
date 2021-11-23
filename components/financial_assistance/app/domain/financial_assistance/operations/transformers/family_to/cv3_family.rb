@@ -46,10 +46,10 @@ module FinancialAssistance
 
           def transform_applications(family)
             return unless EnrollRegistry.feature_enabled?(:financial_assistance)
-            member_hbx_ids = family.family_members.collect {|family_member| family_member.person.hbx_id}
+            member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
             applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
             applications.collect do |application|
-              applicant_person_hbx_ids = application.applicants.pluck(:person_hbx_id)
+              applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
               if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
                 appl = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
                 appl.success? ? appl.value! : {result: appl }
