@@ -1313,7 +1313,7 @@ class HbxEnrollment
 
   def select_applicable_broker_account(broker_accounts)
     last_broker_before_purchase = broker_accounts.select do |baa|
-      (baa.start_on < self.time_of_purchase)# &&
+      (baa.start_on <= self.time_of_purchase) # &&
     end.sort_by(&:start_on).last
     return nil if last_broker_before_purchase.nil?
     if  ((last_broker_before_purchase.end_on.blank?) || (last_broker_before_purchase.end_on >= self.time_of_purchase))
