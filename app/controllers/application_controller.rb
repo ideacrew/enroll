@@ -378,6 +378,7 @@ class ApplicationController < ActionController::Base
 
     def set_bookmark_url(url=nil)
       set_current_person
+      return unless current_user.person.id == @person.id
       bookmark_url = url || request.original_url
       if /employee/.match(bookmark_url)
         role = @person.try(:employee_roles).try(:last)
