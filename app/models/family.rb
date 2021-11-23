@@ -1116,9 +1116,18 @@ class Family
     fully_uploaded = []
     in_review = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
-      in_review = in_review + member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
-      fully_uploaded = fully_uploaded + member.person.verification_types.active.select{ |type| type.type_verified? }
+      outstanding_types += member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
+      in_review += member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
+      fully_uploaded += member.person.verification_types.active.select(&:type_verified?)
+    end
+
+    if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+      application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
+      application.active_applicants.each do |applicant|
+        outstanding_types += applicant.evidences.select{|evidence| ["outstanding", "pending"].include? evidence.eligibility_status }
+        in_review += applicant.evidences.select{|evidence| ["review"].include? evidence.eligibility_status }
+        fully_uploaded += applicant.evidences.select(&:type_verified?)
+      end
     end
 
     if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
