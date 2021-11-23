@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-# 3 family_members
-# submit the application with 3 applicants
-# delete a family member, now there are two family members
-# create application with 2 applicants and try to submit the application
 require 'dry/monads'
 require 'dry/monads/do'
 require 'rails_helper'
