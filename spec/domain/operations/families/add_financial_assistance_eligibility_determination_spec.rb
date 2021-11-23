@@ -125,6 +125,16 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "source" => "Faa"}]}
   end
 
+  before do
+    applicant = params[:applicants].first
+    applicant.merge!({:is_ia_eligible => true,
+                      :is_medicaid_chip_eligible => false,
+                      :is_totally_ineligible => false,
+                      :is_magi_medicaid => false,
+                      :is_non_magi_medicaid_eligible => false,
+                      :is_without_assistance => false})
+  end
+
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
