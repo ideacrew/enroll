@@ -147,19 +147,39 @@ module FinancialAssistance
 
           def transform_broker_accounts(broker_accounts)
             broker_accounts.collect do |account|
-              person = account.writing_agent&.person
+              broker_role = account.writing_agent
+              profile = account.broker_agency_profile
+              person = broker_role&.person
 
               {
                 start_on: account.start_on,
                 end_on: account.end_on,
                 is_active: account.is_active,
-                hbx_id: person&.hbx_id,
-                organization_name: account.ba_name,
-                dob: person&.dob,
-                full_name: person&.name_sfx.to_s + person&.full_name,
-                first_name: person&.first_name,
-                middle_name: person&.middle_name,
-                last_name: person&.last_name
+                broker_role_reference: {
+                  npn: broker_role.npn,
+                  person_reference: {
+                    hbx_id: person&.hbx_id,
+                    first_name: person&.first_name,
+                    middle_name: person&.middle_name,
+                    last_name: person&.last_name,
+                    dob: person&.dob,
+                    gender: person&.gender,
+                  },
+                  broker_agency_reference: {
+                    hbx_id: profile.hbx_id,
+                    market_kind: profile.market_kind,
+                    name: profile.legal_name,
+                    fein: profile.fein,
+                    corporate_npn: profile.corporate_npn,
+                  },
+                },
+                broker_agency_reference: {
+                  hbx_id: profile.hbx_id,
+                  market_kind: profile.market_kind,
+                  name: profile.legal_name,
+                  fein: profile.fein,
+                  corporate_npn: profile.corporate_npn,
+                },
               }
             end
           end
