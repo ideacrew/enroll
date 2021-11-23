@@ -4,7 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'rails_helper'
 
-RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_each do
   let(:primary_applicant) { FactoryBot.create(:person, hbx_id: "732020") }
   let(:dependent1) { FactoryBot.create(:person, hbx_id: "732021") }
   let(:dependent2) { FactoryBot.create(:person, hbx_id: "732022") }
@@ -41,12 +41,12 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_
 
   describe '#transform_applications' do
 
-    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family) }
+    subject { FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family) }
     before do
       create_instate_addresses
       create_relationships
       application.save!
-			allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
+      allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
     end
 
     context "when all applicants are valid" do
