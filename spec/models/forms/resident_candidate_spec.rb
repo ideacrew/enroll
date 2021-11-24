@@ -118,6 +118,8 @@ describe "match a person in db" do
     end
 
     it 'should pass validation when names passed with case mismatch' do
+      allow(subject).to receive(:state_based_policy_satisfied?).and_return(true)
+
       subject.first_name.upcase!
       subject.last_name.downcase!
 
