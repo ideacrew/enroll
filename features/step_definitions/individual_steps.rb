@@ -1025,7 +1025,7 @@ end
 
 Then(/Individual should land on help paying coverage page$/) do
   sleep 1
-  expect(page).to have_content "You can get help paying for coverage if you qualify"
+  expect(page).to have_content "Upload document(s) proving your identity"
 end
 
 When(/Individual clicks on Go To My Account button$/) do
