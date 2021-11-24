@@ -10,8 +10,10 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :around_each do
   let(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, person: person_user, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
   let(:this_broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
   let(:signed_in?){ true }
+  let(:broker_role) { FactoryBot.create(:broker_role, :aasm_state => 'active', broker_agency_profile: this_broker_agency_profile) }
   let(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
   #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
+  
   before do
     Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
   end
@@ -25,7 +27,7 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :around_each do
     expect(rendered).to match(/I'm an Admin/)
   end
   it 'identifies Brokers' do
-    assign(:broker_agency_profile, this_broker_agency_profile)
+    assign(:broker_role, broker_role)
     allow(controller).to receive(:controller_path).and_return("broker_agency_profiles")
     person_user.broker_agency_staff_roles = [broker_agency_staff_role]
     current_user.roles=['broker_agency_staff']
