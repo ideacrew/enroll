@@ -167,23 +167,23 @@ module FinancialAssistance
                     middle_name: person&.middle_name,
                     last_name: person&.last_name,
                     dob: person&.dob,
-                    gender: person&.gender,
+                    gender: person&.gender
                   },
                   broker_agency_reference: {
                     hbx_id: profile.hbx_id,
                     market_kind: profile.market_kind,
                     name: profile.legal_name,
                     fein: profile.fein,
-                    corporate_npn: profile.corporate_npn,
-                  },
+                    corporate_npn: profile.corporate_npn
+                  }
                 },
                 broker_agency_reference: {
                   hbx_id: profile.hbx_id,
                   market_kind: profile.market_kind,
                   name: profile.legal_name,
                   fein: profile.fein,
-                  corporate_npn: profile.corporate_npn,
-                },
+                  corporate_npn: profile.corporate_npn
+                }
               }
             end
           end
