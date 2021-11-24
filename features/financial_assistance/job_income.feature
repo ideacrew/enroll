@@ -72,6 +72,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the employer information
     Then the new employer information should be saved on the page
   
+  @flaky
   Scenario: User enters self employment information
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information

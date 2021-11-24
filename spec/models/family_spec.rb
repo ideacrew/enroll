@@ -262,48 +262,70 @@ describe Family, type: :model, dbclean: :around_each do
 
       it "adds a broker agency account" do
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         expect(carols_family.broker_agency_accounts.length).to eq(1)
       end
 
       it "adding twice only gives two broker agency accounts" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(1)
       end
 
       it "new broker adds a broker_agency_account" do
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         carols_family.hire_broker_agency(writing_agent2.id)
+        carols_family.reload
         expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
-        expect(carols_family.broker_agency_accounts[0].is_active).to be_falsey
-        expect(carols_family.broker_agency_accounts[1].is_active).to be_truthy
-        expect(carols_family.broker_agency_accounts[1].writing_agent_id).to eq(writing_agent2.id)
+        expect(carols_family.broker_agency_accounts.unscoped[0].is_active).to be_falsey
+        expect(carols_family.broker_agency_accounts.unscoped[1].is_active).to be_truthy
+        expect(carols_family.broker_agency_accounts.unscoped[1].writing_agent_id).to eq(writing_agent2.id)
       end
 
       it "carol changes brokers" do
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         carols_family.hire_broker_agency(writing_agent2.id)
+        carols_family.reload
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(0)
         expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(1)
       end
 
       it "writing_agent is popular" do
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         carols_family.hire_broker_agency(writing_agent2.id)
+        carols_family.reload
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         mikes_family.hire_broker_agency(writing_agent.id)
+        mikes_family.reload
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(2)
         expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(0)
       end
 
       it "broker agency profile is popular" do
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         carols_family.hire_broker_agency(writing_agent2.id)
+        carols_family.reload
         carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
         mikes_family.hire_broker_agency(writing_agent.id)
+        mikes_family.reload
         expect(Family.by_broker_agency_profile_id(broker_agency_profile.id).count).to eq(2)
         expect(Family.by_broker_agency_profile_id(broker_agency_profile2.id).count).to eq(0)
+      end
+
+      it "should not rehire already existing active broker" do
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
+        carols_family.hire_broker_agency(writing_agent.id)
+        carols_family.reload
+        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(1)
       end
     end
   end
@@ -1738,6 +1760,10 @@ describe Family, "scopes", dbclean: :after_each do
       end
       let!(:none_uploaded_family) do
         FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)
+      end
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
       end
 
       it "should not return uploaded verifications" do

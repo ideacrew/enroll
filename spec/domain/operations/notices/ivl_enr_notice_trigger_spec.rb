@@ -70,6 +70,10 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         expect(family_members_hash.success.count).to eq 2
         expect(family_members_hash.success.any? { |member_hash| member_hash[:person][:person_name][:first_name] == person_2.first_name }).to be_truthy
       end
+
+      it 'should include contact method' do
+        expect(family_members_hash.success.all? { |member_hash| member_hash[:person][:consumer_role][:contact_method].present? }).to be_truthy
+      end
     end
 
     context 'with valid params when in special enrollment period' do

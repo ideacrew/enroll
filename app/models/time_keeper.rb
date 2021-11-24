@@ -28,6 +28,10 @@ class TimeKeeper
     "Eastern Time (US & Canada)"
   end
 
+  def self.datetime_local
+    DateTime.parse "{date_of_record.strftime('%Y-%m-%d')} #{Time.now.in_time_zone(exchange_zone).strftime('%H:%M:%S %z')}"
+  end
+
   def self.start_of_exchange_day_from_utc(date)
     start_of_day = date.beginning_of_day
     Time.use_zone(exchange_zone) do

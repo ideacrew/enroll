@@ -52,8 +52,9 @@ module FinancialAssistance
       reasons_list = FinancialAssistance::Document::VERIFICATION_REASONS + FinancialAssistance::Document::REJECT_REASONS
       if reasons_list.include?(update_reason)
         verification_result = admin_verification_action(admin_action, @evidence, update_reason)
-        message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
+        message = (verification_result.is_a? String) ? verification_result : "Verification successfully approved."
         flash[:success] =  message
+        update_documents_status(@applicant) if @applicant
       else
         flash[:error] = "Please provide a verification reason."
       end
@@ -68,6 +69,7 @@ module FinancialAssistance
 
         if (@evidence.documents - [@document]).empty?
           @evidence.update_attributes(:eligibility_status => "outstanding", :update_reason => "all documents deleted")
+          update_documents_status(@docs_owner)
           flash[:danger] = "All documents were deleted. Action needed"
         else
           flash[:success] = "Document deleted."
@@ -134,11 +136,17 @@ module FinancialAssistance
       file.original_filename
     end
 
+    def update_documents_status(applicant)
+      family = applicant.family
+      family.update_family_document_status!
+    end
+
     def update_documents(title, file_uri)
       document = @evidence.documents.build
       success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
       @evidence.update_attributes(:rejected => false, :eligibility_status => "review", :update_reason => "document uploaded")
       @doc_errors = document.errors.full_messages unless success
+      update_documents_status(@docs_owner)
       @docs_owner.save!
     end
 
