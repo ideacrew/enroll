@@ -50,12 +50,15 @@ module PortalHeaderHelper
   end
 
   def get_broker_profile_path
+    broker_role = current_user.person.broker_role
+    broker_agency_profile = broker_role&.broker_agency_profile
     #if class is from benefit sponsor
-    klass_name = @broker_agency_profile.class.to_s.demodulize.constantize
-    if @broker_agency_profile.is_a? BrokerAgencyProfile
-      main_app.broker_agencies_profile_path(id: @broker_agency_profile.id)
+    klass_name = broker_agency_profile.class.to_s.demodulize.constantize
+
+    if broker_agency_profile.is_a? BrokerAgencyProfile
+      main_app.broker_agencies_profile_path(id: broker_role.broker_agency_profile_id)
     elsif klass_name == BrokerAgencyProfile
-      benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile.id)
+      benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: broker_role.benefit_sponsors_broker_agency_profile_id)
     end
   end
 
