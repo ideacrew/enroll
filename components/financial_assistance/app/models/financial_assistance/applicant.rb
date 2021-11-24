@@ -1272,7 +1272,7 @@ module FinancialAssistance
     end
 
     def propagate_applicant
-      #return if incomes_changed? || benefits_changed? || deductions_changed?
+      # return if incomes_changed? || benefits_changed? || deductions_changed?
       if is_active
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
         create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
