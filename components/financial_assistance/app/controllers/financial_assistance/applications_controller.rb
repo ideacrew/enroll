@@ -61,7 +61,12 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit! if @application.may_unsubmit?
-              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: #{publish_result.failure}" }
+              flash = if publish.result.failure.is_a?(Dry::Validation::Result)
+                        { error: validation_errors_parser(result.failure) }
+                      else
+                        { error: publish_result.failure }
+                      end
+              redirect_to application_publish_error_application_path(@application), flash: flash
             end
           else
             render 'workflow/step'
@@ -220,6 +225,23 @@ module FinancialAssistance
     end
 
     private
+
+    def validation_errors_parser(dry_result)
+      dry_result.errors.map do |error|
+        message = error.path.reduce("The ") do |attribute, path|
+          next_element = error.path[(error.path.index(path) + 1)]
+
+          attribute + if next_element.is_a?(Integer)
+                        "#{(next_element + 1).ordinalize} #{path}'s "
+                      elsif path.is_a? Integer
+                        ""
+                      else
+                        "#{path}:"
+                      end
+        end
+        message + " #{error.text}."
+      end
+    end
 
     def haven_determination_is_enabled?
       FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
