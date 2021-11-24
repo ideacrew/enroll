@@ -1041,3 +1041,8 @@ And(/Individual signed in to resume enrollment$/) do
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
 end
+
+Then(/Individual should land on interactive verifications page$/) do
+  sleep 1
+  expect(page).to have_content YourInformation.interactive_verifications_page
+end
