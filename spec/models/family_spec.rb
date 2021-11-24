@@ -1762,6 +1762,10 @@ describe Family, "scopes", dbclean: :after_each do
         FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)
       end
 
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
+      end
+
       it "should not return uploaded verifications" do
         expect(none_uploaded_family.all_persons_vlp_documents_status).to eq("None")
       end
