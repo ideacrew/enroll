@@ -138,6 +138,22 @@ describe "match a person in db" do
       expect(subject.match_person).to eq db_person
     end
 
+    it 'matches the person ingoring case' do
+      subject.first_name.upcase!
+      subject.last_name.downcase!
+      expect(subject.match_person).to eq db_person
+    end
+
+    it 'should pass validation when names passed with case mismatch' do
+      allow(subject).to receive(:state_based_policy_satisfied?).and_return(true)
+
+      subject.first_name.upcase!
+      subject.last_name.downcase!
+
+      expect(subject.state_based_policy_satisfied?).to be_truthy
+      expect(subject.valid?).to be_truthy
+    end
+
     it 'does not find the person if payload has a different ssn from the person' do
       subject.ssn = "888891234"
       expect(subject.match_person).to eq nil

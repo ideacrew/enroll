@@ -116,11 +116,19 @@ describe "match a person in db" do
       subject.ssn = "888891234"
       expect(subject.match_person).to eq nil
     end
+
+    it 'should pass validation when names passed with case mismatch' do
+      subject.first_name.upcase!
+      subject.last_name.downcase!
+
+      expect(subject.state_based_policy_satisfied?).to be_truthy
+      expect(subject.valid?).to be_truthy
+    end
   end
 
   context "with a person with a first name, different last name, dob and ssn" do
     let(:described_class) do
-      Forms::ConsumerCandidate.new({
+      Forms::ResidentCandidate.new({
                                      :dob => "1943-05-14",
                                      :ssn => "517994321",
                                      :first_name => "test",
@@ -135,7 +143,7 @@ describe "match a person in db" do
     it 'should be invalid' do
       allow(described_class).to receive(:state_based_policy_satisfied?).and_return(true)
       described_class.instance_variable_set(:@configuration, {ssn_present: ["first_name", "last_name", "dob", "encrypted_ssn"]})
-      expect(described_class.valid?).to eq false
+      expect(described_class.valid?).to eq true
     end
   end
 end

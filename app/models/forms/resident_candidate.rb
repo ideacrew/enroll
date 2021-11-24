@@ -69,7 +69,7 @@ module Forms
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       matched_person = match_person
 
-      if matched_person && matched_person != person_with_ssn
+      if matched_person != person_with_ssn
         errors.add(:base, l10n("insured.match_person.ssn_dob_name_error", site_short_name: EnrollRegistry[:enroll_app].settings(:short_name).item,
                                                                           contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
                                                                           contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
