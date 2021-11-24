@@ -1023,9 +1023,9 @@ Then(/Individual should land on Home page$/) do
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
-Then(/Individual should land on help paying coverage page$/) do
+Then(/IIndividual should land on interactive verifications page$/) do
   sleep 1
-  expect(page).to have_content "Upload document(s) proving your identity"
+  expect(page).to have_content YourInformation.interactive_verifications_page
 end
 
 When(/Individual clicks on Go To My Account button$/) do

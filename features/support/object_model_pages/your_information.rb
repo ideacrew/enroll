@@ -27,4 +27,8 @@ class YourInformation
   def self.continue_btn
     '.interaction-click-control-continue'
   end
+
+  def self.interactive_verifications_page
+    "Upload document(s) proving your identity"
+  end
 end
