@@ -1023,7 +1023,7 @@ Then(/Individual should land on Home page$/) do
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
-Then(/IIndividual should land on interactive verifications page$/) do
+Then(/Individual should land on interactive verifications page$/) do
   sleep 1
   expect(page).to have_content YourInformation.interactive_verifications_page
 end
