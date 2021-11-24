@@ -1023,6 +1023,11 @@ Then(/Individual should land on Home page$/) do
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
+Then(/Individual should land on help paying coverage page$/) do
+  sleep 1
+  expect(page).to have_content "You can get help paying for coverage if you qualify"
+end
+
 When(/Individual clicks on Go To My Account button$/) do
   click_link "GO TO MY ACCOUNT"
 end
