@@ -57,7 +57,7 @@ module PortalHeaderHelper
     klass_name = ["BrokerAgencyProfile"].include?(class_string) ? class_string.constantize : nil
 
     if broker_agency_profile.is_a? BrokerAgencyProfile
-      main_app.broker_agencies_profile_path(id: @broker_role.broker_agency_profile_id)    
+      main_app.broker_agencies_profile_path(id: @broker_role.broker_agency_profile_id)
     elsif klass_name == BrokerAgencyProfile
       benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_role.benefit_sponsors_broker_agency_profile_id)
     end

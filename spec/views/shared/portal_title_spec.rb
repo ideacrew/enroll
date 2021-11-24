@@ -13,7 +13,6 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :around_each do
   let(:broker_role) { FactoryBot.create(:broker_role, :aasm_state => 'active', broker_agency_profile: this_broker_agency_profile) }
   let(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
   #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
-  
   before do
     Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
   end
