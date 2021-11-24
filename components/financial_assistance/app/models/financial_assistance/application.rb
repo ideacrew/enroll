@@ -362,7 +362,7 @@ module FinancialAssistance
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
     end
 
-    def families_with_latest_determined_outstanding_verification
+    def self.families_with_latest_determined_outstanding_verification
       states = ["outstanding", "in_review"]
       application_ids = FinancialAssistance::Application.order_by(created_at: :asc).collection.aggregate([
         {"$match" => {"aasm_state" => "determined"}},

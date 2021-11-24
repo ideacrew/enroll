@@ -18,8 +18,10 @@ module FinancialAssistance
       case admin_action
       when "verify"
         evidence.update!(eligibility_status: 'verified', update_reason: update_reason)
+        "#{evidence.title} successfully verified."
       when "return_for_deficiency"
         evidence.update!(eligibility_status: 'outstanding', update_reason: update_reason, rejected: true)
+        "#{evidence.title} rejected."
       end
     end
 
