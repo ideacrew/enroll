@@ -16,7 +16,7 @@ class UpdateConsumerRoleVerificationStatus < MongoidMigrationTask
         puts "updated for person #{hbx_enrollment.family.primary_person.hbx_id}"
       end
     rescue StandardError => e
-      puts "failed for person #{hbx_enrollment.family.primary_person.hbx_id} due to #{e} "
+      puts "failed for person #{hbx_enrollment&.family&.primary_person&.hbx_id} due to #{e.inspect} "
     end
   end
 

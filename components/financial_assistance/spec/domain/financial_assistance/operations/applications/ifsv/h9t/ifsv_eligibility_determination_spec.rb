@@ -50,7 +50,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
       it 'should update applicant verification' do
         @applicant.reload
         expect(@applicant.evidences.by_name(:income).first.eligibility_status).to eq "verified"
-        expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+        expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
     context 'FTI Ifsv ineligible response' do
@@ -72,7 +72,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
       it 'should update applicant verification' do
         @applicant.reload
         expect(@applicant.evidences.by_name(:income).first.eligibility_status).to eq "outstanding"
-        expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+        expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
   end
