@@ -28,13 +28,14 @@ module FinancialAssistance
           def fetch_application(family)
             ::FinancialAssistance::Application.where(family_id: family.id,
                                                      assistance_year: TimeKeeper.date_of_record.next_year.year,
-                                                     :created_at.lte => Date.new(TimeKeeper.date_of_record.year, 11, 1),
+                                                     # It may required to add it back based on testing resultts to exclude applications creatted after 11/1
+                                                     # :created_at.lte => Date.new(TimeKeeper.date_of_record.year, 11, 1),
                                                      aasm_state: 'determined').max_by(&:created_at)
           end
 
           # rubocop:disable Metrics/CyclomaticComplexity
           def build_evidences(types, applicant, application)
-            types.collect do |type|
+            evidences =  types.collect do |type|
               key, title = type
 
               next if applicant.evidences.by_name(key).present?
@@ -44,9 +45,12 @@ module FinancialAssistance
                 FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
               when :income
                 next unless application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
-                FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "outstanding")
+                status = applicant.incomes.blank? ? "attested" : "outstanding"
+                FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
               end
             end
+
+            evidences.compact || []
           end
            # rubocop:enable Metrics/CyclomaticComplexity
 
@@ -55,12 +59,14 @@ module FinancialAssistance
             types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
             types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
-            application.active_applicants.each { |app| app.evidences << build_evidences(types, app, application) }
-            application.save!
-            application
+            application.active_applicants.each do |applicant|
+              applicant.evidences << build_evidences(types, applicant, application)
+              applicant.save!
+            end
           end
 
-          def transform_and_construct(application)
+          def transform_and_construct(family)
+            application = fetch_application(family)
             payload = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!).value!
           end
@@ -73,13 +79,13 @@ module FinancialAssistance
             families.each do |family|
               determined_application = fetch_application(family)
               next unless determined_application.present?
-              application = create_evidences(determined_application)
-              cv3_application = transform_and_construct(application)
+              create_evidences(determined_application)
+              cv3_application = transform_and_construct(family)
               applications_with_evidences << cv3_application.to_h
               count += 1
               rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
-            rescue StandardError
-              rrv_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id}")
+            rescue StandardError => e
+              rrv_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
 
             applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Applications for given families")

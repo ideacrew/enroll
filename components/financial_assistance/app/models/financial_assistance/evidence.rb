@@ -41,6 +41,10 @@ module FinancialAssistance
       ["verified", "attested"].include? eligibility_status
     end
 
+    def verif_due_date
+      due_on || TimeKeeper.date_of_record + 95.days
+    end
+
     def add_verification_history(params)
       verification_history << FinancialAssistance::VerificationHistory.new(params)
     end

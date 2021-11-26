@@ -826,34 +826,22 @@ class Family
 
   def hire_broker_agency(broker_role_id)
     return unless broker_role_id
-    existing_agency = current_broker_agency
-    broker_role = BrokerRole.find(broker_role_id)
-
-    # Removed code which checks and assigns for old broker profile.
-    # Instead log missing new broker profile scenario and avoid the hire of broker by family.
-    if broker_role.benefit_sponsors_broker_agency_profile_id.present?
-      broker_agency_profile_id = broker_role.benefit_sponsors_broker_agency_profile_id
-    elsif Rails.env.production?
-      logger = Logger.new("#{Rails.root}/log/family_hire_broker_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-      logger.info "Unable to find benefit sponsor broker profile for broker role,
-                    broker_role_id: #{broker_role_id},
-                    broker_agency_profile_id: #{broker_role.broker_agency_profile_id},
-                    benefit sponsor broker_agency_profile_id: #{broker_role.benefit_sponsors_broker_agency_profile_id}"
-    end
-
-    terminate_broker_agency if existing_agency
-    start_on = Time.now
-    broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
-    self.save
+    hire_params = { family_id: id,
+                    terminate_date: TimeKeeper.date_of_record,
+                    broker_role_id: broker_role_id,
+                    start_date: TimeKeeper.datetime_local,
+                    current_broker_account_id: current_broker_agency&.id }
+    ::Operations::Families::HireBrokerAgency.new.call(hire_params)
   end
 
   # Terminate the active Broker agency for this family
   #
   # @param terminate_on [ Date ] Date to end broker engagement
   def terminate_broker_agency(terminate_on = TimeKeeper.date_of_record)
-    if current_broker_agency.present?
-      current_broker_agency.update_attributes!(end_on: (terminate_on.to_date - 1.day).end_of_day, is_active: false)
-    end
+    terminate_params = { family_id: id,
+                         terminate_date: terminate_on,
+                         broker_account_id: current_broker_agency&.id }
+    ::Operations::Families::TerminateBrokerAgency.new.call(terminate_params)
   end
 
   # Get the active {BrokerAgencyAccount} account for this family. New Individual market enrollments will include this
@@ -1075,6 +1063,16 @@ class Family
         due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
+
+    if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+      application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
+      application&.active_applicants&.each do |applicant|
+        applicant.evidences.each do |evidence|
+          due_dates << evidence.verif_due_date if FinancialAssistance::Evidence::DUE_DATE_STATES.include? evidence.eligibility_status
+        end
+      end
+    end
+
     due_dates.compact!
     due_dates.uniq.sort
   end
@@ -1128,9 +1126,19 @@ class Family
     fully_uploaded = []
     in_review = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
-      in_review = in_review + member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
-      fully_uploaded = fully_uploaded + member.person.verification_types.active.select{ |type| type.type_verified? }
+      outstanding_types += member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
+      in_review += member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
+      fully_uploaded += member.person.verification_types.active.select(&:type_verified?)
+    end
+
+    if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+      application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
+
+      application&.active_applicants&.each do |applicant|
+        outstanding_types += applicant.evidences.select{|evidence| ["outstanding", "pending"].include? evidence.eligibility_status }
+        in_review += applicant.evidences.select{|evidence| ["review"].include? evidence.eligibility_status }
+        fully_uploaded += applicant.evidences.select(&:type_verified?)
+      end
     end
 
     if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
