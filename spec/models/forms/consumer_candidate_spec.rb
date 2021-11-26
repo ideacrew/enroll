@@ -173,7 +173,7 @@ describe "match a person in db" do
                                    })
     end
     let!(:db_person) { Person.create!(first_name: "test",   last_name: "o",   dob: "1943-05-14", ssn: "517994321")}
-  
+
     let(:person_match_policy) do
       double(
         settings: [
@@ -188,7 +188,7 @@ describe "match a person in db" do
     end
 
     let(:enroll_app) { double }
-  
+
     it 'should be invalid' do
       allow(described_class).to receive(:state_based_policy_satisfied?).and_return(true)
       described_class.instance_variable_set(:@configuration, {ssn_present: ["first_name", "last_name", "dob", "encrypted_ssn"]})
