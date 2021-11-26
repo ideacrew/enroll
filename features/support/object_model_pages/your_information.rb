@@ -29,6 +29,6 @@ class YourInformation
   end
 
   def self.interactive_verifications_page
-    "Upload document(s) proving your identity"
+    '.upload-document-text'
   end
 end
