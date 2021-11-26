@@ -94,7 +94,7 @@ describe 'match a person in db' do
       expect(subject.match_person).to eq db_person
     end
 
-    it 'matches the person ingoring case' do
+    it 'matches the person ignoring case' do
       subject.first_name.upcase!
       subject.last_name.downcase!
       expect(subject.match_person).to eq db_person
