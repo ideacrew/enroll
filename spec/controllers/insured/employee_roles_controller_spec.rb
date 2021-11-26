@@ -22,6 +22,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       before(:each) do
         allow(Person).to receive(:find).with(person_id).and_return(person)
         allow(person).to receive(:employee_roles).and_return([employee_role])
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
         allow(role_form).to receive(:update_attributes).and_return(save_result)
         allow(user).to receive(:person).and_return(person)
@@ -95,6 +98,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       let(:hbx_enrollments) {double(:active => [hbx_enrollment])}
       before do
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         allow(person).to receive(:employee_roles).and_return(employee_roles)
         allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
         allow(employer_profile).to receive(:broker_agency_accounts).and_return(broker_agency_accounts)
@@ -137,6 +143,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
       before :each do
         allow(EmployeeRole).to receive(:find).and_return(employee_role)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         allow(user).to receive(:person).and_return(person)
         allow(person).to receive(:agent?).and_return(false)
         allow(Forms::EmployeeRole).to receive(:new).and_return(person)
@@ -208,6 +217,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
       context "can construct_employee_role" do
         before :each do
+          allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+          allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+          allow(user).to receive(:has_broker_role?).and_return(false)
           allow(Forms::EmploymentRelationship).to receive(:new).and_return(employment_relationship)
           allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
           allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
@@ -269,6 +281,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
       before(:each) do
         allow(user).to receive(:person).and_return(nil)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         sign_in(user)
         allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
         allow(census_employee).to receive(:is_active?).and_return(true)
@@ -324,6 +339,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
       before(:each) do
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         sign_in(user)
         get :search
       end
@@ -347,6 +365,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       it "renders the 'welcome' template when user has no employee role" do
         allow(user).to receive(:person).and_return(person)
         allow(person).to receive(:agent?).and_return(false)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(user).to receive(:last_portal_visited=).and_return(true)
         allow(user).to receive(:save!).and_return(true)
@@ -374,6 +395,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
       before(:each) do
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         sign_in(user)
       end
 
