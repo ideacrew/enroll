@@ -490,6 +490,10 @@ describe Family, dbclean: :around_each do
   context "best_verification_due_date" do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
+    before do
+      EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
+    end
+
     it "should earliest duedate when family had two or more due dates" do
       family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
       allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)

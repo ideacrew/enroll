@@ -1558,7 +1558,7 @@ module FinancialAssistance
     # rubocop:enable Metrics/CyclomaticComplexity
 
     def build_evidences(types, applicant)
-      types.collect do |type|
+      evidences = types.collect do |type|
         key, title = type
 
         next if applicant.evidences.by_name(key).present?
@@ -1568,9 +1568,12 @@ module FinancialAssistance
           FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
         when :income
           next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
-          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "outstanding")
+          status = applicant.incomes.blank? ? "attested" : "outstanding"
+          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
         end
       end
+
+      evidences.compact || []
     end
 
     def delete_verification_documents
