@@ -1123,11 +1123,13 @@ class Family
 
     if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
       application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
-      application.active_applicants.each do |applicant|
+
+      application&.active_applicants&.each do |applicant|
         outstanding_types += applicant.evidences.select{|evidence| ["outstanding", "pending"].include? evidence.eligibility_status }
         in_review += applicant.evidences.select{|evidence| ["review"].include? evidence.eligibility_status }
         fully_uploaded += applicant.evidences.select(&:type_verified?)
       end
+
     end
 
     if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
