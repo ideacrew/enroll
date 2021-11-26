@@ -1,5 +1,6 @@
 module Forms
   class ResidentCandidate
+    include Acapi::Notifiers
     include ActiveModel::Model
     include ActiveModel::Validations
 
