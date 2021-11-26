@@ -42,15 +42,16 @@ module FinancialAssistance
 
               application.eligibility_determinations.each do |ed|
                 ed.applicants.each do |applicant|
-                  update_applicant_verifications(applicant, status)
+                  next if applicant.evidences.blank?
+                  update_applicant_evidence(applicant, status)
                 end
               end
-              Success('Successfully updated Applicant with evidences and verifications')
+              Success('Successfully updated Applicant with evidence')
             end
 
-            def update_applicant_verifications(applicant, status)
-              applicant_esi_evidence = applicant.evidences.by_name(:income).first
-              applicant_esi_evidence.update_attributes(eligibility_status: status)
+            def update_applicant_evidence(applicant, status)
+              applicant_ifsv_evidence = applicant.evidences.by_name(:income).first
+              applicant_ifsv_evidence.update_attributes(eligibility_status: status)
               applicant.save!
 
               Success(applicant)

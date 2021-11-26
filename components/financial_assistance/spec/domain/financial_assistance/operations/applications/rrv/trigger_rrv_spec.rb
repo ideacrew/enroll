@@ -121,4 +121,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
       expect(applicant.reload.evidences.count).to eq 2
     end
   end
+
+  it "when evidences are not created due to applicant ineligible" do
+    applicant.update(is_applying_coverage: false, is_ia_eligible: false)
+    expect(applicant.evidences.count).to eq 0
+    result = subject.call(families: [family])
+    expect(result).to be_success
+    expect(applicant.reload.evidences.count).to eq 0
+  end
 end
