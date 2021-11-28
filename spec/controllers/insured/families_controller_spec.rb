@@ -94,6 +94,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
     allow(person).to receive(:is_resident_role_active?).and_return(true)
     allow(person).to receive(:resident_role).and_return(resident_role)
+    allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
   end

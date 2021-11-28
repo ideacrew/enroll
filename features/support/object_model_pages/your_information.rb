@@ -27,4 +27,8 @@ class YourInformation
   def self.continue_btn
     '.interaction-click-control-continue'
   end
+
+  def self.interactive_verifications_page
+    '.upload-document-text'
+  end
 end
