@@ -290,7 +290,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 184,
+          "line": 186,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -388,6 +388,26 @@
       "note": ""
     },
     {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "5422444e7f2f2ee38545a0181b07ead8b4b7e5304f41a594778fe1c48b1c190b",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/exceptions_controller.rb",
+      "line": 8,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(file => \"public/#{(params[:code] or 500)}.html\", { :status => ((params[:code] or 500)), :layout => false })",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ExceptionsController",
+        "method": "show"
+      },
+      "user_input": "params[:code]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "552c3f77ff5d9e92a4efe636c41cb51596c1387ff9f57ba4e19b553f874d6706",
@@ -462,7 +482,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 184,
+          "line": 186,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -533,7 +553,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 486,
+          "line": 489,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -762,6 +782,26 @@
       "note": ""
     },
     {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "cf976b939c38f3829acf6b61bdac9f275d30d87a17ef72a6b18ca4bed60d7626",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/exceptions_controller.rb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(action => (params[:code] or 500).to_s, { :status => ((params[:code] or 500)) })",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ExceptionsController",
+        "method": "show"
+      },
+      "user_input": "params[:code]",
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "d092830cba35fa51bb209b41e985e5925bbbb6a3a6b60cc531203a8770391ac3",
@@ -822,6 +862,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-08-26 09:22:43 -0400",
+  "updated": "2021-11-19 17:00:41 -0500",
   "brakeman_version": "5.1.1"
 }

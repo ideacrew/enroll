@@ -150,6 +150,7 @@ Then(/^the consumer will be directed to answer the Experian Identity Proofing qu
 end
 
 And(/^that the consumer has answered the Experian Identity Proofing questions$/) do
+  sleep 30
   find(IvlVerifyIdentity.pick_answer_a).click
   find(IvlVerifyIdentity.pick_answer_c).click
   # screenshot("identify_verification")
@@ -173,6 +174,7 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
   find('td.sorting_1 a[class^="interaction-click-control"]').click
   sleep 2
   expect(page).to have_content('Identity')
+  sleep 20
   within('#Identity') do
     find('.label', :text => 'Action').click
     find('li', :text => 'Verify').click
@@ -216,6 +218,7 @@ And(/^HBX admin clicks continue after approving Identity document$/) do
 end
 
 When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
+  sleep 20
   expect(page).to have_content 'None of the situations listed above apply'
   find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
   expect(page).to have_content 'To enroll before open enrollment'
@@ -227,6 +230,7 @@ And(/^HBX admin click on back to my account button$/) do
 end
 
 Then(/^HBX admin should land on home page$/) do
+  sleep 15
   expect(page).to have_content Settings.site.short_name
 end
 
