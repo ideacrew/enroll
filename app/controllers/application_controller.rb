@@ -378,9 +378,6 @@ class ApplicationController < ActionController::Base
 
     def set_bookmark_url(url=nil)
       set_current_person
-      return if current_user.has_hbx_staff_role? ||
-                current_user.has_broker_agency_staff_role? ||
-                current_user.has_broker_role?
       bookmark_url = url || request.original_url
       if /employee/.match(bookmark_url)
         role = @person.try(:employee_roles).try(:last)
@@ -392,9 +389,6 @@ class ApplicationController < ActionController::Base
 
     def set_employee_bookmark_url(url=nil)
       set_current_person
-      return if current_user.has_hbx_staff_role? ||
-                current_user.has_broker_agency_staff_role? ||
-                current_user.has_broker_role?
       role = @person.try(:employee_roles).try(:last)
       bookmark_url = url || request.original_url
       save_bookmark role, bookmark_url
@@ -403,9 +397,6 @@ class ApplicationController < ActionController::Base
 
     def set_consumer_bookmark_url(url=nil)
       set_current_person
-      return if current_user.has_hbx_staff_role? ||
-                current_user.has_broker_agency_staff_role? ||
-                current_user.has_broker_role?
       role = @person.try(:consumer_role)
       bookmark_url = url || request.original_url
       save_bookmark role, bookmark_url
@@ -414,9 +405,6 @@ class ApplicationController < ActionController::Base
 
     def set_resident_bookmark_url(url=nil)
       set_current_person
-      return if current_user.has_hbx_staff_role? ||
-                current_user.has_broker_agency_staff_role? ||
-                current_user.has_broker_role?
       role = @person.try(:resident_role)
       bookmark_url = url || request.original_url
       save_bookmark role, bookmark_url
@@ -425,10 +413,7 @@ class ApplicationController < ActionController::Base
 
     def save_faa_bookmark(url)
       current_person = get_current_person
-      return if current_person.consumer_role.blank? ||
-                current_user.has_hbx_staff_role? ||
-                current_user.has_broker_agency_staff_role? ||
-                current_user.has_broker_role?
+      return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
     end
 

@@ -389,7 +389,7 @@ end
 
 Then(/Individual creates a new HBX account$/) do
   # find('.interaction-click-control-create-account').click
-  sleep 30
+  sleep 5
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -1034,16 +1034,10 @@ end
 And(/Individual signed in to resume enrollment$/) do
   visit '/'
   click_link('Consumer/Family Portal', wait: 10)
-  sleep 30
+  sleep 2
   find('.btn-link', :text => 'Sign In', wait: 5).click
-  sleep 20
+  sleep 5
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
-  sleep 15
-end
-
-Then(/Individual should land on interactive verifications page$/) do
-  sleep 1
-  find(YourInformation.interactive_verifications_page)
 end

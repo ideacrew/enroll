@@ -194,4 +194,6 @@ Feature: Consumer RIDP verification process
     Then HBX admin should land on home page
     When HBX admin logs out
     And Individual signed in to resume enrollment
-    Then Individual should land on interactive verifications page
+    Then Individual should land on Home page
+    
+
