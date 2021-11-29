@@ -663,11 +663,11 @@ module FinancialAssistance
 
               slcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
                 result << slcsp_info.success.dig(:person_hbx_id, :health_only_slcsp_premiums)
-              end
+              end.compact
 
               lcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
                 result << lcsp_info.success.dig(:person_hbx_id, :health_only_lcsp_premiums)
-              end
+              end.compact
 
               Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
             end
