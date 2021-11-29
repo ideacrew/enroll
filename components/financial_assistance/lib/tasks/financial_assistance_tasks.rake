@@ -12,10 +12,10 @@ task :transfer_accounts => :environment do
   assistance_year = FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
 
 
-  eligible_family_ids = ::FinancialAssistance::Application.determined.where(:submitted_at.gte => start_on, assistance_year: assistance_year).distinct(:family_id)
+  eligible_family_ids = ::FinancialAssistance::Application.determined.where(submitted_at: range, assistance_year: assistance_year).distinct(:family_id)
   eligible_family_ids.each do |family_id|
     application = FinancialAssistance::Application.where(family_id: family_id, assistance_year: assistance_year, aasm_state: 'determined').last
-    if application.present? && (application.transfer_requested || application.is_transferrable? )
+    if application.present? && (application.transfer_requested || application.is_transferrable? ) && (!application.account_transferred)
       application.transfer_account
     end
   end
