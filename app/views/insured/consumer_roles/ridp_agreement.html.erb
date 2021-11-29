@@ -43,3 +43,22 @@
     <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
   </div>
 </div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    let fdshEnabled = <%= EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>;
+    const path = fdshEnabled ? "/insured/fdsh_ridp_verifications/new" : "/insured/interactive_identity_verifications/new"
+    const agree = document.querySelector(".interaction-choice-control-value-agreement-agree");
+    const disagree = document.querySelector(".interaction-choice-control-value-agreement-disagree");
+
+    agree.addEventListener("click", function(){
+      $(".interaction-click-control-continue").attr("href", path);
+      $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
+    });
+
+    disagree.addEventListener("click", function(){
+      $(".interaction-click-control-continue").attr("href", "/insured/consumer_role/upload_ridp_document");
+      $('.aut_cons_text').parents('.row-form-wrapper').removeClass('hide');
+    });
+  });
+</script>
