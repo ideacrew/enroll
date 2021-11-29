@@ -669,6 +669,9 @@ registry:
       - key: :send_secure_purchase_confirmation_email
         item: :send_secure_purchase_confirmation_email
         is_enabled: false
+      - key: :custom_exceptions_controller
+        item: :custom_exceptions_controller
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:

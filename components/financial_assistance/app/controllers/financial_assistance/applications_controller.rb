@@ -320,11 +320,11 @@ module FinancialAssistance
       jobs.each do |job|
         job_hash[job.id] = {
           "Employer Name" => job.employer_name,
-          "EMPLOYER ADDRESSS LINE 1" => job.employer_address&.address_1,
-          "EMPLOYER ADDRESSS LINE 2" => job.employer_address&.address_2,
-          "CITY" => job.employer_address&.city,
-          "STATE" => job.employer_address&.state,
-          "ZIP" => job.employer_address&.zip,
+          "EMPLOYER ADDRESSS LINE 1" => job&.employer_address&.address_1,
+          "EMPLOYER ADDRESSS LINE 2" => job&.employer_address&.address_2,
+          "CITY" => job&.employer_address&.city,
+          "STATE" => job&.employer_address&.state,
+          "ZIP" => job&.employer_address&.zip,
           "EMPLOYER PHONE " => job.employer_phone&.full_phone_number
         }
       end
