@@ -11,8 +11,13 @@ $(document).on('change', "#person_no_dc_address, #dependent_no_dc_address, #no_d
 });
 
 $(document).on('ready', function(){
+    if(`EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true')`) {
+      var path = "/insured/fdsh_ridp_verifications/new";
+    } else {
+      var path = "/insured/interactive_identity_verifications/new";
+    }
     $(document).on("click", ".interaction-choice-control-value-agreement-agree", function(){
-        $(".interaction-click-control-continue").attr("href", "/insured/interactive_identity_verifications/new");
+        $(".interaction-click-control-continue").attr("href", path);
         $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
     });
     $(document).on("click", ".interaction-choice-control-value-agreement-disagree", function(){
