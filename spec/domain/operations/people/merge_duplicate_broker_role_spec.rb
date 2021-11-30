@@ -31,14 +31,8 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
           address_2: '#2',
           state: 'DC'
         )
-      per.emails = [
-        FactoryBot.build(:email, kind: 'work'),
-        FactoryBot.build(:email, kind: 'home')
-      ]
-      per.phones = [
-        FactoryBot.build(:phone, kind: 'work'),
-        FactoryBot.build(:phone, kind: 'home')
-      ]
+      per.emails = [FactoryBot.build(:email, kind: 'home')]
+      per.phones = [FactoryBot.build(:phone, kind: 'home')]
       per.save!
       per
     end
@@ -70,17 +64,30 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
       }
     end
 
-
-    let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
-    # let(:writing_agent)         { FactoryBot.create(:broker_role, person: broker_person, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    let(:broker_agency_profile) do
+      FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
+    end
 
     context 'When broker and consumer hbx id passed' do
       it 'should merge broker person' do
-        # binding.irb
         expect(consumer_person.broker_role).to be_blank
         subject.call(params)
         consumer_person.reload
         expect(consumer_person.broker_role).to be_present
+      end
+
+      it 'should copy work email' do
+        expect(consumer_person.work_email).to be_blank
+        subject.call(params)
+        consumer_person.reload
+        expect(consumer_person.work_email).to be_present
+      end
+
+      it 'should copy work phone' do
+        expect(consumer_person.work_phone).to be_blank
+        subject.call(params)
+        consumer_person.reload
+        expect(consumer_person.work_phone).to be_present
       end
 
       it 'should delete broker person' do
@@ -91,13 +98,47 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
     end
 
     context 'when families exists with broker assigned' do
-      let(:person_1) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
-      let(:family_1) { FactoryBot.create(:family, :with_primary_family_member, person: person_1)}
-      let(:person_2) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'jimmy', last_name: 'adams', dob: 40.years.ago, ssn: '472743400') }
-      let(:family_2) { FactoryBot.create(:family, :with_primary_family_member, person: person_2)}
+      let(:person_1) do
+        FactoryBot.create(
+          :person,
+          :with_consumer_role,
+          :male,
+          first_name: 'john',
+          last_name: 'adams',
+          dob: 40.years.ago,
+          ssn: '472743442'
+        )
+      end
+      let(:family_1) do
+        FactoryBot.create(
+          :family,
+          :with_primary_family_member,
+          person: person_1
+        )
+      end
+      let(:person_2) do
+        FactoryBot.create(
+          :person,
+          :with_consumer_role,
+          :male,
+          first_name: 'jimmy',
+          last_name: 'adams',
+          dob: 40.years.ago,
+          ssn: '472743400'
+        )
+      end
+      let(:family_2) do
+        FactoryBot.create(
+          :family,
+          :with_primary_family_member,
+          person: person_2
+        )
+      end
 
       before(:each) do
-        broker_person.broker_role.update(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
+        broker_person.broker_role.update(
+          benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id
+        )
         family_1.hire_broker_agency(broker_person.broker_role.id)
         family_1.reload
         family_2.hire_broker_agency(broker_person.broker_role.id)
@@ -106,7 +147,12 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
 
       it 'should reassign the broker' do
         writing_agent_old = broker_person.broker_role
-        expect(Family.where(:"broker_agency_accounts.writing_agent_id" => writing_agent_old.id).count).to eq 2
+        expect(
+          Family.where(
+            'broker_agency_accounts.writing_agent_id': writing_agent_old.id
+          ).count
+        ).to eq 2
+        expect(writing_agent_old.workflow_state_transitions).to be_present
 
         subject.call(params)
         consumer_person.reload
@@ -114,6 +160,7 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
 
         expect(Family.by_writing_agent_id(writing_agent_old.id).count).to eq 0
         expect(Family.by_writing_agent_id(writing_agent_new.id).count).to eq 2
+        expect(writing_agent_new.workflow_state_transitions).to be_present
       end
     end
   end
