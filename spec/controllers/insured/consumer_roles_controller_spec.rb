@@ -240,7 +240,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it "should throw a 500 error" do
       sign_in user
       post :create, params: { person: person_params }
-      expect(response).to have_http_status(500)
+      expect(flash[:error]).to eq "Unable to find a unique record matching the given information"
     end
   end
 
