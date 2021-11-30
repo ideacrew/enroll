@@ -58,7 +58,7 @@ class Family
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   # embeds_many :broker_agency_accounts #depricated
-  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
+  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount", cascade_callbacks: true
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
   has_many :payment_transactions
