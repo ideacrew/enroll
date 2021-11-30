@@ -195,15 +195,6 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       person.save
       expect(helper.ridp_redirection_link(person)).to eq "/insured/consumer_role/help_paying_coverage"
     end
-
-    it "should return nil if identity is not verified and current user has not staff role" do
-      allow(person.consumer_role).to receive(:identity_verified?).and_return false
-      person.primary_family.update_attributes(application_type: 'In Person')
-      consumer = person.consumer_role
-      consumer.admin_bookmark_url = "/insured/ridp_agreement"
-      person.save
-      expect(helper.ridp_redirection_link(person)).to eq nil
-    end
   end
 end
 end
