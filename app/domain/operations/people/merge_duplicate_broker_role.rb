@@ -36,7 +36,7 @@ module Operations
           Success(broker_record)
         else
           Failure("Unable to find broker person record with hbx id #{params[:source_hbx_id]}")
-        end        
+        end
       end
 
       def find_consumer(params)
@@ -64,18 +64,18 @@ module Operations
 
       def merge_map
         {
-            user: {from: :source, attribute: :user_id},
-            broker_role: {from: :source},
-            broker_agency_staff_roles: {from: :source},
-            addresses: {from: :source, on: :kind},
-            phones: {from: :source, on: :kind},
-            emails: {from: :source, on: :kind},
-            documents: {from: :source}
+          user: {from: :source, attribute: :user_id},
+          broker_role: {from: :source},
+          broker_agency_staff_roles: {from: :source},
+          addresses: {from: :source, on: :kind},
+          phones: {from: :source, on: :kind},
+          emails: {from: :source, on: :kind},
+          documents: {from: :source}
         }
       end
 
       def merge(broker_record, consumer_record)
-        Person.relations.each do |rel, rel_metadata| 
+        Person.relations.each do |rel, _rel_metadata|
           next unless merge_map.key?(rel.to_sym)
           instruction = merge_map[rel.to_sym]
           if instruction[:attribute]
@@ -86,38 +86,42 @@ module Operations
             next
           end
 
-          broker_value = broker_record.send(rel)
-          if broker_value.present?
-            consumer_value = consumer_record.send(rel)
-
-            if rel.pluralize == rel && instruction[:on]
-              broker_value.each do |embed_record|
-                if consumer_value.none?{|r| r.send(instruction[:on]) == embed_record.send(instruction[:on])}
-                  consumer_record.send_chain(rel, ["build",  broker_value.attributes])
-                  p "Added #{rel} to consumer record with #{instruction[:on]} #{embed_record.send(instruction[:on])}."
-                end
-              end
-            else
-              unless consumer_value
-                consumer_record.send("build_#{rel}", broker_value.attributes.merge('_id' => BSON::ObjectId.new))
-                p "Added #{rel} to consumer record."
-              end
-            end
-          end
+          merge_embed_documents(broker_record, consumer_record, rel)
         end
 
         # if consumer_record.save
           # p "Saved changes to consumer person record."
-          Success(consumer_record)
+        Success(consumer_record)
         # else
         #   p "Failed to save consumer due to #{consumer_record.errors.to_h}."
         #   Failure(consumer_record.errors.to_h)
         # end
       end
 
+      def merge_embed_documents(broker_record, consumer_record, rel)
+        instruction = merge_map[rel.to_sym]
+        broker_value = broker_record.send(rel)
+        return unless broker_value.present?
+        consumer_value = consumer_record.send(rel)
+
+        if rel.pluralize == rel && instruction[:on]
+          broker_value.each do |embed_record|
+            if consumer_value.none?{|r| r.send(instruction[:on]) == embed_record.send(instruction[:on])}
+              consumer_record.send_chain(rel, ["build",  broker_value.attributes])
+              p "Added #{rel} to consumer record with #{instruction[:on]} #{embed_record.send(instruction[:on])}."
+            end
+          end
+        else
+          unless consumer_value
+            consumer_record.send("build_#{rel}", broker_value.attributes.merge('_id' => BSON::ObjectId.new))
+            p "Added #{rel} to consumer record."
+          end
+        end
+      end
+
       def save_and_delete_broker_role(broker_record, consumer_record)
         writing_agent = broker_record.broker_role
-  
+
         if consumer_record.valid?
           broker_record.broker_role.delete
           consumer_record.save!
@@ -129,14 +133,14 @@ module Operations
 
       def update_broker_families(writing_agent, consumer_record)
         Family.by_writing_agent_id(writing_agent.id).each do |family|
-          
+
           family.broker_agency_accounts.where(:writing_agent_id => writing_agent.id, :is_active => true).each do |baa|
             family.broker_agency_accounts << baa.class.new({
-              start_on: baa.start_on,
-              writing_agent_id: consumer_record.broker_role.id,
-              benefit_sponsors_broker_agency_profile_id: baa.benefit_sponsors_broker_agency_profile_id,
-              is_active: true
-            })
+                                                             start_on: baa.start_on,
+                                                             writing_agent_id: consumer_record.broker_role.id,
+                                                             benefit_sponsors_broker_agency_profile_id: baa.benefit_sponsors_broker_agency_profile_id,
+                                                             is_active: true
+                                                           })
 
             baa.update_attributes!(is_active: false, end_on: Date.today)
           end

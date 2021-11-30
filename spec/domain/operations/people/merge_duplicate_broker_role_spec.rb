@@ -52,7 +52,7 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
     end
 
     let!(:broker_person) do
-       FactoryBot.create(
+      FactoryBot.create(
         :person,
         :with_broker_role,
         :with_mailing_address,
@@ -63,14 +63,14 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
         gender: 'male'
       )
     end
-    let(:params) {
+    let(:params) do
       {
         source_hbx_id: broker_person.hbx_id,
         target_hbx_id: consumer_person.hbx_id
       }
-    }
+    end
 
-   
+
     let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
     # let(:writing_agent)         { FactoryBot.create(:broker_role, person: broker_person, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
 
@@ -107,11 +107,11 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
       it 'should reassign the broker' do
         writing_agent_old = broker_person.broker_role
         expect(Family.where(:"broker_agency_accounts.writing_agent_id" => writing_agent_old.id).count).to eq 2
-      
+
         subject.call(params)
         consumer_person.reload
         writing_agent_new = consumer_person.broker_role
- 
+
         expect(Family.by_writing_agent_id(writing_agent_old.id).count).to eq 0
         expect(Family.by_writing_agent_id(writing_agent_new.id).count).to eq 2
       end
