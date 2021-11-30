@@ -62,7 +62,7 @@ module FinancialAssistance
             else
               @application.unsubmit! if @application.may_unsubmit?
               flash_message = if publish_result.failure.is_a?(Dry::Validation::Result)
-                                { error: "Submission Error: #{build_error_messages(publish_result.failure.errors)}" }
+                                { error: build_error_messages(publish_result.failure.errors) }
                               else
                                 { error: "Submission Error: #{publish_result.failure}" }
                               end
