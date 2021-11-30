@@ -91,27 +91,18 @@ module ConsumerRolesHelper
     end
   end
 
+  # Just send the consumer straight to either the help paying for coverage/insured family members page if their id is verified already
   def ridp_redirection_link(person)
+    consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: person.consumer_role.id)
     consumer = person.consumer_role
     app_type = person.primary_family.application_type
     admin_user =  current_user.has_hbx_staff_role?
     id_verified = consumer.identity_verified?
     app_verified = consumer.application_verified?
-    case app_type
-      when 'Paper'
-        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-      when 'In Person'
-        in_person_type(id_verified, admin_user, consumer)
-      when 'Phone'
-        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-      when 'Curam'
-        consumer.admin_bookmark_url
-      when 'Mobile'
-        return consumer.admin_bookmark_url
-      else
-        if id_verified
-          return consumer.admin_bookmark_url
-        end
-    end
+    return paper_or_phone_type(id_verified, app_verified, admin_user, consumer) if ['Paper', 'Phone'].include?(app_type)
+    return in_person_type(id_verified, admin_user, consumer) if app_type == 'In Person'
+    return consumer.admin_bookmark_url if ['Curam', 'Mobile'].include?(app_type)
+    return consumer_redirection_path if id_verified
+    consumer.admin_bookmark_url
   end
 end
