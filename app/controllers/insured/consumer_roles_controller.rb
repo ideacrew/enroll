@@ -154,9 +154,7 @@ class Insured::ConsumerRolesController < ApplicationController
       if @consumer_role.present?
         @person = @consumer_role.person
       else
-      # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
-        return
+        raise 'Unable to find a unique record matching the given information'
       end
     rescue Exception => e
       flash[:error] = set_error_message(e.message)
