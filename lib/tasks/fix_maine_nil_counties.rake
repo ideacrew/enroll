@@ -14,7 +14,9 @@ namespace :migrations do
     def pull_county
       puts("Beginning pull counties")
       file_name = "#{Rails.root}/list_county.csv"
-      people = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""])
+      people_1 = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""])
+      people_2 = Person.where("addresses.county" => /.*benefitmarkets.*/i )
+      people = people_1 + people_2
       total_count = people.count
       users_per_iteration = 10_000.0
       counter = 0
@@ -42,7 +44,7 @@ namespace :migrations do
       zip = address.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
       counties = county_finder(zip)
       if counties.count == 1
-        address.county = counties.first
+        address.county = counties.first.county_name
         :fixed
       elsif counties.count == 0
         puts "No county found for ZIP: #{zip} #{address.state}"
