@@ -1,6 +1,6 @@
 class Exchanges::AgentsController < ApplicationController
   before_action :check_agent_role
-  before_action :check_for_paper_app, only: [:resume_enrollment, :resume_person_enrollment]
+  before_action :check_for_paper_app, only: [:resume_enrollment]
   def home
      @title = current_user.agent_title
      person_id = session[:person_id]
@@ -46,10 +46,6 @@ class Exchanges::AgentsController < ApplicationController
     else
       redirect_to family_account_path
     end
-  end
-
-  def resume_person_enrollment
-    redirect_to bookmark_url_path(@person.consumer_role.bookmark_url)
   end
 
   def inbox

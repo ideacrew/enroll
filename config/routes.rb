@@ -228,7 +228,6 @@ Rails.application.routes.draw do
         get :begin_consumer_enrollment
         get :begin_employee_enrollment
         get :resume_enrollment
-        get :resume_person_enrollment
         get :show
       end
       member do

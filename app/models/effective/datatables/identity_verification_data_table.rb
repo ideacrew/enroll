@@ -8,7 +8,7 @@ module Effective
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
-        table_column :document_type, :label => 'Document Type', :proc => proc { |row| link_to document_type(row), resume_person_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
+        table_column :document_type, :label => 'Document Type', :proc => proc { |row| link_to document_type(row), row.consumer_role.bookmark_url }, :filter => false, :sortable => false
         table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => Proc.new { |row| document_uploaded_date(row) } , :filter => false, :sortable => false
       end
 
