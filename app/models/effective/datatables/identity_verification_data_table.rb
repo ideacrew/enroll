@@ -3,13 +3,13 @@ module Effective
   module Datatables
     class IdentityVerificationDataTable < Effective::MongoidDatatable
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
-        table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
-        table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
-        table_column :document_type, :label => 'Document Type', :proc => Proc.new { |row| document_type(row) }, :filter => false, :sortable => false
-        table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => Proc.new { |row| document_uploaded_date(row) } , :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => Proc { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
+        table_column :ssn, :label => 'SSN', :proc => Proc { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
+        table_column :dob, :label => 'DOB', :proc => Proc(&:dob), :filter => false, :sortable => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => Proc(&:hbx_id), :filter => false, :sortable => false
+        table_column :count, :label => 'Count', :width => '100px', :proc => Proc { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
+        table_column :document_type, :label => 'Document Type', :proc => Proc { |row| link_to document_type(row), document_uploaded_path(row) }, :filter => false, :sortable => false
+        table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => Proc { |row| document_uploaded_date(row) }, :filter => false, :sortable => false
       end
 
       scopes do
@@ -26,7 +26,15 @@ module Effective
       def global_search?
         true
       end
-      
+
+      def document_uploaded_path(row)
+        if EnrollRegistry.feature_enabled?(:ridp_h139)
+          Rails.application.routes.url_helpers.failed_validation_insured_fdsh_ridp_verifications_path(person_id: row.id)
+        else
+          Rails.application.routes.url_helpers.failed_validation_insured_interactive_identity_verifications_path(person_id: row.id)
+        end
+      end
+
       def document_type(row)
         if row.consumer_role.application_validation == "outstanding" && row.consumer_role.identity_validation == "pending" || row.consumer_role.application_validation == "valid" && row.consumer_role.identity_validation == "pending"
           return "Identity"
@@ -46,7 +54,6 @@ module Effective
           ridp_document.present? && ridp_document.uploaded_at.present? ? ridp_document.uploaded_at : ""
         end
       end
-
     end
   end
 end
