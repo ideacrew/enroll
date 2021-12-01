@@ -95,7 +95,7 @@ FactoryBot.define do
 
     after(:build) do |product, _evaluator|
       product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period,
-                                                                                       rating_area: FactoryBot.create(:benefit_markets_locations_rating_area, active_year: product.application_period.min.year))
+                                                                                       rating_area: FactoryBot.create(:benefit_markets_locations_rating_area))
     end
 
     factory :active_individual_health_product,       traits: [:ivl_product]
