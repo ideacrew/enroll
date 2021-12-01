@@ -16,11 +16,24 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   context 'success' do
     context 'with valid payload' do
       before do
+        ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
         @result = subject.call(transformed)
       end
 
-      it 'should return success' do
+      it 'should return failure if no zips are present' do
         expect(@result).to be_success
+      end
+    end
+  end
+
+  context 'failure' do
+    context 'with counties not matching those present in database' do
+      before do
+        @result = subject.call(transformed)
+      end
+
+      it 'should return failure if no zips are present' do
+        expect(@result).to eq(Failure("Unable to find county objects for zips [\"04330\", \"04330\", \"04330\"]"))
       end
     end
   end

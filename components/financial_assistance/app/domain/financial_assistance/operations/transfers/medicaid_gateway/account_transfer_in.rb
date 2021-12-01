@@ -391,8 +391,13 @@ module FinancialAssistance
             Success(applications.first)
           end
 
+          def county_finder(zip)
+            ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
+          end
+
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
+            zips_with_missing_counties = []
             applications[:applicants].each do |applicant|
               persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
               return Failure("No matching applicant") unless persisted_applicant.present?
@@ -447,10 +452,15 @@ module FinancialAssistance
               persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
               persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
+              # Check applicant address
+              zip = persisted_applicant.addresses.first.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
+              real_county = county_finder(zip)
+              zips_with_missing_counties << zip if real_county.blank?
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
               persisted_applicant.save(validate: false)
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
             end
+            return Failure("Unable to find county objects for zips #{zips_with_missing_counties}") if zips_with_missing_counties.present?
             Success("Successfully transferred in account")
           rescue Mongoid::Errors::Validations => e
             Failure("Fill applicant form validation: #{e.summary}")
