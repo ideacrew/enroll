@@ -102,7 +102,6 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
       let(:params) {{ "enrollment_id" => terminated_enrollment.id.to_s, "new_termination_date" => (termination_date + 10.days).to_s}}
 
       it 'should return success and create a new terminated enrollment' do
-        binding.irb
         expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
         expect(subject).to be_success
         expect(terminated_enrollment.family.hbx_enrollments.count).to eq 2
