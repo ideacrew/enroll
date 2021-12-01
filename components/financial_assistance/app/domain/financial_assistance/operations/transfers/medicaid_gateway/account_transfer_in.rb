@@ -28,6 +28,10 @@ module FinancialAssistance
             Success(application_id)
           end
 
+          def county_finder(zip)
+            ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
+          end
+
           private
 
           def load_data(payload = {})
@@ -389,10 +393,6 @@ module FinancialAssistance
             applications = FinancialAssistance::Application.where(id: id)
             return Failure("Application with id #{id} not found") unless applications.any?
             Success(applications.first)
-          end
-
-          def county_finder(zip)
-            ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
           end
 
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength

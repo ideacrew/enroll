@@ -13,6 +13,8 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
   let(:transformed) { ::AcaEntities::Atp::Transformers::Cv::Family.transform(record.to_hash(identifier: true)) }
 
+  let(:zip_double) { double }
+
   context 'success' do
     context 'with valid payload' do
       before do
@@ -20,7 +22,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call(transformed)
       end
 
-      it 'should return failure if no zips are present' do
+      it 'should return success if zips are present in database' do
         expect(@result).to be_success
       end
     end
