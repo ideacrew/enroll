@@ -10,7 +10,7 @@ module Services
     def process_enrollments(new_date)
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments if new_date == new_date.beginning_of_year
-      send_enrollment_notice_for_ivl(new_date)
+      send_enr_or_dr_notice_to_ivl(new_date)
       send_reminder_notices_for_ivl(new_date)
     end
 
@@ -78,21 +78,25 @@ module Services
       )
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
-      return [] unless EnrollRegistry[:legacy_enrollment_trigger].enabled?
-
+    # Triggers ENR or DR notice based on the application setting
+    def send_enr_or_dr_notice_to_ivl(new_date)
       @logger.info '*' * 50
-      @logger.info "Started send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
+      @logger.info "Started send_enr_or_dr_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
         begin
           person = family.primary_applicant.person
-          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+          if EnrollRegistry[:legacy_enrollment_trigger].enabled?
+            IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+          elsif EnrollRegistry[:document_reminder_notice_trigger].enabled?
+            result = ::Operations::Notices::IvlDocumentReminderNotice.new.call(family: family)
+            reminder_notice_logger(result, person, 'verifications_reminder')
+          end
         rescue Exception => e
           Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
         end
       end
-      @logger.info "Ended send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
+      @logger.info "Ended send_enr_or_dr_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families
     end
 
