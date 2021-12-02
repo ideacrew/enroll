@@ -887,10 +887,10 @@ class Family
     def advance_day(new_date)
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
-      send_enrollment_notice_for_ivl(new_date)
+      send_enr_or_dr_notice_to_ivl(new_date)
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
+    def send_enr_or_dr_notice_to_ivl(new_date)
       start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
       end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
       families = Family.where({
