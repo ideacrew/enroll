@@ -18,6 +18,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
       before do
+        allow(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family).and_return(true)
         family.primary_person.emails.create(kind: "home", address: "fakeemail@email.com")
         @application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
         @expected_response =
