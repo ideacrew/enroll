@@ -24,6 +24,7 @@ FactoryBot.define do
     service_area { create(:benefit_markets_locations_service_area) }
 
     transient do
+      build_premium_tables true
       issuer_name { 'BlueChoice' }
     end
 
@@ -93,9 +94,11 @@ FactoryBot.define do
 
     # association :service_area, factory: :benefit_markets_locations_service_area, strategy: :create
 
-    after(:build) do |product, _evaluator|
-      product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period,
-                                                                                       rating_area: FactoryBot.create(:benefit_markets_locations_rating_area, active_year: product.application_period.min.year))
+    after(:build) do |product, evaluator|
+      if evaluator.build_premium_tables
+        product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period,
+                                                                                         rating_area: FactoryBot.create(:benefit_markets_locations_rating_area, active_year: product.application_period.min.year))
+      end
     end
 
     factory :active_individual_health_product,       traits: [:ivl_product]
