@@ -9,11 +9,11 @@ module Eligibilities
       include Mongoid::Timestamps
 
       ELIGIBILITIES_LIST = %i[
-        aptc_financial_assistance_eligibility,
-        magi_medicaid_eligiblility,
-        chip_eligibility,
+        aptc_financial_assistance_eligibility
+        magi_medicaid_eligiblility
+        chip_eligibility
         enrollment_eligibility
-      ]
+      ].freeze
 
       field :key, type: Symbol
       field :title, type: String
@@ -42,13 +42,13 @@ module Eligibilities
       #    list of eligibility keys to geerate for this snapshot.
       #    Default is :all
       # @return [Array<Eligibility>]
-      def snap(family, effective_date = Date.today, options = {})
+      def snap(_family, _effective_date = Date.today, options = {})
         eligibilities = options[:eligibilities].slice || [:all]
 
         eligibilities = ELIGIBILITIES_LIST if eligibilities.include?(:all)
 
         eligibilities.reduce([]) do |list, eligibility|
-          next unless ELIGIBILITIES_LIST.include?(eligibility.to_sym)
+          next list unless ELIGIBILITIES_LIST.include?(eligibility.to_sym)
           eligibility.evidences
         end
       end
