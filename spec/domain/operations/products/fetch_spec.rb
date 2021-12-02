@@ -250,7 +250,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         p3
       end
       let!(:family_member3) { FactoryBot.create(:family_member, person: person3, family: family)}
-  
+
       let!(:list_dental_products) {  FactoryBot.create_list(:benefit_markets_products_dental_products_dental_product, 5, :with_issuer_profile, :with_qhp, pediatric_ehb: 0.9943, rating_method: 'Age-Based Rates')}
 
       before do
@@ -284,7 +284,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
 
       it "should add ped dental premium to health_and_ped_dental section" do
         child_ped_premium_info = @result.success.values[0][:health_and_ped_dental][person3.hbx_id][0]
-        expect( child_ped_premium_info[:monthly_premium]).to eq 397.72
+        expect(child_ped_premium_info[:monthly_premium]).to eq 397.72
       end
     end
   end

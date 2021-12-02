@@ -662,8 +662,8 @@ module FinancialAssistance
               return lcsp_info if lcsp_info.failure?
 
               # select available applicants from slcsp_info
-              selected_slcsp_info = slcsp_info.success.select{|k,v| person_hbx_ids.include?(k)}
-              selected_lcsp_info = lcsp_info.success.select{|k,v| person_hbx_ids.include?(k)}
+              selected_slcsp_info = slcsp_info.success.select{|k,_v| person_hbx_ids.include?(k)}
+              selected_lcsp_info = lcsp_info.success.select{|k,_v| person_hbx_ids.include?(k)}
               slcsp_member_premiums = group_by_kinds(selected_slcsp_info)
               lcsp_member_premiums = group_by_kinds(selected_lcsp_info)
 
