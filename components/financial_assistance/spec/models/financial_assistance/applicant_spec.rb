@@ -20,6 +20,17 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                       family_member_id: BSON::ObjectId.new)
   end
 
+  describe 'after_update' do
+    context 'callbacks' do
+
+      it 'calls propagate_applicant' do
+        applicant.stub(:propagate_applicant)
+        applicant.update_attributes(dob: Date.today - 30.years)
+        expect(applicant).to have_received(:propagate_applicant)
+      end
+    end
+  end
+
   context 'i766' do
     context 'valid i766 document exists' do
       before do
