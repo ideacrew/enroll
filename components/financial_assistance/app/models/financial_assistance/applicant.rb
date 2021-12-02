@@ -323,7 +323,7 @@ module FinancialAssistance
     before_save :generate_hbx_id
 
     # Responsible for updating family member  when applicant is created/updated
-    # after_update :propagate_applicant
+    after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
 
     def generate_hbx_id

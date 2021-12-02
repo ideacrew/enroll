@@ -17,5 +17,6 @@ module Publishers
     register_event 'medicaid_eligible_on_reverification'
     register_event 'expired_consent_during_reverification'
     register_event 'mixed_determination_on_reverification'
+    register_event 'account_transferred'
   end
 end
