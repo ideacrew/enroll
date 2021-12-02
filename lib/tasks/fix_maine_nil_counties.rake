@@ -10,13 +10,18 @@ namespace :migrations do
     # - list the county with nil county with zip outside ME
     # - application county update
 
+    def people
+      people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""]).map(&:_id)
+      # benefitmarkets because previously we erroneously assigned a object instead of ring to county
+      people_2_ids = Person.where("addresses.county" => /.*benefitmarkets.*/i ).map(&:_id)
+      people_ids = (people_1_ids + people_2_ids).flatten
+      Person.where(:"_id".in => people_ids)
+    end
+
     #1 list people with nil county
     def pull_county
       puts("Beginning pull counties")
       file_name = "#{Rails.root}/list_county.csv"
-      people_1 = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""])
-      people_2 = Person.where("addresses.county" => /.*benefitmarkets.*/i )
-      people = people_1 + people_2
       total_count = people.count
       users_per_iteration = 10_000.0
       counter = 0
@@ -63,7 +68,6 @@ namespace :migrations do
     def update_county
       puts("Beginning update counties")
       file_name = "#{Rails.root}/update_county.csv"
-      people = Person.all.where(:consumer_role.exists => true, :addresses.exists => true, :"addresses.county".in => [nil, ""])
       total_count = people.count
       users_per_iteration = 10_000.0
       counter = 0
@@ -121,7 +125,6 @@ namespace :migrations do
     def update_county
       puts("Beginning update counties")
       file_name = "#{Rails.root}/update_county.csv"
-      people = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""])
       CSV.open(file_name, 'w+', headers: true) do |csv|
         csv << ["person_hbx_id", "zip", "status"]
         output = people.no_timeout.each do |person|
