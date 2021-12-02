@@ -10,7 +10,17 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
   let!(:person2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }
   let!(:person3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, account_transferred: false, transfer_requested: true, assistance_year: assistance_year, aasm_state: 'determined', hbx_id: "830293", submitted_at: Date.today - 1.day, created_at: Date.today - 1.day) }
+  let!(:application) do
+    FactoryBot.create(:financial_assistance_application,
+                      family_id: family.id,
+                      account_transferred: false,
+                      transfer_requested: true,
+                      assistance_year: assistance_year,
+                      aasm_state: 'determined',
+                      hbx_id: "830293",
+                      submitted_at: Date.yesterday,
+                      created_at: Date.yesterday)
+  end
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   first_name: person.first_name,
@@ -110,7 +120,7 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
 
   context 'only transfer once' do
     before do
-      @result = ::FinancialAssistance::TransferAccounts.run 
+      @result = ::FinancialAssistance::TransferAccounts.run
     end
 
     it 'should transfer the account the first time' do
@@ -122,7 +132,7 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
     end
 
     it 'should not transfer the 2nd time' do
-      result = ::FinancialAssistance::TransferAccounts.run 
+      result = ::FinancialAssistance::TransferAccounts.run
       expect(result).not_to include(application.hbx_id)
     end
 
