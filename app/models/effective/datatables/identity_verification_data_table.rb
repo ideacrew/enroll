@@ -3,13 +3,13 @@ module Effective
   module Datatables
     class IdentityVerificationDataTable < Effective::MongoidDatatable
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
-        table_column :ssn, :label => 'SSN', :proc => Proc { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
-        table_column :dob, :label => 'DOB', :proc => Proc(&:dob), :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc(&:hbx_id), :filter => false, :sortable => false
-        table_column :count, :label => 'Count', :width => '100px', :proc => Proc { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
-        table_column :document_type, :label => 'Document Type', :proc => Proc { |row| link_to document_type(row), document_uploaded_path(row) }, :filter => false, :sortable => false
-        table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => Proc { |row| document_uploaded_date(row) }, :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
+        table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
+        table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false
+        table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
+        table_column :document_type, :label => 'Document Type', :proc => proc { |row| link_to document_type(row), document_uploaded_path(row) }, :filter => false, :sortable => false
+        table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => proc { |row| document_uploaded_date(row) }, :filter => false, :sortable => false
       end
 
       scopes do
