@@ -3668,6 +3668,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
   describe "#has_active_term_or_expired_exists_for_reinstated_date?" do
 
     before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11,1) + 14.days)
       EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
       EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(true)
       EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(true)
@@ -3707,7 +3708,6 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
                            aasm_state: "coverage_selected",
                            effective_on: TimeKeeper.date_of_record.end_of_month + 1.day)
       end
-
 
       it "should return true if active enrollment exists for reinstated date " do
         ivl_enrollment2
