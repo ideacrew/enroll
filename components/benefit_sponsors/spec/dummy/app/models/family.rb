@@ -823,7 +823,7 @@ class Family
       @logger = Logger.new("#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
-      send_enrollment_notice_for_ivl(new_date)
+      send_enr_or_dr_notice_to_ivl(new_date)
     end
 
     def enrollment_notice_for_ivl_families(new_date)
@@ -838,7 +838,7 @@ class Family
       )
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
+    def send_enr_or_dr_notice_to_ivl(new_date)
       families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
         begin

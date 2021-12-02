@@ -35,7 +35,6 @@ Then(/^Admin continues to families home page$/) do
 end
 
 When(/^user registers as an individual$/) do
-  sleep 30
   fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
   fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"

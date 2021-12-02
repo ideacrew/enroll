@@ -58,7 +58,7 @@ class Family
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   # embeds_many :broker_agency_accounts #depricated
-  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
+  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount", cascade_callbacks: true
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
   has_many :payment_transactions
@@ -908,8 +908,8 @@ class Family
       initialize_ivl_enrollment_service.enrollment_notice_for_ivl_families(new_date)
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
-      initialize_ivl_enrollment_service.send_enrollment_notice_for_ivl(new_date)
+    def send_enr_or_dr_notice_to_ivl(new_date)
+      initialize_ivl_enrollment_service.send_enr_or_dr_notice_to_ivl(new_date)
     end
 
     def find_by_employee_role(employee_role)
