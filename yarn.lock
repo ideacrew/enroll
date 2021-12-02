@@ -2605,12 +2605,10 @@ cssom@0.3.x, "cssom@>= 0.3.0 < 0.4.0":
   dependencies:
     cssom "0.3.x"
 
-cucumber-report-analyzer@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/cucumber-report-analyzer/-/cucumber-report-analyzer-1.3.0.tgz#82127250399edde5961b02844352454b10eb1621"
-  integrity sha512-roI7nfhE0wZZr4L3xT7UTaGNsBQkc3YVMAUwQUVX6vJ2GSTU5FVlv8Dchth1UU6vYSmlwenhbOI43aAR5T0oVg==
-  dependencies:
-    split-config-generator "^1.1.0"
+cucumber-report-analyzer@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/cucumber-report-analyzer/-/cucumber-report-analyzer-2.0.1.tgz#6989bad608e466a7068d8f84fc0547c6cd0564bc"
+  integrity sha512-KDBFv9Zv09IaEEBC+whIJS6gspyfNGE/IdrshuTdXOmZieOwYMX7dq0vfo/tpymQ2ioMf7l6CQON3CvHQxsCVQ==
 
 currently-unhandled@^0.4.1:
   version "0.4.1"

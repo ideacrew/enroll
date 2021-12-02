@@ -1,14 +1,18 @@
 const { promises: fs } = require('fs');
 
+import { CucumberFeature } from 'cucumber-report-analyzer';
 import {
-  createCucumberSplitConfig,
-  CucumberFeature,
-} from 'cucumber-report-analyzer';
+  createSplitConfig,
+  FileWithRuntime,
+  SplitConfig,
+} from 'split-config-generator';
+import { runtimeDetails } from './util/numberOfGroups';
+import { reportToRuntime } from './util/reportToRuntime';
 
 const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
-async function createSplitConfig(): Promise<void> {
+async function createCucumberSplit(): Promise<void> {
   // Parse cucumber report
   const cucumberReport = await fs.readFile(REPORT_PATH, 'utf-8');
   const report: CucumberFeature[] = JSON.parse(cucumberReport);
@@ -20,7 +24,12 @@ async function createSplitConfig(): Promise<void> {
       ? parseInt(manualGroupCountInput, 10)
       : undefined;
 
-  const splitConfig = createCucumberSplitConfig(report, groupCount);
+  // const splitConfig = createCucumberSplitConfig(report, groupCount);
+
+  const files: FileWithRuntime[] = reportToRuntime(report);
+  const splitConfig: SplitConfig = createSplitConfig(files, groupCount);
+  const details = runtimeDetails(files);
+  console.log(details);
 
   try {
     await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
@@ -29,4 +38,4 @@ async function createSplitConfig(): Promise<void> {
   }
 }
 
-createSplitConfig();
+createCucumberSplit();
