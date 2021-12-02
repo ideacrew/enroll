@@ -198,7 +198,79 @@ describe '#fetch_county_fips_code' do
     end
 
     it ' should return nil' do
-      expect(address.fetch_county_fips_code).to eq nil
+      expect(address.fetch_county_fips_code).to eq ""
+    end
+  end
+
+  context 'find fips code by state and zip code if county does not exists' do
+    let!(:county_zip) { BenefitMarkets::Locations::CountyZip.create({ state: 'ME',  zip: '21222', county_name: 'Aroostook'}) }
+    let!(:address) do
+      Address.new(
+          address_1: "An address line 1",
+          address_2: "An address line 2",
+          city: "A City",
+          state: "ME",
+          county: 'test',
+          zip: "21222"
+      )
+    end
+
+    it 'should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23003'
+    end
+
+    context 'more than one county for state and zip code' do
+      let!(:county_zip_2) { ::BenefitMarkets::Locations::CountyZip.create({ state: 'ME',  zip: '21222', county_name: 'Aroostook'}) }
+      let!(:address) do
+        Address.new(
+            address_1: "An address line 1",
+            address_2: "An address line 2",
+            city: "A City",
+            state: "ME",
+            county: 'test',
+            zip: "21222"
+        )
+      end
+
+      it ' should return nil' do
+        expect(address.fetch_county_fips_code).to eq ""
+      end
+    end
+  end
+
+  context 'finds fips code by formatting state and zip code' do
+    let!(:county_zip) { ::BenefitMarkets::Locations::CountyZip.create({ state: 'ME',  zip: '04930', county_name: 'Somerset'}) }
+    let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23025', county_name: 'Somerset'}) }
+    let!(:address) do
+      Address.new(
+          address_1: "An address line 1",
+          address_2: "An address line 2",
+          city: "A City",
+          state: "me",
+          county: 'test',
+          zip: "04930 "
+      )
+    end
+
+    it 'should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23025'
+    end
+  end
+
+  context 'finds fips code by formatting county name' do
+    let!(:address) do
+      Address.new(
+          address_1: "An address line 1",
+          address_2: "An address line 2",
+          city: "A City",
+          state: "ME",
+          county: 'AROOSTOOK',
+          zip: "21222 "
+      )
+    end
+
+    it 'should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23003'
     end
   end
 
