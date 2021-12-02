@@ -172,6 +172,7 @@ RSpec.shared_context 'eligibilities' do
     }
   end
 
+  # rubocop:disable Metrics/MethodLength
   def faa_eligibility_sample
     [
       {
@@ -278,4 +279,5 @@ RSpec.shared_context 'eligibilities' do
     # snapshot.unsatisfied_eligibilities
     # snapshot.satisfied_eligibilities
   end
+  # rubocop:enable Metrics/MethodLength
 end
