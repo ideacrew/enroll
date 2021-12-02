@@ -53,6 +53,12 @@ FactoryBot.define do
       benefit_market_kind  { :aca_individual }
     end
 
+    trait :with_qhp do
+      before(:create) do |product, _evaluator|
+        create(:products_qhp, active_year: product.active_year, standard_component_id: product.hios_base_id)
+      end
+    end
+
     trait :next_year do
       application_period do
         year = Time.zone.today.next_year.year

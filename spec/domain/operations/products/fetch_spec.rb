@@ -114,7 +114,6 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
     end
 
     let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver, :with_qhp) }
-
     let(:products) { ::BenefitMarkets::Products::Product.all }
     let(:products_payload) do
       {
@@ -241,6 +240,51 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
 
       it 'should return false' do
         expect(@result.failure?).to be_truthy
+      end
+    end
+
+    context 'with one member age less than 18' do
+      let!(:person3) do
+        p3 = FactoryBot.create(:person, :with_consumer_role, first_name: 'Person3', dob: TimeKeeper.date_of_record - 16.years)
+        person.ensure_relationship_with(p3, 'child')
+        p3
+      end
+      let!(:family_member3) { FactoryBot.create(:family_member, person: person3, family: family)}
+  
+      let!(:list_dental_products) {  FactoryBot.create_list(:benefit_markets_products_dental_products_dental_product, 5, :with_issuer_profile, :with_qhp, pediatric_ehb: 0.9943, rating_method: 'Age-Based Rates')}
+
+      before do
+        family.primary_applicant.person.addresses.first.update_attributes(state: 'me', zip: '04007', county: 'york')
+        family.family_members.where(is_primary_applicant: false).each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+        end
+        BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
+        ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'york',zip: "04007", state: "ME")
+
+        rating_area = BenefitMarkets::Locations::RatingArea.all.first
+        list_dental_products.each do |p|
+          p.premium_tables.update_all(rating_area_id: rating_area.id)
+          p.qhp.update_attributes!(child_only_offering: 'Allows Child-Only')
+        end
+
+        @result = subject.call(params)
+      end
+
+      it 'should return true' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it "should fetch products for primary applicant's address" do
+        expect(@result.success.count).to eq 1
+      end
+
+      it "should fetch products mapped to all members" do
+        expect(@result.success.keys.flatten.count).to eq family.active_family_members.count
+      end
+
+      it "should add ped dental premium to health_and_ped_dental section" do
+        child_ped_premium_info = @result.success.values[0][:health_and_ped_dental][person3.hbx_id][0]
+        expect( child_ped_premium_info[:monthly_premium]).to eq 397.72
       end
     end
   end

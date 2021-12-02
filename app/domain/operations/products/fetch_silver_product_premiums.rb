@@ -14,7 +14,7 @@ module Operations
       def call(params)
         values            = yield validate(params)
         family_members    = yield fetch_family_members(values[:family], values[:family_member_id])
-        product_premiums  = yield fetch_product_premiums({products: values[:products], dental_products: values[:dental_products], family_members: family_members, effective_date: values[:effective_date], rating_area_id: values[:rating_area_id].to_s})
+        product_premiums  = yield fetch_product_premiums(values: values, family_members: family_members)
 
         Success(product_premiums)
       end
@@ -41,10 +41,11 @@ module Operations
         end
       end
 
-      def fetch_product_premiums(attrs)
-        member_premiums = attrs[:family_members].inject({}) do |member_result, family_member|
+      def fetch_product_premiums(*args)
+        attrs = args.first[:values]
+        member_premiums = args.first[:family_members].inject({}) do |member_result, family_member|
           age = family_member.age_on(attrs[:effective_date])
-          attrs[:slcsp_type] = :health_only if age > 18
+          slcsp_type = age > 18 ? :health_only : attrs[:slcsp_type]
           hbx_id = family_member.hbx_id
           sldp = second_lowest_dental_product_premium(attrs[:dental_products], attrs[:effective_date], attrs[:rating_area_id], age)
           # age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
@@ -58,10 +59,11 @@ module Operations
                                                              :'effective_period.max'.gte => attrs[:effective_date]
                                                            }).first
 
+              next result if premium_table.nil?
               tuple = premium_table.premium_tuples.where(age: age).first || set_tuple(premium_table, age)
 
               if tuple.present?
-                cost = product_premium(product, tuple, attrs[:slcsp_type], sldp)
+                cost = product_premium(product, tuple, slcsp_type, sldp)
                 result << { cost: cost, product_id: product.id, member_identifier: hbx_id, monthly_premium: cost }
               end
 
@@ -84,7 +86,7 @@ module Operations
       end
 
       def product_premium(product, tuple, slcsp_type, sldp)
-        return ((tuple.cost * product.ehb) + sldp).round(2) if slcsp_type == :health_and_dental
+        return ((tuple.cost * product.ehb) + sldp).round(2) if slcsp_type == :health_and_dental && !product.covers_pediatric_dental?
         return (tuple.cost * product.ehb).round(2) if slcsp_type == :health_only || product.covers_pediatric_dental?
         ((tuple.cost * product.ehb) + sldp).round(2)
       end

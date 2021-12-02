@@ -75,15 +75,14 @@ module Operations
           return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
           member_premiums[hbx_ids][:health_only] = premiums.value!
 
-
-          dental_products = payload[:products].select { |product| product.allows_adult_and_child_only_offering? && product.age_based_rating? }
+          dental_products = payload[:products].select { |product| product.allows_adult_and_child_only_offering? && product.age_based_rating? && product.kind == :dental }
           premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_products, dental_products: dental_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id],
                                                                                 slcsp_type: :health_and_dental})
 
           return Failure("unable to fetch health_and_dental premiums for - #{hbx_ids}") if premiums.failure?
           member_premiums[hbx_ids][:health_and_dental] = premiums.value!
 
-          dental_products = payload[:products].select { |product| product.allows_child_only_offering? && product.age_based_rating? }
+          dental_products = payload[:products].select { |product| product.allows_child_only_offering? && product.age_based_rating? && product.kind == :dental }
           premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_products, dental_products: dental_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id],
                                                                                 slcsp_type: :health_and_ped_dental})
 

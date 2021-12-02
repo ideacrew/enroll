@@ -661,15 +661,18 @@ module FinancialAssistance
               lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
               return lcsp_info if lcsp_info.failure?
 
-              slcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
-                result << slcsp_info.success[person_hbx_id][:health_only_slcsp_premiums]
-              end
+              # select available applicants from slcsp_info
+              selected_slcsp_info = slcsp_info.success.select{|k,v| person_hbx_ids.include?(k)}
+              selected_lcsp_info = lcsp_info.success.select{|k,v| person_hbx_ids.include?(k)}
+              slcsp_member_premiums = group_by_kinds(selected_slcsp_info)
+              lcsp_member_premiums = group_by_kinds(selected_lcsp_info)
 
-              lcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
-                result << lcsp_info.success[person_hbx_id][:health_only_lcsp_premiums]
-              end
+              Success(lcsp_member_premiums.merge(slcsp_member_premiums))
+            end
 
-              Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
+            def group_by_kinds(silver_products_info)
+              entries = silver_products_info.values.flat_map(&:entries)
+              entries.group_by(&:first).map{|k,v| Hash[k, v.map(&:last)]}.reduce(:merge)
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
