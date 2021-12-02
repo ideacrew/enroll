@@ -155,7 +155,7 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
         family_2.reload
       end
 
-      it 'should reassign the broker' do
+      it 'should associate with consumer person broker role' do
         writing_agent_old = broker_person.broker_role
         expect(
           Family.where(
@@ -168,7 +168,7 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
         consumer_person.reload
         writing_agent_new = consumer_person.broker_role
 
-        expect(Family.by_writing_agent_id(writing_agent_old.id).count).to eq 0
+        expect(writing_agent_old).to eq writing_agent_new
         expect(Family.by_writing_agent_id(writing_agent_new.id).count).to eq 2
         expect(writing_agent_new.workflow_state_transitions).to be_present
       end
