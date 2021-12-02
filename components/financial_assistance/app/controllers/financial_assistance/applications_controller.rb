@@ -61,7 +61,17 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit! if @application.may_unsubmit?
-              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: #{publish_result.failure}" }
+              flash = case publish_result.failure.class
+                      when Dry::Validation::Result
+                        { error: validation_errors_parser(result.failure) }
+                      when String
+                        { error: publish_result.failure }
+                      when Exception
+                        { error: publish_result.failure.message }
+                      else
+                        { error: publish_result.failure }
+                      end
+              redirect_to application_publish_error_application_path(@application), flash: flash
             end
           else
             render 'workflow/step'
