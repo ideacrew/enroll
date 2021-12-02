@@ -29,6 +29,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       FactoryBot.create(
         :benefit_markets_products_health_products_health_product,
         :with_issuer_profile,
+        build_premium_tables: false,
         benefit_market_kind: :aca_individual,
         kind: :health,
         service_area: renewal_service_area,
@@ -49,6 +50,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       FactoryBot.create(
         :benefit_markets_products_health_products_health_product,
         :with_issuer_profile,
+        build_premium_tables: false,
         benefit_market_kind: :aca_individual,
         kind: :health,
         service_area: service_area,
