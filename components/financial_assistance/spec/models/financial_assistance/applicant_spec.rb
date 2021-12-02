@@ -24,7 +24,8 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     context 'callbacks' do
 
       it 'calls propagate_applicant' do
-        applicant.stub(:propagate_applicant)
+        #applicant.stub(:propagate_applicant)
+        allow(applicant).to receive(:propagate_applicant).and_return(true)
         applicant.update_attributes(dob: Date.today - 30.years)
         expect(applicant).to have_received(:propagate_applicant)
       end
