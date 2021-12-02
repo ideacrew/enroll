@@ -37,6 +37,8 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
       per
     end
 
+    let(:broker_user) { FactoryBot.create(:user)}
+
     let!(:consumer_family) do
       FactoryBot.create(
         :family,
@@ -52,11 +54,13 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
         :with_mailing_address,
         :with_work_email,
         :with_work_phone,
+        user: broker_user,
         first_name: 'Hasse',
         last_name: 'Timur',
         gender: 'male'
       )
     end
+
     let(:params) do
       {
         source_hbx_id: broker_person.hbx_id,
@@ -94,6 +98,12 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
         expect(Person.where(id: broker_person.id)).to exist
         subject.call(params)
         expect(Person.where(id: broker_person.id)).not_to exist
+      end
+
+      it 'should transfer broker user record' do
+        expect(Person.where(id: consumer_person.id).first.user).to be_blank
+        subject.call(params)
+        expect(Person.where(id: consumer_person.id).first.user).to be_present
       end
     end
 

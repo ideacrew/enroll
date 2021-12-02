@@ -127,6 +127,10 @@ module Operations
 
         if consumer_record.valid?
           broker_record.broker_role.delete
+          if broker_record.user
+            broker_record.user_id = nil
+            broker_record.save(validate: false)
+          end
           consumer_record.save!
           Success(writing_agent)
         else
