@@ -135,8 +135,23 @@ class Address
   end
 
   def fetch_county_fips_code
-    us_county = BenefitMarkets::Locations::CountyFips.where(state_postal_code: state, county_name: county).first
-    us_county ? us_county.county_fips_code : nil
+    state_abbrev = state.blank? ? '' : state.upcase
+    county_name = county.blank? ? '' : county.titlecase
+    county_fip = ::BenefitMarkets::Locations::CountyFips.where(state_postal_code: state_abbrev, county_name: county_name).first
+
+    if county_fip.present?
+      county_fip.county_fips_code
+    else
+      county_fip_by_zip_state.present? ? county_fip_by_zip_state.county_fips_code : ""
+    end
+  end
+
+  def county_fip_by_zip_state
+    state_abbrev = state.blank? ? '' : state.upcase
+    zip_code = zip.blank? ? "" : zip.scan(/\d+/).join
+    counties = ::BenefitMarkets::Locations::CountyZip.where(:zip => zip_code, :state => state_abbrev)
+    county_name = counties.count == 1 ? counties.first.county_name.titlecase : ""
+    ::BenefitMarkets::Locations::CountyFips.where(state_postal_code: state_abbrev, county_name: county_name).first
   end
 
   # Get the full address formatted as a string

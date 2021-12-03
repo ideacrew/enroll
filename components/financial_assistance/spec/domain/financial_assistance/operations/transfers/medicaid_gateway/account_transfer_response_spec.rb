@@ -15,25 +15,33 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
   context 'success' do
     context 'with valid application id' do
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+
       before do
-        family = FactoryBot.create(:family, :with_primary_family_member)
+        allow(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family).and_return(true)
         family.primary_person.emails.create(kind: "home", address: "fakeemail@email.com")
-        application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
+        @application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
         @expected_response =
           {
             family_identifier: family.hbx_assigned_id.to_s,
-            application_identifier: application.hbx_id,
+            application_identifier: @application.hbx_id,
             result: "Success"
           }
-        @result = subject.call(application.id)
       end
 
       it 'should return success' do
-        expect(@result).to be_success
+        result = subject.call(@application.id)
+        expect(result).to be_success
       end
 
       it 'should return success with message' do
-        expect(@result.value!).to eq(@expected_response)
+        result = subject.call(@application.id)
+        expect(result.value!).to eq(@expected_response)
+      end
+
+      it 'should trigger account transfer notice' do
+        expect(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family)
+        subject.call(@application.id)
       end
     end
   end
