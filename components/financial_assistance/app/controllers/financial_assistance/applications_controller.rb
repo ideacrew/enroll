@@ -69,7 +69,7 @@ module FinancialAssistance
                       when Exception
                         { error: publish_result.failure.message }
                       else
-                        { error: publish_result.failure }
+                        { error: "Submission Error: #{publish_result.failure}" }
                       end
               redirect_to application_publish_error_application_path(@application), flash: flash
             end
