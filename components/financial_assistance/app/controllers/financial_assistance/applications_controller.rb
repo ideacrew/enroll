@@ -62,9 +62,9 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit! if @application.may_unsubmit?
-              flash = case publish_result.failure.class
+              flash = case publish_result.failure
                       when Dry::Validation::Result
-                        { error: validation_errors_parser(result.failure) }
+                        { error: validation_errors_parser(publish_result.failure) }
                       when Exception
                         { error: publish_result.failure.message }
                       else
@@ -231,8 +231,8 @@ module FinancialAssistance
 
     private
 
-    def validation_errors_parser(errors)
-      errors.each_with_object([]) do |error, collect|
+    def validation_errors_parser(result)
+      result.errors.each_with_object([]) do |error, collect|
         collect << if error.is_a?(Dry::Schema::Message)
                      message = error.path.reduce("The ") do |attribute_message, path|
                        next_element = error.path[(error.path.index(path) + 1)]

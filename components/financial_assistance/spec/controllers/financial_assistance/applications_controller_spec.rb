@@ -185,6 +185,24 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           expect(flash[:error].first).to eql("The 1st applicants's 1st phones's full phone number: length must be within 10 - 15.")
         end
       end
+
+      context "containing an Exception" do
+        let(:failure) do
+          StandardError.new("test")
+        end
+
+        it 'builds the flash message with the exception text' do
+          expect(flash[:error]).to eql('test')
+        end
+      end
+
+      context "containing with a string" do
+        let(:failure) { "big big problem" }
+
+        it 'builds the flash message with the string' do
+          expect(flash[:error]).to eql('Submission Error: big big problem')
+        end
+      end
     end
 
     context "when params has application key" do
