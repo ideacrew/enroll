@@ -3,10 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ExceptionsController, :type => :controller, :dbclean => :after_each do
-  let(:user) { FactoryBot.create(:user) }
-  before do
-    sign_in(user)
-  end
+  # No login required
   context "GET #show" do
     context "custom_exceptions_controller feature" do
       context "enabled" do
