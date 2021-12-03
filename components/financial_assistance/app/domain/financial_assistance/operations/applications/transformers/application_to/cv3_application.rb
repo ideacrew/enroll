@@ -650,26 +650,30 @@ module FinancialAssistance
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
-              person_hbx_ids = application.applicants.pluck(:person_hbx_id)
+              family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
+              applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
+              if family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
+                premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
+                return premiums if premiums.failure?
 
-              premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              return premiums if premiums.failure?
+                slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
+                return slcsp_info if slcsp_info.failure?
 
-              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
-              return slcsp_info if slcsp_info.failure?
+                lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
+                return lcsp_info if lcsp_info.failure?
 
-              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
-              return lcsp_info if lcsp_info.failure?
+                slcsp_member_premiums = applicant_hbx_ids.inject([]) do |result, applicant_hbx_id|
+                  result << slcsp_info.success[applicant_hbx_id][:health_only_slcsp_premiums]
+                end
 
-              slcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
-                result << slcsp_info.success[person_hbx_id][:health_only_slcsp_premiums]
+                lcsp_member_premiums = applicant_hbx_ids.inject([]) do |result, applicant_hbx_id|
+                  result << lcsp_info.success[applicant_hbx_id][:health_only_lcsp_premiums]
+                end
+
+                Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
+              else
+                Failure("Applicants do not match family members")
               end
-
-              lcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
-                result << lcsp_info.success[person_hbx_id][:health_only_lcsp_premiums]
-              end
-
-              Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
