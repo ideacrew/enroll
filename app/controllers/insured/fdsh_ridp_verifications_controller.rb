@@ -113,6 +113,7 @@ module Insured
       set_consumer_bookmark_url
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
+      @person = Person.find(params[:person_id]) if params[:person_id].present?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "failed_validation"
     end

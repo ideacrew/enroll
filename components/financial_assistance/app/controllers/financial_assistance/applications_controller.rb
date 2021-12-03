@@ -44,6 +44,8 @@ module FinancialAssistance
       model_params = params[model_name]
       @model.clean_conditional_params(model_params) if model_params.present?
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
+      @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
+
 
       # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)

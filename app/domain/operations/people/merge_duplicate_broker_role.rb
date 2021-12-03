@@ -20,9 +20,9 @@ module Operations
         yield validate(broker_record, consumer_record)
         # yield validate_merge_map  # implement validation for the merge map passed in from outside
         consumer_record = yield merge(broker_record, consumer_record)
-        writing_agent = yield save_and_delete_broker_role(broker_record, consumer_record)
+        _writing_agent = yield save_and_delete_broker_role(broker_record, consumer_record)
 
-        yield update_broker_assigned_families(writing_agent, consumer_record)
+        # yield update_broker_assigned_families(writing_agent, consumer_record)
         yield delete_broker_record(broker_record)
 
         Success(consumer_record)
@@ -116,7 +116,7 @@ module Operations
           end
         else
           unless consumer_value
-            consumer_record.send("build_#{rel}", broker_value.attributes.merge('_id' => BSON::ObjectId.new))
+            consumer_record.send("build_#{rel}", broker_value.attributes)
             p "Added #{rel} to consumer record."
           end
         end
@@ -136,26 +136,6 @@ module Operations
         else
           Failure("Unable to save consumer record due to #{consumer_record.errors.to_h}")
         end
-      end
-
-      def update_broker_assigned_families(writing_agent, consumer_record)
-        Family.by_writing_agent_id(writing_agent.id).each do |family|
-
-          family.broker_agency_accounts.where(:writing_agent_id => writing_agent.id, :is_active => true).each do |baa|
-            family.broker_agency_accounts << baa.class.new({
-                                                             start_on: baa.start_on,
-                                                             writing_agent_id: consumer_record.broker_role.id,
-                                                             benefit_sponsors_broker_agency_profile_id: baa.benefit_sponsors_broker_agency_profile_id,
-                                                             is_active: true
-                                                           })
-
-            baa.update_attributes!(is_active: false, end_on: Date.today)
-          end
-          p "Created new broker agency account for family #{family.hbx_assigned_id}."
-          family.save!
-        end
-
-        Success(true)
       end
 
       def delete_broker_record(broker_record)
