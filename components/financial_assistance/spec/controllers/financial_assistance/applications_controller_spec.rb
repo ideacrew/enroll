@@ -154,6 +154,40 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(response).to render_template 'workflow/step'
     end
 
+    context "submit step with a publish_result failure" do
+      # receive_message_chain(:new, :call).and_return(success_result)
+      let(:operation) { double new: double(call: double(failure: failure, success?: false)) }
+
+      before do
+        application.update_attributes!(aasm_state: 'submitted')
+        allow(application).to receive(:complete?).and_return(true)
+        allow(application).to receive(:submit!).and_return(true)
+        allow(application).to receive(:save).and_return(true)
+        allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+        allow(controller).to receive(:determination_request_class).and_return(operation)
+
+        post :step, params: { id: application.id, commit: 'Submit Application', application: application_valid_params }
+      end
+
+      context "containing a failed Dry::Validation::Result" do
+        let(:failure) do
+          Dry::Validation::Result.new(double(message_set: [], to_h: {})) do |r|
+            r.add_error(Dry::Validation::Message.new("length must be within 10 - 15",
+              path: [:applicants, 0, :phones, 0, :full_phone_number]
+            ))
+          end
+        end
+
+        it 'redirects to application_publish_error_application_path' do
+          expect(response).to redirect_to(application_publish_error_application_path(application.id))
+        end
+
+        it 'builds the flash message correctly' do
+          expect(flash[:error].first).to eql("The 1st applicants's 1st phones's full phone number: length must be within 10 - 15.")
+        end
+      end
+    end
+
     context "when params has application key" do
       let(:success_result) { double(success?: true)}
 

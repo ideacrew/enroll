@@ -46,7 +46,6 @@ module FinancialAssistance
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
       @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
 
-
       # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)
         if @model.save
@@ -232,11 +231,15 @@ module FinancialAssistance
     def build_error_messages(errors)
       errors.each_with_object([]) do |error, collect|
         collect << if error.is_a?(Dry::Schema::Message)
-                     message = error.path.reduce("The ") do |attribute, path|
-                       attribute + if path.is_a? Integer
+
+                     message = error.path.reduce("The ") do |attribute_message, path|
+                       next_element = error.path[(error.path.index(path) + 1)]
+                       attribute_message + if next_element.is_a?(Integer)
+                                     "#{(next_element + 1).ordinalize} #{path.to_s.humanize.downcase}'s "
+                                   elsif path.is_a? Integer
                                      ""
                                    else
-                                     "#{path}:"
+                                     "#{path.to_s.humanize.downcase}:"
                                    end
                      end
                      message + " #{error.text}."
