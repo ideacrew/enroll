@@ -13,9 +13,10 @@
 </div>
 
 <script>
-	    $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
- initializeDataTables();
- <% if @selector == 'assisted' %>
+	$('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
+  initializeDataTables();
+  DT.filters();
+  <% if @selector == 'assisted' %>
     $('#Tab\\:by_enrollment_individual_market').click();
     $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');
   <% end %>

@@ -51,7 +51,7 @@ module Forms
                                                                     :first_name => first_name,
                                                                     :ssn => ssn})
 
-      return nil if records.count == 0
+      return nil if records.blank?
 
       if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
          (match_criteria == :dob_present && ssn.blank?) ||
@@ -59,6 +59,7 @@ module Forms
         records.first
       end
     end
+
 
     def state_based_policy_satisfied?
       @configuration = EnrollRegistry[:person_match_policy].settings.map(&:to_h).each_with_object({}) do |s,c|
@@ -72,11 +73,10 @@ module Forms
     def uniq_name_ssn_dob
       return true if ssn.blank?
 
-      query_params = self.as_json.merge("encrypted_ssn" => Person.encrypt_ssn(ssn)).slice(*@configuration[:ssn_present])
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
-      person_with_name_ssn_dob = Person.where(query_params).first
+      matched_person = match_person
 
-      if person_with_ssn != person_with_name_ssn_dob
+      if matched_person != person_with_ssn
         errors.add(:base, l10n("insured.match_person.ssn_dob_name_error", site_short_name: EnrollRegistry[:enroll_app].settings(:short_name).item,
                                                                           contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
                                                                           contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,

@@ -72,6 +72,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the employer information
     Then the new employer information should be saved on the page
   
+  @flaky
   Scenario: User enters self employment information
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information
@@ -87,6 +88,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the self employment information
     # Then I should see a JS alert
   
+  @flaky
   Scenario: User enters self employment information when there is more than one self employment income
     Given the user has entered at least one self employment information
     When the Add Another Self Employment link appears

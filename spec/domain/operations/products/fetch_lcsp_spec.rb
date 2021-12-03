@@ -74,4 +74,32 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
       expect(values[:product_id]).not_to eq nil
     end
   end
+
+  describe 'valid params with missing premiums' do
+
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+    let(:params) do
+      {
+        member_silver_product_premiums: member_silver_product_premiums
+      }
+    end
+
+    let(:member_silver_product_premiums) do
+      {
+        [person.hbx_id] => {
+          :health_only => {
+            person.hbx_id => [
+              # missing premiums
+            ]
+          }
+        }
+      }
+    end
+
+    it 'should return a failure' do
+      result = subject.call(params)
+      expect(result.failure?).to eq true
+    end
+  end
 end

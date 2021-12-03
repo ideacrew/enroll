@@ -212,7 +212,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         member
       end
       let!(:family_member2) {FactoryBot.create(:family_member, family: family_5, person: person2)}
-      let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+      let(:effective_on) { Date.new(TimeKeeper.date_of_record.year, 11, 1) }
       let!(:tax_household_5) {FactoryBot.create(:tax_household, household: family_5.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
       let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family_5.family_members[0].id, tax_household: tax_household_5)}
       let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household_5)}

@@ -60,7 +60,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_consent_applicant" => false,
            "is_living_in_state" => false,
            "is_temporarily_out_of_state" => false,
-           "is_ia_eligible" => false,
+           "is_ia_eligible" => true,
            "is_medicaid_chip_eligible" => false,
            "is_non_magi_medicaid_eligible" => false,
            "is_totally_ineligible" => false,
@@ -161,20 +161,33 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
   context 'creation of tax households for family' do
     context 'applicant ineligible' do
-      before do
+      it 'should not create a tax household for non applicant members' do
         applicant = params[:applicants].first
-        applicant.merge!({:is_ia_eligible => false,
-                          :is_medicaid_chip_eligible => false,
-                          :is_totally_ineligible => false,
-                          :is_magi_medicaid => false,
-                          :is_non_magi_medicaid_eligible => false,
-                          :is_without_assistance => false})
+        applicant.merge!({"is_ia_eligible" => false,
+                          "is_medicaid_chip_eligible" => false,
+                          "is_totally_ineligible" => false,
+                          "is_magi_medicaid" => false,
+                          "is_non_magi_medicaid_eligible" => false,
+                          "is_without_assistance" => false})
 
         @result = subject.call(params: params)
         family.reload
+
+        expect(family.active_household.tax_households.count).to eq(0)
       end
 
-      it 'should not create a tax household for non applicant members' do
+      it 'should not create a tax household for applicants with nil attributes' do
+        applicant = params[:applicants].first
+        applicant.merge!({"is_ia_eligible" => nil,
+                          "is_medicaid_chip_eligible" => nil,
+                          "is_totally_ineligible" => nil,
+                          "is_magi_medicaid" => nil,
+                          "is_non_magi_medicaid_eligible" => nil,
+                          "is_without_assistance" => nil})
+
+        @result = subject.call(params: params)
+        family.reload
+
         expect(family.active_household.tax_households.count).to eq(0)
       end
     end

@@ -187,15 +187,14 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       expect(helper.ridp_redirection_link(person)).to eq "/insured/ridp_agreement"
     end
 
-    it "should return nil if identity is not verified and current user has not staff role" do
-      allow(person.consumer_role).to receive(:identity_verified?).and_return false
-      person.primary_family.update_attributes(application_type: 'In Person')
+    it "should return help paying for coverage path if identify is verified and FA feature on even with upload_ridp link" do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+      allow(person.consumer_role).to receive(:identity_verified?).and_return true
       consumer = person.consumer_role
-      consumer.admin_bookmark_url = "/insured/ridp_agreement"
+      consumer.admin_bookmark_url = "/insured/consumer_role/upload_ridp_document"
       person.save
-      expect(helper.ridp_redirection_link(person)).to eq nil
+      expect(helper.ridp_redirection_link(person)).to eq "/insured/consumer_role/help_paying_coverage"
     end
   end
-
 end
 end

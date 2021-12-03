@@ -1,6 +1,17 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+
+  get 'errors/not_found'
+  get 'errors/internal_server_error'
+  # For custom exceptions controller
+  resources :exceptions
+  # https://gist.github.com/mlanett/a31c340b132ddefa9cca
+  # Make sure all exception throwing status codes get sent to the "friendly" exception page
+  (400..510).to_a.map(&:to_s).each do |code|
+    get code, :to => "exceptions#show", :code => code
+  end
+
   default_url_options Rails.application.config.action_mailer.default_url_options
   require 'resque/server'
 

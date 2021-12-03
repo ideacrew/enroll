@@ -4,9 +4,10 @@ on:
   schedule:
     - cron: '0 6 * * *'
 
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+# Failing because of https://github.com/actions/runner/issues/1532
+# concurrency:
+#   group: ${{ github.ref }}
+#   cancel-in-progress: true
 
 env:
   REPORT_PATH: 'ci/cuke-report.json'
