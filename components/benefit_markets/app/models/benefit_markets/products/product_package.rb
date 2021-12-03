@@ -62,12 +62,12 @@ module BenefitMarkets
     end
 
     def products=(attributes)
-      attributes.each do |attribute|
-        if attribute.is_a?(Hash)
-          kind = attribute[:kind].to_s.titleize
-          self.products.build(attribute.merge(_type: "BenefitMarkets::Products::#{kind}Products::#{kind}Product"))
+      attributes.each do |object|
+        if object.is_a?(Hash)
+          kind = object[:kind].to_s.titleize
+          self.products.build(object.merge(_type: "BenefitMarkets::Products::#{kind}Products::#{kind}Product"))
         else
-          self.products.push(attribute)
+          self.products.build(object.attributes)
         end
       end
     end
