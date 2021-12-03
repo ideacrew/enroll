@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe Address, "with proper validations" do
@@ -7,7 +9,7 @@ describe Address, "with proper validations" do
   let(:state) { "CA" }
   let(:zip) { "20171" }
 
-  let(:address_params) {
+  let(:address_params) do
     {
       kind: address_kind,
       address_1: address_1,
@@ -15,7 +17,7 @@ describe Address, "with proper validations" do
       state: state,
       zip: zip
     }
-  }
+  end
 
   subject { Address.new(address_params) }
 
@@ -88,7 +90,7 @@ describe Address, "with proper validations" do
     it { should validate_presence_of :state }
     it { should validate_presence_of :zip }
 
-    let(:person) {Person.new(first_name: "John", last_name: "Doe", gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+    let(:person) {Person.new(first_name: "John", last_name: "Doe", gender: "male", dob: "10/10/1974", ssn: "123456789")}
     let(:address) {FactoryBot.create(:address)}
     let(:employer){FactoryBot.create(:employer_profile)}
 
@@ -110,15 +112,15 @@ describe Address, "with proper validations" do
 end
 
 describe 'view helpers/presenters' do
-  let(:address) {
-     Address.new(
-       address_1: "An address line 1 NE",
-       address_2: "An address line 2",
-       city: "A City",
-       state: "CA",
-       zip: "21222"
-     )
-  }
+  let(:address) do
+    Address.new(
+      address_1: "An address line 1 NE",
+      address_2: "An address line 2",
+      city: "A City",
+      state: "CA",
+      zip: "21222"
+    )
+  end
 
   describe '#to_s' do
     it 'returns a string with a formated address' do
@@ -198,7 +200,79 @@ describe '#fetch_county_fips_code' do
     end
 
     it ' should return nil' do
-      expect(address.fetch_county_fips_code).to eq nil
+      expect(address.fetch_county_fips_code).to eq ""
+    end
+  end
+
+  context 'find fips code by state and zip code if county does not exists' do
+    let!(:county_zip) { BenefitMarkets::Locations::CountyZip.create({ state: 'ME',  zip: '21222', county_name: 'Aroostook'}) }
+    let!(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "ME",
+        county: 'test',
+        zip: "21222"
+      )
+    end
+
+    it 'should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23003'
+    end
+
+    context 'more than one county for state and zip code' do
+      let!(:county_zip_2) { ::BenefitMarkets::Locations::CountyZip.create({ state: 'ME',  zip: '21222', county_name: 'Aroostook'}) }
+      let!(:address) do
+        Address.new(
+          address_1: "An address line 1",
+          address_2: "An address line 2",
+          city: "A City",
+          state: "ME",
+          county: 'test',
+          zip: "21222"
+        )
+      end
+
+      it ' should return nil' do
+        expect(address.fetch_county_fips_code).to eq ""
+      end
+    end
+  end
+
+  context 'finds fips code by formatting state and zip code' do
+    let!(:county_zip) { ::BenefitMarkets::Locations::CountyZip.create({ state: 'ME',  zip: '04930', county_name: 'Somerset'}) }
+    let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23025', county_name: 'Somerset'}) }
+    let!(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "me",
+        county: 'test',
+        zip: "04930 "
+      )
+    end
+
+    it 'should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23025'
+    end
+  end
+
+  context 'finds fips code by formatting county name' do
+    let!(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "ME",
+        county: 'AROOSTOOK',
+        zip: "21222 "
+      )
+    end
+
+    it 'should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23003'
     end
   end
 
@@ -217,16 +291,16 @@ describe '#clean_fields' do
 end
 
 describe '#matches_addresses?' do
-  let(:address) {
-     Address.new(
-       address_1: "An address line 1",
-       address_2: "An address line 2",
-       city: "A City",
-       state: "CA",
-       zip: "21222"
-     )
-  }
-  
+  let(:address) do
+    Address.new(
+      address_1: "An address line 1",
+      address_2: "An address line 2",
+      city: "A City",
+      state: "CA",
+      zip: "21222"
+    )
+  end
+
   context 'addresses are the same' do
     let(:second_address) { address.clone }
     it 'returns true' do
