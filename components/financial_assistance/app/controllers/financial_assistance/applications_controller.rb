@@ -46,7 +46,6 @@ module FinancialAssistance
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
       @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
 
-
       # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)
         if @model.save
@@ -63,7 +62,12 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit! if @application.may_unsubmit?
-              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: #{publish_result.failure}" }
+              flash_message = if publish_result.failure.is_a?(Dry::Validation::Result)
+                                { error: build_error_messages(publish_result.failure.errors) }
+                              else
+                                { error: "Submission Error: #{publish_result.failure}" }
+                              end
+              redirect_to application_publish_error_application_path(@application), flash: flash_message
             end
           else
             render 'workflow/step'
@@ -71,7 +75,8 @@ module FinancialAssistance
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
-          flash[:error] = build_error_messages(@model)
+          @model.valid?
+          flash[:error] = build_error_messages(@model.errors)
           render 'workflow/step'
         end
       else
@@ -223,6 +228,27 @@ module FinancialAssistance
 
     private
 
+    def build_error_messages(errors)
+      errors.each_with_object([]) do |error, collect|
+        collect << if error.is_a?(Dry::Schema::Message)
+
+                     message = error.path.reduce("The ") do |attribute_message, path|
+                       next_element = error.path[(error.path.index(path) + 1)]
+                       attribute_message + if next_element.is_a?(Integer)
+                                             "#{(next_element + 1).ordinalize} #{path.to_s.humanize.downcase}'s "
+                                           elsif path.is_a? Integer
+                                             ""
+                                           else
+                                             "#{path.to_s.humanize.downcase}:"
+                                           end
+                     end
+                     message + " #{error.text}."
+                   else
+                     error.flatten.flatten.join(',').gsub(",", " ").titleize
+                   end
+      end
+    end
+
     def haven_determination_is_enabled?
       FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
     end
@@ -255,10 +281,6 @@ module FinancialAssistance
         @assistance_status = true
         @message = nil
       end
-    end
-
-    def build_error_messages(model)
-      model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
     end
 
     def hash_to_param(param_hash)
