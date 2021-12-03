@@ -13,7 +13,7 @@ namespace :migrations do
     def people
       people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""]).map(&:_id)
       # benefitmarkets because previously we erroneously assigned a object instead of ring to county
-      people_2_ids = Person.where("addresses.county" => /.*benefitmarkets.*/i ).map(&:_id)
+      people_2_ids = Person.where("addresses.county" => /.*benefitmarkets.*/i).map(&:_id)
       people_ids = (people_1_ids + people_2_ids).flatten
       Person.where(:"_id".in => people_ids)
     end
@@ -42,7 +42,7 @@ namespace :migrations do
     pull_county
 
     def address_needs_fixing?(address)
-      address.county.blank? && !address.zip.blank?
+      address.county.blank? && !address.zip.blank? || address.county.downcase.include?("benefitmarket")
     end
 
     def address_fixer(address)
@@ -50,6 +50,7 @@ namespace :migrations do
       counties = county_finder(zip)
       if counties.count == 1
         address.county = counties.first.county_name
+        address.save
         :fixed
       elsif counties.count == 0
         puts "No county found for ZIP: #{zip} #{address.state}"
