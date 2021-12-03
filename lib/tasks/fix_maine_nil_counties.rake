@@ -10,11 +10,18 @@ namespace :migrations do
     # - list the county with nil county with zip outside ME
     # - application county update
 
+    def people
+      people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""]).map(&:_id)
+      # benefitmarkets because previously we erroneously assigned a object instead of ring to county
+      people_2_ids = Person.where("addresses.county" => /.*benefitmarkets.*/i).map(&:_id)
+      people_ids = (people_1_ids + people_2_ids).flatten
+      Person.where(:"_id".in => people_ids)
+    end
+
     #1 list people with nil county
     def pull_county
       puts("Beginning pull counties")
       file_name = "#{Rails.root}/list_county.csv"
-      people = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""])
       total_count = people.count
       users_per_iteration = 10_000.0
       counter = 0
@@ -35,14 +42,15 @@ namespace :migrations do
     pull_county
 
     def address_needs_fixing?(address)
-      address.county.blank? && !address.zip.blank?
+      address.county.blank? && !address.zip.blank? || address.county.downcase.include?("benefitmarket")
     end
 
     def address_fixer(address)
       zip = address.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
       counties = county_finder(zip)
       if counties.count == 1
-        address.county = counties.first
+        address.county = counties.first.county_name
+        address.save
         :fixed
       elsif counties.count == 0
         puts "No county found for ZIP: #{zip} #{address.state}"
@@ -61,65 +69,6 @@ namespace :migrations do
     def update_county
       puts("Beginning update counties")
       file_name = "#{Rails.root}/update_county.csv"
-      people = Person.all.where(:consumer_role.exists => true, :addresses.exists => true, :"addresses.county".in => [nil, ""])
-      total_count = people.count
-      users_per_iteration = 10_000.0
-      counter = 0
-      number_of_iterations = (total_count / users_per_iteration).ceil
-      CSV.open(file_name, 'w+', headers: true) do |csv|
-        csv << ["person_hbx_id", "zip", "status"]
-        while counter < number_of_iterations
-          offset_count = users_per_iteration * counter
-          output = people.no_timeout.offset(offset_count).each do |person|
-            address = person.rating_address
-            county = address&.county
-            next if county.present?
-            next if person.consumer_role.blank?
-
-            county_objs = ::BenefitMarkets::Locations::CountyZip.where(zip: address.zip)
-            if county_objs.count == 1
-              begin
-                address.update_attributes!(county: county_objs[0].county_name)
-                applications = FinancialAssistance::Application.where(family_id: person.primary_family.id, aasm_state: "draft")
-                applications.each do |application|
-                   application.applicants.each do |applicant|
-                     applicant_address = applicant.addresses.where(kind: "home").first
-                     if applicant_address
-                       applicant_address.update_attributes(county: address.county, zip: address.zip)
-                     else
-                      puts("No address present for applicant #{applicant.id}. Creating address for it.")
-                      applicant.addresses.create(address.attributes.except(:created_at, :updated_at))
-                     end
-                   end
-                end
-                csv << [person.hbx_id, address&.zip, "updated"]
-              rescue StandardError => e
-                csv << [person.hbx_id, address&.zip, "StandardError: #{e}"]
-              end
-            elsif county_objs.count > 1
-              csv << [person.hbx_id, address&.zip, "multiple county for matching zip"]
-            elsif county_objs.count == 0
-              csv << [person.hbx_id, address&.zip, "zip outside me"]
-            end
-            counter += 1
-          end
-        end
-      end
-    end
-    update_county
-
-
-    #3 list people by counties with nil county for testing purpose
-
-    @one_county = 0
-    @zero_county = 0
-    @many_county = 0
-
-  #2 update people with nil county
-    def update_county
-      puts("Beginning update counties")
-      file_name = "#{Rails.root}/update_county.csv"
-      people = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""])
       CSV.open(file_name, 'w+', headers: true) do |csv|
         csv << ["person_hbx_id", "zip", "status"]
         output = people.no_timeout.each do |person|

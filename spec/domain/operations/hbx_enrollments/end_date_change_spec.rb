@@ -93,8 +93,8 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
                           :no_open_enrollment_coverage_period,
                           coverage_year: prior_coverage_year)
       end
-      let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
-      let(:termination_date) { (TimeKeeper.date_of_record - 1.year).end_of_month }
+      let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
+      let(:termination_date) { (Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).end_of_month }
       let(:terminated_enrollment) do
         FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual',
                                            effective_on: start_date, terminated_on: termination_date, consumer_role_id: family.primary_person.consumer_role.id)
@@ -115,8 +115,8 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
                           :no_open_enrollment_coverage_period,
                           coverage_year: prior_coverage_year)
       end
-      let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
-      let(:termination_date) { (TimeKeeper.date_of_record - 1.year).end_of_month }
+      let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
+      let(:termination_date) { (Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).end_of_month }
       let(:terminated_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual', effective_on: start_date, terminated_on: termination_date)}
       let(:params) {{ "enrollment_id" => terminated_enrollment.id.to_s, "new_termination_date" => (termination_date - 10.days).to_s}}
 
@@ -139,7 +139,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
                           :no_open_enrollment_coverage_period,
                           coverage_year: prior_coverage_year)
       end
-      let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
+      let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
       let(:termination_date) { start_date + 2.months }
       let(:expired_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_expired', kind: 'individual', effective_on: start_date)}
       let(:params) {{ "enrollment_id" => expired_enrollment.id.to_s, "new_termination_date" => (termination_date - 10.days).to_s}}
@@ -161,7 +161,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
       end
 
       context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do
-        let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
+        let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
         let(:termination_date) { start_date + 2.months }
         let(:expired_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_expired', kind: 'individual', effective_on: start_date, product_id: prior_product.id)}
         let(:active_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_selected', kind: 'individual', effective_on: expired_enrollment.effective_on.end_of_year.next_day,  product_id: current_product.id)}
@@ -184,7 +184,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     context 'prior year terminated, current active enrollment and IVL OE renewing enrollment' do
       include_context 'prior, current and next year benefit coverage periods and products'
       context 'prior year terminated enrollment where termination date is less than than enrollment terminated date' do
-        let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
+        let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
         let(:termination_date) { start_date + 2.months }
         let(:terminated_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual', effective_on: start_date, terminated_on: termination_date, product_id: prior_product.id)}
         let(:active_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_selected', kind: 'individual', effective_on: terminated_enrollment.effective_on.end_of_year.next_day,  product_id: current_product.id)}
@@ -358,7 +358,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
             "application_period.min" => TimeKeeper.date_of_record.beginning_of_year
           ).first
         end
-        let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
+        let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
         let(:termination_date) { start_date + 2.months }
         let!(:expired_enrollment) do
           FactoryBot.create(:hbx_enrollment,
