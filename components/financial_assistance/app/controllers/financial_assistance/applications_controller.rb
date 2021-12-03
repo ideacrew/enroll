@@ -62,12 +62,15 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit! if @application.may_unsubmit?
-              flash_message = if publish_result.failure.is_a?(Dry::Validation::Result)
-                                { error: build_error_messages(publish_result.failure.errors) }
-                              else
-                                { error: "Submission Error: #{publish_result.failure}" }
-                              end
-              redirect_to application_publish_error_application_path(@application), flash: flash_message
+              flash = case publish_result.failure
+                      when Dry::Validation::Result
+                        { error: validation_errors_parser(publish_result.failure) }
+                      when Exception
+                        { error: publish_result.failure.message }
+                      else
+                        { error: "Submission Error: #{publish_result.failure}" }
+                      end
+              redirect_to application_publish_error_application_path(@application), flash: flash
             end
           else
             render 'workflow/step'
@@ -228,10 +231,9 @@ module FinancialAssistance
 
     private
 
-    def build_error_messages(errors)
-      errors.each_with_object([]) do |error, collect|
+    def validation_errors_parser(result)
+      result.errors.each_with_object([]) do |error, collect|
         collect << if error.is_a?(Dry::Schema::Message)
-
                      message = error.path.reduce("The ") do |attribute_message, path|
                        next_element = error.path[(error.path.index(path) + 1)]
                        attribute_message + if next_element.is_a?(Integer)
@@ -247,6 +249,10 @@ module FinancialAssistance
                      error.flatten.flatten.join(',').gsub(",", " ").titleize
                    end
       end
+    end
+
+    def build_error_messages(model)
+      model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
     end
 
     def haven_determination_is_enabled?
