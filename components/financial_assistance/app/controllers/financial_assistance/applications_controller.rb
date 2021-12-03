@@ -66,8 +66,6 @@ module FinancialAssistance
               flash = case publish_result.failure.class
                       when Dry::Validation::Result
                         { error: validation_errors_parser(result.failure) }
-                      when String
-                        { error: publish_result.failure }
                       when Exception
                         { error: publish_result.failure.message }
                       else
