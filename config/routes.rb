@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   get 'errors/internal_server_error'
   # For custom exceptions controller
   resources :exceptions
-  %w[404 422 500 503].each do |code|
+  # https://gist.github.com/mlanett/a31c340b132ddefa9cca
+  # Make sure all exception throwing status codes get sent to the "friendly" exception page
+  (400..510).to_a.map(&:to_s).each do |code|
     get code, :to => "exceptions#show", :code => code
   end
 
