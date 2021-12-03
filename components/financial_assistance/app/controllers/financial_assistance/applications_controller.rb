@@ -235,12 +235,12 @@ module FinancialAssistance
                      message = error.path.reduce("The ") do |attribute_message, path|
                        next_element = error.path[(error.path.index(path) + 1)]
                        attribute_message + if next_element.is_a?(Integer)
-                                     "#{(next_element + 1).ordinalize} #{path.to_s.humanize.downcase}'s "
-                                   elsif path.is_a? Integer
-                                     ""
-                                   else
-                                     "#{path.to_s.humanize.downcase}:"
-                                   end
+                                             "#{(next_element + 1).ordinalize} #{path.to_s.humanize.downcase}'s "
+                                           elsif path.is_a? Integer
+                                             ""
+                                           else
+                                             "#{path.to_s.humanize.downcase}:"
+                                           end
                      end
                      message + " #{error.text}."
                    else

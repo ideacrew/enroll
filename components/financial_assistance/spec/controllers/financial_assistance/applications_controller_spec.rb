@@ -173,8 +173,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         let(:failure) do
           Dry::Validation::Result.new(double(message_set: [], to_h: {})) do |r|
             r.add_error(Dry::Validation::Message.new("length must be within 10 - 15",
-              path: [:applicants, 0, :phones, 0, :full_phone_number]
-            ))
+                                                     path: [:applicants, 0, :phones, 0, :full_phone_number]))
           end
         end
 
