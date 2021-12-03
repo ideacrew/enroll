@@ -22,7 +22,12 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
   let!(:eligibility_determination1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family.family_members.first.id) }
   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family.family_members.last.id) }
-
+  let!(:bad_county_address_person) do
+    person = FactoryBot.create(:person, :with_consumer_role)
+    person.addresses.each do |address|
+      address.update_attributes!(county: BenefitMarkets::Locations::CountyZip.new, zip: "20024")
+    end
+  end
   let(:create_instate_addresses) do
     applicant1.addresses = [
         FactoryBot.build(
@@ -35,7 +40,7 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
           :kind => 'home',
           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
           :zip => "20024",
-          county: "Whateva county"
+          county: BenefitMarkets::Locations::CountyZip.new
         )
     ]
     applicant1.save!
@@ -74,6 +79,8 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
       family.save!
       create_instate_addresses
       expect(applicant2.addresses.first.county.blank?).to eq(true)
+      county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
+      expect(county_people.present?).to eq(true)
       Rake::Task["migrations:fix_maine_nil_counties"].invoke
     end
 
@@ -82,6 +89,8 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
         applicant.reload
         expect(applicant.addresses.to_a.select { |address| address.county.blank? }).to eq([])
       end
+      county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
+      expect(county_people.present?).to eq(false)
     end
   end
 end
