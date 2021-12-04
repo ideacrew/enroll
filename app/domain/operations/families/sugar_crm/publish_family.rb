@@ -15,8 +15,8 @@ module Operations
 
         # @param [ Family] instance of family
         # @return Success result
-        def call(family)
-          transformed_family = yield construct_payload_hash(family)
+        def call(family, options = {})
+          transformed_family = yield construct_payload_hash(family, options[:force])
           event = yield build_event(transformed_family)
           result = yield publish(event)
           Success([result, transformed_family])
@@ -58,11 +58,11 @@ module Operations
           new_payload_changes != old_payload_changes
         end
 
-        def construct_payload_hash(family)
+        def construct_payload_hash(family, force)
           payload_hash = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
           if !family.is_a?(::Family)
             Failure("Invalid Family Object. Family class is: #{family.class}")
-          elsif send_to_gateway?(family, payload_hash.value!)
+          elsif send_to_gateway?(family, payload_hash.value!) && !force
             payload_hash
           else
             Failure("No critical changes made to family, no update needed to CRM gateway.")
