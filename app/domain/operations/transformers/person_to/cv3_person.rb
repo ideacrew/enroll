@@ -218,7 +218,7 @@ module Operations
             is_applying_coverage: consumer_role.is_applying_coverage,
             bookmark_url: consumer_role.bookmark_url,
             admin_bookmark_url: consumer_role.admin_bookmark_url,
-            contact_method: contact_method(consumer_role.contact_method),
+            contact_method: consumer_role.contact_method,
             language_preference: consumer_role.language_preference,
             is_state_resident: consumer_role.is_state_resident,
             identity_validation: consumer_role.identity_validation,
@@ -235,10 +235,6 @@ module Operations
             local_residency_responses: transform_event_responses(consumer_role.local_residency_responses),
             local_residency_requests: transform_event_requests(consumer_role.local_residency_requests)
           }
-        end
-
-        def contact_method(cmethod)
-          cmethod == "Only Electronic communications" ? "email" : "mail"
         end
 
         def transform_verification_type_history_elements(elements)
