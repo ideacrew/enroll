@@ -5,7 +5,7 @@ require 'dry/monads/do'
 require 'rails_helper'
 
 RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_each do
-  let(:primary_applicant) { FactoryBot.create(:person, hbx_id: "732020") }
+  let(:primary_applicant) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "732020") }
   let(:dependent1) { FactoryBot.create(:person, hbx_id: "732021") }
   let(:dependent2) { FactoryBot.create(:person, hbx_id: "732022") }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
@@ -64,6 +64,41 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_
 
       it "should ignore the application and return an empty array" do
         expect(subject).to be_empty
+      end
+    end
+  end
+
+  describe '#transform_households' do
+    let(:aasm_state) { 'coverage_selected' }
+    let!(:shopping_enrollment) do
+      create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :individual_unassisted,
+        family: family,
+        aasm_state: aasm_state,
+        product_id: product.id,
+        applied_aptc_amount: Money.new(44_500),
+        consumer_role_id: primary_applicant.consumer_role.id,
+        enrollment_members: family.family_members
+      )
+    end
+    let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
+    let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
+
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households) }
+
+    context 'when enrollment is in shopping state' do
+      let(:aasm_state) { 'shopping' }
+      it 'should not include hbx_enrollments in the hash' do
+        expect(subject[0][:hbx_enrollments]).to be_nil
+      end
+    end
+
+    context 'when enrollment is coverage_selected state' do
+      let(:aasm_state) { 'coverage_selected' }
+      it 'should include hbx_enrollments in the hash' do
+        expect(subject[0][:hbx_enrollments]).to be_present
       end
     end
   end
