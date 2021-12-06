@@ -159,7 +159,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       allow(application).to receive(:save!).with(validate: false).and_return(false)
       allow(application).to receive(:valid?).and_return(false)
       post :step, params: {application: application.attributes, id: application.id }
-      expect(flash[:error]).to eq("Hbx Id Can't Be Blank, Fake Error Can't Be Blank")
+      expect(flash[:error]).to eq("Hbx id can't be blank, fake error can't be blank")
     end
 
     it "showing errors when @model does not save and errors blank" do

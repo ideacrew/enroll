@@ -251,7 +251,7 @@ module FinancialAssistance
     end
 
     def build_error_messages(model)
-      model.valid? ? nil : model.errors.messages.map { |message| message.flatten.flatten.join(',').gsub(",", " ").titleize }.join(", ")
+      model.valid? ? nil : model.errors.messages.map { |message| message.flatten.flatten.join(',').gsub(",", " ") }.join(", ").humanize
     end
 
     def haven_determination_is_enabled?
