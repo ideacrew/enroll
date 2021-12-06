@@ -77,6 +77,7 @@ module FinancialAssistance
                         @application.applicants.build
                       end
           applicant.assign_attributes(values.to_h)
+          applicant.callback_update = true
 
           if applicant.save
             @application.ensure_relationship_with_primary(applicant, values.to_h[:relationship]) unless applicant.is_primary_applicant

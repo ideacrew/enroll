@@ -48,6 +48,7 @@ module FinancialAssistance
         def delete_applicant(applicant)
           Try {
             applicant_id = applicant
+            applicant.callback_update = true
             applicant&.destroy!
             @application.relationships.where(applicant_id: applicant_id).destroy_all
             @application.relationships.where(relative_id: applicant_id).destroy_all
