@@ -106,11 +106,18 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :aft
   end
 
   describe 'when a draft application is present with an applicant' do
+    before do
+      allow(::Operations::Families::DropFamilyMember).to receive(:new).and_call_original
+      subject.call(financial_applicant: applicant_params, family_id: family_id)
+    end
 
     it 'should be delete the applicant' do
       expect(application.applicants.count).to eq 1
-      subject.call(financial_applicant: applicant_params, family_id: family_id)
       expect(application.reload.applicants.count).to eq 0
+    end
+
+    it 'should be delete the applicant' do
+      expect(::Operations::Families::DropFamilyMember).to_not have_received(:new)
     end
   end
 
