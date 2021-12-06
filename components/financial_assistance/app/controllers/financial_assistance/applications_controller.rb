@@ -62,15 +62,15 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit! if @application.may_unsubmit?
-              flash = case publish_result.failure
-                      when Dry::Validation::Result
-                        { error: validation_errors_parser(publish_result.failure) }
-                      when Exception
-                        { error: publish_result.failure.message }
-                      else
-                        { error: "Submission Error: #{publish_result.failure}" }
-                      end
-              redirect_to application_publish_error_application_path(@application), flash: flash
+              flash_message = case publish_result.failure
+                              when Dry::Validation::Result
+                                { error: validation_errors_parser(publish_result.failure) }
+                              when Exception
+                                { error: publish_result.failure.message }
+                              else
+                                { error: "Submission Error: #{publish_result.failure}" }
+                              end
+              redirect_to application_publish_error_application_path(@application), flash: flash_message
             end
           else
             render 'workflow/step'
@@ -78,7 +78,7 @@ module FinancialAssistance
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
-          build_error_messages(@model)
+          flash[:error] = build_error_messages(@model)
           render 'workflow/step'
         end
       else
@@ -251,7 +251,7 @@ module FinancialAssistance
     end
 
     def build_error_messages(model)
-      flash[:error] = model.valid? ? nil : model&.errors&.messages&.first&.flatten&.flatten&.join(',')&.gsub(",", " ")&.titleize
+      model.valid? ? nil : model.errors.messages.map { |message| message.flatten.flatten.join(',').gsub(",", " ").titleize }.join(", ")
     end
 
     def haven_determination_is_enabled?

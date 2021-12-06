@@ -151,12 +151,15 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     it "showing errors when @model does not save" do
       # to give errors
+      allow(application).to receive_message_chain('errors.messages').and_return(
+        {:hbx_id => ["can't be blank"], :fake_error => ["can't be blank"]}
+      )
       allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
       allow(application).to receive(:save).and_return(false)
       allow(application).to receive(:save!).with(validate: false).and_return(false)
       allow(application).to receive(:valid?).and_return(false)
       post :step, params: {application: application.attributes, id: application.id }
-      expect(flash[:error]).to eq(nil)
+      expect(flash[:error]).to eq("Hbx Id Can't Be Blank, Fake Error Can't Be Blank")
     end
 
     it "should render step if no key present in params with modal_name" do
