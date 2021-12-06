@@ -21,6 +21,8 @@ module Subscribers
         if transfer_response.failure?
           transfer_details[:result] = "Failed"
           transfer_details[:failure] = "Unsucessfully built account transfer response by Enroll - #{transfer_response.failure}"
+        else 
+          transfer_details.merge!(transfer_response.value!)
         end
         ack(delivery_info.delivery_tag)
         logger.info "AtpSubscriber: acked with success: #{result.success}"
