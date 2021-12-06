@@ -146,7 +146,30 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
       allow(obj).to receive(:build_event).and_return(event)
       allow(event.success).to receive(:publish).and_return(true)
-      controller.instance_variable_set(:@modal, application.reload)
+      controller.instance_variable_set(:@model, application.reload)
+    end
+
+    it "showing errors when @model does not save" do
+      # to give errors
+      allow(application).to receive_message_chain('errors.messages').and_return(
+        {:hbx_id => ["can't be blank"], :fake_error => ["can't be blank"]}
+      )
+      allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+      allow(application).to receive(:save).and_return(false)
+      allow(application).to receive(:save!).with(validate: false).and_return(false)
+      allow(application).to receive(:valid?).and_return(false)
+      post :step, params: {application: application.attributes, id: application.id }
+      expect(flash[:error]).to eq("Hbx id can't be blank, fake error can't be blank")
+    end
+
+    it "showing errors when @model does not save and errors blank" do
+      # to give errors
+      allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+      allow(application).to receive(:save).and_return(false)
+      allow(application).to receive(:save!).with(validate: false).and_return(false)
+      allow(application).to receive(:valid?).and_return(false)
+      post :step, params: {application: application.attributes, id: application.id }
+      expect(flash[:error]).to eq("")
     end
 
     it "should render step if no key present in params with modal_name" do
