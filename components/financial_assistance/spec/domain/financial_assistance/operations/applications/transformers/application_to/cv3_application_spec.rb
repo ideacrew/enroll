@@ -386,7 +386,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:result) { subject.call(application) }
 
     before :each do
-      family.family_members.first.update_attributes(person_id: person.hbx_id)
+      family.family_members.first.update_attributes(person_id: person.id)
       applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
       application.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: 'renewal_draft',
@@ -1455,6 +1455,27 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'should return adjusted_gross_income for mitc_income' do
       expect(@mitc_income[:adjusted_gross_income]).to be_a Float
       expect(@mitc_income[:adjusted_gross_income]).not_to be_a Money
+    end
+  end
+
+  describe "#applicant_benchmark_premium" do
+    let(:result) { subject.call(application) }
+    context "when all applicants are valid" do
+
+      it "should successfully submit a cv3 application" do
+        expect(result).to be_success
+      end
+    end
+
+    context "when a family member is deleted" do
+      before do
+        family.family_members.last.delete
+        family.reload
+      end
+
+      it "should unsuccessfully submit a cv3 application and get a failure response" do
+        expect(result).to_not be_success
+      end
     end
   end
 end

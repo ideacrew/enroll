@@ -182,6 +182,7 @@ module Operations
 
         def transform_households(households)
           households.collect do |household|
+            enrollments = household.hbx_enrollments.where(:aasm_state.ne => "shopping", :product_id.ne => nil)
             household_data = {
               start_date: household.effective_starting_on,
               end_date: household.effective_ending_on,
@@ -190,7 +191,7 @@ module Operations
               tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households)
             }
-            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(household.hbx_enrollments)) if household.hbx_enrollments.present?
+            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(enrollments)) if enrollments.present?
             household_data
           end
         end
