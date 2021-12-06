@@ -78,7 +78,7 @@ module FinancialAssistance
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
-          flash[:error] = build_error_messages(@model)
+          build_error_messages(@model)
           render 'workflow/step'
         end
       else
@@ -251,7 +251,7 @@ module FinancialAssistance
     end
 
     def build_error_messages(model)
-      model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+      flash[:error] = model.valid? ? nil : model&.errors&.messages&.first&.flatten&.flatten&.join(',')&.gsub(",", " ")&.titleize
     end
 
     def haven_determination_is_enabled?
