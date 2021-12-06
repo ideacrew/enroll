@@ -78,8 +78,7 @@ module FinancialAssistance
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
-          @model.valid?
-          flash[:error] = build_error_messages(@model.errors)
+          flash[:error] = build_error_messages(@model)
           render 'workflow/step'
         end
       else
