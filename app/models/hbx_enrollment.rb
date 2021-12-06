@@ -1316,10 +1316,10 @@ class HbxEnrollment
       (baa.start_on <= self.time_of_purchase) # &&
     end
     eligible_brokers = brokers_before_purchase.reject do |bbp|
-      (!bbp.end_on.blank?) && (bbp.end_on < self.time_of_purchase)
+      !bbp.end_on.blank? && (bbp.end_on < self.time_of_purchase)
     end
     return nil if eligible_brokers.empty?
-    eligible_brokers.sort_by(&:start_on).last
+    eligible_brokers.max_by(&:start_on)
   end
 
   def shop_broker_agency_account
