@@ -162,6 +162,16 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(flash[:error]).to eq("Hbx Id Can't Be Blank, Fake Error Can't Be Blank")
     end
 
+    it "showing errors when @model does not save and errors blank" do
+      # to give errors
+      allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+      allow(application).to receive(:save).and_return(false)
+      allow(application).to receive(:save!).with(validate: false).and_return(false)
+      allow(application).to receive(:valid?).and_return(false)
+      post :step, params: {application: application.attributes, id: application.id }
+      expect(flash[:error]).to eq("")
+    end
+
     it "should render step if no key present in params with modal_name" do
       post :step, params: { id: application.id }
       expect(response).to render_template 'workflow/step'
