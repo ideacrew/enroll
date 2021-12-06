@@ -604,12 +604,7 @@ end
 
 And(/^employer filled all the fields on benefit application form$/) do
   find(EmployerAddBenefitPackage.select_start_on_dropdown, wait: 20).click
-
-  if @new_application&.reload&.termination_pending?
-    find('li', :text => @new_application.reload.effective_period.max.next_day.strftime("%m/%d/%Y")).click
-  else
-    find('li[data-index="1"]').click
-  end
+  find('li[data-index="1"]').click
   sleep 2
   fill_in EmployerAddBenefitPackage.full_time_employees, with: 5
   fill_in EmployerAddBenefitPackage.part_time_employees, with: 5
