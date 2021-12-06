@@ -729,7 +729,11 @@ module FinancialAssistance
     end
 
     def format_citizen
-      CITIZEN_KINDS[citizen_status.to_sym]
+      if !is_applying_coverage && citizen_status == "not_lawfully_present_in_us" && EnrollRegistry.feature_enabled?(:non_applicant_citizen_status)
+        "N/A"
+      else
+        CITIZEN_KINDS[citizen_status.to_sym]
+      end
     end
 
     def student_age_satisfied?
