@@ -9,7 +9,7 @@ module FinancialAssistance
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
-    include Eligibilities::Eligible
+    include ::Eligibilities::Eligible
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -282,7 +282,6 @@ module FinancialAssistance
     field :transfer_referral_reason, type: String
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
-    embeds_many :evidences, class_name: "::FinancialAssistance::Evidence"
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -293,7 +292,12 @@ module FinancialAssistance
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :evidences
+    embeds_one :income_evidence, class_name: "::FinancialAssistance::Evidence", as: :evidencable
+    embeds_one :esi_evidence, class_name: "::FinancialAssistance::Evidence", as: :evidencable
+    embeds_one :non_esi_evidence, class_name: "::FinancialAssistance::Evidence", as: :evidencable
+    embeds_one :aces_evidence, class_name: "::FinancialAssistance::Evidence", as: :evidencable
+
+    accepts_nested_attributes_for :incomes, :deductions, :benefits
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true

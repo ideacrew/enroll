@@ -14,8 +14,8 @@ module Eligibilities
     field :description, type: String
     field :is_satisfied, type: Boolean, default: false
     field :has_unsatisfied_evidences, type: Boolean, default: true
-
-    embeds_many :evidences, class_name: 'Eligibilities::Evidence'
+    field :effective_date, type: Date
+    embeds_many :evidences, class_name: 'FinancialAssistance::Evidence'
 
     before_save :update_evidence_status
 

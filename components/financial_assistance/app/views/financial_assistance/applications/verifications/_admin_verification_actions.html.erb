@@ -4,12 +4,12 @@
     <div class="col-md-6">
       Provide verification reason:
     </div>
-    <%= form_tag financial_assistance.application_applicant_verification_documents_update_evidence_path(application, applicant), method: :put do %>
+    <%= form_tag financial_assistance.application_applicant_evidences_update_evidence_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
         <%= hidden_field_tag 'evidence', evidence.id %>
         <%= hidden_field_tag 'admin_action', 'verify' %>
         <div class="form-group col-md-3">
-          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Document::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
+          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Evidence::VERIFY_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -25,12 +25,12 @@
     <div class="col-md-6">
       Reject reason:
     </div>
-    <%= form_tag financial_assistance.application_applicant_verification_documents_update_evidence_path(application, applicant), method: :put do %>
+    <%= form_tag financial_assistance.application_applicant_evidences_update_evidence_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
         <%= hidden_field_tag 'evidence', evidence.id %>
         <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
         <div class="form-group col-md-3">
-          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Document::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
+          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Evidence::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -39,4 +39,46 @@
   </div>
 </div>
 <!-- ==== reject reason ==== -->
+
+<!-- ***** FDSH hub request ***** -->
+<div class="row">
+  <div class="fedhub-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.split.join('-')}-hub"%>>
+    <div class="col-md-9">
+       <p>New request to the FDSH will be sent.</p>
+    </div>
+    <%= form_tag financial_assistance.application_applicant_evidences_fdsh_hub_request_path(application, applicant), method: :post do %>
+        <%= hidden_field_tag 'applicant_id', applicant.id  %>
+        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'admin_action', 'hub_request' %>
+        <div class="col-md-3">
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+        </div>
+    <%end%>
+  </div>
+</div>
+<!-- ==== fedhub request ==== -->
+
+<!-- ***** Extend ***** -->
+<div class="row">
+  <div class="extend-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.split.join('-')}-extend"%>>
+    <div class="col-md-6">
+      <p>Do you want to Extend Due Date for verification type</p>
+    </div>
+    <%= form_tag financial_assistance.application_applicant_evidences_extend_due_date_path(application, applicant), method: :put do %>
+        <%= hidden_field_tag 'applicant_id', applicant.id  %>
+        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'admin_action', 'extend' %>
+
+        <div class="col-md-3">
+          <%= link_to "Cancel", main_app.verification_insured_families_path, class: "btn btn-default v-type-confirm-button" %>
+        </div>
+        <div class="col-md-3">
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+        </div>
+    <%end%>
+  </div>
+</div>
+<!-- ==== Extend request ==== -->
+
+
 

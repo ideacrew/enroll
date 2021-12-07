@@ -30,8 +30,14 @@ FinancialAssistance::Engine.routes.draw do
       get 'verification_documents/upload', to: 'verification_documents#upload'
       post 'verification_documents/upload', to: 'verification_documents#upload'
       get 'verification_documents/download/:key', to: 'verification_documents#download'
-      get 'verification_documents/update_evidence', to: 'verification_documents#update_evidence'
-      put 'verification_documents/update_evidence', to: 'verification_documents#update_evidence'
+      get 'evidences/update_evidence', to: 'evidences#update_evidence'
+      put 'evidences/update_evidence', to: 'evidences#update_evidence'
+      get 'evidences/fdsh_hub_request', to: 'evidences#fdsh_hub_request'
+      post 'evidences/fdsh_hub_request', to: 'evidences#fdsh_hub_request'
+      get 'evidences/extend_due_date', to: 'evidences#extend_due_date'
+      put 'evidences/extend_due_date', to: 'evidences#extend_due_date'
+      get 'evidences/view_history', to: 'evidences#view_history'
+
       delete 'verification_documents/destroy', to: 'verification_documents#destroy'
       get :age_of_applicant
       get :primary_applicant_has_spouse

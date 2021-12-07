@@ -12,7 +12,18 @@
               <%= applicant.full_name %>
             </div>
             <div class="verification-types col-md-12">
-                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application} %>
+              <% if applicant.income_evidence.present? && applicant.incomes.present? %>
+                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.income_evidence} %>
+              <% end %>
+              <% if applicant.non_esi_evidence.present? %>
+                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.non_esi_evidence} %>
+              <% end %>
+              <% if applicant.esi_evidence.present? %>
+                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.esi_evidence} %>
+              <% end %>
+              <% if applicant.aces_evidence.present? %>
+                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.aces_evidence} %>
+              <% end %>
             </div>
           </div>
         </div>

@@ -46,22 +46,6 @@ module FinancialAssistance
       end
     end
 
-    def update_evidence
-      update_reason = params[:verification_reason]
-      admin_action = params[:admin_action]
-      reasons_list = FinancialAssistance::Document::VERIFICATION_REASONS + FinancialAssistance::Document::REJECT_REASONS
-      if reasons_list.include?(update_reason)
-        verification_result = admin_verification_action(admin_action, @evidence, update_reason)
-        message = (verification_result.is_a? String) ? verification_result : "Verification successfully approved."
-        flash[:success] =  message
-        update_documents_status(@applicant) if @applicant
-      else
-        flash[:error] = "Please provide a verification reason."
-      end
-
-      redirect_to main_app.verification_insured_families_path
-    end
-
     def destroy
       @document.delete if @evidence.type_unverified?
       if @document.destroyed?
@@ -134,11 +118,6 @@ module FinancialAssistance
 
     def file_name(file)
       file.original_filename
-    end
-
-    def update_documents_status(applicant)
-      family = applicant.family
-      family.update_family_document_status!
     end
 
     def update_documents(title, file_uri)
