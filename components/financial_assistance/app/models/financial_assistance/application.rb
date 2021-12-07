@@ -571,6 +571,21 @@ module FinancialAssistance
       log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
     end
 
+    def validate_relationships(matrix)
+      all_relationships = find_all_relationships(matrix)
+      spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
+      next unless spouse_relation.present?
+      next unless all_relationships.select{|hash| hash[:relation] == "child"}.present?
+
+      primary_rel_id = spouse_relation.to_a.flatten.second
+      spouse_rel_id = spouse_relation.to_a.flatten.last
+      primary_parent_relations = application.relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
+      child_ids = primary_parent_relations.map(&:relative_id)
+      spouse_parent_relations = application.relationships.where(:relative_id.in => [child_ids], applicant_id: second_rel_id, kind: 'parent')
+
+      spouse_parent_relations.present? ? true : false
+    end
+
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       missing_relationships = find_missing_relationships(matrix)
 
@@ -1054,7 +1069,7 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      find_missing_relationships(build_relationship_matrix).blank?
+      find_missing_relationships(build_relationship_matrix).blank? || validate_relationships(matrix)
     end
 
     def is_draft?
