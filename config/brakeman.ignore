@@ -103,7 +103,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 62,
+      "line": 61,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`git checkout #{filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")}`",
       "render_path": null,
@@ -290,7 +290,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -394,7 +394,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/controllers/exceptions_controller.rb",
-      "line": 8,
+      "line": 21,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(file => \"public/#{(params[:code] or 500)}.html\", { :status => ((params[:code] or 500)), :layout => false })",
       "render_path": null,
@@ -414,7 +414,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 51,
+      "line": 50,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`cp -r #{filename_in_config_directory} #{filename_in_config_directory.sub(\"#{target_config_folder}/\", \"\")}`",
       "render_path": null,
@@ -482,7 +482,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -641,6 +641,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "7a598bdb57dd1f2b355cb2748c105a0330720c6d4a6e948516b83005a3d9d57d",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 37,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{target_config_folder}/config/settings.yml config/settings.yml`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_settings_yml_to_current_configuration"
+      },
+      "user_input": "target_config_folder",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "8a980298a5df4d60183c689cfc1c152f4b412c6bcf03ae0ed583ecf0b7041e31",
@@ -718,6 +738,26 @@
         "method": "download_employer_document"
       },
       "user_input": "BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "9a51b55006ddd99784cff144f8a0cfc06f545afde39122f7a8b3210a00e9b751",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 75,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cat config/client_config/#{target_client_state_abbreviation}/system/features/enroll_app/enroll_app.yml`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "migrate"
+      },
+      "user_input": "target_client_state_abbreviation",
       "confidence": "Medium",
       "note": ""
     },
@@ -862,6 +902,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-11-19 17:00:41 -0500",
+  "updated": "2021-12-07 11:56:02 -0500",
   "brakeman_version": "5.1.1"
 }
