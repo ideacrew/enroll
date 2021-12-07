@@ -1,4 +1,4 @@
-import { CucumberFeature } from './models';
+import { CucumberFeature } from 'cucumber-report-analyzer';
 
 const { promises: fs } = require('fs');
 

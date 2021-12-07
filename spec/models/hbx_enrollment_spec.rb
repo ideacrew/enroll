@@ -1347,8 +1347,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:end_on_1) {nil}
       let(:end_on_2) {submitted_at - 2.days}
 
-      it "should have no applicable broker" do
-        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq nil
+      it "should use the initial broker" do
+        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_1
       end
     end
 

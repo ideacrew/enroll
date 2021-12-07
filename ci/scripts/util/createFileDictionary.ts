@@ -8,16 +8,16 @@ export function createFileDictionary(
       const filePath = example.file_path;
 
       if (totalConfig[filePath] !== undefined) {
-        const currentTotal = totalConfig[filePath].runTime;
+        const currentTotal = totalConfig[filePath].runtime;
 
         return {
           ...totalConfig,
-          [filePath]: { runTime: currentTotal + example.run_time },
+          [filePath]: { runtime: currentTotal + example.run_time },
         };
       } else {
         return {
           ...totalConfig,
-          [filePath]: { runTime: example.run_time },
+          [filePath]: { runtime: example.run_time },
         };
       }
     },
