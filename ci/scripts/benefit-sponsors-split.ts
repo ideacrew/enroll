@@ -1,20 +1,17 @@
 import { promises as fs } from 'fs';
-
 import {
+  createSplitConfig,
   FileWithRuntime,
-  FileWithRuntimeDictionary,
-  FileGroup,
-} from './models';
-import {
-  createFileDictionary,
-  createFilesWithRuntime,
-  splitFilesIntoGroups,
-} from './util';
+  SplitConfig,
+} from 'split-config-generator';
+
+import { FileWithRuntimeDictionary } from './models';
+import { createFileDictionary, createFilesWithRuntime } from './util';
 
 const REPORT_PATH = './ci/rspec/components-benefit_sponsors-rspec-report.json';
 const SPLIT_CONFIG_PATH = './ci/benefit_sponsors-split-config.json';
 
-async function createSplitConfig(): Promise<void> {
+async function createBenefitSponsorsSplitConfig(): Promise<void> {
   // Read cli arguments
 
   const report: string = await fs.readFile(REPORT_PATH, 'utf-8');
@@ -41,14 +38,14 @@ async function createSplitConfig(): Promise<void> {
 
     const fileWithRuntime: FileWithRuntime = {
       filePath: shortenedFilePath,
-      runTime: file.runTime,
+      runtime: file.runtime,
     };
 
     return fileWithRuntime;
   });
 
   console.log('Creating split config');
-  const splitConfig: FileGroup[] = splitFilesIntoGroups(
+  const splitConfig: SplitConfig = createSplitConfig(
     shortenedPaths,
     groupCount
   );
@@ -60,4 +57,4 @@ async function createSplitConfig(): Promise<void> {
   }
 }
 
-createSplitConfig();
+createBenefitSponsorsSplitConfig();

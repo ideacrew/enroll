@@ -1,22 +1,18 @@
 import { promises as fs } from 'fs';
-
 import {
+  createSplitConfig,
   FileWithRuntime,
-  FileWithRuntimeDictionary,
-  FileGroup,
-  RspecExample,
-} from './models';
+  SplitConfig,
+} from 'split-config-generator';
 
-import {
-  createFileDictionary,
-  createFilesWithRuntime,
-  splitFilesIntoGroups,
-} from './util';
+import { FileWithRuntimeDictionary, RspecExample } from './models';
+
+import { createFileDictionary, createFilesWithRuntime } from './util';
 
 const REPORT_PATH = './ci/rspec/local-rspec-report.json';
 const SPLIT_CONFIG_PATH = './ci/rspec-split-config.json';
 
-async function createSplitConfig(): Promise<void> {
+async function createRspecSplitConfig(): Promise<void> {
   // Read cli arguments
   const rspecExamples = await fs.readFile(REPORT_PATH, 'utf-8');
   const examples: RspecExample[] = JSON.parse(rspecExamples);
@@ -35,7 +31,7 @@ async function createSplitConfig(): Promise<void> {
   const arrayOfSlowFiles: FileWithRuntime[] =
     createFilesWithRuntime(filesByRuntime);
 
-  const splitConfig: FileGroup[] = splitFilesIntoGroups(
+  const splitConfig: SplitConfig = createSplitConfig(
     arrayOfSlowFiles,
     groupCount
   );
@@ -47,4 +43,4 @@ async function createSplitConfig(): Promise<void> {
   }
 }
 
-createSplitConfig();
+createRspecSplitConfig();

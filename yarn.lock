@@ -2605,6 +2605,11 @@ cssom@0.3.x, "cssom@>= 0.3.0 < 0.4.0":
   dependencies:
     cssom "0.3.x"
 
+cucumber-report-analyzer@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/cucumber-report-analyzer/-/cucumber-report-analyzer-2.0.1.tgz#6989bad608e466a7068d8f84fc0547c6cd0564bc"
+  integrity sha512-KDBFv9Zv09IaEEBC+whIJS6gspyfNGE/IdrshuTdXOmZieOwYMX7dq0vfo/tpymQ2ioMf7l6CQON3CvHQxsCVQ==
+
 currently-unhandled@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
@@ -7854,6 +7859,11 @@ spdy@^4.0.0:
     http-deceiver "^1.2.7"
     select-hose "^2.0.0"
     spdy-transport "^3.0.0"
+
+split-config-generator@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/split-config-generator/-/split-config-generator-1.1.0.tgz#5b9f34d3c245f9b2344ff94f8115b2b3b7bff552"
+  integrity sha512-/Al8PhyUIjB/DhP4Q7JG9Zge6sWw6gvrjuuLNgB4F2rc5cDJfzM1AXiQg4zJPOm3nScv0CKeldWHSFFulFqTEQ==
 
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"

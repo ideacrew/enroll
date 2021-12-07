@@ -49,7 +49,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
               "extension" => "1",
               "full_phone_number" => "20211111111",
               "kind" => "home"}
-],
+              ],
          :emails => [{"kind" => "home", "address" => "example1@example.com"}],
          :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
          :is_primary_applicant => true,
@@ -212,6 +212,43 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
 
       it 'should not create a applicant object' do
         expect(application.reload.applicants.count).to eq(1)
+      end
+    end
+
+    context "when applicant exists and updating the attributes over existing data" do
+      let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          :with_work_phone,
+                          :with_work_email,
+                          :with_home_address,
+                          application: application,
+                          ssn: '889984400',
+                          dob: (Date.today - 10.years),
+                          first_name: 'james',
+                          last_name: 'bond',
+                          :is_applying_coverage => true,
+                          :citizen_status => "us_citizen",
+                          :is_consumer_role => true,
+                          :same_with_primary => false,
+                          :indian_tribe_member => false,
+                          :is_incarcerated => true,
+                          :is_primary_applicant => true,
+                          :is_consent_applicant => false,
+                          :is_disabled => false,
+                          :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
+                          :relationship => "child")
+      end
+
+      let!(:applicant_params) {applicant.serializable_hash.deep_symbolize_keys.merge(:ssn => '889984400', :relationship => "self")}
+
+      before do
+        allow(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to receive(:new).and_call_original
+        @result = subject.call(params: compare(applicant_params), family_id: family_id)
+      end
+
+      it 'should not propagate when callback_update is true' do
+        expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
       end
     end
   end

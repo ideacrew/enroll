@@ -18,7 +18,6 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
       before do
-        allow(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family).and_return(true)
         family.primary_person.emails.create(kind: "home", address: "fakeemail@email.com")
         @application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
         @expected_response =
@@ -39,9 +38,26 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         expect(result.value!).to eq(@expected_response)
       end
 
-      it 'should trigger account transfer notice' do
-        expect(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family)
-        subject.call(@application.id)
+      context 'when account_transfer_notice_trigger is enabled' do
+        before do
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:account_transfer_notice_trigger).and_return(true)
+        end
+
+        it 'should trigger account transfer notice' do
+          expect(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family)
+          subject.call(@application.id)
+        end
+      end
+
+      context 'when account_transfer_notice_trigger is disabled' do
+        before do
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:account_transfer_notice_trigger).and_return(false)
+        end
+
+        it 'should not trigger account transfer notice' do
+          expect(::Operations::Notices::IvlAccountTransferNotice).not_to receive(:new)
+          subject.call(@application.id)
+        end
       end
     end
   end

@@ -34,10 +34,10 @@ module FinancialAssistance
               payment_transactions: transform_payment_transactions(family.payment_transactions),
               magi_medicaid_applications: transform_applications(family),
               documents: transform_documents(family.documents),
-              timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime} # ,
+              timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime},
+              broker_accounts: transform_broker_accounts(family.broker_agency_accounts)
               # foreign_keys TO DO ??
               # general_agency_accounts = transform_general_agency_accounts(family.general_agency_accounts), #TO DO
-              # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
               # updated_by: construct_updated_by(updated_by)
             }
             payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
@@ -151,14 +151,39 @@ module FinancialAssistance
 
           def transform_broker_accounts(broker_accounts)
             broker_accounts.collect do |account|
+              broker_role = account.writing_agent
+              profile = account.broker_agency_profile
+              person = broker_role&.person
+
               {
                 start_on: account.start_on,
                 end_on: account.end_on,
-                is_active: account.aasm_state == "active",
-                aasm_state: account.aasm_state
-                # general_agency_reference: account.general_agency_reference,
-                # broker_role_reference: account.broker_role_reference,
-                # updated_by: account.updated_by
+                is_active: account.is_active,
+                broker_role_reference: {
+                  npn: broker_role.npn,
+                  person_reference: {
+                    hbx_id: person&.hbx_id,
+                    first_name: person&.first_name,
+                    middle_name: person&.middle_name,
+                    last_name: person&.last_name,
+                    dob: person&.dob,
+                    gender: person&.gender
+                  },
+                  broker_agency_reference: {
+                    hbx_id: profile.hbx_id,
+                    market_kind: profile.market_kind,
+                    name: profile.legal_name,
+                    fein: profile.fein,
+                    corporate_npn: profile.corporate_npn
+                  }
+                },
+                broker_agency_reference: {
+                  hbx_id: profile.hbx_id,
+                  market_kind: profile.market_kind,
+                  name: profile.legal_name,
+                  fein: profile.fein,
+                  corporate_npn: profile.corporate_npn
+                }
               }
             end
           end
