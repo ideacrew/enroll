@@ -275,7 +275,7 @@ module FinancialAssistance
     end
 
     def member_name_by_id(id)
-      ::FinancialAssistance::Applicant.find(id).full_name
+      ::FinancialAssistance::Applicant.find(id)&.full_name
     end
 
     def immigration_document_options_submission_url(application, model)
