@@ -1,25 +1,90 @@
 # frozen_string_literal: true
 
 module Eligibilities
-  module Snapshots
     # Use Visitor Development Pattern to access Eligibilities and Evidences
     # distributed across models
-    class FamilySnapshot
+    class FamilyEligibility < Eligibility
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      ELIGIBILITIES_LIST = %i[
-        aptc_financial_assistance_eligibility,
-        magi_medicaid_eligiblility,
-        chip_eligibility,
-        enrollment_eligibility
+      embedded_in :family
+      embeds_one :family_members_eligibility
+
+      family is eligble to enroll on aca_individual
+
+
+{
+      subject: Family,
+      object: :aca_individual,
+      predicate: { evidences: [], status: :eligible }
+}
+
+      MARKET = [
+        :aca_individual,
+        :aca_shop,
+        :coverall,
+        :fehb
+        # :modified_adjusted_gross_income_medicaid, # comprehensive health insurance available to low-income children and adults
+        # :childrens_health_insurance_program # provides low-cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private insurance.
       ]
+
+      ACA_INDIVIDUAL_CREDITS = [
+        :aptc_csr_credit, # advance premium tax credit that consumers can use to lower their monthly insurance premiums
+        # :cost_sharing_reduction_credit # discount that lowers the amount a consumer pays for deductibles, copayments, and coinsurance
+      ]
+
+
+
+      ACA_IVL_MARKET_PRODUCTS = %i[healh_insurance dental_insurance]
+
+      PROGRAMS = []
+
+
+      ELIGIBILITY_EVIDENCE_MAP = {
+        aca_ivl_market_enrollment_eligible: {
+          family: {},
+          family_member: {
+            verified_lawflly_present: {},
+            resident: {}
+          }
+        },
+        family: {},
+        advance_premium_tax_credit: {
+          application: {},
+          applicant: {}
+        }
+      }
+
+      ELIGIBLLITY_MAP = {
+        group: {
+          markets: [:aca_shop_market_enrollment_eligible],
+          other: %i[open_enrollment_period plan_design_period]
+        },
+        family: {
+          markets: %i[
+            aca_shop_market_enrollment_eligible
+            dc_coverall_enrollment_eligible
+          ],
+          credits: %i[advance_premium_tax_credit cost_sharing_reduction_credit],
+          products: []
+        }
+      }
 
       field :key, type: Symbol
       field :title, type: String
       field :description, type: String
+
       field :is_satisfied, type: Boolean, default: false
+
       field :has_unsatisfied_eligibilities, type: Boolean, default: true
+
+      field :has_outstanding_verifications, type: Boolean, default: false
+
+      # Eligibilty => aca_ivl_market_enrollment_eligible
+      #   RDIP, VLP, SSA
+      #
+      # advance_premium_tax_credit
+      #
 
       embeds_many :eligibilities, class_name: 'Eligibilities::Eligibility'
 
@@ -74,6 +139,7 @@ module Eligibilities
               haven_evidence
               ffm_evidence
               ios_evidence
+              curam_evidence
             ]
           }
         }
@@ -82,15 +148,11 @@ module Eligibilities
       def product_eligibilities
         {
           aca_ivl_health_product_eligibility: {},
+          aca_ivl_catastropic_health_product_eligibility: {},
           aca_ivl_dental_product_eligibility: {},
           aca_shop_health_product_eligibility: {},
           aca_shop_dental_product_eligibility: {},
-          evidences: %i[
-            open_enrollment_period_evidence
-            special_enrollment_period_evidence
-            dependent_age_evidence
-            family_relationship_evidence
-          ]
+          evidences: %i[membber_age_evidence family_relationship_evidence]
         }
       end
 
@@ -107,14 +169,16 @@ module Eligibilities
             immigration_evidence
             native_american_heritage_evidence
             tax_household_member_evidence
-            fdsh_non_esi_evidence
-            fdsh_esi_evidence
-            fdsh_vlp_evidence
-            fdsh_ifsv_evidence
-            rrv_non_esi_evidence
-            rrv_esi_evidence
-            rrv_vlp_evidence
-            rrv_ifsv_evidence
+          ],
+          evidence_sources: %i[
+            fdsh_non_esi_service
+            fdsh_esi_service
+            fdsh_vlp_service
+            fdsh_ifsv_service
+            rrv_non_esi_service
+            rrv_esi_service
+            rrv_vlp_service
+            rrv_ifsv_service
           ]
         }
       end
