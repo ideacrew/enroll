@@ -56,21 +56,26 @@ module FinancialAssistance
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
               return
             end
-            @application.submit! if @application.complete? && @application.may_submit?
-            publish_result = determination_request_class.new.call(application_id: @application.id)
-            if publish_result.success?
-              redirect_to wait_for_eligibility_response_application_path(@application)
+            if @application.complete? && @application.may_submit?
+              @application.submit!
+              publish_result = determination_request_class.new.call(application_id: @application.id)
+              if publish_result.success?
+                redirect_to wait_for_eligibility_response_application_path(@application)
+              else
+                @application.unsubmit! if @application.may_unsubmit?
+                flash_message = case publish_result.failure
+                                when Dry::Validation::Result
+                                  { error: validation_errors_parser(publish_result.failure) }
+                                when Exception
+                                  { error: publish_result.failure.message }
+                                else
+                                  { error: "Submission Error: #{publish_result.failure}" }
+                                end
+                redirect_to application_publish_error_application_path(@application), flash: flash_message
+              end
             else
-              @application.unsubmit! if @application.may_unsubmit?
-              flash_message = case publish_result.failure
-                              when Dry::Validation::Result
-                                { error: validation_errors_parser(publish_result.failure) }
-                              when Exception
-                                { error: publish_result.failure.message }
-                              else
-                                { error: "Submission Error: #{publish_result.failure}" }
-                              end
-              redirect_to application_publish_error_application_path(@application), flash: flash_message
+              flash[:error] = build_error_messages(@model)
+              render 'workflow/step'
             end
           else
             render 'workflow/step'

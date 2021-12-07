@@ -177,6 +177,22 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(response).to render_template 'workflow/step'
     end
 
+    context "submit step with a valid but incomplete application" do
+      before do
+        application.update_attributes!(aasm_state: 'draft')
+        allow(application).to receive(:complete?).and_return(false)
+        allow(application).to receive(:save).and_return(true)
+        allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+        allow(controller).to receive(:build_error_messages)
+
+        post :step, params: { id: application.id, commit: 'Submit Application', application: application_valid_params }
+      end
+
+      it 'build errors for the model' do
+        expect(controller).to have_received(:build_error_messages).with(application)
+      end
+    end
+
     context "submit step with a publish_result failure" do
       # receive_message_chain(:new, :call).and_return(success_result)
       let(:operation) { double new: double(call: double(failure: failure, success?: false)) }
