@@ -121,6 +121,21 @@ module Insured
         subject.update_enrollment_for_apcts(enrollment, 2000)
         enrollment.reload
         expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
+        expect(enrollment.elected_aptc_pct).to eq 0.63722
+      end
+
+      it 'should correctly update applied aptc amount if elected aptc is higher than product premium' do
+        subject.update_enrollment_for_apcts(enrollment, 5000)
+        enrollment.reload
+        expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
+        expect(enrollment.elected_aptc_pct).to eq 0.63722
+      end
+
+      it 'should correctly update applied aptc amount if elected aptc is lower than product premium' do
+        subject.update_enrollment_for_apcts(enrollment, 500)
+        enrollment.reload
+        expect(enrollment.applied_aptc_amount.to_f).to eq 500
+        expect(enrollment.elected_aptc_pct).to eq 0.25
       end
     end
     # rubocop:disable Lint/UselessAssignment
@@ -221,6 +236,7 @@ module Insured
 
 
       before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11, 1))
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
         @product.update_attributes(ehb: 0.9844)
         premium_table = @product.premium_tables.first
@@ -235,6 +251,10 @@ module Insured
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'NA').and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+      end
+
+      after do
+        allow(TimeKeeper).to receive(:date_of_record).and_call_original
       end
 
       it 'should return default_tax_credit_value' do

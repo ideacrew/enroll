@@ -70,20 +70,9 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         expect(family_members_hash.success.count).to eq 2
         expect(family_members_hash.success.any? { |member_hash| member_hash[:person][:person_name][:first_name] == person_2.first_name }).to be_truthy
       end
-    end
 
-    context 'when due date on outstanding verifications is nil' do
-      before :each do
-        person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: nil)}
-        allow_any_instance_of(Events::Individual::Enrollments::Submitted).to receive(:publish).and_return true
-      end
-
-      let(:params) {{enrollment: enrollment}}
-
-      it 'should update due date' do
-        result = subject.call(params)
-        expect(result.success?).to be_truthy
-        expect(person.consumer_role.reload.verification_types[0].due_date.present?).to be_truthy
+      it 'should include contact method' do
+        expect(family_members_hash.success.all? { |member_hash| member_hash[:person][:consumer_role][:contact_method].present? }).to be_truthy
       end
     end
 

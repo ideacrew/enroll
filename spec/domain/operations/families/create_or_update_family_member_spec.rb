@@ -14,7 +14,7 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
 
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-  let!(:applicant_params) do
+  let!(:applicant_params) {
     {:_id => BSON::ObjectId('5f5ecf00d73697f046c926fe'),
      :family_id => BSON::ObjectId(family.id),
      :person_hbx_id => '77a0be350dd1437ca5ba2259fdddb982',
@@ -59,7 +59,7 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
      :phones =>
          [{'kind' => 'home', 'country_code' => '', 'area_code' => '213', 'number' => '2131322', 'extension' => '', 'full_phone_number' => '2132131322'},
           {'kind' => 'mobile', 'country_code' => '', 'area_code' => '213', 'number' => '2131322', 'extension' => '', 'full_phone_number' => '2132131322'}]}
-  end
+  }
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy

@@ -56,10 +56,6 @@ module Operations
       def update_and_build_verification_types(person)
         date = TimeKeeper.date_of_record
         person.consumer_role.types_include_to_notices.collect do |verification_type|
-          unless verification_type.due_date && verification_type.due_date_type
-            verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
-            person.consumer_role.save!
-          end
           {
             type_name: verification_type.type_name,
             validation_status: verification_type.validation_status,
@@ -156,6 +152,7 @@ module Operations
       def build_consumer_role(consumer_role)
         {
           is_applying_coverage: consumer_role.is_applying_coverage,
+          contact_method: consumer_role.contact_method,
           five_year_bar: consumer_role.five_year_bar,
           requested_coverage_start_date: consumer_role.requested_coverage_start_date,
           aasm_state: consumer_role.aasm_state,

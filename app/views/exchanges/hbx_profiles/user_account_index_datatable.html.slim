@@ -2,39 +2,6 @@
 .container
   h1.heading-text Account Updates
 
-  -if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak && pundit_allow(User, :change_username_and_email?)
-    #new_user.btn-primary.btn[onclick='this.classList.add("hidden"); document.getElementById("create_user").classList.remove("hidden")']
-      | New User
-
-    #create_user.hidden
-      =form_tag admin_create_users_path, method: 'post', remote: true, class: 'form-inline' do
-        .row
-          .col-md-4
-            =label_tag :permission_id, 'Role', class: 'col-form-label'
-          .col-md-4
-            =label_tag :email, 'Email', class: 'col-form-label'
-          .col-md-4
-            =label_tag :password, 'Password', class: 'col-form-label'
-        .row
-          .col-md-4
-            =select_tag :permission_id, options_from_collection_for_select(Permission.all, 'id', 'humanize_name')
-          .col-md-4
-            =text_field_tag :email, nil, class: 'col-3'
-          .col-md-4
-            =password_field_tag :password, nil, class: 'col-3'
-        .row
-          .col-md-4.col-md-offset-4
-            =label_tag :first_name, 'First Name', class: 'col-form-label'
-          .col-md-4
-            =label_tag :last_name, 'Last Name', class: 'col-form-label'
-        .row
-          .col-md-4.col-md-offset-4
-            =text_field_tag :first_name, nil, class: 'col-3'
-          .col-md-4
-            =text_field_tag :last_name, nil, class: 'col-3'
-        .form-group
-          =submit_tag "Create User", class: 'btn btn-primary'
-
   = raw render_datatable(@datatable)
 
   javascript:

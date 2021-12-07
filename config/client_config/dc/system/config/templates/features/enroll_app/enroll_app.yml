@@ -494,6 +494,9 @@ registry:
             item: false
           - key: :carriers_long_name
             item: 'Community Health Options'
+      - key: :carrier_abbrev_list
+        item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
+        is_enabled: true
   - namespace:
       - :features
       - :enroll_app
@@ -580,6 +583,8 @@ registry:
         is_enabled: false
       - key: :legacy_enrollment_trigger
         is_enabled: true
+      - key: :document_reminder_notice_trigger
+        is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: false
       - key: :show_download_tax_documents
@@ -626,15 +631,15 @@ registry:
       - key: :disable_documents_we_accept_list
         item: :disable_documents_we_accept_list
         is_enabled: false
+      - key: :disable_sep_attestation_options
+        item: :disable_sep_attestation_options
+        is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: false
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
-      - key: :keycloak_integration
-        item: :keycloak_integration
-        is_enabled: false
       - key: :email_validation_notifications
         item: :email_validation_notifications
         is_enabled: false
@@ -649,6 +654,9 @@ registry:
       - key: :send_secure_purchase_confirmation_email
         item: :send_secure_purchase_confirmation_email
         is_enabled: true
+      - key: :custom_exceptions_controller
+        item: :custom_exceptions_controller
+        is_enabled: false
   - namespace:
       - :person_matching_feature
     features:

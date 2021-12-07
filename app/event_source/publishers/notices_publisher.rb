@@ -6,6 +6,7 @@ module Publishers
     include ::EventSource::Publisher[amqp: 'enroll.individual.notices']
 
     register_event 'account_created'
+    register_event 'verifications_reminder'
     register_event 'first_verifications_reminder'
     register_event 'second_verifications_reminder'
     register_event 'third_verifications_reminder'
@@ -16,5 +17,6 @@ module Publishers
     register_event 'medicaid_eligible_on_reverification'
     register_event 'expired_consent_during_reverification'
     register_event 'mixed_determination_on_reverification'
+    register_event 'account_transferred'
   end
 end

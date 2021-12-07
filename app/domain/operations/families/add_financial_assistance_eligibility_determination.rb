@@ -31,10 +31,13 @@ module Operations
         deactivate_latest_tax_households(values)
         benchmark_plan_id = values[:benchmark_product_id]
         values[:eligibility_determinations].each do |faa_ed|
+          applicants = values[:applicants].select{|app| app["eligibility_determination_id"] == faa_ed["_id"]}
+          assistance_criteria = applicants.pluck("is_ia_eligible", "is_medicaid_chip_eligible", "is_totally_ineligible", "is_magi_medicaid", "is_non_magi_medicaid_eligible", "is_without_assistance")
+          next unless assistance_criteria.flatten.any?(true)
+
           th = family.active_household.tax_households.build(hbx_assigned_id: faa_ed["hbx_assigned_id"],
                                                        effective_starting_on: faa_ed["effective_starting_on"],
                                                        is_eligibility_determined: faa_ed["is_eligibility_determined"])
-          applicants = values[:applicants].select{|app| app["eligibility_determination_id"] == faa_ed["_id"]}
           applicants.each do |applicant| #todo select instead
             create_tax_household_members(family, th, applicant, faa_ed)
           end

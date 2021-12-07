@@ -44,7 +44,7 @@ module Operations
                                         :tribal_state,
                                         :tribal_name,
                                         :no_ssn,
-                                        :is_tobacco_user).to_h.symbolize_keys!
+                                        :is_tobacco_user).symbolize_keys!
 
         attrs.merge({person_hbx_id: person.hbx_id,
                      ssn: person.ssn,

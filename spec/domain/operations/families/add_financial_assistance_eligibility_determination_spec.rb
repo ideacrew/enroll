@@ -30,8 +30,8 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_active" => true,
            "has_fixed_address" => true,
            "tax_filer_kind" => "tax_filer",
-           "magi_medicaid_monthly_household_income" => {"cents" => 833_325.0, "currency_iso" => "USD"},
-           "magi_medicaid_monthly_income_limit" => {"cents" => 228_617.0, "currency_iso" => "USD"},
+           "magi_medicaid_monthly_household_income" => {"cents" => 833325.0, "currency_iso" => "USD"},
+           "magi_medicaid_monthly_income_limit" => {"cents" => 228617.0, "currency_iso" => "USD"},
            "magi_as_percentage_of_fpl" => 783.0,
            "age_left_foster_care" => nil,
            "children_expected_count" => nil,
@@ -60,7 +60,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_consent_applicant" => false,
            "is_living_in_state" => false,
            "is_temporarily_out_of_state" => false,
-           "is_ia_eligible" => false,
+           "is_ia_eligible" => true,
            "is_medicaid_chip_eligible" => false,
            "is_non_magi_medicaid_eligible" => false,
            "is_totally_ineligible" => false,
@@ -115,10 +115,10 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
          [{"_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "max_aptc" => {"cents" => 5826.0, "currency_iso" => "USD"},
            "csr_percent_as_integer" => 94,
-           "aptc_csr_annual_household_income" => {"cents" => 3_342_466.0, "currency_iso" => "USD"},
-           "aptc_annual_income_limit" => {"cents" => 4_752_000.0, "currency_iso" => "USD"},
-           "csr_annual_income_limit" => {"cents" => 2_970_000.0, "currency_iso" => "USD"},
-           "hbx_assigned_id" => 10_002,
+           "aptc_csr_annual_household_income" => {"cents" => 3342466.0, "currency_iso" => "USD"},
+           "aptc_annual_income_limit" => {"cents" => 4752000.0, "currency_iso" => "USD"},
+           "csr_annual_income_limit" => {"cents" => 2970000.0, "currency_iso" => "USD"},
+           "hbx_assigned_id" => 10002,
            "effective_starting_on" => "2020-09-09 00:00:00 UTC",
            "is_eligibility_determined" => true,
            "determined_at" => "2020-09-09 00:00:00 UTC",
@@ -157,6 +157,41 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     it 'should update csr on thh member' do
       expect(@thhs.first.tax_household_members.first.csr_eligibility_kind).to eq("csr_0")
     end
+  end
+
+  context 'creation of tax households for family' do
+    context 'applicant ineligible' do
+      it 'should not create a tax household for non applicant members' do
+        applicant = params[:applicants].first
+        applicant.merge!({"is_ia_eligible" => false,
+                          "is_medicaid_chip_eligible" => false,
+                          "is_totally_ineligible" => false,
+                          "is_magi_medicaid" => false,
+                          "is_non_magi_medicaid_eligible" => false,
+                          "is_without_assistance" => false})
+
+        @result = subject.call(params: params)
+        family.reload
+
+        expect(family.active_household.tax_households.count).to eq(0)
+      end
+
+      it 'should not create a tax household for applicants with nil attributes' do
+        applicant = params[:applicants].first
+        applicant.merge!({"is_ia_eligible" => nil,
+                          "is_medicaid_chip_eligible" => nil,
+                          "is_totally_ineligible" => nil,
+                          "is_magi_medicaid" => nil,
+                          "is_non_magi_medicaid_eligible" => nil,
+                          "is_without_assistance" => nil})
+
+        @result = subject.call(params: params)
+        family.reload
+
+        expect(family.active_household.tax_households.count).to eq(0)
+      end
+    end
+
   end
 
   context 'csr_percent_as_integer' do

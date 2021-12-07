@@ -157,6 +157,7 @@ module FinancialAssistance
 
     index({ hbx_id: 1 }, { unique: true })
     index({ aasm_state: 1 })
+    index({ created_at: 1 })
     index({ assistance_year: 1 })
     index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
     index({ "workflow_state_transitions.transition_at" => 1,
@@ -338,6 +339,8 @@ module FinancialAssistance
     index({"applicants.benefits.employer_phone.kind" => 1})
     index({"applicants.benefits.employer_phone.primary" => 1})
 
+    index({"applicants.evidences.eligibility_status" => 1})
+
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
     scope :closed, ->{ any_in(aasm_state: CLOSED_STATUSES) }
@@ -350,11 +353,32 @@ module FinancialAssistance
     scope :submitted_and_after, -> { where(:aasm_state.in => ['submitted', 'determination_response_error', 'determined']) }
     scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
+    scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
+
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
 
     def ensure_relationship_with_primary(applicant, relation_kind)
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
+    end
+
+    def self.families_with_latest_determined_outstanding_verification
+      states = ["outstanding", "in_review"]
+      application_ids = FinancialAssistance::Application.order_by(created_at: :asc).collection.aggregate([
+        {"$match" => {"aasm_state" => "determined"}},
+        {"$sort" => {"family_id" => 1}},
+        {
+          "$group" => {
+            "_id" => "$family_id",
+            "application_id" => {"$last" => "$_id"}
+          }
+        }
+      ],{allow_disk_use: true}).collect {|iap| iap["application_id"]}
+
+      FinancialAssistance::Application.where(:_id.in => application_ids,
+                                             :aasm_state => "determined",
+                                             :"applicants.is_active" => true,
+                                             :"applicants.evidences.eligibility_status".in => states)
     end
 
     # Creates both relationships A to B, and B to A.
@@ -1066,7 +1090,6 @@ module FinancialAssistance
 
     def calculate_total_net_income_for_applicants
       active_applicants.each do |applicant|
-        next applicant if applicant.net_annual_income.present?
         FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
       end
     end
@@ -1535,7 +1558,7 @@ module FinancialAssistance
     # rubocop:enable Metrics/CyclomaticComplexity
 
     def build_evidences(types, applicant)
-      types.collect do |type|
+      evidences = types.collect do |type|
         key, title = type
 
         next if applicant.evidences.by_name(key).present?
@@ -1545,9 +1568,12 @@ module FinancialAssistance
           FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
         when :income
           next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
-          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "outstanding")
+          status = applicant.incomes.blank? ? "attested" : "outstanding"
+          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
         end
       end
+
+      evidences.compact || []
     end
 
     def delete_verification_documents

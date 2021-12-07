@@ -65,6 +65,10 @@ module Eligibilities
 
     field :has_unsatisfied_evidences, type: Boolean, default: true
 
+    field :is_satisfied, type: Boolean, default: false
+    field :has_unsatisfied_evidences, type: Boolean, default: true
+
+    embeds_many :evidences, class_name: 'Eligibilities::Evidence'
 
     before_save :update_evidence_status
 

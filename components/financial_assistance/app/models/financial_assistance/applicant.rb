@@ -323,7 +323,7 @@ module FinancialAssistance
     before_save :generate_hbx_id
 
     # Responsible for updating family member  when applicant is created/updated
-    # after_update :propagate_applicant
+    after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
 
     def generate_hbx_id
@@ -1108,6 +1108,11 @@ module FinancialAssistance
         state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
         :kind.in => ['home', 'mailing']
       ).present?
+    end
+
+    #use this method to check what evidences needs to be included on notices
+    def unverified_evidences
+      evidences.find_all(&:type_unverified?)
     end
 
     private

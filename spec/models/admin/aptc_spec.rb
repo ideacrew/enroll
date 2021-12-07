@@ -125,6 +125,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         }
       end
 
+      before do
+        allow(TimeKeeper).to receive(:datetime_of_record).and_return(DateTime.new(TimeKeeper.date_of_record.year, 11, 1))
+      end
+
+      after do
+        allow(TimeKeeper).to receive(:date_of_record).and_call_original
+      end
+
       it "should create a new enrollment with a new hbx_id" do
         allow(family).to receive(:active_household).and_return household
         allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
@@ -161,7 +169,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "when open_enrollment after Dec 31st" do
         before :each do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(future_date)
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(future_date)
         end
 
         it "should return array without next year added as it is not under_open_enrollment" do
@@ -172,7 +180,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "when open_enrollment on or before Dec 31st" do
         before :each do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(past_date)
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(past_date)
         end
 
         it "should return array with next year added as it is under_open_enrollment" do
@@ -204,7 +212,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         member
       end
       let!(:family_member2) {FactoryBot.create(:family_member, family: family_5, person: person2)}
-      let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+      let(:effective_on) { Date.new(TimeKeeper.date_of_record.year, 11, 1) }
       let!(:tax_household_5) {FactoryBot.create(:tax_household, household: family_5.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
       let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family_5.family_members[0].id, tax_household: tax_household_5)}
       let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household_5)}

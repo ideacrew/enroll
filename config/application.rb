@@ -18,6 +18,9 @@ require File.join(File.dirname(__FILE__), "json_log_format")
 
 module Enroll
   class Application < Rails::Application
+    # Custom exceptions
+    # https://stackoverflow.com/a/19279062/5331859
+    config.exceptions_app = ->(env) { ExceptionsController.action(:show).call(env) }
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

@@ -367,11 +367,7 @@ def employer_poc
 
   def user_account_index
     authorize HbxProfile, :can_access_user_account_tab?
-    @datatable = if EnrollRegistry.feature_enabled?(:keycloak_integration)
-                   Effective::Datatables::AccountUserDatatable.new
-                 else
-                   Effective::Datatables::UserAccountDatatable.new
-                 end
+    @datatable = Effective::Datatables::UserAccountDatatable.new
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/user_account_index_datatable.html.slim' }
     end

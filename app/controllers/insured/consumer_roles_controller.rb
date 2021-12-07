@@ -154,9 +154,7 @@ class Insured::ConsumerRolesController < ApplicationController
       if @consumer_role.present?
         @person = @consumer_role.person
       else
-      # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
-        return
+        raise 'Unable to find a unique record matching the given information'
       end
     rescue Exception => e
       flash[:error] = set_error_message(e.message)
@@ -201,7 +199,6 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
-    @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
     respond_to do |format|
       format.js

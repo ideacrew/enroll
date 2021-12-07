@@ -28,25 +28,51 @@ describe 'Pay Now Click Tracking Report', :dbclean => :after_each do
       )
     end
 
-    before do
-      payment_transaction1.reload
-      payment_transaction2.reload
+    context 'Configuration test for providing carriers' do
+      before do
+        EnrollRegistry[:carrier_abbrev_list].feature.stub(:item).and_return(["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"])
+        payment_transaction1.reload
+        payment_transaction2.reload
 
-      load File.expand_path("#{Rails.root}/lib/tasks/pay_now_click_tracking.rake", __FILE__)
-      Rake::Task.define_task(:environment)
-      Rake::Task["paynow:click_tracking"].invoke(start_date,end_date,carrier)
+        load File.expand_path("#{Rails.root}/lib/tasks/pay_now_click_tracking.rake", __FILE__)
+        Rake::Task.define_task(:environment)
+        Rake::Task["paynow:click_tracking"].invoke(start_date,end_date,carrier)
+      end
+
+      it "should generate the proper report" do
+        file_name = "#{Rails.root}/public/pay_now_click_tracking.csv"
+        expect(File.exist?(file_name)).to eq(true)
+      end
+
+      it "should generate the click tracking data" do
+        result = [["source", "enrollment_id", "datetime_of_click", "hbx_id"], ["plan_shopping","123456789","02/01/2021 00:00", "123456789"], ["enrollment_tile","123456789","02/01/2021 00:00", "123456789"]]
+        data = CSV.read "#{Rails.root}/public/pay_now_click_tracking.csv"
+        expect(data).to eq result
+      end
     end
 
-    it "should generate the proper report" do
-      file_name = "#{Rails.root}/public/pay_now_click_tracking.csv"
-      expect(File.exist?(file_name)).to eq(true)
-    end
+    context 'Configuration test new carrier addition' do
+      before do
+        EnrollRegistry[:carrier_abbrev_list].feature.stub(:item).and_return(["CHO", "HPHC", "ANTHM", "NEDD"])
+        issuer_profile.update_attributes(abbrev: "NEDD")
+        payment_transaction1.reload
+        payment_transaction2.reload
 
-    it "should generate the click tracking data" do
-      result = [["source", "enrollment_id", "datetime_of_click", "hbx_id"], ["plan_shopping","123456789","02/01/2021 00:00", "123456789"], ["enrollment_tile","123456789","02/01/2021 00:00", "123456789"]]
-      data = CSV.read "#{Rails.root}/public/pay_now_click_tracking.csv"
-      expect(data).to eq result
-    end
+        load File.expand_path("#{Rails.root}/lib/tasks/pay_now_click_tracking.rake", __FILE__)
+        Rake::Task.define_task(:environment)
+        Rake::Task["paynow:click_tracking"].invoke(start_date,end_date,'NEDD')
+      end
 
+      it "should generate the proper report" do
+        file_name = "#{Rails.root}/public/pay_now_click_tracking.csv"
+        expect(File.exist?(file_name)).to eq(true)
+      end
+
+      it "should generate the click tracking data" do
+        result = [["source", "enrollment_id", "datetime_of_click", "hbx_id"], ["plan_shopping","123456789","02/01/2021 00:00", "123456789"], ["enrollment_tile","123456789","02/01/2021 00:00", "123456789"]]
+        data = CSV.read "#{Rails.root}/public/pay_now_click_tracking.csv"
+        expect(data).to eq result
+      end
+    end
   end
 end

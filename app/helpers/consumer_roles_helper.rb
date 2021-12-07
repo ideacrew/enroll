@@ -24,7 +24,7 @@ module ConsumerRolesHelper
   def find_consumer_role_for_fields(obj)
     if obj.is_a? Person
       obj.consumer_role
-    elsif obj.persisted?
+    elsif obj.persisted? && obj.family_member.present?
       obj.family_member.person.consumer_role
     else
       ConsumerRole.new
@@ -92,26 +92,19 @@ module ConsumerRolesHelper
   end
 
   def ridp_redirection_link(person)
+    consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: person.consumer_role.id)
     consumer = person.consumer_role
     app_type = person.primary_family.application_type
     admin_user =  current_user.has_hbx_staff_role?
     id_verified = consumer.identity_verified?
     app_verified = consumer.application_verified?
-    case app_type
-      when 'Paper'
-        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-      when 'In Person'
-        in_person_type(id_verified, admin_user, consumer)
-      when 'Phone'
-        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-      when 'Curam'
-        consumer.admin_bookmark_url
-      when 'Mobile'
-        return consumer.admin_bookmark_url
-      else
-        if id_verified
-          return consumer.admin_bookmark_url
-        end
-    end
+    redirect_link = if ['Paper', 'Phone'].include?(app_type)
+                      paper_or_phone_type(id_verified, app_verified, admin_user, consumer)
+                    elsif app_type == 'In Person'
+                      in_person_type(id_verified, admin_user, consumer) if app_type == 'In Person'
+                    elsif ['Curam', 'Mobile'].include?(app_type)
+                      consumer.admin_bookmark_url
+                    end
+    redirect_link || consumer_redirection_path
   end
 end

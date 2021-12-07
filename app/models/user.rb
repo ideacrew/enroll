@@ -1,7 +1,5 @@
-# frozen_string_literal: true
-
 class User
-  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = 'acc'
+  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   MIN_USERNAME_LENGTH = 8
   MAX_USERNAME_LENGTH = 60
 
@@ -12,85 +10,24 @@ class User
   include Mongoid::History::Trackable
   include Config::SiteModelConcern
   include PermissionsConcern
-
-  attr_accessor :login, :invitation_id
-
-  # Keycloak Identity and Access Manager ID
-  field :account_id, type: String, default: ''
-
-  # Oracle Identity Manager ID
-  field :oim_id, type: String, default: ''
-
-  field :roles, type: Array, default: []
-  field :last_portal_visited, type: String
-  field :hints, type: Boolean, default: true
-
-  # for i18L
-  field :preferred_language, type: String, default: 'en'
-
-  ## Enable Admin approval
-  ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
-  field :approved, type: Boolean, default: true
-
-  ##RIDP
-  field :identity_verified_date, type: Date
-  field :identity_final_decision_code, type: String
-  field :identity_final_decision_transaction_id, type: String
-  field :identity_response_code, type: String
-  field :identity_response_description_text, type: String
-
-  ## Trackable
-  field :idp_uuid, type: String
-  field :idp_verified, type: Boolean, default: false
-
-  index({ account_id: 1 }, { sparse: true, unique: true })
-  index({ oim_id: 1 }, { sparse: true, unique: true })
-  index({ email: 1 }, { sparse: true, unique: true })
-  index({ preferred_language: 1 })
-  index({ approved: 1 })
-  index({ roles: 1 }, { sparse: true }) # MongoDB multikey index
-  index({ created_at: 1 })
-
-  track_history on: %i[oim_id email],
-                modifier_field: :modifier,
-                modifier_field_optional: true,
-                version_field: :tracking_version,
-                track_create: true,
-                track_update: true,
-                track_destroy: true
-
-  track_history on: %i[account_id email],
-                modifier_field: :modifier,
-                modifier_field_optional: true,
-                version_field: :tracking_version,
-                track_create: true,
-                track_update: true,
-                track_destroy: true
-
-  # Enable polymorphic associations
-  belongs_to :profile, polymorphic: true, optional: true
-
-  has_one :person, inverse_of: :user
-  accepts_nested_attributes_for :person, allow_destroy: true
-
-  #  validate :ensure_valid_invitation, :on => :create
+  attr_accessor :login
 
   validates_presence_of :oim_id
-  validates_uniqueness_of :oim_id, case_sensitive: false
-
+  validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :oim_id_rules
-
   validates :email,
-            uniqueness: {
-              case_sensitive: false
-            },
-            format: {
-              with: /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i,
-              allow_blank: true,
-              message: 'is invalid'
-            }
+   uniqueness: { :case_sensitive => false },
+   format: { with: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, allow_blank: true, message: "is invalid" }
 
-  before_save :strip_empty_fields
+  def oim_id_rules
+    if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
+      errors.add :oim_id, "cannot contain special characters ; # % = | + , \" > < \\ \/"
+    elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
+      errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
+    elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
+      errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
+    end
+  end
 
   def valid_attribute?(attribute_name)
     self.valid?
@@ -105,28 +42,83 @@ class User
     self.idp_verified = true
     begin
       self.save!
-    rescue StandardError => e
+    rescue => e
       message = "SwitchToIdpException: #{e.message}; "
       message += "user_id: #{self.id}, "
       message += "person_hbx_id: #{self.person.hbx_id}, " if self.person.present?
       message += "errors.full_messages: #{self.errors.full_messages}, "
       message += "stacktrace: #{e.backtrace}"
-      log(message, { severity: 'error' })
+      log(message, {:severity => "error"})
       raise e
     end
   end
 
+  field :hints, type: Boolean, default: true
+  # for i18L
+  field :preferred_language, type: String, default: "en"
+
+  ## Enable Admin approval
+  ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
+  field :approved, type: Boolean, default: true
+
+  ##RIDP
+  field :identity_verified_date, type: Date
+  field :identity_final_decision_code, type: String
+  field :identity_final_decision_transaction_id, type: String
+  field :identity_response_code, type: String
+  field :identity_response_description_text, type: String
+
+  ## Trackable
+  field :idp_uuid, type: String
+
+  field :roles, :type => Array, :default => []
+
+  # Oracle Identity Manager ID
+  field :oim_id, type: String, default: ""
+
+  field :last_portal_visited, type: String
+  field :idp_verified, type: Boolean, default: false
+
+  index({preferred_language: 1})
+  index({approved: 1})
+  index({roles: 1},  {sparse: true}) # MongoDB multikey index
+  index({email: 1},  {sparse: true, unique: true})
+  index({oim_id: 1}, {sparse: true, unique: true})
+  index({created_at: 1 })
+
+  track_history :on => [:oim_id, :email],
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,
+                :track_update  => true,
+                :track_destroy => true
+
+  before_save :strip_empty_fields
+
+  # Enable polymorphic associations
+  belongs_to :profile, polymorphic: true, optional: true
+
+  has_one :person, inverse_of: :user
+  accepts_nested_attributes_for :person, :allow_destroy => true
+
+  attr_accessor :invitation_id
+  #  validate :ensure_valid_invitation, :on => :create
+
   def ensure_valid_invitation
     if self.invitation_id.blank?
-      errors.add(:base, 'There is no valid invitation for this account.')
+      errors.add(:base, "There is no valid invitation for this account.")
       return
     end
     invitation = Invitation.where(id: self.invitation_id).first
-    unless invitation.present?
-      errors.add(:base, 'There is no valid invitation for this account.')
+    if !invitation.present?
+      errors.add(:base, "There is no valid invitation for this account.")
       return
     end
-    errors.add(:base, 'There is no valid invitation for this account.') unless invitation.may_claim?
+    if !invitation.may_claim?
+      errors.add(:base, "There is no valid invitation for this account.")
+      return
+    end
   end
 
   def idp_verified?
@@ -149,11 +141,11 @@ class User
   def agent_title
     if has_agent_role?
       if has_role?(:assister)
-        'In Person Assister (IPA)'
+        "In Person Assister (IPA)"
       elsif person.csr_role.cac == true
-        'Certified Applicant Counselor (CAC)'
+         "Certified Applicant Counselor (CAC)"
       else
-        'Customer Service Representative (CSR)'
+        "Customer Service Representative (CSR)"
       end
     end
   end
@@ -163,27 +155,16 @@ class User
   end
 
   def is_benefit_sponsor_active_broker?(profile_id)
-    profile_organization =
-      BenefitSponsors::Organizations::Organization
-      .employer_profiles
-      .where('profiles._id': BSON::ObjectId.from_string(profile_id))
-      .first
-    if profile_organization&.employer_profile &&
-       profile_organization.employer_profile.active_broker
-
-      person == profile_organization.employer_profile.active_broker
-    end
+    profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(profile_id)).first
+    person == profile_organization.employer_profile.active_broker if (profile_organization && profile_organization.employer_profile && profile_organization.employer_profile.active_broker)
   end
 
   def handle_headless_records
     headless_with_email = User.where(email: /^#{::Regexp.quote(email)}$/i)
     headless_with_oim_id = User.where(oim_id: /^#{::Regexp.quote(oim_id)}$/i)
-    headless_with_account_id =
-      User.where(account_id: /^#{::Regexp.quote(account_id)}$/i)
-    headless_users =
-      headless_with_email + (headless_with_account_id || headless_with_oim_id)
+    headless_users = headless_with_email + headless_with_oim_id
     headless_users.each do |headless|
-      headless.destroy unless headless.person.present?
+      headless.destroy if !headless.person.present?
     end
   end
 
@@ -196,67 +177,56 @@ class User
   # end
   def identity_verified?
     return false if identity_final_decision_code.blank?
-    identity_final_decision_code.to_s.downcase ==
-      INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
 
   def ridp_by_payload!
-    self.identity_final_decision_code =
-      INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
     self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-    self.identity_response_description_text = 'curam payload'
+    self.identity_response_description_text = "curam payload"
     self.identity_verified_date = TimeKeeper.date_of_record
-
-    self.oim_id = self.email if self.account_id.present?
-    self.oim_id = self.email if self.oim_id.blank?
+    unless self.oim_id.present?
+      self.oim_id = self.email
+    end
+    self.save!
   end
 
   def ridp_by_paper_application
-    self.identity_final_decision_code =
-      INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
     self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-    self.identity_response_description_text = 'admin bypass ridp'
+    self.identity_response_description_text = "admin bypass ridp"
     self.identity_verified_date = TimeKeeper.date_of_record
     self.save
   end
 
-  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-  def get_announcements_by_roles_and_portal(portal_path = '')
+  def get_announcements_by_roles_and_portal(portal_path="")
     announcements = []
 
-    if portal_path.include?('employers/employer_profiles')
+    case
+    when portal_path.include?("employers/employer_profiles")
       announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
-    elsif portal_path.include?('families/home')
-      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || person&.has_active_employee_role?
-      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || person&.is_consumer_role_active?
-    elsif portal_path.include?('employee')
-      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || person&.has_active_employee_role?
-    elsif portal_path.include?('consumer')
-      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || person&.is_consumer_role_active?
-    elsif portal_path.include?('broker_agencies')
+    when portal_path.include?("families/home")
+      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.is_consumer_role_active?)
+    when portal_path.include?("employee")
+      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
+    when portal_path.include?("consumer")
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.is_consumer_role_active?)
+    when portal_path.include?("broker_agencies")
       announcements.concat(Announcement.current_msg_for_broker) if has_broker_role?
-    elsif portal_path.include?('general_agencies')
+    when portal_path.include?("general_agencies")
       announcements.concat(Announcement.current_msg_for_ga) if has_general_agency_staff_role?
     end
 
     announcements.uniq
   end
-  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
-  ### TODO Check this for keycloak ###
   class << self
     def find_for_database_authentication(warden_conditions)
       #TODO: Another explicit oim_id dependency
       conditions = warden_conditions.dup
       if login = conditions.delete(:login).downcase
-        where(conditions)
-          .where(
-            '$or' => [
-              { oim_id: /^#{::Regexp.escape(login)}$/i },
-              { email: /^#{::Regexp.escape(login)}$/i }
-            ]
-          )
-          .first
+        where(conditions).where('$or' => [ {:oim_id => /^#{::Regexp.escape(login)}$/i}, {:email => /^#{::Regexp.escape(login)}$/i} ]).first
       else
         where(conditions).first
       end
@@ -277,22 +247,19 @@ class User
       settings.soft = true
 
       # SP section
-      settings.assertion_consumer_service_url =
-        SamlInformation.assertion_consumer_service_url
-      settings.assertion_consumer_logout_service_url =
-        SamlInformation.assertion_consumer_logout_service_url
-      settings.issuer = SamlInformation.issuer
+      settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
+      settings.assertion_consumer_logout_service_url = SamlInformation.assertion_consumer_logout_service_url
+      settings.issuer                         = SamlInformation.issuer
 
       # IdP section
-      settings.idp_entity_id = SamlInformation.idp_entity_id
-      settings.idp_sso_target_url = SamlInformation.idp_sso_target_url
-      settings.idp_slo_target_url = SamlInformation.idp_slo_target_url
-      settings.idp_cert = SamlInformation.idp_cert
-
+      settings.idp_entity_id                  = SamlInformation.idp_entity_id
+      settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
+      settings.idp_slo_target_url             = SamlInformation.idp_slo_target_url
+      settings.idp_cert                       = SamlInformation.idp_cert
       # or settings.idp_cert_fingerprint           = "3B:05:BE:0A:EC:84:CC:D4:75:97:B3:A2:22:AC:56:21:44:EF:59:E6"
       #    settings.idp_cert_fingerprint_algorithm = XMLSecurity::Document::SHA1
 
-      settings.name_identifier_format = SamlInformation.name_identifier_format
+      settings.name_identifier_format         = SamlInformation.name_identifier_format
 
       # Security section
       settings.security[:authn_requests_signed] = false
@@ -309,30 +276,15 @@ class User
     # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
     #   ID in a has_one association
     def orphans
-      user_ids = Person.where(user_id: { '$ne' => nil }).pluck(:user_id)
-      User.where('_id' => { '$nin' => user_ids }).order(email: :asc).entries
+      user_ids = Person.where(:user_id => { "$ne" => nil }).pluck(:user_id)
+      User.where("_id" => { "$nin" => user_ids }).order(email: :asc).entries
     end
   end
 
   private
-
-  def oim_id_rules
-    return true unless oim_id.present?
-
-    if oim_id.present? && oim_id.match(%r{[;#%=|+,">< \\/]})
-      errors.add :oim_id,
-                 "cannot contain special characters ; # % = | + , \" > < \\ \/"
-    elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
-      errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
-    elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
-      errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
-    end
-  end
-
   # Remove indexed, unique, empty attributes from document
   def strip_empty_fields
-    unset('email') if email.blank?
-    unset('oim_id') if oim_id.blank?
-    unset('account_id') if account_id.blank?
+    unset("email") if email.blank?
+    unset("oim_id") if oim_id.blank?
   end
 end

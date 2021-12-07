@@ -100,25 +100,25 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
     user = users_by_role(type)
   end
   case logged_in
-  when 'is'
-    login_as(user, :scope => :user)
-  when 'is not'
-    nil
+    when 'is'
+      login_as(user, :scope => :user)
+    when 'is not'
+      nil
   end
 end
 
 And(/^user with (.*?) role is (.*?)$/) do |type, locked_status|
   case type
-  when "Employer"
-    user = employee(employer)
-  when "Broker"
-    user = broker
-  when "HBX staff"
-    user = admin(subrole)
-  when 'Employer Role'
-    user = employer_staff
-  when 'Employee Role'
-    user = employee_role
+    when "Employer"
+      user = employee(employer)
+    when "Broker"
+      user = broker
+    when "HBX staff"
+      user = admin(subrole)
+    when 'Employer Role'
+      user = employer_staff
+    when 'Employee Role'
+      user = employee_role
   end
   case locked_status
   when 'locked'

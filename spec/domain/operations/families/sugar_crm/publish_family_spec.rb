@@ -37,9 +37,9 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
       person.save!
       family.save!
       call_publish = subject.call(family)
-      expect(call_publish[0]).to be_a(Dry::Monads::Result::Success)
+      expect(call_publish).to be_a(Dry::Monads::Result::Success)
       # Set in family_concern
-      family.set(cv3_payload: call_publish[1].to_h.with_indifferent_access)
+      family.set(cv3_payload: call_publish.success[1].to_h.with_indifferent_access)
     end
 
     it "should return failure if no family members critical attributes have been changed" do
@@ -75,7 +75,7 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
     end
 
     it 'should return success' do
-      expect(subject.call(family)[0]).to be_a(Dry::Monads::Result::Success)
+      expect(subject.call(family)).to be_a(Dry::Monads::Result::Success)
     end
   end
 end

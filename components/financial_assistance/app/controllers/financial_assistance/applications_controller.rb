@@ -44,6 +44,8 @@ module FinancialAssistance
       model_params = params[model_name]
       @model.clean_conditional_params(model_params) if model_params.present?
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
+      @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
+
 
       # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)
@@ -55,12 +57,12 @@ module FinancialAssistance
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
               return
             end
-            @application.submit! if @application.complete?
+            @application.submit! if @application.complete? && @application.may_submit?
             publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
-              @application.unsubmit!
+              @application.unsubmit! if @application.may_unsubmit?
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: #{publish_result.failure}" }
             end
           else
@@ -301,12 +303,12 @@ module FinancialAssistance
       jobs.each do |job|
         job_hash[job.id] = {
           "Employer Name" => job.employer_name,
-          "EMPLOYER ADDRESSS LINE 1" => job.employer_address.address_1,
-          "EMPLOYER ADDRESSS LINE 2" => job.employer_address.address_2,
-          "CITY" => job.employer_address.city,
-          "STATE" => job.employer_address.state,
-          "ZIP" => job.employer_address.zip,
-          "EMPLOYER PHONE " => job.employer_phone.full_phone_number
+          "EMPLOYER ADDRESSS LINE 1" => job&.employer_address&.address_1,
+          "EMPLOYER ADDRESSS LINE 2" => job&.employer_address&.address_2,
+          "CITY" => job&.employer_address&.city,
+          "STATE" => job&.employer_address&.state,
+          "ZIP" => job&.employer_address&.zip,
+          "EMPLOYER PHONE " => job.employer_phone&.full_phone_number
         }
       end
       job_hash
@@ -316,11 +318,11 @@ module FinancialAssistance
       addresses_hash = {}
       applicant.addresses.each do |address|
         addresses_hash["#{address.kind}_address"] = {
-          "ADDRESS LINE 1" => address.address_1,
-          "ADDRESS LINE 2" => address.address_2,
-          "CITY" => address.city,
-          "ZIP" => address.zip,
-          "STATE" => address.state
+          "ADDRESS LINE 1" => address&.address_1,
+          "ADDRESS LINE 2" => address&.address_2,
+          "CITY" => address&.city,
+          "ZIP" => address&.zip,
+          "STATE" => address&.state
         }
       end
       addresses_hash

@@ -353,7 +353,7 @@ module Forms
       return if family.blank? || family.family_members.blank?
       new_dependent = self
       # Don't use SSN in case there is no SSN
-      potential_duplicate_present = family.family_members.any? do |family_member|
+      potential_duplicate_present = family.family_members.active.any? do |family_member|
         family_member&.first_name == new_dependent.first_name &&
           family_member&.last_name == new_dependent.last_name &&
           family_member&.dob == new_dependent.dob

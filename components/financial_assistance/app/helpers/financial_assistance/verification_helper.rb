@@ -11,15 +11,17 @@ module FinancialAssistance
 
     def show_verification_status(status, admin = nil)
       status = "verified" if status == "valid"
-      status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+      (status || '').capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     end
 
     def admin_verification_action(admin_action, evidence, update_reason)
       case admin_action
       when "verify"
         evidence.update!(eligibility_status: 'verified', update_reason: update_reason)
+        "#{evidence.title} successfully verified."
       when "return_for_deficiency"
         evidence.update!(eligibility_status: 'outstanding', update_reason: update_reason, rejected: true)
+        "#{evidence.title} rejected."
       end
     end
 

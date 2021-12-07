@@ -196,7 +196,7 @@ module FinancialAssistance
     end
 
     def format_phone(phone)
-      return '' unless phone.size == 10
+      return '' unless phone && phone.size == 10
       number_to_phone(phone, area_code: true)
     end
 

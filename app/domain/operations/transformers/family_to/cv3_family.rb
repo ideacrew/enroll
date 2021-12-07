@@ -30,7 +30,7 @@ module Operations
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
-            magi_medicaid_applications: transform_applications(family.id),
+            magi_medicaid_applications: transform_applications(family),
             documents: transform_documents(family.documents),
             timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime} # ,
             # foreign_keys TO DO ??
@@ -38,23 +38,26 @@ module Operations
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
+          payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: transform_households(family.households)) if family.households.present?
 
           Success(payload)
         end
 
-        def transform_applications(primary_id)
+        def transform_applications(family)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
-          applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(:aasm_state.in => ["submitted", "determined"])
+          member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
+          applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
           applications.collect do |application|
-            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-          end
+            applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
+            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value! if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
+          end.compact
         end
 
         def transform_special_enrollment_periods(special_enrollment_periods)
           special_enrollment_periods.collect do |period|
-            {
+            sep_hash = {
               qualifying_life_event_kind_reference: construct_qle_reference(period.qualifying_life_event_kind),
               qle_on: period.qle_on,
               start_on: period.start_on,
@@ -65,35 +68,38 @@ module Operations
               is_valid: period.is_valid,
               title: period.title,
               qle_answer: period.qle_answer,
-              next_poss_effective_date: period.next_poss_effective_date,
-              option1_date: period.option1_date,
-              option2_date: period.option2_date,
-              option3_date: period.option3_date,
               optional_effective_on: period.optional_effective_on,
               csl_num: period.csl_num,
               market_kind: period.market_kind,
               admin_flag: period.admin_flag,
               timestamp: {created_at: period.created_at.to_datetime, modified_at: period.updated_at.to_datetime}
             }
+            sep_hash.merge!(next_poss_effective_date: period.next_poss_effective_date) if period.next_poss_effective_date.present?
+            sep_hash.merge!(option1_date: period.option1_date) if period.option1_date.present?
+            sep_hash.merge!(option2_date: period.option2_date) if period.option2_date.present?
+            sep_hash.merge!(option3_date: period.option3_date) if period.option3_date.present?
+            sep_hash
           end
         end
 
         def construct_qle_reference(reference)
           return if reference.nil?
-          {
+
+          qle_hash = {
             start_on: reference.start_on,
-            end_on: reference.end_on,
             title: reference.title,
             reason: reference.reason,
             market_kind: reference.market_kind
           }
+          qle_hash.merge!(end_on: reference.end_on) if reference.end_on.present?
+          qle_hash
         end
 
         def transform_payment_transactions(payment_transactions)
           payment_transactions.collect do |transaction|
             {
-              enrollment_id: transaction.enrollment_id,
-              carrier_id: transaction.carrier_id,
+              enrollment_id: transaction.enrollment_id.to_s,
+              carrier_id: transaction.carrier_id.to_s,
               enrollment_effective_date: transaction.enrollment_effective_date,
               payment_transaction_id: transaction.payment_transaction_id,
               status: transaction.status
@@ -184,7 +190,7 @@ module Operations
               tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households)
             }
-            household_data.merge(hbx_enrollments: transform_hbx_enrollments(household.hbx_enrollments)) if household.hbx_enrollments.present?
+            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(household.hbx_enrollments)) if household.hbx_enrollments.present?
             household_data
           end
         end
