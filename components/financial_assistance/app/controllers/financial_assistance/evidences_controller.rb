@@ -16,7 +16,7 @@ module FinancialAssistance
       if reasons_list.include?(update_reason)
         verification_result = admin_verification_action(admin_action, @evidence, update_reason)
         message = (verification_result.is_a? String) ? verification_result : "Verification successfully approved."
-        flash[:success] =  message
+        flash[:success] = message
         update_documents_status(@applicant) if @applicant
       else
         flash[:error] = "Please provide a verification reason."
@@ -30,10 +30,10 @@ module FinancialAssistance
       key, message = result.success? ? [:success, "request submited successfully"] : [:error, "unable to submited requuest"]
 
       respond_to do |format|
-        format.html {
+        format.html do
           flash[key] = message
           redirect_back(fallback_location: main_app.verification_insured_families_path)
-        }
+        end
         format.js
       end
     end

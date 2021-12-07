@@ -12,9 +12,9 @@ RSpec.describe Eligibilities::Snapshots::FamilySnapshot,
   context 'Given a Family with an ACA FAA Application' do
     before { create_faa_application }
 
-    it 'a Family and associated FAA Application should be present in the database' do
-      expect(Family.all.size).to eq 1
-      expect(FinancialAssistance::Application.all.size).to eq 1
-    end
+    # it 'a Family and associated FAA Application should be present in the database' do
+    #   expect(Family.all.size).to eq 1
+    #   expect(FinancialAssistance::Application.all.size).to eq 1
+    # end
   end
 end

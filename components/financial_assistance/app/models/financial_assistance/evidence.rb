@@ -14,6 +14,13 @@ module FinancialAssistance
     #add them to registry
     REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "Too old"].freeze
 
+    FDSH_EVENTS = {
+      :non_esi_mec => 'fdsh.evidences.esi_determination_requested',
+      :esi_mec => 'fdsh.evidences.non_esi_determination_requested',
+      :income => 'fti.evidences.ifsv_determination_requested',
+      :aces_mec => "iap.mec_check.mec_check_requested"
+    }.freeze
+
     # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
     embedded_in :evidencable, polymorphic: true
@@ -55,20 +62,7 @@ module FinancialAssistance
     def request_determination
       application = self.applicant.application
       payload = construct_payload(application)
-      event(get_event_name_path, attributes: payload.to_h, headers: { correlation_id: application.id })
-    end
-
-    def get_event_name_path
-      case self.key
-      when :non_esi_mec
-        'fdsh.evidences.esi_determination_requested'
-      when :esi_mec
-        'fdsh.evidences.non_esi_determination_requested'
-      when :income
-        'fti.evidences.ifsv_determination_requested'
-      when :aces_mec
-        "iap.mec_check.mec_check_requested"
-      end
+      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
     end
 
     def construct_payload(application)
@@ -76,16 +70,13 @@ module FinancialAssistance
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
     end
 
-    def extend_due_on(date=(TimeKeeper.datetime_of_record + 30.days))
-      due_on = date
+    def extend_due_on(date = (TimeKeeper.datetime_of_record + 30.days))
+      self.due_on = date
     end
 
-    def view_history
-    end
-
-    PENDING = [:pending, :attested]
-    OUTSTANDING = [:outstanding, :review, :errored]
-    CLOSED = [:denied, :closed, :expired]
+    PENDING = [:pending, :attested].freeze
+    OUTSTANDING = [:outstanding, :review, :errored].freeze
+    CLOSED = [:denied, :closed, :expired].freeze
     aasm do
       state :attested, initial: true
       state :pending
