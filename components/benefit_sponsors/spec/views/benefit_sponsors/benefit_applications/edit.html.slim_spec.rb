@@ -31,7 +31,7 @@ RSpec.describe "views/benefit_sponsors/benefit_applications/benefit_applications
     allow(view).to receive(:product_rates_available?).and_return(true)
     allow(view).to receive(:benefit_sponsorship_benefit_application_path).and_return('/')
     # view.should_receive(:render).with(hash_including(:partial => "form")).and_return("<span id=\"rendered-form\"/>")
-    view.should_receive(:render).and_return("<span id=\"rendered-form\"/>")
+    allow(view).to receive(:render).and_return("<span id=\"rendered-form\"/>")
     sign_in user
     render template: "benefit_sponsors/benefit_applications/benefit_applications/edit"
   end
