@@ -57,10 +57,10 @@ registry:
           - key: :months
             item: 6
       - key: :prior_plan_year_shop_sep
-        is_enabled: true
+        is_enabled: false
         item: Operations::GeneratePriorPlanYearShopRenewals.new
         settings:
           - key: :offset_months
             item: 12
       - key: :admin_shop_end_date_changes
-        is_enabled: true
+        is_enabled: false
