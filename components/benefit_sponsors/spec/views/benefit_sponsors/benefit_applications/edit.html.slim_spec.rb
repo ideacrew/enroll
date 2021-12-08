@@ -37,6 +37,6 @@ RSpec.describe "views/benefit_sponsors/benefit_applications/benefit_applications
   end
 
   it 'should not show Reference Plans if health sponsored benefits does not present' do
-    expect(rendered).to_not match(/Reference Plans/)
+    expect(rendered).not_to have_selector('td', text: sponsored_benefit.reference_product.title.to_s)
   end
 end
