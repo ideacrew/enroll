@@ -34,7 +34,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
+        run: chmod +x .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
 
       # Upload Docker Image to Amazon ECR
       # - name: Upload Image to ECR
