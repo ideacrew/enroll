@@ -14,7 +14,8 @@ jobs:
         ports:
           - 5672:5672
         options: >-
-          --health-cmd "rabbitmqctl node_health_check"
+          --health-cmd "rabbitmqctl add_vhost /"
+          --health-cmd "rabbitmqctl add_vhost event_source"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
