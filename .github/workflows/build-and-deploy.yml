@@ -16,7 +16,7 @@ jobs:
           host port: 5672
           rabbitmq user: 'guest'
           rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
+          rabbitmq vhost: 'event_source'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
@@ -44,15 +44,15 @@ jobs:
         run: curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
 
       # Build Docker Image
-      # - name: Build Image
-      #   id: build-image
-      #   env:
-      #     # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     # ECR_REPOSITORY: rails_app
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #   # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #   run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
+      - name: Build Image
+        id: build-image
+        env:
+          # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # ECR_REPOSITORY: rails_app
+          IMAGE_TAG: ${{ github.sha }}
+        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
 
       # Upload Docker Image to Amazon ECR
       # - name: Upload Image to ECR
