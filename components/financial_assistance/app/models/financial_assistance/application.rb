@@ -1076,7 +1076,8 @@ module FinancialAssistance
     end
 
     def all_tax_dependent_claiming_applicants_exist?
-      return true if active_applicants.count == 1 && active_applicants.first.applicant_validation_complete?
+      return true if active_applicants.count == 1 && active_applicants.first.applicant_validation_complete? ||
+                     active_applicants.all? { |applicant| applicant.claimed_as_tax_dependent_by.blank? }
       cfl_service = init_cfl_service
       conditional_applicants = active_applicants.map do |applicant|
         cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by)
