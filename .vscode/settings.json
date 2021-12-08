@@ -4,8 +4,10 @@
     "interactors",
     "nanasess",
     "rabbitmq",
+    "rabbitmqctl",
     "serializers",
     "vhost",
+    "vhosts",
     "wbari"
   ],
   "git.ignoreLimitWarning": true
