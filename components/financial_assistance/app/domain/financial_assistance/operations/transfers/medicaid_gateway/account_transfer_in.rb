@@ -28,14 +28,34 @@ module FinancialAssistance
             Success(application_id)
           end
 
+          private
+
           def county_finder(zip)
             ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
           end
 
-          private
+          def load_missing_county_names(payload)
+            zips_with_missing_counties = []
+            zips_with_multiple_counties = []
+            payload.dig("family", "family_members").each do |person|
+              addresses = person.dig("person", "addresses")
+              addresses.each do |address|
+                zip = address["zip"]
+                county = county_finder(zip)
+                address["county"] = county.first.county_name if county&.count == 1
+                zips_with_missing_counties << zip if county.blank?
+                zips_with_multiple_counties << zip if county.count > 1
+              end
+            end
+            return Failure("Unable to find county objects for zips #{zips_with_missing_counties.uniq}") if zips_with_missing_counties.present?
+            return Failure("Unable to match county for #{zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if zips_with_multiple_counties.present?
+          end
 
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
+            missing_counties = load_missing_county_names(payload)
+            return missing_counties if missing_counties&.failure?
+
             decrypt_ssns(payload)
           rescue StandardError => e
             Failure("load_data #{e}")
@@ -212,10 +232,10 @@ module FinancialAssistance
 
             compare_keys = ["address_1", "address_2", "city", "state", "zip"]
             sas = member.is_homeless? == primary.is_homeless? &&
-              member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
-              member.home_address.attributes.select {|k, _v| compare_keys.include? k} == primary.home_address.attributes.select do |k, _v|
-                                                                                           compare_keys.include? k
-                                                                                         end
+                  member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
+                  member.home_address.attributes.select {|k, _v| compare_keys.include? k} == primary.home_address.attributes.select do |k, _v|
+                                                                                               compare_keys.include? k
+                                                                                             end
             Success(sas)
           rescue StandardError => e
             Failure("same_address_with_primary: #{e}")
@@ -397,7 +417,7 @@ module FinancialAssistance
 
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
-            zips_with_missing_counties = []
+            # zips_with_missing_counties = []
             applications[:applicants].each do |applicant|
               persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
               return Failure("No matching applicant") unless persisted_applicant.present?
@@ -447,20 +467,14 @@ module FinancialAssistance
               persisted_applicant.has_deductions = applicant[:has_deductions]
               persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
               persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
-
               persisted_applicant.incomes = applicant[:incomes]
               persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
               persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
-              # Check applicant address
-              zip = persisted_applicant.addresses.first.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
-              real_county = county_finder(zip)
-              zips_with_missing_counties << zip if real_county.blank?
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
               persisted_applicant.save(validate: false)
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
             end
-            return Failure("Unable to find county objects for zips #{zips_with_missing_counties}") if zips_with_missing_counties.present?
             Success("Successfully transferred in account")
           rescue Mongoid::Errors::Validations => e
             Failure("Fill applicant form validation: #{e.summary}")
