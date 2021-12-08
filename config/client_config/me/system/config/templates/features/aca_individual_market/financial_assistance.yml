@@ -78,6 +78,8 @@ registry:
         is_enabled: true
       - key: :include_faa_outstanding_verifications
         is_enabled: true
+      - key: :skip_aptc_families_from_document_reminder_notices
+        is_enabled: false
   - namespace:
     - :request_determination
     features:

@@ -143,7 +143,12 @@ module Services
     end
 
     def send_reminder_notices_for_ivl(date)
-      families = Family.outstanding_verification_datatable
+      families =
+        if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+          Family.outstanding_verifications_including_faa_datatable
+        else
+          Family.outstanding_verification_datatable
+        end
       return if families.blank?
 
       @logger.info '*' * 50
@@ -151,7 +156,7 @@ module Services
 
       families.each do |family|
         begin
-          next if family.has_valid_e_case_id? #skip assisted families
+          next if EnrollRegistry.feature_enabled?(:skip_aptc_families_from_document_reminder_notices) && family.has_valid_e_case_id? #skip assisted families
           consumer_role = family.primary_applicant.person.consumer_role
           person = family.primary_applicant.person
           if consumer_role.present? && family.best_verification_due_date.present? && (family.best_verification_due_date > date)
