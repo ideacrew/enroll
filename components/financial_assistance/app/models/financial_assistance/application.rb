@@ -577,7 +577,6 @@ module FinancialAssistance
       return true unless spouse_relation.present?
       return true unless all_relationships.select{|hash| hash[:relation] == "parent"}.present?
 
-      primary_rel_id = spouse_relation.to_a.flatten.second
       spouse_rel_id = spouse_relation.to_a.flatten.last
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
       child_ids = primary_parent_relations.map(&:relative_id)
