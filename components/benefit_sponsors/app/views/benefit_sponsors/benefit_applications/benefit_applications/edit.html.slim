@@ -38,19 +38,20 @@
                 | ELIGIBILITY
             td #{benefit_package_form.probation_period_display_name}
 
-        table.table
-          tr
-            th colspan="2" Reference Plans
-            th colspan="2" Carrier
-            th colspan="2" Type
-            th colspan="2" Metal Level
-            th colspan="2" Plans By
-          tr
-            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.title}
-            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.issuer_name}
-            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.plan_kind}
-            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.metal_level_kind}
-            td colspan="2" N/A
+        - if benefit_package_form.sponsored_benefits.present?
+          table.table
+            tr
+              th colspan="2" Reference Plans
+              th colspan="2" Carrier
+              th colspan="2" Type
+              th colspan="2" Metal Level
+              th colspan="2" Plans By
+            tr
+              td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.title}
+              td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.issuer_name}
+              td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.plan_kind}
+              td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.metal_level_kind}
+              td colspan="2" N/A
 
 row
   = link_to 'Add Benefit Package', new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.benefit_sponsorship_id, @benefit_application_form.id, add_new_benefit_package: true, :tab=>'benefits'), :class => 'btn btn-default pull-left mr-1', disabled: flag == "blocking"
