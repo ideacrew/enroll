@@ -1084,6 +1084,7 @@ module FinancialAssistance
       end
       claimed_as_tax_dependent_by_ids = conditional_applicants.map { |applicant| applicant.claimed_as_tax_dependent_by.to_s }.compact.uniq
       claiming_applicants = applicants.where(:_id.in => claimed_as_tax_dependent_by_ids).to_a.uniq
+      errors.add(:base, "Missing all tax claiming dependents.") if claimed_as_tax_dependent_by_ids.length != claiming_applicants.length
       claimed_as_tax_dependent_by_ids.length == claiming_applicants.length
     end
 
