@@ -65,11 +65,12 @@ end
 
 Then(%r{the user will see the nonapplicant citizen status as N/A}) do
   non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
-  expect(non_applicant_status).to_not have_content("Not lawfully present in US")
-  expect(non_applicant_status).to have_content("N/A")
+  expect(non_applicant_status).to_not have_content(FinancialAssistance::Applicant::CITIZEN_KINDS[:not_lawfully_present_in_us])
+  expect(non_applicant_status).to have_content(l10n("faa.not_applicable_abbreviation"))
 end
 
 Then(/the user will see the nonapplicant citizen status in full/) do
   non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
-  expect(non_applicant_status).to have_content("Not lawfully present in US")
+  expect(non_applicant_status).to have_content(FinancialAssistance::Applicant::CITIZEN_KINDS[:not_lawfully_present_in_us])
+  expect(non_applicant_status).to_not have_content(l10n("faa.not_applicable_abbreviation"))
 end
