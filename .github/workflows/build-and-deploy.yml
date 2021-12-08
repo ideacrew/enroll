@@ -14,8 +14,7 @@ jobs:
         ports:
           - 5672:5672
         options: >-
-          --health-cmd "rabbitmqctl add_vhost /"
-          --health-cmd "rabbitmqctl add_vhost event_source"
+          --health-cmd "rabbitmqctl node_health_check"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -33,7 +32,7 @@ jobs:
           mongoDBVersion: '4.2'
 
       # Check out repository
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
 
       # Provide credentials for AWS
       # - name: Configure AWS credentials
@@ -48,8 +47,12 @@ jobs:
       #   id: login-ecr
       #   uses: aws-actions/amazon-ecr-login@v1
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - run: docker container ls
+
+      - run: rabbitmqctl status
 
       # Build Docker Image
       # - name: Build Image
