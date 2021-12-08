@@ -140,12 +140,21 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
     end
   end
 
-  context "destroy" do
+  context "valid income id #destroy" do
     it "should create new income" do
       expect(applicant.incomes.count).to eq 1
       delete :destroy, params: { application_id: application.id, applicant_id: applicant.id, id: income.id }
       applicant.reload
       expect(applicant.incomes.count).to eq 0
+    end
+  end
+
+  context "invalid income id #destroy" do
+    it "should not throw an exception" do
+      expect(applicant.incomes.count).to eq 1
+      delete :destroy, params: { application_id: application.id, applicant_id: applicant.id, id: '55555' }
+      applicant.reload
+      expect(response).to_not have_http_status(500)
     end
   end
 end
