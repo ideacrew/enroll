@@ -38,7 +38,7 @@ jobs:
           mongoDBVersion: '4.2'
 
       # Check out repository
-      # - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       # Provide credentials for AWS
       # - name: Configure AWS credentials
@@ -60,6 +60,7 @@ jobs:
 
       - run: docker exec -it -d rabbitmq /bin/bash rabbitmqctl add_vhost event_source
       - run: docker exec -it -d rabbitmq /bin/bash rabbitmqctl add_vhost /
+      - run: docker exec -it rabbitmq /bin/bash rabbitmqctl list_vhosts
 
       # Build Docker Image
       - name: Build Image
