@@ -505,6 +505,7 @@ module FinancialAssistance
           missing_relationships << {id_map[xi] => id_map[yi]} if (xi > yi) && matrix[xi][yi].blank?
         end
       end
+      self.errors[:base] << "You must have a complete set of relationships defined among every member."
       missing_relationships
     end
 
@@ -571,18 +572,36 @@ module FinancialAssistance
       log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
     end
 
+    def applicant_relative_exists_for_relations
+      result = relationships.collect do |relationship|
+        next if FinancialAssistance::Applicant.find(relationship.applicant_id).present? && FinancialAssistance::Applicant.find(relationship.relative_id).present?
+        relationship
+      end.compact
+      if result.blank?
+        true
+      else
+        self.errors[:base] << "Extra relationship exist without an applicant"
+        false
+      end
+    end
+
     def validate_relationships(matrix)
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
       return true unless all_relationships.select{|hash| hash[:relation] == "parent"}.present?
 
-      spouse_rel_id = spouse_relation.to_a.flatten.last
+      spouse_rel_id =  spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
       child_ids = primary_parent_relations.map(&:relative_id)
-      spouse_parent_relations = relationships.where(:relative_id.in => [child_ids], applicant_id: spouse_rel_id, kind: 'parent')
+      spouse_parent_relations = relationships.where(:relative_id.in => child_ids.flatten, applicant_id: spouse_rel_id, kind: 'parent')
 
-      spouse_parent_relations.present? ? true : false
+      if spouse_parent_relations.count == child_ids.flatten.count
+        true
+      else
+        self.errors[:base] << "Invalid set of relationships defined among household members"
+        false
+      end
     end
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
@@ -1070,6 +1089,7 @@ module FinancialAssistance
     def relationships_complete?
       matrix = build_relationship_matrix
       is_valid = [find_missing_relationships(matrix).blank?]
+      is_valid << applicant_relative_exists_for_relations
       is_valid << validate_relationships(matrix) if EnrollRegistry.feature_enabled?(:mitc_relationships)
       is_valid.all?(true)
     end
@@ -1230,7 +1250,6 @@ module FinancialAssistance
       if relationships_complete?
         relationships_validity = true
       else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
         relationships_validity = false
       end
 

@@ -785,7 +785,7 @@ module FinancialAssistance
                 next result unless applicant_id.present? || relative_id.present?
                 applicant = FinancialAssistance::Applicant.find(applicant_id)
                 relative = FinancialAssistance::Applicant.find(relative_id)
-                next result unless applicant.present? || relative.present?
+                next result unless applicant.present? && relative.present?
                 result << {kind: rl.kind,
                            applicant_reference: applicant_reference(applicant),
                            relative_reference: applicant_reference(relative),
