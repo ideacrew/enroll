@@ -5,9 +5,10 @@ import {
   createSplitConfig,
   FileWithRuntime,
   SplitConfig,
+  runtimeDetails,
 } from 'split-config-generator';
-import { runtimeDetails } from './util/numberOfGroups';
-import { reportToRuntime } from './util/reportToRuntime';
+
+import { cucumberReportToRuntime } from './util/cucumberReportToRuntime';
 
 const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
@@ -24,12 +25,9 @@ async function createCucumberSplit(): Promise<void> {
       ? parseInt(manualGroupCountInput, 10)
       : undefined;
 
-  // const splitConfig = createCucumberSplitConfig(report, groupCount);
-
-  const files: FileWithRuntime[] = reportToRuntime(report);
+  const files: FileWithRuntime[] = cucumberReportToRuntime(report);
   const splitConfig: SplitConfig = createSplitConfig(files, groupCount);
-  const details = runtimeDetails(files);
-  console.log(details);
+  console.log(runtimeDetails(files));
 
   try {
     await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));

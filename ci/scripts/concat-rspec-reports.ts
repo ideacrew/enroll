@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { RspecExample, RspecReport } from './models';
+import { RspecExample, RspecReport } from 'rspec-report-analyzer';
 
 async function getJson(): Promise<void> {
   console.log('Reading gha reports');

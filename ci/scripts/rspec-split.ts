@@ -4,13 +4,12 @@ import {
   FileWithRuntime,
   SplitConfig,
 } from 'split-config-generator';
+import { RspecExample } from 'rspec-report-analyzer';
 
-import { FileWithRuntimeDictionary, RspecExample } from './models';
-
-import { createFileDictionary, createFilesWithRuntime } from './util';
+import { rspecExamplesToRuntime } from './util';
 
 const REPORT_PATH = './ci/rspec/local-rspec-report.json';
-const SPLIT_CONFIG_PATH = './ci/rspec-split-config.json';
+// const SPLIT_CONFIG_PATH = './ci/rspec-split-config.json';
 
 async function createRspecSplitConfig(): Promise<void> {
   // Read cli arguments
@@ -24,23 +23,20 @@ async function createRspecSplitConfig(): Promise<void> {
       ? parseInt(manualGroupCountInput, 10)
       : undefined;
 
-  // Create a dictionary of
-  const filesByRuntime: FileWithRuntimeDictionary =
-    createFileDictionary(examples);
-
-  const arrayOfSlowFiles: FileWithRuntime[] =
-    createFilesWithRuntime(filesByRuntime);
+  const arrayOfSlowFiles: FileWithRuntime[] = rspecExamplesToRuntime(examples);
 
   const splitConfig: SplitConfig = createSplitConfig(
     arrayOfSlowFiles,
     groupCount
   );
 
-  try {
-    await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
-  } catch (e) {
-    console.error(e);
-  }
+  console.log(splitConfig);
+
+  // try {
+  //   await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
+  // } catch (e) {
+  //   console.error(e);
+  // }
 }
 
 createRspecSplitConfig();

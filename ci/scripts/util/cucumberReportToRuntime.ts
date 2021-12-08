@@ -3,7 +3,7 @@ import { FileWithRuntime } from 'split-config-generator';
 
 import { createFileWithRuntime } from './createFileWithRuntime';
 
-export const reportToRuntime = (
+export const cucumberReportToRuntime = (
   report: CucumberFeature[]
 ): FileWithRuntime[] => {
   return report
