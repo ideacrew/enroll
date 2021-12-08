@@ -1081,7 +1081,10 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      find_missing_relationships(build_relationship_matrix).blank? && validate_relationships(build_relationship_matrix)
+      matrix = build_relationship_matrix
+      is_valid = [find_missing_relationships(matrix).blank?]
+      is_valid << validate_relationships(matrix) if EnrollRegistry.feature_enabled?(:mitc_relationships)
+      is_valid.all?(true)
     end
 
     def is_draft?

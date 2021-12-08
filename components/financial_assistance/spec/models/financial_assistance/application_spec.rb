@@ -781,19 +781,20 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(application.relationships.count).to eq(@no_of_applicants * (@no_of_applicants - 1))
     end
 
-    context "when there are invalid relationships" do
-      it 'should return false' do
-        set_up_relationships
-        application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(kind: "domestic_partners_child")
-        expect(application.relationships_complete?).to eq(false)
+    if EnrollRegistry.feature_enabled?(:mitc_relationships)
+      context "when there are invalid relationships" do
+        it 'should return false' do
+          set_up_relationships
+          application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(kind: "domestic_partners_child")
+          expect(application.relationships_complete?).to eq(false)
+        end
       end
-    end
 
-    context "when there are valid relationships" do
-      it 'should return true' do
-        set_up_relationships
-        # application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(kind: "domestic_partners_child")
-        expect(application.relationships_complete?).to eq(false)
+      context "when there are valid relationships" do
+        it 'should return true' do
+          set_up_relationships
+          expect(application.relationships_complete?).to eq(false)
+        end
       end
     end
   end
