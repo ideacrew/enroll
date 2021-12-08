@@ -56,7 +56,7 @@ jobs:
 
       - run: docker container ls
 
-      - run: curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
+      - run: curl -u guest:guest -X PUT amqp://localhost:5672/api/vhosts/event_source
 
       # Build Docker Image
       # - name: Build Image
