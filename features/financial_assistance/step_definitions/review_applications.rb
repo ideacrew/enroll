@@ -63,7 +63,7 @@ Given(/a family has a non applicant member/) do
   applicant.relationships.create(kind: "spouse", applicant_id: applicant.id, relative_id: application.applicants.first.id)
 end
 
-Then(%r{/the user will see the nonapplicant citizen status as N/A/}) do
+Then(%r{the user will see the nonapplicant citizen status as N/A}) do
   non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
   expect(non_applicant_status).to_not have_content("Not lawfully present in US")
   expect(non_applicant_status).to have_content("N/A")
