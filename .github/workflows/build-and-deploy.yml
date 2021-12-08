@@ -25,6 +25,9 @@ jobs:
       #   id: login-ecr
       #   uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       # Build Docker Image
       - name: Build Image
         id: build-image
@@ -34,7 +37,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        run: chmod +x .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
+        run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
 
       # Upload Docker Image to Amazon ECR
       # - name: Upload Image to ECR
