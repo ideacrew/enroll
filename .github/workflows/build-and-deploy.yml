@@ -9,6 +9,18 @@ jobs:
   build-image:
     runs-on: ubuntu-latest
     steps:
+      # Needed for docker build script
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 5672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '4.2'
+
       # Check out repository
       - uses: actions/checkout@v2
 
