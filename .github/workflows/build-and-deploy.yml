@@ -8,23 +8,31 @@ on:
 jobs:
   build-image:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       # Needed for docker build script
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
+      # - uses: getong/rabbitmq-action@v1.2
+      #   with:
+      #     rabbitmq version: '3.8.2-management-alpine'
+      #     host port: 5672
+      #     rabbitmq user: 'guest'
+      #     rabbitmq password: 'guest'
+      #     rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
 
       # Check out repository
       - uses: actions/checkout@v2
-
-      - run: rabbitmqctl help
 
       # Provide credentials for AWS
       # - name: Configure AWS credentials
