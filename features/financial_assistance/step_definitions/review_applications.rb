@@ -60,10 +60,10 @@ Given(/a family has a non applicant member/) do
   @family = user.primary_family
   FactoryBot.create(:family_member, family: @family)
   applicant = FactoryBot.create(:financial_assistance_applicant, is_applying_coverage: false, application: application, dob: Date.new(2000,1,1), gender: "male", citizen_status: "not_lawfully_present_in_us")
-  applicant.relationships.create(kind:"spouse", applicant_id: applicant.id, relative_id: application.applicants.first.id)
+  applicant.relationships.create(kind: "spouse", applicant_id: applicant.id, relative_id: application.applicants.first.id)
 end
 
-Then(/the user will see the nonapplicant citizen status as N\/A/) do
+Then(%r{/the user will see the nonapplicant citizen status as N/A/}) do
   non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
   expect(non_applicant_status).to_not have_content("Not lawfully present in US")
   expect(non_applicant_status).to have_content("N/A")
