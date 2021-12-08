@@ -49,6 +49,8 @@ module FinancialAssistance
           end
 
           def trigger_account_transfer_notice(family)
+            return unless ::EnrollRegistry.feature_enabled?(:account_transfer_notice_trigger)
+
             result = ::Operations::Notices::IvlAccountTransferNotice.new.call(family: family)
             if result.success?
               Rails.logger.info { "Triggered account transfer notice for family id: #{family.id}" }

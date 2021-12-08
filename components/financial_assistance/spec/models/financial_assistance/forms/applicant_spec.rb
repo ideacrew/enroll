@@ -118,6 +118,24 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     end
   end
 
+  describe "ssn is missing" do
+    let!(:application2) { FactoryBot.create(:financial_assistance_application, family_id: BSON::ObjectId.new) }
+    let!(:other_applicant) { FactoryBot.create(:financial_assistance_applicant, application: application2, ssn: '889984400', family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
+    let!(:child_applicant) { FactoryBot.create(:financial_assistance_applicant, application: application, dob: Date.today - 40.years, family_member_id: BSON::ObjectId.new) }
+    let(:input_applicant) {child_applicant}
+    let(:relationship) {'child'}
+    before do
+      allow_any_instance_of(described_class).to receive(:relationship_validation).and_return(nil)
+      @applicant_form = described_class.new(params.merge!(first_name: "Test", last_name: "User", gender: "male", same_with_primary: false))
+      @applicant_form.save
+    end
+
+    it "form should contain error" do
+      expect(@applicant_form.errors.full_messages).to include('ssn is missing')
+    end
+  end
+
+
   context 'check_same_ssn' do
     context 'applicant child update with same ssn' do
       let!(:application2) { FactoryBot.create(:financial_assistance_application, family_id: BSON::ObjectId.new) }
