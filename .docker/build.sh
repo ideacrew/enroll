@@ -45,7 +45,7 @@ docker build --build-arg BUNDLER_VERSION_OVERRIDE='2.0.1' \
 	     --build-arg CLIENT="me" \
              --build-arg SECRET_KEY_BASE="c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82" \
              -f .docker/production/Dockerfile --target app -t $2:$1 --network="host" .
-docker push $2:$1
+# docker push $2:$1
 
 #mv Gemfile.tmp Gemfile
 #mv Gemfile.lock.tmp Gemfile.lock
