@@ -27,67 +27,142 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
   context "send_reminder_notices_for_ivl" do
 
-    it 'should trigger first reminder notice for unassisted families after 10 days of ENR notice' do
-      person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
-      family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
-      person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-      hbx_enrollment.save!
-      expect(IvlNoticesNotifierJob).to receive(:perform_later)
-      subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
-    end
-
-    it 'should not trigger first reminder notice for unassisted families before 10 days of ENR notice' do
-      person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 88.days)}
-      family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 88.days)
-      person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-      hbx_enrollment.save!
-      expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
-      subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
-    end
-
-    it 'should not trigger reminder notice for unassisted families from curam' do
-      family.update_attributes!(:e_case_id => "someecaseid")
-      person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-      hbx_enrollment.save!
-      expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
-      subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
-    end
-
-    it 'should not trigger reminder notice for unassisted families with verified consumers' do
-      person.consumer_role.update_attributes!(aasm_state: "fully_verified")
-      hbx_enrollment.save!
-      expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
-      subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
-    end
-
-    context 'when document_reminder_notice_trigger is disabled' do
-      before do
-        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(false)
-      end
-
-      it 'should not trigger document reminder events to polypress' do
+    context 'when include_faa_outstanding_verifications feature is turned off' do
+      it 'should trigger first reminder notice for unassisted families after 10 days of ENR notice' do
         person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
         family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
         person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         hbx_enrollment.save!
-        expect(::Operations::Notices::IvlDocumentReminderNotice).not_to receive(:new)
+        expect(IvlNoticesNotifierJob).to receive(:perform_later)
         subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+      end
+
+      it 'should not trigger first reminder notice for unassisted families before 10 days of ENR notice' do
+        person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 88.days)}
+        family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 88.days)
+        person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        hbx_enrollment.save!
+        expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
+        subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+      end
+
+      context 'when consumer is assisted' do
+        context 'when skip_aptc_families_from_document_reminder_notices feature is turned on' do
+          before do
+            EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature.stub(:is_enabled).and_return(true)
+          end
+
+          it 'should not trigger reminder notice for families from curam' do
+            family.update_attributes!(:e_case_id => "someecaseid")
+            person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+            hbx_enrollment.save!
+            expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
+            subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+          end
+        end
+
+        context 'when skip_aptc_families_from_document_reminder_notices feature is turned off' do
+          let(:due_date) { TimeKeeper.date_of_record + 85.days }
+
+          before do
+            EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(true)
+            EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature.stub(:is_enabled).and_return(false)
+          end
+
+          it 'should trigger reminder notice for families from curam' do
+            person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: due_date)}
+            family.update_attributes!(e_case_id: "someecaseid", min_verification_due_date: due_date)
+            person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+            hbx_enrollment.save!
+            expect(IvlNoticesNotifierJob).to receive(:perform_later)
+            subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+          end
+        end
+      end
+
+      it 'should not trigger reminder notice for unassisted families with verified consumers' do
+        person.consumer_role.update_attributes!(aasm_state: "fully_verified")
+        hbx_enrollment.save!
+        expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
+        subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+      end
+
+      context 'when document_reminder_notice_trigger is disabled' do
+        before do
+          EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(false)
+        end
+
+        it 'should not trigger document reminder events to polypress' do
+          person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
+          family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
+          person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+          hbx_enrollment.save!
+          expect(::Operations::Notices::IvlDocumentReminderNotice).not_to receive(:new)
+          subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+        end
+      end
+
+      context 'when document_reminder_notice_trigger is enabled' do
+        before do
+          EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it 'should trigger document reminder events to polypress' do
+          person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
+          family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
+          person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+          hbx_enrollment.save!
+          expect(::Operations::Notices::IvlDocumentReminderNotice).to receive(:new)
+          subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
+        end
       end
     end
 
-    context 'when document_reminder_notice_trigger is enabled' do
+    context 'when include_faa_outstanding_verifications feature is turned on' do
+      let!(:application) do
+        create(
+          :financial_assistance_application,
+          family_id: family.id,
+          aasm_state: 'determined',
+          hbx_id: "830293",
+          assistance_year: TimeKeeper.date_of_record.year
+        )
+      end
+      let!(:applicant) do
+        create(
+          :applicant,
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob,
+          gender: person.gender,
+          ssn: person.ssn,
+          application: application,
+          ethnicity: [],
+          is_ia_eligible: true,
+          is_primary_applicant: true,
+          person_hbx_id: person.hbx_id,
+          evidences: [evidence]
+        )
+      end
+
+      let(:due_on) { TimeKeeper.date_of_record + 85.days }
+
+      let(:evidence) { ::FinancialAssistance::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC", eligibility_status: "outstanding", due_on: due_on) }
+
       before do
         EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
         EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(true)
-      end
-
-      it 'should trigger document reminder events to polypress' do
-        person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
-        family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
+        EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature.stub(:is_enabled).and_return(false)
+        family.update_attributes(min_verification_due_date: due_on)
         person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         hbx_enrollment.save!
-        expect(::Operations::Notices::IvlDocumentReminderNotice).to receive(:new)
+      end
+
+      it 'should trigger DR notices to families with outstanding evidences' do
+        expect(::Operations::Notices::IvlDocumentReminderNotice).to receive_message_chain('new.call').with(family: family)
         subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
       end
     end
