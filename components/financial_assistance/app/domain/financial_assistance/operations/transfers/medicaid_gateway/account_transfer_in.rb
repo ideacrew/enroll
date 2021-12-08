@@ -49,6 +49,8 @@ module FinancialAssistance
             end
             return Failure("Unable to find county objects for zips #{zips_with_missing_counties.uniq}") if zips_with_missing_counties.present?
             return Failure("Unable to match county for #{zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if zips_with_multiple_counties.present?
+          rescue StandardError => e
+            Failure("load_missing_county_names #{e}")
           end
 
           def load_data(payload = {})
@@ -417,7 +419,6 @@ module FinancialAssistance
 
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
-            # zips_with_missing_counties = []
             applications[:applicants].each do |applicant|
               persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
               return Failure("No matching applicant") unless persisted_applicant.present?
