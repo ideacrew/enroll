@@ -64,10 +64,12 @@ Given(/a family has a non applicant member/) do
 end
 
 Then(/the user will see the nonapplicant citizen status as N\/A/) do
-  expect(page).to_not have_content("Not lawfully present in US")
-  expect(page).to have_content("N/A")
+  non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
+  expect(non_applicant_status).to_not have_content("Not lawfully present in US")
+  expect(non_applicant_status).to have_content("N/A")
 end
 
 Then(/the user will see the nonapplicant citizen status in full/) do
-  expect(page).to have_content("Not lawfully present in US")
+  non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
+  expect(non_applicant_status).to have_content("Not lawfully present in US")
 end
