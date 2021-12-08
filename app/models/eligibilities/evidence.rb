@@ -7,6 +7,25 @@ module Eligibilities
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
+    include ::EventSource::Command
+
+    DUE_DATE_STATES = %w[review outstanding].freeze
+
+    ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject", "View History", "Call HUB", "Extend"].freeze
+
+    VERIFY_REASONS = EnrollRegistry[:verification_reasons].item
+    REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "Too old"].freeze
+
+    FDSH_EVENTS = {
+      :non_esi_mec => 'fdsh.evidences.esi_determination_requested',
+      :esi_mec => 'fdsh.evidences.non_esi_determination_requested',
+      :income => 'fti.evidences.ifsv_determination_requested',
+      :aces_mec => "iap.mec_check.mec_check_requested"
+    }.freeze
+
+    # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
+
+    embedded_in :evidencable, polymorphic: true
 
     field :key, type: Symbol
     field :title, type: String
@@ -15,89 +34,158 @@ module Eligibilities
     field :received_at, type: DateTime, default: -> { Time.now }
     field :is_satisfied, type: Boolean, default: false
     field :verification_outstanding, type: Boolean, default: false
-    field :aasm_state, type: String
+
+    field :aasm_state, type: Symbol
+    field :update_reason, type: String
+    field :due_on, type: Date
+    field :external_service, type: String
     field :updated_by, type: String
 
-    embedded_in :eligibility, class_name: 'Eligibilities::Eligibility'
+    embeds_many :verification_history, class_name: "::Eligibilities::VerificationHistory"
+    embeds_many :request_results, class_name: "::Eligibilities::RequestResult"
 
-    # The service or aquthority that provided the fact
-    embeds_one :evidence_source, class_name: 'Eligibilities::EvidenceSource'
+    embeds_many :documents, as: :documentable do
+      def uploaded
+        @target.select(&:identifier)
+      end
+    end
 
-    # embeds_many :eligibility_results, class_name: '::FinancialAssistance::EligibilityResult'
+    embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
-    # embeds_one :evidence_exception_workflow, class_name: 'Eligibilities::EvidenceExceptionWorkflow'
-    # accepts_nested_attributes_for :evidence_exception_workflows
+    validates_presence_of :key, :is_satisfied, :aasm_state
 
-    # embeds_one :verification_status, class_name: '::FinancialAssistance::VerificationStatus'
-    # embeds_many :verification_history, class_name: '::FinancialAssistance::VerificationHistory'
+    scope :by_name, ->(type_name) { where(:key => type_name) }
 
-    validates_presence_of :key, :is_satisfied, :verification_outstanding, :aasm_state
+    def request_determination
+      application = self.applicant.application
+      payload = construct_payload(application)
+      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
+    end
 
-    # embeds_many :documents, as: :documentable do
-    #   def uploaded
-    #     @target.select(&:identifier)
-    #   end
-    # end
+    def construct_payload(application)
+      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
+    end
 
+    def extend_due_on(date = (TimeKeeper.datetime_of_record + 30.days))
+      self.due_on = date
+    end
+
+    PENDING = [:pending, :attested].freeze
+    OUTSTANDING = [:outstanding, :review, :errored].freeze
+    CLOSED = [:denied, :closed, :expired].freeze
     aasm do
-      state :pending, initial: true
-      state :requested
+      state :attested, initial: true
+      state :pending
+      state :review
+      state :outstanding
+      state :verified
+      state :non_verified
+
       state :determined
-      state :review_required
       state :expired
-      state :rejected
+      state :denied
       state :errored
-      state :corrected
       state :closed
 
-      event :requested do
-        transitions from: :pending, to: :requested
-        transitions from: :requested, to: :requested
-        transitions from: :review_required, to: :requested
-        transitions from: :expired, to: :requested
-        transitions from: :rejected, to: :requested
-        transitions from: :errored, to: :requested
+      state :corrected
+
+      event :attest, :after => [:record_transition] do
+        transitions from: :pending, to: :attested
+        transitions from: :attested, to: :attested
+        transitions from: :review, to: :attested
+        transitions from: :outstanding, to: :attested
+        transitions from: :attested, to: :attested
       end
 
-      event :review_required do
-        transitions from: :requested, to: :review_required
-        transitions from: :review_required, to: :review_required
-        transitions from: :errored, to: :review_required
+      event :move_to_outstanding, :after => [:record_transition] do
+        transitions from: :pending, to: :outstanding
+        transitions from: :outstanding, to: :outstanding
+        transitions from: :review, to: :outstanding
+        transitions from: :attested, to: :outstanding
+        transitions from: :verified, to: :outstanding
       end
 
-      event :determined do
+      event :move_to_verified, :after => [:record_transition] do
+        transitions from: :pending, to: :verified
+        transitions from: :verified, to: :verified
+        transitions from: :review, to: :verified
+        transitions from: :attested, to: :verified
+        transitions from: :outstanding, to: :verified
+      end
+
+      event :move_to_review, :after => [:record_transition] do
+        transitions from: :pending, to: :review
+        transitions from: :review, to: :review
+        transitions from: :outstanding, to: :review
+        transitions from: :attested, to: :review
+        transitions from: :verified, to: :review
+      end
+
+      event :move_to_pending, :after => [:record_transition] do
+        transitions from: :attested, to: :pending
+        transitions from: :pending, to: :pending
+        transitions from: :review, to: :pending
+        transitions from: :outstanding, to: :pending
+        transitions from: :verified, to: :pending
+      end
+
+      event :determined, :after => [:record_transition] do
         transitions from: :requested, to: :determined
         transitions from: :review_required, to: :determined
         transitions from: :corrected, to: :determined
       end
 
-      event :expired do
+      event :expired, :after => [:record_transition] do
         transitions from: :requested, to: :expired
       end
 
-      event :rejected do
-        transitions from: :requested, to: :rejected
+      event :denied, :after => [:record_transition] do
+        transitions from: :requested, to: :denied
       end
 
-      event :errored do
+      event :errored, :after => [:record_transition] do
         transitions from: :requested, to: :errored
         transitions from: :errored, to: :errored
         transitions from: :corrected, to: :errored
       end
 
-      event :corrected do
+      event :corrected, :after => [:record_transition] do
         transitions from: :errored, to: :corrected
       end
 
-      event :closed do
+      event :closed, :after => [:record_transition] do
         transitions from: :pending, to: :closed
         transitions from: :requested, to: :closed
         transitions from: :review_required, to: :closed
         transitions from: :expired, to: :closed
-        transitions from: :rejected, to: :closed
+        transitions from: :denied, to: :closed
         transitions from: :errored, to: :closed
         transitions from: :closed, to: :closed
       end
+    end
+
+    def record_transition
+      self.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: aasm.from_state,
+        to_state: aasm.to_state
+      )
+    end
+
+    def type_unverified?
+      !type_verified?
+    end
+
+    def type_verified?
+      ["verified", "attested"].include? aasm_state
+    end
+
+    def verif_due_date
+      due_on || TimeKeeper.date_of_record + 95.days
+    end
+
+    def add_verification_history(params)
+      verification_history << FinancialAssistance::VerificationHistory.new(params)
     end
   end
 end

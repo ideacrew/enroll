@@ -31,9 +31,9 @@ module FinancialAssistance
 
     def build_actions_list(evidence)
       if evidence.aasm_state == "outstanding"
-        FinancialAssistance::Document::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
+        Eligibilities::Evidence::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
       else
-        FinancialAssistance::Document::ADMIN_VERIFICATION_ACTIONS
+        Eligibilities::Evidence::ADMIN_VERIFICATION_ACTIONS
       end
     end
 
