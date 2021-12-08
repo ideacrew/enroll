@@ -792,9 +792,15 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       context "when there are valid relationships" do
         it 'should return true' do
-          set_up_relationships
-          expect(application.relationships_complete?).to eq(false)
+          expect(application.relationships_complete?).to eq(true)
         end
+      end
+    end
+
+    context "when there are relationships without applicant or relative" do
+      it 'should return false' do
+        application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(applicant_id: "619ce9d9eab5e7c59bc2485f")
+        expect(application.relationships_complete?).to eq(false)
       end
     end
   end
