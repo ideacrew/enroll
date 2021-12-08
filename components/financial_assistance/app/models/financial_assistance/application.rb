@@ -574,14 +574,14 @@ module FinancialAssistance
     def validate_relationships(matrix)
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
-      next unless spouse_relation.present?
-      next unless all_relationships.select{|hash| hash[:relation] == "child"}.present?
+      return true unless spouse_relation.present?
+      return true unless all_relationships.select{|hash| hash[:relation] == "parent"}.present?
 
       primary_rel_id = spouse_relation.to_a.flatten.second
       spouse_rel_id = spouse_relation.to_a.flatten.last
-      primary_parent_relations = application.relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
+      primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
       child_ids = primary_parent_relations.map(&:relative_id)
-      spouse_parent_relations = application.relationships.where(:relative_id.in => [child_ids], applicant_id: second_rel_id, kind: 'parent')
+      spouse_parent_relations = relationships.where(:relative_id.in => [child_ids], applicant_id: spouse_rel_id, kind: 'parent')
 
       spouse_parent_relations.present? ? true : false
     end
@@ -1069,7 +1069,7 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      find_missing_relationships(build_relationship_matrix).blank? || validate_relationships(matrix)
+      find_missing_relationships(build_relationship_matrix).blank? && validate_relationships(build_relationship_matrix)
     end
 
     def is_draft?
