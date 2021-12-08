@@ -60,7 +60,6 @@ jobs:
 
       - run: docker exec -d rabbitmq /bin/bash rabbitmqctl add_vhost event_source
       - run: docker exec -d rabbitmq /bin/bash rabbitmqctl add_vhost /
-      - run: docker exec -i rabbitmq /bin/bash rabbitmqctl list_vhosts
 
       # Build Docker Image
       - name: Build Image
