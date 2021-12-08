@@ -1071,18 +1071,12 @@ module FinancialAssistance
       CLOSED_STATUSES.include?(aasm_state)
     end
 
-    def init_cfl_service
-      ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
-    end
-
+    # Need to make sure that claimed_as_tax_dependent_by, which holds an applicant ID, actually exists for the
+    # applicants associated with the application.
     def all_tax_dependent_claiming_applicants_exist?
       return true if active_applicants.count == 1 && active_applicants.first.applicant_validation_complete? ||
                      active_applicants.all? { |applicant| applicant.claimed_as_tax_dependent_by.blank? }
-      cfl_service = init_cfl_service
-      conditional_applicants = active_applicants.map do |applicant|
-        cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by)
-      end
-      claimed_as_tax_dependent_by_ids = conditional_applicants.map { |applicant| applicant.claimed_as_tax_dependent_by.to_s }.compact.uniq
+      claimed_as_tax_dependent_by_ids = active_applicants.map { |applicant| applicant.claimed_as_tax_dependent_by.to_s }.compact.uniq
       claiming_applicants = applicants.where(:_id.in => claimed_as_tax_dependent_by_ids).to_a.uniq
       errors.add(:base, "Missing all tax claiming dependents.") if claimed_as_tax_dependent_by_ids.length != claiming_applicants.length
       claimed_as_tax_dependent_by_ids.length == claiming_applicants.length
