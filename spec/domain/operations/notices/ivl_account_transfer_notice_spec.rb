@@ -9,7 +9,7 @@ RSpec.describe ::Operations::Notices::IvlAccountTransferNotice, dbclean: :after_
   end
 
   describe 'ivl account transfer notice' do
-    let(:person) { create(:person, :with_consumer_role)}
+    let(:person) { create(:person, :with_consumer_role, is_incarcerated: nil)} #operation handles nil incarceration statuses
     let(:family) { create(:family, :with_primary_family_member, person: person)}
 
     context 'with invalid params' do
