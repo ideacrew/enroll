@@ -20,7 +20,7 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: Settings.aca.shop_market.employee.default_contact_method
+  field :contact_method, type: String, default: EnrollRegistry[:enroll_app].setting(:default_contact_method).item
   field :language_preference, type: String, default: "English"
 
   track_history :on => [:fields],

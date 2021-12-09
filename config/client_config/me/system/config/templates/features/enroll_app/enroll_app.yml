@@ -65,6 +65,8 @@ registry:
             item: "Maine"
           - key: :short_name
             item: "CoverME.gov"
+          - key: :default_contact_method
+            item: 'Only Electronic communications'
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
@@ -391,6 +393,9 @@ registry:
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: true
+      - key: :default_contact_method
+        is_enabled: true
+        item: 'Only Electronic communications'
   - namespace:
       - :pay_now_feature
     features:

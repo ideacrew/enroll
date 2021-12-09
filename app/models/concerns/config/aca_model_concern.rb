@@ -88,7 +88,7 @@ module Config::AcaModelConcern
     end
 
     def individual_market_is_enabled?
-      @@individual_market_is_enabled ||= Settings.aca.market_kinds.include? "individual"
+      @@individual_market_is_enabled ||= EnrollRegistry.feature_enabled?(:aca_individual_market)
     end
 
     def fehb_market_is_enabled?

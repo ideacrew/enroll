@@ -65,6 +65,8 @@ registry:
             item: "https://www.healthcare.gov"
           - key: :short_name
             item: "DC Health Link"
+          - key: :default_contact_method
+            item: 'Only Electronic communications'
           - key: :byline
             item: "Welcome to the District's Health Insurance Marketplace"
           - key: :long_name
