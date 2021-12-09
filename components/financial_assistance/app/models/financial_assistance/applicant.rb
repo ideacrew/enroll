@@ -1123,13 +1123,13 @@ module FinancialAssistance
       evidences.find_all(&:type_unverified?)
     end
 
-    private
-
     def ssn_present?
       errors.add(:base, 'no ssn present.') if no_ssn != '0' && ssn.blank?
       return false if no_ssn != '0' && ssn.blank?
       true
     end
+
+    private
 
     def date_ranges_overlap?(range_a, range_b)
       range_b.begin <= range_a.end && range_a.begin <= range_b.end

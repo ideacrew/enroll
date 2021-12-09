@@ -3,10 +3,16 @@
 <% else %>
   <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class="in-progress-icon">Info Needed</span>
   <ul>
-    <% applicant.errors.full_messages.each do |message| %>
-      <li><%= message %></li>
+    <% unless applicant.ssn_present? %>
+      <li>
+        <%= l10n("ssn_not_present") %>
+      </li>
+    <% end %>
+    <% unless applicant.covering_applicant_exists? %>
+      <li>
+        <% l10n("tax_covering_applicant_not_present") %>
+      </li>
     <% end %>
   </ul>
 <% end %>
-
 
