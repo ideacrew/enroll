@@ -344,7 +344,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     context 'non-applicant member has not_lawfully_present_in_us citizen status' do
       context 'non_applicant_citizen_status feature is enabled' do
         before do
-          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_applicant_citizen_status).and_return(true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_applicant_citizen_status).and_return(true)
         end
 
         it 'should return N/A' do
@@ -354,7 +354,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
       context 'non_applicant_citizen_status feature is disabled' do
         before do
-          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_applicant_citizen_status).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_applicant_citizen_status).and_return(false)
         end
 
         it 'should return Not lawfully present in US' do
