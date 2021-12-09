@@ -301,6 +301,11 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe '.incomplete_applicants?' do
+    it 'should return true if applicant with non existing claimed_as_tax_dependent_by id exists' do
+      allow(application.applicants.last).to receive(:claimed_as_tax_dependent_by).and_return("11111")
+      expect(application.incomplete_applicants?).to eq(true)
+    end
+
     it 'should returns true if application has incomplete_applicants' do
       allow(applicant1).to receive(:applicant_validation_complete?).and_return(false)
       application.incomplete_applicants?
