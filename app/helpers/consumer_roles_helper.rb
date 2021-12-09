@@ -75,22 +75,7 @@ module ConsumerRolesHelper
     return first_checked, second_checked
   end
 
-  def paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-    if admin_user && (app_verified || id_verified)
-      return consumer.admin_bookmark_url
-    elsif id_verified
-      return consumer.admin_bookmark_url
-    end
-  end
-
-  def in_person_type(id_verified, admin_user, consumer)
-    if admin_user && id_verified
-      return consumer.admin_bookmark_url
-    elsif id_verified
-      return consumer.admin_bookmark_url
-    end
-  end
-
+  # Allow flow to the next page if app or ID verified, otherwise stay on the same page
   def ridp_redirection_link(person)
     consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: person.consumer_role.id)
     consumer = person.consumer_role
@@ -98,13 +83,7 @@ module ConsumerRolesHelper
     admin_user =  current_user.has_hbx_staff_role?
     id_verified = consumer.identity_verified?
     app_verified = consumer.application_verified?
-    redirect_link = if ['Paper', 'Phone'].include?(app_type)
-                      paper_or_phone_type(id_verified, app_verified, admin_user, consumer)
-                    elsif app_type == 'In Person'
-                      in_person_type(id_verified, admin_user, consumer) if app_type == 'In Person'
-                    elsif ['Curam', 'Mobile'].include?(app_type)
-                      consumer.admin_bookmark_url
-                    end
-    redirect_link || consumer_redirection_path
+    return consumer_redirection_path if app_verified || id_verified
+    consumer.admin_bookmark_url
   end
 end
