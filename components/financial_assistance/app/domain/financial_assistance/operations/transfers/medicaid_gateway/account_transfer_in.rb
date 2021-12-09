@@ -49,16 +49,17 @@ module FinancialAssistance
             end
             return Failure("Unable to find county objects for zips #{zips_with_missing_counties.uniq}") if zips_with_missing_counties.present?
             return Failure("Unable to match county for #{zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if zips_with_multiple_counties.present?
+            Success(payload)
           rescue StandardError => e
             Failure("load_missing_county_names #{e}")
           end
 
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
-            missing_counties = load_missing_county_names(payload)
-            return missing_counties if missing_counties&.failure?
+            payload = load_missing_county_names(payload)
+            return payload if payload.failure?
 
-            decrypt_ssns(payload)
+            decrypt_ssns(payload.value!)
           rescue StandardError => e
             Failure("load_data #{e}")
           end
