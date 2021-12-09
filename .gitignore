@@ -83,8 +83,6 @@ fixture_dumps
 # This is a test version of this file
 !spec/support/update_bulk_broker_emails_2021_10_5.csv
 *.txt
-# This is for holding current client configuration
-!current_configuration.txt
 *.xml
 *.xls
 *.xlst
