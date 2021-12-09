@@ -1517,7 +1517,7 @@ module FinancialAssistance
 
 
       tax_dependents.each do |applicant|
-        thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
+        thh_of_claimer = active_applicants.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
         applicant.update_attributes(tax_filer_kind: 'dependent')
       end

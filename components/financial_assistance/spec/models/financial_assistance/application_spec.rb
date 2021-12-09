@@ -517,6 +517,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(applicant2.tax_filer_kind).to eq 'tax_filer'
       expect(applicant3.tax_filer_kind).to eq 'dependent'
     end
+
+    it 'When there is one tax filers and two claimed as NESTED tax dependents - applicants looping order 5' do
+      applicant1.update_attributes(is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant2.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      applicant2.update_attributes(is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant3.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      applicant3.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: true)
+      application.submit!
+      expect(applicant1.tax_filer_kind).to eq 'dependent'
+      expect(applicant2.tax_filer_kind).to eq 'dependent'
+      expect(applicant3.tax_filer_kind).to eq 'tax_filer'
+    end
   end
 
   describe 'applications with eligibility determinations, tax households and applicants' do
