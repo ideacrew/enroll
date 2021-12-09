@@ -335,6 +335,35 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context 'format_citizen' do
+    before do
+      applicant.update_attributes({is_applying_coverage: false,
+                                   citizen_status: "not_lawfully_present_in_us"})
+    end
+
+    context 'non-applicant member has not_lawfully_present_in_us citizen status' do
+      context 'non_applicant_citizen_status feature is enabled' do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_applicant_citizen_status).and_return(true)
+        end
+
+        it 'should return N/A' do
+          expect(applicant.format_citizen).to eq 'N/A'
+        end
+      end
+
+      context 'non_applicant_citizen_status feature is disabled' do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_applicant_citizen_status).and_return(false)
+        end
+
+        it 'should return Not lawfully present in US' do
+          expect(applicant.format_citizen).to eq 'Not lawfully present in US'
+        end
+      end
+    end
+  end
+
   context '#tax_info_complete?' do
     before do
       applicant.update_attributes({is_required_to_file_taxes: true,

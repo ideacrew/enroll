@@ -47,28 +47,3 @@ And(/^the user fills out the review and submit details$/) do
   # Submit Application
   find("#application_medicaid_terms").click
 end
-
-Given(/the non applicant citizen status feature is enabled/) do
-  EnrollRegistry[:non_applicant_citizen_status].feature.stub(:is_enabled).and_return(true)
-end
-
-Given(/the non applicant citizen status feature is disabled/) do
-  EnrollRegistry[:non_applicant_citizen_status].feature.stub(:is_enabled).and_return(false)
-end
-
-Given(/a family has a non applicant member/) do
-  @family = user.primary_family
-  FactoryBot.create(:family_member, family: @family)
-  applicant = FactoryBot.create(:financial_assistance_applicant, is_applying_coverage: false, application: application, dob: Date.new(2000,1,1), gender: "male", citizen_status: "not_lawfully_present_in_us")
-  applicant.relationships.create(kind: "spouse", applicant_id: applicant.id, relative_id: application.applicants.first.id)
-end
-
-Then(%r{the user will see the nonapplicant citizen status as N/A}) do
-  non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
-  expect(non_applicant_status).to have_content(l10n("faa.not_applicable_abbreviation"))
-end
-
-Then(/the user will see the nonapplicant citizen status in full/) do
-  non_applicant_status = find_all(FinancialAssistance::ReviewApplicationPage.applicant_citizen_status).last
-  expect(non_applicant_status).to have_content(FinancialAssistance::Applicant::CITIZEN_KINDS[:not_lawfully_present_in_us])
-end

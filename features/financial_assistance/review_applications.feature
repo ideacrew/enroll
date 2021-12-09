@@ -51,25 +51,3 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     Then the user will navigate to the Review Application page
     Then user should see Medicaid eligibility question
     And user should have feature toggled questions in review
-
-  Scenario: Review Application page displays "N/A" for nonapplicant citizen status when feature is enabled
-    Given the non applicant citizen status feature is enabled
-    Given that a family has a Financial Assistance application in the submitted state
-    Given a family has a non applicant member
-    And the user navigates to the “Help Paying For Coverage” portal
-    When the user clicks the “Action” dropdown corresponding to the submitted application
-    And the “Review Application” link will be actionable
-    And clicks the “Review Application” link
-    Then the user will navigate to the Review Application page
-    Then the user will see the nonapplicant citizen status as N/A
-
-  Scenario: Review Application page displays "Not lawfully present in US" for nonapplicant citizen status when feature is disabled
-    Given the non applicant citizen status feature is disabled
-    Given that a family has a Financial Assistance application in the submitted state
-    Given a family has a non applicant member
-    And the user navigates to the “Help Paying For Coverage” portal
-    When the user clicks the “Action” dropdown corresponding to the submitted application
-    And the “Review Application” link will be actionable
-    And clicks the “Review Application” link
-    Then the user will navigate to the Review Application page
-    Then the user will see the nonapplicant citizen status in full
