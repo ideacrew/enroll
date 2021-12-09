@@ -118,8 +118,6 @@ end
 
 pre_11_1_purchase_set = Set.new(pre_11_1_ids)
 
-passive_renewals_set = all_enrolled_people_set & renewal_candidate_set & pre_11_1_purchase_set
-
 post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {
       "hbx_enrollment_members" => {"$ne" => nil},
@@ -160,6 +158,8 @@ end
 post_11_1_purchase_set = Set.new(post_11_1_ids)
 
 active_renewals_set = all_enrolled_people_set & renewal_candidate_set & post_11_1_purchase_set
+
+passive_renewals_set = (all_enrolled_people_set & renewal_candidate_set & pre_11_1_purchase_set) - active_renewals_set
 
 puts "Total Member Enrolled(2022) Count: #{all_enrolled_people_set.size}"
 puts "Total New Member/Consumer selected 2022 enrollments after 11/1/2021 : #{new_member_set.size}"
