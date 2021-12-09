@@ -1691,4 +1691,102 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
   end
+
+  context "relationships_complete?" do
+    let(:family_id) { BSON::ObjectId.new }
+    let!(:year) { TimeKeeper.date_of_record.year }
+    let!(:relationship_application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+    let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
+
+    before :each do
+      relationship_application.applicants.each do |appl|
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
+        appl.save!
+      end
+      relationship_application.save!
+    end
+    context "when there is only one applicant" do
+      it "should return true" do
+        expect(relationship_application.relationships_complete?).to eq(true)
+      end
+    end
+
+    context "when there are two applicants with spouse relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+        relationship_application.build_relationship_matrix
+        relationship_application.save!
+      end
+
+      it "should return true" do
+        set_up_relationships
+        expect(relationship_application.relationships_complete?).to eq(true)
+      end
+    end
+
+    context "when there are two applicants with parent relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'child')
+        relationship_application.build_relationship_matrix
+        relationship_application.save!
+      end
+
+      before do
+        set_up_relationships
+      end
+
+      it "should return true" do
+        expect(relationship_application.relationships_complete?).to eq(true)
+      end
+    end
+
+    context "when there are three applicants with spouse and parent relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'child')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'parent')
+        relationship_application.build_relationship_matrix
+        relationship_application.save!
+      end
+
+      before do
+        set_up_relationships
+      end
+      it "should return true" do
+        expect(relationship_application.relationships_complete?).to eq(true)
+      end
+    end
+
+    # context "when there are three applicants with spouse and domestic_partners_child relationship" do
+    #   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+    #   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+    #   let(:set_up_relationships) do
+    #     relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+    #     relationship_application.ensure_relationship_with_primary(applicant2, 'child')
+    #     relationship_application.add_or_update_relationships(applicant1, applicant2, 'domestic_partners_child')
+    #     relationship_application.build_relationship_matrix
+    #     relationship_application.save!
+    #   end
+
+    #   before do
+    #     set_up_relationships
+    #   end
+    #   it "should return false" do
+    #     expect(relationship_application.relationships_complete?).to eq(true)
+    #   end
+    # end
+  end
 end
