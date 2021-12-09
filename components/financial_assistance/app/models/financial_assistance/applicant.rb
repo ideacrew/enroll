@@ -1124,8 +1124,8 @@ module FinancialAssistance
     end
 
     def ssn_present?
-      errors.add(:base, 'no ssn present.') if no_ssn != '0' && ssn.blank?
-      return false if no_ssn != '0' && ssn.blank?
+      errors.add(:base, 'no ssn present.') if no_ssn == '0' && ssn.blank?
+      return false if no_ssn == '0' && ssn.blank?
       true
     end
 
