@@ -57,8 +57,10 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - run: docker container ls
+      # - run: docker exec -i rabbitmq /bin/sh curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
+      - run: docker exec -i rabbitmq /bin/sh type curl
+      - run: docker exec -i rabbitmq /bin/sh which curl
 
-      - run: docker exec -i rabbitmq /bin/sh curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
       # - run: docker exec -d rabbitmq /bin/bash rabbitmqctl add_vhost /
 
       # Build Docker Image
