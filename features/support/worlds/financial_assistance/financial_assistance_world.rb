@@ -25,6 +25,7 @@ module FinancialAssistance
                                                     last_name: member.last_name,
                                                     gender: member.gender,
                                                     dob: member.dob,
+                                                    ssn: generate_and_return_unique_ssn,
                                                     is_primary_applicant: member.is_primary_applicant?,
                                                     is_applying_coverage: true)
 
