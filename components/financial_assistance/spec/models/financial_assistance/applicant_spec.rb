@@ -348,7 +348,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it 'should return N/A' do
-          expect(applicant.format_citizen).to eq l10n("faa.not_applicable_abbreviation")
+          expect(applicant.format_citizen).to_not eq FinancialAssistance::Applicant::CITIZEN_KINDS[:not_lawfully_present_in_us]
         end
       end
 
