@@ -64,3 +64,31 @@ registry:
             item: 12
       - key: :admin_shop_end_date_changes
         is_enabled: true
+      - key: :shop_open_enrollment
+        is_enabled: true
+        settings: 
+          - key: :monthly_start_on
+            item: 1
+          - key: :monthly_end_on
+            item: 10
+      - key: :renewal_application
+        is_enabled: true
+        settings:
+        - key: :earliest_start_prior_to_effective_on_months
+          item: 3
+        - key: :earliest_start_prior_to_effective_on_day_of_month
+          item: 0
+        - key: :monthly_open_enrollment_end_on
+          item: 13
+        - key: :publish_due_day_of_month
+          item: 10
+        - key: :application_submission_soft_deadline
+          item: 5
+        - key: :force_publish_day_of_month
+          item: 11
+        - key: :open_enrollment_minimum_length_days
+          item: 3
+        - key: :quiet_period_month_offset
+          item: -1
+        - key: :quiet_period_month_offset_mday
+          item: 15

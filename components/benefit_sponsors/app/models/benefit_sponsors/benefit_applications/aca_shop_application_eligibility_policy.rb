@@ -22,8 +22,8 @@ module BenefitSponsors
     MIN_BENEFIT_GROUPS = 1
     EMPLOYEE_MINIMUM_COUNT = 1
     EMPLOYEE_MAXIMUM_COUNT = 50
-    INITIAL_OE_END_DAY = Settings.aca.shop_market.open_enrollment.monthly_end_on
-    RENEWAL_OE_END_DAY = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+    INITIAL_OE_END_DAY = EnrollRegistry[:shop_open_enrollment].settings(:monthly_end_on).item
+    RENEWAL_OE_END_DAY = EnrollRegistry[:renewal_application].settings(:monthly_open_enrollment_end_on).item
 
 
     rule :open_enrollment_period_minimum,
