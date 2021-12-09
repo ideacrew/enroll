@@ -1071,22 +1071,10 @@ module FinancialAssistance
       CLOSED_STATUSES.include?(aasm_state)
     end
 
-    # Need to make sure that claimed_as_tax_dependent_by, which holds an applicant ID, actually exists for the
-    # applicants associated with the application.
-    def all_tax_dependent_claiming_applicants_exist?
-      return true if active_applicants.count == 1 && active_applicants.first.applicant_validation_complete? ||
-                     active_applicants.all? { |applicant| applicant.claimed_as_tax_dependent_by.blank? }
-      claimed_as_tax_dependent_by_ids = active_applicants.map { |applicant| applicant.claimed_as_tax_dependent_by.to_s }.compact.uniq
-      claiming_applicants = applicants.where(:_id.in => claimed_as_tax_dependent_by_ids).to_a.uniq
-      errors.add(:base, "Missing all tax claiming dependents.") if claimed_as_tax_dependent_by_ids.length != claiming_applicants.length
-      claimed_as_tax_dependent_by_ids.length == claiming_applicants.length
-    end
-
     def incomplete_applicants?
       active_applicants.each do |applicant|
         return true unless applicant.applicant_validation_complete?
       end
-      return true unless all_tax_dependent_claiming_applicants_exist?
       false
     end
 

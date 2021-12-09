@@ -705,18 +705,28 @@ module FinancialAssistance
       eligibility_determination
     end
 
+    # If there is no claimed_as_tax_dependent_by, return true
+    # if there is a claimed_as_tax_dependent_by, make sure that the application
+    # has an applicant with that id
+    def covering_applicant_exists?
+      return true if claimed_as_tax_dependent_by.blank?
+      application.applicants.where(_id: claimed_as_tax_dependent_by).present?
+    end
+
     def applicant_validation_complete?
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists?
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists?
       end
     end
 
