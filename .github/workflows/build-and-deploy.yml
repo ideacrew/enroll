@@ -58,7 +58,7 @@ jobs:
 
       - run: docker container ls
 
-      - run: docker exec -i rabbitmq /bin/bash curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
+      - run: docker exec -i rabbitmq /bin/sh curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
       # - run: docker exec -d rabbitmq /bin/bash rabbitmqctl add_vhost /
 
       # Build Docker Image
