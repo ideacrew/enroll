@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 # This class is used to swap the applicaiton wide configuration between different clients (I.E. DC to Maine)
+# TODO 12/7/2021: The need to move system/ folder has been removed. Please fully deprecate settings.yml in the near future.
+# One way to achieve this might be to remove the method #copy_settings_yml_to_current_configuration from this and run with
+# Maine configuration and check for Settings.yml related failures, and the other way is simply grepping for Settings calls
 class ClientConfigurationToggler < MongoidMigrationTask
   def system_config_target_folder
     "#{Rails.root}/system"
@@ -15,7 +18,7 @@ class ClientConfigurationToggler < MongoidMigrationTask
   end
 
   def old_configured_state_abbreviation
-    EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
+    File.read("#{Rails.root}/current_configuration.txt")
   end
 
   def target_client_state_abbreviation
@@ -28,17 +31,13 @@ class ClientConfigurationToggler < MongoidMigrationTask
     ENV['client'].downcase
   end
 
-  def copy_target_configuration_to_system_folder
-    target_configuration_files = Dir.glob("#{target_config_folder}/system/**/*.yml")
-    raise("No configuration files present in target directory.") if target_configuration_files.blank?
-    `rm -rf #{Rails.root}/system` if Dir.exist?("#{Rails.root}/system")
-    `cp -r #{target_config_folder}/system #{Rails.root}`
+  def copy_settings_yml_to_current_configuration
     if File.exist?("#{target_config_folder}/config/settings.yml")
       puts("Settings.yml present for target configuration, setting it as current settings.")
+      `cp -r #{target_config_folder}/config/settings.yml config/settings.yml`
     else
       puts("No settings.yml file present for target configuration")
     end
-    `cp -r #{target_config_folder}/config/settings.yml config/settings.yml`
   end
 
   def copy_app_assets_and_straggler_files
@@ -66,14 +65,18 @@ class ClientConfigurationToggler < MongoidMigrationTask
   def migrate
     @old_configured_state_abbreviation = old_configured_state_abbreviation
     @target_client_state_abbreviation = target_client_state_abbreviation
-    copy_target_configuration_to_system_folder
+    copy_settings_yml_to_current_configuration
     copy_app_assets_and_straggler_files
     checkout_straggler_files
+    File.open("#{Rails.root}/current_configuration.txt", 'w') do |file_line|
+      file_line.write @target_client_state_abbreviation
+    end
     puts("Client configuration toggle complete system complete. enroll_app.yml file is now set to:")
-    resource_registry_result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
+    resource_registry_result = `cat config/client_config/#{@target_client_state_abbreviation}/system/features/enroll_app/enroll_app.yml`
     puts(resource_registry_result[0..800])
     puts("Settings yml now set to:")
     settings_yml_result = `cat config/settings.yml`
     puts(settings_yml_result[0..400])
   end
 end
+
