@@ -92,3 +92,6 @@ registry:
           item: -1
         - key: :quiet_period_month_offset_mday
           item: 15
+      - key: :default_dental_option_kind
+        is_enabled: true
+        item: 'multi_product'

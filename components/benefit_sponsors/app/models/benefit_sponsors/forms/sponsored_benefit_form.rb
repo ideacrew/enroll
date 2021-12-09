@@ -8,7 +8,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :kind, String
       attribute :product_option_choice, String
-      attribute :product_package_kind, String, default: Settings.aca.default_dental_option_kind
+      attribute :product_package_kind, String, default: EnrollRegistry[:default_dental_option_kind].item
       attribute :elected_product_choices, Array # used for dental choice model
       
       # for employee cost details
