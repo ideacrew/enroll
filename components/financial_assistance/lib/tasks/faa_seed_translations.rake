@@ -1,7 +1,15 @@
 # frozen_string_literal: true
 # Run it with this: bundle exec rake app:seed:load_faa_translations
 
-site_key = ::EnrollRegistry[:enroll_app].settings(:site_key).item
+# TODO: refactor this once this is implemented with the other task... for some reason enroll registry wasn't being loaded here
+EnrollRegistry = ResourceRegistry::Registry.new
+
+EnrollRegistry.configure do |config|
+  config.name       = :enroll
+  config.created_at = DateTime.now
+  config.load_path = Rails.root.to_s.gsub("/components/benefit_markets/spec/dummy", "") + "/system/config/templates/features"
+end
+site_key =  EnrollRegistry[:enroll_app].setting(:site_key).item
 
 require 'rake'
 require_relative "../../db/seedfiles/translations/en/#{site_key}/financial_assistance"
