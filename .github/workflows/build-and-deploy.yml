@@ -25,14 +25,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      # Needed for docker build script
-      # - uses: getong/rabbitmq-action@v1.2
-      #   with:
-      #     rabbitmq version: '3.8.2-management-alpine'
-      #     host port: 5672
-      #     rabbitmq user: 'guest'
-      #     rabbitmq password: 'guest'
-      #     rabbitmq vhost: '/'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
@@ -40,31 +32,28 @@ jobs:
       # Check out repository
       - uses: actions/checkout@v2
 
-      # Provide credentials for AWS
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-1
-
-      # Login to Amazon
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
-
+      # Adds `docker` to the environment for running commands
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - run: docker container ls
-      # - run: docker exec -i rabbitmq /bin/sh curl -u guest:guest -X PUT http://localhost:5672/api/vhosts/event_source
-      # - run: docker exec -i rabbitmq /bin/sh type curl
-      # - run: docker exec -i rabbitmq /bin/sh which curl
+      # Add vhosts to RabbitMQ
+      - run: |
+          docker exec rabbitmq rabbitmqctl add_vhost /
+          docker exec rabbitmq rabbitmqctl add_vhost event_source
+          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
 
-      - run: docker exec rabbitmq rabbitmqctl add_vhost /
-      - run: docker exec rabbitmq rabbitmqctl add_vhost event_source
-      - run: docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
-      - run: docker exec rabbitmq rabbitmqctl list_vhosts
+      # Provide credentials for AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Login to Amazon
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       # Build Docker Image
       - name: Build Image
@@ -80,12 +69,13 @@ jobs:
       # Scan Image
 
       # Upload Docker Image to Amazon ECR
-      # - name: Upload Image to ECR
-      #   id: upload-image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: rails_app
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      - name: Upload Image to ECR
+        id: upload-image
+        env:
+          # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # ECR_REPOSITORY: rails_app
+          IMAGE_TAG: ${{ github.sha }}
+          # run: |
+          #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          run: docker push public.ecr.aws/ideacrew/enroll:test-$IMAGE_TAG
