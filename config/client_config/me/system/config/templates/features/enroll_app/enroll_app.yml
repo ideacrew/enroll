@@ -628,6 +628,8 @@ registry:
         is_enabled: false
       - key: :document_reminder_notice_trigger
         is_enabled: true
+      - key: :account_transfer_notice_trigger
+        is_enabled: true
       - key: :verification_type_income_verification
         is_enabled: true
       - key: :tobacco_user_field

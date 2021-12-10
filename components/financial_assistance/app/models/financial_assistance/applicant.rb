@@ -316,7 +316,7 @@ module FinancialAssistance
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
 
-    attr_accessor :relationship
+    attr_accessor :relationship, :callback_update
 
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
@@ -705,18 +705,32 @@ module FinancialAssistance
       eligibility_determination
     end
 
+    # If there is no claimed_as_tax_dependent_by, return true
+    # if there is a claimed_as_tax_dependent_by, make sure that the application
+    # has an applicant with that id
+    def covering_applicant_exists?
+      return true if claimed_as_tax_dependent_by.blank?
+      tax_claimer_present = application.applicants.where(_id: claimed_as_tax_dependent_by).present?
+      errors.add(:base, "Applicant claiming #{applicant.full_name} as tax dependent not present.") if tax_claimer_present.blank?
+      tax_claimer_present
+    end
+
     def applicant_validation_complete?
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists? &&
+          ssn_present?
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists? &&
+          ssn_present?
       end
     end
 
@@ -1109,6 +1123,12 @@ module FinancialAssistance
       evidences.find_all(&:type_unverified?)
     end
 
+    def ssn_present?
+      errors.add(:base, 'no ssn present.') if no_ssn == '0' && ssn.blank?
+      return false if no_ssn == '0' && ssn.blank?
+      true
+    end
+
     private
 
     def date_ranges_overlap?(range_a, range_b)
@@ -1273,7 +1293,7 @@ module FinancialAssistance
 
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
-      if is_active
+      if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
         create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
         if create_or_update_result.success?
@@ -1286,6 +1306,7 @@ module FinancialAssistance
     end
 
     def propagate_destroy
+      return if callback_update
       delete_params = {:family_id => application.family_id, :person_hbx_id => person_hbx_id}
       ::Operations::Families::DropFamilyMember.new.call(delete_params)
 

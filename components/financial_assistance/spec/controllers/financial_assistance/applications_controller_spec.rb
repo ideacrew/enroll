@@ -146,12 +146,55 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
       allow(obj).to receive(:build_event).and_return(event)
       allow(event.success).to receive(:publish).and_return(true)
-      controller.instance_variable_set(:@modal, application.reload)
+      controller.instance_variable_set(:@model, application.reload)
+    end
+
+    it "showing errors when @model does not save" do
+      # to give errors
+      allow(application).to receive_message_chain('errors.full_messages').and_return(
+        ["Hbx id can't be blank", "fake errors can't be blank"]
+      )
+      allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+      allow(application).to receive(:save).and_return(false)
+      allow(application).to receive(:save!).with(validate: false).and_return(false)
+      allow(application).to receive(:valid?).and_return(false)
+      post :step, params: {application: application.attributes, id: application.id }
+      expect(flash[:error]).to eq("Hbx id can't be blank, fake errors can't be blank")
+    end
+
+    it "showing errors when @model does not save and errors blank" do
+      # to give errors
+      allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+      allow(application).to receive(:save).and_return(false)
+      allow(application).to receive(:save!).with(validate: false).and_return(false)
+      allow(application).to receive(:valid?).and_return(false)
+      post :step, params: {application: application.attributes, id: application.id }
+      expect(flash[:error]).to eq("")
     end
 
     it "should render step if no key present in params with modal_name" do
       post :step, params: { id: application.id }
       expect(response).to render_template 'workflow/step'
+    end
+
+    context "submit step with a valid but incomplete application" do
+      before do
+        application.update_attributes!(aasm_state: 'draft')
+        allow(application).to receive(:complete?).and_return(false)
+        allow(application).to receive(:save).and_return(true)
+        allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
+        allow(controller).to receive(:build_error_messages)
+
+        post :step, params: { id: application.id, commit: 'Submit Application', application: application_valid_params }
+      end
+
+      it 'build errors for the model' do
+        expect(controller).to have_received(:build_error_messages).with(application)
+      end
+
+      it "should render error page when there is an incomplete or already submitted application" do
+        expect(response).to redirect_to(application_publish_error_application_path(application))
+      end
     end
 
     context "submit step with a publish_result failure" do
@@ -161,6 +204,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       before do
         application.update_attributes!(aasm_state: 'submitted')
         allow(application).to receive(:complete?).and_return(true)
+        allow(application).to receive(:may_submit?).and_return(true)
         allow(application).to receive(:submit!).and_return(true)
         allow(application).to receive(:save).and_return(true)
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
@@ -256,6 +300,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         application.update_attributes!(aasm_state: 'submitted')
         application.reload
         allow(application).to receive(:complete?).and_return(true)
+        allow(application).to receive(:may_submit?).and_return(true)
         allow(application).to receive(:submit!).and_return(true)
         allow(FinancialAssistance::Operations::Application::RequestDetermination).to receive_message_chain(:new, :call).and_return(success_result)
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)

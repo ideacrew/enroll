@@ -87,8 +87,8 @@ module FinancialAssistance
 
     def destroy
       income_id = params['id'].split('_').last
-      @income = @applicant.incomes.find(income_id)
-      @income.destroy!
+      @income = @applicant.incomes.where(id: income_id).first
+      @income&.destroy
 
       head :ok
     end

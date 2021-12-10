@@ -28,16 +28,4 @@ async function getJson(): Promise<void> {
   );
 }
 
-// export const runtimeDictionary =
-//   async (): Promise<FileWithRuntimeDictionary> => {
-//     console.log('Creating runtime dictionary');
-//     const reports = await getJson();
-
-//     const examplesOnly: RspecExample[] = reports
-//       .map((report) => report.examples)
-//       .flat()
-//       .filter((report) => report.status !== 'pending');
-
-//     return createFileDictionary(examplesOnly);
-//   };
 getJson();

@@ -434,4 +434,42 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  context 'propagate_applicant' do
+    before do
+      allow(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to receive(:new).and_call_original
+      applicant.assign_attributes({
+                                    is_pregnant: true,
+                                    children_expected_count: 1,
+                                    pregnancy_due_on: nil,
+                                    is_applying_coverage: true,
+                                    is_physically_disabled: nil
+                                  })
+    end
+
+    it 'should not propagate when callback_update is true' do
+      applicant.callback_update = true
+      applicant.save!
+      expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
+    end
+  end
+
+  context 'propagate_destroy' do
+    before do
+      allow(::Operations::Families::DropFamilyMember).to receive(:new).and_call_original
+      applicant.assign_attributes({
+                                    is_pregnant: true,
+                                    children_expected_count: 1,
+                                    pregnancy_due_on: nil,
+                                    is_applying_coverage: true,
+                                    is_physically_disabled: nil
+                                  })
+    end
+
+    it 'should not propagate when callback_update is true' do
+      applicant.callback_update = true
+      applicant.destroy!
+      expect(::Operations::Families::DropFamilyMember).to_not have_received(:new)
+    end
+  end
 end
