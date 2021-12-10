@@ -730,7 +730,7 @@ module FinancialAssistance
 
     def format_citizen
       return "" unless citizen_status.present?
-      if !is_applying_coverage && citizen_status == "not_lawfully_present_in_us" && EnrollRegistry.feature_enabled?(:non_applicant_citizen_status)
+      if !is_applying_coverage && citizen_status == "not_lawfully_present_in_us" && FinancialAssistanceRegistry.feature_enabled?(:non_applicant_citizen_status)
         l10n("faa.not_applicable_abbreviation")
       else
         CITIZEN_KINDS[citizen_status.to_sym]
