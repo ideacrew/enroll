@@ -56,10 +56,11 @@ module FinancialAssistance
 
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
-            payload = load_missing_county_names(payload)
-            return payload if payload.failure?
+            result = load_missing_county_names(payload)
+            return result if result.failure?
 
-            decrypt_ssns(payload.value!)
+            updated_payload = result.value!
+            decrypt_ssns(updated_payload)
           rescue StandardError => e
             Failure("load_data #{e}")
           end
