@@ -51,3 +51,5 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     Then the user will navigate to the Review Application page
     Then user should see Medicaid eligibility question
     And user should have feature toggled questions in review
+    Then user should see need help paying question
+    And user should have answer an related to applicant
