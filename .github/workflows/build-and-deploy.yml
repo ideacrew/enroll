@@ -8,7 +8,6 @@ on:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  RABBITMQ_CONF: 'rabbitmq.config'
 
 jobs:
   build-image:
@@ -64,7 +63,7 @@ jobs:
 
       - run: docker exec rabbitmq rabbitmqctl add_vhost /
       - run: docker exec rabbitmq rabbitmqctl add_vhost event_source
-      - run: docker exec rabbitmq rabbitmqctl list_hosts
+      - run: docker exec rabbitmq rabbitmqctl list_vhosts
 
       # Build Docker Image
       # - name: Build Image
