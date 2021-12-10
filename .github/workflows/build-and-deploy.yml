@@ -64,7 +64,7 @@ jobs:
 
       - run: docker exec rabbitmq rabbitmqctl add_vhost /
       - run: docker exec rabbitmq rabbitmqctl add_vhost event_source
-      # - run: docker exec rabbitmq rabbitmqctl list_hosts
+      - run: docker exec rabbitmq rabbitmqctl list_hosts
 
       # Build Docker Image
       # - name: Build Image
