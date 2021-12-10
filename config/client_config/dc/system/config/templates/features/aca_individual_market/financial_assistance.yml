@@ -80,6 +80,8 @@ registry:
         is_enabled: false
       - key: :skip_aptc_families_from_document_reminder_notices
         is_enabled: true
+      - key: :non_applicant_citizen_status
+        is_enabled: false
   - namespace:
     - :request_determination
     features:
