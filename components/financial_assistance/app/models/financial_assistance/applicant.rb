@@ -705,18 +705,32 @@ module FinancialAssistance
       eligibility_determination
     end
 
+    # If there is no claimed_as_tax_dependent_by, return true
+    # if there is a claimed_as_tax_dependent_by, make sure that the application
+    # has an applicant with that id
+    def covering_applicant_exists?
+      return true if claimed_as_tax_dependent_by.blank?
+      tax_claimer_present = application.applicants.where(_id: claimed_as_tax_dependent_by).present?
+      errors.add(:base, "Applicant claiming #{applicant.full_name} as tax dependent not present.") if tax_claimer_present.blank?
+      tax_claimer_present
+    end
+
     def applicant_validation_complete?
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists? &&
+          ssn_present?
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists? &&
+          ssn_present?
       end
     end
 
@@ -1112,6 +1126,12 @@ module FinancialAssistance
     #use this method to check what evidences needs to be included on notices
     def unverified_evidences
       evidences.find_all(&:type_unverified?)
+    end
+
+    def ssn_present?
+      errors.add(:base, 'no ssn present.') if no_ssn == '0' && ssn.blank?
+      return false if no_ssn == '0' && ssn.blank?
+      true
     end
 
     private

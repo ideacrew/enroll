@@ -70,9 +70,11 @@ Given(/^the user will navigate to the FAA Household Info page$/) do
 end
 
 Given(/^the user SSN is nil$/) do
-  consumer.person.update_attributes(no_ssn: "1")
+  consumer.person.primary_family.family_members.each do |fm|
+    fm&.person&.update_attributes(no_ssn: "1")
+  end
   application&.applicants.each do |applicant|
-    applicant.update_attributes(no_ssn: '1') if applicant.ssn.nil?
+    applicant.update_attributes(no_ssn: '1')
   end
 end
 
