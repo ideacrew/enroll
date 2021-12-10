@@ -345,6 +345,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.family_members.index.continue_to_get_insurance' => "If you need to add other members to your health insurance, select 'Add New Person'. When you’re finished, select CONTINUE.",
   :'en.insured.family_members.index.add_member_info_html' => "<span class='bold'>Here's your chance to add family members to your plan.</span><br>Add family members by clicking the 'Add Member' button. If you don't need to add more members, or when you are done adding members, click continue.",
   :'en.insured.family_members.duplicate_error_message' => "Cannot %{action} the duplicate members as they are present on enrollments/tax households. Please call customer service at %{contact_center_phone_number}.",
+  :'en.insured.family_members.relationship_error_message' => "Select relationship type",
   :'en.insured.home_address_info' => "The home address is where this person legally reside. If they want to receive mail at another address such as an office or a PO Box, Select 'Add Mailing Address'",
   :'en.month' => "Month",
   :'en.termination_date' => "Termination date",
