@@ -63,7 +63,7 @@ jobs:
 
       - run: docker exec rabbitmq rabbitmqctl add_vhost /
       - run: docker exec rabbitmq rabbitmqctl add_vhost event_source
-      - run: docker exec rabbitmq rabbitmqctl set_permissions -p /event_source guest ".*" ".*" ".*"
+      - run: docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
       - run: docker exec rabbitmq rabbitmqctl list_vhosts
 
       # Build Docker Image
