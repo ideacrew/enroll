@@ -8,7 +8,6 @@ on:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-image:
@@ -59,7 +58,7 @@ jobs:
       # Build Docker Image
       - name: Build Image
         id: build-image
-        run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
+        run: .docker/build.sh test-${{ github.sha }} public.ecr.aws/ideacrew/enroll
         # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -67,7 +66,7 @@ jobs:
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
-        run: docker push public.ecr.aws/ideacrew/enroll:test-$IMAGE_TAG
+        run: docker push public.ecr.aws/ideacrew/enroll:test-${{ github.sha }}
         # run: |
         #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
