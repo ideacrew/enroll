@@ -8,6 +8,7 @@ on:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-image:
@@ -58,24 +59,15 @@ jobs:
       # Build Docker Image
       - name: Build Image
         id: build-image
-        env:
-          # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          # ECR_REPOSITORY: rails_app
-          IMAGE_TAG: ${{ github.sha }}
-        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
-
-      # Scan Image
+        # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
-        env:
-          # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          # ECR_REPOSITORY: rails_app
-          IMAGE_TAG: ${{ github.sha }}
-          # run: |
-          #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          run: docker push public.ecr.aws/ideacrew/enroll:test-$IMAGE_TAG
+        run: docker push public.ecr.aws/ideacrew/enroll:test-$IMAGE_TAG
+        # run: |
+        #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
