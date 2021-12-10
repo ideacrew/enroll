@@ -5,12 +5,16 @@ on:
     branches:
       - build-deploy-on-push
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
 
 jobs:
-  build-image:
+  build-and-upload-image:
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -58,11 +62,16 @@ jobs:
       # Build Docker Image
       - name: Build Image
         id: build-image
-        run: .docker/build.sh test-${{ github.sha }} public.ecr.aws/ideacrew/enroll
+        # run: .docker/build.sh test-${{ github.sha }} public.ecr.aws/ideacrew/enroll
+        run: docker build -f .docker/simple/Dockerfile --target app -t public.ecr.aws/ideacrew/enroll:test-${{ github.sha }} --network="host" .
         # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
+      #- name: upload Anchore scan SARIF report
+      #  uses: github/codeql-action/upload-sarif@v1
+      #  with:
+      #    sarif_file: ${{ steps.scan.outputs.sarif }}
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
@@ -70,3 +79,14 @@ jobs:
         # run: |
         #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+  scan-uploaded-image:
+    runs-on: ubuntu-latest
+    needs: [build-and-upload-image]
+    steps:
+      - name: Scan Docker image
+        uses: anchore/scan-action@main
+        with:
+          image: 'public.ecr.aws/ideacrew/enroll:test-${{ github.sha }}'
+          acs-report-enable: true
+          fail-build: false
+          severity-cutoff: critical
