@@ -66,15 +66,17 @@ jobs:
       - run: docker exec rabbitmq rabbitmqctl list_vhosts
 
       # Build Docker Image
-      # - name: Build Image
-      #   id: build-image
-      #   env:
-      #     # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     # ECR_REPOSITORY: rails_app
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #   # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #   run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
+      - name: Build Image
+        id: build-image
+        env:
+          # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # ECR_REPOSITORY: rails_app
+          IMAGE_TAG: ${{ github.sha }}
+        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        run: .docker/build.sh test-$IMAGE_TAG public.ecr.aws/ideacrew/enroll
+
+      # Scan Image
 
       # Upload Docker Image to Amazon ECR
       # - name: Upload Image to ECR
