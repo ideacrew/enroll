@@ -42,7 +42,8 @@ namespace :migrations do
     pull_county
 
     def address_needs_fixing?(address)
-      address.county.blank? && !address.zip.blank? || address.county.downcase.include?("benefitmarket")
+      return false if address.zip.blank? 
+      address.county.blank? || address.county.downcase.include?("benefitmarket") || address.county.downcase.include?("zip code outside supported area")
     end
 
     def address_fixer(address)
@@ -50,7 +51,7 @@ namespace :migrations do
       counties = county_finder(zip)
       if counties.count == 1
         address.county = counties.first.county_name
-        address.save
+        address.save!
         :fixed
       elsif counties.count == 0
         puts "No county found for ZIP: #{zip} #{address.state}"
