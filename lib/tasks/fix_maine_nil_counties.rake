@@ -11,7 +11,7 @@ namespace :migrations do
     # - application county update
 
     def people
-      people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, ""]).map(&:_id)
+      people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, "", "Zip code outside supported area"]).map(&:_id)
       # benefitmarkets because previously we erroneously assigned a object instead of ring to county
       people_2_ids = Person.where("addresses.county" => /.*benefitmarkets.*/i).map(&:_id)
       people_ids = (people_1_ids + people_2_ids).flatten
