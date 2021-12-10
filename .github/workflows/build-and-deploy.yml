@@ -63,7 +63,7 @@ jobs:
       - name: Build Image
         id: build-image
         # run: .docker/build.sh test-${{ github.sha }} public.ecr.aws/ideacrew/enroll
-        run: docker build -f .docker/simple/Dockerfile --target app -t public.ecr.aws/ideacrew/enroll:test-${{ github.sha }} --network="host" .
+        run: docker build -f .docker/simple/Dockerfile -t public.ecr.aws/ideacrew/enroll:test-${{ github.sha }} --network="host" .
         # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
