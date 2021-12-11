@@ -92,5 +92,10 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
       county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
       expect(county_people.present?).to eq(false)
     end
+
+    it "update the applicants with zip code outside supported area" do
+      blank_county = Person.where("address.county" => "Zip code outside supported area")
+      expect(blank_county.count).to eq(0)
+    end
   end
 end
