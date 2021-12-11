@@ -2588,7 +2588,7 @@ class HbxEnrollment
 
   def family_tier_value
     return couple_tier_value if couple_enrollee?
-    primary_tier_value if primary_enrollee?
+    primary_tier_value
   end
 
   def couple_tier_value
@@ -2607,7 +2607,10 @@ class HbxEnrollment
   end
 
   def primary_enrollee?
-    @primary_enrollee ||= hbx_enrollment_members.where(is_subscriber: true).present?
+    @primary_enrollee ||= begin
+      primary_applicant_id = family.primary_applicant.id
+      hbx_enrollment_members.map(&:applicant_id).include?(primary_applicant_id)
+    end
   end
 
   def couple_enrollee?

@@ -611,6 +611,14 @@ And(/^the user should click on the destroy applicant icon$/) do
   find('.fa-times').click
 end
 
+Then(/^user should see need help paying question$/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.need_help_paying_bills)
+end
+
+And(/^user should have an answer related to applicant$/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.applicant_paying_bills)
+end
+
 Then(/^the user should see the popup for the remove applicant confirmation$/) do
   popup_text = "Are you sure you want to remove this applicant?"
   expect(page).to have_content(popup_text)
