@@ -1,6 +1,6 @@
 name: cucumber report
 on:
-  # push:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -9,18 +9,18 @@ jobs:
       matrix:
         feature:
           [
-            'admin',
-            'brokers',
+            # 'admin',
+            # 'brokers',
             'cover_all',
-            'employee',
-            'employers',
-            'financial_assistance',
+            # 'employee',
+            # 'employers',
+            # 'financial_assistance',
             'general_agencies',
-            'group_selection',
+            # 'group_selection',
             'hbx',
-            'hbx_admin',
-            'insured',
-            'permissions',
+            # 'hbx_admin',
+            # 'insured',
+            # 'permissions',
             'plan_shopping',
           ]
     runs-on: ubuntu-latest
@@ -98,7 +98,10 @@ jobs:
         with:
           name: cucumber-concatenated-reports
           path: ci/cucumber/local-cucumber-report.json
-      - run: npm run cucumber:split-config
+      # - run: npm run cucumber:split-config
+      - uses: markgoho/analyze-cucumber-report@trunk
+        with:
+          local-report: 'ci/cucumber/local-cucumber-report.json'
       - uses: actions/upload-artifact@v2
         with:
           name: cucumber-split-config
