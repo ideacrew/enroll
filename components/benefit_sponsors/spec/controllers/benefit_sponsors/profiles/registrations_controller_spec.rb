@@ -118,7 +118,6 @@ module BenefitSponsors
     end
 
     before :each do
-      Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
@@ -129,10 +128,6 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false)
       allow(Settings.site).to receive(:key).and_return(:dc)
       allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
-    end
-
-    after do
-      Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
     end
 
     shared_examples_for "initialize registration form" do |action, params, profile_type|

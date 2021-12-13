@@ -5,10 +5,6 @@ module CrmGateway
   module PersonConcern
     extend ActiveSupport::Concern
 
-    included do
-      after_save :trigger_primary_subscriber_publish
-    end
-
     def trigger_primary_subscriber_publish
       return unless EnrollRegistry.feature_enabled?(:crm_publish_primary_subscriber)
       return unless has_active_consumer_role?
