@@ -199,8 +199,9 @@ describe "CRM update" do
     EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(true)
   end
 
-  it "should publish to CRM on save" do
-    expect(test_person.send(:trigger_primary_subscriber_publish).to_s).to eq("Success(\"Successfully published payload to CRM Gateway.\")")
+  it "calls the PublishPrimarySubscriber operation" do
+    expect(::Operations::People::SugarCrm::PublishPrimarySubscriber).to receive(:new).and_call_original
+    test_person.trigger_primary_subscriber_publish
   end
 end
 

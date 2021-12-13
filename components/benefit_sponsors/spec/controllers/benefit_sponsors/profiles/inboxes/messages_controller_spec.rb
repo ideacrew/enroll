@@ -21,14 +21,6 @@ module BenefitSponsors
     let(:admin_user) {FactoryBot.create(:user, :person => admin_person)}
     let(:hbx_staff_role) {FactoryBot.create(:hbx_staff_role, person: admin_user.person)}
 
-    before do
-      Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
-    end
-
-    after do
-      Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
-    end
-
     describe "GET show / DELETE destroy" do
       context "redirect show message if user not signed in" do
         before do
