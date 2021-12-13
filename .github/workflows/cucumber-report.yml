@@ -98,7 +98,9 @@ jobs:
         with:
           name: cucumber-concatenated-reports
           path: ci/cucumber/local-cucumber-report.json
-      - run: npm run cucumber:split-config
+      - uses: markgoho/analyze-cucumber-report@trunk
+        with:
+          local-report: 'ci/cucumber/local-cucumber-report.json'
       - uses: actions/upload-artifact@v2
         with:
           name: cucumber-split-config
