@@ -74,9 +74,9 @@ module FinancialAssistance
     end
 
     def destroy
-      @deduction = @applicant.deductions.find(params[:id])
-      @deduction_kind = @deduction.kind
-      @deduction.destroy!
+      @deduction = @applicant.deductions.where(id: params[:id]).first
+      @deduction_kind = @deduction&.kind
+      @deduction&.destroy
 
       head :ok
     end
