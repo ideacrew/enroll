@@ -428,8 +428,15 @@ module FinancialAssistance
       end
     end
 
-    #Used for RelationshipMatrix
+    #apply rules, update relationships and fetch matrix
     def build_relationship_matrix
+      matrix = fetch_relationship_matrix
+      apply_rules_and_update_relationships(matrix)
+      fetch_relationship_matrix
+    end
+
+    # fetch existing relationships matrix
+    def fetch_relationship_matrix
       applicant_ids = active_applicants.map(&:id)
       matrix_size = applicant_ids.count
       matrix = Array.new(matrix_size){Array.new(matrix_size)}
@@ -441,7 +448,6 @@ module FinancialAssistance
           matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi])
         end
       end
-      apply_rules_and_update_relationships(matrix)
     end
 
     def find_existing_relationship(member_a_id, member_b_id)
@@ -1318,7 +1324,11 @@ module FinancialAssistance
           next if child_relation.nil? || child_relation.relative_id != each_relation.relative_id
           parents_domestic_partner = applicants.where(id: each_relation.applicant_id).first
           domestic_partners_child = applicants.where(id: other_applicant_id).first
-          add_or_update_relationships(parents_domestic_partner, domestic_partners_child, 'parents_domestic_partner')
+          # pivotal ticket: 180576660 domestic_partner should be able to select parent for primary's child_dependent or vice versa
+          #  MemberA is domestic_partner to MemberB
+          #  MemberA is parent to MemberC
+          #  MemberB should be able to select MemberC as parent
+          # add_or_update_relationships(parents_domestic_partner, domestic_partners_child, 'parents_domestic_partner')
           missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
         end
       end
