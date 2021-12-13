@@ -103,7 +103,7 @@ module FinancialAssistance
 
     def claim_eligible_tax_dependents
       return if @application.blank? || @applicant.blank?
-      eligible_applicants = @application.active_applicants.map! do |applicant|
+      eligible_applicants = @application.active_applicants.where(is_claimed_as_tax_dependent: false).map! do |applicant|
         [applicant.full_name, applicant.id.to_s] if applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id
       end
       eligible_applicants
