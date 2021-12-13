@@ -36,6 +36,16 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     before(:each) do
       sign_in user
+      applicants = application.applicants
+      application.add_or_update_relationships(applicants[0], applicants[1], 'spouse')
+      application.add_or_update_relationships(applicants[0], applicants[2], 'parent')
+      application.add_or_update_relationships(applicants[0], applicants[3], 'parent')
+      application.add_or_update_relationships(applicants[1], applicants[2], 'parent')
+      application.add_or_update_relationships(applicants[1], applicants[3], 'parent')
+      application.add_or_update_relationships(applicants[2], applicants[3], 'sibling')
+      application.relationships << ::FinancialAssistance::Relationship.new(kind: 'spouse', applicant_id: applicants[0].id, relative_id: applicants[1].id)
+      application.relationships << ::FinancialAssistance::Relationship.new(kind: 'spouse', applicant_id: applicants[0].id, relative_id: applicants[1].id)
+
       get :copy, params: { :id => application.id }
       @new_application = FinancialAssistance::Application.where(family_id: application.family_id, :id.ne => application.id).first
     end
@@ -54,6 +64,17 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     it 'copies all the applicants' do
       expect(@new_application.applicants.count).to eq application.applicants.count
+    end
+
+    it 'does not copy duplicate relationships' do
+      applicants = @new_application.applicants
+      expect(@new_application.relationships.where(applicant_id: applicants[0].id, relative_id: applicants[1].id).count).to eq 1
+    end
+
+    it 'only copies relationships to the primary applicant' do
+      applicants = @new_application.applicants
+      expect(@new_application.relationships.where(applicant_id: applicants[2].id, relative_id: applicants[3].id).count).to eq 0
+      expect(@new_application.relationships.count).to eq 6
     end
   end
 end
