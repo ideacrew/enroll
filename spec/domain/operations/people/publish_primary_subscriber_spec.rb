@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 RSpec.describe Operations::People::SugarCrm::PublishPrimarySubscriber, type: :model, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
   let!(:person) do
     # Some of these attributes are necessary in the person entity
     FactoryBot.create(
@@ -33,6 +34,19 @@ RSpec.describe Operations::People::SugarCrm::PublishPrimarySubscriber, type: :mo
 
     it 'should return success with correct primary subscriber person validation for publishing' do
       expect(subject.call(person)).to be_a(Dry::Monads::Result::Success)
+    end
+  end
+
+  context "only publish payload to CRM if critical upates were made" do
+    before do
+      call_publish = subject.call(person)
+      expect(call_publish).to be_a(Dry::Monads::Result::Success)
+      # Set in family_concern
+      person.set(cv3_payload: call_publish.success[1].to_h.with_indifferent_access)
+    end
+
+    it "should return failure if no family members critical attributes have been changed" do
+      expect(subject.call(person)).to eq(Failure("No critical changes made to primary subscriber, no update needed to CRM gateway."))
     end
   end
 end

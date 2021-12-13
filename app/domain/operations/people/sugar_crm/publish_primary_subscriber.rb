@@ -15,15 +15,38 @@ module Operations
 
         def call(primary_subscriber_person)
           transformed_person = yield construct_payload_hash(primary_subscriber_person)
-          #payload_value = yield validate_payload(transformed_person)
           simplified_person_payload = simplify_crm_person_payload(transformed_person)
-          #payload_entity = yield create_payload_entity(simplified_person_payload)
-          event = yield build_event(simplified_person_payload)
+          event = yield build_event(simplified_person_payload, primary_subscriber_person)
           result = yield publish(event)
-          Success(result)
+          Success([result, transformed_person])
         end
 
         private
+
+        # Updates should only be made to CRM gateway if critical attributes are changed
+        # or new family members are added/deleted
+        def send_to_gateway?(person, new_payload)
+          old_payload = person.cv3_payload
+          return true if old_payload.blank?
+          new_payload_hash = new_payload.to_h.with_indifferent_access
+          old_payload_hash = old_payload.to_h.with_indifferent_access
+          new_payload_changes = {
+            encrypted_ssn: new_payload_hash.dig(:person_demographics, :encrypted_ssn),
+            first_name: new_payload_hash.dig(:person_demographics, :first_name),
+            last_name: new_payload_hash.dig(:person_demographics, :last_name),
+            addresses: new_payload_hash[:addresses],
+            phones: new_payload_hash[:phones]
+          }
+          old_payload_changes = {
+            encrypted_ssn: old_payload_hash.dig(:person_demographics, :encrypted_ssn),
+            first_name: old_payload_hash.dig(:person_demographics, :first_name),
+            last_name: old_payload_hash.dig(:person_demographics, :last_name),
+            addresses: old_payload_hash[:addresses],
+            phones: old_payload_hash[:phones]
+          }
+          new_payload_changes != old_payload_changes
+        end
+
 
         def construct_payload_hash(person)
           if person.is_a?(::Person)
@@ -50,22 +73,12 @@ module Operations
           transformed_person
         end
 
-        def build_event(payload)
-          event('events.crm_gateway.people.primary_subscriber_update', attributes: payload.to_h)
-        end
-
-        def validate_payload(transformed_person)
-          simplified_person_payload = simplify_crm_person_payload(transformed_person)
-          result = AcaEntities::Contracts::People::PersonContract.new.call(simplified_person_payload)
-          if result.success?
-            result
+        def build_event(payload, primary_subscriber_person)
+          if send_to_gateway?(primary_subscriber_person, payload)
+            event('events.crm_gateway.people.primary_subscriber_update', attributes: payload.to_h)
           else
-            Failure("Person with hbx_id #{result[:hbx_id]} is not valid due to #{result.errors.to_h}.")
+            Failure("No critical changes made to primary subscriber, no update needed to CRM gateway.")
           end
-        end
-
-        def create_payload_entity(payload_value)
-          Success(AcaEntities::People::Person.new(payload_value.to_h))
         end
 
         def publish(event)
