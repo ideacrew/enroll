@@ -321,6 +321,7 @@ jobs:
     needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         group:
           [
