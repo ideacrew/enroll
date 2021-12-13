@@ -57,10 +57,7 @@
     "hugo:dev": "cd hugo && hugo server --disableFastRender",
     "build:hugo": "cd hugo && hugo --minify",
     "build:hugo:local": "rm -rf hugo/public && npm run build:hugo",
-    "cucumber:concat-reports": "ts-node ci/scripts/concat-cucumber-reports",
-    "cucumber:split-config": "ts-node ci/scripts/cucumber-split",
     "rspec:concat-reports": "ts-node ci/scripts/concat-rspec-reports",
-    "cucumber:move-reports": "ts-node ci/scripts/move-cucumber-reports",
     "rspec:move-reports": "ts-node ci/scripts/move-rspec-reports",
     "rspec:split-config": "ts-node ci/scripts/rspec-split",
     "benefit-sponsors:split-config": "ts-node ci/scripts/benefit-sponsors-split"

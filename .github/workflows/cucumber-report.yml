@@ -92,16 +92,11 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: ci/cucumber/compressed-reports
-      - run: npm run cucumber:move-reports
-      - run: npm run cucumber:concat-reports
-      - uses: actions/upload-artifact@v2
-        with:
-          name: cucumber-concatenated-reports
-          path: ci/cucumber/local-cucumber-report.json
       - uses: markgoho/analyze-cucumber-report@trunk
         with:
-          local-report: 'ci/cucumber/local-cucumber-report.json'
+          individual-reports-folder: 'ci/cucumber/compressed-reports'
+          output-report: 'cucumber-split-config.json'
       - uses: actions/upload-artifact@v2
         with:
           name: cucumber-split-config
-          path: ci/cucumber-split-config.json
+          path: cucumber-split-config.json
