@@ -9,18 +9,18 @@ jobs:
       matrix:
         feature:
           [
-            # 'admin',
-            # 'brokers',
+            'admin',
+            'brokers',
             'cover_all',
-            # 'employee',
-            # 'employers',
-            # 'financial_assistance',
+            'employee',
+            'employers',
+            'financial_assistance',
             'general_agencies',
-            # 'group_selection',
+            'group_selection',
             'hbx',
-            # 'hbx_admin',
-            # 'insured',
-            # 'permissions',
+            'hbx_admin',
+            'insured',
+            'permissions',
             'plan_shopping',
           ]
     runs-on: ubuntu-latest
