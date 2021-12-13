@@ -5,6 +5,7 @@ Feature: Functionality for the Family Relationships page
     And a benchmark plan exists
     And the FAA feature configuration is enabled
     And a financial assistance application and two applicants in info completed state exist
+    And the user SSN is nil
     And financial assistance primary applicant logs in
     And user clicks CONTINUE
     Then the user will navigate to Family Relationships page
@@ -19,6 +20,7 @@ Feature: Functionality for the Family Relationships page
     Then the user will navigate to the Review & Submit page
 
   Scenario: Continue button enabled when all relationships are entered
+    And the user SSN is nil
     And there is a nil value for at least one relationship
     When the user populates the drop down with a value
     And the relationship is saved

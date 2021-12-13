@@ -66,7 +66,7 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
 
   context "Rake task" do
     before do
-      person.addresses.first.update_attributes!(zip: "20024", county: "")
+      person.addresses.first.update_attributes!(zip: "20024", county: "Zip code outside supported area")
       ::BenefitMarkets::Locations::CountyZip.create!(
         county_name: "Hampden",
         zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
@@ -91,6 +91,11 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
       end
       county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
       expect(county_people.present?).to eq(false)
+    end
+
+    it "update the applicants with zip code outside supported area" do
+      blank_county = Person.where("address.county" => "Zip code outside supported area")
+      expect(blank_county.count).to eq(0)
     end
   end
 end

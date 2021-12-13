@@ -6,6 +6,8 @@ module FinancialAssistance
       include ActiveModel::Model
       include ActiveModel::Validations
       include Config::AcaModelConcern
+      include ActionView::Helpers::TranslationHelper
+      include FinancialAssistance::L10nHelper
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
                     :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
@@ -204,7 +206,7 @@ module FinancialAssistance
       end
 
       def relationship_validation
-        return self.errors.add(:base, "select Relationship Type") if relationship.blank?
+        return self.errors.add(:base, l10n('faa.relationship_error_message')) if relationship.blank?
         primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in => ['spouse', 'life_partner'])
         if applicant
           other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }
