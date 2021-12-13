@@ -18,14 +18,6 @@ module BenefitSponsors
     let(:primary_general_agency_staff_role)     { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true, aasm_state: 'denied') }
     let!(:ga_person)                            { primary_general_agency_staff_role.person }
 
-    before do
-      Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
-    end
-
-    after do
-      Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
-    end
-
     describe ".re_apply" do
 
       shared_examples_for "broker re-application" do |from_state, to_state|

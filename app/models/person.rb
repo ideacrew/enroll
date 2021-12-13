@@ -116,6 +116,8 @@ class Person
   # Mec check
   field :mec_check_response, type: String
   field :mec_check_date, type: DateTime
+  # Used for recording payloads sent to CRM Gateway
+  field :cv3_payload, type: Hash, default: {}
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
