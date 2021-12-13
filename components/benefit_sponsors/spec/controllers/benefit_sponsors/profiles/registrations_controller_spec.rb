@@ -221,6 +221,7 @@ module BenefitSponsors
         context "for new on broker_agency_portal click without user" do
 
           before :each do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
@@ -244,7 +245,7 @@ module BenefitSponsors
           let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
 
           before :each do
-
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
             broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
             sign_in broker_user
             get :new, params: {profile_type: "broker_agency", portal: true}
@@ -377,6 +378,10 @@ module BenefitSponsors
     end
 
     describe "GET edit", dbclean: :after_each do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+      end
+
       let!(:benefit_sponsor) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:benefit_sponsorship) do
         benefit_sponsorship = benefit_sponsor.profiles.first.add_benefit_sponsorship
@@ -436,6 +441,9 @@ module BenefitSponsors
     end
 
     describe "PUT update", dbclean: :after_each do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+      end
 
       context "updating profile" do
 
