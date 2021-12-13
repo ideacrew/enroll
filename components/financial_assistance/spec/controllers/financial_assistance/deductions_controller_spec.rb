@@ -25,11 +25,7 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
 
   before do
     sign_in(user)
-  end
-
-  context "POST create" do
-    before do
-      @applicant = applicant
+    @applicant = applicant
       post :create, params: {application_id: application.id,
                              applicant_id: applicant.id,
                              deduction: {amount: "$200.00",
@@ -37,10 +33,22 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
                                          start_on: "1/1/#{TimeKeeper.datetime_of_record.year}",
                                          end_on: "12/31/#{TimeKeeper.datetime_of_record.year}",
                                          kind: "student_loan_interest"}}, format: :js
-    end
+  end
+
+  context "POST create" do
 
     it "should create with valid params" do
       expect(response.status).to eq(200)
+    end
+  end
+
+  context "DELETE destroy" do
+
+    it "should not throw an exception for invalid ids" do
+      applicant.reload
+      expect(applicant.deductions.count).to eq 1
+      delete :destroy, params: { application_id: application.id, applicant_id: applicant.id, id: '55555' }
+      expect(response.status).to_not eq(500)
     end
   end
 end
