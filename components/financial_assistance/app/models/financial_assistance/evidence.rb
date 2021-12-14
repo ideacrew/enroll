@@ -41,9 +41,7 @@ module FinancialAssistance
 
     embeds_one :verification_status, class_name: "::FinancialAssistance::VerificationStatus"
     embeds_many :verification_history, class_name: "::FinancialAssistance::VerificationHistory"
-    embeds_many :eligibility_results, class_name: "::FinancialAssistance::EligibilityResult"
-
-    embeds_many :events, class_name: "::FinancialAssistance::EventSource::Event"
+    embeds_many :request_results, class_name: "::FinancialAssistance::EligibilityResult"
 
     embeds_many :documents, as: :documentable do
       def uploaded
@@ -83,6 +81,7 @@ module FinancialAssistance
       state :review
       state :outstanding
       state :verified
+      state :non_verified
 
       state :determined
       state :expired

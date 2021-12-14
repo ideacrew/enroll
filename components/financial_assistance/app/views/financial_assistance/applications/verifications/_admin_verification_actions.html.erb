@@ -1,3 +1,5 @@
+<% evidence_type = evidence.title %>
+
 <!-- ***** Verification reason ***** -->
 <div class="row">
   <div class="verification-update-reason col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}"%>>
@@ -6,7 +8,7 @@
     </div>
     <%= form_tag financial_assistance.application_applicant_evidences_update_evidence_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
-        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'verify' %>
         <div class="form-group col-md-3">
           <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Evidence::VERIFY_REASONS), {prompt: ' Select Reason', required: true}%>
@@ -27,7 +29,7 @@
     </div>
     <%= form_tag financial_assistance.application_applicant_evidences_update_evidence_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
-        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
         <div class="form-group col-md-3">
           <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Evidence::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
@@ -42,13 +44,13 @@
 
 <!-- ***** FDSH hub request ***** -->
 <div class="row">
-  <div class="fedhub-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.split.join('-')}-hub"%>>
+  <div class="fedhub-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-hub"%>>
     <div class="col-md-9">
        <p>New request to the FDSH will be sent.</p>
     </div>
     <%= form_tag financial_assistance.application_applicant_evidences_fdsh_hub_request_path(application, applicant), method: :post do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
-        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'hub_request' %>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -56,17 +58,17 @@
     <%end%>
   </div>
 </div>
-<!-- ==== fedhub request ==== -->
+<!-- ====  FDSH hub request ==== -->
 
 <!-- ***** Extend ***** -->
 <div class="row">
-  <div class="extend-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.split.join('-')}-extend"%>>
+  <div class="extend-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-extend"%>>
     <div class="col-md-6">
       <p>Do you want to Extend Due Date for verification type</p>
     </div>
     <%= form_tag financial_assistance.application_applicant_evidences_extend_due_date_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
-        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'extend' %>
 
         <div class="col-md-3">

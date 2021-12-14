@@ -5,15 +5,15 @@
       <%= l10n(display_evidence_type(evidence_type)) %>
     </div>
     <div class="v-type-status col-md-2 text-center">
-        <span class="label lb-md label-<%=verification_status_class(evidence.aasm_state)%>">
-          <%= show_verification_status(evidence.aasm_state, current_user.has_hbx_staff_role?) %>
+        <span class="label lb-md label-<%=verification_status_class(evidence.aasm_state.to_s)%>">
+          <%= show_verification_status(evidence.aasm_state.to_s, current_user.has_hbx_staff_role?) %>
         </span>&nbsp;
     </div>
 
     <div class="v-type-due-date col-md-3">
-      <% if FinancialAssistance::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state) && evidence.due_on.present? %>
+      <% if Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state.to_s) %>
         <span class="text-danger"><%= l10n('due_date') %></span>
-        <%= evidence.due_on %>
+        <%= evidence.verif_due_date %>
       <% end %>
     </div>
 
@@ -27,6 +27,7 @@
           </span>
             <%= hidden_field_tag 'applicant_id', applicant.id  %>
             <%= hidden_field_tag 'evidence', evidence.id  %>
+            <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <% end %>
       <% end %>
     </div>
@@ -38,8 +39,8 @@
   </div>
 </div>
 
-<% if current_user.has_hbx_staff_role? %>
-  <%= render :partial => "financial_assistance/applications/verifications/admin_verification_actions", locals: { application: application, applicant: applicant, evidence: evidence, evidence_type: evidence_type} %>
+<% if current_user.has_hbx_staff_role? && evidence_type.present? %>
+  <%= render :partial => "financial_assistance/applications/verifications/admin_verification_actions", locals: { application: application, applicant: applicant, evidence: evidence, evidence_kind: evidence_kind} %>
 <% end %>
 
 <div class="row">
@@ -52,12 +53,12 @@
           <div class="v-doc-elem col-md-12">
             <div class="v-doc col-md-11">
               <% if document.identifier.present? %>
-                <%= link_to "#{document.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/financial_assistance/applications/#{application.id}/applicants/#{applicant.id}/verification_documents/download/#{key}", :target => '_blank', title: "Download", data: {"toggle": "tooltip"} %>
+                <%= link_to "#{document.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/financial_assistance/applications/#{application.id}/applicants/#{applicant.id}/verification_documents/download?key=#{key}&evidence_kind=#{evidence_kind}", :target => '_blank', title: "Download", data: {"toggle": "tooltip"} %>
               <% end %>
             </div>
             <div class="v-doc col-md-1">
               <span class="<%=pundit_class(Family, :updateable?)%>" >
-                <%= link_to financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize), method: :delete do %>
+                <%= link_to financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), method: :delete do %>
                   <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"></i>
                 <% end %>
               </span>

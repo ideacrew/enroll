@@ -29,7 +29,7 @@ FinancialAssistance::Engine.routes.draw do
     resources :applicants do
       get 'verification_documents/upload', to: 'verification_documents#upload'
       post 'verification_documents/upload', to: 'verification_documents#upload'
-      get 'verification_documents/download/:key', to: 'verification_documents#download'
+      get 'verification_documents/download', to: 'verification_documents#download'
       get 'evidences/update_evidence', to: 'evidences#update_evidence'
       put 'evidences/update_evidence', to: 'evidences#update_evidence'
       get 'evidences/fdsh_hub_request', to: 'evidences#fdsh_hub_request'

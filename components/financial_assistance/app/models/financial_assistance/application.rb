@@ -790,7 +790,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :trigger_aces_call] do
         transitions from: :submitted, to: :determined
       end
 
@@ -934,12 +934,12 @@ module FinancialAssistance
         FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
     end
 
-    def trigger_fdhs_calls
+    def publish_application_determined
       return unless predecessor_id.blank? && can_trigger_fdsh_calls?
 
-      Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+      Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
-      Rails.logger.error { "FAA trigger_fdhs_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+      Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def trigger_aces_call
@@ -1530,7 +1530,6 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
       return if predecessor_id.present?
 
@@ -1543,30 +1542,30 @@ module FinancialAssistance
       active_applicants.each do |applicant|
         applicant.evidences << build_evidences(types, applicant)
         applicant.save if applicant.evidences
-        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-           family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-
-          family_member_record = family.family_members.where(id: applicant.family_member_id).first
-          next if family_member_record.blank?
-          person_record = family_member_record.person
-          next if person_record.blank?
-          person_record.add_new_verification_type('Income')
-        end
-        from_state = applicant.aasm_state
-        # TODO: revisit
-        applicant.write_attribute(:aasm_state, 'verification_pending')
-        applicant.workflow_state_transitions << WorkflowStateTransition.new(
-          from_state: from_state,
-          to_state: 'verification_pending',
-          event: 'move_to_pending!'
-        )
-      rescue StandardError => e
-        Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
+        create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
-    rescue StandardError => e
-      Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
+
+    def create_income_verification(applicant)
+      if family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+        family_member_record = family.family_members.where(id: applicant.family_member_id).first
+        if family_member_record.present?
+          person_record = family_member_record.person
+          if person_record.present?
+            person_record.add_new_verification_type('Income')
+
+            from_state = applicant.aasm_state
+            # TODO: revisit
+            applicant.write_attribute(:aasm_state, 'verification_pending')
+            applicant.workflow_state_transitions << WorkflowStateTransition.new(
+              from_state: from_state,
+              to_state: 'verification_pending',
+              event: 'move_to_pending!'
+            )
+          end
+        end
+      end
+    end
 
     def build_evidences(types, applicant)
       evidences = []
@@ -1584,7 +1583,9 @@ module FinancialAssistance
           evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
         end
       end
-      evidences
+      evidences.compact || []
+    rescue StandardError => e
+      Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
     end
 
     def delete_verification_documents

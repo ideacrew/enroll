@@ -90,6 +90,8 @@ module FinancialAssistance
 
     EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
 
+    EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :aces_mec_evidence].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -295,9 +297,9 @@ module FinancialAssistance
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
     embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
-    embeds_one :aces_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
+    embeds_one :aces_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :aces_evidence
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :aces_mec_evidence
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
@@ -331,6 +333,7 @@ module FinancialAssistance
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
+
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?

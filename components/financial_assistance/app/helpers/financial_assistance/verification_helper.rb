@@ -15,14 +15,20 @@ module FinancialAssistance
     end
 
     def admin_verification_action(admin_action, evidence, update_reason)
+      evidence.update(update_reason: update_reason, updated_by: current_user.id)
+      evidence.verification_histories << create_verification_history(admin_action, update_reason)
       case admin_action
       when "verify"
-        evidence.update!(eligibility_status: 'verified', update_reason: update_reason)
+        evidence.move_to_verified!
         "#{evidence.title} successfully verified."
       when "return_for_deficiency"
-        evidence.update!(eligibility_status: 'outstanding', update_reason: update_reason, rejected: true)
+        evidence.move_to_outstanding!
         "#{evidence.title} rejected."
       end
+    end
+
+    def create_verification_history(admin_action, update_reason)
+      Eligibilities::VerificationHistory.new(action: admin_action, update_reason: update_reason, updated_by: current_user.id)
     end
 
     def admin_actions_on_faa_documents(evidence)

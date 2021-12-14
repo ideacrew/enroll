@@ -7,7 +7,7 @@ module FinancialAssistance
     include VerificationHelper
 
     before_action :fetch_applicant
-    before_action :updateable?, :find_type, only: [:upload, :update_evidence]
+    before_action :updateable?, :find_type, only: [:upload, :update_evidence, :download]
     before_action :set_document, only: [:destroy]
 
     def upload
@@ -52,8 +52,9 @@ module FinancialAssistance
         @docs_owner.save!
 
         if (@evidence.documents - [@document]).empty?
-          @evidence.update_attributes(:eligibility_status => "outstanding", :update_reason => "all documents deleted")
-          update_documents_status(@docs_owner)
+          @evidence.move_to_outstanding!
+          @evidence.update_attributes(:update_reason => "all documents deleted", updated_by: current_user.id)
+          # update_documents_status(@docs_owner)
           flash[:danger] = "All documents were deleted. Action needed"
         else
           flash[:success] = "Document deleted."
@@ -109,7 +110,7 @@ module FinancialAssistance
     def find_type
       fetch_applicant
       find_docs_owner
-      @evidence = @docs_owner.evidences.find(params[:evidence]) if params[:evidence]
+      @evidence = @docs_owner.send(params[:evidence_kind]) if params[:evidence_kind]
     end
 
     def file_path(file)
@@ -123,14 +124,15 @@ module FinancialAssistance
     def update_documents(title, file_uri)
       document = @evidence.documents.build
       success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
-      @evidence.update_attributes(:rejected => false, :eligibility_status => "review", :update_reason => "document uploaded")
+      @evidence.move_to_review!
+      @evidence.update_attributes(:update_reason => "document uploaded", updated_by: current_user.id)
       @doc_errors = document.errors.full_messages unless success
-      update_documents_status(@docs_owner)
+      # update_documents_status(@docs_owner)
       @docs_owner.save!
     end
 
     def get_document(key)
-      documents = @applicant.evidences.flat_map(&:documents)
+      documents = @evidence.documents
 
       documents.detect do |doc|
         next if doc.identifier.blank?

@@ -9,30 +9,30 @@ module FinancialAssistance
     module Applications
       module Verifications
           # Requests FDSH for ESI, NON ESI and IFSV
-        class FdshVerificationRequest
+        class PublishMagiMedicaidApplicationDetermined
 
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
 
           # @param [ Hash ] params Applicant Attributes
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
-          def call(application_id:)
-            application    = yield find_application(application_id)
-            payload_param  = yield construct_payload(application)
-            payload_value  = yield validate_payload(payload_param)
-            payload        = yield publish(payload_value, application_id)
+          def call(application)
+            valid_application  = yield validate_application(application_id)
+            payload_param      = yield construct_payload(valid_application)
+            payload_value      = yield validate_payload(payload_param)
+            payload            = yield publish(payload_value, valid_application.id)
 
             Success(payload)
           end
 
           private
 
-          def find_application(application_id)
-            application = FinancialAssistance::Application.find(application_id)
-
-            Success(application)
-          rescue Mongoid::Errors::DocumentNotFound
-            Failure("Unable to find Application with ID #{application_id}.")
+          def validate_application(application)
+            if application.is_a?(FinancialAssistance::Application)
+              Success(application)
+            else
+              Failure("Invalid Application object #{application}, expected FinancialAssistance::Application")
+            end
           end
 
           def construct_payload(application)

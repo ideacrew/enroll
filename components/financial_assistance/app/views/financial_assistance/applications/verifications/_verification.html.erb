@@ -12,17 +12,12 @@
               <%= applicant.full_name %>
             </div>
             <div class="verification-types col-md-12">
-              <% if applicant.income_evidence.present? && applicant.incomes.present? %>
-                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.income_evidence} %>
-              <% end %>
-              <% if applicant.non_esi_evidence.present? %>
-                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.non_esi_evidence} %>
-              <% end %>
-              <% if applicant.esi_evidence.present? %>
-                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.esi_evidence} %>
-              <% end %>
-              <% if applicant.aces_evidence.present? %>
-                <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: applicant.aces_evidence} %>
+              <% FinancialAssistance::Applicant::EVIDENCES.each do |evidence_kind| %>
+                <% evidence = applicant.send(evidence_kind) %>
+                <% if evidence.present? %>
+                  <% next if evidence.key == :income && applicant.incomes.blank? %>
+                  <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: evidence, evidence_kind: evidence_kind } %>
+                <% end %>
               <% end %>
             </div>
           </div>

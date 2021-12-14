@@ -41,14 +41,16 @@ module Eligibilities
     field :external_service, type: String
     field :updated_by, type: String
 
-    embeds_many :verification_history, class_name: "::Eligibilities::VerificationHistory"
+    embeds_many :verification_histories, class_name: "::Eligibilities::VerificationHistory"
     embeds_many :request_results, class_name: "::Eligibilities::RequestResult"
 
-    embeds_many :documents, as: :documentable do
+    embeds_many :documents, class_name: "::Document", as: :documentable do
       def uploaded
         @target.select(&:identifier)
       end
     end
+
+    accepts_nested_attributes_for :verification_histories, :request_results
 
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
@@ -57,9 +59,9 @@ module Eligibilities
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
     def request_determination
-      application = self.applicant.application
+      application = self.evidencable.application
       payload = construct_payload(application)
-      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
+      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id }).publish
     end
 
     def construct_payload(application)
