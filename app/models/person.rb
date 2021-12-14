@@ -19,7 +19,7 @@ class Person
   include LegacyVersioningRecords
   include CrmGateway::PersonConcern
   include L10nHelper
-
+  include Eligibilities::Visitors::Visitable
 
   # verification history tracking
   include Mongoid::History::Trackable
@@ -395,6 +395,14 @@ class Person
       end
     end
     false
+  end
+
+  def accept(visitor)
+    {
+      first_name: first_name,
+      last_name: last_name,
+      verification_status: consumer_role.accept(visitor)
+    }
   end
 
   def agent_npn

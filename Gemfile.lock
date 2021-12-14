@@ -1114,6 +1114,7 @@ DEPENDENCIES
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
+  globalid
   haml (~> 5.0)
   httparty (~> 0.16)
   i18n (~> 1.5)

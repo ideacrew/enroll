@@ -9,6 +9,7 @@ module Eligibilities
     include AASM
     include ::EventSource::Command
     include Dry::Monads[:result, :do, :try]
+    include GlobalID::Identification
 
     DUE_DATE_STATES = %w[review outstanding].freeze
 
