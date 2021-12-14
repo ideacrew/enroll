@@ -34,6 +34,7 @@ module Operations
             encrypted_ssn: new_payload_hash.dig(:person_demographics, :encrypted_ssn),
             first_name: new_payload_hash.dig(:person_demographics, :first_name),
             last_name: new_payload_hash.dig(:person_demographics, :last_name),
+            dob: new_payload_hash.dig(:person_demographics, :dob),
             addresses: new_payload_hash[:addresses],
             phones: new_payload_hash[:phones]
           }
@@ -41,6 +42,7 @@ module Operations
             encrypted_ssn: old_payload_hash.dig(:person_demographics, :encrypted_ssn),
             first_name: old_payload_hash.dig(:person_demographics, :first_name),
             last_name: old_payload_hash.dig(:person_demographics, :last_name),
+            dob: old_payload_hash.dig(:person_demographics, :dob),
             addresses: old_payload_hash[:addresses],
             phones: old_payload_hash[:phones]
           }
