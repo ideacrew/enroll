@@ -68,14 +68,6 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   let(:partner_contribution_unit) { contribution_model.contribution_units.where(order: 2).first }
   let(:child_contribution_unit) { contribution_model.contribution_units.where(order: 3).first }
 
-  before do
-    Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
-  end
-
-  after do
-    Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
-  end
-
   describe "GET new", dbclean: :after_each do
 
     context "when a user having right permissions signed in" do
