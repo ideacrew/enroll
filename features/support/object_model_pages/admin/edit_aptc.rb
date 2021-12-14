@@ -4,7 +4,7 @@
 class EditAptc
 
   def self.csr_pct_as_integer
-    '[data-aptc-cucumber="csr_pct"]'
+    '[data-cuke="csr_pct"]'
   end
 
   def self.edit_aptc_csr_action
