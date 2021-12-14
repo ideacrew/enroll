@@ -18,13 +18,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop") }
   let(:model_instance) { FactoryBot.build(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id, title: "Married") }
-  before do
-    Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
-  end
-  after do
-    Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
-  end
-
 
   describe "ModelEvent" do
     context "when employee sep request accepted" do

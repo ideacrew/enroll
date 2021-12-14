@@ -1360,6 +1360,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'with valid case for DomesticPartnersChild' do
       before do
         application10.ensure_relationship_with_primary(applicant12, 'domestic_partner')
+        application10.ensure_relationship_with_primary(applicant13, 'parent')
         application10.add_or_update_relationships(applicant12, applicant13, 'parent')
         application10.build_relationship_matrix
       end
@@ -1368,19 +1369,57 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         expect(application10.relationships_complete?).to be_truthy
       end
 
-      it 'should create a relationship i.e., applicant11 is parents_domestic_partner to applicant13' do
+      it 'should create a relationship i.e., applicant11 is child to applicant13' do
         expect(
           application10.relationships.where(applicant_id: applicant11.id, relative_id: applicant13.id).first.kind
-        ).to eq('parents_domestic_partner')
+        ).to eq('child')
       end
 
-      it 'should create a relationship i.e., applicant13 is domestic_partners_child to applicant11' do
+      it 'should create a relationship i.e., applicant13 is parent to applicant11' do
         expect(
           application10.relationships.where(applicant_id: applicant13.id, relative_id: applicant11.id).first.kind
-        ).to eq('domestic_partners_child')
+        ).to eq('parent')
       end
     end
 
+  end
+
+  describe 'fetch_relationship_matrix' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+    end
+
+    let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+    let!(:applicant11) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application10,
+                        family_member_id: BSON::ObjectId.new,
+                        is_primary_applicant: true,
+                        first_name: 'Primary')
+    end
+    let!(:applicant12) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application10,
+                        family_member_id: BSON::ObjectId.new,
+                        first_name: 'Wife')
+    end
+    let!(:applicant13) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application10,
+                        family_member_id: BSON::ObjectId.new,
+                        first_name: 'PrimaryFather')
+    end
+
+    context 'with valid case for FatherOrMotherInLaw/DaughterOrSonInLaw' do
+      before do
+        application10.ensure_relationship_with_primary(applicant12, 'spouse')
+        application10.ensure_relationship_with_primary(applicant13, 'parent')
+      end
+
+      it 'should populate fetch existing relationships' do
+        expect(application10.fetch_relationship_matrix).to eq [["self", "spouse", "child"], ["spouse", "self", nil], ["parent", nil, "self"]]
+      end
+    end
   end
 
   describe 'set_magi_medicaid_eligibility_request_errored' do
