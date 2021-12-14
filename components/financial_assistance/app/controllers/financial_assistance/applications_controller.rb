@@ -236,7 +236,6 @@ module FinancialAssistance
     # if the current user as an HBX Admin. This will also prevent a nil financial assistance identifier
     # in the event of impersonation from an admin not working properly
     def set_financial_assistance_identifier
-      # family_id is passed through the cost_savings tab
       if current_user.try(:has_hbx_staff_role?)
         [FinancialAssistance::Application.where(id: params[:id])&.first&.family_id]
       else
