@@ -24,7 +24,7 @@ cp .docker/config/redis.rb config/initializers/
 cp .docker/config/sidekiq.rb config/initializers/
 
 docker build --build-arg BUNDLER_VERSION_OVERRIDE='2.0.1' \
-             --build-arg NODE_MAJOR='10' \
+             --build-arg NODE_MAJOR='12' \
              --build-arg YARN_VERSION='1.22.4' \
              --build-arg ENROLL_DB_HOST='localhost' \
              --build-arg ENROLL_DB_PORT="27017" \
