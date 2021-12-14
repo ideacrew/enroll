@@ -4,7 +4,6 @@ module Eligibilities::Visitors
   # Use Visitor Development Pattern to access models and determine Non-ESI
   # eligibility status for a Family Financial Assistance Application's Applicants
   class FaaApplicationVisitor < Visitor
-    Klass = Faa::Application
     Evidences = {
       applicants: %i[esi non_esi medicare],
       tax_household: [:income]
@@ -18,10 +17,10 @@ module Eligibilities::Visitors
             # << send(:applicant)
           end
         end
+    end
 
-      def visit(applicant)
-        puts "Evidence: #{subject.resource}, Satisfied? #{subject.is_satisfied}"
-      end
+    def visit(applicant)
+      puts "Evidence: #{subject.resource}, Satisfied? #{subject.is_satisfied}"
     end
   end
 end

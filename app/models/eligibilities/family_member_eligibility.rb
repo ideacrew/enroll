@@ -16,23 +16,20 @@ module Eligibilities
 
       belongs_to :family_member
 
-      Families with family members who are enrolled and have FAA evidences in outstanding status
+      # Families with family members who are enrolled and have FAA evidences in outstanding status
 
-      aptc_csr eligibility
-      for tax_household
-        is income verified?
-      for each family member
-        are they enrolled? (evidence)
-        are they on renewal enrollent?
-        current FAA application
-          applicant with outstanindg verification? (evidence)
-
-       aca_ivl_market eligibility
-          consumer role
-          vlp outstanding verification?
-          immigration outstanding verification
-
-
+      # aptc_csr eligibility
+      # for tax_household
+      #   is income verified?
+      # for each family member
+      #   are they enrolled? (evidence)
+      #   are they on renewal enrollent?
+      #   current FAA application
+      #     applicant with outstanindg verification? (evidence)
+      #  aca_ivl_market eligibility
+      #     consumer role
+      #     vlp outstanding verification?
+      #     immigration outstanding verification
 
       MARKET_ELIGIBILITIES = [
         :aca_ivl_market_enrollment,
@@ -42,49 +39,38 @@ module Eligibilities
         # :childrens_health_insurance_program # provides low-cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private insurance.
       ]
 
-      # ACA IVL Eligibility
-      { family_member: { aca_ivl_enrollment_evidences: [:vlp, :immigration]} }
+      #       # ACA IVL Eligibility
+      #       { family_member: { aca_ivl_enrollment_evidences: [:vlp, :immigration]} }
 
-      { family_member: { aca_ivl_enrollment_evidences: [:active_enrollment, :renewal_enrollment]} }
+      #       { family_member: { aca_ivl_enrollment_evidences: [:active_enrollment, :renewal_enrollment]} }
 
-FAA::Application
-HbxEnrollment
-ConsumerRole
+      # FAA::Application
+      # HbxEnrollment
+      # ConsumerRole
 
-      # ACA IVL FAA Eligibility
-      { tax_household: { aptc_csr_credit_evidences: [:income]} }
-      { family_member: { klass: FAA:Application::Applicant, visitor_operatino: Operations::Eligibilites::Evidences::VisitEsi, aptc_csr_credit_evidences: [:esi, :non_esi,  :aces_mec]} }
+      # # ACA IVL FAA Eligibility
+      # { tax_household: { aptc_csr_credit_evidences: [:income]} }
+      # { family_member: { klass: FAA:Application::Applicant, visitor_operatino: Operations::Eligibilites::Evidences::VisitEsi, aptc_csr_credit_evidences: [:esi, :non_esi,  :aces_mec]} }
 
+      field :key, type: Symbol
+      field :title, type: String
+      field :description, type: String
 
+      field :is_satisfied, type: Boolean, default: false
+      field :has_outstanding_verifications, type: Boolean, default: false
 
-    field :key, type: Symbol
-    field :title, type: String
-    field :description, type: String
-
-    field :is_satisfied, type: Boolean, default: false
-    field :has_outstanding_verifications, type: Boolean, default: false
-
-    # Eligibilty => aca_ivl_market_enrollment_eligible
-    #   RDIP, VLP, SSA
-    #
-    # advance_premium_tax_credit
-
-
-
-
-
-    embeds_many :eligibilities, class_name: 'Eligibilities::Eligibility'
-
-    before_save :update_eligibility_status
-
-
+      # Eligibilty => aca_ivl_market_enrollment_eligible
+      #   RDIP, VLP, SSA
       #
+      # advance_premium_tax_credit
+
+      embeds_many :eligibilities, class_name: 'Eligibilities::Eligibility'
+
+      before_save :update_eligibility_status
+
       field :aca_ivl_enrollment_evidences, type: Hash, default: {}
-
-
       field :aptc_csr_credit_evidences, type: Hash, default: {}
       field :aca_ivl_market_active_enrollments, type: Hash, default: {}
-
       field :aca_shop_market_enrollments, type: Hash, default: {}
 
       has_one :financial_assistance_applicant
