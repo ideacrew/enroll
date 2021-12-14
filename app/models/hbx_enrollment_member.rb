@@ -5,6 +5,7 @@ class HbxEnrollmentMember
   include Insured::GroupSelectionHelper
   include Insured::EmployeeRolesHelper
   include ApplicationHelper
+  include Eligibilities::Visitors::Visitable
 
   embedded_in :hbx_enrollment
 
@@ -38,6 +39,10 @@ class HbxEnrollmentMember
   
   def covered?
     (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
+  end
+
+  def accept(visitor)
+    visitor.visit(self)
   end
 
   def family_member

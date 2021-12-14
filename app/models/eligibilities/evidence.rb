@@ -7,6 +7,7 @@ module Eligibilities
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
+    include GlobalID::Identification
 
     field :key, type: Symbol
     field :title, type: String

@@ -7,6 +7,7 @@ ruby '2.5.1'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
 gem 'ffaker'
+gem 'globalid'
 #######################################################
 # FIXME
 #######################################################
@@ -33,6 +34,7 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
+
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"

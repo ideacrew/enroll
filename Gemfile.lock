@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: e27a91dc0f1248fb37b632ee6e45ac54981b4e8f
+  revision: caabd72eac9b623d258e375ca292a65756b8f354
   branch: trunk
   specs:
     aca_entities (0.9.0)
@@ -1114,6 +1114,7 @@ DEPENDENCIES
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
+  globalid
   haml (~> 5.0)
   httparty (~> 0.16)
   i18n (~> 1.5)

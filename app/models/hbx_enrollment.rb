@@ -12,6 +12,7 @@ class HbxEnrollment
   include Mongoid::History::Trackable
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
+  include Eligibilities::Visitors::Visitable
 
   belongs_to :household
   # Override attribute accessor as well
@@ -490,6 +491,14 @@ class HbxEnrollment
       new_is_subscriber_true = hbx_enrollment_members.min_by { |hbx_member| hbx_member.person.dob }
       new_is_subscriber_true.is_subscriber = true
     end
+  end
+
+  def accept(visitor)
+    self.attributes.slice(:kind, :enrollment_kind, :coverage_kind).merge(
+      {
+       members: hbx_enrollment_members.collect{|member| member.accept(visitor)}
+      }
+    )
   end
 
   def generate_hbx_signature
