@@ -76,7 +76,8 @@ module FinancialAssistance
                       else
                         @application.applicants.build
                       end
-          applicant.assign_attributes(values.to_h)
+
+          applicant.assign_attributes(values.to_h.except(:relationship))
           applicant.callback_update = true
 
           if applicant.save
