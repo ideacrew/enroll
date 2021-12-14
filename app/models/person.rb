@@ -509,7 +509,7 @@ class Person
   end
 
   def current_and_past_financial_assistance_identifiers
-    families.map(&:id.to_s)
+    families.map(&:id).map(&:to_s)
   end
 
   def full_name

@@ -18,7 +18,7 @@ module FinancialAssistance
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
     def index
-      @applications = ::FinancialAssistance::Application.where(:family_id.in => set_financial_assistance_identifier)
+      @applications = ::FinancialAssistance::Application.where(:family_id.in => get_current_person.current_and_past_financial_assistance_identifiers)
     end
 
     def new
@@ -104,7 +104,7 @@ module FinancialAssistance
     end
 
     def uqhp_flow
-      ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: set_financial_assistance_identifier).destroy_all
+      ::FinancialAssistance::Application.where(aasm_state: "draft", :family_id.in => set_financial_assistance_identifier).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
 
@@ -149,7 +149,7 @@ module FinancialAssistance
         return
       end
 
-      @application = FinancialAssistance::Application.where(id: params['id'], family_id: set_financial_assistance_identifier).first
+      @application = FinancialAssistance::Application.where(id: params['id'], :family_id.in => set_financial_assistance_identifier).first
 
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
@@ -236,6 +236,7 @@ module FinancialAssistance
     # if the current user as an HBX Admin. This will also prevent a nil financial assistance identifier
     # in the event of impersonation from an admin not working properly
     def set_financial_assistance_identifier
+      # family_id is passed through the cost_savings tab
       if current_user.try(:has_hbx_staff_role?)
         [FinancialAssistance::Application.where(id: params[:id])&.first&.family_id]
       else

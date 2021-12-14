@@ -154,7 +154,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET Index" do
     it "should assign applications", dbclean: :after_each do
       get :index
-      applications = FinancialAssistance::Application.where(family_id: family_id)
+      applications = FinancialAssistance::Application.where(:family_id.in => [family_id])
       expect(assigns(:applications)).to eq applications
     end
   end
