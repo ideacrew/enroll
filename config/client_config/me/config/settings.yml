@@ -93,7 +93,7 @@ contact_center:
   non_discrimination_email: "info@coverme.gov"
 
   appeals: "info@coverme.gov"
-  
+
   # Voting Info for FA Engine Steps
   # TOOD: This needs to be updated. These are pulled of Maine government website.
   # # https://www.maine.gov/sos/cec/elec/voter-info/index.html
@@ -187,7 +187,7 @@ aca:
     with_in_sixty_days: 60
   #
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 18
     verification_outstanding_window:
       days: 0
     verification_due:
