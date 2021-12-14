@@ -77,7 +77,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -105,9 +105,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -131,7 +131,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -165,9 +165,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: |
@@ -194,7 +194,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -226,9 +226,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -277,7 +277,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -306,9 +306,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -351,7 +351,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -380,9 +380,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
