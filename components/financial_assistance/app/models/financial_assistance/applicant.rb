@@ -9,7 +9,8 @@ module FinancialAssistance
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
-    include ::Eligibilities::Eligible
+    include Eligibilities::Eligible
+    include Eligibilities::Visitors::Visitable
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -339,11 +340,9 @@ module FinancialAssistance
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
 
-    # Use Visitor pattern to access eligibility evidences
     def accept(visitor)
-      evidences.each { |evidence| evidence.accept(visitor) }
+      visitor.visit(self)
     end
-
 
     def csr_percent_as_integer=(new_csr_percent)
       super

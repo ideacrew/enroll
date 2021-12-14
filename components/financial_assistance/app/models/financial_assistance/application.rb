@@ -8,6 +8,7 @@ module FinancialAssistance
     include AASM
     include Acapi::Notifiers
     require 'securerandom'
+    include Eligibilities::Visitors::Visitable
 
     # belongs_to :family, class_name: "Family"
 
@@ -405,6 +406,10 @@ module FinancialAssistance
           }
         )
       end
+    end
+
+    def accept(visitor)
+      applicants.collect{|applicant| applicant.accept(visitor) }
     end
 
     # Related to Relationship Matrix
