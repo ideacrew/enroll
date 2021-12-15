@@ -9,7 +9,6 @@ module FinancialAssistance
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
-    include Eligibilities::Eligible
     include Eligibilities::Visitors::Visitable
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants

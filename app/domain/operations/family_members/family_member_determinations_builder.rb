@@ -46,7 +46,7 @@ module Operations
                 evidence_ref: 'gid://enroll_app/FinancialAssitance::Application'
               },
               {
-                key: :aces_evidence,
+                key: :aces_mec_evidence,
                 subject_ref: 'gid://enroll_app/Family::FamilyMember',
                 evidence_ref: 'gid://enroll_app/FinancialAssitance::Application'
               }

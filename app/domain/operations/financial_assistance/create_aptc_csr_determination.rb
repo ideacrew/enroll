@@ -75,8 +75,7 @@ module Operations
       end
 
       def validate_determination(determination)
-        binding.irb
-        result = AcaEntities::Eligibilities::Contracts::DeterminationContract.new.call(determinations: determination)
+        AcaEntities::Eligibilities::Contracts::DeterminationContract.new.call(determinations: determination)
       end
 
       def create

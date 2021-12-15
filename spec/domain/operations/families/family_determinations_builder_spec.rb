@@ -114,7 +114,6 @@ RSpec.describe ::Operations::Families::FamilyDeterminationsBuilder,
   it 'should create aptc csr determination' do
     result = subject.call(family: family)
     expect(result.success?).to be_truthy
-    binding.irb
     result.success[:subjects].each do |identifier, value|
       expect(identifier).to be_a URI
       expect(value[:determinations]).to be_present

@@ -67,5 +67,21 @@ FactoryBot.define do
     trait :with_home_address do
       addresses { [FactoryBot.build(:financial_assistance_address)]}
     end
+
+    trait :with_income_evidence do
+      income_evidence { FactoryBot.build(:evidence, key: :income) }
+    end
+
+    trait :with_esi_evidence do
+      esi_evidence { FactoryBot.build(:evidence, key: :esi) }
+    end
+
+    trait :with_non_esi_evidence do
+      non_esi_evidence { FactoryBot.build(:evidence, key: :non_esi) }
+    end
+
+    trait :with_aces_evidence do
+      aces_mec_evidence { FactoryBot.build(:evidence, key: :aces) }
+    end
   end
 end
