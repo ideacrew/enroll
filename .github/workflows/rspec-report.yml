@@ -164,13 +164,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: ci/rspec/compressed-reports
-      - run: npm run rspec:move-reports
-      - run: npm run rspec:concat-reports
-      - uses: actions/upload-artifact@v2
+      - uses: markgoho/analyze-rspec-report@trunk
         with:
-          name: concatenated-rspec-reports
-          path: ci/rspec/local-rspec-report.json
-      - run: npm run rspec:split-config
+          individual-reports-folder: 'ci/rspec/compressed-reports'
+          output-report: 'rspec-split-config.json'
       # - run: npm run benefit-sponsors:split-config
       # - uses: actions/upload-artifact@v2
       #   with:
