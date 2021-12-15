@@ -227,7 +227,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           end
 
           it 'should return the difference between premium and aptc amount of the member from individual member aptc hash' do
-            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq(@upcd_2.premium_for(hbx_enrollment_member1) - @upcd_2.aptc_amount(hbx_enrollment_member1))
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq 0.0
           end
         end
 

@@ -97,7 +97,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def employee_cost_for(member)
     cost = (premium_for(member) - aptc_amount(member)).round(2)
-    return cost if large_family_factor(member) == 0
+    return cost if large_family_factor(member) == 0 && cost <= 0
 
     cost = 0.00 if cost < 0
     (cost * large_family_factor(member)).round(2)

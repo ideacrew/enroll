@@ -77,7 +77,7 @@ module Ssn
     end
 
     def decrypt_ssn(val)
-      SymmetricEncryption.decrypt(val)
+      # SymmetricEncryption.decrypt(val)
     end
 
     def find_by_ssn(ssn)
