@@ -168,6 +168,7 @@ jobs:
         with:
           individual-reports-folder: 'ci/rspec/compressed-reports'
           output-report: 'rspec-split-config.json'
+      - run: npm run rspec:move-reports
       - run: npm run benefit-sponsors:split-config
       # - uses: actions/upload-artifact@v2
       #   with:
