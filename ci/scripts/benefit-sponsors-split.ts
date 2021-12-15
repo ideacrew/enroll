@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import {
   createSplitConfig,
   FileWithRuntime,
+  runtimeDetails,
   SplitConfig,
 } from 'split-config-generator';
 
@@ -44,11 +45,13 @@ async function createBenefitSponsorsSplitConfig(): Promise<void> {
     return fileWithRuntime;
   });
 
-  console.log('Creating split config');
   const splitConfig: SplitConfig = createSplitConfig(
     shortenedPaths,
     groupCount
   );
+
+  const details = runtimeDetails(arrayOfSlowFiles);
+  console.log(details);
 
   try {
     await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));

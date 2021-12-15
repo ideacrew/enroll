@@ -4,94 +4,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  rspec-report:
-    strategy:
-      matrix:
-        folder: [
-            # 'client_config',
-            'components',
-            'concerns',
-            # 'controllers',
-            # 'data_migrations',
-            # 'domain',
-            # 'helpers',
-            'interactors',
-            'invoices',
-            # 'lib',
-            'mailers',
-            # 'migrations',
-            # 'models',
-            # 'notices',
-            # 'policies',
-            'reflexes',
-            # 'requests',
-            'reports',
-            'routing',
-            'script',
-            # 'test_data',
-            # 'views',
-            'workers',
-          ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - name: Restore project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-      - name: Restore Node Modules
-        id: npm-cache
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
-      - name: Install node dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      - name: Run tests
-        run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.folder }}
-          path: ci/rspec/${{ matrix.folder }}-rspec-report.json
-  # rspec-engines-report:
+  # rspec-report:
   #   strategy:
   #     matrix:
-  #       folder:
-  #         [
-  #           'benefit_markets',
-  #           'benefit_sponsors',
-  #           'notifier',
-  #           'sponsored_benefits',
-  #           'transport_gateway',
-  #           'transport_profiles',
+  #       folder: [
+  #           # 'client_config',
+  #           'components',
+  #           'concerns',
+  #           # 'controllers',
+  #           # 'data_migrations',
+  #           # 'domain',
+  #           # 'helpers',
+  #           'interactors',
+  #           'invoices',
+  #           # 'lib',
+  #           'mailers',
+  #           # 'migrations',
+  #           # 'models',
+  #           # 'notices',
+  #           # 'policies',
+  #           'reflexes',
+  #           # 'requests',
+  #           'reports',
+  #           'routing',
+  #           'script',
+  #           # 'test_data',
+  #           # 'views',
+  #           'workers',
   #         ]
   #   runs-on: ubuntu-latest
   #   steps:
@@ -100,6 +39,9 @@ jobs:
   #     - uses: actions/setup-node@v2
   #       with:
   #         node-version: '12'
+  #     - uses: wbari/start-mongoDB@v0.2
+  #       with:
+  #         mongoDBVersion: '4.2'
   #     - uses: getong/rabbitmq-action@v1.2
   #       with:
   #         rabbitmq version: '3.8.2-management-alpine'
@@ -107,9 +49,6 @@ jobs:
   #         rabbitmq user: 'guest'
   #         rabbitmq password: 'guest'
   #         rabbitmq vhost: '/'
-  #     - uses: wbari/start-mongoDB@v0.2
-  #       with:
-  #         mongoDBVersion: '4.2'
   #     - name: Restore project gems
   #       uses: actions/cache@v2
   #       with:
@@ -136,14 +75,75 @@ jobs:
   #     - name: run webpack
   #       run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
   #     - name: Run tests
-  #       run: bundle exec rspec components/${{ matrix.folder }} --format json --out ci/rspec/components-${{matrix.folder}}-rspec-report.json
+  #       run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
   #     - name: Upload build artifact
   #       uses: actions/upload-artifact@v2
   #       with:
-  #         name: components-${{ matrix.folder }}
-  #         path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
+  #         name: ${{ matrix.folder }}
+  #         path: ci/rspec/${{ matrix.folder }}-rspec-report.json
+  rspec-engines-report:
+    strategy:
+      matrix:
+        folder:
+          [
+            'benefit_markets',
+            'benefit_sponsors',
+            'notifier',
+            'sponsored_benefits',
+            'transport_gateway',
+            'transport_profiles',
+          ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 5672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '4.2'
+      - name: Restore project gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: run webpack
+        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: Run tests
+        run: bundle exec rspec components/${{ matrix.folder }} --format json --out ci/rspec/components-${{matrix.folder}}-rspec-report.json
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: components-${{ matrix.folder }}
+          path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
   split-config:
-    needs: [rspec-report]
+    needs: [rspec-engines-report]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -168,7 +168,7 @@ jobs:
         with:
           individual-reports-folder: 'ci/rspec/compressed-reports'
           output-report: 'rspec-split-config.json'
-      # - run: npm run benefit-sponsors:split-config
+      - run: npm run benefit-sponsors:split-config
       # - uses: actions/upload-artifact@v2
       #   with:
       #     name: rspec-split-config
