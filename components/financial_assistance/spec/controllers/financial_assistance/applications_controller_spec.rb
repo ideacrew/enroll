@@ -12,6 +12,20 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
+  describe "HBX admin" do
+    context "inferring FA app's family_id" do
+      before do
+        sign_in(user)
+        allow(user).to receive(:try).with(:has_hbx_staff_role?).and_return(true)
+      end
+      it "should set properly even when logged in as admin" do
+        application = FinancialAssistance::Application.create!(family_id: family_id)
+        get :index
+        expect(assigns(:applications).to_a).to eq([application])
+      end
+    end
+  end
+
   describe "GET index" do
 
     before(:each) do
@@ -140,7 +154,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET Index" do
     it "should assign applications", dbclean: :after_each do
       get :index
-      applications = FinancialAssistance::Application.where(family_id: family_id)
+      applications = FinancialAssistance::Application.where(:family_id.in => [family_id])
       expect(assigns(:applications)).to eq applications
     end
   end
