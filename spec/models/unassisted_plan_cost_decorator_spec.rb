@@ -205,7 +205,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       end
 
       context 'employee_cost_for member' do
-        context 'when preimum for member is zero and large family factor is zero' do
+        context 'when premium for member is zero and large family factor is zero' do
           before :each do
             @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
             allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(0.0)
@@ -218,7 +218,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           end
         end
 
-        context 'when preimum for member is not zero and large family factor is zero' do
+        context 'when premium for member is not zero and large family factor is zero' do
           before :each do
             @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
             allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(100.0)
@@ -231,7 +231,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           end
         end
 
-        context 'when preimum for member is not zero and large family factor is 1.0' do
+        context 'when premium for member is not zero and large family factor is 1.0' do
           before :each do
             @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
             allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(100.0)
@@ -244,7 +244,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           end
         end
 
-        context 'when preimum for member is zero and large family factor is 1.0' do
+        context 'when premium for member is zero and large family factor is 1.0' do
           before :each do
             @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
             allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(0.0)
