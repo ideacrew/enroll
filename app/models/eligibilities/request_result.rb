@@ -11,8 +11,8 @@ module Eligibilities
     field :result, type: String
     field :source, type: String
     field :source_transaction_id, type: String
-    field :error_code, type: String
-    field :error_code_description, type: Date
+    field :code, type: String
+    field :code_description, type: Date
     field :raw_payload, type: String
   end
 end

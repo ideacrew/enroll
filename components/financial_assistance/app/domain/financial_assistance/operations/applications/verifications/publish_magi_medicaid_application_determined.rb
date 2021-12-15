@@ -17,7 +17,7 @@ module FinancialAssistance
           # @param [ Hash ] params Applicant Attributes
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
           def call(application)
-            valid_application  = yield validate_application(application_id)
+            valid_application  = yield validate_application(application)
             payload_param      = yield construct_payload(valid_application)
             payload_value      = yield validate_payload(payload_param)
             payload            = yield publish(payload_value, valid_application.id)

@@ -115,18 +115,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
 
   context 'success' do
     it 'should return success' do
-      expect(applicant.evidences.count).to eq 0
+      expect(applicant.income_evidence.present?).to be_falsey
+      expect(applicant.non_esi_evidence.present?).to be_falsey
       result = subject.call(families: [family])
       expect(result).to be_success
-      expect(applicant.reload.evidences.count).to eq 2
+      expect(applicant.reload.income_evidence.present?).to be_truthy
+      expect(applicant.reload.non_esi_evidence.present?).to be_truthy
     end
   end
 
   it "when evidences are not created due to applicant ineligible" do
     applicant.update(is_applying_coverage: false, is_ia_eligible: false)
-    expect(applicant.evidences.count).to eq 0
+    expect(applicant.income_evidence.present?).to be_falsey
+    expect(applicant.non_esi_evidence.present?).to be_falsey
     result = subject.call(families: [family])
     expect(result).to be_success
-    expect(applicant.reload.evidences.count).to eq 0
+    expect(applicant.reload.income_evidence.present?).to be_falsey
+    expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end
 end

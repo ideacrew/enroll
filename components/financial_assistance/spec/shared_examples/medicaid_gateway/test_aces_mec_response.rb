@@ -183,20 +183,20 @@ RSpec.shared_context 'ACES MEC Check sample response', :shared_context => :metad
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :evidences => [
-            {:key => :aces_mec,
-             :title => "ACES MEC",
-             :description => nil,
-             :eligibility_status => "verified",
-             :due_on => nil,
-             :updated_by => nil,
-             :eligibility_results => [{
-               :result => :eligible,
-               :source => "MEDC",
-               :code => "7313",
-               :code_description => "Applicant Not Found"
-             }]}
-],
+          :aces_mec_evidence => {
+            :key => :aces_mec,
+            :title => "ACES MEC",
+            :description => nil,
+            :aasm_state => "verified",
+            :due_on => nil,
+            :updated_by => nil,
+            :request_results => [{
+              :result => "eligible",
+              :source => "MEDC",
+              :code => "7313",
+              :code_description => "Applicant Not Found"
+            }]
+          },
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
         }

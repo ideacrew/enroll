@@ -12,12 +12,12 @@ module FinancialAssistance
     def update_evidence
       update_reason = params[:verification_reason]
       admin_action = params[:admin_action]
-      reasons_list = FinancialAssistance::Document::VERIFICATION_REASONS + FinancialAssistance::Document::REJECT_REASONS
+      reasons_list = FinancialAssistance::Evidence::VERIFY_REASONS + FinancialAssistance::Evidence::REJECT_REASONS
       if reasons_list.include?(update_reason)
         verification_result = admin_verification_action(admin_action, @evidence, update_reason)
         message = (verification_result.is_a? String) ? verification_result : "Verification successfully approved."
         flash[:success] = message
-        update_documents_status(@applicant) if @applicant
+        # update_documents_status(@applicant) if @applicant
       else
         flash[:error] = "Please provide a verification reason."
       end
@@ -27,7 +27,14 @@ module FinancialAssistance
 
     def fdsh_hub_request
       result = @evidence.request_determination
-      key, message = result.success? ? [:success, "request submited successfully"] : [:error, "unable to submited requuest"]
+      if result
+        add_verification_history(params[:admin_action], "Requested Hub for verification")
+        key = :success
+        message = "request submited successfully"
+      else
+        key = :error
+        message = "unable to submited request"
+      end
 
       respond_to do |format|
         format.html do
@@ -39,23 +46,28 @@ module FinancialAssistance
     end
 
     def extend_due_date
-      # @family_member = FamilyMember.find(params[:family_member_id])
-      # enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
-      # if enrollment.present?
-      #   new_date = @verification_type.verif_due_date + 30.days
-      #   updated = @verification_type.update_attributes(:due_date => new_date)
-      #   if updated
-      #     flash[:success] = "#{@verification_type.type_name} verification due date was extended for 30 days."
-      #     set_min_due_date_on_family
-      #     add_type_history_element
-      #   end
-      # else
-      #   flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
-      # end
+      @family_member = FamilyMember.find(@evidence.evidencable.family_member_id)
+      enrollment = @family_member.family.enrollments.enrolled.first
+      if enrollment.present? && @evidence.type_unverified?
+        new_date = @evidence.verif_due_date + 30.days
+        updated = @evidence.update(:due_on => new_date)
+        if updated
+          flash[:success] = "#{@evidence.title} verification due date was extended for 30 days."
+          add_verification_history(params[:admin_action], "Extended due date for 30 days")
+        end
+      else
+        flash[:danger] = "Applicant doesn't have active Enrollment to extend verification due date."
+      end
       redirect_back(fallback_location: main_app.verification_insured_families_path)
     end
 
     private
+
+    def add_verification_history(action, update_reason)
+      history = Eligibilities::VerificationHistory.new(action: action, update_reason: update_reason, updated_by: current_user.id)
+      @evidence.verification_histories << history
+      @evidence.save!
+    end
 
     def updateable?
       authorize ::Family, :updateable?
@@ -68,7 +80,7 @@ module FinancialAssistance
     def find_type
       fetch_applicant
       find_docs_owner
-      @evidence = @docs_owner.evidences.find(params[:evidence]) if params[:evidence]
+      @evidence = @docs_owner.send(params[:evidence_kind]) if params[:evidence_kind]
     end
 
     def update_documents_status(applicant)

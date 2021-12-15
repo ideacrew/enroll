@@ -5,7 +5,7 @@ module Events
     module Evidences
       # This class will register event
       class IfsvDeterminationRequested < EventSource::Event
-        publisher_path 'publishers.fti.evidences.ifsv_determination_requested'
+        publisher_path 'publishers.fti.evidence_publisher'
 
       end
     end

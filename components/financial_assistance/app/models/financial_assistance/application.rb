@@ -1513,7 +1513,6 @@ module FinancialAssistance
         end
       end
 
-
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
@@ -1535,58 +1534,55 @@ module FinancialAssistance
 
       types = []
       types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-      types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
-      types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+      types << [:esi, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      types << [:non_esi, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
       active_applicants.each do |applicant|
-        applicant.evidences << build_evidences(types, applicant)
-        applicant.save if applicant.evidences
+        build_all_evidences(types, applicant)
         create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
     end
 
     def create_income_verification(applicant)
-      if family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-        family_member_record = family.family_members.where(id: applicant.family_member_id).first
-        if family_member_record.present?
-          person_record = family_member_record.person
-          if person_record.present?
-            person_record.add_new_verification_type('Income')
+      return unless family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
 
-            from_state = applicant.aasm_state
-            # TODO: revisit
-            applicant.write_attribute(:aasm_state, 'verification_pending')
-            applicant.workflow_state_transitions << WorkflowStateTransition.new(
-              from_state: from_state,
-              to_state: 'verification_pending',
-              event: 'move_to_pending!'
-            )
-          end
-        end
-      end
+      family_member_record = family.family_members.where(id: applicant.family_member_id).first
+      return unless family_member_record.present?
+
+      person_record = family_member_record.person
+      return unless person_record.present?
+
+      person_record.add_new_verification_type('Income')
+
+      from_state = applicant.aasm_state
+      # TODO: revisit
+      applicant.write_attribute(:aasm_state, 'verification_pending')
+      applicant.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: from_state,
+        to_state: 'verification_pending',
+        event: 'move_to_pending!'
+      )
     end
 
-    def build_evidences(types, applicant)
-      evidences = []
-      types.each do |type_array|
-        key = type_array[0]
-        title = type_array[1]
-        next if applicant.evidences.by_name(key).present?
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def build_all_evidences(types, applicant)
+      types.each do |type|
+        key, title = type
         case key
-        when :aces_mec, :esi_mec, :non_esi_mec
+        when :aces_mec, :esi, :non_esi
           next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-          evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
+          applicant.send("build_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
         when :income
           next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
-          status = applicant.incomes.blank? ? "attested" : "outstanding"
-          evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
+          applicant.build_income_evidence(key: key, title: title) if applicant.income_evidence.blank?
+          applicant.income_evidence.move_to_pending! if  applicant.incomes.present?
         end
+      rescue StandardError => e
+        Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
       end
-      evidences.compact || []
-    rescue StandardError => e
-      Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def delete_verification_documents
       active_applicants.each do |applicant|

@@ -47,10 +47,10 @@ module FinancialAssistance
           end
 
           def update_applicant_verifications(applicant, response_applicant_entity)
-            response_evidence = response_applicant_entity.evidences.detect{|evi| evi.key == :aces_mec}
-            applicant_evidence = applicant.evidences.by_name(:aces_mec).first
-            applicant_evidence.update_attributes(eligibility_status: response_evidence.eligibility_status)
-            applicant_evidence.eligibility_results << FinancialAssistance::EligibilityResult.new(response_evidence.eligibility_results.first.to_h) if response_evidence.eligibility_results.present?
+            response_evidence = response_applicant_entity.aces_mec_evidence
+            applicant_evidence = applicant.aces_mec_evidence
+            applicant_evidence.update_attributes(aasm_state: response_evidence.aasm_state)
+            applicant_evidence.request_results << Eligibilities::RequestResult.new(response_evidence.request_results.first.to_h) if response_evidence.request_results.present?
             applicant.save!
             Success(applicant)
           end

@@ -5,7 +5,7 @@ module Events
     module Evidences
       # This class will register event
       class EsiDeterminationRequested < EventSource::Event
-        publisher_path 'publishers.fdsh.evidences.esi_determination_requested'
+        publisher_path 'publishers.fdsh.evidence_publisher'
 
       end
     end

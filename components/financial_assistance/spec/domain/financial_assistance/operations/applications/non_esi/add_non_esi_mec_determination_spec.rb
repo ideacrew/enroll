@@ -29,7 +29,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Add
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC")
+        @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC")
+        @applicant.save!
         @result = subject.call(payload: response_payload)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -42,8 +43,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Add
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:non_esi_mec).first.eligibility_status).to eq "outstanding"
-        expect(@applicant.evidences.by_name(:non_esi_mec).first.eligibility_results.present?).to eq true
+        expect(@applicant.non_esi_evidence.aasm_state).to eq "outstanding"
+        expect(@applicant.non_esi_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end

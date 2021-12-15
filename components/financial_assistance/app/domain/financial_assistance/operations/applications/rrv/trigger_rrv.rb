@@ -35,32 +35,30 @@ module FinancialAssistance
 
           # rubocop:disable Metrics/CyclomaticComplexity
           def build_evidences(types, applicant, application)
-            evidences =  types.collect do |type|
+            types.each do |type|
               key, title = type
-
-              next if applicant.evidences.by_name(key).present?
               case key
-              when :non_esi_mec
+              when :non_esi
                 next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-                FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
+                applicant.send("build_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
               when :income
                 next unless application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
-                status = applicant.incomes.blank? ? "attested" : "outstanding"
-                FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
+                applicant.build_income_evidence(key: key, title: title) if applicant.income_evidence.blank?
+                applicant.income_evidence.move_to_pending! if  applicant.incomes.present?
               end
+            rescue StandardError => e
+              Rails.logger.error("unable to create #{key} evidence for applicant #{applicant.id} due to #{e.inspect}")
             end
-
-            evidences.compact || []
           end
-           # rubocop:enable Metrics/CyclomaticComplexity
+          # rubocop:enable Metrics/CyclomaticComplexity
 
           def create_evidences(application)
             types = []
-            types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+            types << [:non_esi, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
             types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
 
             application.active_applicants.each do |applicant|
-              applicant.evidences << build_evidences(types, applicant, application)
+              build_evidences(types, applicant, application)
               applicant.save!
             end
           end

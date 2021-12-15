@@ -42,7 +42,7 @@ module FinancialAssistance
 
               application.eligibility_determinations.each do |ed|
                 ed.applicants.each do |applicant|
-                  next if applicant.evidences.blank?
+                  next unless applicant.income_evidence.present?
                   update_applicant_evidence(applicant, status)
                 end
               end
@@ -50,9 +50,16 @@ module FinancialAssistance
             end
 
             def update_applicant_evidence(applicant, status)
-              applicant_ifsv_evidence = applicant.evidences.by_name(:income).first
-              applicant_ifsv_evidence.update_attributes(eligibility_status: status)
-              applicant.save!
+              evidence = applicant.income_evidence
+
+              case status
+              when "verified"
+                evidence.move_to_verified!
+                applicant_non_esi_evidence.update!(is_satisfied: true)
+              when "outstanding"
+                evidence.move_to_outstanding!
+                applicant_non_esi_evidence.update!(verification_outstanding: true)
+              end
 
               Success(applicant)
             end

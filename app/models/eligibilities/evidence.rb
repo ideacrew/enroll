@@ -8,6 +8,7 @@ module Eligibilities
     include Mongoid::Timestamps
     include AASM
     include ::EventSource::Command
+    include Dry::Monads[:result, :do, :try]
 
     DUE_DATE_STATES = %w[review outstanding].freeze
 
@@ -17,10 +18,10 @@ module Eligibilities
     REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "Too old"].freeze
 
     FDSH_EVENTS = {
-      :non_esi_mec => 'fdsh.evidences.esi_determination_requested',
-      :esi_mec => 'fdsh.evidences.non_esi_determination_requested',
-      :income => 'fti.evidences.ifsv_determination_requested',
-      :aces_mec => "iap.mec_check.mec_check_requested"
+      :esi_mec => 'events.fdsh.evidences.esi_determination_requested',
+      :non_esi_mec => 'events.fdsh.evidences.non_esi_determination_requested',
+      :income => 'events.fti.evidences.ifsv_determination_requested',
+      :aces_mec => "events.iap.mec_check.mec_check_requested"
     }.freeze
 
     # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
@@ -35,7 +36,7 @@ module Eligibilities
     field :is_satisfied, type: Boolean, default: false
     field :verification_outstanding, type: Boolean, default: false
 
-    field :aasm_state, type: Symbol
+    field :aasm_state, type: String
     field :update_reason, type: String
     field :due_on, type: Date
     field :external_service, type: String
@@ -61,7 +62,8 @@ module Eligibilities
     def request_determination
       application = self.evidencable.application
       payload = construct_payload(application)
-      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id }).publish
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
+      request_event.success? ? request_event.value!.publish : false
     end
 
     def construct_payload(application)

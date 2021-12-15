@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::FdshVerificationRequest, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
@@ -98,7 +98,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::F
   context 'success' do
     context 'with valid application' do
       before do
-        @result = subject.call({application_id: application.id})
+        @result = subject.call(application)
       end
 
       it 'should return success' do
@@ -115,11 +115,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::F
   context 'failure' do
     context 'invalid application id' do
       before do
-        @result = subject.call({application_id: 'application_id'})
+        @result = subject.call('application_id')
       end
 
       it 'should return a failure with error message' do
-        expect(@result.failure).to eq('Unable to find Application with ID application_id.')
+        expect("Invalid Application object application_id, expected FinancialAssistance::Application")
       end
     end
   end

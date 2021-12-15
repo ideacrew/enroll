@@ -20,9 +20,11 @@ module FinancialAssistance
       case admin_action
       when "verify"
         evidence.move_to_verified!
+        evidence.update!(is_satisfied: true, verification_outstanding: false)
         "#{evidence.title} successfully verified."
       when "return_for_deficiency"
         evidence.move_to_outstanding!
+        evidence.update!(is_satisfied: false, verification_outstanding: true)
         "#{evidence.title} rejected."
       end
     end
