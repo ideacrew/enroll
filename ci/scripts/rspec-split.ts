@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import {
   createSplitConfig,
   FileWithRuntime,
+  runtimeDetails,
   SplitConfig,
 } from 'split-config-generator';
 
@@ -35,6 +36,9 @@ async function createRspecSplitConfig(): Promise<void> {
     arrayOfSlowFiles,
     groupCount
   );
+
+  const details = runtimeDetails(arrayOfSlowFiles);
+  console.log(details);
 
   try {
     await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
