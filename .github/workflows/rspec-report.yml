@@ -147,34 +147,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-      - name: Restore Node Modules
-        uses: actions/cache@v2
-        id: npm-cache
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
-      - name: Install node dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: yarn install
       - uses: actions/download-artifact@v2
         with:
           path: ci/rspec/compressed-reports
       - uses: markgoho/analyze-rspec-report@trunk
         with:
           individual-reports-folder: 'ci/rspec/compressed-reports'
-          output-report: 'rspec-split-config.json'
-      - run: npm run rspec:move-reports
-      - run: npm run benefit-sponsors:split-config
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: rspec-split-config
-      #     path: ci/rspec-split-config.json
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: benefit_sponsors-split-config
-      #     path: ci/benefit_sponsors-split-config.json
+      - uses: markgoho/analyze-rspec-report@trunk
+        with:
+          single-report-path: 'ci/rspec/compressed-reports/components-benefit_sponsors/components-benefit_sponsors-rspec-report.json'
+          output-report: 'benefit_sponsors-split-config.json'
+          upload-name: 'benefit-sponsors-split'
