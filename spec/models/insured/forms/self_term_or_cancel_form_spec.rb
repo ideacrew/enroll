@@ -219,7 +219,7 @@ module Insured
       end
 
       it "should terminate an enrollment if it is already effective" do
-        attrs = {enrollment_id: enrollment_to_term.id, term_date: (TimeKeeper.date_of_record + 1.month).to_s}
+        attrs = {enrollment_id: enrollment_to_term.id, term_date: (TimeKeeper.date_of_record + 1.month + 16.days).to_s}
         Insured::Forms::SelfTermOrCancelForm.for_post(attrs)
         enrollment_to_term.reload
         expect(enrollment_to_term.aasm_state).to eq 'coverage_terminated'
