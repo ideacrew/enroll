@@ -86,7 +86,7 @@ jobs:
       - name: Scan Docker image
         uses: anchore/scan-action@main
         with:
-          image: 'public.ecr.aws/ideacrew/enroll:test-${{ github.sha }}'
+          image: '${{ steps.login-ecr.outputs.registry }}/rails_app:test-${{ github.sha }}'
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
