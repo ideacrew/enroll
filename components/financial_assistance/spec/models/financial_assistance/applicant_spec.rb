@@ -446,7 +446,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                                       has_unemployment_income: false,
                                       is_pregnant: false,
                                       no_ssn: 0,
-                                      ssn: 123456789,
+                                      ssn: 'g',
                                       is_post_partum_period: false})
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
