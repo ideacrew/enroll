@@ -9,7 +9,7 @@ module Eligibilities
 
     embedded_in :family_eligibility
     embeds_many :family_member_eligibilities
-
+    # Family member eligibility
     class FamilyMemberEligibility
       include Mongoid::Document
       include Mongoid::Timestamps
@@ -34,10 +34,10 @@ module Eligibilities
       MARKET_ELIGIBILITIES = [
         :aca_ivl_market_enrollment,
         :aca_shop_market_enrollment,
-        :dc_coverall_enrollment,
+        :dc_coverall_enrollment
         # :modified_adjusted_gross_income_medicaid, # comprehensive health insurance available to low-income children and adults
         # :childrens_health_insurance_program # provides low-cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private insurance.
-      ]
+      ].freeze
 
       #       # ACA IVL Eligibility
       #       { family_member: { aca_ivl_enrollment_evidences: [:vlp, :immigration]} }
@@ -81,11 +81,11 @@ module Eligibilities
     ACA_IVL_MARKET_CREDITS = [
       :advance_premium_tax_credit, # tax credits consumers can use to lower their monthly insurance premiums
       :cost_sharing_reduction_credit # discount that lowers the amount a consumer pays for deductibles, copayments, and coinsurance
-    ]
+    ].freeze
 
-    ACA_IVL_MARKET_PRODUCTS = %i[healh_insurance dental_insurance]
+    ACA_IVL_MARKET_PRODUCTS = %i[healh_insurance dental_insurance].freeze
 
-    PROGRAMS = []
+    PROGRAMS = [].freeze
 
     ELIGIBILITY_EVIDENCE_MAP = {
       aca_ivl_market_enrollment_eligible: {
@@ -100,7 +100,7 @@ module Eligibilities
         application: {},
         applicant: {}
       }
-    }
+    }.freeze
 
     ELIGIBLLITY_MAP = {
       group: {
@@ -115,7 +115,7 @@ module Eligibilities
         credits: %i[advance_premium_tax_credit cost_sharing_reduction_credit],
         products: []
       }
-    }
+    }.freeze
 
 
     # field :enrollment_period
@@ -135,14 +135,15 @@ module Eligibilities
     #    list of eligibility keys to geerate for this snapshot.
     #    Default is :all
     # @return [Array<Eligibility>]
-    def snap(family, effective_date = Date.today, options = {})
+    def snap(_family, _effective_date = Date.today, options = {})
       eligibilities = options[:eligibilities].slice || [:all]
 
       eligibilities = ELIGIBILITIES_LIST if eligibilities.include?(:all)
 
-      eligibilities.reduce([]) do |list, eligibility|
-        next unless ELIGIBILITIES_LIST.include?(eligibility.to_sym)
-        eligibility.evidences
+      eligibilities.reduce([]) do |_list, eligibility|
+        if ELIGIBILITIES_LIST.include?(eligibility.to_sym)
+          eligibility.evidences
+        end
       end
     end
 

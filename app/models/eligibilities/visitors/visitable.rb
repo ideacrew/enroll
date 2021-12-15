@@ -2,6 +2,7 @@
 
 module Eligibilities
   module Visitors
+    # Visitor mixin
     module Visitable
       def accept(visitor); end
     end

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
-  factory :evidence , :class => 'Eligibilities::Evidence'do
+  factory :evidence, :class => 'Eligibilities::Evidence' do
 
     key { :income }
     title { 'income evidence' }

@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module FamilyMembers
+    # Build Family Member Determination
     class FamilyMemberDeterminationsBuilder
       send(:include, Dry::Monads[:result, :do])
 
@@ -57,7 +58,8 @@ module Operations
 
       def build_determination(values)
         output = {}
-        determinations = construct_determinations(values[:family_member], values[:application])
+        determinations =
+          construct_determinations(values[:family_member], values[:application])
 
         if determinations.success?
           output[values[:family_member].to_global_id.uri] = {
@@ -76,19 +78,14 @@ module Operations
           result =
             if eligibility_item[:key] == 'aptc_csr_credit'
               Operations::FinancialAssistance::CreateAptcCsrDetermination.new
-                .call(
-                family_member: family_member,
-                eligibility_item: eligibility_item,
-                application: application
-              )
-            else # TODO
-
+                                                                         .call(
+                                                                           family_member: family_member,
+                                                                           eligibility_item: eligibility_item,
+                                                                           application: application
+                                                                         )
             end
-          if result.success?
-            determinations.merge! result.success
-          else
-            return result
-          end
+          return result unless result.success?
+          determinations.merge! result.success
         end
 
         Success(determinations)

@@ -1,25 +1,26 @@
 # frozen_string_literal: true
 
-module Eligibilities::Visitors
+module Eligibilities
+  module Visitors
   # Use Visitor Development Pattern to access models and determine Non-ESI
   # eligibility status for a Family Financial Assistance Application's Applicants
-  class AptcCsrVisitor < Visitor
-    attr_accessor :evidences, :family_member, :evidence_items
+    class AptcCsrVisitor < Visitor
+      attr_accessor :evidences, :family_member, :evidence_items
 
-    # EVIDENCES = %i[income_evidence esi_evidence non_esi_evidence aces_evidence]
+      # EVIDENCES = %i[income_evidence esi_evidence non_esi_evidence aces_evidence]
 
-    # def self.get_evidence_on(evidence_key, date)
-    #   @evidence_key = evidence_key
-    #   @evidence_date = date
-    #   application =
-    #     Klass.where(family_id: enrollment.family_id, aasm_state: :determined)
-    #       .last
-    #   application.accept(self.new)
-    # end
+      # def self.get_evidence_on(evidence_key, date)
+      #   @evidence_key = evidence_key
+      #   @evidence_date = date
+      #   application =
+      #     Klass.where(family_id: enrollment.family_id, aasm_state: :determined)
+      #       .last
+      #   application.accept(self.new)
+      # end
 
-    def visit(applicant)
-      @evidences =
-        evidence_items
+      def visit(applicant)
+        @evidences =
+          evidence_items
           .collect do |evidence_item|
             evidence = applicant.send(evidence_item[:key])
             ids = {
@@ -38,7 +39,8 @@ module Eligibilities::Visitors
           end
           .reduce(:merge)
 
-      evidences
+        evidences
+      end
     end
   end
 end

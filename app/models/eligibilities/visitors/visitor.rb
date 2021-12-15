@@ -6,10 +6,7 @@ module Eligibilities
     class Visitor
       def visit(subject); end
 
-
-      def self.get_evidence_on(evidence_key, date)
-
-      end
+      def self.get_evidence_on(evidence_key, date); end
 
     end
   end

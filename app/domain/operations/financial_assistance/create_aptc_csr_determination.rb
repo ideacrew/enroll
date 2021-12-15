@@ -59,7 +59,7 @@ module Operations
         Success(visitor.evidences)
       end
 
-      def create_determination(application, evidences)
+      def create_determination(_application, evidences)
         determination =
           Hash[
             :aptc_csr_credit,
@@ -78,8 +78,7 @@ module Operations
         AcaEntities::Eligibilities::Contracts::DeterminationContract.new.call(determinations: determination)
       end
 
-      def create
-      end
+      def create; end
     end
   end
 end

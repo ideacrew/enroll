@@ -57,16 +57,11 @@ module Eligibilities
 
   #   FamilyMembers.each  |member| member. }
 
-    def evidences
-    end
+    def evidences; end
 
+    def visit_evidence(evidence_meta, id); end
 
-    def visit_evidence(evidence_meta, id)
-
-    end
-
-    def visit_all_evidences(instance)
-    end
+    def visit_all_evidences(instance); end
 
     # scope :eligibility_verifications_outstanding
 
