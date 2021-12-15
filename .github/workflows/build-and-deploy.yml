@@ -50,8 +50,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.DB_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DB_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       # Login to Amazon
@@ -62,8 +62,8 @@ jobs:
       # Build Docker Image
       - name: Build Image
         id: build-image
-        run: .docker/build.sh test-${{ github.sha }} public.ecr.aws/ideacrew/enroll
-        # run: docker build -f .docker/simple/Dockerfile -t public.ecr.aws/ideacrew/enroll:test-${{ github.sha }} --network="host" .
+        # run: .docker/build.sh test-${{ github.sha }} ${{ steps.login-ecr.outputs.registry }}/ideacrew
+        run: docker build -f .docker/simple/Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/rails_app/enroll:test-${{ github.sha }} .
         # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
