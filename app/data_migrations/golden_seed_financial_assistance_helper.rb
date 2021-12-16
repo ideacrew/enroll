@@ -78,8 +78,11 @@ module GoldenSeedFinancialAssistanceHelper
   end
   # rubocop:enable Metrics/CyclomaticComplexity
 
-  def create_fa_relationships(case_array)
-    case_array = case_array.is_a?(Array) ? case_array[1] : case_array[0]
+  # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/PerceivedComplexity:
+  def create_fa_relationships(case_array_data)
+    # TODO: This needs to be refactored to harmonize the calls in financial_assistance_world.rb and the seed_worker
+    case_array = case_array_data.is_a?(Array) ? case_array_data.first : case_array_data.last
     application = case_array[:fa_application]
     primary_applicant = application.applicants.detect(&:is_primary_applicant)
     applicants = case_array[:fa_applicants].reject { |applicant| applicant[:applicant_record] == primary_applicant }
@@ -98,6 +101,8 @@ module GoldenSeedFinancialAssistanceHelper
         kind: relationship_to_primary
       )
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity:
   end
 
   def add_applicant_income(case_info_hash)

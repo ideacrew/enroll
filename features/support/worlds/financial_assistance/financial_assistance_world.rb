@@ -143,7 +143,7 @@ module FinancialAssistance
         add_applicant_emails(target_row_data)
         add_applicant_income_response(target_row_data)
       end
-      create_fa_relationships(case_array_for_relationships)
+      create_fa_relationships([case_array_for_relationships])
     end
     # rubocop:enable Metrics/AbcSize
 
