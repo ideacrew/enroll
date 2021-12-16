@@ -12,7 +12,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  ECR_REPOSITORY: 'k3j4a1h3'
+  ECR_REPOSITORY: 'enroll'
 
 jobs:
   build-and-upload-image:
@@ -51,8 +51,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.DB_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.DB_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       # Login to Amazon
