@@ -29,6 +29,7 @@ module FinancialAssistance
     field :title, type: String
     field :description, type: String
     field :eligibility_status, type: String
+    field :aasm_state, type: String
     field :update_reason, type: String
     field :rejected, type: Boolean
     field :due_on, type: Date
