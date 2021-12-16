@@ -612,7 +612,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
     before do
-      allow(valid_app).to receive(:trigger_fdhs_calls).and_return(true)
+      allow(valid_app).to receive(:publish_application_determined).and_return(true)
     end
 
     it 'should allow a sucessful state transition for valid application' do

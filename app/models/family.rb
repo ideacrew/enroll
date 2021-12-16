@@ -1067,8 +1067,11 @@ class Family
     if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
       application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
       application&.active_applicants&.each do |applicant|
-        applicant.evidences.each do |evidence|
-          due_dates << evidence.verif_due_date if FinancialAssistance::Evidence::DUE_DATE_STATES.include? evidence.eligibility_status
+        FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+          evidence = applicant.send(evidence_type)
+          if evidence.present?
+            due_dates << evidence.verif_due_date if Eligibilities::Evidence::DUE_DATE_STATES.include? evidence.aasm_state
+          end
         end
       end
     end
@@ -1135,9 +1138,14 @@ class Family
       application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
 
       application&.active_applicants&.each do |applicant|
-        outstanding_types += applicant.evidences.select{|evidence| ["outstanding", "pending"].include? evidence.eligibility_status }
-        in_review += applicant.evidences.select{|evidence| ["review"].include? evidence.eligibility_status }
-        fully_uploaded += applicant.evidences.select(&:type_verified?)
+        FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+          evidence = applicant.send(evidence_type)
+          if evidence.present?
+            (outstanding_types += [evidence]) if ["outstanding", "pending"].include? evidence.aasm_state
+            (in_review += [evidence]) if ["review"].include? evidence.aasm_state
+            (fully_uploaded += [evidence]) if evidence.type_verified?
+          end
+        end
       end
     end
 
