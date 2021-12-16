@@ -28,20 +28,16 @@ module FinancialAssistance
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-
-    field :received_at, type: DateTime, default: -> { Time.now }
-    field :is_satisfied, type: Boolean, default: false
-    field :verification_outstanding, type: Boolean, default: false
-
-    field :aasm_state, type: Symbol
+    field :eligibility_status, type: String
     field :update_reason, type: String
+    field :rejected, type: Boolean
     field :due_on, type: Date
     field :external_service, type: String
     field :updated_by, type: String
 
     embeds_one :verification_status, class_name: "::FinancialAssistance::VerificationStatus"
     embeds_many :verification_history, class_name: "::FinancialAssistance::VerificationHistory"
-    embeds_many :request_results, class_name: "::FinancialAssistance::EligibilityResult"
+    embeds_many :eligibility_results, class_name: "::FinancialAssistance::EligibilityResult"
 
     embeds_many :documents, as: :documentable do
       def uploaded
@@ -51,7 +47,7 @@ module FinancialAssistance
 
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
-    validates_presence_of :key, :is_satisfied, :aasm_state
+    # validates_presence_of :key, :is_satisfied, :aasm_state
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
     default_scope ->{ exists(key: true) }

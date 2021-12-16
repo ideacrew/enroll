@@ -294,6 +294,9 @@ module FinancialAssistance
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
 
+    # depricated, need to remove this after after data migration
+    embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
+
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
     embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
