@@ -14,6 +14,7 @@ RSpec.describe ::Operations::Notices::IvlFinalRenewalEligibilityNotice, dbclean:
     let(:issuer) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:aasm_state) { 'auto_renewing' }
+    let(:effective_on) { TimeKeeper.date_of_record.next_year.beginning_of_year }
     let!(:enrollment) do
       FactoryBot.create(
         :hbx_enrollment,
@@ -22,7 +23,7 @@ RSpec.describe ::Operations::Notices::IvlFinalRenewalEligibilityNotice, dbclean:
         family: family,
         aasm_state: aasm_state,
         product_id: product.id,
-        effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year,
+        effective_on: effective_on,
         applied_aptc_amount: Money.new(44_500),
         consumer_role_id: person.consumer_role.id,
         enrollment_members: family.family_members
@@ -57,7 +58,7 @@ RSpec.describe ::Operations::Notices::IvlFinalRenewalEligibilityNotice, dbclean:
 
         it 'should return failure' do
           result = subject.call(params)
-          expect(result.failure).to eq "Family does not have 01/01/2022 auto_renewing enrollments"
+          expect(result.failure).to eq "Family does not have #{effective_on} auto_renewing enrollments"
         end
 
       end
