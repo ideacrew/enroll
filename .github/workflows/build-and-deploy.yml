@@ -3,7 +3,7 @@ name: Build Image and Deploy
 on:
   push:
     branches:
-      - 'trunk'
+      - 'build-deploy-on-push'
 
 concurrency:
   group: ${{ github.ref }}
@@ -66,20 +66,20 @@ jobs:
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # Build Docker Image
-      - name: Build Image
-        id: build-image
-        run: .docker/build_gha.sh test-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+      # - name: Build Image
+      #   id: build-image
+      #   run: .docker/build_gha.sh ${{ github.ref }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
       # Debug docker push with very simple image
-      # - name: Build Simple Docker Image
-      #   id: build-image
-      #   run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
+      - name: Build Simple Docker Image
+        id: build-image
+        run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }} .
 
       - name: Scan Docker image
         id: scan
         uses: anchore/scan-action@main
         with:
-          image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}'
+          image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }}'
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
@@ -92,4 +92,16 @@ jobs:
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }}
+  notify-slack:
+    needs: [build-and-upload-image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.16.0
+        with:
+          channel-id: 'docker-images'
+          slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }}'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
