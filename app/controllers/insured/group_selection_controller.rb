@@ -183,7 +183,13 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_plan
-    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+    begin
+      @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+    rescue FetchBenchmarkFetchFailure => e
+    #flash[:error] = "Address out of state or invalid"
+    flash[:error] = e.message
+      redirect_to family_account_path
+    end
   end
 
   def term_or_cancel
