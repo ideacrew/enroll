@@ -3,84 +3,39 @@
 module Eligibilities
   # Use Visitor Development Pattern to access Eligibilities and Evidences
   # distributed across models
-  class FamilyMembersEligibility
+  class FamilyEligibility < Eligibility
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :family_eligibility
-    embeds_many :family_member_eligibilities
-    # Family member eligibility
-    class FamilyMemberEligibility
-      include Mongoid::Document
-      include Mongoid::Timestamps
+    ELIGIBILITIES_LIST = %i[
+      aptc_financial_assistance_eligibility
+      magi_medicaid_eligiblility
+      chip_eligibility
+      enrollment_eligibility
+    ].freeze
+    embedded_in :family
+    embeds_one :family_members_eligibility
 
-      belongs_to :family_member
+    # family is eligble to enroll on aca_individual
 
-      # Families with family members who are enrolled and have FAA evidences in outstanding status
+    # {
+    #       subject: Family,
+    #       object: :aca_individual,
+    #       predicate: { evidences: [], status: :eligible }
+    # }
 
-      # aptc_csr eligibility
-      # for tax_household
-      #   is income verified?
-      # for each family member
-      #   are they enrolled? (evidence)
-      #   are they on renewal enrollent?
-      #   current FAA application
-      #     applicant with outstanindg verification? (evidence)
-      #  aca_ivl_market eligibility
-      #     consumer role
-      #     vlp outstanding verification?
-      #     immigration outstanding verification
+    MARKET = [
+      :aca_individual,
+      :aca_shop,
+      :coverall,
+      :fehb
+      # :modified_adjusted_gross_income_medicaid, # comprehensive health insurance available to low-income children and adults
+      # :childrens_health_insurance_program # provides low-cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private insurance.
+    ].freeze
 
-      MARKET_ELIGIBILITIES = [
-        :aca_ivl_market_enrollment,
-        :aca_shop_market_enrollment,
-        :dc_coverall_enrollment
-        # :modified_adjusted_gross_income_medicaid, # comprehensive health insurance available to low-income children and adults
-        # :childrens_health_insurance_program # provides low-cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private insurance.
-      ].freeze
-
-      #       # ACA IVL Eligibility
-      #       { family_member: { aca_ivl_enrollment_evidences: [:vlp, :immigration]} }
-
-      #       { family_member: { aca_ivl_enrollment_evidences: [:active_enrollment, :renewal_enrollment]} }
-
-      # FAA::Application
-      # HbxEnrollment
-      # ConsumerRole
-
-      # # ACA IVL FAA Eligibility
-      # { tax_household: { aptc_csr_credit_evidences: [:income]} }
-      # { family_member: { klass: FAA:Application::Applicant, visitor_operatino: Operations::Eligibilites::Evidences::VisitEsi, aptc_csr_credit_evidences: [:esi, :non_esi,  :aces_mec]} }
-
-      field :key, type: Symbol
-      field :title, type: String
-      field :description, type: String
-
-      field :is_satisfied, type: Boolean, default: false
-      field :has_outstanding_verifications, type: Boolean, default: false
-
-      # Eligibilty => aca_ivl_market_enrollment_eligible
-      #   RDIP, VLP, SSA
-      #
-      # advance_premium_tax_credit
-
-      embeds_many :eligibilities, class_name: 'Eligibilities::Eligibility'
-
-      before_save :update_eligibility_status
-
-      field :aca_ivl_enrollment_evidences, type: Hash, default: {}
-      field :aptc_csr_credit_evidences, type: Hash, default: {}
-      field :aca_ivl_market_active_enrollments, type: Hash, default: {}
-      field :aca_shop_market_enrollments, type: Hash, default: {}
-
-      has_one :financial_assistance_applicant
-
-      embeds_many :active_enrollments
-    end
-
-    ACA_IVL_MARKET_CREDITS = [
-      :advance_premium_tax_credit, # tax credits consumers can use to lower their monthly insurance premiums
-      :cost_sharing_reduction_credit # discount that lowers the amount a consumer pays for deductibles, copayments, and coinsurance
+    ACA_INDIVIDUAL_CREDITS = [
+      :aptc_csr_credit # advance premium tax credit that consumers can use to lower their monthly insurance premiums
+      # :cost_sharing_reduction_credit # discount that lowers the amount a consumer pays for deductibles, copayments, and coinsurance
     ].freeze
 
     ACA_IVL_MARKET_PRODUCTS = %i[healh_insurance dental_insurance].freeze
@@ -117,6 +72,25 @@ module Eligibilities
       }
     }.freeze
 
+    field :key, type: Symbol
+    field :title, type: String
+    field :description, type: String
+
+    field :is_satisfied, type: Boolean, default: false
+
+    field :has_unsatisfied_eligibilities, type: Boolean, default: true
+
+    field :has_outstanding_verifications, type: Boolean, default: false
+
+    # Eligibilty => aca_ivl_market_enrollment_eligible
+    #   RDIP, VLP, SSA
+    #
+    # advance_premium_tax_credit
+    #
+
+    embeds_many :eligibilities, class_name: 'Eligibilities::Eligibility'
+
+    before_save :update_eligibility_status
 
     # field :enrollment_period
     # @return [Array<Eligibility>]
@@ -140,8 +114,9 @@ module Eligibilities
 
       eligibilities = ELIGIBILITIES_LIST if eligibilities.include?(:all)
 
-      eligibilities.reduce([]) do |_list, eligibility|
-        eligibility.evidences if ELIGIBILITIES_LIST.include?(eligibility.to_sym)
+      eligibilities.reduce([]) do |list, eligibility|
+        next list unless ELIGIBILITIES_LIST.include?(eligibility.to_sym)
+        eligibility.evidences
       end
     end
 
