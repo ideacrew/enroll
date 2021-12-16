@@ -66,9 +66,9 @@ jobs:
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # Build Docker Image
-      # - name: Build Image
-      #   id: build-image
-      #   run: .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+      - name: Build Image
+        id: build-image
+        run: .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
       # gets the branch name without the 'refs/heads/' prefix
       - name: Git branch name
@@ -76,9 +76,9 @@ jobs:
         uses: EthanSK/git-branch-name-action@v1
 
       # Debug docker push with very simple image
-      - name: Build Simple Docker Image
-        id: build-image
-        run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} .
+      # - name: Build Simple Docker Image
+      #   id: build-image
+      #   run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} .
 
       - name: Scan Docker image
         id: scan
