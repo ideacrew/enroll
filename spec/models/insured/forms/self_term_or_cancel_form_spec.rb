@@ -203,6 +203,38 @@ module Insured
           expect(family.hbx_enrollments.to_a.last.product.csr_variant_id).to eq '05'
         end
       end
+
+      context 'for nil rating area id' do
+        before(:each) do
+          person = family.primary_applicant.person
+          person.addresses.update_all(county: "Zip code outside supported area", state: 'DC', zip: '20003')
+          ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        end
+
+        it 'should not create new enrollment' do
+          expect(family.hbx_enrollments.size).to eq 1
+          attrs = {enrollment_id: enrollment.id, elected_aptc_pct: 1.0, aptc_applied_total: applied_aptc_amount}
+          result = Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+          expect(family.hbx_enrollments.size).to eq 1
+          expect(result).to eq "rating_area_id is nil, cannot create reinstatement enrollment"
+        end
+      end
+
+      context 'for nil county' do
+        before(:each) do
+          person = family.primary_applicant.person
+          person.addresses.update_all(county: nil)
+          ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        end
+
+        it 'should not create new enrollment' do
+          expect(family.hbx_enrollments.size).to eq 1
+          attrs = {enrollment_id: enrollment.id, elected_aptc_pct: 1.0, aptc_applied_total: applied_aptc_amount}
+          result = Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+          expect(family.hbx_enrollments.size).to eq 1
+          expect(result).to eq  "rating_area_id is nil, cannot create reinstatement enrollment"
+        end
+      end
     end
 
     describe "#for_post" do
