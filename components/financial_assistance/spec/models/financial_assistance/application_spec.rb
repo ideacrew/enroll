@@ -672,6 +672,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.send(:create_evidences)
       expect(applicant1.evidences.count).to eq 4
       expect(applicant2.evidences.count).to eq 4
+      expect(applicant1.reload.evidences.where(key: nil).present?).to eq false
     end
 
     it 'should have both income and mec in pending state' do

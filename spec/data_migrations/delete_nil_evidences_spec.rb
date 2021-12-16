@@ -42,7 +42,7 @@ describe DeleteNilEvidences, dbclean: :after_each do
       expect(applicant.evidences.count).to eq 1
       expect(applicant.evidences.first.key).to eq nil
       subject.migrate
-      expect(applicant.reload.evidences.count).to eq 0
+      expect(applicant.reload.evidences.where(key: nil).present?).to eq false
     end
   end
 end
