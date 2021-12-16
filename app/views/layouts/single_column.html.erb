@@ -26,9 +26,6 @@
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
 
         <%= yield :head %>
-    <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
-      <%= render "shared/customer_support/live_chat_scripts" %>
-    <% end %>
   </head>
   <body class="font">
 
