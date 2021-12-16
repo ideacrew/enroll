@@ -659,8 +659,8 @@ registry:
       - key: :disable_documents_we_accept_list
         item: :disable_documents_we_accept_list
         is_enabled: false
-      - key: :disable_sep_attestation_options
-        item: :disable_sep_attestation_options
+      - key: :hide_sep_attestation_options
+        item: :hide_sep_attestation_options
         is_enabled: false
       - key: :live_chat_widget
         item: :live_chat_widget
