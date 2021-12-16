@@ -6,7 +6,7 @@ on:
       - 'build-deploy-on-push'
 
 concurrency:
-  group: ${{ env.GIT_BRANCH_NAME }}
+  group: ${{ github.ref }}
   cancel-in-progress: true
 
 env:
