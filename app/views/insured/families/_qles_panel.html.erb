@@ -1,4 +1,4 @@
-<% unless EnrollRegistry.feature_enabled?(:hide_sep_attestation_options) %>
+<% if EnrollRegistry.feature_enabled?(:show_sep_attestation_options) %>
   <div class="qles-panel panel panel-default">
     <div class="panel-heading">
       <div class="row" id='qle-header'>
