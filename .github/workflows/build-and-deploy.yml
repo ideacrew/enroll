@@ -12,7 +12,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  ECR_REPOSITORY: 'k3j4a1h3'
+  ECR_REPOSITORY: 'rails_app'
 
 jobs:
   build-and-upload-image:
