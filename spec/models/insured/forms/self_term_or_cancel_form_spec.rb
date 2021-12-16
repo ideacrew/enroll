@@ -206,8 +206,10 @@ module Insured
 
       context 'for nil rating area id' do
         before(:each) do
-          person = family.primary_applicant.person
-          person.addresses.update_all(county: "Zip code outside supported area", state: 'DC', zip: '20003')
+          person = family.primary_person
+          allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+          allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+          person.addresses.update_all(county: "Zip code outside supported area", state: 'NC', zip: '50003')
           ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
         end
 
@@ -222,7 +224,9 @@ module Insured
 
       context 'for nil county' do
         before(:each) do
-          person = family.primary_applicant.person
+          person = family.primary_person
+          allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+          allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
           person.addresses.update_all(county: nil)
           ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
         end

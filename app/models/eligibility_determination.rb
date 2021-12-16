@@ -142,7 +142,7 @@ private
   def apply_aptc_aggregate
     # EnrollRegistry[:apply_aggregate_to_enrollment] {{eligibility_determination: self}}
     # TODO: Refactor below code to make use of updated Operation call pattern.
-    primary_person = family.primary_applicant.person
+    primary_person = family.primary_person
     rating_address = primary_person.rating_address
     rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address) if rating_address
 
