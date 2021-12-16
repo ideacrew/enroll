@@ -8,10 +8,14 @@ Feature: Update APTC and CSR
         When Hbx Admin logs on to the Hbx Portal
         When Hbx Admin click Families link
         And Hbx Admin clicks Actions button
-    
+
     Scenario: Admin views the Edit APTC / CSR grid for an individual without an assistance recieving (with APTC) enrollment
         Then Hbx Admin should see an Edit APTC / CSR link
-    
+
     Scenario: Admin tries to Apply APTC/CSR for Catastrophic plan
         And Hbx Admin clicks on the Update APTC CSR button
         Then Hbx Admin should see cat plan error message
+
+    Scenario: Admin should see individual level csr percent as integer
+        And Hbx Admin clicks the Edit APTC CSR link
+        Then Hbx Admin should see individual level csr percent
