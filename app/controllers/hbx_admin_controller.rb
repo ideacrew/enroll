@@ -84,6 +84,9 @@ class HbxAdminController < ApplicationController
   end
 
   def build_thhm_csr_hash(tax_household)
-    tax_household.tax_household_members.inject({}) {|hash, thhm| hash[thhm.person.id.to_s] = thhm.csr_percent_as_integer; hash}
+    tax_household.tax_household_members.inject({}) do |hash, thhm|
+      hash[thhm.person.id.to_s] = thhm.csr_percent_as_integer
+      hash
+    end
   end
 end
