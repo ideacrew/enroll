@@ -74,7 +74,7 @@ jobs:
       - name: Build Image
         id: build-image
         run: |
-          chmod +x ./docker/build_gha.sh
+          chmod +x .docker/build_gha.sh
           .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
       # Debug docker push with very simple image
