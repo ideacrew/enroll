@@ -5,7 +5,7 @@ module Eligibilities
   # Use Visitor Development Pattern to access models and determine Non-ESI
   # eligibility status for a Family Financial Assistance Application's Applicants
     class FaaApplicationVisitor < Visitor
-      Evidences = {
+      EVIDENCES = {
         applicants: %i[esi non_esi medicare],
         tax_household: [:income]
       }.freeze
