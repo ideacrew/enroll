@@ -1069,9 +1069,9 @@ class Family
       application&.active_applicants&.each do |applicant|
         FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
           evidence = applicant.send(evidence_type)
-          if evidence.present?
-            due_dates << evidence.verif_due_date if Eligibilities::Evidence::DUE_DATE_STATES.include? evidence.aasm_state
-          end
+          next unless evidence.present? && Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state)
+
+          due_dates << evidence.verif_due_date
         end
       end
     end
@@ -1140,11 +1140,11 @@ class Family
       application&.active_applicants&.each do |applicant|
         FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
           evidence = applicant.send(evidence_type)
-          if evidence.present?
-            (outstanding_types += [evidence]) if ["outstanding", "pending"].include? evidence.aasm_state
-            (in_review += [evidence]) if ["review"].include? evidence.aasm_state
-            (fully_uploaded += [evidence]) if evidence.type_verified?
-          end
+          next unless evidence.present?
+
+          (outstanding_types += [evidence]) if ["outstanding", "pending"].include? evidence.aasm_state
+          (in_review += [evidence]) if ["review"].include? evidence.aasm_state
+          (fully_uploaded += [evidence]) if evidence.type_verified?
         end
       end
     end

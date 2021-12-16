@@ -149,7 +149,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
       let(:due_on) { TimeKeeper.date_of_record + 85.days }
 
-      let(:evidence) { ::FinancialAssistance::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC", aasm_state: "outstanding", due_on: due_on) }
+      let(:evidence) { ::Eligibilities::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC", aasm_state: "outstanding", due_on: due_on) }
 
       before do
         EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
