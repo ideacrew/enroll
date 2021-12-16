@@ -39,7 +39,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
@@ -67,9 +67,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -100,7 +100,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -128,9 +128,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_v12_modules-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -148,36 +148,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Restore Node Modules
-        uses: actions/cache@v2
-        id: npm-cache
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
-      - name: Install node dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: yarn install
+
+      # Download all artifacts into the provided directory
       - uses: actions/download-artifact@v2
         with:
           path: ci/rspec/compressed-reports
-      - run: npm run rspec:move-reports
-      - run: npm run rspec:concat-reports
-      - uses: actions/upload-artifact@v2
+
+      # Move, concat, analyze report, upload split config
+      - uses: markgoho/analyze-rspec-report@trunk
         with:
-          name: concatenated-rspec-reports
-          path: ci/rspec/local-rspec-report.json
-      - run: npm run rspec:split-config
-      - run: npm run benefit-sponsors:split-config
-      - uses: actions/upload-artifact@v2
+          individual-reports-folder: 'ci/rspec/compressed-reports'
+
+      # Analyze benefit-sponsors report, upload split config
+      - uses: markgoho/analyze-rspec-report@trunk
         with:
-          name: rspec-split-config
-          path: ci/rspec-split-config.json
-      - uses: actions/upload-artifact@v2
-        with:
-          name: benefit_sponsors-split-config
-          path: ci/benefit_sponsors-split-config.json
+          single-report-path: 'ci/rspec/compressed-reports/components-benefit_sponsors/components-benefit_sponsors-rspec-report.json'
+          output-report: 'benefit_sponsors-split-config.json'
+          upload-name: 'benefit-sponsors-split'

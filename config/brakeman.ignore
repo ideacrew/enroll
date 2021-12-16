@@ -290,7 +290,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -394,7 +394,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/controllers/exceptions_controller.rb",
-      "line": 8,
+      "line": 21,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(file => \"public/#{(params[:code] or 500)}.html\", { :status => ((params[:code] or 500)), :layout => false })",
       "render_path": null,
@@ -482,7 +482,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -722,6 +722,22 @@
       "note": ""
     },
     {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 121,
+      "fingerprint": "9a3951031616a07c8e02c86652f537e92c08685da97f5ec2b12d5d3602b55bb8",
+      "check_name": "EOLRuby",
+      "message": "Support for Ruby 2.5.1 ended on 2021-03-31",
+      "file": "Gemfile.lock",
+      "line": 770,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "b122d2f7957b4b965ade2855ead1eda0b76571257de543ed1ead416bd5a54418",
@@ -862,6 +878,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-11-19 17:00:41 -0500",
-  "brakeman_version": "5.1.1"
+  "updated": "2021-12-16 09:55:19 -0500",
+  "brakeman_version": "5.2.0"
 }
