@@ -136,6 +136,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollments' => "Enrollment(s)",
   :'en.edit' => "Edit",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
+  :'en.insured.csr_percent_as_integer' => "CSR % as Integer",
   :'en.members' => "Members",
   :'en.plan_contact_info' => "Plan Contact Info",
   :'en.insured.switch_to_all_families' => "Switch to All Families",

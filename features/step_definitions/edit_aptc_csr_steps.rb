@@ -26,6 +26,14 @@ Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
   find_link('Edit APTC / CSR').visible?
 end
 
+Then(/Hbx Admin clicks the Edit APTC CSR link/) do
+  find_all(EditAptc.edit_aptc_csr_action).first.click
+end
+
+Then(/Hbx Admin should see individual level csr percent/) do
+  expect(page.has_css?(EditAptc.csr_pct_as_integer)).to eq true
+end
+
 Given(/^User with tax household exists$/) do
   create_thh_for_family
 end
