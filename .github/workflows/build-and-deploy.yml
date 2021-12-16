@@ -78,7 +78,7 @@ jobs:
       # Debug docker push with very simple image
       - name: Build Simple Docker Image
         id: build-image
-        run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:TEST_${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} .
+        run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} .
 
       - name: Scan Docker image
         id: scan
