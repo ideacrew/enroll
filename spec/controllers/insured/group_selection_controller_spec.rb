@@ -521,6 +521,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit_plan)
       end
+
+      it 'redirects to families account when invalid params are passed through' do
+        sign_in user
+        @family.special_enrollment_periods << @sep
+        attrs = {hbx_enrollment_id: nil, family_id: @family.id}
+        get :edit_plan, params: attrs
+        expect(response).to redirect_to family_account_path
+      end
     end
   end
 
