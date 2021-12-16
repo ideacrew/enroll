@@ -68,7 +68,7 @@ jobs:
       # Build Docker Image
       - name: Build Image
         id: build-image
-        run: .docker/build.sh test-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+        run: .docker/build_gha.sh test-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
       # Debug docker push with very simple image
       # - name: Build Simple Docker Image
