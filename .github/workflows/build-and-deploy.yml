@@ -12,7 +12,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  ECR_REPOSITORY: 'ideacrew'
+  ECR_REPOSITORY: 'enroll'
 
 jobs:
   build-and-upload-image:
