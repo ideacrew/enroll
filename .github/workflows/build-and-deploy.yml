@@ -13,26 +13,28 @@ env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
   ECR_REPOSITORY: 'enroll'
+  ECR_REGISTRY: 'public.ecr.aws'
+  ECR_ORG: 'ideacrew'
 
 jobs:
   build-and-upload-image:
     runs-on: ubuntu-latest
-    # services:
-    #   rabbitmq:
-    #     image: rabbitmq:latest
-    #     ports:
-    #       - 5672:5672
-    #       - 15672:15672
-    #     options: >-
-    #       --name "rabbitmq"
-    #       --health-cmd "rabbitmqctl node_health_check"
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
-      # - uses: wbari/start-mongoDB@v0.2
-      #   with:
-      #     mongoDBVersion: '4.2'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '4.2'
 
       # Check out repository
       - uses: actions/checkout@v2
@@ -42,10 +44,10 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       # Add vhosts to RabbitMQ
-      # - run: |
-      #     docker exec rabbitmq rabbitmqctl add_vhost /
-      #     docker exec rabbitmq rabbitmqctl add_vhost event_source
-      #     docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
+      - run: |
+          docker exec rabbitmq rabbitmqctl add_vhost /
+          docker exec rabbitmq rabbitmqctl add_vhost event_source
+          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
 
       # Provide credentials for AWS
       - name: Configure AWS credentials
@@ -55,45 +57,39 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # Login to Amazon
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
+      # Must use docker login in order to specify public registry
       - name: Login to Public ECR
         uses: docker/login-action@v1
         with:
-          registry: ${{ steps.login-ecr.outputs.registry }}
+          registry: ${{ env.ECR_REGISTRY }}
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # Build Docker Image
       - name: Build Image
         id: build-image
-        # run: .docker/build.sh test-${{ github.sha }} ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
-        # run: docker build -f .docker/simple/Dockerfile -t public.ecr.aws/ideacrew/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
-        run: docker build -f .docker/simple/Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
-        # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        run: .docker/build.sh test-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
 
-      # - name: Scan Docker image
-      #   id: scan
-      #   uses: anchore/scan-action@main
-      #   with:
-      #     image: '${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:test-${{ github.sha }}'
-      #     acs-report-enable: true
-      #     fail-build: false
-      #     severity-cutoff: critical
-      # - name: upload Anchore scan SARIF report
-      #   uses: github/codeql-action/upload-sarif@v1
-      #   with:
-      #     sarif_file: ${{ steps.scan.outputs.sarif }}
+      # Debug docker push with very simple image
+      # - name: Build Simple Docker Image
+      #   id: build-image
+      #   run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
+
+      - name: Scan Docker image
+        id: scan
+        uses: anchore/scan-action@main
+        with:
+          image: '${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:test-${{ github.sha }}'
+          acs-report-enable: true
+          fail-build: false
+          severity-cutoff: critical
+
+      - name: upload Anchore scan SARIF report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
-        # run: docker push public.ecr.aws/ideacrew/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
-        # run: |
-        #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
