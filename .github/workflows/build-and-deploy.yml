@@ -6,7 +6,7 @@ on:
       - 'build-deploy-on-push'
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ env.GIT_BRANCH_NAME }}
   cancel-in-progress: true
 
 env:
@@ -68,18 +68,23 @@ jobs:
       # Build Docker Image
       # - name: Build Image
       #   id: build-image
-      #   run: .docker/build_gha.sh ${{ github.ref }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+      #   run: .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+
+      # gets the branch name without the 'refs/heads/' prefix
+      - name: Git branch name
+        id: git-branch-name
+        uses: EthanSK/git-branch-name-action@v1
 
       # Debug docker push with very simple image
       - name: Build Simple Docker Image
         id: build-image
-        run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }} .
+        run: docker build -f .docker/simple/Dockerfile -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:TEST_${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} .
 
       - name: Scan Docker image
         id: scan
         uses: anchore/scan-action@main
         with:
-          image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }}'
+          image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
@@ -92,7 +97,7 @@ jobs:
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }}
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}
   notify-slack:
     needs: [build-and-upload-image]
     runs-on: ubuntu-latest
@@ -102,6 +107,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ github.ref }}-${{ github.sha }}'
+          slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
