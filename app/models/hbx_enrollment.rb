@@ -1530,7 +1530,7 @@ class HbxEnrollment
     #       'child only' or 'adult and child only' on the child_only_offering
     #       property of BenefitMarkets::Products::Product.
     if coverage_kind == 'dental'
-      elected_plans.reject(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
+      elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
       elected_plans.reject!(&:allows_adult_and_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_adult_and_child_only_offering) && !any_member_greater_than_18?
     end
     elected_plans
