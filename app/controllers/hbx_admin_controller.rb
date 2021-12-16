@@ -20,6 +20,7 @@ class HbxAdminController < ApplicationController
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
     @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
+    binding.pry
     @household_csrs = build_thhm_csr_hash(@active_tax_household_for_current_year)
     @year_options = Admin::Aptc::years_with_tax_household(@family)
     respond_to do |format|
@@ -84,10 +85,6 @@ class HbxAdminController < ApplicationController
   end
 
   def build_thhm_csr_hash(tax_household)
-    household_csrs = {}
-    tax_household.tax_household_members.each do |thhm|
-      household_csrs[thhm.person.id.to_s] = thhm.csr_percent_as_integer
-    end
-    household_csrs
+    tax_household.tax_household_members.inject({}) {|hash, thhm| hash[thhm.person.id.to_s] = thhm.csr_percent_as_integer; hash}
   end
 end
