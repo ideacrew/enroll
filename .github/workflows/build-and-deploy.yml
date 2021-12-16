@@ -12,7 +12,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  ECR_REPOSITORY: 'rails_app'
+  ECR_REPOSITORY: 'k3j4a1h3'
 
 jobs:
   build-and-upload-image:
@@ -65,7 +65,7 @@ jobs:
         id: build-image
         # run: .docker/build.sh test-${{ github.sha }} ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
         # run: docker build -f .docker/simple/Dockerfile -t public.ecr.aws/ideacrew/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
-        run: docker build -f .docker/simple/Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
+        run: docker build -f .docker/simple/Dockerfile -t public.ecr.aws/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }} .
         # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         # run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -85,7 +85,7 @@ jobs:
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         id: upload-image
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
+        run: docker push public.ecr.aws/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
         # run: docker push public.ecr.aws/ideacrew/${{ env.ECR_REPOSITORY }}:test-${{ github.sha }}
         # run: |
         #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
