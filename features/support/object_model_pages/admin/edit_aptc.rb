@@ -10,5 +10,4 @@ class EditAptc
   def self.edit_aptc_csr_action
     '.edit-aptc-csr-enabled'
   end
-
 end
