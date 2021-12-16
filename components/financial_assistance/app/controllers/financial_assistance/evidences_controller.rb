@@ -80,7 +80,7 @@ module FinancialAssistance
     def find_type
       fetch_applicant
       find_docs_owner
-      @evidence = @docs_owner.send(params[:evidence_kind]) if params[:evidence_kind]
+      @evidence = @docs_owner.send(evidence_kind) if @docs_owner.respond_to?(params[:evidence_kind])
     end
 
     def update_documents_status(applicant)

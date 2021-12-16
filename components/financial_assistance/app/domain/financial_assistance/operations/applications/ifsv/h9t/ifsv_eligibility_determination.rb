@@ -55,10 +55,10 @@ module FinancialAssistance
               case status
               when "verified"
                 evidence.move_to_verified!
-                applicant_non_esi_evidence.update!(is_satisfied: true)
+                evidence.update!(is_satisfied: true)
               when "outstanding"
                 evidence.move_to_outstanding!
-                applicant_non_esi_evidence.update!(verification_outstanding: true)
+                evidence.update!(verification_outstanding: true)
               end
 
               Success(applicant)
