@@ -79,21 +79,22 @@ module GoldenSeedFinancialAssistanceHelper
   # rubocop:enable Metrics/CyclomaticComplexity
 
   def create_fa_relationships(case_array)
+    case_array = case_array.is_a?(Array) ? case_array[1] : case_array[0]
     application = case_array[:fa_application]
     primary_applicant = application.applicants.detect(&:is_primary_applicant)
     applicants = case_array[:fa_applicants].reject { |applicant| applicant[:applicant_record] == primary_applicant }
     return if applicants.blank?
     applicants.each do |applicant|
-      relationship_to_primary = applicant[:person_attributes][:relationship_to_primary].downcase
+      relationship_to_primary = applicant.dig(:person_attributes, :relationship_to_primary)&.downcase || applicant[:relationship_to_primary]&.downcase
       next if relationship_to_primary == 'self'
       application.relationships.create!(
-        applicant_id: applicant[:target_fa_applicant].id,
+        applicant_id: applicant[:target_fa_applicant]&.id || applicant[:applicant_record]&.id,
         relative_id: primary_applicant.id,
         kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship_to_primary]
       )
       application.relationships.create!(
         applicant_id: primary_applicant.id,
-        relative_id: applicant[:target_fa_applicant].id,
+        relative_id: applicant[:target_fa_applicant]&.id || applicant[:applicant_record]&.id,
         kind: relationship_to_primary
       )
     end
@@ -115,11 +116,10 @@ module GoldenSeedFinancialAssistanceHelper
       employer_address = income.build_employer_address
       employer_address.kind = 'work'
       employer_address.address_1 = FFaker::AddressUS.street_name
-      employer_address.county
+      employer_address.county = EnrollRegistry[:enroll_app].setting(:contact_center_county).item
       employer_address.state = FFaker::AddressUS.state_abbr
       employer_address.city = FFaker::AddressUS.city
       employer_address.zip = FFaker::AddressUS.zip_code
-      employer_address.county = %w[Washington Burlington Kennebec Arlington Washington Jefferson Franklin].sample
       employer_address.save!
       employer_phone = income.build_employer_phone
       employer_phone.country_code = '1'

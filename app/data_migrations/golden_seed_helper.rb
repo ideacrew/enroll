@@ -27,6 +27,11 @@ module GoldenSeedHelper
     (0..999).to_a.sample
   end
 
+  # For out of state addresses
+  # Obviously, update this if they become a client.
+  OUT_OF_STATE_STATES = %w[WA NJ NY NC].freeze
+  OUT_OF_STATE_COUNTIES = %w[Franklin Washington].freeze
+
   # These methods are in case you want to avoid external
   # hbx id calls
   # def update_person_hbx_ids
@@ -170,6 +175,8 @@ module GoldenSeedHelper
       when 'Temporarily absent'
         address_and_phone = generate_address_and_phone({out_of_state_resident: true})
         person.phones << address_and_phone[:phone]
+        address_and_phone[:address].state = OUT_OF_STATE_STATES.sample
+        address_and_phone[:address].county = OUT_OF_STATE_COUNTIES.sample
         person.addresses << address_and_phone[:address]
         person.is_temporarily_out_of_state = true
       else # DC home address'
@@ -284,7 +291,8 @@ module GoldenSeedHelper
       address_1: address_1,
       city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
       state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+      county: EnrollRegistry[:enroll_app].setting(:contact_center_county).item
     )
     area_code = primary_phone.present? ? primary_phone.area_code : FFaker::PhoneNumber.area_code
     phone_number = primary_phone.present? ? primary_phone.number : generate_unique_phone_number
@@ -428,18 +436,22 @@ module GoldenSeedHelper
   # rubocop:enable Metrics/AbcSize
 
   def remove_golden_seed_callbacks
+    Person.skip_callback(:save, :after, :trigger_async_publish)
     Person.skip_callback(:create, :after, :notify_created)
     Person.skip_callback(:update, :after, :notify_updated)
     Person.skip_callback(:update, :after, :person_create_or_update_handler)
+    Family.skip_callback(:save, :after, :trigger_async_publish)
     PersonRelationship.skip_callback(:save, :after, :notify_updated)
     HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
     FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
   end
 
   def reinstate_golden_seed_callbacks
+    Person.set_callback(:save, :after, :trigger_async_publish)
     Person.set_callback(:create, :after, :notify_created)
     Person.set_callback(:update, :after, :notify_updated)
     Person.set_callback(:update, :after, :person_create_or_update_handler)
+    Family.set_callback(:save, :after, :trigger_async_publish)
     PersonRelationship.set_callback(:save, :after, :notify_updated)
     HbxEnrollment.set_callback(:save, :after, :notify_on_save)
     FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)

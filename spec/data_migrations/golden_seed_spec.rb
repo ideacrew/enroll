@@ -3,13 +3,13 @@
 require "rails_helper"
 # require 'rake'
 
-# require File.join(Rails.root, "app", "data_migrations", "golden_seed_individual")
-# require File.join(Rails.root, "components", "benefit_sponsors", "spec", "support", "benefit_sponsors_site_spec_helpers")
-# require File.join(Rails.root, "app", "data_migrations", "load_issuer_profiles")
+require File.join(Rails.root, "app", "data_migrations", "golden_seed_individual")
+require File.join(Rails.root, "components", "benefit_sponsors", "spec", "support", "benefit_sponsors_site_spec_helpers")
+require File.join(Rails.root, "app", "data_migrations", "load_issuer_profiles")
 
 # TODO: This will all be deprecated since Golden Seed will be a UI facing task
 # TODO: Deprecating this since its moving to a UI function
-xdescribe "Golden Seed Rake Tasks", dbclean: :after_all do
+describe "Golden Seed Rake Tasks", dbclean: :after_all do
   describe "Generate Consumers and Families for Individual Market" do
     let(:given_task_name) { "golden_seed_individual" }
     subject { GoldenSeedIndividual.new(given_task_name, double(:current_scope => nil)) }
