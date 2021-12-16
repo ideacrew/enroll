@@ -88,8 +88,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
     member_premium = premium_for(member)
     member_premium = (member_premium * __getobj__.ehb)
-    member_premium = all_members_aptc[member.applicant_id.to_s] if member_premium == 0 #TODO: revisit revisit since we always want a aptc amount for member
-    aptc_amount = [all_members_aptc[member.applicant_id.to_s], member_premium].min
+    aptc_amount = all_members_aptc[member.applicant_id.to_s] if member_premium == 0 #TODO: revisit since we always want a aptc amount for member
+    aptc_amount ||= [all_members_aptc[member.applicant_id.to_s], member_premium].min
 
     return aptc_amount unless @member_bool_hash[member.id.to_s]
     round_down_float_two_decimals(aptc_amount)
