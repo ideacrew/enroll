@@ -20,6 +20,7 @@ class HbxAdminController < ApplicationController
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
     @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
+    @household_csrs = build_thhm_csr_hash(@active_tax_household_for_current_year)
     @year_options = Admin::Aptc::years_with_tax_household(@family)
     respond_to do |format|
       format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
@@ -80,5 +81,12 @@ class HbxAdminController < ApplicationController
 
   def validate_aptc
     @aptc_errors = Admin::Aptc.build_error_messages(params[:max_aptc], params[:csr_percentage], params[:applied_aptcs_array], @current_year, @hbxs)
+  end
+
+  def build_thhm_csr_hash(tax_household)
+    tax_household.tax_household_members.inject({}) do |hash, thhm|
+      hash[thhm.person.id.to_s] = thhm.csr_percent_as_integer
+      hash
+    end
   end
 end
