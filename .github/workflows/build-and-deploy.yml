@@ -80,19 +80,19 @@ jobs:
           chmod +x .docker/build_gha.sh
           .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
-      - name: Scan Docker image
-        id: scan
-        uses: anchore/scan-action@main
-        with:
-          image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
-          acs-report-enable: true
-          fail-build: false
-          severity-cutoff: critical
+      # - name: Scan Docker image
+      #   id: scan
+      #   uses: anchore/scan-action@main
+      #   with:
+      #     image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
+      #     acs-report-enable: true
+      #     fail-build: false
+      #     severity-cutoff: critical
 
-      - name: upload Anchore scan SARIF report
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
+      # - name: upload Anchore scan SARIF report
+      #   uses: github/codeql-action/upload-sarif@v1
+      #   with:
+      #     sarif_file: ${{ steps.scan.outputs.sarif }}
 
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
