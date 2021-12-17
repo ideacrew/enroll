@@ -12,8 +12,8 @@ module Insured
     end
 
     let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
-    let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
-    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
     let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', metal_level_kind: :silver, benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
@@ -66,6 +66,38 @@ module Insured
         end
       end
     end
+
+    describe "#validate_rating_address" do
+
+    context "#validate_rating_address with valid rating address" do
+      before do
+        family.special_enrollment_periods << sep
+        @enrollment_id = enrollment.id
+        @family_id     = family.id
+        @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
+      end
+
+        it "returns true with valid rating address" do
+          result = subject.validate_rating_address(@family_id)
+          expect(result).to be_truthy
+        end
+    end
+
+    context "#validate_rating_address with invalid rating address" do
+      let(:person1) {FactoryBot.create(:person, addresses: nil)}
+      let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)} 
+      before :each do
+        family1.primary_person.rating_address.destroy!
+        family1.save!
+      end
+
+      it "returns a failure message with invalid rating address" do
+        family1.primary_person.rating_address.destroy!
+        result = subject.validate_rating_address(family1.id)
+        expect(result).to include(false)
+      end
+    end
+  end
 
     describe "post methods" do
       before :all do

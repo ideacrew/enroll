@@ -21,6 +21,18 @@ module Insured
         new({enrollment_id: enrollment_id, family_id: family_id}).build_form_params
       end
 
+      def self.validate_rating_address(family_id)
+        family = Family.where(id: family_id).first
+        primary_person = family.primary_person
+        primary_person_address = primary_person.rating_address
+        rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_person_address) if primary_person_address.present?
+        if rating_area.nil?
+          [false, "Address is out of state of the supported area, please review your application detail to update your address."]
+        else
+          [true, nil]
+        end
+      end
+
       def self.term_or_cancel(enrollment_id, term_date, term_or_cancel)
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
         enrollment.term_or_cancel_enrollment(enrollment, term_date)

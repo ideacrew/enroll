@@ -183,11 +183,9 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_plan
-    begin
-      @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
-    rescue StandardError => e
-    flash[:error] = "Address out of state or invalid"
-    flash[:error] = e.message
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+    if @self_term_or_cancel_form.errors.present?
+      flash[:error] = @self_term_or_cancel_form.errors.full_messages
       redirect_to family_account_path
     end
   end

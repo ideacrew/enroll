@@ -114,7 +114,7 @@ module Insured
       end
     end
 
-    describe "#for_view" do
+    describe "valid params #for_view" do
       before(:each) do
         # This effective on mock to compensate for new yaers
         enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
@@ -167,6 +167,23 @@ module Insured
       end
     end
 
+    describe "invalid params #for_view" do
+      let(:person1) {FactoryBot.create(:person, addresses: nil)}
+      let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)} 
+      before :each do
+        family1.primary_person.rating_address.destroy!
+        family1.save!
+      end
+
+      it 'should throw an error for invalid address' do
+        family1.primary_person.rating_address.destroy!
+        attrs = {enrollment_id: enrollment.id.to_s, family_id: family1.id}
+        family.primary_person.rating_address.destroy!
+        form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
+        expect(form.errors.full_messages).to be_present
+      end
+    end
+ 
     describe "#for_aptc_update_post" do
       before(:each) do
         enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year

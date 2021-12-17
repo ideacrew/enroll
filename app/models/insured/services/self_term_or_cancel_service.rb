@@ -20,6 +20,10 @@ module Insured
         attributes_to_form_params(form_params)
       end
 
+      def validate_rating_address
+        @factory_class.validate_rating_address(@family_id)
+      end
+
       def term_or_cancel
         @factory_class.term_or_cancel(@enrollment_id, @term_date, @term_or_cancel)
       end

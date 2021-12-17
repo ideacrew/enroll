@@ -110,25 +110,11 @@ class TaxHouseholdMember
     @person = family_member.person
   end
 
-  class BenchmarkFetchFailure < StandardError
-    attr_reader :message
-
-    def initialize(message)
-      @message = message
-    end
-
-  end
-
   def benchmark_product_details_for(effective_date)
     result = Operations::Products::DetermineSlcspForTaxHouseholdMember.new.call(effective_date: effective_date, tax_household_member: self)
-    #result.failure unless result.success?
-    if result.success?
-      result.success
-    else
-      raise BenchmarkFetchFailure.new(result.errors)
-    end
+    raise result.failure unless result.success?
 
-    #result.success
+    result.success
   end
 
   def aptc_benchmark_amount(enrollment)
