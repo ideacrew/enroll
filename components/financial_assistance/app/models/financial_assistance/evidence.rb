@@ -31,7 +31,7 @@ module FinancialAssistance
     end
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
-
+    default_scope ->{ exists(key: true) }
 
     def type_unverified?
       !type_verified?
