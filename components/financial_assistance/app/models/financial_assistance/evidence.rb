@@ -32,6 +32,8 @@ module FinancialAssistance
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
+    validates :title, presence: true
+    validates :key, presence: true
 
     def type_unverified?
       !type_verified?
