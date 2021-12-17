@@ -34,8 +34,7 @@ describe DeleteNilEvidences, dbclean: :after_each do
     end
 
     before do
-      applicant.evidences << FinancialAssistance::Evidence.new
-      applicant.save!
+      applicant.set(evidences: [FinancialAssistance::Evidence.new])
     end
 
     it "successfully deletes the nil evidences" do
