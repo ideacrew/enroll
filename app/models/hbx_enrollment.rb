@@ -1520,12 +1520,19 @@ class HbxEnrollment
 
     tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
-    filtered_elected_plans(elected_plans).collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+    filtered_elected_plans(elected_plans, coverage_kind).collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
-  def filtered_elected_plans(elected_plans)
-    elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
-    elected_plans.reject!(&:allows_adult_and_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_adult_and_child_only_offering) && !any_member_greater_than_18?
+  def filtered_elected_plans(elected_plans, coverage_kind)
+    # TODO: Address this more structurally later.  The logic for pediatric
+    #       dental plan eligibilty is not encoded in a way that interacts
+    #       intuitively with the two available values for whether a plan is
+    #       'child only' or 'adult and child only' on the child_only_offering
+    #       property of BenefitMarkets::Products::Product.
+    if coverage_kind == 'dental'
+      elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
+      elected_plans.reject!(&:allows_adult_and_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_adult_and_child_only_offering) && !any_member_greater_than_18?
+    end
     elected_plans
   end
 
