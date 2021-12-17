@@ -231,7 +231,7 @@ module Insured
 
         it 'should not create new enrollment' do
           expect(family.active_household.hbx_enrollments.count).to eq 1
-          subject.update_aptc(enrollment.id, 1000)
+          expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
           enrollment.reload
           family.reload
           expect(family.active_household.hbx_enrollments.count).to eq 1

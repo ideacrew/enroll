@@ -216,9 +216,8 @@ module Insured
         it 'should not create new enrollment' do
           expect(family.hbx_enrollments.size).to eq 1
           attrs = {enrollment_id: enrollment.id, elected_aptc_pct: 1.0, aptc_applied_total: applied_aptc_amount}
-          result = Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+          expect { Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs) }.to raise_error
           expect(family.hbx_enrollments.size).to eq 1
-          expect(result).to eq "rating_area_id is nil, cannot create reinstatement enrollment"
         end
       end
 
@@ -234,9 +233,8 @@ module Insured
         it 'should not create new enrollment' do
           expect(family.hbx_enrollments.size).to eq 1
           attrs = {enrollment_id: enrollment.id, elected_aptc_pct: 1.0, aptc_applied_total: applied_aptc_amount}
-          result = Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+          expect { Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs) }.to raise_error
           expect(family.hbx_enrollments.size).to eq 1
-          expect(result).to eq "rating_area_id is nil, cannot create reinstatement enrollment"
         end
       end
     end
