@@ -60,7 +60,7 @@ module Effective
 
           dropdown += if individual_market_is_enabled?
                         [
-                          ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
+                          [l10n('admin_actions.edit_aptc_csr'), edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
                            aptc_csr_link_type(row, pundit_allow(Family, :can_edit_aptc?))],
                           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), no_transition_families_is_enabled? ? 'static' : ''],
                           ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), no_transition_families_is_enabled? ? 'static' : '']
