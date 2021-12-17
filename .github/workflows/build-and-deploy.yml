@@ -9,7 +9,7 @@ on:
       - 'v*'
 
 concurrency:
-  group: ${{ github.ref }}
+  group: docker-${{ github.ref }}
   cancel-in-progress: true
 
 env:
