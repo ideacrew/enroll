@@ -925,6 +925,7 @@ module FinancialAssistance
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && person_coverage_end_on.blank?
       return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
