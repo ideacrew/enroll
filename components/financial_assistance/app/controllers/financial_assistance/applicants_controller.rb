@@ -177,7 +177,11 @@ module FinancialAssistance
     end
 
     def find_application
-      @application = FinancialAssistance::Application.find_by(id: params[:application_id], :family_id.in => get_current_person.current_and_past_financial_assistance_identifiers)
+      @application = if current_user.try(:person).try(:agent?) && !session[:person_id].present?
+                       FinancialAssistance::Application.find_by(id: params[:application_id])
+                     else
+                       FinancialAssistance::Application.find_by(id: params[:application_id], :family_id.in => get_current_person.current_and_past_financial_assistance_identifiers)
+                     end
     end
 
     def find
