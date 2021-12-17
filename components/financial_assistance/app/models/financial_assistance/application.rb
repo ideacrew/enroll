@@ -1542,6 +1542,7 @@ module FinancialAssistance
 
       active_applicants.each do |applicant|
         applicant.evidences << build_evidences(types, applicant)
+        applicant.save if applicant.evidences
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
 
@@ -1568,22 +1569,22 @@ module FinancialAssistance
     # rubocop:enable Metrics/CyclomaticComplexity
 
     def build_evidences(types, applicant)
-      evidences = types.collect do |type|
-        key, title = type
-
+      evidences = []
+      types.each do |type_array|
+        key = type_array[0]
+        title = type_array[1]
         next if applicant.evidences.by_name(key).present?
         case key
         when :aces_mec, :esi_mec, :non_esi_mec
           next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
+          evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
         when :income
-          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
+          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
           status = applicant.incomes.blank? ? "attested" : "outstanding"
-          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
+          evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
         end
       end
-
-      evidences.compact || []
+      evidences
     end
 
     def delete_verification_documents

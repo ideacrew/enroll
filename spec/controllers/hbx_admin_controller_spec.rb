@@ -24,6 +24,7 @@ RSpec.describe HbxAdminController, :type => :controller do
       allow(HbxProfile).to receive(:current_hbx).and_return(organization)
       allow(Admin::Aptc).to receive(:calculate_slcsp_value).with(valid_date.year, family).and_return('100')
       allow(Admin::Aptc).to receive(:years_with_tax_household).with(family).and_return(valid_date.year)
+      FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)
     end
 
     it "should initialize the variables for the method and render the proper template" do

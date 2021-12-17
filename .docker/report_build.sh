@@ -24,7 +24,7 @@ cp .docker/config/redis.rb config/initializers/
 cp .docker/config/sidekiq.rb config/initializers/
 
 docker build --build-arg BUNDLER_VERSION_OVERRIDE='2.0.1' \
-             --build-arg NODE_MAJOR='12' \
+             --build-arg NODE_MAJOR='10' \
              --build-arg YARN_VERSION='1.22.4' \
              --build-arg ENROLL_DB_HOST='host.docker.internal' \
              --build-arg ENROLL_DB_PORT="27017" \
@@ -44,7 +44,7 @@ docker build --build-arg BUNDLER_VERSION_OVERRIDE='2.0.1' \
              --build-arg RIDP_SERVICE_USERNAME="user" \
 	     --build-arg CLIENT="me" \
              --build-arg SECRET_KEY_BASE="c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82" \
-             -f .docker/production/Dockerfile --target app -t $2:$1 --network="host" .
+             -f .docker/production/Dockerfile.reports --target app -t $2:$1 --network="host" .
 docker push $2:$1
 
 #mv Gemfile.tmp Gemfile
