@@ -45,7 +45,10 @@ module Insured
 
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
-        return [false, "rating_area_id is nil, cannot create reinstatement enrollment"] if reinstatement.rating_area_id.nil?
+        if reinstatement.rating_area_id.nil?
+          log("ERROR in SelfServiceFactory: Rating_area_id is nil, cannot create reinstatement enrollment. person_hbx_id: #{enrollment.family.primary_person.hbx_id}, enrollment_hbx_id: #{enrollment.hbx_id}")
+          raise
+        end
         reinstatement.save!
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
 
