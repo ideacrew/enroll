@@ -521,14 +521,24 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit_plan)
       end
+    end
+  end
 
-      it 'redirects to families account when invalid params are passed through' do
-        sign_in user
-        @family.special_enrollment_periods << @sep
-        attrs = {hbx_enrollment_id: nil, family_id: @family.id}
-        get :edit_plan, params: attrs
-        expect(response).to redirect_to family_account_path
-      end
+  context "#edit_plan with invalid params" do
+    let(:person1) {FactoryBot.create(:person, addresses: nil)}
+    let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+    let(:enrollment) {HbxEnrollment.all[0] }
+    before :each do
+      family1.primary_person.rating_address.destroy!
+      family1.save!
+    end
+
+    it 'redirects to families account when invalid params are passed through' do
+      sign_in user
+      family1.primary_person.rating_address.destroy!
+      attrs = {hbx_enrollment_id: enrollment.id.to_s, family_id: family1.id}
+      get :edit_plan, params: attrs
+      expect(response).to redirect_to family_account_path
     end
   end
 

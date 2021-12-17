@@ -27,7 +27,7 @@ module Insured
         primary_person_address = primary_person.rating_address
         rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_person_address) if primary_person_address.present?
         if rating_area.nil?
-          [false, "Address is out of state of the supported area, please review your application detail to update your address."]
+          [false, "Address is out of state of the supported area, please review your application details to update your address."]
         else
           [true, nil]
         end

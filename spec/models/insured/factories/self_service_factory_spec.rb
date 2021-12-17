@@ -19,7 +19,9 @@ module Insured
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', metal_level_kind: :silver, benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
     let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
-    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: enrollment, coverage_start_on: TimeKeeper.date_of_record)}
+    let!(:hbx_enrollment_member1) do
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: enrollment, coverage_start_on: TimeKeeper.date_of_record)
+    end
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment)}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
 
@@ -69,35 +71,35 @@ module Insured
 
     describe "#validate_rating_address" do
 
-    context "#validate_rating_address with valid rating address" do
-      before do
-        family.special_enrollment_periods << sep
-        @enrollment_id = enrollment.id
-        @family_id     = family.id
-        @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
-      end
+      context "#validate_rating_address with valid rating address" do
+        before do
+          family.special_enrollment_periods << sep
+          @enrollment_id = enrollment.id
+          @family_id     = family.id
+          @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
+        end
 
         it "returns true with valid rating address" do
           result = subject.validate_rating_address(@family_id)
           expect(result).to be_truthy
         end
-    end
-
-    context "#validate_rating_address with invalid rating address" do
-      let(:person1) {FactoryBot.create(:person, addresses: nil)}
-      let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)} 
-      before :each do
-        family1.primary_person.rating_address.destroy!
-        family1.save!
       end
 
-      it "returns a failure message with invalid rating address" do
-        family1.primary_person.rating_address.destroy!
-        result = subject.validate_rating_address(family1.id)
-        expect(result).to include(false)
+      context "#validate_rating_address with invalid rating address" do
+        let(:person1) {FactoryBot.create(:person, addresses: nil)}
+        let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+        before :each do
+          family1.primary_person.rating_address.destroy!
+          family1.save!
+        end
+
+        it "returns a failure message with invalid rating address" do
+          family1.primary_person.rating_address.destroy!
+          result = subject.validate_rating_address(family1.id)
+          expect(result).to include(false)
+        end
       end
     end
-  end
 
     describe "post methods" do
       before :all do

@@ -169,7 +169,7 @@ module Insured
 
     describe "invalid params #for_view" do
       let(:person1) {FactoryBot.create(:person, addresses: nil)}
-      let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)} 
+      let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)}
       before :each do
         family1.primary_person.rating_address.destroy!
         family1.save!
@@ -183,7 +183,7 @@ module Insured
         expect(form.errors.full_messages).to be_present
       end
     end
- 
+
     describe "#for_aptc_update_post" do
       before(:each) do
         enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
