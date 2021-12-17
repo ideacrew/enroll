@@ -3,24 +3,29 @@ on:
   push:
   workflow_dispatch:
 
+concurrency:
+  group: cucumber-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   cucumber-report:
     strategy:
       matrix:
-        feature: [
-            # 'admin',
-            # 'brokers',
-            # 'cover_all',
-            # 'employee',
-            # 'employers',
-            # 'financial_assistance',
-            # 'general_agencies',
-            # 'group_selection',
-            # 'hbx',
-            # 'hbx_admin',
+        feature:
+          [
+            'admin',
+            'brokers',
+            'cover_all',
+            'employee',
+            'employers',
+            'financial_assistance',
+            'general_agencies',
+            'group_selection',
+            'hbx',
+            'hbx_admin',
             'insured',
-            # 'permissions',
-            # 'plan_shopping',
+            'permissions',
+            'plan_shopping',
           ]
     runs-on: ubuntu-latest
     steps:
