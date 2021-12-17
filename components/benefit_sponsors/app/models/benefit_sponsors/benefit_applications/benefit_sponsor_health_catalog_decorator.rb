@@ -75,16 +75,19 @@ module BenefitSponsors
 
         product_packages.by_product_kind(:health).each do |product_package|
           package_products = product_package.products.collect do |product|
-            Product.new(product.id,
-                        product.title,
-                        product.metal_level_kind,
-                        carriers[product.issuer_profile_id.to_s],
-                        product.issuer_profile_id,
+            parent_product = ::BenefityMarkets::Products::Product.by_year(product.active_year)
+                                                                 .where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind)
+                                                                 .first
+            Product.new(parent_product.id,
+                        parent_product.title,
+                        parent_product.metal_level_kind,
+                        carriers[parent_product.issuer_profile_id.to_s],
+                        parent_product.issuer_profile_id,
                         false,
-                        product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental",
-                        product.product_type,
-                        product.network_information,
-                        product.network)
+                        parent_product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental",
+                        parent_product.product_type,
+                        parent_product.network_information,
+                        parent_product.network)
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :single_issuer

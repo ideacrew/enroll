@@ -31,7 +31,7 @@ module BenefitSponsors
 
 
         @contributions = product_packages.by_product_kind(:dental).inject({}) do |contributions, product_package|
-          
+
           if benefit_package.present?
             if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
               sponsor_contribution = sponsored_benefit.sponsor_contribution
@@ -125,7 +125,20 @@ module BenefitSponsors
         product_packages.by_product_kind(:dental).each do |product_package|
           package_products = product_package.products.collect do |product|
             # TODO
-            Product.new(product.id, product.title, product.metal_level, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.kind.to_s, product.product_type, product.network_information, product.network)
+            parent_product = ::BenefityMarkets::Products::Product.by_year(product.active_year)
+                                                                 .where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind)
+                                                                 .first
+            Product.new(parent_product.id,
+              parent_product.title,
+              parent_product.metal_level,
+              carriers[parent_product.issuer_profile_id.to_s],
+              parent_product.issuer_profile_id,
+              false,
+              parent_product.kind.to_s,
+              parent_product.product_type,
+              parent_product.network_information,
+              parent_product.network
+            )
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :multi_product
