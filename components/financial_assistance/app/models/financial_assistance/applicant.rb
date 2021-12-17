@@ -291,7 +291,8 @@ module FinancialAssistance
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :evidences
+    accepts_nested_attributes_for :incomes, :deductions, :benefits
+    accepts_nested_attributes_for :evidences, :reject_if => proc { |evidence| evidence[:key].blank? }, allow_destroy: true
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
@@ -324,6 +325,7 @@ module FinancialAssistance
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
+    after_save :remove_nil_evidences
     before_destroy :destroy_relationships, :propagate_destroy
 
     def generate_hbx_id
@@ -1295,6 +1297,11 @@ module FinancialAssistance
     #Income/MEC Verifications
     def notify_of_eligibility_change
       # CoverageHousehold.update_eligibility_for_family(family)
+    end
+
+    # Remove any evidences with nil attributes that may have been created
+    def remove_nil_evidences
+      set(evidences: self.evidences.select { |evidence| evidence.key.present? })
     end
 
     def propagate_applicant

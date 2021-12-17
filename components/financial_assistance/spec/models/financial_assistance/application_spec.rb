@@ -669,9 +669,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it 'should create MEC evidences, ACES MEC check only if is_ia_eligible? not true' do
-      application.send(:create_evidences)
+      application.update_attributes(aasm_state: 'submitted')
+      application.determine!
       expect(applicant1.evidences.count).to eq 4
       expect(applicant2.evidences.count).to eq 4
+      applicant1.evidences << FinancialAssistance::Evidence.new
+      applicant1.save
       expect(applicant1.reload.evidences.where(key: nil).present?).to eq false
     end
 
