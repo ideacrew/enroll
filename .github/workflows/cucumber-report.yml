@@ -1,27 +1,26 @@
 name: cucumber report
 on:
-  # push:
+  push:
   workflow_dispatch:
 
 jobs:
   cucumber-report:
     strategy:
       matrix:
-        feature:
-          [
-            'admin',
-            'brokers',
-            'cover_all',
-            'employee',
-            'employers',
-            'financial_assistance',
-            'general_agencies',
-            'group_selection',
-            'hbx',
-            'hbx_admin',
+        feature: [
+            # 'admin',
+            # 'brokers',
+            # 'cover_all',
+            # 'employee',
+            # 'employers',
+            # 'financial_assistance',
+            # 'general_agencies',
+            # 'group_selection',
+            # 'hbx',
+            # 'hbx_admin',
             'insured',
-            'permissions',
-            'plan_shopping',
+            # 'permissions',
+            # 'plan_shopping',
           ]
     runs-on: ubuntu-latest
     steps:
@@ -75,20 +74,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Restore Node Modules
-        id: npm-cache
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-      - name: Install node dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: yarn install
       - uses: actions/download-artifact@v2
         with:
           path: ci/cucumber/compressed-reports
