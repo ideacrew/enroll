@@ -50,7 +50,6 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       expect(plan_cost_decorator.premium_for(one)).to eq 20.0
     end
 
-
     it "should have a premium for two" do
       expect(plan_cost_decorator.premium_for(two)).to eq 18.0
     end
@@ -189,6 +188,72 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
           it 'should return total_aptc_amount' do
             expect(@upcd_2.total_aptc_amount).to eq 1500
+          end
+        end
+
+        context 'when no premium but allocated aptc ratio for the member is present' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            age = @upcd_2.age_of(hbx_enrollment_member1)
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, age, area, 'NA').and_return(0.0)
+          end
+
+          it 'should return the aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.aptc_amount(hbx_enrollment_member1)).to eq @upcd_2.all_members_aptc[hbx_enrollment_member1.applicant_id.to_s]
+          end
+        end
+      end
+
+      context 'employee_cost_for member' do
+        context 'when premium for member is zero and large family factor is zero' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(0.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(100.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(0.0)
+          end
+
+          it 'should return the negative aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq(- @upcd_2.aptc_amount(hbx_enrollment_member1))
+          end
+        end
+
+        context 'when premium for member is not zero and large family factor is zero' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(100.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(10.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(0.0)
+          end
+
+          it 'should return the difference between premium and aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq 0.0
+          end
+        end
+
+        context 'when premium for member is not zero and large family factor is 1.0' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(100.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(10.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(1.0)
+          end
+
+          it 'should return the difference between premium and aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq(@upcd_2.premium_for(hbx_enrollment_member1) - @upcd_2.aptc_amount(hbx_enrollment_member1))
+          end
+        end
+
+        context 'when premium for member is zero and large family factor is 1.0' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(0.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(10.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(1.0)
+          end
+
+          it 'should return 0.0' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq 0.0
           end
         end
       end

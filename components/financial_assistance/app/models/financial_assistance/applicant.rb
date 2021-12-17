@@ -725,7 +725,8 @@ module FinancialAssistance
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists? &&
-          ssn_present?
+          ssn_present? &&
+          (FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) ? medicare_eligible_qns : true)
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
