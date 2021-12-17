@@ -122,7 +122,7 @@
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
             <div class='row top-pd'>
               <div class="col-sm-12">
-                <h4><%= l10n("insured.do_you_need_coverage_earlier_msg", site_short_name: site_short_name, current_year: '2021', healthcare_link: link_to('HealthCare.gov', EnrollRegistry[:enroll_app].setting(:website_url).item, target: "_blank"), link: link_to('Special Enrollment Period', find_sep_insured_families_path, id: "find_sep_link" ), year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)%></h4>
+                <h4><%= l10n("insured.group_selection.new.need_coverage_earlier_html")%></h4>
               </div>
             </div>
 
