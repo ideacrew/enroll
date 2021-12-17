@@ -1,4 +1,4 @@
-version: "3.4"
+version: '3.4'
 services:
   web:
     build:
@@ -6,13 +6,13 @@ services:
       dockerfile: ./.docker/development/Dockerfile
       args:
         BUNDLER_VERSION_OVERRIDE: '2.0.1'
-        NODE_MAJOR: '10'
+        NODE_MAJOR: '12'
         YARN_VERSION: '1.22.4'
     image: enroll:dev-0.1.0
     links:
       - db
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - .:/enroll:cached
       - bundle:/bundle
