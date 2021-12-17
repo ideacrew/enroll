@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - 'trunk'
+      - 'release_*'
+    tags:
+      - 'v*'
 
 concurrency:
   group: ${{ github.ref }}
