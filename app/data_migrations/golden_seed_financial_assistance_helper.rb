@@ -82,7 +82,13 @@ module GoldenSeedFinancialAssistanceHelper
   # rubocop:disable Metrics/PerceivedComplexity:
   def create_fa_relationships(case_array_data)
     # TODO: This needs to be refactored to harmonize the calls in financial_assistance_world.rb and the seed_worker
-    case_array = case_array_data.is_a?(Array) ? case_array_data.first : case_array_data.last
+    case_array = if case_array_data.any? { |value| value.is_a?(Hash) }
+                   case_array_data.detect { |value| value.is_a?(Hash) }
+                 elsif case_array_data.is_a?(Array)
+                   case_array_data.first
+                 else
+                   case_array_data.last
+                 end
     application = case_array[:fa_application]
     primary_applicant = application.applicants.detect(&:is_primary_applicant)
     applicants = case_array[:fa_applicants].reject { |applicant| applicant[:applicant_record] == primary_applicant }
