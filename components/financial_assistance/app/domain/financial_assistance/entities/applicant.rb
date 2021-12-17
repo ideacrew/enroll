@@ -64,6 +64,7 @@ module FinancialAssistance
       attribute :incomes, Types::Array.of(FinancialAssistance::Entities::Income).meta(omittable: true)
 
       attribute :is_temporarily_out_of_state, Types::Strict::Bool.meta(omittable: true) if EnrollRegistry[:enroll_app].settings(:site_key).item == :dc
+      attribute :transfer_referral_reason, Types::String.optional.meta(omittable: true)
     end
   end
 end
