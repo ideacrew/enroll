@@ -4,6 +4,7 @@ require 'rails_helper'
 
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{Rails.root}/spec/models/shared_contexts/census_employee.rb"
 
 RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
@@ -13,6 +14,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
+  include_context "census employee base data"
 
   let(:current_effective_date) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
 
@@ -38,22 +40,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   let(:address) {Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001")}
   let(:autocomplete) {" lynyrd skynyrd"}
 
-  let(:valid_params) do
-    {
-      employer_profile: employer_profile,
-      first_name: first_name,
-      middle_name: middle_name,
-      last_name: last_name,
-      name_sfx: name_sfx,
-      ssn: ssn,
-      dob: dob,
-      gender: gender,
-      hired_on: hired_on,
-      is_business_owner: is_business_owner,
-      address: address,
-      benefit_sponsorship: organization.active_benefit_sponsorship
-    }
-  end
+  
 
   describe "Model instance" do
     context "model Attributes" do
