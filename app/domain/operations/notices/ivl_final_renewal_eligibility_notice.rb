@@ -10,6 +10,7 @@ module Operations
       include Dry::Monads[:result, :do]
       include EventSource::Command
       include EventSource::Logging
+      include ActionView::Helpers::NumberHelper
 
       # @param [Family] :family Family
       # @return [Dry::Monads::Result]
@@ -50,7 +51,17 @@ module Operations
         result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
         return result unless result.success?
 
-        Success(result.value!)
+        family_hash = update_issuer_phone_format(result.value!)
+        Success(family_hash)
+      end
+
+      def update_issuer_phone_format(family_hash)
+        family_hash[:households].each do |household|
+          household[:hbx_enrollments].each do |hbx_enrollment|
+            hbx_enrollment[:issuer_profile_reference][:phone] = number_to_phone(hbx_enrollment[:issuer_profile_reference][:phone], area_code: true)
+          end
+        end
+        family_hash
       end
 
       def validate_payload(payload)
