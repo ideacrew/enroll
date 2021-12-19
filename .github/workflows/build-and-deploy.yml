@@ -119,7 +119,7 @@ jobs:
             BUNDLER_VERSION_OVERRIDE=2.0.1
             NODE_MAJOR=12
             YARN_VERSION=1.22.4
-            ENROLL_DB_HOST=localhost
+            ENROLL_DB_HOST=mongo
             ENROLL_DB_PORT=27017
             ENROLL_DB_NAME=enroll_production
             REDIS_HOST_ENROLL=localhost
