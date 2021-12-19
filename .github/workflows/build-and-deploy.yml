@@ -102,23 +102,23 @@ jobs:
       #     sarif_file: ${{ steps.scan.outputs.sarif }}
 
       # Upload Docker Image to Amazon ECR
-      - name: Upload Image to ECR
-        id: upload-image
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}
-  notify-slack:
-    needs: [build-and-upload-image]
-    runs-on: ubuntu-latest
-    steps:
-      # gets the branch name without the 'refs/heads/' prefix
-      - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
+      # - name: Upload Image to ECR
+      #   id: upload-image
+      #   run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}
+  # notify-slack:
+  #   needs: [build-and-upload-image]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # gets the branch name without the 'refs/heads/' prefix
+  #     - name: Git branch name
+  #       id: git-branch-name
+  #       uses: EthanSK/git-branch-name-action@v1
 
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.16.0
-        with:
-          channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+  #     - name: Post to a Slack channel
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v1.16.0
+  #       with:
+  #         channel-id: 'docker-images'
+  #         slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
