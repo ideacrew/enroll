@@ -2,11 +2,13 @@ name: Build Image and Deploy
 
 on:
   push:
+    # branches:
+    #   - 'trunk'
+    #   - 'release_*'
+    # tags:
+    #   - 'v*'
     branches:
-      - 'trunk'
-      - 'release_*'
-    tags:
-      - 'v*'
+      - 'refactor-gha-docker-build'
 
 concurrency:
   group: docker-${{ github.ref }}
@@ -34,51 +36,68 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
     steps:
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-
       # Check out repository
       - uses: actions/checkout@v2
-
-      # Adds `docker` to the environment for running commands
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      # Add vhosts to RabbitMQ
-      - run: |
-          docker exec rabbitmq rabbitmqctl add_vhost /
-          docker exec rabbitmq rabbitmqctl add_vhost event_source
-          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
-
-      # Provide credentials for AWS
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      # Must use docker login in order to specify public registry
-      - name: Login to Public ECR
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.ECR_REGISTRY }}
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # gets the branch name without the 'refs/heads/' prefix
       - name: Git branch name
         id: git-branch-name
         uses: EthanSK/git-branch-name-action@v1
 
-      # Build Docker Image
-      - name: Build Image
-        id: build-image
+      - name: Prepare
+        id: prep
         run: |
-          chmod +x .docker/build_gha.sh
-          .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+          TAG=${{ env.GIT_BRANCH_NAME}}-$(echo $GITHUB_SHA | head -c7)
+          IMAGE="public.ecr.aws/ideacrew/enroll"
+          echo ::set-output name=tagged_image::${IMAGE}:${TAG}
+          echo ::set-output name=tag::${TAG}
+
+      - name: echo stuff
+        run: |
+          echo ${{ env.tagged_image }}
+          echo ${{ env.tag }}
+
+      # # Adds `docker` to the environment for running commands
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v1
+      #   with:
+      #     install: true
+
+      # # Add vhosts to RabbitMQ
+      # - run: |
+      #     docker exec rabbitmq rabbitmqctl add_vhost /
+      #     docker exec rabbitmq rabbitmqctl add_vhost event_source
+      #     docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
+
+      # # Provide credentials for AWS
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
+
+      # # Must use docker login in order to specify public registry
+      # - name: Login to Public ECR
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: ${{ env.ECR_REGISTRY }}
+      #     username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # # Build Docker Image
+      # - name: Build Image
+      #   id: build-image
+      #   run: |
+      #     chmod +x .docker/build_gha.sh
+      #     .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
       # - name: Scan Docker image
       #   id: scan
@@ -95,23 +114,23 @@ jobs:
       #     sarif_file: ${{ steps.scan.outputs.sarif }}
 
       # Upload Docker Image to Amazon ECR
-      - name: Upload Image to ECR
-        id: upload-image
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}
-  notify-slack:
-    needs: [build-and-upload-image]
-    runs-on: ubuntu-latest
-    steps:
-      # gets the branch name without the 'refs/heads/' prefix
-      - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
+      # - name: Upload Image to ECR
+      #   id: upload-image
+      #   run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}
+  # notify-slack:
+  #   needs: [build-and-upload-image]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # gets the branch name without the 'refs/heads/' prefix
+  #     - name: Git branch name
+  #       id: git-branch-name
+  #       uses: EthanSK/git-branch-name-action@v1
 
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.16.0
-        with:
-          channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+  #     - name: Post to a Slack channel
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v1.16.0
+  #       with:
+  #         channel-id: 'docker-images'
+  #         slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
