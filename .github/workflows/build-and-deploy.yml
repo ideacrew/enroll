@@ -49,9 +49,9 @@ jobs:
       # Check out repository
       - uses: actions/checkout@v2
 
-      # - uses: wbari/start-mongoDB@v0.2
-      #   with:
-      #     mongoDBVersion: '4.2'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '4.2'
 
       # # gets the branch name without the 'refs/heads/' prefix
       # - name: Git branch name
@@ -65,11 +65,6 @@ jobs:
       #     IMAGE="public.ecr.aws/ideacrew/enroll"
       #     echo ::set-output name=tagged_image::${IMAGE}:${TAG}
       #     echo ::set-output name=tag::${TAG}
-
-      # - name: echo stuff
-      #   run: |
-      #     echo ${{ steps.prep.outputs.tagged_image }}
-      #     echo ${{ steps.prep.outputs.tag }}
 
       # # Adds `docker` to the environment for running commands
       # - name: Set up Docker Buildx
@@ -99,16 +94,18 @@ jobs:
       #     username: ${{ secrets.AWS_ACCESS_KEY_ID }}
       #     password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - run: cat .docker/config/mongoid.yml
-      - run: cat config/mongoid.yml
+      # # Pre-build Script
+      # - name: Pre-build Script
+      #   run: |
+      #     chmod +x .docker/pre_build.sh
+      #     .docker/pre_build.sh
 
-      # Pre-build Script
-      - name: Pre-build Script
+      # Build Docker Image
+      - name: Build Image
+        id: build-image
         run: |
-          chmod +x .docker/pre_build.sh
-          .docker/pre_build.sh
-
-      - run: cat config/mongoid.yml
+          chmod +x .docker/build_gha.sh
+          .docker/build_gha.sh test public.ecr.aws/ideacrew/enroll .
 
       # - name: Build Image
       #   uses: docker/build-push-action@v2
