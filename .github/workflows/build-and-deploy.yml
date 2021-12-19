@@ -49,55 +49,58 @@ jobs:
       # Check out repository
       - uses: actions/checkout@v2
 
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
+      # - uses: wbari/start-mongoDB@v0.2
+      #   with:
+      #     mongoDBVersion: '4.2'
 
-      # gets the branch name without the 'refs/heads/' prefix
-      - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
+      # # gets the branch name without the 'refs/heads/' prefix
+      # - name: Git branch name
+      #   id: git-branch-name
+      #   uses: EthanSK/git-branch-name-action@v1
 
-      - name: Prepare
-        id: prep
-        run: |
-          TAG=${{ env.GIT_BRANCH_NAME}}-$(echo $GITHUB_SHA | head -c7)
-          IMAGE="public.ecr.aws/ideacrew/enroll"
-          echo ::set-output name=tagged_image::${IMAGE}:${TAG}
-          echo ::set-output name=tag::${TAG}
+      # - name: Prepare
+      #   id: prep
+      #   run: |
+      #     TAG=${{ env.GIT_BRANCH_NAME}}-$(echo $GITHUB_SHA | head -c7)
+      #     IMAGE="public.ecr.aws/ideacrew/enroll"
+      #     echo ::set-output name=tagged_image::${IMAGE}:${TAG}
+      #     echo ::set-output name=tag::${TAG}
 
-      - name: echo stuff
-        run: |
-          echo ${{ steps.prep.outputs.tagged_image }}
-          echo ${{ steps.prep.outputs.tag }}
+      # - name: echo stuff
+      #   run: |
+      #     echo ${{ steps.prep.outputs.tagged_image }}
+      #     echo ${{ steps.prep.outputs.tag }}
 
-      # Adds `docker` to the environment for running commands
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          install: true
+      # # Adds `docker` to the environment for running commands
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v1
+      #   with:
+      #     install: true
 
-      # Add vhosts to RabbitMQ
-      - run: |
-          docker exec rabbitmq rabbitmqctl add_vhost /
-          docker exec rabbitmq rabbitmqctl add_vhost event_source
-          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
+      # # Add vhosts to RabbitMQ
+      # - run: |
+      #     docker exec rabbitmq rabbitmqctl add_vhost /
+      #     docker exec rabbitmq rabbitmqctl add_vhost event_source
+      #     docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
 
-      # Provide credentials for AWS
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+      # # Provide credentials for AWS
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
 
-      # Must use docker login in order to specify public registry
-      - name: Login to Public ECR
-        uses: docker/login-action@v1
-        with:
-          registry: public.ecr.aws
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # # Must use docker login in order to specify public registry
+      # - name: Login to Public ECR
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: public.ecr.aws
+      #     username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - run: cat .docker/config/mongoid.yml
+      - run: cat config/mongoid.yml
 
       # Pre-build Script
       - name: Pre-build Script
@@ -105,43 +108,45 @@ jobs:
           chmod +x .docker/pre_build.sh
           .docker/pre_build.sh
 
-      - name: Build Image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          builder: ${{ steps.buildx.outputs.name }}
-          file: .docker/production/Dockerfile
-          # Set the desired build target here
-          target: app
-          network: host
-          push: false
-          tags: ${{ steps.prep.outputs.tagged_image }}
-          # cache-from: type=local,src=/tmp/.buildx-cache
-          # Note the mode=max here
-          # More: https://github.com/moby/buildkit#--export-cache-options
-          # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
-          # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-          build-args: |
-            NODE_MAJOR=12
-            YARN_VERSION=1.22.4
-            ENROLL_DB_HOST=localhost
-            ENROLL_DB_PORT=27017
-            ENROLL_DB_NAME=enroll_production
-            REDIS_HOST_ENROLL=localhost
-            RABBITMQ_URL=amqp://localhost:5672
-            RABBITMQ_HOST=amqp://localhost
-            RABBITMQ_PORT=5672
-            RABBITMQ_VHOST=event_source
-            MITC_HOST=http://mitc
-            MITC_PORT=3001
-            MITC_URL=http://mitc:3001
-            RIDP_CLIENT_KEY_PATH=./config/fdsh.key
-            RIDP_INITIAL_SERVICE_URL=https://impl.hub.cms.gov/Imp1
-            RIDP_CLIENT_CERT_PATH=./config/fdsh.pem
-            RIDP_SERVICE_PASSWORD=password
-            RIDP_SERVICE_USERNAME=user
-            CLIENT=me
-            SECRET_KEY_BASE=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
+      - run: cat config/mongoid.yml
+
+      # - name: Build Image
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     builder: ${{ steps.buildx.outputs.name }}
+      #     file: .docker/production/Dockerfile
+      #     # Set the desired build target here
+      #     target: app
+      #     network: host
+      #     push: false
+      #     tags: ${{ steps.prep.outputs.tagged_image }}
+      #     # cache-from: type=local,src=/tmp/.buildx-cache
+      #     # Note the mode=max here
+      #     # More: https://github.com/moby/buildkit#--export-cache-options
+      #     # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
+      #     # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+      #     build-args: |
+      #       NODE_MAJOR=12
+      #       YARN_VERSION=1.22.4
+      #       ENROLL_DB_HOST=localhost
+      #       ENROLL_DB_PORT=27017
+      #       ENROLL_DB_NAME=enroll_production
+      #       REDIS_HOST_ENROLL=localhost
+      #       RABBITMQ_URL=amqp://localhost:5672
+      #       RABBITMQ_HOST=amqp://localhost
+      #       RABBITMQ_PORT=5672
+      #       RABBITMQ_VHOST=event_source
+      #       MITC_HOST=http://mitc
+      #       MITC_PORT=3001
+      #       MITC_URL=http://mitc:3001
+      #       RIDP_CLIENT_KEY_PATH=./config/fdsh.key
+      #       RIDP_INITIAL_SERVICE_URL=https://impl.hub.cms.gov/Imp1
+      #       RIDP_CLIENT_CERT_PATH=./config/fdsh.pem
+      #       RIDP_SERVICE_PASSWORD=password
+      #       RIDP_SERVICE_USERNAME=user
+      #       CLIENT=me
+      #       SECRET_KEY_BASE=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
 
       # - name: Scan Docker image
       #   id: scan
