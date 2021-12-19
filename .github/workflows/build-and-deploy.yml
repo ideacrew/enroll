@@ -61,8 +61,8 @@ jobs:
 
       - name: echo stuff
         run: |
-          echo ${{ env.tagged_image }}
-          echo ${{ env.tag }}
+          echo ${{ steps.prep.outputs.tagged_image }}
+          echo ${{ steps.prep.outputs.tag }}
 
       # # Adds `docker` to the environment for running commands
       # - name: Set up Docker Buildx
