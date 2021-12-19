@@ -103,6 +103,7 @@ jobs:
           file: .docker/production/Dockerfile
           # Set the desired build target here
           target: app
+          network: host
           push: false
           tags: ${{ steps.prep.outputs.tagged_image }}
           # cache-from: type=local,src=/tmp/.buildx-cache
