@@ -1,12 +1,16 @@
 {
   "cSpell.words": [
+    "amqp",
     "anchore",
     "buildx",
+    "fdsh",
     "getong",
     "interactors",
+    "MITC",
     "nanasess",
     "rabbitmq",
     "rabbitmqctl",
+    "RIDP",
     "serializers",
     "vhost",
     "vhosts",
