@@ -17,9 +17,6 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  ECR_REPOSITORY: 'enroll'
-  ECR_REGISTRY: 'public.ecr.aws'
-  ECR_ORG: 'ideacrew'
 
 jobs:
   build-and-upload-image:
@@ -64,40 +61,45 @@ jobs:
           echo ${{ steps.prep.outputs.tagged_image }}
           echo ${{ steps.prep.outputs.tag }}
 
-      # # Adds `docker` to the environment for running commands
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v1
-      #   with:
-      #     install: true
+      # Adds `docker` to the environment for running commands
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
 
-      # # Add vhosts to RabbitMQ
-      # - run: |
-      #     docker exec rabbitmq rabbitmqctl add_vhost /
-      #     docker exec rabbitmq rabbitmqctl add_vhost event_source
-      #     docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
+      # Add vhosts to RabbitMQ
+      - run: |
+          docker exec rabbitmq rabbitmqctl add_vhost /
+          docker exec rabbitmq rabbitmqctl add_vhost event_source
+          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
 
-      # # Provide credentials for AWS
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-1
+      # Provide credentials for AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-      # # Must use docker login in order to specify public registry
-      # - name: Login to Public ECR
-      #   uses: docker/login-action@v1
-      #   with:
-      #     registry: ${{ env.ECR_REGISTRY }}
-      #     username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # Must use docker login in order to specify public registry
+      - name: Login to Public ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.ECR_REGISTRY }}
+          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # # Build Docker Image
-      # - name: Build Image
-      #   id: build-image
-      #   run: |
-      #     chmod +x .docker/build_gha.sh
-      #     .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
+      # Pre-build Script
+      - name: Pre-build Script
+        run: |
+          chmod +x .docker/pre_build.sh
+
+      # Build Docker Image
+      - name: Build Image
+        id: build-image
+        run: |
+          chmod +x .docker/build_gha.sh
+          .docker/build_gha.sh ${{ env.GIT_BRANCH_NAME }}-${{ github.sha }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }} .
 
       # - name: Scan Docker image
       #   id: scan
