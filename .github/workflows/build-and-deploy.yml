@@ -35,22 +35,23 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      mongo:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
-        options: >-
-          --name "mongo"
-          --health-cmd mongo
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+      # mongo:
+      #   image: mongo:4.2
+      #   ports:
+      #     - 27017:27017
+      #   options: >-
+      #     --name "mongo"
+      #     --health-cmd mongo
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
     steps:
       # Check out repository
       - uses: actions/checkout@v2
 
-      - name: Start Mongo
-        run: mongod
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '4.2'
 
       # gets the branch name without the 'refs/heads/' prefix
       - name: Git branch name
