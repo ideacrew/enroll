@@ -49,6 +49,9 @@ jobs:
       # Check out repository
       - uses: actions/checkout@v2
 
+      - name: Start Mongo
+        run: mongod
+
       # gets the branch name without the 'refs/heads/' prefix
       - name: Git branch name
         id: git-branch-name
@@ -118,7 +121,6 @@ jobs:
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
-            BUNDLER_VERSION_OVERRIDE=2.0.1
             NODE_MAJOR=12
             YARN_VERSION=1.22.4
             ENROLL_DB_HOST=localhost
