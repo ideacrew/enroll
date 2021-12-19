@@ -17,6 +17,8 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
+  MONGODB_HOST: localhost
+  MONGODB_PORT: 27017
 
 jobs:
   build-and-upload-image:
@@ -33,23 +35,19 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      # mongo:
-      #   image: mongo:4.2
-      #   ports:
-      #     - 27017:27017
-      #   options: >-
-      #     --name "mongo"
-      #     --health-cmd mongo
-      #     --health-interval 10s
-      #     --health-timeout 5s
-      #     --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       # Check out repository
       - uses: actions/checkout@v2
-
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
 
       # gets the branch name without the 'refs/heads/' prefix
       - name: Git branch name
@@ -123,7 +121,7 @@ jobs:
             BUNDLER_VERSION_OVERRIDE=2.0.1
             NODE_MAJOR=12
             YARN_VERSION=1.22.4
-            ENROLL_DB_HOST=mongo
+            ENROLL_DB_HOST=localhost
             ENROLL_DB_PORT=27017
             ENROLL_DB_NAME=enroll_production
             REDIS_HOST_ENROLL=localhost
