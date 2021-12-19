@@ -367,7 +367,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   describe "#assign_prior_plan_benefit_packages", dbclean: :after_each do
-    include_context "setup benefit market with market catalogs and product packages"
     include_context "setup expired, and active benefit applications"
 
     context 'new hire hired on falls under prior plan year and prior year shop functionality is enabled' do
@@ -1229,7 +1228,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   context ".is_employee_in_term_pending?", dbclean: :after_each  do
-    include_context "setup benefit market with market catalogs and product packages"
     include_context "setup renewal application"
 
     let(:employer_profile) {abc_organization.employer_profile}
@@ -1848,8 +1846,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   context 'future_active_reinstated_benefit_group_assignment' do
-    include_context "setup initial benefit application"
-
     let(:benefit_package)      { initial_application.benefit_packages.first }
     let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
     let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month + 1.year }
@@ -1883,7 +1879,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   context 'assign reinstated benefit group assignment to census employee' do
-    include_context "setup initial benefit application"
 
     let(:benefit_package)      { initial_application.benefit_packages.first }
     let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
