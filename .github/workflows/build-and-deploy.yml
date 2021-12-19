@@ -17,8 +17,6 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  MONGODB_HOST: localhost
-  MONGODB_PORT: 27017
 
 jobs:
   build-and-upload-image:
