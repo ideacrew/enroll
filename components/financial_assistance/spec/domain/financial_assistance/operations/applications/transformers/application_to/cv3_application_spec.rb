@@ -1479,7 +1479,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
-  describe "#applicant is not applying forr coverage" do
+  describe "#applicant is not applying for coverage" do
     let!(:create_esi_benefit) do
       emp_add = FinancialAssistance::Locations::Address.new({
                                                               :address_1 => "123",
