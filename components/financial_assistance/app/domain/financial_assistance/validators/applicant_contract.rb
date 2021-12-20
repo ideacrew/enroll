@@ -61,7 +61,7 @@ module FinancialAssistance
         optional(:phones).maybe(:array)
         optional(:emails).maybe(:array)
         optional(:immigration_doc_statuses).maybe(:array)
-        optional(:transfer_referral_reason).filled(:string)
+        optional(:transfer_referral_reason).maybe(:string)
       end
 
       rule(:addresses).each do
