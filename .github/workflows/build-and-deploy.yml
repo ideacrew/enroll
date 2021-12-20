@@ -52,6 +52,8 @@ jobs:
       # Adds `docker` to the environment for running commands
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          install: true
 
       # Add vhosts to RabbitMQ
       - run: |
