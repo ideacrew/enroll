@@ -22,3 +22,5 @@ cp .docker/config/production.rb config/environments/
 cp .docker/config/devise.rb config/initializers/
 cp .docker/config/redis.rb config/initializers/
 cp .docker/config/sidekiq.rb config/initializers/
+
+cat config/mongoid.yml

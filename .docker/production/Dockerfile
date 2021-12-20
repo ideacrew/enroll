@@ -2,7 +2,7 @@
 ### app/rails config ###
 ########################
 
-# FROM public.ecr.aws/ideacrew/enroll:base  AS app
+FROM public.ecr.aws/ideacrew/enroll:base  AS app
 
 # LABEL author="IdeaCrew"
 
@@ -20,6 +20,8 @@ ENV PATH $BUNDLE_BIN:$GEM_HOME/gems/bin:$PATH
 ARG BUNDLER_VERSION_OVERRIDE=2.2.27
 ENV BUNDLER_VERSION=$BUNDLER_VERSION_OVERRIDE
 RUN gem update --system && gem install bundler:$BUNDLER_VERSION
+
+RUN cat config/mongoid.yml
 
 # Configure app home directory
 ENV HOME /enroll
