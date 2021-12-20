@@ -11,6 +11,12 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
   let(:primary_addresses) { primary_applicant.addresses }
   let(:dependent1_addresses) { dependent1.addresses }
   let(:dependent2_addresses) { dependent2.addresses }
+  let(:primary_emails) { primary_applicant.emails }
+  let(:dependent1_emails) { dependent1.emails }
+  let(:dependent2_emails) { dependent2.emails }
+  let(:primary_phones) { primary_applicant.phones }
+  let(:dependent1_phones) { dependent1.phones }
+  let(:dependent2_phones) { dependent2.phones }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
   let(:family_member1) { family.primary_family_member }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
@@ -140,27 +146,27 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   }
                 ],
                 :emails => [
-                  {:kind => "home", :address => "example1@example.com"},
-                  {:kind => "home", :address => "example2@example.com"}
+                  {:kind => primary_emails[0].kind, :address => primary_emails[0].address},
+                  {:kind => primary_emails[1].kind, :address => primary_emails[1].address}
                 ],
                 :phones => [
                   {
-                    :kind => "home",
+                    :kind => primary_phones[0].kind,
                     :country_code => "",
-                    :area_code => "202",
-                    :number => "1111111",
-                    :extension => "1",
+                    :area_code => primary_phones[0].area_code,
+                    :number => primary_phones[0].number,
+                    :extension => primary_phones[0].extension,
                     :primary => nil,
-                    :full_phone_number => "20211111111"
+                    :full_phone_number => primary_phones[0].full_phone_number
                   },
                   {
-                    :kind => "home",
+                    :kind => primary_phones[1].kind,
                     :country_code => "",
-                    :area_code => "202",
-                    :number => "1111112",
-                    :extension => "2",
+                    :area_code => primary_phones[1].area_code,
+                    :number => primary_phones[1].number,
+                    :extension => primary_phones[1].extension,
                     :primary => nil,
-                    :full_phone_number => "20211111122"
+                    :full_phone_number => primary_phones[1].full_phone_number
                   }
                 ],
                 :documents => [],
@@ -250,32 +256,32 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 ],
                 :emails => [
                   {
-                    :kind => "home",
-                    :address => "example3@example.com"
+                    :kind => dependent1_emails[0].kind,
+                    :address => dependent1_emails[0].address
                   },
                   {
-                    :kind => "home",
-                    :address => "example4@example.com"
+                    :kind => dependent1_emails[1].kind,
+                    :address => dependent1_emails[1].address
                   }
                 ],
                 :phones => [
                   {
-                    :kind => "home",
+                    :kind => dependent1_phones[0].kind,
                     :country_code => "",
-                    :area_code => "202",
-                    :number => "1111113",
-                    :extension => "3",
+                    :area_code => dependent1_phones[0].area_code,
+                    :number => dependent1_phones[0].number,
+                    :extension => dependent1_phones[0].extension,
                     :primary => nil,
-                    :full_phone_number => "20211111133"
+                    :full_phone_number => dependent1_phones[0].full_phone_number
                   },
                   {
-                    :kind => "home",
+                    :kind => dependent1_phones[1].kind,
                     :country_code => "",
-                    :area_code => "202",
-                    :number => "1111114",
-                    :extension => "4",
+                    :area_code => dependent1_phones[1].area_code,
+                    :number => dependent1_phones[1].number,
+                    :extension => dependent1_phones[1].extension,
                     :primary => nil,
-                    :full_phone_number => "20211111144"
+                    :full_phone_number => dependent1_phones[1].full_phone_number
                   }
                 ],
                 :documents => [],
@@ -365,33 +371,33 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 ],
                 :emails => [
                   {
-                    :kind => "home",
-                    :address => "example5@example.com"
+                    :kind => dependent2_emails[0].kind,
+                    :address => dependent2_emails[0].address
                   },
                   {
-                    :kind => "home",
-                    :address => "example6@example.com"
+                    :kind => dependent2_emails[1].kind,
+                    :address => dependent2_emails[1].address
                   }
                 ],
 
                 :phones => [
                   {
-                    :kind => "home",
+                    :kind => dependent2_phones[0].kind,
                     :country_code => "",
-                    :area_code => "202",
-                    :number => "1111115",
-                    :extension => "5",
+                    :area_code => dependent2_phones[0].area_code,
+                    :number => dependent2_phones[0].number,
+                    :extension => dependent2_phones[0].extension,
                     :primary => nil,
-                    :full_phone_number => "20211111155"
+                    :full_phone_number => dependent2_phones[0].full_phone_number
                   },
                   {
-                    :kind => "home",
+                    :kind => dependent2_phones[1].kind,
                     :country_code => "",
-                    :area_code => "202",
-                    :number => "1111116",
-                    :extension => "6",
+                    :area_code => dependent2_phones[1].area_code,
+                    :number => dependent2_phones[1].number,
+                    :extension => dependent2_phones[1].extension,
                     :primary => nil,
-                    :full_phone_number => "20211111166"
+                    :full_phone_number => dependent2_phones[1].full_phone_number
                   }
                 ],
                 :documents => [],
