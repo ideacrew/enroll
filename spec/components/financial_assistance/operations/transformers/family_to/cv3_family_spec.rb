@@ -8,6 +8,9 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
   let(:primary_applicant) { FactoryBot.create(:person, hbx_id: "732020", gender: 'male') }
   let(:dependent1) { FactoryBot.create(:person, hbx_id: "732021", gender: 'male') }
   let(:dependent2) { FactoryBot.create(:person, hbx_id: "732022", gender: 'female') }
+  let(:primary_addresses) { primary_applicant.addresses }
+  let(:dependent1_addresses) { dependent1.addresses }
+  let(:dependent2_addresses) { dependent2.addresses }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
   let(:family_member1) { family.primary_family_member }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
@@ -58,7 +61,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
     end
 
     it 'should return payload' do
-      expect(subject.value!).to eq(
+      expect(subject.value!).to include(
         {
           :hbx_id => family.hbx_assigned_id.to_s,
           :family_members => [
@@ -112,26 +115,26 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 :user => {},
                 :addresses => [
                   {
-                    :kind => "home",
-                    :address_1 => "1111 Awesome Street NE",
-                    :address_2 => "#111",
-                    :address_3 => "",
-                    :city => "Washington",
-                    :county => "Hampden",
-                    :state => "DC",
-                    :zip => "01001",
+                    :kind => primary_addresses[0].kind,
+                    :address_1 => primary_addresses[0].address_1,
+                    :address_2 => primary_addresses[0].address_2,
+                    :address_3 => primary_addresses[0].address_3,
+                    :city => primary_addresses[0].city,
+                    :county => primary_addresses[0].county,
+                    :state => primary_addresses[0].state,
+                    :zip => primary_addresses[0].zip,
                     :country_name => "United States of America",
                     :has_fixed_address => true
                   },
                   {
-                    :kind => "home",
-                    :address_1 => "1112 Awesome Street NE",
-                    :address_2 => "#112",
-                    :address_3 => "",
-                    :city => "Washington",
-                    :county => "Hampden",
-                    :state => "DC",
-                    :zip => "01001",
+                    :kind => primary_addresses[1].kind,
+                    :address_1 => primary_addresses[1].address_1,
+                    :address_2 => primary_addresses[1].address_2,
+                    :address_3 => primary_addresses[1].address_3,
+                    :city => primary_addresses[1].city,
+                    :county => primary_addresses[1].county,
+                    :state => primary_addresses[1].state,
+                    :zip => primary_addresses[1].zip,
                     :country_name => "United States of America",
                     :has_fixed_address => true
                   }
@@ -221,26 +224,26 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 :user => {},
                 :addresses => [
                   {
-                    :kind => "home",
-                    :address_1 => "1113 Awesome Street NE",
-                    :address_2 => "#113",
-                    :address_3 => "",
-                    :city => "Washington",
-                    :county => "Hampden",
-                    :state => "DC",
-                    :zip => "01001",
+                    :kind => dependent1_addresses[0].kind,
+                    :address_1 => dependent1_addresses[0].address_1,
+                    :address_2 => dependent1_addresses[0].address_2,
+                    :address_3 => dependent1_addresses[0].address_3,
+                    :city => dependent1_addresses[0].city,
+                    :county => dependent1_addresses[0].county,
+                    :state => dependent1_addresses[0].state,
+                    :zip => dependent1_addresses[0].zip,
                     :country_name => "United States of America",
                     :has_fixed_address => true
                   },
                   {
-                    :kind => "home",
-                    :address_1 => "1114 Awesome Street NE",
-                    :address_2 => "#114",
-                    :address_3 => "",
-                    :city => "Washington",
-                    :county => "Hampden",
-                    :state => "DC",
-                    :zip => "01001",
+                    :kind => dependent1_addresses[1].kind,
+                    :address_1 => dependent1_addresses[1].address_1,
+                    :address_2 => dependent1_addresses[1].address_2,
+                    :address_3 => dependent1_addresses[1].address_3,
+                    :city => dependent1_addresses[1].city,
+                    :county => dependent1_addresses[1].county,
+                    :state => dependent1_addresses[1].state,
+                    :zip => dependent1_addresses[1].zip,
                     :country_name => "United States of America",
                     :has_fixed_address => true
                   }
@@ -336,26 +339,26 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 :user => {},
                 :addresses => [
                   {
-                    :kind => "home",
-                    :address_1 => "1115 Awesome Street NE",
-                    :address_2 => "#115",
-                    :address_3 => "",
-                    :city => "Washington",
-                    :county => "Hampden",
-                    :state => "DC",
-                    :zip => "01001",
+                    :kind => dependent2_addresses[0].kind,
+                    :address_1 => dependent2_addresses[0].address_1,
+                    :address_2 => dependent2_addresses[0].address_2,
+                    :address_3 => dependent2_addresses[0].address_3,
+                    :city => dependent2_addresses[0].city,
+                    :county => dependent2_addresses[0].county,
+                    :state => dependent2_addresses[0].state,
+                    :zip => dependent2_addresses[0].zip,
                     :country_name => "United States of America",
                     :has_fixed_address => true
                   },
                   {
-                    :kind => "home",
-                    :address_1 => "1116 Awesome Street NE",
-                    :address_2 => "#116",
-                    :address_3 => "",
-                    :city => "Washington",
-                    :county => "Hampden",
-                    :state => "DC",
-                    :zip => "01001",
+                    :kind => dependent2_addresses[1].kind,
+                    :address_1 => dependent2_addresses[1].address_1,
+                    :address_2 => dependent2_addresses[1].address_2,
+                    :address_3 => dependent2_addresses[1].address_3,
+                    :city => dependent2_addresses[1].city,
+                    :county => dependent2_addresses[1].county,
+                    :state => dependent2_addresses[1].state,
+                    :zip => dependent2_addresses[1].zip,
                     :country_name => "United States of America",
                     :has_fixed_address => true
                   }
