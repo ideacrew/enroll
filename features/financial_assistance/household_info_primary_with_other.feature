@@ -6,14 +6,10 @@ Feature: A dedicated page that gives the user access to household member creatio
     Given the FAA feature configuration is enabled
     Given a plan year, with premium tables, exists
     Given that the user is on FAA Household Info: Family Members page
-
-  Scenario: CONTINUE button navigation
-    When at least one applicant is in the Info Needed state
-    Then the CONTINUE button will be disabled
-
-  Scenario: primary member with NO other household members
+  
+  Scenario: primary member with other household members
     And the primary member exists
-    And NO other household members exist
-    Then Family Relationships left section will NOT display
-
-
+    And at least one other household members exist
+    And all applicants are in Info Completed state
+    Then Family Relationships left section WILL display
+    And the CONTINUE button will be ENABLED

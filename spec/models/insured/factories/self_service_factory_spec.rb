@@ -221,6 +221,23 @@ module Insured
         expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
       end
 
+      context 'for nil rating area' do
+        before :each do
+          allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+          allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+          person.addresses.update_all(county: "Zip code outside supported area")
+          ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        end
+
+        it 'should not create new enrollment' do
+          expect(family.active_household.hbx_enrollments.count).to eq 1
+          expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
+          enrollment.reload
+          family.reload
+          expect(family.active_household.hbx_enrollments.count).to eq 1
+        end
+      end
+
       after do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
@@ -285,6 +302,45 @@ module Insured
 
         it 'should return start of next year as effective date' do
           expect(@effective_date).to eq(Date.today.next_year.beginning_of_year)
+        end
+      end
+
+      context "within OE before last month and after 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = Date.new(current_year, 12, 19)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE last month and before 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, 1)..Date.new(current_year.next, 1, 15))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE last month and after 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, 16)..Date.new(current_year.next, 1, 31))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 3/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 3, 1))
         end
       end
     end
