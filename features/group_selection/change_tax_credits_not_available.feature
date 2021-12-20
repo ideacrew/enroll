@@ -12,42 +12,34 @@ Feature: Change Tax Credit button
     And the family has an active tax household
     And consumer has successful ridp
     When consumer visits home page
-
-  Scenario: Change Tax Credit button is available for Health Plans
-    Given the enrollment is a Health plan
-    And the metal level is gold
+  
+  Scenario: Change Tax Credit button is not available for catastrophic plans
+    And the metal level is catastrophic
     And the tax household has at least one member that is APTC eligible
     When consumer should be able to see Actions dropdown
     Then consumer clicks on the Actions button
     When consumer clicks on the make changes to my coverage button
-    Then the Change Tax Credit button should be available
+    Then the Change Tax Credit button should NOT be available
 
-  Scenario: Change Tax Credit button is available for families with at least 1 member that is APTC eligible
+  Scenario: Change Tax Credit button is not available for families with no members that are APTC eligible
+    And the tax household has no members that are APTC eligible
+    When consumer should be able to see Actions dropdown
+    Then consumer clicks on the Actions button
+    When consumer clicks on the make changes to my coverage button
+    Then the Change Tax Credit button should NOT be available
+
+  Scenario: Change Tax Credit button is not available for Resident
+    Given the coverall enrollment flag is TRUE
     And the tax household has at least one member that is APTC eligible
     When consumer should be able to see Actions dropdown
     Then consumer clicks on the Actions button
     When consumer clicks on the make changes to my coverage button
-    And the Change Tax Credit button should be available
-    When the user clicks on the Change Tax Credit button
-    And the user sees the Change Tax Credit Form
+    Then the Change Tax Credit button should NOT be available
 
-  Scenario: Eligible IVL Family can Modify APTC
+  Scenario: Change Tax Credit button is not available for Dental Plans
+    Given the enrollment is a Dental plan
     And the tax household has at least one member that is APTC eligible
     When consumer should be able to see Actions dropdown
     Then consumer clicks on the Actions button
     When consumer clicks on the make changes to my coverage button
-    And the Change Tax Credit button should be available
-    When the user clicks on the Change Tax Credit button
-    And the user sees the Change Tax Credit Form
-    And the user confirms "Yes" to change the tax credit
-    And the user changes Tax credit applied to 50%
-    When the user submits the Change Tax Credit form
-    Then the user should see a message that their Tax Credits were updated
-    And current user visits the family home page
-    When consumer should be able to see Actions dropdown
-    Then consumer clicks on the Actions button
-    When consumer clicks on the make changes to my coverage button
-    When the user clicks on the Change Tax Credit button
-    Then the user should see that applied tax credit has been set accordingly
-
-
+    Then the Change Tax Credit button should NOT be available
