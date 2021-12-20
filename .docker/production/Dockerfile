@@ -70,14 +70,16 @@ ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
 ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL
 ENV CLIENT=$CLIENT
 
-# Adding gems
-COPY Gemfile Gemfile
-COPY Gemfile.lock Gemfile.lock
+RUN echo $ENROLL_DB_HOST $ENROLL_DB_PORT
 
-RUN bundle install --jobs 20 --retry 5 --without development test 
-RUN bundle exec rake configuration:client_configuration_toggler client=$CLIENT
-RUN bundle exec rake assets:precompile 
-RUN rm -f /enroll/config/master.key && rm -f /enroll/config/credentials.yml.enc
+# Adding gems
+# COPY Gemfile Gemfile
+# COPY Gemfile.lock Gemfile.lock
+
+# RUN bundle install --jobs 20 --retry 5 --without development test 
+# RUN bundle exec rake configuration:client_configuration_toggler client=$CLIENT
+# RUN bundle exec rake assets:precompile 
+# RUN rm -f /enroll/config/master.key && rm -f /enroll/config/credentials.yml.enc
 
 #CMD ["./entrypoints/docker-entrypoint.sh"]
 
@@ -86,11 +88,11 @@ RUN rm -f /enroll/config/master.key && rm -f /enroll/config/credentials.yml.enc
 ### web/nginx config ###
 ######################## 
 
-FROM nginx:1.17.6-alpine as web
+# FROM nginx:1.17.6-alpine as web
 
-RUN mkdir /enroll
+# RUN mkdir /enroll
 
 # copy assets from the app build and nginx config
-COPY --from=app /enroll/public /enroll/
-COPY .docker/production/nginx.conf /etc/nginx/conf.d/enroll.conf
-RUN mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf-bkp
+# COPY --from=app /enroll/public /enroll/
+# COPY .docker/production/nginx.conf /etc/nginx/conf.d/enroll.conf
+# RUN mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf-bkp
