@@ -21,8 +21,6 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the user answers no to the have you applied for an SSN question
     Then the reason why question is displayed 
 
-
-
   Scenario: Answered yes to military question
     Given the user answers yes to having an eligible immigration status
     And user answers no to the military veteran question
