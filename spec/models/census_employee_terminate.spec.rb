@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{Rails.root}/spec/models/shared_contexts/census_employee.rb"
@@ -514,9 +516,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:renewal_benefit_group) { renewal_application.benefit_packages.first}
     let(:census_employee) do
       ce = FactoryBot.create(
-          :benefit_sponsors_census_employee,
-          employer_profile: employer_profile,
-          benefit_sponsorship: organization.active_benefit_sponsorship
+        :benefit_sponsors_census_employee,
+        employer_profile: employer_profile,
+        benefit_sponsorship: organization.active_benefit_sponsorship
       )
       person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
       employee_role = FactoryBot.build(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
@@ -530,33 +532,33 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let!(:active_enrollment) do
       FactoryBot.create(
-          :hbx_enrollment,
-          household: census_employee.employee_role.person.primary_family.active_household,
-          coverage_kind: "health",
-          kind: "employer_sponsored",
-          effective_on: renewal_benefit_group.start_on,
-          family: census_employee.employee_role.person.primary_family,
-          benefit_sponsorship_id: benefit_sponsorship.id,
-          sponsored_benefit_package_id: renewal_benefit_group.id,
-          employee_role_id: census_employee.employee_role.id,
-          benefit_group_assignment_id: active_bga.id,
-          aasm_state: "coverage_selected"
+        :hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        coverage_kind: "health",
+        kind: "employer_sponsored",
+        effective_on: renewal_benefit_group.start_on,
+        family: census_employee.employee_role.person.primary_family,
+        benefit_sponsorship_id: benefit_sponsorship.id,
+        sponsored_benefit_package_id: renewal_benefit_group.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: active_bga.id,
+        aasm_state: "coverage_selected"
       )
     end
 
     let!(:expired_enrollment) do
       FactoryBot.create(
-          :hbx_enrollment,
-          household: census_employee.employee_role.person.primary_family.active_household,
-          coverage_kind: "health",
-          kind: "employer_sponsored",
-          effective_on: current_benefit_package.start_on,
-          family: census_employee.employee_role.person.primary_family,
-          benefit_sponsorship_id: benefit_sponsorship.id,
-          sponsored_benefit_package_id: current_benefit_package.id,
-          employee_role_id: census_employee.employee_role.id,
-          benefit_group_assignment_id: inactive_bga.id,
-          aasm_state: "coverage_expired"
+        :hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        coverage_kind: "health",
+        kind: "employer_sponsored",
+        effective_on: current_benefit_package.start_on,
+        family: census_employee.employee_role.person.primary_family,
+        benefit_sponsorship_id: benefit_sponsorship.id,
+        sponsored_benefit_package_id: current_benefit_package.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: inactive_bga.id,
+        aasm_state: "coverage_expired"
       )
     end
 

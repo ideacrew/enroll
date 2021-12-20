@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{Rails.root}/spec/models/shared_contexts/census_employee.rb"
@@ -100,17 +102,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       it 'should return hired_on date as new hire enrollment period start date' do
         expect(census_employee.new_hire_enrollment_period.min).to eq census_employee.hired_on
-      end
-    end
-
-    context 'when earliest effective date is in future more than 30 days from current date' do
-      let(:hired_on) {TimeKeeper.date_of_record}
-
-      it 'should return earliest_eligible_date as new hire enrollment period end date' do
-        # TODO: - Fix Effective On For & Eligible On on benefit package
-        expected_end_date = (hired_on + 60.days)
-        expected_end_date = (hired_on + 60.days).end_of_month + 1.day if expected_end_date.day != 1
-        # expect(census_employee.new_hire_enrollment_period.max).to eq (expected_end_date).end_of_day
       end
     end
 

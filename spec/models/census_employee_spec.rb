@@ -667,13 +667,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:plan_year_start_on) {benefit_application.start_on}
     let(:plan_year_end_on) {benefit_application.end_on}
 
-    let(:census_employee) {FactoryBot.create(:benefit_sponsors_census_employee,
-                                             benefit_sponsorship: employer_profile.active_benefit_sponsorship,
-                                             employer_profile: employer_profile,
-                                             created_at: (plan_year_start_on + 10.days),
-                                             updated_at: (plan_year_start_on + 10.days),
-                                             hired_on: (plan_year_start_on + 10.days)
-    )}
+    let(:census_employee) do
+      FactoryBot.create(:benefit_sponsors_census_employee,
+                        benefit_sponsorship: employer_profile.active_benefit_sponsorship,
+                        employer_profile: employer_profile,
+                        created_at: (plan_year_start_on + 10.days),
+                        updated_at: (plan_year_start_on + 10.days),
+                        hired_on: (plan_year_start_on + 10.days))
+    end
 
     it 'should return false if census employee is not terminated' do
       expect(census_employee.is_employee_in_term_pending?).to eq false
@@ -693,7 +694,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     it 'should return true if census employee is terminated with future date which falls under active PY' do
-      active_benefit_package =  census_employee.active_benefit_group_assignment.benefit_package
+      active_benefit_package = census_employee.active_benefit_group_assignment.benefit_package
       census_employee.update_attributes(employment_terminated_on: active_benefit_package.end_on - 5.days)
       census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_package, start_on: active_benefit_package.benefit_application.start_on)
       expect(census_employee.is_employee_in_term_pending?).to eq true
@@ -923,7 +924,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       census_employee.hired_on = TimeKeeper.date_of_record - 31.years
       expect(census_employee.save).to be_falsey
       expect(census_employee.errors[:hired_on].any?).to be_truthy
-      expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
+      expect(census_employee.errors[:hired_on].to_s).to match(/date can't be before  date of birth/)
     end
   end
 
@@ -970,9 +971,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:census_employee) do
       FactoryBot.create :benefit_sponsors_census_employee,
-                       employer_profile: employer_profile,
-                       benefit_sponsorship: organization.active_benefit_sponsorship,
-                       benefit_group_assignments: [benefit_group_assignment]
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship,
+                        benefit_group_assignments: [benefit_group_assignment]
     end
     let(:waived_hbx_enrollment_double) { double('WaivedHbxEnrollment', is_coverage_waived?: true, sponsored_benefit_package_id: benefit_group.id) }
     let(:coverage_selected_hbx_enrollment_double) { double('CoveredHbxEnrollment', is_coverage_waived?: false, sponsored_benefit_package_id: benefit_group.id) }

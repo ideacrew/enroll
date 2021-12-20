@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{Rails.root}/spec/models/shared_contexts/census_employee.rb"

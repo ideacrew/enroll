@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{Rails.root}/spec/models/shared_contexts/census_employee.rb"
@@ -483,7 +485,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
   end
-  
+
   describe "#benefit_package_for_date", dbclean: :around_each do
     let(:employer_profile) {abc_profile}
     let(:census_employee) do
