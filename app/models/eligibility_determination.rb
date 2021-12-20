@@ -3,6 +3,7 @@ class EligibilityDetermination
   include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
+  include Acapi::Notifiers
 
   embedded_in :tax_household
   after_create :apply_aptc_aggregate
@@ -141,6 +142,17 @@ private
   def apply_aptc_aggregate
     # EnrollRegistry[:apply_aggregate_to_enrollment] {{eligibility_determination: self}}
     # TODO: Refactor below code to make use of updated Operation call pattern.
-    Operations::Individual::ApplyAggregateToEnrollment.new.call({eligibility_determination: self}) if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) && self.persisted?
+    primary_person = family.primary_person
+    rating_address = primary_person.rating_address
+    rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address) if rating_address
+
+    if rating_address && rating_area_id
+      Operations::Individual::ApplyAggregateToEnrollment.new.call({eligibility_determination: self}) if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) && self.persisted?
+    else
+      log(
+        "ERROR: Unable to find rating_area_id for primary person hbx_id: #{primary_person.hbx_id}, address - county: #{rating_address&.county}, zip: #{rating_address&.zip}, state: #{rating_address&.state}. Reinstatement enrollment is not created.
+        EVENT: After creation of eligibility determination and triggering source: #{source} ", {:severity => "error"}
+      )
+    end
   end
 end

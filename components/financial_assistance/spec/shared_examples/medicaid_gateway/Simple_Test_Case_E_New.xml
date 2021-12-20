@@ -87,6 +87,7 @@
                 <ns5:ReferralActivityReasonCode>FullDetermination</ns5:ReferralActivityReasonCode>
             </ns5:ReferralActivity>
             <ns5:InsuranceApplicantFosterCareIndicator>false</ns5:InsuranceApplicantFosterCareIndicator>
+            <ns5:InsuranceApplicantTransferReferralReason>initiated</ns5:InsuranceApplicantTransferReferralReason>
         </ns5:InsuranceApplicant>
         <ns5:InsuranceApplicant>
             <ns4:RoleOfPersonReference ns1:ref="pe1992374604681766995"/>
@@ -113,6 +114,7 @@
                 <ns5:ReferralActivityReasonCode>FullDetermination</ns5:ReferralActivityReasonCode>
             </ns5:ReferralActivity>
             <ns5:InsuranceApplicantFosterCareIndicator>true</ns5:InsuranceApplicantFosterCareIndicator>
+            <ns5:InsuranceApplicantTransferReferralReason>rejected</ns5:InsuranceApplicantTransferReferralReason>
         </ns5:InsuranceApplicant>
         <ns5:InsuranceApplicationRequestingFinancialAssistanceIndicator>true</ns5:InsuranceApplicationRequestingFinancialAssistanceIndicator>
         <ns5:InsuranceApplicationCoverageRenewalYearQuantity>1</ns5:InsuranceApplicationCoverageRenewalYearQuantity>
