@@ -395,6 +395,28 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant.tax_info_complete?).to eq true
       end
     end
+
+    context 'is filing application with parents in household' do
+      let!(:parent_applicant) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 40.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:parent2_applicant) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 40.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      it "shouldn't require 'filing jointly' to be present" do
+        expect(applicant.tax_info_complete?).to eq true
+      end
+    end
   end
 
   context '#other_questions_complete?' do
