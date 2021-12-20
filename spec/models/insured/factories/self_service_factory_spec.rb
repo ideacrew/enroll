@@ -287,6 +287,45 @@ module Insured
           expect(@effective_date).to eq(Date.today.next_year.beginning_of_year)
         end
       end
+
+      context "within OE before last month and after 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = Date.new(current_year, 12, 19)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE last month and before 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, 1)..Date.new(current_year.next, 1, 15))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE last month and after 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, 16)..Date.new(current_year.next, 1, 31))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 3/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 3, 1))
+        end
+      end
     end
 
     after(:all) do
