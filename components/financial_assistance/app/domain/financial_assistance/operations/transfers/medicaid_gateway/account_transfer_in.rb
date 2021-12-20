@@ -237,7 +237,7 @@ module FinancialAssistance
             compare_keys = ["address_1", "address_2", "city", "state", "zip"]
             sas = member.is_homeless? == primary.is_homeless? &&
                   member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
-                  member.home_address.attributes.select {|k, _v| compare_keys.include? k} == primary.home_address.attributes.select do |k, _v|
+                  member&.home_address&.attributes&.select {|k, _v| compare_keys.include? k} == primary&.home_address&.attributes&.select do |k, _v|
                                                                                                compare_keys.include? k
                                                                                              end
             Success(sas)
@@ -357,7 +357,8 @@ module FinancialAssistance
                 indian_tribe_member: applicant_hash['indian_tribe_member'],
                 tribal_id: applicant_hash['tribal_id'],
                 tribal_name: applicant_hash['tribal_name'],
-                tribal_state: applicant_hash['tribal_state']
+                tribal_state: applicant_hash['tribal_state'],
+                transfer_referral_reason: applicant_hash['transfer_referral_reason']
               }
             end
             Success(sanitize_params)
@@ -474,6 +475,7 @@ module FinancialAssistance
               persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
               persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
+              persisted_applicant.transfer_referral_reason = applicant[:transfer_referral_reason]
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
               persisted_applicant.save(validate: false)
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
