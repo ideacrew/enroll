@@ -85,6 +85,7 @@ module Insured
       context "#validate_rating_address with invalid rating address" do
         let(:person1) {FactoryBot.create(:person, addresses: nil)}
         let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+        let(:message) {l10n("insured.out_of_state_error_message")}
         before :each do
           family1.primary_person.rating_address.destroy!
           family1.save!
@@ -93,7 +94,7 @@ module Insured
         it "returns a failure message with invalid rating address" do
           family1.primary_person.rating_address.destroy!
           result = subject.validate_rating_address(family1.id)
-          expect(result).to include(false)
+          expect(result).to include(message)
         end
       end
     end

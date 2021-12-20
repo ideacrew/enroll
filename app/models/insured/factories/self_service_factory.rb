@@ -3,8 +3,7 @@
 module Insured
   module Factories
     class SelfServiceFactory
-      include ActionView::Helpers::TranslationHelper
-      include ::L10nHelper
+      extend L10nHelper
       extend ::FloatHelper
       include ::FloatHelper
       extend Acapi::Notifiers
