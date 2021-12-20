@@ -40,6 +40,18 @@ RSpec.describe ::Operations::Notices::IvlFinalRenewalEligibilityNotice, dbclean:
       end
     end
 
+    context 'payload' do
+      before do
+        issuer.office_locations.first.phone.update_attributes!(full_phone_number: '1234567890', extension: nil)
+      end
+
+      let(:payload) { ::Operations::Notices::IvlFinalRenewalEligibilityNotice.new.send('build_payload', family).success }
+
+      it 'should contain phone number in the desired format' do
+        expect(payload[:households][0][:hbx_enrollments][0][:issuer_profile_reference][:phone]).to eq "(123) 456-7890"
+      end
+    end
+
     context 'with valid params' do
       before :each do
         allow_any_instance_of(Events::Individual::Notices::FinalRenewalEligibilityDetermined).to receive(:publish).and_return true

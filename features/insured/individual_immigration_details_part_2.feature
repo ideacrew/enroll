@@ -25,14 +25,6 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
 
     Examples:
       | document type                     |
-      | i327                              |
-      | i551                              |
-      | i571                              |
-      | i766                              |
-      | Certificate of Citizenship        |
-      | Naturalization Certificate        |
-      | Machine Readable Immigrant Visa   |
-      | Temporary i551 Stamp              |
       | i94                               |
       | i94 in Unexpired Foreign Passport |
       | Unexpired Foreign Passport        |
