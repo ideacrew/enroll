@@ -14,7 +14,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual clicks on the Continue button of the Account Setup page
     And the individual agrees to the privacy agreeement
 
-  Scenario: Should see extended agreement on "Thank You" page for IVL when APTC present and extended agreement message present
+  Scenario: Validation of new APTC tool UI changes
     And the individual answers the questions of the Identity Verification page and clicks on submit
     When the individual is on the Help Paying for Coverage page
     And the individual does not apply for assistance and clicks continue
@@ -29,5 +29,8 @@ Feature: Insured Plan Shopping on Individual Assisted market
     Then the individual should see the original applied APTC amount
     Then the individual sets APTC amount
     And the individual selects a silver plan on Plan Shopping page
-    Then individual should see the extended APTC confirmation message
     Then the individual should see the elected APTC amount and click on the Confirm button of the Thank You page
+    And the individual should see the APTC amount on the Receipt page
+    And the individual clicks on the Continue button to go to the Individual home page
+    Then the individual should see the elected aptc amount applied to enrollment in the Individual home page
+    Then the individual logs out

@@ -6,14 +6,10 @@ Feature: A dedicated page that gives the user access to household member creatio
     Given the FAA feature configuration is enabled
     Given a plan year, with premium tables, exists
     Given that the user is on FAA Household Info: Family Members page
-
-  Scenario: CONTINUE button navigation
-    When at least one applicant is in the Info Needed state
-    Then the CONTINUE button will be disabled
-
-  Scenario: primary member with NO other household members
+      
+  Scenario: CONTINUE button enabled when non-applying dependent does not enter ssn
     And the primary member exists
-    And NO other household members exist
-    Then Family Relationships left section will NOT display
-
-
+    And a new household member is not applying
+    Then the no ssn warning will appear
+    And all applicants are in Info Completed state
+    Then the CONTINUE button will be ENABLED
