@@ -221,6 +221,23 @@ module Insured
         expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
       end
 
+      context 'for nil rating area' do
+        before :each do
+          allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+          allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+          person.addresses.update_all(county: "Zip code outside supported area")
+          ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        end
+
+        it 'should not create new enrollment' do
+          expect(family.active_household.hbx_enrollments.count).to eq 1
+          expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
+          enrollment.reload
+          family.reload
+          expect(family.active_household.hbx_enrollments.count).to eq 1
+        end
+      end
+
       after do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
