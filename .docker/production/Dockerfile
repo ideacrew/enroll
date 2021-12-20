@@ -2,9 +2,9 @@
 ### app/rails config ###
 ########################
 
-FROM public.ecr.aws/ideacrew/enroll:base  AS app
+# FROM public.ecr.aws/ideacrew/enroll:base  AS app
 
-LABEL author="IdeaCrew"
+# LABEL author="IdeaCrew"
 
 
 # Configure bundler and PATH, install bundler version
@@ -72,8 +72,8 @@ ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
 ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL
 ENV CLIENT=$CLIENT
 
-COPY $HOME/config/mongoid.yml $HOME/config/mongoid.yml.tmp
-COPY $HOME/.docker/config/mongoid.yml $HOME/config/mongoid.yml
+COPY config/mongoid.yml $HOME/config/mongoid.yml.tmp
+COPY .docker/config/mongoid.yml $HOME/config/mongoid.yml
 
 RUN cat config/mongoid.yml
 
