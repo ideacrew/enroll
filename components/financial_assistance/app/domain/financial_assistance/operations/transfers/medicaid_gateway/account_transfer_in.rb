@@ -385,7 +385,7 @@ module FinancialAssistance
               date_of_death: person_hash['person_demographics']['date_of_death'],
               dob_check: person_hash['person_demographics']['dob_check'],
               race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
-              ethnicity: consumer_role_hash['is_applying_coverage'] ? [person_hash['race']] : nil,
+              ethnicity: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['ethnicity'] : nil,
               is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
               tribal_id: person_hash['person_demographics']['tribal_id'],
               tribal_name: person_hash['person_demographics']['tribal_name'],
