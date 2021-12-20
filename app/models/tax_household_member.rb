@@ -144,5 +144,3 @@ class TaxHouseholdMember
     @age_on_effective_date = age
   end
 end
-
-

@@ -73,10 +73,7 @@ module Insured
 
       context "#validate_rating_address with valid rating address" do
         before do
-          family.special_enrollment_periods << sep
-          @enrollment_id = enrollment.id
           @family_id     = family.id
-          @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
         end
 
         it "returns true with valid rating address" do

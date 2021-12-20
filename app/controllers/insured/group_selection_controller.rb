@@ -184,9 +184,8 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_plan
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
-    return unless @self_term_or_cancel_form.errors.present?
     flash[:error] = @self_term_or_cancel_form.errors.full_messages
-    redirect_to family_account_path
+    redirect_to family_account_path if @self_term_or_cancel_form.errors.present?
   end
 
   def term_or_cancel
