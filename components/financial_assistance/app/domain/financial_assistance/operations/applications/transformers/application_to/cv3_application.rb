@@ -131,10 +131,10 @@ module FinancialAssistance
                            is_primary_applicant: applicant.is_primary_applicant.present?,
                            native_american_information: native_american_information(applicant),
                            citizenship_immigration_status_information: if applicant.is_applying_coverage
-                                                                          {citizen_status: applicant.citizen_status,
+                                                                         {citizen_status: applicant.citizen_status,
                                                                           is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
                                                                           is_resident_post_092296: applicant.is_resident_post_092296.present?}
-                                                                        end,
+                                                                       end,
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
                            is_applying_coverage: applicant.is_applying_coverage.present?,

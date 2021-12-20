@@ -1510,7 +1510,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       benefit.employer_address = emp_add
       benefit.employer_phone = emp_phone
       applicant.benefits << benefit
-      applicant.update_attributes(is_applying_coverage: false, indian_tribe_member: true, tribal_name: "test", tribal_state: 'DC')
+      applicant.update_attributes(is_applying_coverage: false, indian_tribe_member: true, tribal_name: "test",
+                                  tribal_state: 'DC', has_eligible_medicaid_cubcare: true, medicaid_cubcare_due_on: Date.today,
+                                  has_eligibility_changed: true, has_household_income_changed: true, medicaid_chip_ineligible: true, immigration_status_changed: true)
       applicant.save!
     end
 
