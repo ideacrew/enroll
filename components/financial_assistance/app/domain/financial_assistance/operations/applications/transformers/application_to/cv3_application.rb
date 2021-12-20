@@ -134,6 +134,8 @@ module FinancialAssistance
                                                                          {citizen_status: applicant.citizen_status,
                                                                           is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
                                                                           is_resident_post_092296: applicant.is_resident_post_092296.present?}
+                                                                       else
+                                                                         {}
                                                                        end,
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
@@ -311,7 +313,7 @@ module FinancialAssistance
             def demographic(applicant)
               {gender: applicant.gender.capitalize,
                dob: applicant.dob,
-               ethnicity: applicant.is_applying_coverage ? applicant.ethnicity : nil,
+               ethnicity: applicant.is_applying_coverage ? applicant.ethnicity : [],
                race: applicant.is_applying_coverage ? applicant.race : nil,
                is_veteran_or_active_military: applicant.is_veteran.present?,
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}

@@ -1534,7 +1534,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it "should successfully generate a cv3 application without ethnicity and race" do
-        expect(@applicant[:demographic][:ethnicity]).to be_nil
+        expect(@applicant[:demographic][:ethnicity]).to eq []
         expect(@applicant[:demographic][:race]).to be_nil
       end
 
@@ -1551,7 +1551,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it "should successfully generate a cv3 application without citizenship_immigration_status_information" do
-        expect(@applicant[:citizenship_immigration_status_information]).to be_nil
+        expect(@applicant[:citizenship_immigration_status_information].present?).to eq false
       end
     end
   end
