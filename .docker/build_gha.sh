@@ -1,7 +1,7 @@
 docker build --build-arg BUNDLER_VERSION_OVERRIDE='2.0.1' \
              --build-arg NODE_MAJOR='12' \
              --build-arg YARN_VERSION='1.22.4' \
-             --build-arg ENROLL_DB_HOST='localhost' \
+             --build-arg ENROLL_DB_HOST='host.docker.internal' \
              --build-arg ENROLL_DB_PORT="27017" \
              --build-arg ENROLL_DB_NAME="enroll_production" \
              --build-arg REDIS_HOST_ENROLL="localhost" \
