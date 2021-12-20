@@ -27,6 +27,8 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 COPY . $HOME
 
+
+
 # RUN yarn install
 
 # Setting env up
@@ -70,7 +72,9 @@ ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
 ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL
 ENV CLIENT=$CLIENT
 
-RUN echo $ENROLL_DB_HOST $ENROLL_DB_PORT
+COPY $HOME/config/mongoid.yml $HOME/config/mongoid.yml.tmp
+COPY $HOME/.docker/config/mongoid.yml $HOME/config/mongoid.yml
+
 RUN cat config/mongoid.yml
 
 # Adding gems
