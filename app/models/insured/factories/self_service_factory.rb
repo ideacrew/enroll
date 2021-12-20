@@ -3,6 +3,8 @@
 module Insured
   module Factories
     class SelfServiceFactory
+      include ActionView::Helpers::TranslationHelper
+      include ::L10nHelper
       extend ::FloatHelper
       include ::FloatHelper
       extend Acapi::Notifiers
@@ -27,7 +29,7 @@ module Insured
         primary_person_address = primary_person.rating_address
         rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_person_address) if primary_person_address.present?
         if rating_area.nil?
-          [false, "Address is out of state of the supported area, please review your application details to update your address."]
+          [false, l10n("insured.out_of_state_error_message")]
         else
           [true, nil]
         end
