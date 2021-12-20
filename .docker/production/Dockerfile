@@ -27,7 +27,7 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 COPY . $HOME
 
-RUN yarn install
+# RUN yarn install
 
 # Setting env up
 ARG SECRET_KEY_BASE=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
@@ -71,6 +71,7 @@ ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL
 ENV CLIENT=$CLIENT
 
 RUN echo $ENROLL_DB_HOST $ENROLL_DB_PORT
+RUN cat config/mongoid.yml
 
 # Adding gems
 # COPY Gemfile Gemfile
