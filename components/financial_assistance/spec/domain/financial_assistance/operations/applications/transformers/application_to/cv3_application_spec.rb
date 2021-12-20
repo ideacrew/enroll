@@ -1478,4 +1478,79 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe "#applicant is not applying forr coverage" do
+    let!(:create_esi_benefit) do
+      emp_add = FinancialAssistance::Locations::Address.new({
+                                                              :address_1 => "123",
+                                                              :kind => "work",
+                                                              :city => "was",
+                                                              :state => "DC",
+                                                              :zip => "21312"
+                                                            })
+      emp_phone = FinancialAssistance::Locations::Phone.new({
+                                                              :kind => "work",
+                                                              :area_code => "131",
+                                                              :number => "2323212",
+                                                              :full_phone_number => "1312323212"
+                                                            })
+      benefit = ::FinancialAssistance::Benefit.new({
+                                                     :employee_cost => 500.00,
+                                                     :employer_id => '12-2132133',
+                                                     :kind => "is_enrolled",
+                                                     :insurance_kind => "employer_sponsored_insurance",
+                                                     :employer_name => "er1",
+                                                     :is_esi_waiting_period => false,
+                                                     :is_esi_mec_met => true,
+                                                     :esi_covered => "self",
+                                                     :start_on => Date.today.prev_year.beginning_of_month,
+                                                     :end_on => nil,
+                                                     :employee_cost_frequency => "monthly"
+                                                   })
+      benefit.employer_address = emp_add
+      benefit.employer_phone = emp_phone
+      applicant.benefits << benefit
+      applicant.update_attributes(is_applying_coverage: false, indian_tribe_member: true, tribal_name: "test", tribal_state: 'DC')
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @applicant = result.success[:applicants].first
+      @benefit = result.success[:applicants].first[:benefits].first
+    end
+
+    context "when all applicants are valid" do
+
+      it "should successfully generate a cv3 application without benefits" do
+        expect(@benefit).to be_nil
+      end
+
+      it "should successfully generate a cv3 application without medicaid_and_chip" do
+        expect(@applicant[:medicaid_and_chip]).to be_nil
+      end
+
+      it "should successfully generate a cv3 application without ethnicity and race" do
+        expect(@applicant[:demographic][:ethnicity]).to be_nil
+        expect(@applicant[:demographic][:race]).to be_nil
+      end
+
+      it "should successfully generate a cv3 application without vlp_document" do
+        expect(@applicant[:vlp_document]).to be_nil
+      end
+
+      it "should successfully generate a cv3 application without native_american_information" do
+        expect(@applicant[:native_american_information]).to be_nil
+      end
+
+      it "should successfully generate a cv3 application without is_self_attested_long_term_care" do
+        expect(@applicant[:is_self_attested_long_term_care]).to be_nil
+      end
+
+      it "should successfully generate a cv3 application without citizenship_immigration_status_information" do
+        expect(@applicant[:citizenship_immigration_status_information]).to be_nil
+      end
+    end
+  end
 end

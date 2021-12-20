@@ -130,9 +130,11 @@ module FinancialAssistance
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
                            native_american_information: native_american_information(applicant),
-                           citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
-                                                                        is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
-                                                                        is_resident_post_092296: applicant.is_resident_post_092296.present?},
+                           citizenship_immigration_status_information: if applicant.is_applying_coverage
+                                                                          {citizen_status: applicant.citizen_status,
+                                                                          is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
+                                                                          is_resident_post_092296: applicant.is_resident_post_092296.present?}
+                                                                        end,
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
                            is_applying_coverage: applicant.is_applying_coverage.present?,
@@ -185,7 +187,7 @@ module FinancialAssistance
                            deductions: deductions(applicant),
                            is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
                            # Does this person need help with daily life activities, such as dressing or bathing?
-                           is_self_attested_long_term_care: applicant.has_daily_living_help.present?,
+                           is_self_attested_long_term_care: applicant.is_applying_coverage ? applicant.has_daily_living_help.present? : nil,
                            has_insurance: applicant.is_enrolled_in_insurance?,
                            has_state_health_benefit: applicant.has_state_health_benefit?,
                            had_prior_insurance: prior_insurance_benefit.present?,
@@ -207,6 +209,8 @@ module FinancialAssistance
             # rubocop:enable Metrics/MethodLength
 
             def native_american_information(applicant)
+              return nil unless applicant.is_applying_coverage
+
               if FinancialAssistanceRegistry.feature_enabled?(:indian_alaskan_tribe_details)
                 {indian_tribe_member: applicant.indian_tribe_member,
                  tribal_name: applicant.tribal_name,
@@ -250,6 +254,8 @@ module FinancialAssistance
             end
 
             def medicaid_and_chip(applicant)
+              return unless applicant.is_applying_coverage
+
               {not_eligible_in_last_90_days: applicant.has_eligible_medicaid_cubcare.present?,
                denied_on: applicant.medicaid_cubcare_due_on,
                ended_as_change_in_eligibility: applicant.has_eligibility_changed.present?,
@@ -293,6 +299,8 @@ module FinancialAssistance
             end
 
             def attestation(applicant)
+              return nil unless applicant.is_applying_coverage
+
               {is_incarcerated: applicant.is_incarcerated.present?,
               # Enroll's UI maps to is_physically_disabled and not is_self_attested_disabled
                is_self_attested_disabled: applicant.is_physically_disabled.present?,
@@ -303,8 +311,8 @@ module FinancialAssistance
             def demographic(applicant)
               {gender: applicant.gender.capitalize,
                dob: applicant.dob,
-               ethnicity: applicant.ethnicity,
-               race: applicant.race,
+               ethnicity: applicant.is_applying_coverage ? applicant.ethnicity : nil,
+               race: applicant.is_applying_coverage ? applicant.race : nil,
                is_veteran_or_active_military: applicant.is_veteran.present?,
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}
             end
@@ -516,6 +524,7 @@ module FinancialAssistance
             end
 
             def vlp_document(applicant)
+              return unless applicant.is_applying_coverage
               return if applicant.vlp_subject.nil?
               {subject: applicant.vlp_subject,
                alien_number: applicant.alien_number,
@@ -605,6 +614,8 @@ module FinancialAssistance
             end
 
             def benefits(applicant)
+              return [] unless applicant.is_applying_coverage
+
               applicant.benefits.inject([]) do |result, benefit|
                 result << { name: benefit.title,
                             kind: benefit.insurance_kind,
