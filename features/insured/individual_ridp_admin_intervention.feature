@@ -78,3 +78,5 @@ Feature: Consumer agrees RIDP verification process with Admin intervention
     When HBX admin logs out
     And Individual signed in to resume enrollment
     Then Individual should land on Home page
+  
+ 

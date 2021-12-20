@@ -232,17 +232,6 @@ module FinancialAssistance
 
     private
 
-    # For security reasons, only set the financial assistance identifier as the FA application's family_id
-    # if the current user as an HBX Admin. This will also prevent a nil financial assistance identifier
-    # in the event of impersonation from an admin not working properly
-    def set_financial_assistance_identifier
-      if current_user.try(:has_hbx_staff_role?)
-        [FinancialAssistance::Application.where(id: params[:id])&.first&.family_id]
-      else
-        get_current_person.current_and_past_financial_assistance_identifiers
-      end
-    end
-
     def validation_errors_parser(result)
       result.errors.each_with_object([]) do |error, collect|
         collect << if error.is_a?(Dry::Schema::Message)
