@@ -7,6 +7,8 @@ Rake::Task.define_task(:environment)
 RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :after_each do
   # Main app stuff
   # HBX ID from the CSV
+  let(:maine_zip) { '04401' }
+  let(:maine_city) { 'Bangor' }
   let(:person) {FactoryBot.create(:person, :with_consumer_role, hbx_id: "12345")}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
@@ -25,7 +27,7 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
   let!(:bad_county_address_person) do
     person = FactoryBot.create(:person, :with_consumer_role)
     person.addresses.each do |address|
-      address.update_attributes!(county: BenefitMarkets::Locations::CountyZip.new, zip: "20024")
+      address.update_attributes!(county: BenefitMarkets::Locations::CountyZip.new, zip: maine_zip)
     end
   end
   let(:create_instate_addresses) do
@@ -35,11 +37,11 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
           :address_1 => '1111 Awesome Street NE',
           :address_2 => '#111',
           :address_3 => '',
-          :city => EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
+          :city => maine_city,
           :country_name => '',
           :kind => 'home',
           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
-          :zip => "20024",
+          :zip => maine_zip,
           county: BenefitMarkets::Locations::CountyZip.new
         )
     ]
@@ -55,8 +57,8 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
         :city => EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
         :country_name => '',
         :kind => 'home',
-        :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
-        :zip => "20024",
+        :state => maine_city,
+        :zip => maine_zip,
         county: ""
       )
     ]
@@ -66,11 +68,11 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
 
   context "Rake task" do
     before do
-      person.addresses.first.update_attributes!(zip: "20024", county: "Zip code outside supported area")
+      person.addresses.first.update_attributes!(zip: maine_zip, county: "Zip code outside supported area")
       ::BenefitMarkets::Locations::CountyZip.create!(
         county_name: "Hampden",
-        zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
-        state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item
+        zip: maine_zip,
+        state: maine_city
       )
       person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
       person.person_relationships.build(relative: dependent_person, kind: "spouse")
