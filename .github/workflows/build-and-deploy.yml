@@ -18,7 +18,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  SHOULD_DEPLOY: ${{ github.event_name == 'pull_request' }}
+  SHOULD_DEPLOY: ${{ github.event_name != 'pull_request' }}
 
 jobs:
   test-event-type:
