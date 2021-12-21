@@ -24,7 +24,14 @@ module Insured
 
       def self.for_view(attrs)
         service     = self_term_or_cancel_service(attrs)
-        form_params = service.find
+        status, error = service.validate_rating_address
+        if status
+          form_params = service.find
+        else
+          form = self.new
+          form.errors.add(:base, error)
+          return form
+        end
         form_params.merge!({enable_tax_credit_btn: check_to_enable_tax_credit_btn(attrs)})
         new(form_params)
       end
