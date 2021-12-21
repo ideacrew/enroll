@@ -12,14 +12,16 @@ module Insured
     end
 
     let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
-    let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
-    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
     let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', metal_level_kind: :silver, benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
     let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
-    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: enrollment, coverage_start_on: TimeKeeper.date_of_record)}
+    let!(:hbx_enrollment_member1) do
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: enrollment, coverage_start_on: TimeKeeper.date_of_record)
+    end
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment)}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
 
@@ -63,6 +65,36 @@ module Insured
           FactoryBot.create(:tax_household_member, tax_household: tax_household)
           form_params = subject.find(@enrollment_id, @family_id)
           expect(form_params[:is_aptc_eligible]).to be_truthy
+        end
+      end
+    end
+
+    describe "#validate_rating_address" do
+
+      context "#validate_rating_address with valid rating address" do
+        before do
+          @family_id     = family.id
+        end
+
+        it "returns true with valid rating address" do
+          result = subject.new({family_id: @family_id}).validate_rating_address
+          expect(result).to be_truthy
+        end
+      end
+
+      context "#validate_rating_address with invalid rating address" do
+        let(:person1) {FactoryBot.create(:person, addresses: nil)}
+        let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+        let(:message) {l10n("insured.out_of_state_error_message")}
+        before :each do
+          family1.primary_person.rating_address.destroy!
+          family1.save!
+        end
+
+        it "returns a failure message with invalid rating address" do
+          family1.primary_person.rating_address.destroy!
+          result = subject.new({family_id: family1.id}).validate_rating_address
+          expect(result).to include(message)
         end
       end
     end
