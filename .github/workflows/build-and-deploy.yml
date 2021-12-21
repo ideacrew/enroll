@@ -104,7 +104,7 @@ jobs:
         with:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
-          file: .docker/production/Dockerfile
+          file: .docker/production/Dockerfile.gha
           # Set the desired build target here
           target: deploy
           # needed to access mongo and rabbit on GHA machine
