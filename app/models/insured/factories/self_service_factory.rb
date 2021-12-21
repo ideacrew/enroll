@@ -3,6 +3,7 @@
 module Insured
   module Factories
     class SelfServiceFactory
+      include L10nHelper
       extend ::FloatHelper
       include ::FloatHelper
       extend Acapi::Notifiers
@@ -19,6 +20,18 @@ module Insured
 
       def self.find(enrollment_id, family_id)
         new({enrollment_id: enrollment_id, family_id: family_id}).build_form_params
+      end
+
+      def validate_rating_address
+        family = Family.where(id: family_id).first
+        primary_person = family.primary_person
+        primary_person_address = primary_person.rating_address
+        rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_person_address) if primary_person_address.present?
+        if rating_area.nil?
+          [false, l10n("insured.out_of_state_error_message")]
+        else
+          [true, nil]
+        end
       end
 
       def self.term_or_cancel(enrollment_id, term_date, term_or_cancel)
@@ -145,8 +158,11 @@ module Insured
           year = current_enrollment_effective_on.year
           month = day = 1
         elsif current_enrollment_effective_on.year != hbx_created_datetime.year
+          monthly_enrollment_due_on = Settings.aca.individual_market.monthly_enrollment_due_on
+          condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, monthly_enrollment_due_on)).include?(hbx_created_datetime.to_date)
+          offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
-          month = current_enrollment_effective_on.month
+          month = hbx_created_datetime.next_month.month + offset_month
         else
           offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
           year = hbx_created_datetime.year
