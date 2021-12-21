@@ -191,7 +191,7 @@
             <ns2:PersonGivenName>Laura</ns2:PersonGivenName>
             <ns2:PersonSurName>Banfield</ns2:PersonSurName>
         </ns2:PersonName>
-        <ns2:PersonRaceText>White</ns2:PersonRaceText>
+        <ns2:PersonEthnicityText>White</ns2:PersonEthnicityText>
         <ns2:PersonSexText>Female</ns2:PersonSexText>
         <ns2:PersonUSCitizenIndicator ns1:metadata="vm2009583325215611506">false</ns2:PersonUSCitizenIndicator>
         <ns4:TribalAugmentation>
