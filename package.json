@@ -74,6 +74,5 @@
     "titleTemplate": "{classname}-{title}",
     "ancestorSeparator": " › ",
     "usePathForSuiteName": "true"
-  },
-  "version": "0.0.0"
+  }
 }
