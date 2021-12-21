@@ -21,7 +21,7 @@ module Insured
       end
 
       def validate_rating_address
-        @factory_class.validate_rating_address(@family_id)
+        @factory_class.new({family_id: @family_id}).validate_rating_address
       end
 
       def term_or_cancel

@@ -3,7 +3,7 @@
 module Insured
   module Factories
     class SelfServiceFactory
-      extend L10nHelper
+      include L10nHelper
       extend ::FloatHelper
       include ::FloatHelper
       extend Acapi::Notifiers
@@ -22,7 +22,7 @@ module Insured
         new({enrollment_id: enrollment_id, family_id: family_id}).build_form_params
       end
 
-      def self.validate_rating_address(family_id)
+      def validate_rating_address
         family = Family.where(id: family_id).first
         primary_person = family.primary_person
         primary_person_address = primary_person.rating_address

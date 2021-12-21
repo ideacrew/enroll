@@ -77,7 +77,7 @@ module Insured
         end
 
         it "returns true with valid rating address" do
-          result = subject.validate_rating_address(@family_id)
+          result = subject.new({family_id: @family_id}).validate_rating_address
           expect(result).to be_truthy
         end
       end
@@ -93,7 +93,7 @@ module Insured
 
         it "returns a failure message with invalid rating address" do
           family1.primary_person.rating_address.destroy!
-          result = subject.validate_rating_address(family1.id)
+          result = subject.new({family_id: family1.id}).validate_rating_address
           expect(result).to include(message)
         end
       end
