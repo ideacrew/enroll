@@ -45,6 +45,10 @@ module Insured
 
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
+        if reinstatement.rating_area_id.nil?
+          log("ERROR in SelfServiceFactory: Rating_area_id is nil, cannot create reinstatement enrollment. person_hbx_id: #{enrollment.family.primary_person.hbx_id}, enrollment_hbx_id: #{enrollment.hbx_id}")
+          raise
+        end
         reinstatement.save!
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
 
@@ -141,10 +145,11 @@ module Insured
           year = current_enrollment_effective_on.year
           month = day = 1
         elsif current_enrollment_effective_on.year != hbx_created_datetime.year
-          condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, 15)).include?(hbx_created_datetime.to_date)
+          monthly_enrollment_due_on = Settings.aca.individual_market.monthly_enrollment_due_on
+          condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, monthly_enrollment_due_on)).include?(hbx_created_datetime.to_date)
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
-          month = current_enrollment_effective_on.month + offset_month
+          month = hbx_created_datetime.next_month.month + offset_month
         else
           offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
           year = hbx_created_datetime.year
