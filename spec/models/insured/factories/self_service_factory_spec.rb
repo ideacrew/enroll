@@ -305,10 +305,49 @@ module Insured
         end
       end
 
-      context "within OE before last month and after 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+      context "within OE before last month and before monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth" do
         before do
           current_year = Date.today.year
-          system_date = Date.new(current_year, 12, 19)
+          system_date = rand(Date.new(current_year, 12, 1)..Date.new(current_year, 12, Settings.aca.individual_market.monthly_enrollment_due_on))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 1, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 1, 1))
+        end
+      end
+
+      context "within OE before last month and before monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with effective date 2/1" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year, 12, 1)..Date.new(current_year, 12, Settings.aca.individual_market.monthly_enrollment_due_on))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 1, 1))
+        end
+      end
+
+      context "within OE before last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year, 12, 31))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 1, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE before last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth and has a 2/1 effective_date" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year, 12, 31))
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
           @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 2, 1)).to_date
         end
@@ -318,10 +357,36 @@ module Insured
         end
       end
 
-      context "within OE last month and before 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+      context "within OE before last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth and has a 3/1 effective_date" do # for scenarios when there is any bad data and we try to re-shop
         before do
           current_year = Date.today.year
-          system_date = rand(Date.new(current_year.next, 1, 1)..Date.new(current_year.next, 1, 15))
+          system_date = rand(Date.new(current_year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year, 12, 31))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.next_year.year, 3, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE last month and before monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, 1)..Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 1, 1)).to_date
+        end
+
+        it 'should return start of as 2/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "within OE last month and before monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with effective date 2/1" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, 1)..Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on))
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
           @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 2, 1)).to_date
         end
@@ -331,12 +396,25 @@ module Insured
         end
       end
 
-      context "within OE last month and after 15th day of the month of IndividualEnrollmentDueDayOfMonth" do
+      context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth" do
         before do
           current_year = Date.today.year
-          system_date = rand(Date.new(current_year.next, 1, 16)..Date.new(current_year.next, 1, 31))
+          system_date = rand(Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year.next, 1, 31))
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
           @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 2, 1)).to_date
+        end
+
+        it 'should return start of as 3/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 3, 1))
+        end
+      end
+
+      context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 3/1" do
+        before do
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year.next, 1, 31))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 3, 1)).to_date
         end
 
         it 'should return start of as 3/1' do
