@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application]
+    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
