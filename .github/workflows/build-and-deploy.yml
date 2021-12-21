@@ -100,7 +100,7 @@ jobs:
           # send to public registry
           push: true
           # create local image (for scanning)
-          load: true
+          load: false
           tags: ${{ steps.prep.outputs.tagged_image }}
           # cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
