@@ -3,6 +3,7 @@
 module Insured
   module Factories
     class SelfServiceFactory
+      include L10nHelper
       extend ::FloatHelper
       include ::FloatHelper
       extend Acapi::Notifiers
@@ -19,6 +20,18 @@ module Insured
 
       def self.find(enrollment_id, family_id)
         new({enrollment_id: enrollment_id, family_id: family_id}).build_form_params
+      end
+
+      def validate_rating_address
+        family = Family.where(id: family_id).first
+        primary_person = family.primary_person
+        primary_person_address = primary_person.rating_address
+        rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_person_address) if primary_person_address.present?
+        if rating_area.nil?
+          [false, l10n("insured.out_of_state_error_message")]
+        else
+          [true, nil]
+        end
       end
 
       def self.term_or_cancel(enrollment_id, term_date, term_or_cancel)
