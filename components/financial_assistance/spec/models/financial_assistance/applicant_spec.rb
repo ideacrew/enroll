@@ -401,9 +401,9 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(false)
       applicant.update_attributes({is_required_to_file_taxes: true,
-                                 is_joint_tax_filing: false,
-                                 is_claimed_as_tax_dependent: false,
-                                 is_filing_as_head_of_household: false})
+                                   is_joint_tax_filing: false,
+                                   is_claimed_as_tax_dependent: false,
+                                   is_filing_as_head_of_household: false})
     end
     let!(:parent_applicant) do
       FactoryBot.create(:applicant,
