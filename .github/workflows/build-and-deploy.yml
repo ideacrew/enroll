@@ -24,8 +24,14 @@ jobs:
   test-event-type:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ github.event_name }}
-      - run: echo ${{ github.event_name == 'pull_request' }}
+      - name: Print event name
+        run: echo ${{ github.event_name }}
+      - name: Print head ref
+        run: echo ${{ github.head_ref }}
+      - name: Print base ref
+        run: echo ${{ github.base_ref }}
+      - name: Print comparison of pull request
+        run: echo ${{ github.event_name == 'pull_request' }}
   # build-and-upload-image:
   #   runs-on: ubuntu-latest
   #   services:
