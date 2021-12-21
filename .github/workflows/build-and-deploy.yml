@@ -16,9 +16,6 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  ECR_REPOSITORY: 'enroll'
-  ECR_REGISTRY: 'public.ecr.aws'
-  ECR_ORG: 'ideacrew'
 
 jobs:
   build-and-upload-image:
@@ -100,6 +97,7 @@ jobs:
           target: deploy
           network: host
           push: false
+          load: true
           tags: ${{ steps.prep.outputs.tagged_image }}
           # cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
@@ -107,21 +105,23 @@ jobs:
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
-            RABBITMQ_URL=localhost
+            RABBITMQ_URL=amqp://localhost:5672
+            RABBITMQ_HOST=amqp://localhost
+            ENROLL_DB_HOST=localhost
 
-      # - name: Scan Docker image
-      #   id: scan
-      #   uses: anchore/scan-action@main
-      #   with:
-      #     image: '${{ env.ECR_REGISTRY }}/${{ env.ECR_ORG }}/${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
-      #     acs-report-enable: true
-      #     fail-build: false
-      #     severity-cutoff: critical
+      - name: Scan Docker image
+        id: scan
+        uses: anchore/scan-action@main
+        with:
+          image: '${{ steps.prep.outputs.tagged_image }}'
+          acs-report-enable: true
+          fail-build: false
+          severity-cutoff: critical
 
-      # - name: upload Anchore scan SARIF report
-      #   uses: github/codeql-action/upload-sarif@v1
-      #   with:
-      #     sarif_file: ${{ steps.scan.outputs.sarif }}
+      - name: upload Anchore scan SARIF report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
 
   # notify-slack:
   #   needs: [build-and-upload-image]
