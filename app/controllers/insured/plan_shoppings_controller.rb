@@ -12,6 +12,7 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :find_hbx_enrollment, :only => [:show, :plans]
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
+  before_action :validate_rating_address, only: [:show, :plans, :checkout]
 
   def checkout
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
@@ -490,5 +491,12 @@ class Insured::PlanShoppingsController < ApplicationController
     if session[:elected_aptc].to_f != elected_aptc.to_f
       session[:elected_aptc] = elected_aptc.to_f
     end
+  end
+
+  def validate_rating_address
+    return if @hbx_enrollment.rating_area_id.present?
+
+    flash[:error] = l10n("insured.out_of_state_error_message")
+    redirect_to family_account_path
   end
 end
