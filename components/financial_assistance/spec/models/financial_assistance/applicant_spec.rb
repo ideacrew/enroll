@@ -395,27 +395,48 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant.tax_info_complete?).to eq true
       end
     end
+  end
 
-    context 'is filing application with parents in household' do
-      let!(:parent_applicant) do
-        FactoryBot.create(:applicant,
-                          application: application,
-                          dob: Date.today - 40.years,
-                          is_primary_applicant: false,
-                          family_member_id: BSON::ObjectId.new)
-      end
+  context 'is filing application with parents in household' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(false)
+      applicant.update_attributes({is_required_to_file_taxes: true,
+                                 is_joint_tax_filing: false,
+                                 is_claimed_as_tax_dependent: false,
+                                 is_filing_as_head_of_household: false})
+    end
+    let!(:parent_applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 40.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
 
-      let!(:parent2_applicant) do
-        FactoryBot.create(:applicant,
-                          application: application,
-                          dob: Date.today - 40.years,
-                          is_primary_applicant: false,
-                          family_member_id: BSON::ObjectId.new)
-      end
+    let!(:parent2_applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 40.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
 
-      it "shouldn't require 'filing jointly' to be present" do
-        expect(applicant.tax_info_complete?).to eq true
-      end
+    let!(:applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 20.years,
+                        is_primary_applicant: true,
+                        family_member_id: BSON::ObjectId.new)
+    end
+    before do
+      application.ensure_relationship_with_primary(parent_applicant, 'parent')
+      application.ensure_relationship_with_primary(parent2_applicant, 'parent')
+      application.update_or_build_relationship(parent2_applicant, parent_applicant, 'spouse')
+      application.update_or_build_relationship(parent_applicant, parent2_applicant, 'spouse')
+    end
+
+    it "shouldn't require 'filing jointly' to be present" do
+      expect(applicant.tax_info_complete_unmarried_child?).to eq true
     end
   end
 
