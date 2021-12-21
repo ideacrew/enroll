@@ -98,7 +98,7 @@ jobs:
           # needed to access mongo and rabbit on GHA machine
           network: host
           # send to public registry
-          push: false
+          push: true
           # create local image (for scanning)
           load: true
           tags: ${{ steps.prep.outputs.tagged_image }}
@@ -108,7 +108,9 @@ jobs:
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
-            HOST_STRING=172.17.0.1
+            ENROLL_DB_HOST=172.17.0.1
+            RABBITMQ_URL=amqp://172.17.0.1:5672
+            RABBITMQ_HOST=amqp://172.17.0.1
 
       - name: Scan Docker image
         id: scan

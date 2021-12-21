@@ -112,16 +112,11 @@ COPY --chown=nonroot:nonroot . $HOME
 
 ARG SECRET_KEY_BASE=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
 
-# Used in multiple places, easier than passing in multiple
-# build-args and overriding each one of them, needs to be
-# localhost in GitHub Actions, i.e. HOST_STRING=localhost
-ARG HOST_STRING=host.docker.internal
-
-ARG ENROLL_DB_HOST=$HOST_STRING
+ARG ENROLL_DB_HOST=host.docker.internal
 ARG ENROLL_DB_PORT=27017
 ARG ENROLL_DB_NAME=enroll_production
-ARG RABBITMQ_URL=amqp://$HOST_STRING:5672
-ARG RABBITMQ_HOST=amqp://$HOST_STRING
+ARG RABBITMQ_URL=amqp://rabbitmq:5672
+ARG RABBITMQ_HOST=amqp://rabbitmq
 ARG RABBITMQ_PORT=5672
 ARG RABBITMQ_VHOST=event_source
 ARG MITC_HOST=http://mitc
