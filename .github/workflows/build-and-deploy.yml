@@ -5,9 +5,11 @@ on:
     branches:
       - 'trunk'
       - 'release_*'
-      - 'move-script-to-dockerfile'
     tags:
       - 'v*'
+  pull_request:
+    branches:
+      - 'trunk'
 
 concurrency:
   group: docker-mark-${{ github.ref }}
@@ -16,6 +18,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
+  SHOULD_DEPLOY: ${{ github.event.type != 'pull_request' }}
 
 jobs:
   build-and-upload-image:
@@ -107,7 +110,7 @@ jobs:
           # needed to access mongo and rabbit on GHA machine
           network: host
           # send to public registry
-          push: true
+          push: ${{ env.SHOULD_DEPLOY}}
           # create local image (for scanning)
           load: false
           tags: ${{ steps.prep.outputs.tagged_image }}
@@ -122,6 +125,7 @@ jobs:
             RABBITMQ_HOST=amqp://172.17.0.1
 
       - name: Scan Docker image
+        if: ${{ github.event_name != 'pull_request }}
         id: scan
         uses: anchore/scan-action@main
         with:
@@ -131,6 +135,7 @@ jobs:
           severity-cutoff: critical
 
       - name: upload Anchore scan SARIF report
+        if: ${{ github.event_name != 'pull_request }}
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
@@ -140,20 +145,21 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-  # notify-slack:
-  #   needs: [build-and-upload-image]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     # gets the branch name without the 'refs/heads/' prefix
-  #     - name: Git branch name
-  #       id: git-branch-name
-  #       uses: EthanSK/git-branch-name-action@v1
+  notify-slack:
+    if: ${{ github.event_name != 'pull_request }}
+    needs: [build-and-upload-image]
+    runs-on: ubuntu-latest
+    steps:
+      # gets the branch name without the 'refs/heads/' prefix
+      - name: Git branch name
+        id: git-branch-name
+        uses: EthanSK/git-branch-name-action@v1
 
-  #     - name: Post to a Slack channel
-  #       id: slack
-  #       uses: slackapi/slack-github-action@v1.16.0
-  #       with:
-  #         channel-id: 'docker-images'
-  #         slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
-  #       env:
-  #         SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.16.0
+        with:
+          channel-id: 'docker-images'
+          slack-message: 'New image pushed: ${{ env.ECR_REPOSITORY }}:${{ env.GIT_BRANCH_NAME }}-${{ github.sha }}'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
