@@ -530,6 +530,21 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           it 'should not validate applicant as complete' do
             expect(applicant.applicant_validation_complete?).to eq false
           end
+
+          context 'person_coverage_end_on not given after selecting yes to has_eligibility_changed' do
+            before do
+              applicant.update_attributes!({
+                                             has_eligible_medicaid_cubcare: false,
+                                             has_eligibility_changed: true,
+                                             has_household_income_changed: false,
+                                             person_coverage_end_on: nil
+                                           })
+            end
+
+            it 'should not validate applicant as complete' do
+              expect(applicant.applicant_validation_complete?).to eq false
+            end
+          end
         end
 
         context 'medicare_eligible_qns answered' do

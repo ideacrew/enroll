@@ -279,6 +279,8 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
+    field :transfer_referral_reason, type: String
+
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :evidences, class_name: "::FinancialAssistance::Evidence"
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
@@ -937,6 +939,7 @@ module FinancialAssistance
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && person_coverage_end_on.blank?
       return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
