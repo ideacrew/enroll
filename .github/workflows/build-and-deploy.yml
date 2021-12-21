@@ -18,14 +18,14 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  SHOULD_DEPLOY: ${{ github.event.type == 'pull_request' }}
+  SHOULD_DEPLOY: ${{ github.event_type == 'pull_request' }}
 
 jobs:
   test-event-type:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ github.event.type }}
-      - run: echo ${{ github.event.type == 'pull_request' }}
+      - run: echo ${{ github.event_type }}
+      - run: echo ${{ github.event_type == 'pull_request' }}
   # build-and-upload-image:
   #   runs-on: ubuntu-latest
   #   services:
