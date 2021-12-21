@@ -21,12 +21,20 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     context 'with valid payload' do
       before do
         record = serializer.parse(xml)
-        transformed = transformer.transform(record.to_hash(identifier: true))
-        @result = subject.call(transformed)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
       end
 
       it 'should return success if zips are present in database' do
         expect(@result).to be_success
+      end
+
+      context 'person ethnicity' do
+        it 'should populate person ethnicity using cv3 person demographics ethnicity' do
+          person_demographics = @transformed["family"]["family_members"].first["person"]["person_demographics"]
+          person = Person.first
+          expect(person.ethnicity).to eq person_demographics["ethnicity"]
+        end
       end
     end
   end
