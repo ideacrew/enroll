@@ -65,6 +65,15 @@ jobs:
         with:
           install: true
 
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          # Key is named differently to avoid collision
+          key: ${{ runner.os }}-multi-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-multi-buildx
+
       # Add vhosts to RabbitMQ
       - run: |
           docker exec rabbitmq rabbitmqctl add_vhost /
@@ -102,11 +111,11 @@ jobs:
           # create local image (for scanning)
           load: false
           tags: ${{ steps.prep.outputs.tagged_image }}
-          # cache-from: type=local,src=/tmp/.buildx-cache
+          cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
-          # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
             ENROLL_DB_HOST=172.17.0.1
             RABBITMQ_URL=amqp://172.17.0.1:5672
@@ -125,6 +134,11 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   # notify-slack:
   #   needs: [build-and-upload-image]
