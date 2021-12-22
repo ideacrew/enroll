@@ -48,9 +48,8 @@ module FinancialAssistance
             Failure("send_successful_account_transfer_email: #{e}")
           end
 
-          def trigger_account_transfer_notice(family)
+          def trigger_account_transfer_notice(family, application)
             return unless ::EnrollRegistry.feature_enabled?(:account_transfer_notice_trigger)
-
             result = ::Operations::Notices::IvlAccountTransferNotice.new.call(family: family)
             if result.success?
               Rails.logger.info { "Triggered account transfer notice for family id: #{family.id}" }
@@ -62,8 +61,9 @@ module FinancialAssistance
           end
 
           def construct_payload(application, family)
-            send_successful_account_transfer_email(family)
-            trigger_account_transfer_notice(family)
+            initiated_applicants = application.applicants&.where(transfer_referral_reason: 'Initiated')&.any?
+            send_successful_account_transfer_email(family, application) if initiated_applicants
+            trigger_account_transfer_notice(family, application) if initiated_applicants
             response_hash = {}
             response_hash[:family_identifier] = family.hbx_assigned_id.to_s
             response_hash[:application_identifier] = application.hbx_id
