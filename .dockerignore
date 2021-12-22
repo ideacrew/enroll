@@ -31,3 +31,11 @@ pickle-email-*.html
 /test/tmp/
 /test/version_tmp/
 /tmp/
+
+### Development ###
+.github
+.semaphore
+.vscode
+ci
+hugo
+jenkins
