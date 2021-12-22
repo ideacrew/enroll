@@ -27,3 +27,4 @@ Feature: Cost Savings Raw Application
     Then user should land on full application page and should see 2 view my applications buttons
     Then user should see 2 print buttons
     And user should see Medicaid eligibility question
+    And user should see Claimed as Dependent question

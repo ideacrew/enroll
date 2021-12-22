@@ -25,7 +25,7 @@
         Will this Person file taxes for <%= @application.assistance_year %>?: <%= applicant.is_required_to_file_taxes %>
         Will this person be claimed as a tax dependent for <%= @application.assistance_year %>?: <%= applicant.is_claimed_as_tax_dependent %>
         Will this person be filing jointly?: <%= applicant.is_joint_tax_filing %>
-        This person will be claimed as a dependent by: <%= applicant.claimed_as_tax_dependent_by ? @applicants.find(applicant.claimed_as_tax_dependent_by).full_name : nil %>
+        This person will be claimed as a dependent by: <%= applicant.claimed_as_tax_dependent_by ? @applicants.where(id: applicant.claimed_as_tax_dependent_by).first&.full_name : nil %>
     INCOME:
     INCOME ADJUSTMENTS:
         <%= strip_tags(l10n('faa.deductions.income_adjustments', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) %>: <%= applicant.has_deductions %>

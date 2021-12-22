@@ -598,6 +598,10 @@ And(/^user should see Medicaid eligibility question$/) do
   expect(page).to have_content("Medicaid eligibility")
 end
 
+And(/^user should see Claimed as Dependent question$/) do
+  expect(page).to have_content(FinancialAssistance::RawApplicationPage.claimed_as_dependent_text)
+end
+
 And(/^user should have feature toggled questions in review$/) do
   # Add more stuff here as you add more conditional questions please, fam
   if EnrollRegistry.feature_enabled?(:financial_assistance) &&
