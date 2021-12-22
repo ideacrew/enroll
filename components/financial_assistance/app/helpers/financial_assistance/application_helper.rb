@@ -318,7 +318,7 @@ module FinancialAssistance
       application.aasm_state.titleize
     end
 
-    def fetch_counties(address)
+    def fetch_counties_by_zip(address)
       return [] unless address&.zip
 
       BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
