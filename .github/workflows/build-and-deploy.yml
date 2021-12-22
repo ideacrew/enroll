@@ -41,6 +41,16 @@ jobs:
           echo ::set-output name=tag::${TAG}
           echo ::set-output name=registry::public.ecr.aws
           echo ::set-output name=alpha_image::${IMAGE}:${TAG}-alpha
+  confirm:
+    runs-on: ubuntu-latest
+    needs: [prep]
+    steps:
+      - name: Confirm outputs
+        run: |
+          echo ${{ needs.prep.outputs.alphaImage }}
+          echo ${{ needs.prep.outputs.registry }}
+          echo ${{ needs.prep.outputs.taggedImage }}
+          echo ${{ needs.prep.outputs.tag }}
   build-and-upload-image:
     needs: [prep]
     runs-on: ubuntu-latest
@@ -217,7 +227,8 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
   notify-slack:
-    needs: [build-and-upload-image]
+    if: github.event_name != 'pull_request'
+    needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     steps:
       # gets the branch name without the 'refs/heads/' prefix
