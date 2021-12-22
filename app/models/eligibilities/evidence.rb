@@ -27,7 +27,7 @@ module Eligibilities
 
     # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
-    embedded_in :evidencable, polymorphic: true
+    embedded_in :evidenceable, polymorphic: true
 
     field :key, type: Symbol
     field :title, type: String

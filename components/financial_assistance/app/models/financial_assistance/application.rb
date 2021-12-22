@@ -9,6 +9,7 @@ module FinancialAssistance
     include Acapi::Notifiers
     require 'securerandom'
     include Eligibilities::Visitors::Visitable
+    include GlobalID::Identification
 
     # belongs_to :family, class_name: "Family"
 

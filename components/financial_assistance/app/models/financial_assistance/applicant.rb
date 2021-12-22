@@ -297,10 +297,10 @@ module FinancialAssistance
     # depricated, need to remove this after after data migration
     embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
 
-    embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
-    embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
-    embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
-    embeds_one :aces_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidencable
+    embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
+    embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
+    embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
+    embeds_one :aces_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
 
     accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :aces_mec_evidence
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
