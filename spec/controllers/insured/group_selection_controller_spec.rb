@@ -1128,7 +1128,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should redirect to family home page" do
-        post :create, params: { "person_id" => @person1.id, "family_member_ids"=>{"0"=> @family.primary_applicant.id}, "market_kind"=>"individual", "coverage_kind"=>"health"}
+        post :create, params: { "person_id" => @person1.id, "family_member_ids" => {"0" => @family.primary_applicant.id}, "market_kind" => "individual", "coverage_kind" => "health"}
         expect(response).to have_http_status(:redirect)
         expect(flash[:error]).to eq l10n("insured.out_of_state_error_message")
       end

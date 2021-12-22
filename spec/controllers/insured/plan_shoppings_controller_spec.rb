@@ -725,7 +725,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:family1) { FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
 
     context "for nil rating area" do
-      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family1, household: family1.active_household, consumer_role_id: person1.consumer_role.id, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
+      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family1, household: family1.active_household, consumer_role_id: person1.consumer_role.id, kind: 'individual', product_id: product.id)}
 
       before :each do
         allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
