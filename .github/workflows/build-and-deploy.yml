@@ -101,7 +101,7 @@ jobs:
       - name: Upload Image to ECR
         if: github.event_name != 'pull_request'
         id: upload-image
-        run: docker push ${{ needs.prep.outputs.tagged_image }}
+        run: docker push ${{ needs.prep.outputs.taggedImage }}
 
   # Uses buildx to build and push the image
   build-and-upload-image-v2:
@@ -233,6 +233,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.tagged_image }}'
+          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }}'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
