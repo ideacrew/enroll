@@ -566,4 +566,34 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       expect(helper.render_product_type_details(:gold, false)).to eq "<span class=\"gold-icon\">Gold</span>"
     end
   end
+
+  describe '#fetch_counties_by_zip', dbclean: :after_each do
+    let!(:person) { FactoryBot.create(:person)}
+    let!(:county) {BenefitMarkets::Locations::CountyZip.create(zip: "04642", county_name: "Hancock")}
+
+    context 'for 9 digit zip' do
+      it "should return county" do
+        person.addresses.update_all(zip: "04642-3116", county: 'Hancock')
+        address = person.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq ['Hancock']
+      end
+    end
+
+    context 'for nil address' do
+      it "should return empty array" do
+        result = helper.fetch_counties_by_zip(nil)
+        expect(result).to eq []
+      end
+    end
+
+    context 'for nil zip' do
+      it "should return empty array" do
+        person.addresses.update_all(zip: nil, county: 'Hancock')
+        address = person.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq []
+      end
+    end
+  end
 end
