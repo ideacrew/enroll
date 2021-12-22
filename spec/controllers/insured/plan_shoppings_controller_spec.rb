@@ -719,6 +719,30 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
+  context "GET show for IVL", :dbclean => :around_each do
+    let(:user)  { FactoryBot.create(:user, person: person1) }
+    let(:person1) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)}
+    let(:family1) { FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
+
+    context "for nil rating area" do
+      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family1, household: family1.active_household, consumer_role_id: person1.consumer_role.id, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
+
+      before :each do
+        allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+        allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+        ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        sign_in user
+        person1.addresses.update_all(county: nil)
+        get :show, params: {id: hbx_enrollment.id, market_kind: "individual"}
+      end
+
+      it "should redirect to family home page" do
+        expect(response).to have_http_status(:redirect)
+        expect(flash[:error]).to eq l10n("insured.out_of_state_error_message")
+      end
+    end
+  end
+
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "plan_selection_callback" do
       let(:coverage_kind){"health"}
