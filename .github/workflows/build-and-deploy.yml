@@ -90,18 +90,20 @@ jobs:
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # Build Docker Image
-      - name: Build Image
-        id: build-image
-        run: |
-          chmod +x .docker/build_gha.sh
-          .docker/build_gha.sh ${{ needs.prep.outputs.tag }} public.ecr.aws/ideacrew/enroll .
-
+      # # Build Docker Image
+      # - name: Build Image
+      #   id: build-image
+      #   run: |
+      #     chmod +x .docker/build_gha.sh
+      #     .docker/build_gha.sh ${{ needs.prep.outputs.tag }} public.ecr.aws/ideacrew/enroll .
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         if: github.event_name != 'pull_request'
         id: upload-image
-        run: docker push ${{ needs.prep.outputs.tagged_image }}
+        run: |
+          echo ${{ needs.prep.outputs.tagged_image }}
+
+        # docker push ${{ needs.prep.outputs.tagged_image }}
 
   # Uses buildx to build and push the image
   build-and-upload-image-v2:
@@ -218,21 +220,21 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-  notify-slack:
-    if: github.event_name != 'pull_request'
-    needs: [prep, build-and-upload-image]
-    runs-on: ubuntu-latest
-    steps:
-      # gets the branch name without the 'refs/heads/' prefix
-      - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
+  # notify-slack:
+  #   if: github.event_name != 'pull_request'
+  #   needs: [prep, build-and-upload-image]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # gets the branch name without the 'refs/heads/' prefix
+  #     - name: Git branch name
+  #       id: git-branch-name
+  #       uses: EthanSK/git-branch-name-action@v1
 
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.16.0
-        with:
-          channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.tagged_image }}'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+  #     - name: Post to a Slack channel
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v1.16.0
+  #       with:
+  #         channel-id: 'docker-images'
+  #         slack-message: 'New image pushed: ${{ needs.prep.outputs.tagged_image }}'
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
