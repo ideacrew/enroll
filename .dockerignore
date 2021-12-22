@@ -1,3 +1,6 @@
+.git
+.gitignore
+
 .bundle
 node_modules
 
