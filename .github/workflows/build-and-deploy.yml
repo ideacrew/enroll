@@ -98,6 +98,7 @@ jobs:
 
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
+        if: github.event_name != 'pull_request'
         id: upload-image
         run: docker push ${{ needs.prep.outputs.tagged_image }}
 
@@ -200,7 +201,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@main
         with:
-          image: '${{ needs.prep.outputs.tagged_image }}-alpha'
+          image: ${{ needs.prep.outputs.alphaImage }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
