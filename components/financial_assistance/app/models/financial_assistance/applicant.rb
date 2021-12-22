@@ -551,6 +551,10 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
+    def is_spouse_of_primary
+      application.relationships.where(kind: 'spouse', relative_id: application.primary_applicant.id).present?
+    end
+
     def eligibility_determination_of_spouse
       return nil unless has_spouse
       spouse_relationship.relative.eligibility_determination
@@ -782,6 +786,14 @@ module FinancialAssistance
       !is_required_to_file_taxes.nil? &&
         !is_claimed_as_tax_dependent.nil? &&
         filing_as_head
+    end
+
+    def tax_info_complete_unmarried_child?
+      filing_as_head = (!FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && is_claimed_as_tax_dependent == false)
+      !is_required_to_file_taxes.nil? &&
+        !is_claimed_as_tax_dependent.nil? &&
+        filing_as_head &&
+        !is_joint_tax_filing.nil?
     end
 
     def incomes_complete?
@@ -1195,7 +1207,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_step_1
-      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
+      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && is_spouse_of_primary
 
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 
