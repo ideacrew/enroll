@@ -23,7 +23,7 @@ module Operations
       def validate(params)
         contract_result =
           AcaEntities::Eligibilities::Contracts::EligibilityItemContract.new
-            .call(params)
+                                                                        .call(params)
         if contract_result.success?
           Success(contract_result.to_h)
         else

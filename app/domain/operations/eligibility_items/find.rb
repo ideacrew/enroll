@@ -25,9 +25,7 @@ module Operations
 
       def validate(params)
         errors = []
-        unless params[:eligibility_item_key]
-          errors << 'eligibility_item_key missing'
-        end
+        errors << 'eligibility_item_key missing' unless params[:eligibility_item_key]
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -35,7 +33,7 @@ module Operations
       def find_eligibility_item(values)
         evidence_item_keys =
           EnrollRegistry[values[:eligibility_item_key]].setting(:evidence_items)
-            .item
+                                                       .item
 
         evidence_items =
           evidence_item_keys.collect do |evidence_item_key|

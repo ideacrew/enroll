@@ -37,10 +37,10 @@ module Operations
         errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def get_eligibility_items(values)
+      def get_eligibility_items(_values)
         eligibility_item_keys =
           EnrollRegistry[:'gid://enroll_app/Family'].setting(:eligibility_items)
-            .item
+                                                    .item
 
         eligibility_items =
           eligibility_item_keys.collect do |eligibility_item_key|
@@ -58,13 +58,13 @@ module Operations
       def build_determination(eligibility_items, values)
         subjects =
           values[:subjects]
-            .collect do |subject|
-              Hash[
-                subject.uri,
-                build_eligibility_states(subject, eligibility_items, values)
-              ]
-            end
-            .reduce(:merge)
+          .collect do |subject|
+            Hash[
+              subject.uri,
+              build_eligibility_states(subject, eligibility_items, values)
+            ]
+          end
+          .reduce(:merge)
 
         determination = {
           effective_date: values[:effective_date],
@@ -77,26 +77,25 @@ module Operations
       def build_eligibility_states(subject, eligibility_items, values)
         eligibility_items
           .collect do |eligibility_item|
-            if values[:eligibility_items_requested].blank? ||
-                 values[:eligibility_items_requested]&.key?(
-                   eligibility_item.key
-                 )
-              eligibility_state =
-                BuildEligibilityState.new.call(
-                  effective_date: values[:effective_date],
-                  subject: subject,
-                  eligibility_item: eligibility_item,
-                  evidence_item_keys:
-                    (values[:eligibility_items_requested] || {})[
-                      :evidence_items
-                    ]
-                )
+            next unless values[:eligibility_items_requested].blank? ||
+                        values[:eligibility_items_requested]&.key?(
+                          eligibility_item.key
+                        )
+            eligibility_state =
+              BuildEligibilityState.new.call(
+                effective_date: values[:effective_date],
+                subject: subject,
+                eligibility_item: eligibility_item,
+                evidence_item_keys:
+                  (values[:eligibility_items_requested] || {})[
+                    :evidence_items
+                  ]
+              )
 
-              if eligibility_state.success?
-                Hash[eligibility_item.key, eligibility_state.success]
-              else
-                Hash[eligibility_item.key, {}]
-              end
+            if eligibility_state.success?
+              Hash[eligibility_item.key, eligibility_state.success]
+            else
+              Hash[eligibility_item.key, {}]
             end
           end
           .compact
