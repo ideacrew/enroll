@@ -1,0 +1,70 @@
+# frozen_string_literal: true
+
+module Eligibilities
+  module Visitors
+    # Use Visitor Development Pattern to access models and determine Non-ESI
+    # eligibility status for a Family Financial Assistance Application's Applicants
+    class AptcCsrCreditVisitor < Visitor
+      attr_accessor :evidence, :subject, :evidence_item, :effective_date
+
+      def call
+        application = application_instance_for(subject, effective_date)
+        
+        application.accept(self)
+      end
+
+      def visit(applicant)
+        unless applicant.family_member_id == subject.id
+          @evidence = Hash[evidence_item[:key], {}]
+          return
+        end
+
+        current_record = applicant.send(evidence_item[:key])
+        unless current_record
+          @evidence = Hash[evidence_item[:key], {}]
+          return
+        end
+
+        evidence_record = evidence_record_for(current_record, effective_date)
+        @evidence = evidence_state_for(evidence_record)
+      end
+
+      private
+
+      def application_instance_for(subject, effective_date)
+        ::FinancialAssistance::Application.where(
+          :family_id => subject.family.id,
+          :aasm_state => 'determined',
+          :effective_date.gte => effective_date.beginning_of_year,
+          :effective_date.lte => effective_date
+        ).last
+      end
+
+      def evidence_record_for(current_record, effective_date)
+        evidence_history =
+          current_record
+            .verification_histories
+            .where(:created_at.lte => effective_date)
+            .last
+
+        evidence_history || current_record
+      end
+
+      def evidence_state_for(evidence_record)
+        ids = {
+          'evidence_gid' => evidence_record.to_global_id.uri,
+          'visited_at' => DateTime.now,
+          'status' => evidence_record.aasm_state
+        }
+
+        Hash[
+          evidence_item[:key],
+          evidence_record
+            .attributes
+            .slice('is_satisfied', 'verification_outstanding', 'due_on')
+            .merge(ids)
+        ]
+      end
+    end
+  end
+end

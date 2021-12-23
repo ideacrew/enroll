@@ -90,7 +90,7 @@ module FinancialAssistance
 
     EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
 
-    EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :aces_mec_evidence].freeze
+    EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
 
     field :name_pfx, type: String
     field :first_name, type: String
@@ -300,9 +300,9 @@ module FinancialAssistance
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
     embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
-    embeds_one :aces_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
+    embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :aces_mec_evidence
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
