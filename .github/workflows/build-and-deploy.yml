@@ -65,6 +65,9 @@ jobs:
       # Check out repository
       - uses: actions/checkout@v2
 
+      - name: Add git HEAD info to docker image
+        run: git show --quiet HEAD > release.txt
+
       # Adds `docker` to the environment for running commands
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -132,6 +135,9 @@ jobs:
     steps:
       # Check out repository
       - uses: actions/checkout@v2
+
+      - name: Add git HEAD info to docker image
+        run: git show --quiet HEAD > release.txt
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
