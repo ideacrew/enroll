@@ -222,9 +222,10 @@ module FinancialAssistance
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
-            exiting_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
-            return Success("checked relationship") if exiting_relationship && exiting_relationship.kind == relationship_kind
-            family.primary_person.ensure_relationship_with(person, relationship_kind)
+            existing_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
+            return Success("checked relationship") if existing_relationship && existing_relationship.kind == relationship_kind
+            relationships = family.primary_person.ensure_relationship_with(person, relationship_kind)
+            relationships&.map(&:save!)
             Success("created relationship")
           rescue StandardError => e
             Failure("create_or_update_relationship: #{e}")
@@ -238,8 +239,8 @@ module FinancialAssistance
             sas = member.is_homeless? == primary.is_homeless? &&
                   member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
                   member&.home_address&.attributes&.select {|k, _v| compare_keys.include? k} == primary&.home_address&.attributes&.select do |k, _v|
-                                                                                               compare_keys.include? k
-                                                                                             end
+                                                                                                  compare_keys.include? k
+                                                                                                end
             Success(sas)
           rescue StandardError => e
             Failure("same_address_with_primary: #{e}")
@@ -477,8 +478,13 @@ module FinancialAssistance
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
               persisted_applicant.transfer_referral_reason = applicant[:transfer_referral_reason]
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
+              ::FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant)
               persisted_applicant.save(validate: false)
+              persisted_applicant.relationships.each do |rel|
+                rel.save(validate: false)
+              end
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
+              ::FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant)
             end
             Success("Successfully transferred in account")
           rescue Mongoid::Errors::Validations => e
