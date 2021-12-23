@@ -180,7 +180,8 @@ module BenefitMarkets
       class << self
         def by_coverage_date(collection, coverage_date)
           collection.select do |product|
-            product.premium_tables.any? do |pt|
+            actual_product = product.premium_tables.nil? ? BenefitMarkets::Products::Product.where(id: product.id).first : product
+            actual_product.premium_tables.any? do |pt|
               (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
             end
           end

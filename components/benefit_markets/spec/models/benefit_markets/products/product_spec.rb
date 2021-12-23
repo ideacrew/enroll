@@ -310,5 +310,18 @@ module BenefitMarkets
         expect(subject.display_carrier_logo).to eq "<img src=\"\/assets\/logo\/carrier\/#{legal_name.parameterize.underscore}.jpg\" width=\"50\"/>"
       end
     end
+
+    context '.by_coverage_date' do
+      let(:product)           { FactoryBot.build(:benefit_markets_products_health_products_health_product) }
+      let(:collection)   { [product] }
+      let(:coverage_date)   { quarter_1.begin + 2.months }
+
+      subject { described_class }
+
+      it "should return the actual product" do
+        expect(subject.by_coverage_date(collection, coverage_date)).to include(product)
+      end
+    end
+
   end
 end
