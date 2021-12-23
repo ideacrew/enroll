@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module EligibilityItems
+    # Find eligibility item from resource registry
     class Find
       send(:include, Dry::Monads[:result, :do])
 

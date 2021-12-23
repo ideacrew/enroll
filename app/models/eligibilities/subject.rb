@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Eligibilities
   class Subject
     include Mongoid::Document

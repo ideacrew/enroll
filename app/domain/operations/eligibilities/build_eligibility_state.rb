@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Eligibilities
+    # Build Eligibility state for the eligibility item passed
     class BuildEligibilityState
       send(:include, Dry::Monads[:result, :do])
 

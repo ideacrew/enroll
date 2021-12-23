@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Eligibilities
+  # Evidence State model
   class EvidenceState
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -7,8 +10,8 @@ module Eligibilities
       income_evidence
       esi_evidence
       non_esi_evidence
-      aces_evidence  
-    ]
+      aces_evidence
+    ].freeze
 
     embedded_in :eligibility_state, class_name: '::Eligibilities::EligibilityState'
 

@@ -11,6 +11,7 @@ require 'dry/monads/do'
 
 module Operations
   module Eligibilities
+    # Build determination for subjects passed with effective date
     class BuildDetermination
       send(:include, Dry::Monads[:result, :do])
 
@@ -83,9 +84,7 @@ module Operations
                         )
 
             evidence_item_keys = []
-            if values[:eligibility_items_requested]&.key?(eligibility_item.key.to_sym)
-              evidence_item_keys = values[:eligibility_items_requested][eligibility_item.key.to_sym][:evidence_items]
-            end
+            evidence_item_keys = values[:eligibility_items_requested][eligibility_item.key.to_sym][:evidence_items] if values[:eligibility_items_requested]&.key?(eligibility_item.key.to_sym)
 
             eligibility_state =
               BuildEligibilityState.new.call(

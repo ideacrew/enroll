@@ -13,6 +13,7 @@ require 'dry/monads/do'
 
 module Operations
   module Eligibilities
+    # Build Evidence state for the evidence item passed
     class BuildEvidenceState
       send(:include, Dry::Monads[:result, :do])
 

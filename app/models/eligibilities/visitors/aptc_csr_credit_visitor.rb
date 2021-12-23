@@ -9,7 +9,7 @@ module Eligibilities
 
       def call
         application = application_instance_for(subject, effective_date)
-        
+
         application.accept(self)
       end
 
@@ -43,9 +43,9 @@ module Eligibilities
       def evidence_record_for(current_record, effective_date)
         evidence_history =
           current_record
-            .verification_histories
-            .where(:created_at.lte => effective_date)
-            .last
+          .verification_histories
+          .where(:created_at.lte => effective_date)
+          .last
 
         evidence_history || current_record
       end

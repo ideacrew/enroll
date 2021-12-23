@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Eligibilities
   # Use Visitor Development Pattern to access Eligibilities and Eveidences
@@ -6,7 +7,7 @@ module Eligibilities
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    ELIGIBILITY_KEYS = [:income_evidence, :esi_evidence, :non_esi_evidence, :aces_evidence]
+    ELIGIBILITY_KEYS = [:income_evidence, :esi_evidence, :non_esi_evidence, :aces_evidence].freeze
 
     embeds_many :evidence_items
 

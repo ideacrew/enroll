@@ -102,7 +102,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
   let(:eligibility_items) { [:aptc_csr_credit] }
 
   let(:effective_date) { Date.today }
-  let(:subjects) { family.family_members.map { |fm| fm.to_global_id } }
+  let(:subjects) { family.family_members.map(&:to_global_id) }
 
   let(:required_params) do
     { subjects: subjects, effective_date: effective_date }

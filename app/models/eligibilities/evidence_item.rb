@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Eligibilities
   # Use Visitor Development Pattern to access Eligibilities and Eveidences
