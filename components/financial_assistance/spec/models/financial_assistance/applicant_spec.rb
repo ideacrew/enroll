@@ -536,7 +536,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
 
           it 'should not validate applicant as complete' do
-     
+
             expect(applicant.applicant_validation_complete?).to eq false
           end
 
@@ -596,7 +596,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
-        
+
       end
 
       context 'question_required feature disabled' do
