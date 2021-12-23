@@ -33,10 +33,10 @@ RSpec.describe 'migrations:fix_nil_ethnicity_arrays', :type => :task, dbclean: :
     end
 
     it 'should not affect valid ethnicity arrays' do
-        person2.reload
-        applicant2.reload
-        expect(person2.ethnicity).to eq ["Mexican"]
-        expect(applicant2.ethnicity).to eq ["Mexican"]
+      person2.reload
+      applicant2.reload
+      expect(person2.ethnicity).to eq ["Mexican"]
+      expect(applicant2.ethnicity).to eq ["Mexican"]
     end
   end
 end
