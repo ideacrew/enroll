@@ -48,7 +48,7 @@ module Operations
 
         eligibility_item.evidence_items.select do |evidence_item|
           values[:evidence_item_keys].blank? ||
-            values[:evidence_item_keys].include?(evidence_item.key)
+            values[:evidence_item_keys].include?(evidence_item.key.to_sym)
         end
       end
 

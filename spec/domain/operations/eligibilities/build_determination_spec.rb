@@ -97,25 +97,16 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     )
   end
 
-  let(:subject_ref) {
-    family_member.to_global_id
-  }
+  let(:subject_ref) { family_member.to_global_id }
 
-  let(:eligibility_items) {
-    [
-      :aptc_csr_credit
-    ]
-  }
+  let(:eligibility_items) { [:aptc_csr_credit] }
 
   let(:effective_date) { Date.today }
-  let(:subjects) { family.family_members.map{|fm| fm.to_global_id} }
+  let(:subjects) { family.family_members.map { |fm| fm.to_global_id } }
 
-  let(:required_params) {
-    {
-      subjects: subjects,
-      effective_date: effective_date,
-    }
-  }
+  let(:required_params) do
+    { subjects: subjects, effective_date: effective_date }
+  end
 
   before do
     EnrollRegistry[:financial_assistance]
@@ -132,31 +123,40 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  context 'when eligibility_items_required not passed' do 
+  context 'when eligibility_items_required not passed' do
+    it 'should build evidences' do
+      result = subject.call(required_params)
+
+      expect(result.success?).to be_truthy
+
+      # result.success.each do |identifier, value|
+      #   expect(identifier).to be_a URI
+      #   expect(value[:determinations]).to be_present
+      # end
+    end
+  end
+
+  context 'when eligibility_items_requested passed' do
+    let(:eligibility_items_requested) do
+      { aptc_csr_credit: { evidence_items: [:esi_evidence] } }
+    end
+
+    let(:required_params) do
+      {
+        subjects: subjects,
+        effective_date: effective_date,
+        eligibility_items_requested: eligibility_items_requested
+      }
+    end
 
     it 'should build evidences' do
-        result = subject.call(required_params)
+      result = subject.call(required_params)
+      expect(result.success?).to be_truthy
 
-        expect(result.success?).to be_truthy
-
-        # result.success.each do |identifier, value|
-        #   expect(identifier).to be_a URI
-        #   expect(value[:determinations]).to be_present
-        # end
+      # result.success.each do |identifier, value|
+      #   expect(identifier).to be_a URI
+      #   expect(value[:determinations]).to be_present
+      # end
     end
-  end 
-
-#   context 'when eligibility_items_required passed' do 
-
-#     it 'should build evidences' do
-#         result = subject.call(required_params)
-
-#         expect(result.success?).to be_truthy
-
-#         # result.success.each do |identifier, value|
-#         #   expect(identifier).to be_a URI
-#         #   expect(value[:determinations]).to be_present
-#         # end
-#     end
-#   end 
+  end
 end

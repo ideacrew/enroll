@@ -79,17 +79,20 @@ module Operations
           .collect do |eligibility_item|
             next unless values[:eligibility_items_requested].blank? ||
                         values[:eligibility_items_requested]&.key?(
-                          eligibility_item.key
+                          eligibility_item.key.to_sym
                         )
+
+            evidence_item_keys = []
+            if values[:eligibility_items_requested]&.key?(eligibility_item.key.to_sym)
+              evidence_item_keys = values[:eligibility_items_requested][eligibility_item.key.to_sym][:evidence_items]
+            end
+
             eligibility_state =
               BuildEligibilityState.new.call(
                 effective_date: values[:effective_date],
                 subject: subject,
                 eligibility_item: eligibility_item,
-                evidence_item_keys:
-                  (values[:eligibility_items_requested] || {})[
-                    :evidence_items
-                  ]
+                evidence_item_keys: evidence_item_keys
               )
 
             if eligibility_state.success?
