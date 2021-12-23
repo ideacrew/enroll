@@ -6,7 +6,7 @@ registry:
       - :eligibilities
     features:
       - key: :'gid://enroll_app/Family'
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :eligibility_items
             item:
@@ -20,7 +20,7 @@ registry:
       - :eligibility_items
     features:
       - key: :aptc_csr_credit
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :evidence_items
             item:
