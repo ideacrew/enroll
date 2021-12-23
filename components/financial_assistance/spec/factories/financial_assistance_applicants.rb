@@ -80,8 +80,8 @@ FactoryBot.define do
       non_esi_evidence { FactoryBot.build(:evidence, key: :non_esi) }
     end
 
-    trait :with_local_evidence do
-      local_mec_evidence { FactoryBot.build(:evidence, key: :aces) }
+    trait :with_local_mec_evidence do
+      local_mec_evidence { FactoryBot.build(:evidence, key: :local_mec) }
     end
   end
 end

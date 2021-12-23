@@ -949,12 +949,12 @@ module FinancialAssistance
     end
 
     def trigger_aces_call
-      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_aces_call error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
-    def is_aces_mec_checkable?
+    def is_local_mec_checkable?
       return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       self.active_applicants.any?(&:is_ia_eligible?)
     end
@@ -1539,7 +1539,7 @@ module FinancialAssistance
       return if predecessor_id.present?
 
       types = []
-      types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      types << [:local_mec, "Local MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       types << [:esi, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
       types << [:non_esi, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
@@ -1576,7 +1576,7 @@ module FinancialAssistance
       types.each do |type|
         key, title = type
         case key
-        when :aces_mec, :esi, :non_esi
+        when :local_mec, :esi, :non_esi
           next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
           applicant.send("build_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
         when :income

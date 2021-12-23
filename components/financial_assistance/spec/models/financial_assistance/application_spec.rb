@@ -679,7 +679,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         expect(applicant.income_evidence.present?).to be_truthy
         expect(applicant.esi_evidence.present?).to be_truthy
         expect(applicant.non_esi_evidence.present?).to be_truthy
-        expect(applicant.aces_mec_evidence.present?).to be_truthy
+        expect(applicant.local_mec_evidence.present?).to be_truthy
       end
     end
 

@@ -55,7 +55,7 @@ module FinancialAssistance
       case evidence
       when "ESI MEC"
         "faa.evidence_type_esi"
-      when "ACES MEC"
+      when "Local MEC"
         "faa.evidence_type_aces"
       when "Non ESI MEC"
         "faa.evidence_type_non_esi"

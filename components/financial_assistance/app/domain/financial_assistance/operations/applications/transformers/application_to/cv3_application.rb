@@ -210,7 +210,7 @@ module FinancialAssistance
                            income_evidence: applicant&.income_evidence&.serializable_hash&.deep_symbolize_keys,
                            esi_evidence: applicant&.esi_evidence&.serializable_hash&.deep_symbolize_keys,
                            non_esi_evidence: applicant&.non_esi_evidence&.serializable_hash&.deep_symbolize_keys,
-                           aces_mec_evidence: applicant&.aces_mec_evidence&.serializable_hash&.deep_symbolize_keys,
+                           local_mec_evidence: applicant&.local_mec_evidence&.serializable_hash&.deep_symbolize_keys,
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes)}
                 result

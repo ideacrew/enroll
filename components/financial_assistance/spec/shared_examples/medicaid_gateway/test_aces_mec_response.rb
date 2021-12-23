@@ -183,9 +183,9 @@ RSpec.shared_context 'ACES MEC Check sample response', :shared_context => :metad
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :aces_mec_evidence => {
-            :key => :aces_mec,
-            :title => "ACES MEC",
+          :local_mec_evidence => {
+            :key => :local_mec,
+            :title => "Local MEC",
             :description => nil,
             :aasm_state => "verified",
             :due_on => nil,

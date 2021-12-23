@@ -22,7 +22,7 @@ module Eligibilities
       :esi_mec => 'events.fdsh.evidences.esi_determination_requested',
       :non_esi_mec => 'events.fdsh.evidences.non_esi_determination_requested',
       :income => 'events.fti.evidences.ifsv_determination_requested',
-      :aces_mec => "events.iap.mec_check.mec_check_requested"
+      :local_mec => "events.iap.mec_check.mec_check_requested"
     }.freeze
 
     embedded_in :evidenceable, polymorphic: true

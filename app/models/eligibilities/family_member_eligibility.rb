@@ -50,7 +50,7 @@ module Eligibilities
 
       # # ACA IVL FAA Eligibility
       # { tax_household: { aptc_csr_credit_evidences: [:income]} }
-      # { family_member: { klass: FAA:Application::Applicant, visitor_operatino: Operations::Eligibilites::Evidences::VisitEsi, aptc_csr_credit_evidences: [:esi, :non_esi,  :aces_mec]} }
+      # { family_member: { klass: FAA:Application::Applicant, visitor_operatino: Operations::Eligibilites::Evidences::VisitEsi, aptc_csr_credit_evidences: [:esi, :non_esi,  :local_mec]} }
 
       field :key, type: Symbol
       field :title, type: String

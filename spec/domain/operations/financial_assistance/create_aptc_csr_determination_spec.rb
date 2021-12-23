@@ -54,7 +54,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateAptcCsrDetermination,
       :with_income_evidence,
       :with_esi_evidence,
       :with_non_esi_evidence,
-      :with_aces_evidence,
+      :with_local_mec_evidence,
       family_member_id: family.primary_applicant.id,
       application: application,
       gender: person1.gender,
@@ -81,7 +81,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateAptcCsrDetermination,
       :with_income_evidence,
       :with_esi_evidence,
       :with_non_esi_evidence,
-      :with_aces_evidence,
+      :with_local_mec_evidence,
       is_consumer_role: true,
       family_member_id: family_member.id,
       application: application,
@@ -127,7 +127,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateAptcCsrDetermination,
           evidence_ref: 'gid://enroll_app/FinancialAssitance::Application'
         },
         {
-          key: :aces_mec_evidence,
+          key: :local_mec_evidence,
           subject_ref: 'gid://enroll_app/Family::FamilyMember',
           evidence_ref: 'gid://enroll_app/FinancialAssitance::Application'
         }
@@ -148,6 +148,6 @@ RSpec.describe ::Operations::FinancialAssistance::CreateAptcCsrDetermination,
       )
     expect(result.success?).to be_truthy
     expect(result.success.key?(:aptc_csr_credit)).to be_truthy
-    expect(result.success[:aptc_csr_credit][:evidence_states].keys).to eq([:income_evidence, :esi_evidence, :non_esi_evidence, :aces_mec_evidence])
+    expect(result.success[:aptc_csr_credit][:evidence_states].keys).to eq([:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence])
   end
 end

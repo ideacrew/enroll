@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_aces_mec_response"
+require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_local_mec_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckApplication, dbclean: :after_each do
 
@@ -30,7 +30,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       before do
         @applicant = application.applicants.first
-        @applicant.build_aces_mec_evidence(key: :aces_mec, title: "ACES MEC")
+        @applicant.build_local_mec_evidence(key: :local_mec, title: "Local MEC")
         @applicant.save
         @result = subject.call(response_payload)
 
@@ -44,8 +44,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.aces_mec_evidence.aasm_state).to eq "verified"
-        expect(@applicant.aces_mec_evidence.request_results.present?).to eq true
+        expect(@applicant.local_mec_evidence.aasm_state).to eq "verified"
+        expect(@applicant.local_mec_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end

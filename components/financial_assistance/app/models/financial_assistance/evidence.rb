@@ -18,7 +18,7 @@ module FinancialAssistance
       :non_esi_mec => 'fdsh.evidences.esi_determination_requested',
       :esi_mec => 'fdsh.evidences.non_esi_determination_requested',
       :income => 'fti.evidences.ifsv_determination_requested',
-      :aces_mec => "iap.mec_check.mec_check_requested"
+      :local_mec => "iap.mec_check.mec_check_requested"
     }.freeze
 
     # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
