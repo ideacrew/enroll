@@ -49,6 +49,17 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           expect(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family)
           subject.call(@application.id)
         end
+
+        context 'when the family has already received the notice' do
+          before do
+            family.primary_person.inbox.messages.create(subject: 'Find Out If You Qualify For Health Insurance On CoverME.gov')
+          end
+
+          it 'should not receive duplicate account transfer notice' do
+            expect(::Operations::Notices::IvlAccountTransferNotice).not_to receive(:new)
+            subject.call(@application.id)
+          end
+        end
       end
 
       context 'when no applicants are initiated' do

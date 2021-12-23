@@ -50,6 +50,12 @@ module FinancialAssistance
 
           def trigger_account_transfer_notice(family)
             return unless ::EnrollRegistry.feature_enabled?(:account_transfer_notice_trigger)
+
+            # Temporary solution to skip multiple AccountTransfer notices if primary has already received a notice
+            message_subject = 'Find Out If You Qualify For Health Insurance On CoverME.gov'
+            inbox = family.primary_person.inbox
+            return if inbox.present? && inbox.messages.pluck(:subject).include?(message_subject)
+
             result = ::Operations::Notices::IvlAccountTransferNotice.new.call(family: family)
             if result.success?
               Rails.logger.info { "Triggered account transfer notice for family id: #{family.id}" }
