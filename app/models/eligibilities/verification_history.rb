@@ -12,10 +12,10 @@ module Eligibilities
     field :modifier, type: String
     field :update_reason, type: String
     field :updated_by, type: String
-    field :is_satisfied, Boolean
-    field :verification_outstanding, Boolean
-    field :due_on, Date
-    field :aasm_state, String
+    field :is_satisfied, type: Boolean
+    field :verification_outstanding, type: Boolean
+    field :due_on, type: Date
+    field :aasm_state, type: String
 
   end
 end
