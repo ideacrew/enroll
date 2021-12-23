@@ -73,7 +73,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                         family_member_id: BSON::ObjectId.new)
     end
 
-
     let!(:spouse_applicant) do
       FactoryBot.create(:applicant,
                         application: application,
@@ -481,7 +480,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
 
     context '#applicant_validation_complete?' do
-
       before do
         applicant.update_attributes!({is_applying_coverage: true,
                                       is_required_to_file_taxes: false,
@@ -517,7 +515,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         it 'should validate applicant as complete' do
           expect(applicant.applicant_validation_complete?).to eq true
         end
-
       end
 
       context 'has_medicare_cubcare_eligible feature enabled' do
@@ -536,7 +533,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
 
           it 'should not validate applicant as complete' do
-
             expect(applicant.applicant_validation_complete?).to eq false
           end
 
@@ -596,7 +592,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
-
       end
 
       context 'question_required feature disabled' do
@@ -616,7 +611,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
-
 
   context 'propagate_applicant' do
     before do
