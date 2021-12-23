@@ -29,7 +29,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     context 'callbacks' do
 
       it 'calls propagate_applicant' do
-        #applicant.stub(:propagate_applicant)
         allow(applicant).to receive(:propagate_applicant).and_return(true)
         applicant.update_attributes(dob: Date.today - 30.years)
         expect(applicant).to have_received(:propagate_applicant)
@@ -516,8 +515,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it 'should validate applicant as complete' do
-          applicant.reload
-          binding.irb
           expect(applicant.applicant_validation_complete?).to eq true
         end
 
@@ -539,6 +536,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
 
           it 'should not validate applicant as complete' do
+     
             expect(applicant.applicant_validation_complete?).to eq false
           end
 
@@ -571,6 +569,17 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           it 'should validate applicant as complete' do
             expect(applicant.applicant_validation_complete?).to eq true
           end
+        end
+      end
+
+      context "invalid income" do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          applicant.incomes << income
+          applicant.incomes.first.update_attributes(amount: '0.00')
+        end
+        it "should not validate as complete" do
+          expect(applicant.applicant_validation_complete?).to eq false
         end
       end
     end
@@ -608,17 +617,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
-  context '#applicant_validation_complete? with nil income' do
-    before do
-      #applicant.update_attributes(incomes: nil)
-    end
-
-    it "should not validate applicant" do
-      binding.irb
-      expect(applicant.applicant_validation_complete?).to eq(false)
-    end
-    
-  end
 
   context 'propagate_applicant' do
     before do
