@@ -55,7 +55,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       :with_income_evidence,
       :with_esi_evidence,
       :with_non_esi_evidence,
-      :with_local_evidence,
+      :with_local_mec_evidence,
       family_member_id: family.primary_applicant.id,
       application: application,
       gender: person1.gender,
@@ -82,18 +82,21 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       :with_income_evidence,
       :with_esi_evidence,
       :with_non_esi_evidence,
-      :with_local_evidence,
+      :with_local_mec_evidence,
       is_consumer_role: true,
       family_member_id: family_member.id,
       application: application,
-      gender: 'male',
-      is_incarcerated: false,
-      dob: TimeKeeper.date_of_record,
-      first_name: 'first',
-      last_name: 'last',
+      gender: person2.gender,
+      is_incarcerated: person2.is_incarcerated,
+      ssn: person2.ssn,
+      dob: person2.dob,
+      first_name: person2.first_name,
+      last_name: person2.last_name,
       is_primary_applicant: false,
-      is_applying_coverage: false,
-      citizen_status: 'us_citizen'
+      person_hbx_id: person2.hbx_id,
+      is_applying_coverage: true,
+      citizen_status: 'us_citizen',
+      indian_tribe_member: false
     )
   end
 
@@ -123,12 +126,10 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  context 'when eligibility_items_required not passed' do
+  context 'when eligibility_items_requested not passed' do
     it 'should build evidences' do
       result = subject.call(required_params)
-
       expect(result.success?).to be_truthy
-
       # result.success.each do |identifier, value|
       #   expect(identifier).to be_a URI
       #   expect(value[:determinations]).to be_present
@@ -152,7 +153,6 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     it 'should build evidences' do
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
-
       # result.success.each do |identifier, value|
       #   expect(identifier).to be_a URI
       #   expect(value[:determinations]).to be_present
