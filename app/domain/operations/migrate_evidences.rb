@@ -24,9 +24,11 @@ module Operations
     end
 
     def create_new_evidence(applicant, evidence)
-      applicant.send("build_#{evidence.key}_evidence",
-                     key: evidence.key,
-                     title: evidence.title,
+      key = evidence.key.to_s == "aces_mec" ? "local_mec" : evidence.key.to_s
+      title = evidence.title == "ACES MEC" ? "Local Mec" : evidence.title
+      applicant.send("build_#{key}_evidence",
+                     key: key.to_sym,
+                     title: title,
                      aasm_state: evidence.eligibility_status,
                      is_satisfied: evidence.type_verified?,
                      verification_outstanding: evidence.type_unverified?,
@@ -36,25 +38,25 @@ module Operations
 
     def build_verification_histories(evidence)
       evidence.verification_history.collect do |history|
-        Eligibilities::VerificationHistory.new(action: history.action,
-                                               updated_by: history.modifier,
-                                               update_reason: history.update_reason,
-                                               created_at: history.created_at,
-                                               updated_at: history.updated_at)
+        ::Eligibilities::VerificationHistory.new(action: history.action,
+                                                 updated_by: history.modifier,
+                                                 update_reason: history.update_reason,
+                                                 created_at: history.created_at,
+                                                 updated_at: history.updated_at)
       end
     end
 
     def build_request_results(evidence)
       evidence.eligibility_results.collect do |eligibility_result|
         params = eligibility_result.serializable_hash
-        Eligibilities::RequestResult.new(params)
+        ::Eligibilities::RequestResult.new(params)
       end
     end
 
     def build_documents(evidence)
       evidence.documents.collect do |document|
         params = document.serializable_hash
-        Document.new(params)
+        ::Document.new(params)
       end
     end
 
@@ -70,7 +72,6 @@ module Operations
         documents = build_documents(evidence)
         new_evidence.documents = documents if documents.present?
       end
-
 
       if applicant.valid?
         Success(applicant.save!)
