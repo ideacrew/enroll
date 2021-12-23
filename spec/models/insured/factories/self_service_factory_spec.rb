@@ -125,7 +125,7 @@ module Insured
       end
     end
 
-    describe "update_enrollment_for_apcts when apply_aggregate_to_enrollment feature is disabled" do
+    describe "update_enrollment_for_apcts" do
       let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}
       let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000)}
       let!(:tax_household_member1) {tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
@@ -133,7 +133,6 @@ module Insured
 
 
       before :each do
-        EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
         @product.update_attributes(ehb: 0.9844)
         premium_table = @product.premium_tables.first
@@ -171,35 +170,6 @@ module Insured
         expect(enrollment.elected_aptc_pct).to eq 0.25
       end
     end
-
-    describe "update_enrollment_for_apcts when apply_aggregate_to_enrollment feature is enabled" do
-      let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}
-      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 300.0)}
-      let!(:tax_household_member1) {tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
-      let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
-
-      before :each do
-        EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(true)
-        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
-        @product.update_attributes(ehb: 0.9966)
-        @product.save!
-        enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record.beginning_of_month)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 32, "R-#{site_key}001", 'NA').and_return(614.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001", 'NA').and_return(646.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'NA').and_return(679.8)
-        person.update_attributes!(dob: (enrollment.effective_on - 32.years))
-        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 61.years))
-      end
-
-      it 'should return updated enrollment with aptc fields' do
-        subject.update_enrollment_for_apcts(enrollment, 255.0)
-        enrollment.reload
-        expect(enrollment.applied_aptc_amount.to_f).to eq 255.0
-        expect(enrollment.elected_aptc_pct).to eq 0.85
-      end
-    end
-
     # rubocop:disable Lint/UselessAssignment
     describe "update enrollment for renewing enrollments" do
       let(:address) { family.primary_person.rating_address }
