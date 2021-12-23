@@ -124,6 +124,22 @@ Then(/^.+ sees form to enter personal information$/) do
   # screenshot("personal_form")
 end
 
+Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
+find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
+find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
+find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
+find(IvlPersonalInformation.incarcerated_no_radiobtn).click
+find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
+fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
+fill_in IvlPersonalInformation.address_line_two, :with => "212"
+fill_in IvlPersonalInformation.city, :with => "Washington"
+find_all(IvlPersonalInformation.select_state_dropdown).first.click
+find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+#fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
+sleep 2
+end
+
 And(/the individual enters address information$/) do
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
