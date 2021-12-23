@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_local_mec_response"
+require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_aces_mec_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckApplication, dbclean: :after_each do
 
