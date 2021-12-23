@@ -25,8 +25,6 @@ module Eligibilities
       :aces_mec => "events.iap.mec_check.mec_check_requested"
     }.freeze
 
-    # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
-
     embedded_in :evidenceable, polymorphic: true
 
     field :key, type: Symbol
