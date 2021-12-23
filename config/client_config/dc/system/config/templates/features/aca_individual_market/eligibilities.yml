@@ -1,0 +1,99 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+    features:
+      - key: :'gid://enroll_app/Family'
+        is_enabled: false
+        settings:
+          - key: :eligibility_items
+            item:
+              - :aptc_csr_credit
+              - :aca_individual_market_eligibility
+              - :product_enrollment_status
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+      - :eligibility_items
+    features:
+      - key: :aptc_csr_credit
+        is_enabled: false
+        settings:
+          - key: :evidence_items
+            item:
+              - :income_evidence
+              - :esi_evidence
+              - :non_esi_evidence
+              - :local_mec_evidence
+      - key: :aca_individual_market_eligibility
+        is_enabled: false
+        settings:
+          - key: :evidence_items
+            item:
+              - :vlp_evidence
+              - :citizenship_evidence
+      - key: :product_enrollment_status
+        is_enabled: false
+        settings:
+          - key: :evidence_items
+            item:
+              - :product_enrollment_evidence
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+      - :eligibility_items
+      - :evidence_items
+    features:
+      - key: :income_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :esi_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :non_esi_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :local_mec_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :vlp_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :citizenship_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :product_enrollment_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/HbxEnrollment'
