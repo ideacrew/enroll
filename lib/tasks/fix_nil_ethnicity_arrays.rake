@@ -18,7 +18,8 @@ namespace :migrations do
       updated = person.save(validate: false)
       Person.set_callback(:update, :after, :person_create_or_update_handler)
       raise StandardError, "Failed to save person (hbx_id): #{person.hbx_id}" unless updated
-      puts "APPLICATION: #{application.id} - updated person (hbx_id): #{person.hbx_id}"
+    #   puts "APPLICATION (primary hbx_id): #{application.primary_applicant.person_hbx_id} - updated person (hbx_id): #{person.hbx_id}"
+      @primary_hbx_ids << application.primary_applicant&.person_hbx_id
     rescue StandardError => e
       puts "Error updating peson ethnicity array - #{e}"
     end
@@ -29,12 +30,14 @@ namespace :migrations do
       updated = applicant.save(validate: false)
       ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
       raise StandardError, "Failed to save applicant (person_hbx_id): #{applicant.person_hbx_id}" unless updated
-      puts "APPLICATION: #{application.id} - updated applicant (person_hbx_id): #{applicant.person_hbx_id}"
+  #   puts "APPLICATION (primary hbx_id): #{application.primary_applicant.person_hbx_id} - updated applicant (person_hbx_id): #{applicant.person_hbx_id}"
+      @primary_hbx_ids << application.primary_applicant&.person_hbx_id
     rescue StandardError => e
       puts "Error updating applicant ethnicity array - #{e}"
     end
 
     applications = FinancialAssistance::Application.draft.not.where(transfer_id: nil)
+    @primary_hbx_ids = []
     # Fix person ethnicity arrays
     applications.no_timeout.each do |application|
       application.applicants.no_timeout.each do |applicant|
@@ -48,10 +51,13 @@ namespace :migrations do
     # Fix applicant ethnicity arrays
     applications.no_timeout.each do |application|
       application.applicants.no_timeout.each do |applicant|
+        next if applicant.nil?
         applicant_ethnicity = applicant.ethnicity
         next unless applicant_ethnicity && applicant_ethnicity.include?(nil)
         fix_applicant_ethnicity_array(applicant_ethnicity, application, applicant)
       end
     end
+    puts "UPDATED APPLICATIONS (primary person_hbx_id):"
+    puts @primary_hbx_ids.uniq
   end
 end
