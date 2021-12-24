@@ -130,6 +130,23 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
     end
   end
 
+  describe '.same_plan_enrollment' do
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(effective_on)
+      hbx_enrollment.hbx_enrollment_members.first.update_attributes(tobacco_use: "Y")
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
+    end
+
+    context 'when active coverage present and enrollment member is tobacco yes' do
+      it 'should return plan selection enrollment member should has same tobacco use as the original' do
+        expect(subject.same_plan_enrollment.hbx_enrollment_members.first.tobacco_use).to eq hbx_enrollment.hbx_enrollment_members.first.tobacco_use
+      end
+    end
+  end
+
   describe '.set_enrollment_member_coverage_start_dates' do
     context 'when a new enrollment has a previous enrollment' do
       def hash_key_creator(hbx_enrollment_member)

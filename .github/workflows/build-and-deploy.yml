@@ -28,6 +28,7 @@ jobs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
       tag: ${{ steps.prep.outputs.tag }}
       registry: ${{ steps.prep.outputs.registry }}
+      shortSha: ${{ steps.prep.outputs.short_sha}}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -35,12 +36,14 @@ jobs:
       - name: Prepare info
         id: prep
         run: |
+          SHORT_SHA=$(echo $GITHUB_SHA | head -c7)
           TAG=${{ env.GIT_BRANCH_NAME}}-$(echo $GITHUB_SHA | head -c7)
           IMAGE="public.ecr.aws/ideacrew/enroll"
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
           echo ::set-output name=tag::${TAG}
           echo ::set-output name=registry::public.ecr.aws
           echo ::set-output name=alpha_image::${IMAGE}:${TAG}-alpha
+          echo ::set-output name=short_sha::$SHORT_SHA
 
   build-and-upload-image:
     needs: [prep]
@@ -64,6 +67,9 @@ jobs:
 
       # Check out repository
       - uses: actions/checkout@v2
+
+      - name: Add git HEAD info to docker image
+        run: git show --quiet HEAD > release.txt
 
       # Adds `docker` to the environment for running commands
       - name: Set up Docker Buildx
@@ -132,6 +138,9 @@ jobs:
     steps:
       # Check out repository
       - uses: actions/checkout@v2
+
+      - name: Add git HEAD info to docker image
+        run: git show --quiet HEAD > release.txt
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -223,16 +232,11 @@ jobs:
     needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     steps:
-      # gets the branch name without the 'refs/heads/' prefix
-      - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
-
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }}'
+          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }} built from <https://github.com/ideacrew/enroll/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}>'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
