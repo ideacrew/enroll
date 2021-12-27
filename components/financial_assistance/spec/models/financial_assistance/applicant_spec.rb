@@ -515,6 +515,22 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         it 'should validate applicant as complete' do
           expect(applicant.applicant_validation_complete?).to eq true
         end
+
+        context 'has nil income' do
+          before do
+            applicant.update_attributes!({has_job_income: nil,
+                                          has_self_employment_income: nil,
+                                          has_other_income: nil,
+                                          has_unemployment_income: nil})
+            applicant.incomes << income
+            applicant.incomes.first.update_attributes(amount: nil)
+          end
+
+          it "shouldn't validate applicant as complete" do
+            expect(applicant.applicant_validation_complete?).to eq false
+          end
+        end
+
       end
 
       context 'has_medicare_cubcare_eligible feature enabled' do
@@ -575,6 +591,27 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           applicant.incomes.first.update_attributes(amount: '0.00')
         end
         it "should not validate as complete" do
+          expect(applicant.applicant_validation_complete?).to eq false
+        end
+      end
+
+      context 'applicant not applying for coverage and ssn is not present' do
+        before do
+          applicant.update_attributes!(ssn: nil, no_ssn: nil, is_applying_coverage: false)
+        end
+
+        it 'should return true as ssn is not mandatory for non applicant' do
+          expect(applicant.applicant_validation_complete?).to eq true
+        end
+      end
+
+      context 'applicant applying for coverage and ssn is not present' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          applicant.update_attributes!(ssn: nil, no_ssn: '0', is_applying_coverage: true)
+        end
+
+        it 'should return false as ssn is mandatory for an applicant' do
           expect(applicant.applicant_validation_complete?).to eq false
         end
       end
