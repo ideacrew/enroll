@@ -130,6 +130,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :state => primary_addresses[0].state,
                     :zip => primary_addresses[0].zip,
                     :country_name => "United States of America",
+                    :county_fips => '',
                     :has_fixed_address => true
                   },
                   {
@@ -142,6 +143,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :state => primary_addresses[1].state,
                     :zip => primary_addresses[1].zip,
                     :country_name => "United States of America",
+                    :county_fips => '',
                     :has_fixed_address => true
                   }
                 ],
@@ -239,6 +241,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :state => dependent1_addresses[0].state,
                     :zip => dependent1_addresses[0].zip,
                     :country_name => "United States of America",
+                    :county_fips => '',
                     :has_fixed_address => true
                   },
                   {
@@ -251,6 +254,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :state => dependent1_addresses[1].state,
                     :zip => dependent1_addresses[1].zip,
                     :country_name => "United States of America",
+                    :county_fips => '',
                     :has_fixed_address => true
                   }
                 ],
@@ -354,6 +358,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :state => dependent2_addresses[0].state,
                     :zip => dependent2_addresses[0].zip,
                     :country_name => "United States of America",
+                    :county_fips => '',
                     :has_fixed_address => true
                   },
                   {
@@ -366,6 +371,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :state => dependent2_addresses[1].state,
                     :zip => dependent2_addresses[1].zip,
                     :country_name => "United States of America",
+                    :county_fips => '',
                     :has_fixed_address => true
                   }
                 ],
