@@ -84,9 +84,9 @@ module Insured
 
           enrollment_member.update_attributes!(applied_aptc_amount: member_aptc_value)
         end
-
         max_applicable_aptc = if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled
-                                applicable_aptc_by_member.values.sum
+                                tax_household = reinstatement.family.active_household.latest_tax_household_with_year(reinstatement.effective_on.year)
+                                tax_household.monthly_max_aptc(reinstatement, reinstatement.effective_on)
                               else
                                 eli_fac_obj = ::Factories::EligibilityFactory.new(reinstatement.id, reinstatement.effective_on)
                                 eli_fac_obj.fetch_max_aptc

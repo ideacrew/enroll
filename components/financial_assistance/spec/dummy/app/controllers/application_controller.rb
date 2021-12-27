@@ -16,7 +16,11 @@ class ApplicationController < ActionController::Base
   end
 
   def get_current_person
-    current_user.person
+    if current_user.try(:person).try(:agent?) && session[:person_id].present?
+      Person.find(session[:person_id])
+    else
+      current_user.person
+    end
   end
 
   def set_current_person(required: true) # rubocop:disable Naming/AccessorMethodName
