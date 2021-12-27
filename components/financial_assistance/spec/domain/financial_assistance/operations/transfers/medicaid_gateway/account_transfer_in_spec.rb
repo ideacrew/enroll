@@ -36,6 +36,30 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           expect(person.ethnicity).to eq person_demographics["ethnicity"]
         end
       end
+
+      context 'relationships' do
+        before do
+          @family_member_rels = Family.first.family_members.map(&:relationship)
+          @primary_person_rels = Family.first.primary_person.person_relationships
+          @application_rels = FinancialAssistance::Application.first.relationships
+        end
+
+        it 'should create the expected family member relationships' do
+          expect(@family_member_rels).to eq ["self", "parent", "domestic_partner"]
+        end
+
+        it 'should persist the family primary person relationships' do
+          expect(@primary_person_rels.map(&:persisted?)).not_to include(false)
+        end
+
+        it 'should create the expected application relationships' do
+          expect(@application_rels.map(&:kind)).to eq ["child", "domestic_partner", "parent", "domestic_partner"]
+        end
+
+        it 'should persist the applicant relationships' do
+          expect(@application_rels.map(&:persisted?)).not_to include(false)
+        end
+      end
     end
   end
 
