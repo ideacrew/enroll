@@ -61,8 +61,8 @@ module Operations
           .collect do |evidence_item|
             attrs =
               values
-                .slice(:subject, :effective_date, :eligibility_item)
-                .merge(evidence_item: evidence_item)
+              .slice(:subject, :effective_date, :eligibility_item)
+              .merge(evidence_item: evidence_item)
             evidence_state =
               Operations::Eligibilities::BuildEvidenceState.new.call(attrs)
             evidence_state.success? ? evidence_state.success : {}
@@ -73,7 +73,7 @@ module Operations
 
       def build_eligibility_state(values)
         evidence_states = evidence_states_for(values)
-        evidence_states.delete_if do |evidence_key, evidence_state|
+        evidence_states.delete_if do |_evidence_key, evidence_state|
           evidence_state.empty?
         end
 

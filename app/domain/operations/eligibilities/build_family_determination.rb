@@ -47,7 +47,7 @@ module Operations
       end
 
       def persist(values, determination_entity)
-        family = values[:family]    
+        family = values[:family]
         attributes = determination_entity.sanitize_attributes
         model_attributes = transform(attributes)
         determination = family.build_eligibility_determination(model_attributes)
@@ -67,20 +67,19 @@ module Operations
 
       def transform(values)
         values.reduce({}) do |data, (key, value)|
-          if relations.key?(key) && value.is_a?(Hash)
-            data[key] = flatten_keys(value, relations[key])
-          elsif value.is_a?(URI::GID)
-            data[key] = value.to_s
-          else
-            data[key] = value
-          end
+          data[key] = if relations.key?(key) && value.is_a?(Hash)
+                        flatten_keys(value, relations[key])
+                      elsif value.is_a?(URI::GID)
+                        value.to_s
+                      else
+                        value
+                      end
           data
         end
       end
 
-      def flatten_keys(value, attribute_name)
-        value.reduce([]) do |records, (key, value)|
-          # if relations.key?(key) && value.is_a?(Hash)
+      def flatten_keys(input, attribute_name)
+        input.reduce([]) do |records, (key, value)|
           records << transform(value.merge(Hash[attribute_name, key]))
         end
       end

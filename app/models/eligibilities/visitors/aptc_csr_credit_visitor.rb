@@ -14,9 +14,7 @@ module Eligibilities
       end
 
       def visit(applicant)
-        unless applicant.family_member_id == subject.id
-          return
-        end
+        return unless applicant.family_member_id == subject.id
 
         current_record = applicant.send(evidence_item[:key])
         unless current_record
@@ -42,9 +40,9 @@ module Eligibilities
       def evidence_record_for(current_record, effective_date)
         evidence_history =
           current_record
-            .verification_histories
-            .where(:created_at.lte => effective_date)
-            .last
+          .verification_histories
+          .where(:created_at.lte => effective_date)
+          .last
 
         evidence_history || current_record
       end
@@ -58,9 +56,9 @@ module Eligibilities
 
         evidence_state_attributes =
           evidence_record
-            .attributes
-            .slice('is_satisfied', 'verification_outstanding', 'due_on')
-            .merge(ids)
+          .attributes
+          .slice('is_satisfied', 'verification_outstanding', 'due_on')
+          .merge(ids)
 
         evidence_state_attributes.delete('due_on') if evidence_state_attributes['due_on'].blank?
 
