@@ -113,7 +113,7 @@ module Operations
       end
 
       def create_determination(determination_hash)
-        Operations::Determinations::Create.new.call(determination_hash)
+        ::Operations::Determinations::Create.new.call(determination_hash)
       end
     end
   end

@@ -46,7 +46,7 @@ module FinancialAssistance
     end
 
     def extend_due_date
-      @family_member = FamilyMember.find(@evidence.evidencable.family_member_id)
+      @family_member = FamilyMember.find(@evidence.evidenceable.family_member_id)
       enrollment = @family_member.family.enrollments.enrolled.first
       if enrollment.present? && @evidence.type_unverified?
         new_date = @evidence.verif_due_date + 30.days
@@ -80,7 +80,7 @@ module FinancialAssistance
     def find_type
       fetch_applicant
       find_docs_owner
-      @evidence = @docs_owner.send(evidence_kind) if @docs_owner.respond_to?(params[:evidence_kind])
+      @evidence = @docs_owner.send(params[:evidence_kind]) if @docs_owner.respond_to?(params[:evidence_kind])
     end
 
     def update_documents_status(applicant)

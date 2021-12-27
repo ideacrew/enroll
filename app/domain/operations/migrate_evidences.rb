@@ -34,7 +34,7 @@ module Operations
 
     def create_new_evidence(applicant, evidence)
       key = evidence.key.to_s == "aces_mec" ? "local_mec" : evidence.key.to_s
-      title = evidence.title == "ACES MEC" ? "Local Mec" : evidence.title
+      title = evidence.title == "ACES MEC" ? "Local MEC" : evidence.title
       applicant.send(evidence_name(evidence),
                      key: key.to_sym,
                      title: title,

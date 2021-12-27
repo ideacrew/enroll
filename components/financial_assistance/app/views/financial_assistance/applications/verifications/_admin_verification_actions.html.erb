@@ -11,7 +11,7 @@
         <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'verify' %>
         <div class="form-group col-md-3">
-          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Evidence::VERIFY_REASONS), {prompt: ' Select Reason', required: true}%>
+          <%= select_tag :verification_reason, options_for_select(::Eligibilities::Evidence::VERIFY_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -32,7 +32,7 @@
         <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
         <div class="form-group col-md-3">
-          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Evidence::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
+          <%= select_tag :verification_reason, options_for_select(::Eligibilities::Evidence::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -131,7 +131,7 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <%= JSON.parse(record.raw_payload) %>
+                    <%= JSON.parse(record.raw_payload) if record.raw_payload.present? %>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

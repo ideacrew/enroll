@@ -26,7 +26,7 @@ module Eligibilities
 
     # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
-    embedded_in :evidencable, polymorphic: true
+    embedded_in :evidenceable, polymorphic: true
 
     field :key, type: Symbol
     field :title, type: String
@@ -60,7 +60,7 @@ module Eligibilities
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
     def request_determination
-      application = self.evidencable.application
+      application = self.evidenceable.application
       payload = construct_payload(application)
       request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
       request_event.success? ? request_event.value!.publish : false

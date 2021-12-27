@@ -59,7 +59,7 @@ module Eligibilities
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
     def request_determination
-      application = self.evidencable.application
+      application = self.evidenceable.application
       payload = construct_payload(application)
       request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
       request_event.success? ? request_event.value!.publish : false
@@ -188,7 +188,7 @@ module Eligibilities
     end
 
     def add_verification_history(params)
-      verification_history << FinancialAssistance::VerificationHistory.new(params)
+      verification_histories << FinancialAssistance::VerificationHistory.new(params)
     end
   end
 end

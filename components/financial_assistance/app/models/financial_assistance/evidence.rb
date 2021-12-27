@@ -21,9 +21,7 @@ module FinancialAssistance
       :local_mec => "iap.mec_check.mec_check_requested"
     }.freeze
 
-    # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
-
-    embedded_in :evidencable, polymorphic: true
+    embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
     field :key, type: Symbol
     field :title, type: String
