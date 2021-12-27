@@ -79,7 +79,7 @@
 
             <% if EnrollRegistry.feature_enabled?(:display_county) %>
               <div id="county-select-<%= f.index %>" class="county-select col-sm-<%= "#{col_size}" %> col-xs-12 form-group form-group-lg no-pd">
-                <% @counties = BenefitMarkets::Locations::CountyZip.where(zip: address.object.try(:zip)).pluck(:county_name).uniq %>
+                <% @counties = fetch_counties_by_zip(address.object) %>
                 <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                 <% @counties = [@empty_message] if @counties.empty? %>
                 <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg county-input no-selectric', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
