@@ -128,12 +128,9 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
 
   context 'when eligibility_items_requested not passed' do
     it 'should build evidences' do
+
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
-      # result.success.each do |identifier, value|
-      #   expect(identifier).to be_a URI
-      #   expect(value[:determinations]).to be_present
-      # end
     end
   end
 
@@ -153,10 +150,6 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     it 'should build evidences' do
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
-      # result.success.each do |identifier, value|
-      #   expect(identifier).to be_a URI
-      #   expect(value[:determinations]).to be_present
-      # end
     end
   end
 end

@@ -494,9 +494,7 @@ class HbxEnrollment
   end
 
   def accept(visitor)
-    self.attributes.slice(:kind, :enrollment_kind, :coverage_kind).merge(
-      { members: hbx_enrollment_members.collect{|member| member.accept(visitor)} }
-    )
+    hbx_enrollment_members.each{|hbx_enrollment_member| hbx_enrollment_member.accept(visitor) }
   end
 
   def generate_hbx_signature

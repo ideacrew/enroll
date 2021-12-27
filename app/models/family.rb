@@ -63,6 +63,7 @@ class Family
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
   has_many :payment_transactions
+  embeds_one :eligibility_determination, class_name: "::Eligibilities::Determination", as: :determinable
 
   after_initialize :build_household
   before_save :clear_blank_fields

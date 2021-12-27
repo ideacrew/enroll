@@ -56,7 +56,10 @@ module Operations
         visitor.effective_date = values[:effective_date]
         visitor.call
 
-        Success(visitor.evidence)
+        evidence = visitor.evidence
+        evidence ||= Hash[values[:evidence_item][:key], {}]
+
+        Success(evidence)
       end
 
       def visitor_klass(eligibility_item)

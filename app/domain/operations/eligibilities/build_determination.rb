@@ -23,9 +23,10 @@ module Operations
       def call(params)
         values = yield validate(params)
         eligibility_items = yield get_eligibility_items(values)
-        evidences = yield build_determination(eligibility_items, values)
+        determination_hash = yield build_determination(eligibility_items, values)
+        determination_entity = yield create_determination(determination_hash)
 
-        Success(evidences)
+        Success(determination_entity)
       end
 
       private
@@ -60,9 +61,16 @@ module Operations
         subjects =
           values[:subjects]
           .collect do |subject|
+            subject_instance = GlobalID::Locator.locate(subject)
+
             Hash[
               subject.uri,
-              build_eligibility_states(subject, eligibility_items, values)
+              {
+                first_name: subject_instance.person.first_name,
+                last_name: subject_instance.person.last_name,
+                is_primary: subject_instance.is_primary_applicant?,
+                eligibility_states: build_eligibility_states(subject, eligibility_items, values)
+              }
             ]
           end
           .reduce(:merge)
@@ -95,13 +103,17 @@ module Operations
               )
 
             if eligibility_state.success?
-              Hash[eligibility_item.key, eligibility_state.success]
+              Hash[eligibility_item.key.to_sym, eligibility_state.success]
             else
-              Hash[eligibility_item.key, {}]
+              Hash[eligibility_item.key.to_sym, {}]
             end
           end
           .compact
           .reduce(:merge)
+      end
+
+      def create_determination(determination_hash)
+        Operations::Determinations::Create.new.call(determination_hash)
       end
     end
   end

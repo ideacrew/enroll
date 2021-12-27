@@ -15,7 +15,6 @@ module Eligibilities
 
       def visit(applicant)
         unless applicant.family_member_id == subject.id
-          @evidence = Hash[evidence_item[:key], {}]
           return
         end
 
@@ -43,9 +42,9 @@ module Eligibilities
       def evidence_record_for(current_record, effective_date)
         evidence_history =
           current_record
-          .verification_histories
-          .where(:created_at.lte => effective_date)
-          .last
+            .verification_histories
+            .where(:created_at.lte => effective_date)
+            .last
 
         evidence_history || current_record
       end
@@ -57,13 +56,15 @@ module Eligibilities
           'status' => evidence_record.aasm_state
         }
 
-        Hash[
-          evidence_item[:key],
+        evidence_state_attributes =
           evidence_record
             .attributes
             .slice('is_satisfied', 'verification_outstanding', 'due_on')
             .merge(ids)
-        ]
+
+        evidence_state_attributes.delete('due_on') if evidence_state_attributes['due_on'].blank?
+
+        Hash[evidence_item[:key].to_sym, evidence_state_attributes.symbolize_keys]
       end
     end
   end

@@ -33,15 +33,18 @@ module Operations
         errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def build_eligibility_state(values)
-        eligibility_item = values[:eligibility_item]
+      def fetch_status(evidence_states)
+        evidence_states.values.all? do |evidence_state|
+          evidence_state[:is_satisfied]
+        end
+      end
 
-        eligibility_state = {
-          eligibility_item_key: eligibility_item.key,
-          evidence_states: evidence_states_for(values)
-        }
-
-        Success(eligibility_state)
+      def fetch_earliest_due_date(evidence_states)
+        evidence_states.values.min_by do |evidence_state|
+          evidence_state[:due_on]
+        end[
+          :due_on
+        ]
       end
 
       def evidence_items_for(values)
@@ -58,14 +61,37 @@ module Operations
           .collect do |evidence_item|
             attrs =
               values
-              .slice(:subject, :effective_date, :eligibility_item)
-              .merge(evidence_item: evidence_item)
+                .slice(:subject, :effective_date, :eligibility_item)
+                .merge(evidence_item: evidence_item)
             evidence_state =
               Operations::Eligibilities::BuildEvidenceState.new.call(attrs)
             evidence_state.success? ? evidence_state.success : {}
           end
           .compact
           .reduce(:merge)
+      end
+
+      def build_eligibility_state(values)
+        evidence_states = evidence_states_for(values)
+        evidence_states.delete_if do |evidence_key, evidence_state|
+          evidence_state.empty?
+        end
+
+        eligibility_state = {
+          determined_at: DateTime.now,
+          evidence_states: evidence_states
+        }
+
+        if evidence_states.present?
+          eligibility_state.merge!(
+            {
+              is_eligible: fetch_status(evidence_states),
+              earliest_due_date: fetch_earliest_due_date(evidence_states)
+            }
+          )
+        end
+
+        Success(eligibility_state)
       end
     end
   end
