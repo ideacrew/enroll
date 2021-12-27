@@ -738,8 +738,7 @@ module FinancialAssistance
           incomes.all? {|income| income.nil? || (income.amount && income.amount > 0) } &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
-          covering_applicant_exists? &&
-          ssn_present?
+          covering_applicant_exists?
       end
     end
 
