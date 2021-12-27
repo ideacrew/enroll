@@ -5,8 +5,6 @@ Rake.application.rake_require "tasks/fix_atp_address_issues"
 Rake::Task.define_task(:environment)
 
 RSpec.describe 'migrations:fix_atp_address_issues', :type => :task, dbclean: :after_each do
-  # Main app stuff
-  # HBX ID from the CSV
   let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "12345", addresses: [address1]) }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:address1) do 
@@ -65,7 +63,6 @@ RSpec.describe 'migrations:fix_atp_address_issues', :type => :task, dbclean: :af
       expect(applicant2.addresses.first.attributes.select {|k, _v| compare_keys.include? k}).to eq(applicant2.addresses.last.attributes.select {|k, _v| compare_keys.include? k})
       expect(applicant2.same_with_primary).to eq(false)
       expect(applicant2.is_homeless).to eq(true)
-      
     end
 
     it "update the person and applicants with homeless true but with a home address" do
