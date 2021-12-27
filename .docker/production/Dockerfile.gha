@@ -179,6 +179,9 @@ COPY --chown=nonroot:nonroot . $HOME
 # Copy prebuilt assets
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $HOME/public $HOME/public
 
+# Copy freedesktop file
+COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $HOME/freedesktop.org.xml $HOME/freedesktop.org.xml
+
 # Copy ME-specific files
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $HOME/config/settings.yml $HOME/config/settings.yml
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $HOME/app/assets/images/logo/carrier/community_health_options.jpg $HOME/app/assets/images/logo/carrier/community_health_options.jpg
