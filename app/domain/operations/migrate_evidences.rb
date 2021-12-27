@@ -23,10 +23,23 @@ module Operations
       end
     end
 
+    def evidence_name(evidence)
+      case evidence.key.to_s
+      when 'aces_mec'
+        "build_local_mec_evidence"
+      when 'esi_mec'
+        "build_esi_evidence"
+      when 'non_esi_mec'
+        "build_non_esi_evidence"
+      when 'income'
+        "build_income_evidence"
+      end
+    end
+
     def create_new_evidence(applicant, evidence)
       key = evidence.key.to_s == "aces_mec" ? "local_mec" : evidence.key.to_s
       title = evidence.title == "ACES MEC" ? "Local Mec" : evidence.title
-      applicant.send("build_#{key}_evidence",
+      applicant.send(evidence_name(evidence),
                      key: key.to_sym,
                      title: title,
                      aasm_state: evidence.eligibility_status,
@@ -76,10 +89,10 @@ module Operations
       if applicant.valid?
         Success(applicant.save!)
       else
-        Failure("Error: unable to migrate Evidences for applicant: #{applicant.id} due to #{applicant.errors.to_h}")
+        Failure("Error: unable to migrate #{evidence.key} evidences for applicant: #{applicant.id} due to #{applicant.errors.to_h}")
       end
     rescue StandardError => e
-      Failure("Error: unable to migrate #{evidence.key} evidences for applicant: #{applicant.id} due to #{e.inspect}")
+      Failure("Error: unable to migrate Evidences for applicant: #{applicant.id} due to #{e.inspect}")
     end
   end
 end

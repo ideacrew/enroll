@@ -22,7 +22,7 @@ describe MigrateEvidences, dbclean: :after_each do
     end
 
     let(:evidence_types) do
-      [[:local_mec, "Local MEC"], [:esi, "ESI MEC"], [:non_esi, "Non ESI MEC"], [:income, "Income"]]
+      [[:aces_mec, "ACES MEC"], [:esi_mec, "ESI MEC"], [:non_esi_mec, "Non ESI MEC"], [:income, "Income"]]
     end
 
     let!(:applicant1) do
