@@ -580,6 +580,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
     end
 
+    context 'for 5 digit zip' do
+      it "should return county" do
+        person.addresses.update_all(zip: "04642", county: 'Hancock', state: 'ME')
+        address = person.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq ['Hancock']
+      end
+    end
+
     context 'for nil address' do
       it "should return empty array" do
         result = helper.fetch_counties_by_zip(nil)
