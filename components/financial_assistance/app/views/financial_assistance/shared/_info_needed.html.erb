@@ -3,7 +3,7 @@
 <% else %>
   <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class="in-progress-icon">Info Needed</span>
   <ul>
-    <% unless applicant.ssn_present? %>
+    <% if applicant.is_applying_coverage && !applicant.ssn_present? %>
       <li>
         <%= l10n("ssn_not_present") %>
       </li>
