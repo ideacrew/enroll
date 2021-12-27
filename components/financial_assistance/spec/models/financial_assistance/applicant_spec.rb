@@ -522,6 +522,8 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                                           has_self_employment_income: nil,
                                           has_other_income: nil,
                                           has_unemployment_income: nil})
+            applicant.incomes << income
+            applicant.incomes.first.update_attributes(amount: nil)
           end
 
           it "shouldn't validate applicant as complete" do
