@@ -30,7 +30,8 @@ namespace :migrations do
       updated = applicant.save(validate: false)
       ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
       raise StandardError, "Failed to save applicant (person_hbx_id): #{applicant.person_hbx_id}" unless updated
-      @primary_hbx_ids << application.primary_applicant&.person_hbx_id
+      result = application.primary_applicant ? application.primary_applicant.person_hbx_id : "no primary applicant for application(hbx_id): #{application.hbx_id}"
+      @primary_hbx_ids << result
     rescue StandardError => e
       puts "Error updating applicant ethnicity array - #{e}"
     end
@@ -64,7 +65,7 @@ namespace :migrations do
           fix_applicant_ethnicity_array(applicant_ethnicity, application, applicant)
         end
       end
-    end    
+    end
     remove_ethnicity_nils
 
     puts "UPDATED APPLICATIONS (primary person_hbx_id):"
