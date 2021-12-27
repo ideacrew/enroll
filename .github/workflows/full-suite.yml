@@ -5,7 +5,7 @@ on:
     - cron: '0 6 * * *'
 
 concurrency:
-  group: ${{ github.ref }}
+  group: qb-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -77,7 +77,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -105,9 +105,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -131,7 +131,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -165,9 +165,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: |
@@ -188,13 +188,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5]
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -226,9 +226,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -244,7 +244,6 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -277,7 +276,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -306,9 +305,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -318,7 +317,6 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [view_linter, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -345,13 +343,38 @@ jobs:
             19,
             20,
             21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
           ]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -380,9 +403,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install

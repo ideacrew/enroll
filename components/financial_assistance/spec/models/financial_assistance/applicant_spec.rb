@@ -20,11 +20,15 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                       family_member_id: BSON::ObjectId.new)
   end
 
+  let(:income) do
+    income = FactoryBot.build(:financial_assistance_income)
+    applicant.incomes << income
+  end
+
   describe 'after_update' do
     context 'callbacks' do
 
       it 'calls propagate_applicant' do
-        #applicant.stub(:propagate_applicant)
         allow(applicant).to receive(:propagate_applicant).and_return(true)
         applicant.update_attributes(dob: Date.today - 30.years)
         expect(applicant).to have_received(:propagate_applicant)
@@ -397,6 +401,49 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context 'is filing application with parents in household' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(false)
+      applicant.update_attributes({is_required_to_file_taxes: true,
+                                   is_joint_tax_filing: false,
+                                   is_claimed_as_tax_dependent: false,
+                                   is_filing_as_head_of_household: false})
+    end
+    let!(:parent_applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 40.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    let!(:parent2_applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 40.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    let!(:applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 20.years,
+                        is_primary_applicant: true,
+                        family_member_id: BSON::ObjectId.new)
+    end
+    before do
+      application.ensure_relationship_with_primary(parent_applicant, 'parent')
+      application.ensure_relationship_with_primary(parent2_applicant, 'parent')
+      application.update_or_build_relationship(parent2_applicant, parent_applicant, 'spouse')
+      application.update_or_build_relationship(parent_applicant, parent2_applicant, 'spouse')
+    end
+
+    it "shouldn't require 'filing jointly' to be present" do
+      expect(applicant.tax_info_complete_unmarried_child?).to eq true
+    end
+  end
+
   context '#other_questions_complete?' do
     context 'pregnancy_due_on' do
       before do
@@ -428,6 +475,107 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         it 'should return false without pregnancy_due_on_required' do
           expect(applicant.other_questions_complete?).to eq false
+        end
+      end
+    end
+
+    context '#applicant_validation_complete?' do
+      before do
+        applicant.update_attributes!({is_applying_coverage: true,
+                                      is_required_to_file_taxes: false,
+                                      is_claimed_as_tax_dependent: false,
+                                      has_job_income: false,
+                                      has_self_employment_income: false,
+                                      has_other_income: false,
+                                      has_deductions: false,
+                                      has_enrolled_health_coverage: false,
+                                      has_eligible_health_coverage: false,
+                                      has_unemployment_income: false,
+                                      is_pregnant: false,
+                                      no_ssn: 0,
+                                      ssn: '123456789',
+                                      is_post_partum_period: false})
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
+      end
+
+      context 'has_medicare_cubcare_eligible feature disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          applicant.update_attributes!({
+                                         has_eligible_medicaid_cubcare: nil,
+                                         has_eligibility_changed: nil,
+                                         has_household_income_changed: nil,
+                                         person_coverage_end_on: nil
+                                       })
+        end
+
+        it 'should validate applicant as complete' do
+          expect(applicant.applicant_validation_complete?).to eq true
+        end
+      end
+
+      context 'has_medicare_cubcare_eligible feature enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(true)
+        end
+
+        context 'medicare_eligible_qns not answered' do
+          before do
+            applicant.update_attributes!({
+                                           has_eligible_medicaid_cubcare: false,
+                                           has_eligibility_changed: true,
+                                           has_household_income_changed: nil,
+                                           person_coverage_end_on: nil
+                                         })
+          end
+
+          it 'should not validate applicant as complete' do
+            expect(applicant.applicant_validation_complete?).to eq false
+          end
+
+          context 'person_coverage_end_on not given after selecting yes to has_eligibility_changed' do
+            before do
+              applicant.update_attributes!({
+                                             has_eligible_medicaid_cubcare: false,
+                                             has_eligibility_changed: true,
+                                             has_household_income_changed: false,
+                                             person_coverage_end_on: nil
+                                           })
+            end
+
+            it 'should not validate applicant as complete' do
+              expect(applicant.applicant_validation_complete?).to eq false
+            end
+          end
+        end
+
+        context 'medicare_eligible_qns answered' do
+          before do
+            applicant.update_attributes!({
+                                           has_eligible_medicaid_cubcare: false,
+                                           has_eligibility_changed: true,
+                                           has_household_income_changed: true,
+                                           person_coverage_end_on: Date.today
+                                         })
+          end
+
+          it 'should validate applicant as complete' do
+            expect(applicant.applicant_validation_complete?).to eq true
+          end
+        end
+      end
+
+      context "invalid income" do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          applicant.incomes << income
+          applicant.incomes.first.update_attributes(amount: '0.00')
+        end
+        it "should not validate as complete" do
+          expect(applicant.applicant_validation_complete?).to eq false
         end
       end
     end

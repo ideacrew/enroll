@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: caabd72eac9b623d258e375ca292a65756b8f354
+  revision: 49ee216ef03c71374a71c984509f1a7eb73cf838
   branch: trunk
   specs:
     aca_entities (0.9.0)

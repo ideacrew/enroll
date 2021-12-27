@@ -279,6 +279,8 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
+    field :transfer_referral_reason, type: String
+
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :evidences, class_name: "::FinancialAssistance::Evidence"
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
@@ -549,6 +551,10 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
+    def is_spouse_of_primary
+      application.relationships.where(kind: 'spouse', relative_id: application.primary_applicant.id).present?
+    end
+
     def eligibility_determination_of_spouse
       return nil unless has_spouse
       spouse_relationship.relative.eligibility_determination
@@ -719,14 +725,17 @@ module FinancialAssistance
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
+          incomes.all? {|income| income.nil? || income.amount > 0 } &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists? &&
-          ssn_present?
+          ssn_present? &&
+          (FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) ? medicare_eligible_qns : true)
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
+          incomes.all? {|income| income.nil? || income.amount > 0 } &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists? &&
@@ -779,6 +788,14 @@ module FinancialAssistance
       !is_required_to_file_taxes.nil? &&
         !is_claimed_as_tax_dependent.nil? &&
         filing_as_head
+    end
+
+    def tax_info_complete_unmarried_child?
+      filing_as_head = (!FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && is_claimed_as_tax_dependent == false)
+      !is_required_to_file_taxes.nil? &&
+        !is_claimed_as_tax_dependent.nil? &&
+        filing_as_head &&
+        !is_joint_tax_filing.nil?
     end
 
     def incomes_complete?
@@ -924,6 +941,7 @@ module FinancialAssistance
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && person_coverage_end_on.blank?
       return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
@@ -1191,7 +1209,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_step_1
-      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
+      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && is_spouse_of_primary
 
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 

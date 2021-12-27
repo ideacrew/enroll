@@ -21,12 +21,44 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     context 'with valid payload' do
       before do
         record = serializer.parse(xml)
-        transformed = transformer.transform(record.to_hash(identifier: true))
-        @result = subject.call(transformed)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
       end
 
       it 'should return success if zips are present in database' do
         expect(@result).to be_success
+      end
+
+      context 'person ethnicity' do
+        it 'should populate person ethnicity using cv3 person demographics ethnicity' do
+          person_demographics = @transformed["family"]["family_members"].first["person"]["person_demographics"]
+          person = Person.first
+          expect(person.ethnicity).to eq person_demographics["ethnicity"]
+        end
+      end
+
+      context 'relationships' do
+        before do
+          @family_member_rels = Family.first.family_members.map(&:relationship)
+          @primary_person_rels = Family.first.primary_person.person_relationships
+          @application_rels = FinancialAssistance::Application.first.relationships
+        end
+
+        it 'should create the expected family member relationships' do
+          expect(@family_member_rels).to eq ["self", "parent", "domestic_partner"]
+        end
+
+        it 'should persist the family primary person relationships' do
+          expect(@primary_person_rels.map(&:persisted?)).not_to include(false)
+        end
+
+        it 'should create the expected application relationships' do
+          expect(@application_rels.map(&:kind)).to eq ["child", "domestic_partner", "parent", "domestic_partner"]
+        end
+
+        it 'should persist the applicant relationships' do
+          expect(@application_rels.map(&:persisted?)).not_to include(false)
+        end
       end
     end
   end

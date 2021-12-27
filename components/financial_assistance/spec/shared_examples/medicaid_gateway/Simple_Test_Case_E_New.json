@@ -261,6 +261,7 @@
                         "has_deductions": false,
                         "has_enrolled_health_coverage": false,
                         "has_eligible_health_coverage": null,
+                        "transfer_referral_reason": 'initiated',
                         "addresses": [
                             { "kind": "home", "address_1": "524 Test Street", "address_2": null, "address_3": null, "city": "Augusta", "county": "KENNEBEC", "county_code": "011", "state": "ME", "zip": "04330", "country_name": null },
                             { "kind": "mailing", "address_1": "524 Test Street", "address_2": null, "address_3": null, "city": "Augusta", "county": "KENNEBEC", "county_code": "011", "state": "ME", "zip": "04330", "country_name": null }
@@ -345,6 +346,7 @@
                         "has_deductions": false,
                         "has_enrolled_health_coverage": false,
                         "has_eligible_health_coverage": null,
+                        "transfer_referral_reason": 'rejected',
                         "addresses": [
                             { "kind": "home", "address_1": "524 Test Street", "address_2": null, "address_3": null, "city": "Augusta", "county": "KENNEBEC", "county_code": "011", "state": "ME", "zip": "04330", "country_name": null },
                             { "kind": "mailing", "address_1": "524 Malta Street", "address_2": null, "address_3": null, "city": "Augusta", "county": "KENNEBEC", "county_code": "011", "state": "ME", "zip": "04330", "country_name": null }
@@ -408,6 +410,7 @@
                         "has_deductions": false,
                         "has_enrolled_health_coverage": false,
                         "has_eligible_health_coverage": null,
+                        "transfer_referral_reason": 'accepted',
                         "addresses": [
                             { "kind": "home", "address_1": "524 Test Street", "address_2": null, "address_3": null, "city": "Augusta", "county": "KENNEBEC", "county_code": "011", "state": "ME", "zip": "04330", "country_name": null },
                             { "kind": "mailing", "address_1": "524 Malta Street", "address_2": null, "address_3": null, "city": "Augusta", "county": "KENNEBEC", "county_code": "011", "state": "ME", "zip": "04330", "country_name": null }

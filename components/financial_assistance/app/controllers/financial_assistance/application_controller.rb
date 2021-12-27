@@ -18,6 +18,22 @@ module FinancialAssistance
 
     private
 
+    def find_application
+      application_id = params[:application_id] || params[:id]
+      @application = if current_user.try(:person).try(:agent?) && !session[:person_id].present?
+                       FinancialAssistance::Application.find_by(id: application_id)
+                     else
+                       FinancialAssistance::Application.find_by(id: application_id, :family_id.in => get_current_person.current_and_past_financial_assistance_identifiers)
+                     end
+    end
+
+    # For security reasons, only set the financial assistance identifier as the FA application's family_id
+    # if the current user as an HBX Admin. This will also prevent a nil financial assistance identifier
+    # in the event of impersonation from an admin not working properly
+    def financial_assistance_identifiers
+      get_current_person.current_and_past_financial_assistance_identifiers
+    end
+
     def verify_financial_assistance_enabled
       return render(file: 'public/404.html', status: 404) unless ::EnrollRegistry.feature_enabled?(:financial_assistance)
       true

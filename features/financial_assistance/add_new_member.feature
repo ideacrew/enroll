@@ -11,7 +11,7 @@ Feature: User add's new dependent and submit form after filling required fields
     And user selects yes for applicant's us_citizen status
     And user selects no for applicant's naturalized_citizen status
     And user clicks comfirm member
-    Then form should not submit due to required relationship error
+    Then form should not submit due to required relationship options popup
     And user fills in the missing relationship
     And user clicks comfirm member
     Then the applicant should have been created successfully

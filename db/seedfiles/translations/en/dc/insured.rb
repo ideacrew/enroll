@@ -133,6 +133,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollments' => "Enrollment(s)",
   :'en.edit' => "Edit",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
+  :'en.insured.csr_percent_as_integer' => "CSR % as Integer",
   :'en.members' => "Members",
   :'en.plan_contact_info' => "Plan Contact Info",
   :'en.insured.switch_to_all_families' => "Switch to All Families",
@@ -345,7 +346,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.family_members.index.continue_to_get_insurance' => "If you need to add other members to your health insurance, select 'Add New Person'. When you’re finished, select CONTINUE.",
   :'en.insured.family_members.index.add_member_info_html' => "<span class='bold'>Here's your chance to add family members to your plan.</span><br>Add family members by clicking the 'Add Member' button. If you don't need to add more members, or when you are done adding members, click continue.",
   :'en.insured.family_members.duplicate_error_message' => "Cannot %{action} the duplicate members as they are present on enrollments/tax households. Please call customer service at %{contact_center_phone_number}.",
-  :'en.insured.family_members.relationship_error_message' => "Select relationship type",
   :'en.insured.home_address_info' => "The home address is where this person legally reside. If they want to receive mail at another address such as an office or a PO Box, Select 'Add Mailing Address'",
   :'en.month' => "Month",
   :'en.termination_date' => "Termination date",
@@ -363,7 +363,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.health' => "Health",
   :'en.dental' => "Dental",
   :'en.insured.group_selection.new.coverage_begin_ivl_enrollment_effective_date' => "If you enroll today, coverage will begin %{ivl_enrollment_effective_date}.",
-  :'en.insured.group_selection.new.need_coverage_earlier_html' => "Do you need coverage earlier? See if you qualify for a <a href='#' id='find_sep_link'>Special Enrollment Period</a>",
+  :'en.insured.group_selection.new.need_coverage_earlier_html' => "Do you need coverage earlier? See if you qualify for a %{link}",
   :'en.insured.group_selection.new.show_residency_alert_msg' => "Since %{full_name} is not a resident of the %{aca_state_name} she/he is not eligible to purchase a plan through %{site_short_name}. Other members may still be eligible to enroll. Please call us at %{contact_center_phone_number} to learn about other health insurance options for %{full_name}.",
   :'en.insured.group_selection.new.what_would_you_like_to_do' => "What would you like to do?",
   :'en.shop_for_new_plan' => "Shop for new plan",
@@ -495,5 +495,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.individual_agreement_non_aptc' => "<p> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. I can report changes by going online and logging into “My Account”, by calling %{contact_center_name} toll-free at %{contact_center_phone_number} TTY: %{contact_center_tty_number}, or by submitting information via mail or in-person at one of the Department of Human Services’ Service Centers.</p><p>I'm the person whose name appears in the signature line below. I understand that I’m submitting an application for health insurance and that information I provided will be used to decide eligibility for each member of my application group.</p><p>I've reviewed the information in this application, and I attest under penalty of perjury, that it’s accurate and complete to the best of my knowledge. I understand if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previously covered by the health insurance company.</p>",
   :'en.insured.individual_agreement_aptc_present' => "<p>I understand that because the premium tax credit will be paid on my behalf to reduce the cost of health coverage for myself and/or my dependents:<ul><li>I must file a federal income tax return for the %{coverage_year} tax year.<li>If I’m married at the end of %{coverage_year}, I must file a joint income tax return with my spouse.</li></ul><p>I also expect that:</p><ul><li>No one else will be able to claim me as a dependent on their %{coverage_year} federal income tax return.</li><li>I’ll claim as a dependent on my %{coverage_year} federal income tax return all individuals I listed on my application as my dependent, who are enrolled incoverage through %{site_short_name}, and whose premium for coverage is paid in whole or in part by advance payments of the premium tax credit.</li></ul><p>If any of this changes:</p><ul><li>I understand that it may impact my ability to get the premium tax credit.</li><li>I also understand that when I file my %{coverage_year} federal income tax return, the Internal Revenue Service (IRS) will compare the income on my tax return with the income on my application. I understand that if the income on my tax return is lower than the amount of income on my application, I maybe be eligible to get an additional premium tax credit amount. On the other hand, if the income on my tax return is greater than the amount of income on my application, I may owe additional federal income tax.</li></ul>",
   :'en.insured.ssn_configuration_warning' => "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at %{site_phone_number}.",
-  :'en.insured.match_person.ssn_dob_name_error' => "This Social Security Number, Date-of-Birth and Name are invalid in our records. Please verify the entry, and if correct, contact the %{contact_center_name} at %{contact_center_phone_number}."
+  :'en.insured.match_person.ssn_dob_name_error' => "This Social Security Number, Date-of-Birth and Name are invalid in our records. Please verify the entry, and if correct, contact the %{contact_center_name} at %{contact_center_phone_number}.",
+  :'en.insured.out_of_state_error_message' => "Address is out of state or the supported area, please review your application details to update your address"
 }.freeze

@@ -5,6 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
+    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
@@ -18,7 +19,7 @@ module FinancialAssistance
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
     def index
-      @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
+      @applications = ::FinancialAssistance::Application.where(:family_id.in => get_current_person.current_and_past_financial_assistance_identifiers)
     end
 
     def new
@@ -29,8 +30,7 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      # @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id])
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
 
       load_support_texts
     end
@@ -105,7 +105,7 @@ module FinancialAssistance
     end
 
     def uqhp_flow
-      ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
+      ::FinancialAssistance::Application.where(aasm_state: "draft", :family_id.in => financial_assistance_identifiers).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
 
@@ -114,14 +114,12 @@ module FinancialAssistance
     end
 
     def application_year_selection
-      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance'
     end
 
     def application_checklist
-      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
@@ -129,7 +127,6 @@ module FinancialAssistance
     def review_and_submit
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       @all_relationships = @application.relationships
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
@@ -150,12 +147,11 @@ module FinancialAssistance
         return
       end
 
-      @application = FinancialAssistance::Application.where(id: params['id']).first
+      @application = FinancialAssistance::Application.where(id: params['id'], :family_id.in => financial_assistance_identifiers).first
 
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
       else
-        redirect_to applications_path unless @application.family_id == get_current_person.financial_assistance_identifier
 
         @applicants = @application.active_applicants
         @all_relationships = @application.relationships
@@ -180,33 +176,33 @@ module FinancialAssistance
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       render layout: 'financial_assistance'
     end
 
     def eligibility_results
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
     end
 
     def eligibility_response_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
     end
 
     def check_eligibility_results_received
-      application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       render :plain => (application.success_status_codes?(application.determination_http_status_code) && application.determined?).to_s
     end
 
@@ -301,7 +297,7 @@ module FinancialAssistance
     end
 
     def find
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier) if params.key?(:id)
+      find_application
     end
 
     def save_faa_bookmark(url)
@@ -372,3 +368,4 @@ module FinancialAssistance
     end
   end
 end
+

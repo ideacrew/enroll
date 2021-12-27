@@ -140,7 +140,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET Index" do
     it "should assign applications", dbclean: :after_each do
       get :index
-      applications = FinancialAssistance::Application.where(family_id: family_id)
+      applications = FinancialAssistance::Application.where(:family_id.in => [family_id])
       expect(assigns(:applications)).to eq applications
     end
   end
@@ -393,6 +393,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET review" do
+
+    before do
+      sign_in(user)
+    end
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
       get :review, params: { id: application.id }
