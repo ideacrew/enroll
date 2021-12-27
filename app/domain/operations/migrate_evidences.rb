@@ -24,16 +24,12 @@ module Operations
     end
 
     def evidence_name(evidence)
-      case evidence.key.to_s
-      when 'aces_mec'
-        "build_local_mec_evidence"
-      when 'esi_mec'
-        "build_esi_evidence"
-      when 'non_esi_mec'
-        "build_non_esi_evidence"
-      when 'income'
-        "build_income_evidence"
-      end
+      {
+        'aces_mec' => "build_local_mec_evidence",
+        'esi_mec' => "build_esi_evidence",
+        'non_esi_mec' => "build_non_esi_evidence",
+        'income' => "build_income_evidence"
+      }[evidence.key.to_s]
     end
 
     def create_new_evidence(applicant, evidence)
@@ -46,7 +42,9 @@ module Operations
                      is_satisfied: evidence.type_verified?,
                      verification_outstanding: evidence.type_unverified?,
                      created_at: evidence.created_at,
-                     updated_at: evidence.updated_at)
+                     updated_at: evidence.updated_at,
+                     #TODO: remove before running in production
+                     due_on: evidence.created_at + 95.days)
     end
 
     def build_verification_histories(evidence)

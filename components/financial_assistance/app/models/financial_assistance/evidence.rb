@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  #Evidences for an applicant to detrmine his status
+  #Evidences for an applicant to detrmine its status
   class Evidence
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -29,7 +29,6 @@ module FinancialAssistance
     field :title, type: String
     field :description, type: String
     field :eligibility_status, type: String
-    field :aasm_state, type: String
     field :update_reason, type: String
     field :rejected, type: Boolean
     field :due_on, type: Date
@@ -45,10 +44,6 @@ module FinancialAssistance
         @target.select(&:identifier)
       end
     end
-
-    embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
-
-    # validates_presence_of :key, :is_satisfied, :aasm_state
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
     default_scope ->{ exists(key: true) }
@@ -69,113 +64,12 @@ module FinancialAssistance
       self.due_on = date
     end
 
-    PENDING = [:pending, :attested].freeze
-    OUTSTANDING = [:outstanding, :review, :errored].freeze
-    CLOSED = [:denied, :closed, :expired].freeze
-    aasm do
-      state :attested, initial: true
-      state :pending
-      state :review
-      state :outstanding
-      state :verified
-      state :non_verified
-
-      state :determined
-      state :expired
-      state :denied
-      state :errored
-      state :closed
-
-      state :corrected
-
-      event :attest, :after => [:record_transition] do
-        transitions from: :pending, to: :attested
-        transitions from: :attested, to: :attested
-        transitions from: :review, to: :attested
-        transitions from: :outstanding, to: :attested
-        transitions from: :attested, to: :attested
-      end
-
-      event :move_to_outstanding, :after => [:record_transition] do
-        transitions from: :pending, to: :outstanding
-        transitions from: :outstanding, to: :outstanding
-        transitions from: :review, to: :outstanding
-        transitions from: :attested, to: :outstanding
-        transitions from: :verified, to: :outstanding
-      end
-
-      event :move_to_verified, :after => [:record_transition] do
-        transitions from: :pending, to: :verified
-        transitions from: :verified, to: :verified
-        transitions from: :review, to: :verified
-        transitions from: :attested, to: :verified
-        transitions from: :outstanding, to: :verified
-      end
-
-      event :move_to_review, :after => [:record_transition] do
-        transitions from: :pending, to: :review
-        transitions from: :review, to: :review
-        transitions from: :outstanding, to: :review
-        transitions from: :attested, to: :review
-        transitions from: :verified, to: :review
-      end
-
-      event :move_to_pending, :after => [:record_transition] do
-        transitions from: :attested, to: :pending
-        transitions from: :pending, to: :pending
-        transitions from: :review, to: :pending
-        transitions from: :outstanding, to: :pending
-        transitions from: :verified, to: :pending
-      end
-
-      event :determined, :after => [:record_transition] do
-        transitions from: :requested, to: :determined
-        transitions from: :review_required, to: :determined
-        transitions from: :corrected, to: :determined
-      end
-
-      event :expired, :after => [:record_transition] do
-        transitions from: :requested, to: :expired
-      end
-
-      event :denied, :after => [:record_transition] do
-        transitions from: :requested, to: :denied
-      end
-
-      event :errored, :after => [:record_transition] do
-        transitions from: :requested, to: :errored
-        transitions from: :errored, to: :errored
-        transitions from: :corrected, to: :errored
-      end
-
-      event :corrected, :after => [:record_transition] do
-        transitions from: :errored, to: :corrected
-      end
-
-      event :closed, :after => [:record_transition] do
-        transitions from: :pending, to: :closed
-        transitions from: :requested, to: :closed
-        transitions from: :review_required, to: :closed
-        transitions from: :expired, to: :closed
-        transitions from: :denied, to: :closed
-        transitions from: :errored, to: :closed
-        transitions from: :closed, to: :closed
-      end
-    end
-
-    def record_transition
-      self.workflow_state_transitions << WorkflowStateTransition.new(
-        from_state: aasm.from_state,
-        to_state: aasm.to_state
-      )
-    end
-
     def type_unverified?
       !type_verified?
     end
 
     def type_verified?
-      ["verified", "attested"].include? aasm_state
+      ["verified", "attested"].include? eligibility_status
     end
 
     def verif_due_date
