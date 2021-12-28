@@ -2,6 +2,7 @@
 
 module Eligibilities
   module Visitors
+    # Individual market eligibility visitor
     class AcaIndividualMarketEligibilityVisitor < Visitor
       attr_accessor :evidence, :subject, :evidence_item, :effective_date
 

@@ -9,7 +9,10 @@ module Eligibilities
 
       def call
         enrollment = hbx_enrollment_instance_for(subject, effective_date)
-
+        unless enrollment
+          @evidence = Hash[evidence_item[:key], {}]
+          return
+        end
         enrollment.accept(self)
       end
 
@@ -35,12 +38,16 @@ module Eligibilities
 
       def evidence_state_for(enrollment_member)
         evidence_state_attributes = {
-          status: enrollment_member.parent.aasm_state,
+          status: 'determined',
           meta: {
-            coverage_start_on: enrollment_member.coverage_start_on
+            coverage_start_on: enrollment_member.coverage_start_on,
+            csr_variant_id: enrollment_member.parent.product.csr_variant_id,
+            enrollment_status: enrollment_member.parent.aasm_state
           },
           is_statisfied: true,
-          verification_outstanding: false
+          verification_outstanding: false,
+          visited_at: DateTime.now,
+          due_on: nil
         }
 
         Hash[evidence_item[:key].to_sym, evidence_state_attributes]
