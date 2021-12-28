@@ -134,6 +134,15 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
   end
 end
 
+Then(/the user is on the Family Information page with missing applicant income amount/) do
+  find_all(IvlIapApplicationChecklist.previous_link).first.click
+  FinancialAssistance::Application.first.applicants.first.incomes.first.update_attributes!(amount: nil, frequency_kind: 'biweekly')
+end
+
+Then(/the user should see a missing applicant info error message/) do
+  expect(page).to have_content "Applicant has incomplete information"
+end
+
 Then(/^the user is on the Submit Your Application page$/) do
   expect(page).to have_content('Submit Your Application')
 end
