@@ -164,8 +164,6 @@ RUN bundle exec rails assets:precompile \
 # https://github.com/rubygems/rubygems/issues/3225
 RUN rm -rf /usr/local/bundle/ruby/*/cache
 
-RUN ls | grep freedesktop
-
 ################################################################
 # Deployable image
 ################################################################
