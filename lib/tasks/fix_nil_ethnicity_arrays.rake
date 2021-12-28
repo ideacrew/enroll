@@ -1,6 +1,7 @@
 # Run this with RAILS_ENV=production bundle exec rake migrations:fix_nil_ethnicity_arrays application_hbx_id="12345"
 # application_hbx_id is not required but can be used for testing/fixing on a single application.
 # By default, rake will run on all ATP-ingested applications in a draft state
+# To run just a report: RAILS_ENV=production bundle exec rake migrations:fix_nil_ethnicity_arrays report_only=true
 namespace :migrations do
   desc "Remove nils from person and applicant ethnicity arrays"
   task :fix_nil_ethnicity_arrays => :environment do |_task, _args|
@@ -17,26 +18,31 @@ namespace :migrations do
     def fix_person_ethnicity_array(ethnicities, application, person)
       primary = application.primary_applicant ? application.primary_applicant.person_hbx_id : "no_primary_found"
       result = [application.hbx_id, primary, person.hbx_id, person.ethnicity.to_s]
-      Person.skip_callback(:update, :after, :person_create_or_update_handler)
-      person.ethnicity = ethnicities.compact
-      updated = person.save(validate: false)
-      Person.set_callback(:update, :after, :person_create_or_update_handler)
-      raise StandardError, "Failed to save person (hbx_id): #{person.hbx_id}" unless updated
-      result << person.ethnicity.to_s
+      if ENV['report_only'].nil?
+        Person.skip_callback(:update, :after, :person_create_or_update_handler)
+        person.ethnicity = ethnicities.compact
+        updated = person.save(validate: false)
+        Person.set_callback(:update, :after, :person_create_or_update_handler)
+        result << person.ethnicity.to_s
+        raise StandardError, "Failed to save person (hbx_id): #{person.hbx_id}" unless updated
+      end
+      result
     rescue StandardError => e
-      ["Error updating peson ethnicity array - #{e}"]
+      ["Error updating person ethnicity array - #{e}"]
     end
 
     def fix_applicant_ethnicity_array(ethnicities, application, applicant)
       primary = application.primary_applicant ? application.primary_applicant.person_hbx_id : "no_primary_found"
       result = [application.hbx_id, primary, applicant.person_hbx_id, applicant.ethnicity.to_s]
-
-      ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
-      applicant.ethnicity = ethnicities.compact
-      updated = applicant.save(validate: false)
-      ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
-      raise StandardError, "Failed to save applicant (person_hbx_id): #{applicant.person_hbx_id}" unless updated
-      result << applicant.ethnicity.to_s
+      if ENV['report_only'].nil?
+        ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
+        applicant.ethnicity = ethnicities.compact
+        updated = applicant.save(validate: false)
+        ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
+        raise StandardError, "Failed to save applicant (person_hbx_id): #{applicant.person_hbx_id}" unless updated
+        result << applicant.ethnicity.to_s
+      end
+      result
     rescue StandardError => e
       ["Error updating applicant ethnicity array - #{e}"]
     end
@@ -48,7 +54,7 @@ namespace :migrations do
                        FinancialAssistance::Application.draft.where(hbx_id: application_hbx_id)
                      else
                        # Run on all ATP-ingested draft applications
-                       FinancialAssistance::Application.draft.not.where(transfer_id: nil)
+                       FinancialAssistance::Application.draft.where(:transfer_id.nin => [nil, ''])
                      end
 
     # Fix person ethnicity arrays
@@ -57,7 +63,9 @@ namespace :migrations do
       file_name = "#{Rails.root}/person_nil_ethnicity_#{timestamp}.csv"
       FileUtils.touch(file_name)
       CSV.open(file_name, 'w+', headers: true) do |csv|
-        csv << %w[APPLICATION_HBX_ID PRIMARY_HBX_ID PERSON_HBX_ID INITIAL_ETHNICITY UPDATED_ETHNICIY]
+        headers = %w[APPLICATION_HBX_ID PRIMARY_HBX_ID PERSON_HBX_ID ETHNICITY]
+        headers << "UPDATED_ETHNICIY" unless ENV['report_only'].present?
+        csv << headers
         applications.no_timeout.each do |application|
           application.applicants.no_timeout.each do |applicant|
             person = find_person(applicant.person_hbx_id)
@@ -80,7 +88,9 @@ namespace :migrations do
       file_name = "#{Rails.root}/applicant_nil_ethnicity_#{timestamp}.csv"
       FileUtils.touch(file_name)
       CSV.open(file_name, 'w+', headers: true) do |csv|
-        csv << %w[APPLICATION_HBX_ID PRIMARY_HBX_ID PERSON_HBX_ID INITIAL_ETHNICITY UPDATED_ETHNICIY]
+        headers = %w[APPLICATION_HBX_ID PRIMARY_HBX_ID PERSON_HBX_ID ETHNICITY]
+        headers << "UPDATED_ETHNICIY" unless ENV['report_only'].present?
+        csv << headers
         applications.no_timeout.each do |application|
           application.applicants.no_timeout.each do |applicant|
             next if applicant.nil?
