@@ -14,6 +14,9 @@ registry:
               - :aca_individual_market_eligibility
               - :health_product_enrollment_status
               - :dental_product_enrollment_status
+      - key: :verification_document_due_in_days
+        item: 95
+        is_enabled: true
   - namespace:
       - :enroll_app
       - :aca_individual_market
@@ -34,8 +37,10 @@ registry:
         settings:
           - key: :evidence_items
             item:
-              - :vlp_evidence
-              - :citizenship_evidence
+              - :immigration_status
+              - :citizenship
+              - :american_indian_status
+              - :social_security_number
       - key: :health_product_enrollment_status
         is_enabled: false
         settings:
@@ -83,14 +88,28 @@ registry:
             item: 'gid://enroll_app/Family::FamilyMember'
           - key: :evidence_ref
             item: 'gid://enroll_app/FinancialAssitance::Application'
-      - key: :vlp_evidence
+      - key: :immigration_status
         is_enabled: true
         settings:
           - key: :subject_ref
             item: 'gid://enroll_app/Family::FamilyMember'
           - key: :evidence_ref
             item: 'gid://enroll_app/Person'
-      - key: :citizenship_evidence
+      - key: :citizenship
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :american_indian_status
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :social_security_number
         is_enabled: true
         settings:
           - key: :subject_ref
