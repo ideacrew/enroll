@@ -1030,6 +1030,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         end
       end
     end
+
+    context 'applicant addresses' do
+      before do
+        @applicants = subject.call(application.reload).value![:applicants]
+      end
+
+      it 'should include county fips' do
+        addresses = @applicants.map {|applicant| applicant[:addresses]}.flatten
+        addresses.each do |address|
+          expect(address.keys.include?(:county_fips)).to eq true
+        end
+      end
+    end
   end
 
   context 'for mitc_income' do
