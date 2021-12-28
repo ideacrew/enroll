@@ -6,6 +6,7 @@ class HbxEnrollmentMember
   include Insured::EmployeeRolesHelper
   include ApplicationHelper
   include Eligibilities::Visitors::Visitable
+  include GlobalID::Identification
 
   embedded_in :hbx_enrollment
 

@@ -100,6 +100,39 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
     )
   end
 
+  let(:household) { FactoryBot.create(:household, family: family) }
+  let!(:organization) do
+    FactoryBot.create(:organization, legal_name: 'CareFirst', dba: 'care')
+  end
+  let!(:carrier_profile1) do
+    FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+  end
+  let!(:product1) do
+    FactoryBot.create(
+      :benefit_markets_products_health_products_health_product,
+      benefit_market_kind: :aca_individual,
+      kind: :health,
+      csr_variant_id: '01'
+    )
+  end
+
+  let!(:hbx_enrollment1) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      :with_enrollment_members,
+      enrollment_members: family.family_members,
+      kind: 'individual',
+      product: product1,
+      household: family.latest_household,
+      effective_on: TimeKeeper.date_of_record.beginning_of_year,
+      enrollment_kind: 'open_enrollment',
+      family: family,
+      aasm_state: 'coverage_selected',
+      consumer_role: person1.consumer_role,
+      enrollment_signature: true
+    )
+  end
+
   let(:subject_ref) { family_member.to_global_id }
 
   let(:eligibility_items) { [:aptc_csr_credit] }

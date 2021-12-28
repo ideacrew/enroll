@@ -18,7 +18,6 @@ module Eligibilities
 
       def visit(enrollment_member)
         return unless enrollment_member.applicant_id == subject.id
-
         @evidence = evidence_state_for(enrollment_member)
       end
 
@@ -28,8 +27,8 @@ module Eligibilities
         HbxEnrollment
           .where(
             :family_id => subject.family.id,
-            :effective_date.gte => effective_date.beginning_of_year,
-            :effective_date.lte => effective_date
+            :effective_on.gte => effective_date.beginning_of_year,
+            :effective_on.lte => effective_date
           )
           .by_health
           .enrolled_and_renewing
@@ -37,17 +36,20 @@ module Eligibilities
       end
 
       def evidence_state_for(enrollment_member)
+        enrollment = enrollment_member._parent
+
         evidence_state_attributes = {
           status: 'determined',
           meta: {
             coverage_start_on: enrollment_member.coverage_start_on,
-            csr_variant_id: enrollment_member.parent.product.csr_variant_id,
-            enrollment_status: enrollment_member.parent.aasm_state
+            csr_variant_id: enrollment.product.csr_variant_id,
+            enrollment_status: enrollment.aasm_state
           },
-          is_statisfied: true,
+          is_satisfied: true,
           verification_outstanding: false,
           visited_at: DateTime.now,
-          due_on: nil
+          due_on: nil,
+          evidence_gid: enrollment_member.to_global_id.uri
         }
 
         Hash[evidence_item[:key].to_sym, evidence_state_attributes]

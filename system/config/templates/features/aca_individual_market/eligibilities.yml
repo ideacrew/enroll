@@ -42,13 +42,13 @@ registry:
               - :american_indian_status
               - :social_security_number
       - key: :health_product_enrollment_status
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :evidence_items
             item:
               - :health_product_enrollment_evidence
       - key: :dental_product_enrollment_status
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :evidence_items
             item:
