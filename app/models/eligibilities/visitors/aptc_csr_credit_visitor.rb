@@ -64,6 +64,8 @@ module Eligibilities
           .slice('is_satisfied', 'verification_outstanding', 'due_on')
           .merge(ids)
 
+        due_on_value = evidence_state_attributes['due_on']
+        evidence_state_attributes['due_on'] = due_on_value.to_date if due_on_value.is_a?(DateTime) || due_on_value.is_a?(Time)
         evidence_state_attributes.delete('due_on') if evidence_state_attributes['due_on'].blank?
 
         Hash[evidence_item[:key].to_sym, evidence_state_attributes.symbolize_keys]
