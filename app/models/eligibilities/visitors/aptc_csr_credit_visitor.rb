@@ -9,6 +9,10 @@ module Eligibilities
 
       def call
         application = application_instance_for(subject, effective_date)
+        unless application
+          @evidence = Hash[evidence_item[:key], {}]
+          return
+        end
 
         application.accept(self)
       end

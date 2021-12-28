@@ -398,11 +398,9 @@ class Person
   end
 
   def accept(visitor)
-    {
-      first_name: first_name,
-      last_name: last_name,
-      verification_status: consumer_role.accept(visitor)
-    }
+    verification_types.each do |verification_type|
+      verification_type.accept(visitor)
+    end
   end
 
   def agent_npn

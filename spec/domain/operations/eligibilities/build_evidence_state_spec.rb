@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-RSpec.describe ::Operations::Eligibilities::BuildDetermination,
+RSpec.describe ::Operations::Eligibilities::BuildEvidenceState,
                type: :model,
                dbclean: :after_each do
   let!(:person1) do
@@ -102,13 +102,27 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
 
   let(:subject_ref) { family_member.to_global_id }
 
-  let(:eligibility_items) { [:aptc_csr_credit] }
+  # let(:eligibility_items) { [:aptc_csr_credit] }
+
+  let(:eligibility_item) do
+    Operations::EligibilityItems::Find
+      .new
+      .call(eligibility_item_key: :aptc_csr_credit)
+      .success
+  end
+
+  let(:evidence_item) { eligibility_item.evidence_items.first }
 
   let(:effective_date) { Date.today }
   let(:subjects) { family.family_members.map(&:to_global_id) }
 
   let(:required_params) do
-    { subjects: subjects, effective_date: effective_date }
+    {
+      subject: subject_ref,
+      eligibility_item: eligibility_item,
+      evidence_item: evidence_item,
+      effective_date: effective_date
+    }
   end
 
   before do
@@ -126,29 +140,16 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  context 'when eligibility_items_requested not passed' do
-    it 'should build evidences' do
+  context 'when required params passed' do
+    it 'should build evidence state arguments' do
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
     end
-  end
 
-  context 'when eligibility_items_requested passed' do
-    let(:eligibility_items_requested) do
-      { aptc_csr_credit: { evidence_items: [:esi_evidence] } }
-    end
-
-    let(:required_params) do
-      {
-        subjects: subjects,
-        effective_date: effective_date,
-        eligibility_items_requested: eligibility_items_requested
-      }
-    end
-
-    it 'should build evidences' do
+    it 'should build with evidence details' do
       result = subject.call(required_params)
-      expect(result.success?).to be_truthy
+      expect(result.success).to be_a(Hash)
+      expect(result.success.key?(evidence_item.key.to_sym)).to be_truthy
     end
   end
 end

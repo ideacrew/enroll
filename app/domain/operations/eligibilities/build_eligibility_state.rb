@@ -33,20 +33,6 @@ module Operations
         errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def fetch_status(evidence_states)
-        evidence_states.values.all? do |evidence_state|
-          evidence_state[:is_satisfied]
-        end
-      end
-
-      def fetch_earliest_due_date(evidence_states)
-        evidence_states.values.min_by do |evidence_state|
-          evidence_state[:due_on]
-        end[
-          :due_on
-        ]
-      end
-
       def evidence_items_for(values)
         eligibility_item = values[:eligibility_item]
 
@@ -86,12 +72,47 @@ module Operations
           eligibility_state.merge!(
             {
               is_eligible: fetch_status(evidence_states),
-              earliest_due_date: fetch_earliest_due_date(evidence_states)
+              earliest_due_date: fetch_earliest_due_date(evidence_states),
+              document_status: fetch_document_status(evidence_states)
             }
           )
         end
 
         Success(eligibility_state)
+      end
+
+      def fetch_document_status(evidence_states)
+        all_satisfied = evidence_states.values.all? do |evidence_state|
+          evidence_state[:is_satisfied]
+        end
+
+        if all_satisfied
+          'Fully Uploaded'
+        else
+          any_in_review = evidence_states.values.any? do |evidence_state|
+            evidence_state[:status] == 'review'
+          end
+
+          if any_in_review
+            'Partially Uploaded'
+          else
+            'None'
+          end
+        end
+      end
+
+      def fetch_earliest_due_date(evidence_states)
+        evidence_states.values.min_by do |evidence_state|
+          evidence_state[:due_on]
+        end[
+          :due_on
+        ]
+      end
+
+      def fetch_status(evidence_states)
+        evidence_states.values.all? do |evidence_state|
+          evidence_state[:is_satisfied]
+        end
       end
     end
   end
