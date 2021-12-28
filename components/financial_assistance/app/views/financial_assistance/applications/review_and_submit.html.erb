@@ -34,7 +34,6 @@
                       <td> <%= embedded_document.frequency_kind.humanize %> </td>
                       <td>
                       <b>
-                        <!--% binding.pry %-->
                         <% if embedded_document.is_a? FinancialAssistance::Deduction %>
                           (<%= number_to_currency(embedded_document.amount.to_s) %>)
                         <% else %>
