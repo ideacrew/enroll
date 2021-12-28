@@ -90,6 +90,8 @@ fixture_dumps
 *.doc
 *.docx
 
+!freedesktop.org.xml
+
 /public/packs
 /public/packs-test
 /public/assets
