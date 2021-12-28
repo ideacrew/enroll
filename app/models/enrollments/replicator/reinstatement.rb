@@ -188,7 +188,7 @@ module Enrollments
                       end
         enr_members.inject([]) do |members, hbx_enrollment_member|
           is_tobacco_user = hbx_enrollment_member&.family_member&.person&.is_tobacco_user
-          tobacco_use = is_tobacco_user == 'unknown' ? nil : is_tobacco_user
+          tobacco_use = is_tobacco_user == 'unknown' ? 'NA' : is_tobacco_user
           members << HbxEnrollmentMember.new({
                                                  applicant_id: hbx_enrollment_member.applicant_id,
                                                  eligibility_date: new_effective_date,
