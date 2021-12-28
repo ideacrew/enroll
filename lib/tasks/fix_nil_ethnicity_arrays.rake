@@ -5,35 +5,40 @@ namespace :migrations do
   desc "Remove nils from person and applicant ethnicity arrays"
   task :fix_nil_ethnicity_arrays => :environment do |_task, _args|
     # - find draft applications that were ingested via ATP (or using provided hbx_id)
-    # - check and update person ethnicity array
-    # - check and update applicant ethnicity array
+    # - check and update person ethnicity arrays
+    # - check and update applicant ethnicity arrays
 
     def find_person(person_hbx_id)
       Person.find_by(hbx_id: person_hbx_id)
     rescue StandardError => e
-      puts "Error finding person document - hbx_id: #{person_hbx_id}"
+      ["Error finding person document - hbx_id: #{person_hbx_id}"]
     end
 
-    def fix_person_ethnicity_array(ethnicities, _application, person)
+    def fix_person_ethnicity_array(ethnicities, application, person)
+      primary = application.primary_applicant ? application.primary_applicant.person_hbx_id : "no_primary_found"
+      result = [application.hbx_id, primary, person.hbx_id, person.ethnicity.to_s]
       Person.skip_callback(:update, :after, :person_create_or_update_handler)
       person.ethnicity = ethnicities.compact
       updated = person.save(validate: false)
       Person.set_callback(:update, :after, :person_create_or_update_handler)
       raise StandardError, "Failed to save person (hbx_id): #{person.hbx_id}" unless updated
+      result << person.ethnicity.to_s
     rescue StandardError => e
-      puts "Error updating peson ethnicity array - #{e}"
+      ["Error updating peson ethnicity array - #{e}"]
     end
 
     def fix_applicant_ethnicity_array(ethnicities, application, applicant)
+      primary = application.primary_applicant ? application.primary_applicant.person_hbx_id : "no_primary_found"
+      result = [application.hbx_id, primary, applicant.person_hbx_id, applicant.ethnicity.to_s]
+
       ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
       applicant.ethnicity = ethnicities.compact
       updated = applicant.save(validate: false)
       ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
       raise StandardError, "Failed to save applicant (person_hbx_id): #{applicant.person_hbx_id}" unless updated
-      result = application.primary_applicant ? application.primary_applicant.person_hbx_id : "no primary applicant for application(hbx_id): #{application.hbx_id}"
-      @primary_hbx_ids << result
+      result << applicant.ethnicity.to_s
     rescue StandardError => e
-      puts "Error updating applicant ethnicity array - #{e}"
+      ["Error updating applicant ethnicity array - #{e}"]
     end
 
     def remove_ethnicity_nils
@@ -45,30 +50,49 @@ namespace :migrations do
                        # Run on all ATP-ingested draft applications
                        FinancialAssistance::Application.draft.not.where(transfer_id: nil)
                      end
-      @primary_hbx_ids = []
+
     # Fix person ethnicity arrays
-      applications.no_timeout.each do |application|
-        application.applicants.no_timeout.each do |applicant|
-          person = find_person(applicant.person_hbx_id)
-          next if person.nil?
-          person_ethnicity = person.ethnicity
-          next unless person_ethnicity && person_ethnicity.include?(nil)
-          fix_person_ethnicity_array(person_ethnicity, application, person)
+      puts "\nFinding person ethnicity arrays containing nil..."
+      timestamp = Time.zone.now.strftime("%Y%m%d_%H%M%S")
+      file_name = "#{Rails.root}/person_nil_ethnicity_#{timestamp}.csv"
+      FileUtils.touch(file_name)
+      CSV.open(file_name, 'w+', headers: true) do |csv|
+        csv << %w[APPLICATION_HBX_ID PRIMARY_HBX_ID PERSON_HBX_ID INITIAL_ETHNICITY UPDATED_ETHNICIY]
+        applications.no_timeout.each do |application|
+          application.applicants.no_timeout.each do |applicant|
+            person = find_person(applicant.person_hbx_id)
+            if person.is_a? Array
+              puts person
+              csv << person
+              next
+            end
+            person_ethnicity = person.ethnicity
+            next unless person_ethnicity && person_ethnicity.include?(nil)
+            puts "Removing ethnicity nil(s) from person #{person.hbx_id}"
+            csv << fix_person_ethnicity_array(person_ethnicity, application, person)
+          end
         end
       end
+
     # Fix applicant ethnicity arrays
-      applications.no_timeout.each do |application|
-        application.applicants.no_timeout.each do |applicant|
-          next if applicant.nil?
-          applicant_ethnicity = applicant.ethnicity
-          next unless applicant_ethnicity && applicant_ethnicity.include?(nil)
-          fix_applicant_ethnicity_array(applicant_ethnicity, application, applicant)
+      puts "\nFinding applicant ethnicity arrays containing nil..."
+      timestamp = Time.zone.now.strftime("%Y%m%d_%H%M%S")
+      file_name = "#{Rails.root}/applicant_nil_ethnicity_#{timestamp}.csv"
+      FileUtils.touch(file_name)
+      CSV.open(file_name, 'w+', headers: true) do |csv|
+        csv << %w[APPLICATION_HBX_ID PRIMARY_HBX_ID PERSON_HBX_ID INITIAL_ETHNICITY UPDATED_ETHNICIY]
+        applications.no_timeout.each do |application|
+          application.applicants.no_timeout.each do |applicant|
+            next if applicant.nil?
+            applicant_ethnicity = applicant.ethnicity
+            next unless applicant_ethnicity && applicant_ethnicity.include?(nil)
+            puts "Removing ethnicity nil(s) from applicant #{applicant.person_hbx_id}"
+            csv << fix_applicant_ethnicity_array(applicant_ethnicity, application, applicant)
+          end
         end
       end
     end
     remove_ethnicity_nils
-
-    puts "UPDATED APPLICATIONS (primary person_hbx_id):"
-    puts @primary_hbx_ids.uniq
+    puts "Nil ethnicity fix complete"
   end
 end
