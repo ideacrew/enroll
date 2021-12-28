@@ -102,21 +102,22 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
 
   let(:subject_ref) { family_member.to_global_id }
 
-  let(:eligibility_item) {
-      Operations::EligibilityItems::Find.new.call(
-                eligibility_item_key: :aptc_csr_credit
-      ).success }
+  let(:eligibility_item) do
+    Operations::EligibilityItems::Find.new.call(
+      eligibility_item_key: :aptc_csr_credit
+    ).success
+  end
 
   let(:effective_date) { Date.today }
   let(:subjects) { family.family_members.map(&:to_global_id) }
 
-  let(:required_params) { 
-      {
-          subject: family_member.to_global_id,
-          effective_date: effective_date,
-          eligibility_item: eligibility_item
-        }
+  let(:required_params) do
+    {
+      subject: family_member.to_global_id,
+      effective_date: effective_date,
+      eligibility_item: eligibility_item
     }
+  end
 
   before do
     EnrollRegistry[:financial_assistance]
