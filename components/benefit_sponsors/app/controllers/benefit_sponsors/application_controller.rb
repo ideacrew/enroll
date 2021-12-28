@@ -36,7 +36,7 @@ module BenefitSponsors
         message[:user_id] = current_user.id
         message[:oim_id] = current_user.oim_id
         message[:url] = request.original_url
-        log(message, :severity=>'error')
+        log(message, :severity => 'error')
       else
         message[:message] = "User not logged in"
       end

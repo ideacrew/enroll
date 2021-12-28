@@ -35,7 +35,7 @@ class HbxEnrollmentMember
   def family
     hbx_enrollment.family if hbx_enrollment.present?
   end
-  
+
   def covered?
     (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
   end
@@ -68,7 +68,7 @@ class HbxEnrollmentMember
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
     return unless coverage_start_on.present?
-    
+
     age = calculate_age(coverage_start_on,dob)
     @age_on_effective_date = age
   end
