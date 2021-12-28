@@ -23,22 +23,22 @@ RSpec.describe 'migrations:fix_nil_ethnicity_arrays', :type => :task, dbclean: :
     end
 
     after do
-      Dir.glob("person_nil_ethnicity_*").each do |file_name|
+      Dir.glob("fix_person_nil_ethnicity_*").each do |file_name|
         File.delete(file_name)
       end
-      Dir.glob("applicant_nil_ethnicity_*").each do |file_name|
+      Dir.glob("fix_applicant_nil_ethnicity_*").each do |file_name|
         File.delete(file_name)
       end
     end
 
     context 'csv' do
       it 'should output csv report for updated persons' do
-        report = Dir.glob("person_nil_ethnicity_*")
+        report = Dir.glob("fix_person_nil_ethnicity_*")
         expect(report).not_to be_empty
       end
 
       it 'should output csv report for updated applicants' do
-        report = Dir.glob("applicant_nil_ethnicity_*")
+        report = Dir.glob("fix_applicant_nil_ethnicity_*")
         expect(report).not_to be_empty
       end
     end
