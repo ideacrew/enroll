@@ -95,6 +95,7 @@ namespace :migrations do
           @target_app.select{|application| application.applicants.detect{|a| a.person_hbx_id == person.hbx_id}}&.each do |application|
             primary = application.primary_applicant
             application.applicants&.select{|a| a.person_hbx_id == person.hbx_id}.each do |applicant|
+              next if applicant.nil?
               a_isnt_homeless = applicant.is_homeless? == true && applicant.addresses.any?
               counters[:faa_apps][:homeless_fix] += 1 if a_isnt_homeless
               a_mailing = applicant.addresses&.detect {|a| a.kind == "mailing" }
