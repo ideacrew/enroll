@@ -63,7 +63,7 @@ class Insured::RidpDocumentsController < ApplicationController
   end
 
   def get_person
-    set_current_person
+    set_current_person(required: true)
   end
 
   def person_consumer_role
