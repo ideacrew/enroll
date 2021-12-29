@@ -5,6 +5,13 @@ RSpec.describe Insured::RidpDocumentsController, type: :controller, dbclean: :af
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:consumer_role) { person.consumer_role }
 
+  context "Redirects non-logged in user" do
+    it "redirects when current_user is nil" do
+      expect(controller).to receive(:redirect_to)
+      controller.send(:get_person)
+    end
+  end
+
   context "Failed Upload" do
     it "redirects" do
       request.env["HTTP_REFERER"] = "/home"

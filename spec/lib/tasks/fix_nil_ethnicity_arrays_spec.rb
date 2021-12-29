@@ -19,31 +19,47 @@ RSpec.describe 'migrations:fix_nil_ethnicity_arrays', :type => :task, dbclean: :
   context "Rake task" do
     before do
       rake.reenable
-    end
-
-    it 'should output person hbx id of primary applicant for all affected applications' do
-      expected_output = "UPDATED APPLICATIONS (primary person_hbx_id):\n#{person1.hbx_id}\n"
-      expect {rake.invoke}.to output(expected_output).to_stdout
-    end
-
-    it 'should remove nils from the person ethnicity array' do
       rake.invoke
-      person1.reload
-      expect(person1.ethnicity).to eq []
     end
 
-    it 'should remove nils from the applicant ethnicity array' do
-      rake.invoke
-      applicant1.reload
-      expect(applicant1.ethnicity).to eq []
+    after do
+      Dir.glob("fix_person_nil_ethnicity_*").each do |file_name|
+        File.delete(file_name)
+      end
+      Dir.glob("fix_applicant_nil_ethnicity_*").each do |file_name|
+        File.delete(file_name)
+      end
     end
 
-    it 'should not affect valid ethnicity arrays' do
-      rake.invoke
-      person2.reload
-      applicant2.reload
-      expect(person2.ethnicity).to eq ["Mexican"]
-      expect(applicant2.ethnicity).to eq ["Mexican"]
+    context 'csv' do
+      it 'should output csv report for updated persons' do
+        report = Dir.glob("fix_person_nil_ethnicity_*")
+        expect(report).not_to be_empty
+      end
+
+      it 'should output csv report for updated applicants' do
+        report = Dir.glob("fix_applicant_nil_ethnicity_*")
+        expect(report).not_to be_empty
+      end
+    end
+
+    context 'data fix' do
+      it 'should remove nils from the person ethnicity array' do
+        person1.reload
+        expect(person1.ethnicity).to eq []
+      end
+
+      it 'should remove nils from the applicant ethnicity array' do
+        applicant1.reload
+        expect(applicant1.ethnicity).to eq []
+      end
+
+      it 'should not affect valid ethnicity arrays' do
+        person2.reload
+        applicant2.reload
+        expect(person2.ethnicity).to eq ["Mexican"]
+        expect(applicant2.ethnicity).to eq ["Mexican"]
+      end
     end
   end
 end

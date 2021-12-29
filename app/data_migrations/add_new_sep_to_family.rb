@@ -9,6 +9,7 @@ class AddNewSepToFamily < MongoidMigrationTask
     sep_type = ENV['sep_type'].to_s
     qle_reason = ENV['qle_reason'].to_s
     event_date = Date.strptime(ENV['event_date'].to_s, "%m/%d/%Y")
+    effective_date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
     sep_duration = ENV['sep_duration'].to_i
 
     person_hbx_ids.each do |hbx_id|
@@ -32,12 +33,12 @@ class AddNewSepToFamily < MongoidMigrationTask
                                                   market_kind: sep_type,
                                                   qualifying_life_event_kind: qle,
                                                   qle_on: event_date,
-                                                  effective_on: event_date,
-                                                  start_on: event_date,
-                                                  end_on: event_date + sep_duration.days,
                                                   admin_flag: true,
                                                   coverage_renewal_flag: true)
 
+
+      sep.effective_on = effective_date if effective_date.present?
+      sep.end_on = (event_date + sep_duration.days) if sep_duration.present?
 
       if sep.save
         family.save!
