@@ -84,6 +84,17 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
         expect(reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
       end
     end
+
+    context 'when enrollment reinstated for person with tobacco attestation', dbclean: :around_each do
+      before do
+        enrollment.hbx_enrollment_members.first.family_member.person.update_attributes(is_tobacco_user: 'Y')
+      end
+
+      it 'Enrollment member has tobacco attestation' do
+        reinstated_enrollment = Enrollments::Replicator::Reinstatement.new(enrollment, enrollment.terminated_on.next_day).build
+        expect(reinstated_enrollment.hbx_enrollment_members.first.tobacco_use).to eq 'Y'
+      end
+    end
   end
 
   describe "renewing employer",  dbclean: :around_each do

@@ -1,6 +1,7 @@
 name: Build Image and Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'trunk'
@@ -37,7 +38,7 @@ jobs:
         id: prep
         run: |
           SHORT_SHA=$(echo $GITHUB_SHA | head -c7)
-          TAG=${{ env.GIT_BRANCH_NAME}}-$(echo $GITHUB_SHA | head -c7)
+          TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
           IMAGE="public.ecr.aws/ideacrew/enroll"
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
           echo ::set-output name=tag::${TAG}

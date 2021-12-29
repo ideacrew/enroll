@@ -235,6 +235,26 @@ module FinancialAssistance
         KINDS
       end
 
+      def fetch_county_fips_code
+        state_abbrev = state.blank? ? '' : state.upcase
+        county_name = county.blank? ? '' : county.titlecase
+        county_fip = ::BenefitMarkets::Locations::CountyFips.where(state_postal_code: state_abbrev, county_name: county_name).first
+
+        if county_fip.present?
+          county_fip.county_fips_code
+        else
+          county_fip_by_zip_state.present? ? county_fip_by_zip_state.county_fips_code : ""
+        end
+      end
+
+      def county_fip_by_zip_state
+        state_abbrev = state.blank? ? '' : state.upcase
+        zip_code = zip.blank? ? "" : zip.scan(/\d+/).join
+        counties = ::BenefitMarkets::Locations::CountyZip.where(:zip => zip_code, :state => state_abbrev)
+        county_name = counties.count == 1 ? counties.first.county_name.titlecase : ""
+        ::BenefitMarkets::Locations::CountyFips.where(state_postal_code: state_abbrev, county_name: county_name).first
+      end
+
       private
 
       def attribute_matches?(attribute, other)

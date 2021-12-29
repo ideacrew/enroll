@@ -20,7 +20,7 @@ class HbxEnrollmentMember
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
-  # Allowed values are 'Y', 'N', or nil for 'NA'
+  # Allowed values are 'Y', 'N', or NA for nil/unknown
   field :tobacco_use, type: String
 
   validates_presence_of :applicant_id, :is_subscriber, :eligibility_date,# :premium_amount,
