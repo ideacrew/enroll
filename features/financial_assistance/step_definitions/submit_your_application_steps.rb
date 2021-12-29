@@ -140,7 +140,7 @@ Then(/the user is on the Family Information page with missing applicant income a
 end
 
 Then(/the user should see a missing applicant info error message/) do
-  expect(page).to have_content "Applicant has incomplete information"
+  expect(find_all('.alert').first[:class].include?('alert-error')).to be true
 end
 
 Then(/^the user is on the Submit Your Application page$/) do
