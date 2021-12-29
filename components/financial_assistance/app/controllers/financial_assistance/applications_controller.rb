@@ -130,6 +130,7 @@ module FinancialAssistance
       @all_relationships = @application.relationships
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
+      flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       redirect_to applications_path if @application.blank?
     end
 
@@ -368,4 +369,3 @@ module FinancialAssistance
     end
   end
 end
-
