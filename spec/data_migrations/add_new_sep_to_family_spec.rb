@@ -22,7 +22,7 @@ describe AddNewSepToFamily, dbclean: :after_each do
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let!(:qle) { FactoryBot.create(:qualifying_life_event_kind, reason: 'open_enrollment_december_deadline_grace_period', effective_on_kinds: ["fixed_first_of_next_month"], market_kind: 'individual') }
 
-    let(:sep_params) { {sep_type: 'ivl', qle_reason: 'open_enrollment_december_deadline_grace_period', event_date: '12/28/2021', sep_duration: '10', person_hbx_ids: person.hbx_id.to_s}}
+    let(:sep_params) { {sep_type: 'ivl', qle_reason: 'open_enrollment_december_deadline_grace_period', event_date: '12/28/2021', effective_date: '1/1/2022', sep_duration: '10', person_hbx_ids: person.hbx_id.to_s}}
 
     it "should create a new sep" do
       expect(person.primary_family.special_enrollment_periods.size).to eq 0
@@ -30,6 +30,11 @@ describe AddNewSepToFamily, dbclean: :after_each do
         subject.migrate
       end
       expect(person.primary_family.reload.special_enrollment_periods.size).to eq 1
+      sep = person.primary_family.reload.special_enrollment_periods.last
+      expect(sep.effective_on).to eq Date.strptime(sep_params[:effective_date], "%m/%d/%Y")
+      expect(sep.qle_on).to eq Date.strptime(sep_params[:event_date], "%m/%d/%Y")
+      expect(sep.start_on).to eq Date.strptime(sep_params[:event_date], "%m/%d/%Y")
+      expect(sep.end_on).to eq(Date.strptime(sep_params[:event_date], "%m/%d/%Y") + sep_params[:sep_duration].to_i.days)
     end
   end
 end
