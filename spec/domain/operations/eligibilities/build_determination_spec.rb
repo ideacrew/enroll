@@ -112,14 +112,16 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
   end
 
   before do
-    EnrollRegistry[:financial_assistance]
-      .feature
-      .stub(:is_enabled)
-      .and_return(true)
-    EnrollRegistry[:validate_quadrant]
-      .feature
-      .stub(:is_enabled)
-      .and_return(true)
+    [
+      :financial_assistance,
+      :'gid://enroll_app/Family',
+      :aptc_csr_credit,
+      :aca_individual_market_eligibility,
+      :health_product_enrollment_status,
+      :dental_product_enrollment_status
+    ].each do |feature_key|
+      EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
+    end
   end
 
   it 'should be a container-ready operation' do
