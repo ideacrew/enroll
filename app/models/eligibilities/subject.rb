@@ -12,8 +12,14 @@ module Eligibilities
     field :first_name, type: String
     field :last_name, type: String
     field :is_primary, type: Boolean
+    field :hbx_id, type: String
+    field :person_id, type: String
+    field :encrypted_ssn, type: String
+    field :dob, type: Date
+    field :outstanding_verification_status, type: String
 
     accepts_nested_attributes_for :eligibility_states
 
   end
 end
+

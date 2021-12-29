@@ -9,6 +9,7 @@ module Eligibilities
     embeds_many :subjects, class_name: "::Eligibilities::Subject", cascade_callbacks: true
 
     field :effective_date, type: Date
+    field :outstanding_verification_status, type: String
 
     accepts_nested_attributes_for :subjects
   end
