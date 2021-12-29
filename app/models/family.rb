@@ -106,6 +106,9 @@ class Family
 
   index({"eligibility_determination.outstanding_verification_status" => 1, "eligibility_determination.effective_date" => 1})
 
+  index({"eligibility_determination.subjects.last_name" => 1, "eligibility_determination.subjects.first_name" => 1, "eligibility_determination.subjects.hbx_id" => 1 })
+
+
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
@@ -206,9 +209,9 @@ class Family
   }
 
   scope :eligibility_determination_family_member_search, ->(search_string) {
-    any_of({ :"eligibility_determination.subjects.first_name" => search_string },
+    any_of({ :"eligibility_determination.subjects.last_name" => search_string },
            { :"eligibility_determination.subjects.first_name" => search_string },
-           { :"eligibility_determination.subjects.first_name" => search_string })
+           { :"eligibility_determination.subjects.hbx_id" => search_string })
   }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
