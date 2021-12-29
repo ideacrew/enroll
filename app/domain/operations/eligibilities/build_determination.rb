@@ -80,7 +80,6 @@ module Operations
               eligibility_states:
                 build_eligibility_states(subject, eligibility_items, values)
             }
-
             Hash[
               subject.uri,
               subject_params
@@ -139,6 +138,7 @@ module Operations
           subject[:outstanding_verification_status] == 'not_enrolled'
         end
 
+        return 'not_enrolled' if subjects.blank?
         return 'eligible' if subjects.all? { |subject| subject[:outstanding_verification_status] == 'eligible' }
         return 'outstanding' if subjects.any? { |subject| subject[:outstanding_verification_status] == 'outstanding' }
         'pending'

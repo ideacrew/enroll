@@ -103,6 +103,9 @@ class Family
   index({"family_members.person_id" => 1, hbx_assigned_id: 1})
 
   index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
+
+  index({"eligibility_determination.outstanding_verification_status" => 1, "eligibility_determination.effective_date" => 1})
+
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
@@ -196,6 +199,16 @@ class Family
       :_id.in => (HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id) +
                      FinancialAssistance::Application.families_with_latest_determined_outstanding_verification.pluck(:family_id))
     )
+  }
+
+  scope :eligibility_determination_outstanding_verifications, ->(skip=0, limit=50, order_by={:'eligibility_determination.effective_date' => :asc}) {
+   where(:"eligibility_determination.outstanding_verification_status" => 'outstanding').limit(limit).skip(skip).order_by(order_by)
+  }
+
+  scope :eligibility_determination_family_member_search, ->(search_string) {
+    any_of({ :"eligibility_determination.subjects.first_name" => search_string },
+           { :"eligibility_determination.subjects.first_name" => search_string },
+           { :"eligibility_determination.subjects.first_name" => search_string })
   }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
