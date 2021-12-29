@@ -104,8 +104,8 @@ namespace :migrations do
               end
               a_addresses = a_mailing.present? && a_updated_address_hash != applicant.addresses
               counters[:faa_apps][:address_fix] += 1 if a_addresses
-              same_as_primary = same_address_with_primary(applicant, primary)
-              a_same_as_primary = same_as_primary != applicant.same_with_primary
+              same_as_primary = same_address_with_primary(applicant, primary) unless primary.nil?
+              a_same_as_primary = primary.present? && same_as_primary != applicant.same_with_primary
               counters[:faa_apps][:same_as_primary_fix] += 1 if a_same_as_primary
               if a_addresses || a_isnt_homeless || a_same_as_primary
                 applicant.is_homeless = false if a_isnt_homeless
