@@ -41,9 +41,7 @@ module Operations
       end
 
       def get_eligibility_items(_values)
-        eligibility_item_keys =
-          EnrollRegistry[:'gid://enroll_app/Family'].setting(:eligibility_items)
-                                                    .item
+        eligibility_item_keys = EnrollRegistry[:'gid://enroll_app/Family'].setting(:eligibility_items).item
 
         eligibility_items =
           eligibility_item_keys.collect do |eligibility_item_key|
@@ -65,13 +63,7 @@ module Operations
             subject_instance = GlobalID::Locator.locate(subject)
 
             person = subject_instance.person
-            person_attributes =
-              person.attributes.slice(
-                'first_name',
-                'last_name',
-                'encrypted_ssn',
-                'hbx_id'
-              )
+            person_attributes = person.attributes.slice('first_name', 'last_name', 'encrypted_ssn', 'hbx_id')
             person_attributes['person_id'] = person.id.to_s
             person_attributes['dob'] = person.dob
 
@@ -85,7 +77,10 @@ module Operations
               subject_params
                 .merge(person_attributes.symbolize_keys)
                 .merge(
-                  outstanding_verification_status: outstanding_verification_status_for_subject(subject_params)
+                  outstanding_verification_status:
+                    outstanding_verification_status_for_subject(
+                      subject_params
+                    )
                 )
             ]
           end
@@ -107,18 +102,12 @@ module Operations
 
       def outstanding_verification_status_for_subject(subject)
         enrolled = false
-        eligibility_states = subject[:eligibility_states].values
-
-        eligibility_states.each do |eligibility_state|
-          eligibility_key = eligibility_state[:key]
-          unless %w[
-                   health_product_enrollment_status
-                   dental_product_enrollment_status
-                 ].include?(eligibility_key)
-            next
-          end
+        subject[:eligibility_states].each do |eligibility_key, eligibility_state|
+          next unless %i[health_product_enrollment_status dental_product_enrollment_status].include?(eligibility_key)
           enrolled = true if eligibility_state[:evidence_states].present?
         end
+
+        eligibility_states = subject[:eligibility_states].slice(:aptc_csr_credit, :aca_individual_market_eligibility).values
 
         return 'not_enrolled' unless enrolled
         if eligibility_states.all? do |eligibility_state|
@@ -141,8 +130,16 @@ module Operations
         end
 
         return 'not_enrolled' if subjects.blank?
-        return 'eligible' if subjects.all? { |subject| subject[:outstanding_verification_status] == 'eligible' }
-        return 'outstanding' if subjects.any? { |subject| subject[:outstanding_verification_status] == 'outstanding' }
+        if subjects.all? do |subject|
+             subject[:outstanding_verification_status] == 'eligible'
+           end
+          return 'eligible'
+        end
+        if subjects.any? do |subject|
+             subject[:outstanding_verification_status] == 'outstanding'
+           end
+          return 'outstanding'
+        end
         'pending'
       end
 
