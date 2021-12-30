@@ -675,7 +675,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it 'should create MEC evidence, ACES MEC check only if is_ia_eligible? not true' do
-      application.active_applicants.each do |applicant|
+      application.reload.active_applicants.each do |applicant|
         expect(applicant.income_evidence.present?).to be_truthy
         expect(applicant.esi_evidence.present?).to be_truthy
         expect(applicant.non_esi_evidence.present?).to be_truthy

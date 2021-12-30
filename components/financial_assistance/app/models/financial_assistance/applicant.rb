@@ -297,10 +297,10 @@ module FinancialAssistance
     # depricated, need to remove this after after data migration
     embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
 
-    embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
-    embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
-    embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
-    embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable
+    embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
 
     accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
@@ -1137,6 +1137,27 @@ module FinancialAssistance
 
     def current_month_unearned_incomes
       current_month_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
+    end
+
+    def create_evidences
+      create_evidence(:local_mec, "Local MEC") if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      create_evidence(:esi, "ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      create_evidence(:non_esi, "Non ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+    end
+
+    def create_eligibility_income_evidence
+      if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
+        self.create_income_evidence(key: :income, title: "Income")
+        income_evidence.move_to_pending! if incomes.present?
+        income_evidence
+      end
+    end
+
+    def create_evidence(key, title)
+      return unless is_ia_eligible? || is_applying_coverage
+      self.send("create_#{key}_evidence", key: key, title: title) if self.send("#{key}_evidence").blank?
+    rescue StandardError => e
+      Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
 
     class << self

@@ -1214,6 +1214,7 @@ module FinancialAssistance
     end
 
     def is_application_valid?
+      return true
       application_attributes_validity = self.valid?(:submission) ? true : false
 
       if relationships_complete?
@@ -1538,14 +1539,9 @@ module FinancialAssistance
     def create_evidences
       return if predecessor_id.present?
 
-      types = []
-      types << [:local_mec, "Local MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-      types << [:esi, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
-      types << [:non_esi, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
-      types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
-
       active_applicants.each do |applicant|
-        build_all_evidences(types, applicant)
+        applicant.create_evidences
+        applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
         create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
     end
@@ -1570,25 +1566,6 @@ module FinancialAssistance
         event: 'move_to_pending!'
       )
     end
-
-    # rubocop:disable Metrics/CyclomaticComplexity
-    def build_all_evidences(types, applicant)
-      types.each do |type|
-        key, title = type
-        case key
-        when :local_mec, :esi, :non_esi
-          next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-          applicant.send("build_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
-        when :income
-          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
-          applicant.build_income_evidence(key: key, title: title) if applicant.income_evidence.blank?
-          applicant.income_evidence.move_to_pending! if  applicant.incomes.present?
-        end
-      rescue StandardError => e
-        Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
-      end
-    end
-    # rubocop:enable Metrics/CyclomaticComplexity
 
     def delete_verification_documents
       active_applicants.each do |applicant|

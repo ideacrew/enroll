@@ -38,10 +38,10 @@ module FinancialAssistance
               case key
               when :non_esi
                 next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-                applicant.send("build_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
+                applicant.send("create_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
               when :income
                 next unless application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
-                applicant.build_income_evidence(key: key, title: title) if applicant.income_evidence.blank?
+                applicant.create_income_evidence(key: key, title: title) if applicant.income_evidence.blank?
                 applicant.income_evidence.move_to_pending! if  applicant.incomes.present?
               end
             rescue StandardError => e
