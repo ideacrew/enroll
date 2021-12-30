@@ -23,7 +23,7 @@ module Queries
       family = klass
       family = family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
-        family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from],@custom_attributes[:custom_datatable_date_to])
+        family = family.eligibility_due_date_in_range(@custom_attributes[:custom_datatable_date_from].to_date, @custom_attributes[:custom_datatable_date_to].to_date)
       end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2

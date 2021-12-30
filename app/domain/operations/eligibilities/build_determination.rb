@@ -98,7 +98,9 @@ module Operations
 
         Success(
           determination.merge(
-            outstanding_verification_status: outstanding_verification_status_for_determination(determination)
+            outstanding_verification_status: outstanding_verification_status_for_determination(determination),
+            outstanding_verification_earliest_due_date: outstanding_verification_due_on_for_determination(determination),
+            outstanding_verification_document_status: outstanding_verification_document_status_for_determination(determination)
           )
         )
       end
@@ -142,6 +144,39 @@ module Operations
         return 'eligible' if subjects.all? { |subject| subject[:outstanding_verification_status] == 'eligible' }
         return 'outstanding' if subjects.any? { |subject| subject[:outstanding_verification_status] == 'outstanding' }
         'pending'
+      end
+
+      def outstanding_verification_due_on_for_determination(determination)
+        subjects = determination[:subjects].values
+        subjects.reduce([]) do |memo, subject|
+          aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
+          aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
+          memo << aptc_csr_credit[:earliest_due_date] if aptc_csr_credit.present?
+          memo << aca_individual_market_eligibility[:earliest_due_date] if aca_individual_market_eligibility.present?
+        end.compact.min
+      end
+
+      def eligibility_documents_uploaded_status(determination)
+        subjects = determination[:subjects].values
+        subjects.reduce([]) do |memo, subject|
+          aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
+          aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
+
+          memo << aptc_csr_credit[:document_status] if aptc_csr_credit.present?
+          memo << aca_individual_market_eligibility[:document_status] if aca_individual_market_eligibility.present?
+        end.compact
+      end
+
+      def outstanding_verification_document_status_for_determination(determination)
+        document_states = eligibility_documents_uploaded_status(determination)
+
+        if document_states.all?('Fully Uploaded')
+          'Fully Uploaded'
+        elsif document_states.any?('Partially Uploaded')
+          'Partially Uploaded'
+        else
+          'None'
+        end
       end
 
       def build_eligibility_states(subject, eligibility_items, values)

@@ -84,27 +84,8 @@ module Effective
         family.eligibility_determination.subjects.where(:"eligibility_states.outstanding_verification_status".ne => 'not_enrolled')
       end
 
-      def eligibility_documents_uploaded_status(family)
-        enrolled_members = eligibility_enrolled_family_members(family)
-        enrolled_members.reduce([]) do |memo, member|
-          aptc_csr_credit = member.eligibility_states.where(eligibility_item_key: 'aptc_csr_credit').first
-          aca_individual_market_eligibility = member.eligibility_states.where(eligibility_item_key: 'aca_individual_market_eligibility').first
-
-          (memo << aptc_csr_credit.document_status) if aptc_csr_credit.present?
-          (memo << aca_individual_market_eligibility.document_status) if aca_individual_market_eligibility.present?
-        end.compact
-      end
-
       def document_status_for(family)
-        document_states = eligibility_documents_uploaded_status(family)
-
-        if document_states.all?('Fully Uploaded')
-          'Fully Uploaded'
-        elsif document_states.any?('Partially Uploaded')
-          'Partially Uploaded'
-        else
-          'None'
-        end
+        family.eligibility_determination.outstanding_verification_document_status
       end
 
       def subject_is_ov_eligible(subject)
@@ -122,24 +103,35 @@ module Effective
       end
 
       def eligibility_earliest_due_date(family)
-        enrolled_members = eligibility_enrolled_family_members(family)
+        family.eligibility_determination.outstanding_verification_earliest_due_date
+      end
 
-        enrolled_members.reduce([]) do |memo, member|
-          aptc_csr_credit = member.eligibility_states.where(eligibility_item_key: 'aptc_csr_credit').first
-          aca_individual_market_eligibility = member.eligibility_states.where(eligibility_item_key: 'aca_individual_market_eligibility').first
-          (memo << aptc_csr_credit.earliest_due_date) if aptc_csr_credit.present?
-          (memo << aca_individual_market_eligibility.earliest_due_date) if aca_individual_market_eligibility.present?
-        end.compact.min
+      def verification_type_nested_filters
+        [
+          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
+          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
+          {scope: 'vlp_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
+          {scope: 'all', label: 'All', title: "All outstanding verifications"}
+        ]
+      end
+
+      def eligibility_determination_nested_filters
+        [
+          {scope: 'eligibility_determination_fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
+          {scope: 'eligibility_determination_partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
+          {scope: 'eligibility_determination_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
+          {scope: 'all', label: 'All', title: "All outstanding verifications"}
+        ]
       end
 
       def nested_filter_definition
+        document_uploaded_filters = if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+                                      eligibility_determination_nested_filters
+                                    else
+                                      verification_type_nested_filters
+                                    end
         filters = {
-          documents_uploaded: [
-            {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
-            {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
-            {scope: 'vlp_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
-            {scope: 'all', label: 'All', title: "All outstanding verifications"}
-          ],
+          documents_uploaded: document_uploaded_filters,
           top_scope: :documents_uploaded
         }
       end
