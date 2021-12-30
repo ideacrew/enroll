@@ -1402,6 +1402,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     let(:subject) {HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, family: family)}
 
     before(:each) do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(true)
       family.hire_broker_agency(writing_agent.id)
       family.reload
       family.broker_agency_accounts.first.update_attributes(start_on: TimeKeeper.date_of_record - 1.day)
@@ -1410,7 +1411,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     context "family with imported broker agency assignment" do
       it "should not return broker agency account" do
         writing_agent.update_attributes(aasm_state: 'imported')
-        person.reload
         expect(subject.broker_agency_account_for_edi).to eq nil
       end
     end
@@ -1418,7 +1418,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     context "family with broker assistor assignment" do
       it "should not return broker agency account" do
         writing_agent.update_attributes(npn: 'SMECDOA08')
-        person.reload
         expect(subject.broker_agency_account_for_edi).to eq nil
       end
     end
