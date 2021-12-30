@@ -148,8 +148,9 @@ module Operations
         subjects.reduce([]) do |memo, subject|
           aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
           aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
-          memo << aptc_csr_credit[:earliest_due_date] if aptc_csr_credit.present?
-          memo << aca_individual_market_eligibility[:earliest_due_date] if aca_individual_market_eligibility.present?
+          memo << aptc_csr_credit[:earliest_due_date] if aptc_csr_credit && aptc_csr_credit[:earliest_due_date]
+          memo << aca_individual_market_eligibility[:earliest_due_date] if aca_individual_market_eligibility && aca_individual_market_eligibility[:earliest_due_date]
+          memo
         end.compact.min
       end
 
@@ -158,9 +159,9 @@ module Operations
         subjects.reduce([]) do |memo, subject|
           aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
           aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
-
-          memo << aptc_csr_credit[:document_status] if aptc_csr_credit.present?
-          memo << aca_individual_market_eligibility[:document_status] if aca_individual_market_eligibility.present?
+          memo << aptc_csr_credit[:document_status] if aptc_csr_credit && aptc_csr_credit[:document_status]
+          memo << aca_individual_market_eligibility[:document_status] if aca_individual_market_eligibility && aca_individual_market_eligibility[:document_status]
+          memo
         end.compact
       end
 
