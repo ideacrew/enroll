@@ -725,7 +725,7 @@ module FinancialAssistance
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount > 0) } &&
+          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
@@ -735,7 +735,7 @@ module FinancialAssistance
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount > 0) } &&
+          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists?
