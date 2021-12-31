@@ -15,9 +15,7 @@
 <script>
 	$('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
   initializeDataTables();
-  DT.filters();
-  <% if @selector == 'assisted' %>
-    $('#Tab\\:by_enrollment_individual_market').click();
-    $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');
-  <% end %>
+ $('#date_range_apply').click(function() {
+    $('.effective-datatable').DataTable().draw()
+  })
 </script>

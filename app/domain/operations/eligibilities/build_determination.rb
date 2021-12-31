@@ -110,17 +110,12 @@ module Operations
         eligibility_states = subject[:eligibility_states].slice(:aptc_csr_credit, :aca_individual_market_eligibility).values
 
         return 'not_enrolled' unless enrolled
-        if eligibility_states.all? do |eligibility_state|
-             eligibility_state[:is_eligible]
-           end
-          return 'eligible'
-        end
-        # if eligibility_states.any? do |eligibility_state|
-        #      eligibility_state[:document_status] == 'Partially Uploaded'
-        #    end
-        #   return 'outstanding'
-        # end
-        'outstanding'
+
+        return 'eligible' if eligibility_states.all? { |eligibility_state| eligibility_state[:is_eligible] }
+        return 'pending' if eligibility_states.all? { |eligibility_state| eligibility_state[:is_eligible] || eligibility_state[:evidence_states].blank? }
+        return 'outstanding' if eligibility_states.any? { |eligibility_state| !eligibility_state[:is_eligible] }
+
+        'pending'
       end
 
       def outstanding_verification_status_for_determination(determination)
