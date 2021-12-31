@@ -587,17 +587,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
       end
 
-      context "invalid income" do
-        before do
-          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
-          applicant.incomes << income
-          applicant.incomes.first.update_attributes(amount: '0.00')
-        end
-        it "should not validate as complete" do
-          expect(applicant.applicant_validation_complete?).to eq false
-        end
-      end
-
       context 'applicant not applying for coverage and ssn is not present' do
         before do
           applicant.update_attributes!(ssn: nil, no_ssn: nil, is_applying_coverage: false)
