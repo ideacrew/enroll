@@ -1,6 +1,6 @@
 name: full check suite
 on:
-  # push:
+  push:
   schedule:
     - cron: '0 6 * * *'
 
@@ -368,6 +368,7 @@ jobs:
             44,
             45,
             46,
+            47,
           ]
     steps:
       - uses: actions/checkout@v2
