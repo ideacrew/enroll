@@ -192,11 +192,11 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
       let(:partum_period_params_with_out_enrolled_on_medicaid_params) do
         {
-          "is_pregnant"=>"false",
-          "pregnancy_due_on"=>"",
-          "children_expected_count"=>"",
-          "is_post_partum_period"=>"true",
-          "pregnancy_end_on"=> (TimeKeeper.date_of_record - 1.month).strftime("%m/%d/%Y"),
+          "is_pregnant" => "false",
+          "pregnancy_due_on" => "",
+          "children_expected_count" => "",
+          "is_post_partum_period" => "true",
+          "pregnancy_end_on" => (TimeKeeper.date_of_record - 1.month).strftime("%m/%d/%Y")
         }
       end
 
