@@ -60,7 +60,7 @@ module Eligibilities
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
     def eligibility_event_name
-      "eligibilities.application.applicant.#{title.gsub(/\s/, '_')}_updated"
+      "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
     def request_determination

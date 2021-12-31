@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Eligibilities
+ # Eventable module
   module Eventable
     include EventSource::Command
 
@@ -11,21 +12,23 @@ module Eligibilities
       base.class_eval { after_save :generate_evidence_updated_event }
     end
 
+    # class methods
     module ClassMethods
     end
 
+    # instance methods
     module InstanceMethods
       def generate_evidence_updated_event
         event =
           event(
             eligibility_event_name,
-            payload: {
+            attributes: {
               gid: self.to_global_id.uri,
-              attributes: self.serializable_hash
+              payload: self.serializable_hash
             }
           )
 
-        event.publish
+        event.success.publish if event.success?
       end
     end
   end

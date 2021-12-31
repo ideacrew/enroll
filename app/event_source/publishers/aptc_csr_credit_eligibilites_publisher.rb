@@ -7,8 +7,8 @@ module Publishers
 
     # This event is to generate renewal draft applications
     register_event 'income_evidence_updated'
-    register_event 'esi_evidence_updated'
-    register_event 'non_esi_evidence_updated'
+    register_event 'esi_mec_evidence_updated'
+    register_event 'non_esi_mec_evidence_updated'
     register_event 'local_mec_evidence_updated'
 
   end

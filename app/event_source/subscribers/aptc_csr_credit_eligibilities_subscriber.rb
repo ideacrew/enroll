@@ -8,7 +8,7 @@ module Subscribers
     subscribe(
       :on_enroll_individual_eligibilities
     ) do |delivery_info, _metadata, response|
-      logger.info '-' * 100
+      logger.info '-' * 100 unless Rails.env.test?
 
       payload = JSON.parse(response, symbolize_names: true)
 
@@ -18,9 +18,9 @@ module Subscribers
         )
 
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, response: #{payload}"
-      logger.info "AptcCsrCreditEligibilitiesSubscriber payload: #{payload}"
+      logger.info "AptcCsrCreditEligibilitiesSubscriber payload: #{payload}" unless Rails.env.test?
 
-      # TODO Add logic update family eligibility determination
+      # TODO: Add logic update family eligibility determination
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
