@@ -516,21 +516,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(applicant.applicant_validation_complete?).to eq true
         end
 
-        context 'has nil income' do
-          before do
-            applicant.update_attributes!({has_job_income: nil,
-                                          has_self_employment_income: nil,
-                                          has_other_income: nil,
-                                          has_unemployment_income: nil})
-            applicant.incomes << income
-            applicant.incomes.first.update_attributes(amount: nil)
-          end
-
-          it "shouldn't validate applicant as complete" do
-            expect(applicant.applicant_validation_complete?).to eq false
-          end
-        end
-
         context 'has 0.00 income' do
           before do
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
