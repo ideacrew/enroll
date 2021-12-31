@@ -2,6 +2,7 @@
 
 module Effective
   module Datatables
+    # datatable for outstanding verifications
     class OutstandingVerificationDataTable < Effective::MongoidDatatable
       datatable do
         if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
@@ -130,7 +131,7 @@ module Effective
                                     else
                                       verification_type_nested_filters
                                     end
-        filters = {
+        {
           documents_uploaded: document_uploaded_filters,
           top_scope: :documents_uploaded
         }

@@ -85,14 +85,16 @@ module Operations
         if all_satisfied
           'Fully Uploaded'
         else
-          any_in_review = evidence_states.values.any? do |evidence_state|
-            evidence_state[:status] == 'review'
-          end
+          evidence_statuses = evidence_states.values.collect { |evidence_state| evidence_state[:status] }
 
-          if any_in_review
-            'Partially Uploaded'
+          if evidence_statuses.include?('outstanding')
+            if evidence_statuses.include?('review')
+              'Partially Uploaded'
+            else
+              'None'
+            end
           else
-            'None'
+            'Fully Uploaded'
           end
         end
       end

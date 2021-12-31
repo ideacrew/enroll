@@ -183,6 +183,10 @@ module Eligibilities
       ["verified", "attested"].include? aasm_state
     end
 
+    def is_type_outstanding?
+      aasm_state == "outstanding"
+    end
+
     def verif_due_date
       due_on || TimeKeeper.date_of_record + 95.days
     end

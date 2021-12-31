@@ -115,12 +115,12 @@ module Operations
            end
           return 'eligible'
         end
-        if eligibility_states.any? do |eligibility_state|
-             eligibility_state[:document_status] == 'Partially Uploaded'
-           end
-          return 'outstanding'
-        end
-        'pending'
+        # if eligibility_states.any? do |eligibility_state|
+        #      eligibility_state[:document_status] == 'Partially Uploaded'
+        #    end
+        #   return 'outstanding'
+        # end
+        'outstanding'
       end
 
       def outstanding_verification_status_for_determination(determination)
@@ -148,9 +148,9 @@ module Operations
         subjects.reduce([]) do |memo, subject|
           aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
           aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
-          memo << aptc_csr_credit[:earliest_due_date] if (aptc_csr_credit && aptc_csr_credit[:earliest_due_date] && !aptc_csr_credit[:is_satisfied])
-          memo << aca_individual_market_eligibility[:earliest_due_date] if (aca_individual_market_eligibility && aca_individual_market_eligibility[:earliest_due_date] &&
-                                                                            !aca_individual_market_eligibility[:is_satisfied])
+          memo << aptc_csr_credit[:earliest_due_date] if aptc_csr_credit && aptc_csr_credit[:earliest_due_date] && !aptc_csr_credit[:is_eligible]
+          memo << aca_individual_market_eligibility[:earliest_due_date] if aca_individual_market_eligibility && aca_individual_market_eligibility[:earliest_due_date] &&
+                                                                           !aca_individual_market_eligibility[:is_eligible]
           memo
         end.compact.min
       end
@@ -160,9 +160,9 @@ module Operations
         subjects.reduce([]) do |memo, subject|
           aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
           aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
-          memo << aptc_csr_credit[:document_status] if (aptc_csr_credit && aptc_csr_credit[:document_status] && !aptc_csr_credit[:is_satisfied])
-          memo << aca_individual_market_eligibility[:document_status] if (aca_individual_market_eligibility && aca_individual_market_eligibility[:document_status] &&
-                                                                          aca_individual_market_eligibility[:is_satisfied])
+          memo << aptc_csr_credit[:document_status] if aptc_csr_credit && aptc_csr_credit[:document_status] && !aptc_csr_credit[:is_eligible]
+          memo << aca_individual_market_eligibility[:document_status] if aca_individual_market_eligibility && aca_individual_market_eligibility[:document_status] &&
+                                                                         !aca_individual_market_eligibility[:is_eligible]
           memo
         end.compact
       end
@@ -172,7 +172,7 @@ module Operations
 
         if document_states.all?('Fully Uploaded')
           'Fully Uploaded'
-        elsif document_states.any?('Partially Uploaded')
+        elsif document_states.any?('Partially Uploaded') || document_states.any?('Fully Uploaded')
           'Partially Uploaded'
         else
           'None'

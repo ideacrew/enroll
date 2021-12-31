@@ -1146,11 +1146,11 @@ module FinancialAssistance
     end
 
     def create_eligibility_income_evidence
-      if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
-        self.create_income_evidence(key: :income, title: "Income")
-        income_evidence.move_to_pending! if incomes.present?
-        income_evidence
-      end
+      return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
+
+      self.create_income_evidence(key: :income, title: "Income")
+      income_evidence.move_to_pending! if incomes.present?
+      income_evidence
     end
 
     def create_evidence(key, title)
