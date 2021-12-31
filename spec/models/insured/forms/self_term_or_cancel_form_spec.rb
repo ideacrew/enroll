@@ -270,7 +270,7 @@ module Insured
       end
 
       it "should terminate an enrollment if it is already effective" do
-        # TODO We need to figure this out, it keeps biting us and at THE worst times too
+        # TODO: We need to figure this out, it keeps biting us and at THE worst times too
         attrs = {enrollment_id: enrollment_to_term.id, term_date: (TimeKeeper.date_of_record + 1.month + 30.days).to_s}
         Insured::Forms::SelfTermOrCancelForm.for_post(attrs)
         enrollment_to_term.reload
