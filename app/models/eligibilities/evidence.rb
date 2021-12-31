@@ -10,6 +10,7 @@ module Eligibilities
     include ::EventSource::Command
     include Dry::Monads[:result, :do, :try]
     include GlobalID::Identification
+    include Eligibilities::Eventable
 
     DUE_DATE_STATES = %w[review outstanding].freeze
 
@@ -57,6 +58,10 @@ module Eligibilities
     validates_presence_of :key, :is_satisfied, :aasm_state
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
+
+    def eligibility_event_name
+      "eligibilities.application.applicant.#{title.gsub(/\s/, '_')}_updated"
+    end
 
     def request_determination
       application = self.evidenceable.application
