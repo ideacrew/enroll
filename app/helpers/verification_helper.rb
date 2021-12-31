@@ -88,7 +88,7 @@ module VerificationHelper
     application&.active_applicants&.each do |applicant|
       FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
         evidence = applicant.send(evidence_type)
-        aasm_states << evidence.aasm_state
+        aasm_states << evidence.aasm_state if evidence.present?
       end
     end
 
