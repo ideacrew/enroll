@@ -21,7 +21,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
   let(:family_member1) { family.primary_family_member }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6), submitted_at: TimeKeeper.date_of_record) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year, submitted_at: TimeKeeper.date_of_record) }
   let!(:applicant1) do
     FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member1.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id, gender: primary_applicant.gender, dob: primary_applicant.dob)
   end
