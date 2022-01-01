@@ -84,7 +84,7 @@ module FinancialAssistance
 
       def detect_applicant_changes(family_members)
         # Update: family members with the applicants
-        update_existing_applicants(family_members)
+        # update_existing_applicants(family_members)
 
         # ADDS: family members that are not applicants
         add_members = family_members.reduce([]) do |ids, family_member|
@@ -122,13 +122,11 @@ module FinancialAssistance
         family_members.each do |member_params|
           applicant_params = member_params.except(:relationship)
           applicant = @new_application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id]).first
-          if applicant.present?
-            applicant.update_attributes!(applicant_params)
-
-            if member_params[:relationship].present? && member_params[:relationship] != 'self'
-              applicant.relationship = member_params[:relationship]
-              applicant.save!
-            end
+          next unless applicant.present?
+          applicant.update_attributes!(applicant_params)
+          if member_params[:relationship].present? && member_params[:relationship] != 'self'
+            applicant.relationship = member_params[:relationship]
+            applicant.save!
           end
         end
       end
