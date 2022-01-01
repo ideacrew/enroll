@@ -84,7 +84,7 @@ module FinancialAssistance
 
       def detect_applicant_changes(family_members)
         # Update: family members with the applicants
-        # update_existing_applicants(family_members)
+        update_existing_applicants(family_members)
 
         # ADDS: family members that are not applicants
         add_members = family_members.reduce([]) do |ids, family_member|
