@@ -45,7 +45,11 @@ module SponsoredBenefits
       let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
       let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key.to_sym) }
       let(:benefit_sponsor_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site.site_key}_employer_profile".to_sym, site: site) }
-      let(:sponsor_benefit_sponsorship) { benefit_sponsor_organization.employer_profile.add_benefit_sponsorship }
+      let(:sponsor_benefit_sponsorship) do
+        sponsorship = benefit_sponsor_organization.employer_profile.add_benefit_sponsorship
+        sponsorship.save
+        sponsorship
+      end
 
       let(:plan_design_organization)  { SponsoredBenefits::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
       let(:plan_design_proposal)      { SponsoredBenefits::Organizations::PlanDesignProposal.new(title: "New Proposal") }
