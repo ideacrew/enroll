@@ -8,7 +8,7 @@ module Insured
     before do
       DatabaseCleaner.clean
       EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
-      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11,1) + 14.days)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_month + 14.days)
     end
 
     after do

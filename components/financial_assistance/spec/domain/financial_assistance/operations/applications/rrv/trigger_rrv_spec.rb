@@ -15,8 +15,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
                       family_id: family.id,
                       aasm_state: 'determined',
                       hbx_id: "830293",
-                      assistance_year: 2022,
-                      effective_date: DateTime.new(2021,1,1,4,5,6),
+                      assistance_year: TimeKeeper.date_of_record.next_year.year,
+                      effective_date: TimeKeeper.date_of_record.beginning_of_year,
                       created_at: Date.new(2021, 10, 1))
   end
 
