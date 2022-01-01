@@ -1,4 +1,5 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 module SponsoredBenefits
   RSpec.describe BenefitApplications::EmployerProfileBuilder, type: :model do
@@ -18,6 +19,7 @@ module SponsoredBenefits
     end
 
     context "add_benefit_sponsors_benefit_application", dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
@@ -33,17 +35,7 @@ module SponsoredBenefits
         )
       }
       let(:issuer_profile)     { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-      let(:benefit_market)      { site.benefit_markets.first }
       let(:current_effective_date)  { TimeKeeper.date_of_record }
-      let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                              benefit_market: benefit_market,
-                                              issuer_profile: issuer_profile,
-                                              title: "SHOP Benefits for #{current_effective_date.year}",
-                                              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                      }
-      let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
-      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key.to_sym) }
       let(:benefit_sponsor_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site.site_key}_employer_profile".to_sym, site: site) }
       let(:sponsor_benefit_sponsorship) do
         sponsorship = benefit_sponsor_organization.employer_profile.add_benefit_sponsorship
