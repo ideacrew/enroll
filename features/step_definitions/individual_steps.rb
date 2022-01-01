@@ -982,9 +982,9 @@ end
 
 Then(/^.+should see a new renewing enrollment title on home page$/) do
   current_day = TimeKeeper.date_of_record
-  if (Date.new(current_day.year, 11, 1)..Date.new(current_day.year + 1, 1, 31)).include?(current_day)
-    year = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_period.start_on.year
-    expect(page).to have_content year
+  effective_year = Family.application_applicable_year
+  if (Date.new(effective_year - 1, 11, 1)..Date.new(effective_year, 1, 31)).include?(current_day)
+    expect(page).to have_content effective_year
     expect(page).not_to have_content "Auto Renewing"
   else
     expect(page).to have_content "Auto Renewing"
