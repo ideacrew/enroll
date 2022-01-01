@@ -900,7 +900,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 }
               ],
               :aptc_effective_date => application.effective_date,
-              :assistance_year => 2021,
+              :assistance_year => TimeKeeper.date_of_record.year,
               :family_reference => {
                 :hbx_id => family.hbx_assigned_id.to_s
               },
