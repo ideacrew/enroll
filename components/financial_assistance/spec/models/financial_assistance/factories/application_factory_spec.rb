@@ -445,10 +445,16 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
       context 'Exisitng Family Member data need to be in sync with applicants' do
         it 'should update existing applicants with updated info' do
+          person_11.person_relationships.last.update_attributes(kind: 'child')
+
           expect(application_11.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).not_to eq person_11.dob
+          expect(application_11.applicants.where(person_hbx_id: person_12.hbx_id).first.relation_with_primary).to eq "spouse"
+          expect(person_11.find_relationship_with(person_12)).to eq "child"
+
           @new_application_factory = described_class.new(application_11)
           new_application = @new_application_factory.create_application
           expect(new_application.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).to eq person_11.dob
+          expect(new_application.applicants.where(person_hbx_id: person_12.hbx_id).first.relation_with_primary).to eq "child"
         end
       end
 
