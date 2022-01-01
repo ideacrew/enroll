@@ -725,7 +725,7 @@ module FinancialAssistance
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount > 0) } &&
+          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
@@ -735,7 +735,7 @@ module FinancialAssistance
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount > 0) } &&
+          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists?
@@ -777,7 +777,7 @@ module FinancialAssistance
       questions_array << is_physically_disabled if is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:question_required)
       questions_array << pregnancy_due_on if is_pregnant && FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required)
       questions_array << children_expected_count if is_pregnant
-      questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
+      questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period && is_applying_coverage
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
@@ -1229,7 +1229,7 @@ module FinancialAssistance
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?
         # Enrolled on medicaid must check if nil
-        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
+        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil? && is_applying_coverage
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
