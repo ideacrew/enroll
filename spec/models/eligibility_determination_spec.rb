@@ -114,7 +114,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
     context "for nil rating area id" do
       before do
-        person.addresses.update_all(county: "Zip code outside supported area")
+        person.addresses.update_all(kind: "Zip code outside supported area")
         ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
         @ed = FactoryBot.create(:eligibility_determination, tax_household: tax_household)
         @ed.send(:apply_aptc_aggregate)
