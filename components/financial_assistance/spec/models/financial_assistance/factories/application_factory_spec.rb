@@ -442,6 +442,16 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           expect(@new_application_factory.family_members_changed).to eq true
         end
       end
+
+      context 'Exisitng Family Member data need to be in sync with applicants' do
+        it 'should update existing applicants with updated info' do
+          expect(application_11.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).not_to eq person_11.dob
+          @new_application_factory = described_class.new(application_11)
+          new_application = @new_application_factory.create_application
+          expect(new_application.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).to eq person_11.dob
+        end
+      end
+
     end
 
     context 'claimed_as_tax_dependent_by' do
