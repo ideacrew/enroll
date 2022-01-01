@@ -72,7 +72,8 @@ Feature: Create Benefit Application by admin UI
     Then employer should see benefit application in termination pending state
     And employer clicks Add Plan Year link
     And employer clicks OK in warning modal
-    And employer filled all the fields on benefit application form
+    And selecting effective date of the new benefit application
+    And adding employees for a new benefit application
     And employer clicked on continue button
     And employer filled all the fields on benefit package form for off-cycle application
     And employer selected by metal level plan offerings
