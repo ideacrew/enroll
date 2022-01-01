@@ -18,7 +18,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     FactoryBot.create(:financial_assistance_application,
                       family_id: family.id,
                       id: application_id,
-                      effective_date: DateTime.new(2021,1,1,4,5,6))
+                      effective_date: TimeKeeper.date_of_record.beginning_of_year)
   end
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,

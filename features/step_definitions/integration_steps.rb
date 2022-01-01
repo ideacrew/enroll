@@ -1152,7 +1152,8 @@ Then(/Employee should see the correct employee contribution on plan tile/) do
 end
 
 Then(/Employee should see their current plan/) do
-  expect(page).to have_content "YOUR CURRENT #{TimeKeeper.date_of_record.year} PLAN"
+  year = Person.first.primary_family.hbx_enrollments.first.effective_on.year
+  expect(page).to have_content "YOUR CURRENT #{year} PLAN"
 end
 
 Then("user will click on New Employee Paper Application link") do

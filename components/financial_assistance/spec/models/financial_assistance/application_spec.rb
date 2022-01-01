@@ -789,11 +789,11 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     let(:income) do
-      FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly")
+      FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(TimeKeeper.date_of_record.year,6,1), end_on: Date.new(TimeKeeper.date_of_record.year, 6, 30), frequency_kind: "biweekly")
     end
 
     let(:deduction) do
-      FactoryBot.build(:financial_assistance_deduction, amount: 100, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly")
+      FactoryBot.build(:financial_assistance_deduction, amount: 100, start_on: Date.new(TimeKeeper.date_of_record.year,6,1), end_on: Date.new(TimeKeeper.date_of_record.year, 6, 30), frequency_kind: "biweekly")
     end
 
     context "application does not have any active applicants" do

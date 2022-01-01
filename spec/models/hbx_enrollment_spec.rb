@@ -834,7 +834,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           end
 
           it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
-            hbx_enrollment1.effective_on = date - 10.days
+            hbx_enrollment1.effective_on = date + 5.months
+            hbx_enrollment2.effective_on = date + 6.months
             hbx_enrollment2.select_coverage!
             hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first
             expect(hbx_enrollment1_from_db.coverage_terminated?).to be_truthy

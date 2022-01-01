@@ -8,7 +8,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
   let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,

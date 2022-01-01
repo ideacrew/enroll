@@ -606,6 +606,16 @@ And(/^employer filled all the fields on benefit application form$/) do
   find(EmployerAddBenefitPackage.select_start_on_dropdown, wait: 20).click
   find('li[data-index="1"]').click
   sleep 2
+  step "adding employees for a new benefit application"
+end
+
+And(/^selecting effective date of the new benefit application$/) do
+  find(EmployerAddBenefitPackage.select_start_on_dropdown, wait: 20).click
+  find('li[data-index="2"]').click
+  sleep 2
+end
+
+And(/^adding employees for a new benefit application$/) do
   fill_in EmployerAddBenefitPackage.full_time_employees, with: 5
   fill_in EmployerAddBenefitPackage.part_time_employees, with: 5
 end

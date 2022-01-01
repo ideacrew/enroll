@@ -70,20 +70,20 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
 
     context 'for applied_aptc_amount' do
       it "should return ehb_premium" do
-        renewel_enrollment = subject.assign(aptc_values)
-        expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
+        renewal_enrollment = subject.assign(aptc_values)
+        expect(renewal_enrollment.applied_aptc_amount.to_f).to eq(renewal_enrollment.ivl_decorated_hbx_enrollment.total_ehb_premium)
       end
 
       it "should return selected aptc" do
         aptc_values[:applied_aptc] = 20.00
-        renewel_enrollment = subject.assign(aptc_values)
-        expect(renewel_enrollment.applied_aptc_amount.to_f).to eq(aptc_values[:applied_aptc])
+        renewal_enrollment = subject.assign(aptc_values)
+        expect(renewal_enrollment.applied_aptc_amount.to_f).to eq(aptc_values[:applied_aptc])
       end
 
       it "should return available_aptc" do
         eligibility_determination1.update_attributes!(max_aptc: 15.00)
-        renewel_enrollment = subject.assign(aptc_values)
-        expect(renewel_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
+        renewal_enrollment = subject.assign(aptc_values)
+        expect(renewal_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
       end
     end
 
@@ -97,15 +97,15 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
 
       before do
         eligibility_determination1.update_attributes!(max_aptc: 30.00)
-        @renewel_enrollment = subject.assign(aptc_values)
+        @renewal_enrollment = subject.assign(aptc_values)
       end
 
       it 'should return applied_aptc_amount' do
-        expect(@renewel_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
+        expect(@renewal_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
       end
 
       it 'should return elected_aptc_pct' do
-        expect(@renewel_enrollment.elected_aptc_pct.to_f).to eq(1.0)
+        expect(@renewal_enrollment.elected_aptc_pct.to_f).to eq(1.0)
       end
     end
 
