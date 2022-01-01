@@ -429,7 +429,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         end
       end
 
-      context 'New Family member dropped with corresponding applicant' do
+      context 'New Family member dropped with corresponding applicants' do
         before do
           family_11.remove_family_member(family_member_12.person)
           family_11.save!
