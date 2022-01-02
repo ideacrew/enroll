@@ -1536,35 +1536,34 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       @benefit = result.success[:applicants].first[:benefits].first
     end
 
-    context "when all applicants are valid" do
-
-      it "should successfully generate a cv3 application without benefits" do
-        expect(@benefit).to be_nil
+    context 'with non-applicants' do
+      it 'should successfully generate a cv3 application with benefits' do
+        expect(@benefit).not_to be_nil
       end
 
-      it "should successfully generate a cv3 application without medicaid_and_chip" do
-        expect(@applicant[:medicaid_and_chip]).to be_nil
+      it 'should successfully generate a cv3 application with medicaid_and_chip information' do
+        expect(@applicant[:medicaid_and_chip]).not_to be_nil
       end
 
-      it "should successfully generate a cv3 application without ethnicity and race" do
+      it 'should successfully generate a cv3 application without ethnicity and race' do
         expect(@applicant[:demographic][:ethnicity]).to eq []
         expect(@applicant[:demographic][:race]).to be_nil
       end
 
-      it "should successfully generate a cv3 application without vlp_document" do
+      it 'should successfully generate a cv3 application without vlp_document' do
         expect(@applicant[:vlp_document]).to be_nil
       end
 
-      it "should successfully generate a cv3 application without native_american_information" do
-        expect(@applicant[:native_american_information]).to be_nil
+      it 'should successfully generate a cv3 application with native_american_information' do
+        expect(@applicant[:native_american_information]).not_to be_nil
       end
 
-      it "should successfully generate a cv3 application without is_self_attested_long_term_care" do
-        expect(@applicant[:is_self_attested_long_term_care]).to be_nil
+      it 'should successfully generate a cv3 application with is_self_attested_long_term_care' do
+        expect(@applicant[:is_self_attested_long_term_care]).not_to be_nil
       end
 
-      it "should successfully generate a cv3 application without citizenship_immigration_status_information" do
-        expect(@applicant[:citizenship_immigration_status_information].present?).to eq false
+      it 'should successfully generate a cv3 application with citizenship_immigration_status_information' do
+        expect(@applicant[:citizenship_immigration_status_information].present?).to eq true
       end
     end
   end
