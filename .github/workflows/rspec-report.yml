@@ -6,30 +6,32 @@ on:
 jobs:
   rspec-report:
     strategy:
+      fail-fast: false
       matrix:
-        folder: [
-            # 'client_config',
-            # 'components',
-            # 'concerns',
-            # 'controllers',
-            # 'data_migrations',
-            # 'domain',
-            # 'helpers',
-            # 'interactors',
-            # 'invoices',
-            # 'lib',
-            # 'mailers',
-            # 'migrations',
-            # 'models',
-            # 'notices',
-            # 'policies',
-            # 'reflexes',
-            # 'requests',
-            # 'reports',
-            # 'routing',
-            # 'script',
-            # 'test_data',
-            # 'views',
+        folder:
+          [
+            'client_config',
+            'components',
+            'concerns',
+            'controllers',
+            'data_migrations',
+            'domain',
+            'helpers',
+            'interactors',
+            'invoices',
+            'lib',
+            'mailers',
+            'migrations',
+            'models',
+            'notices',
+            'policies',
+            'reflexes',
+            'requests',
+            'reports',
+            'routing',
+            'script',
+            'test_data',
+            'views',
             'workers',
           ]
     runs-on: ubuntu-latest
@@ -86,15 +88,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        folder: [
-            # 'benefit_markets',
-            # 'benefit_sponsors',
+        folder:
+          [
+            'benefit_markets',
+            'benefit_sponsors',
             'financial_assistance',
-            # 'notifier',
-            # 'sponsored_benefits',
-            # 'transport_gateway',
-            # 'transport_profiles',
-            'ui_helpers',
+            'notifier',
+            'sponsored_benefits',
+            'transport_gateway',
+            'transport_profiles',
           ]
     runs-on: ubuntu-latest
     steps:
