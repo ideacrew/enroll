@@ -38,7 +38,7 @@ end
 
 all_enrolled_people_set = Set.new(all_people_ids)
 
-renewal_candidates = HbxEnrollment.collection.aggregate([
+pre_term_renewal_candidates = HbxEnrollment.collection.aggregate([
   {"$match" => {
       "hbx_enrollment_members" => {"$ne" => nil},
       "coverage_kind" => "health",
@@ -69,11 +69,49 @@ renewal_candidates = HbxEnrollment.collection.aggregate([
   {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
-renewal_candidate_ids = renewal_candidates.map do |rec|
+pre_term_renewal_candidate_ids = pre_term_renewal_candidates.map do |rec|
   rec["_id"]
 end
 
-renewal_candidate_set = Set.new(renewal_candidate_ids)
+post_term_renewal_candidates = HbxEnrollment.collection.aggregate([
+  {"$match" => {
+      "hbx_enrollment_members" => {"$ne" => nil},
+      "coverage_kind" => "health",
+      "consumer_role_id" => {"$ne" => nil},
+      "product_id" => { "$ne" => nil},
+      "aasm_state" => {"$in" =>  ["coverage_expired"]},
+      "effective_on" => {"$lt" => Date.new(2022,1,1)},
+      "terminated_on" => {"$eq" => Date.new(2021,12,31)}
+  }
+  },
+  {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+  {"$lookup" => {
+    "from" => "families",
+    "localField" => "family_id",
+    "foreignField" => "_id",
+    "as" => "family"
+  }},
+  {"$unwind" => "$family"},
+  {"$unwind" => "$family.family_members"},
+  {"$unwind" => "$hbx_enrollment_members"},
+  {"$project" => {
+      "family_id" => "$family_id",
+      "person_id" => "$family.family_members.person_id",
+      "applicant_id" => "$hbx_enrollment_members.applicant_id",
+      "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+    }
+  },
+  {"$match" => {"person_and_member_match" => true}},
+  {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+])
+
+post_term_renewal_candidate_ids = post_term_renewal_candidates.map do |rec|
+  rec["_id"]
+end
+
+pre_term_renewal_candidate_set = Set.new(pre_term_renewal_candidate_ids)
+post_term_renewal_candidate_set = Set.new(post_term_renewal_candidate_ids)
+renewal_candidate_set = pre_term_renewal_candidate_set | post_term_renewal_candidate_set
 
 new_member_set = all_enrolled_people_set - renewal_candidate_set
 
