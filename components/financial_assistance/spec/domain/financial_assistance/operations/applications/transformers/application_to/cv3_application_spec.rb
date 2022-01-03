@@ -384,22 +384,26 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'nil money amounts' do
       let!(:nil_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, aptc_csr_annual_household_income: nil) }
 
-      let(:result) { subject.call(application) }
-
       before do
         applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination: nil_determination)
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
       end
 
       it 'outputs 0.00 for nil magi_medicaid_monthly_household_income amounts' do
-        expect(result.value!.dig(:tax_households, -1, :tax_household_members, -1, :magi_medicaid_monthly_household_income)).to eql('0.00')
+        expect(@result.value!.dig(:tax_households, -1, :tax_household_members, -1, :product_eligibility_determination, :magi_medicaid_monthly_household_income)).to eql(0.00)
       end
 
       it 'outputs 0.00 for nil magi_medicaid_monthly_income_limit amounts' do
-        expect(result.value!.dig(:tax_households, -1, :tax_household_members, -1, :magi_medicaid_monthly_income_limit)).to eql('0.00')
+        expect(@result.value!.dig(:tax_households, -1, :tax_household_members, -1, :product_eligibility_determination, :magi_medicaid_monthly_income_limit)).to eql(0.00)
       end
 
       it 'outputs 0.00 for nil amounts' do
-        expect(result.value!.dig(:tax_households, 0, :annual_tax_household_income)).to eql('0.00')
+        expect(@result.value!.dig(:tax_households, 0, :annual_tax_household_income)).to eql(0.00)
+      end
+
+      it 'should return a valid entitiy' do
+        expect(@entity_init.success?).to be_truthy
       end
     end
   end
