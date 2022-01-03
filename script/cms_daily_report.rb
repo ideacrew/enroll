@@ -80,8 +80,7 @@ post_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  ["coverage_expired"]},
-      "effective_on" => {"$lt" => Date.new(2022,1,1)},
-      "terminated_on" => {"$eq" => Date.new(2021,12,31)}
+      "effective_on" => {"$lt" => Date.new(2022,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
