@@ -16,6 +16,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
                       hbx_id: '100095')
   end
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:addresses) { FactoryBot.create(:address, person: family.primary_person, state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item) }
   let!(:application10) do
     appli = FactoryBot.create(:financial_assistance_application,
                               :with_attestations,

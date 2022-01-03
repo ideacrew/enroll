@@ -6,6 +6,7 @@ on:
 jobs:
   rspec-report:
     strategy:
+      fail-fast: false
       matrix:
         folder:
           [
@@ -84,11 +85,13 @@ jobs:
           path: ci/rspec/${{ matrix.folder }}-rspec-report.json
   rspec-engines-report:
     strategy:
+      fail-fast: false
       matrix:
         folder:
           [
             'benefit_markets',
             'benefit_sponsors',
+            'financial_assistance',
             'notifier',
             'sponsored_benefits',
             'transport_gateway',

@@ -27,7 +27,7 @@ module FinancialAssistance
         end
 
         def find_draft_application(family_id)
-          application = ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').first
+          application = ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').asc(:created_at).last
           if application
             Success(application)
           else

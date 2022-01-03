@@ -173,6 +173,15 @@ FROM base as deploy
 # Copy prebuilt gems
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $BUNDLE_PATH $BUNDLE_PATH
 
+# Copy freedesktop file
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends shared-mime-info; \
+	mkdir -pv /usr/local/share/mime/packages; \
+	cp -v /usr/share/mime/packages/freedesktop.org.xml /usr/local/share/mime/packages/; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false shared-mime-info; \
+	rm -rf /var/lib/apt/lists/*
+
 # Copy all app code again (sans gems, node_modules, assets)
 COPY --chown=nonroot:nonroot . $HOME
 
