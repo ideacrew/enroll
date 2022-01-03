@@ -174,10 +174,10 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         family.family_members.where(is_active: false).each do |f_member|
           f_member.person.addresses.each { |addr| addr.update_attributes!([])}
         end
-  
+
         @result = subject.call(params)
       end
-  
+
       it 'should return true' do
         expect(@result.success?).to be_truthy
       end
@@ -188,10 +188,10 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.family_members.last.person.addresses = []
         family.family_members.last.person.save!
-  
+
         @result = subject.call(params)
       end
-  
+
       it 'should return false' do
         expect(@result.success?).to be_falsy
       end
