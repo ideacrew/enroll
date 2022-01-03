@@ -736,7 +736,7 @@ module FinancialAssistance
                 result << {hbx_id: (determination.hbx_assigned_id || FinancialAssistance::HbxIdGenerator.generate_member_id).to_s,
                            max_aptc: determination.max_aptc,
                            is_insurance_assistance_eligible: insurance_assistance_eligible_for(determination),
-                           annual_tax_household_income: determination.aptc_csr_annual_household_income,
+                           annual_tax_household_income: BigDecimal((determination.aptc_csr_annual_household_income || 0).to_s),
                            tax_household_members: get_thh_member(determination, application)}
               end
             end
@@ -759,9 +759,9 @@ module FinancialAssistance
                                                                is_magi_medicaid: app.is_magi_medicaid,
                                                                is_non_magi_medicaid_eligible: app.is_non_magi_medicaid_eligible,
                                                                is_without_assistance: app.is_without_assistance,
-                                                               magi_medicaid_monthly_household_income: app.magi_medicaid_monthly_household_income,
+                                                               magi_medicaid_monthly_household_income: BigDecimal((app.magi_medicaid_monthly_household_income || 0).to_s),
                                                                medicaid_household_size: app.medicaid_household_size,
-                                                               magi_medicaid_monthly_income_limit: app.magi_medicaid_monthly_income_limit,
+                                                               magi_medicaid_monthly_income_limit: BigDecimal((app.magi_medicaid_monthly_income_limit || 0).to_s),
                                                                magi_as_percentage_of_fpl: app.magi_as_percentage_of_fpl,
                                                                magi_medicaid_category: app.magi_medicaid_category}}
                 result
