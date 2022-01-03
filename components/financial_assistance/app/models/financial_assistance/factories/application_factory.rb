@@ -38,6 +38,7 @@ module FinancialAssistance
       def update_claimed_as_tax_dependent_by
         claimed_applicants = @new_application.applicants.where(is_claimed_as_tax_dependent: true)
         claimed_applicants.each do |new_appl|
+          new_appl.callback_update = false # avoiding callback to enroll in copy feature
           new_matching_applicant = claiming_applicant(new_appl)
           new_appl.update_attributes(claimed_as_tax_dependent_by: new_matching_applicant.id) if new_matching_applicant
         end
@@ -66,18 +67,28 @@ module FinancialAssistance
 
         members_attributes = result.success
         changed_members = detect_applicant_changes(members_attributes)
-
         drop_inactive_applicants(changed_members[:drop_members]) if changed_members[:drop_members].present?
-        return if changed_members[:add_members].blank?
-
-        add_new_applicants(changed_members[:add_members], members_attributes)
+        add_new_applicants(changed_members[:add_members], members_attributes) if changed_members[:add_members].present?
+        existing_members = members_attributes.reject{|member| changed_members.values.flatten.include?(member[:family_member_id])}
+        update_existing_applicants(existing_members)
       end
 
       private
 
+      def update_existing_applicants(existing_members)
+        existing_members.each do |member|
+          applicant = @new_application.applicants.where(family_member_id: member[:family_member_id]).first
+          next unless applicant.present?
+          applicant.addresses.delete_all
+          applicant.callback_update = false # avoiding callback to main app in copy feature
+          applicant.update_attributes!(member.except(:family_member_id))
+        end
+      end
+
       def drop_inactive_applicants(drop_member_ids)
         inactive_applicants = @new_application.applicants.where(:family_member_id.in => drop_member_ids)
         return unless inactive_applicants.present?
+        inactive_applicants.each{|inactive_applicant| inactive_applicant.callback_update = false} # avoiding callback to enroll in copy feature
         inactive_applicants.destroy_all
         @family_members_changed = true
       end
@@ -105,6 +116,7 @@ module FinancialAssistance
           applicant_params = member_params.except(:relationship)
           applicant = @new_application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id]).first
           if applicant.present?
+            applicant.callback_update = false # avoiding callback to enroll in copy feature
             applicant.update_attributes!(applicant_params)
           else
             applicant = @new_application.applicants.create!(applicant_params)
@@ -112,6 +124,7 @@ module FinancialAssistance
           end
           # Have to update relationship separately because the applicant should already be persisted before doing this.
           if member_params[:relationship].present? && member_params[:relationship] != 'self'
+            applicant.callback_update = false # avoiding callback to enroll in copy feature
             applicant.relationship = member_params[:relationship]
             applicant.save!
           end
@@ -186,6 +199,9 @@ module FinancialAssistance
           next source_relationship unless source_relationship.applicant.is_primary_applicant || source_relationship.relative.is_primary_applicant
           new_applicant = fetch_matching_applicant(@new_application, source_relationship.applicant)
           new_relative = fetch_matching_applicant(@new_application, source_relationship.relative)
+          # avoiding callback to enroll in copy feature
+          new_applicant.callback_update = false
+          new_relative.callback_update = false
           @new_application.add_or_update_relationships(new_applicant, new_relative, source_relationship.kind)
           @new_application.save!
         end
