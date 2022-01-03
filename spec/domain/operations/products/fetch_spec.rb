@@ -166,6 +166,36 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         expect(@result.success.count).to eq 1
       end
     end
+
+    context 'with one member being inactive with no address' do
+
+      before do
+        family.family_members.last.update_attributes(is_active: false)
+        family.family_members.where(is_active: false).each do |f_member|
+          f_member.person.addresses.each { |addr| addr.update_attributes!([])}
+        end
+  
+        @result = subject.call(params)
+      end
+  
+      it 'should return true' do
+        expect(@result.success?).to be_truthy
+      end
+    end
+
+    context 'with one member being active with no address' do
+
+      before do
+        family.family_members.last.person.addresses = []
+        family.family_members.last.person.save!
+  
+        @result = subject.call(params)
+      end
+  
+      it 'should return false' do
+        expect(@result.success?).to be_falsy
+      end
+    end
   end
 
   describe 'for rating area site' do
