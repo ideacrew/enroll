@@ -29,7 +29,6 @@ module FinancialAssistance
         end
         @new_application.save!
 
-        create_primary_relationships
         update_claimed_as_tax_dependent_by
         sync_family_members_with_applicants
         @new_application
@@ -164,20 +163,6 @@ module FinancialAssistance
           new_applicant = fetch_matching_applicant(@new_application, source_relationship.applicant)
           new_relative = fetch_matching_applicant(@new_application, source_relationship.relative)
           @new_application.update_or_build_relationship(new_applicant, new_relative, source_relationship.kind)
-          @new_application.save!
-        end
-      end
-
-      def create_primary_relationships
-        source_application.relationships.each do |source_relationship|
-          next source_relationship if source_relationship.applicant.nil? || source_relationship.relative.nil?
-          next source_relationship unless source_relationship.applicant.is_primary_applicant || source_relationship.relative.is_primary_applicant
-          new_applicant = fetch_matching_applicant(@new_application, source_relationship.applicant)
-          new_relative = fetch_matching_applicant(@new_application, source_relationship.relative)
-          # avoiding callback to enroll in copy feature
-          new_applicant.callback_update = true
-          new_relative.callback_update = true
-          @new_application.add_or_update_relationships(new_applicant, new_relative, source_relationship.kind)
           @new_application.save!
         end
       end
