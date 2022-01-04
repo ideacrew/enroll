@@ -6,6 +6,7 @@
     "codeql",
     "getong",
     "interactors",
+    "Mongoid",
     "nanasess",
     "precompile",
     "rabbitmq",
