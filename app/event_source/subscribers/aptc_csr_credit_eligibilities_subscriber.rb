@@ -20,7 +20,26 @@ module Subscribers
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, response: #{payload}"
       logger.info "AptcCsrCreditEligibilitiesSubscriber payload: #{payload}" unless Rails.env.test?
 
-      # TODO: Add logic update family eligibility determination
+      evidence = GlobalID::Locator.locate(payload[:gid])
+      applicant = evidence._parent
+      application = applicant.application
+
+      result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: application.family, effective_date: Date.new(2022,1,1))
+
+      if result.success?
+        logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with success: #{result.success}"
+        subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with success: #{result.success}"
+      else
+        errors =
+          if result.failure.is_a?(Dry::Validation::Result)
+            result.failure.errors.to_h
+          else
+            result.failure
+          end
+
+        logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
+        subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
+      end
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
