@@ -306,7 +306,18 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
   context "PATCH update" do
     let(:family_member_id2) { BSON::ObjectId.new }
-    let!(:applicant2) { FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: false, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, family_member_id: family_member_id2) }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: TimeKeeper.date_of_record - 40.years,
+                        is_primary_applicant: false,
+                        is_claimed_as_tax_dependent: false,
+                        is_self_attested_blind: false,
+                        has_daily_living_help: false,
+                        need_help_paying_bills: false,
+                        family_member_id: family_member_id2)
+    end
+
     let(:update_params) do
       {
         application_id: application.id,
@@ -318,8 +329,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           last_name: 'updated',
           gender: 'male',
           dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
-          ssn: 123456789,
-          addresses_attributes: {'0': {kind:'home'}},
+          ssn: nil,
+          addresses_attributes: {'0': {kind: 'home'}},
           is_consumer_role: false
         }
       }
