@@ -5,9 +5,31 @@ require 'rails_helper'
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
 
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-  let!(:user) { FactoryBot.create(:user, :person => person) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
+  let!(:user) { FactoryBot.create(:user, :person => person1) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
+  let!(:person2) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
+    person1.ensure_relationship_with(per, 'spouse')
+    person1.save!
+    per
+  end
+  let!(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+  let!(:person3) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years)
+    person1.ensure_relationship_with(per, 'child')
+    person1.save!
+    per
+  end
+  let!(:family_member_3) { FactoryBot.create(:family_member, person: person3, family: family)}
+  let!(:person4) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years)
+    person1.ensure_relationship_with(per, 'child')
+    person1.save!
+    per
+  end
+  let!(:family_member_4) { FactoryBot.create(:family_member, person: person4, family: family)}
+
   let(:family_id) { family.id}
   let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
@@ -31,8 +53,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "copy an application" do
-    let(:family1_id) { BSON::ObjectId.new }
-    let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family1_id, aasm_state: 'determined' }
+    let(:family1_id) { family.id }
+    let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
 
     before(:each) do
       sign_in user
