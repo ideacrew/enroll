@@ -43,8 +43,7 @@ module Operations
                      verification_outstanding: evidence.type_unverified?,
                      created_at: evidence.created_at,
                      updated_at: evidence.updated_at,
-                     #TODO: remove before running in production
-                     due_on: evidence.created_at + 95.days)
+                     due_on: evidence.due_on)
     end
 
     def build_verification_histories(evidence)
