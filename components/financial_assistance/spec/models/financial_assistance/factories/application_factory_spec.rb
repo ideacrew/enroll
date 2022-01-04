@@ -10,7 +10,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
   let!(:person1) { FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_11')}
   let!(:person2) do
-    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.today - 30.years)
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
     person1.ensure_relationship_with(per, 'spouse')
     person1.save!
     per
@@ -572,12 +572,12 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
   describe 'family with just two family members for create_application' do
     let!(:person) do
-      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.today - 40.years)
+      per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 40.years)
       per.addresses.delete_all
       per
     end
     let!(:person2) do
-      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.today - 30.years)
+      per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
       person.ensure_relationship_with(per, 'spouse')
       per.addresses.delete_all
       person.save!
