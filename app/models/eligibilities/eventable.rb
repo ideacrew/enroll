@@ -19,6 +19,7 @@ module Eligibilities
     # instance methods
     module InstanceMethods
       def generate_evidence_updated_event
+        return unless self.valid?
         event =
           event(
             eligibility_event_name,
