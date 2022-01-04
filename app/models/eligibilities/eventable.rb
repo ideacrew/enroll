@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Eligibilities
- # Eventable module
+  # Eventable module
   module Eventable
     include EventSource::Command
 
@@ -20,11 +20,17 @@ module Eligibilities
     module InstanceMethods
       def generate_evidence_updated_event
         return unless self.valid?
+
+        global_id = self.to_global_id.uri
+        global_id = self._parent.to_global_id.uri if self._parent.is_a?(
+          FinancialAssistance::Applicant
+        )
+
         event =
           event(
             eligibility_event_name,
             attributes: {
-              gid: self.to_global_id.uri,
+              gid: global_id,
               payload: self.serializable_hash
             }
           )

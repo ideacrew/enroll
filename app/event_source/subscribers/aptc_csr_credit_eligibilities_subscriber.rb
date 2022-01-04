@@ -20,11 +20,10 @@ module Subscribers
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, response: #{payload}"
       logger.info "AptcCsrCreditEligibilitiesSubscriber payload: #{payload}" unless Rails.env.test?
 
-      evidence = GlobalID::Locator.locate(payload[:gid])
-      applicant = evidence._parent
+      applicant = GlobalID::Locator.locate(payload[:gid])
       application = applicant.application
 
-      result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: application.family, effective_date: Date.new(2022,1,1))
+      result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: application.family, effective_date: TimeKeeper.date_of_record)
 
       if result.success?
         logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with success: #{result.success}"

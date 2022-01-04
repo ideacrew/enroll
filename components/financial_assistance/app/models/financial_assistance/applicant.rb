@@ -10,6 +10,7 @@ module FinancialAssistance
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
     include Eligibilities::Visitors::Visitable
+    include GlobalID::Identification
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
