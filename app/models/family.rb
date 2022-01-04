@@ -243,6 +243,10 @@ class Family
     ).distinct(:family_id))
   }
 
+  scope :outstanding_verifications_expiring_on, lambda {|date|
+    where(:"eligibility_determination.outstanding_verification_earliest_due_date" => date.beginning_of_day)
+  }
+
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
 
