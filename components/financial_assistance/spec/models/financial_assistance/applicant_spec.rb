@@ -641,6 +641,39 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context "#covering_applicant_exists" do
+    before do
+      applicant.update_attributes!({
+                                     first_name: "Dusty",
+                                     last_name: "Roberts",
+                                     is_applying_coverage: true,
+                                     is_required_to_file_taxes: false,
+                                     is_claimed_as_tax_dependent: false,
+                                     has_job_income: false,
+                                     has_self_employment_income: false,
+                                     has_other_income: false,
+                                     has_deductions: false,
+                                     has_enrolled_health_coverage: false,
+                                     has_eligible_health_coverage: false,
+                                     has_unemployment_income: false,
+                                     is_pregnant: false,
+                                     no_ssn: 0,
+                                     ssn: '123456789',
+                                     is_post_partum_period: false
+                                   })
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
+      allow(applicant).to receive(:claimed_as_tax_dependent_by).and_return("1")
+    end
+
+    it "should produce correct error message when tax claimer is not present" do
+      applicant.covering_applicant_exists?
+      expect(applicant.errors.full_messages).to include('Applicant claiming Dusty Roberts as tax dependent not present.')
+    end
+  end
+
   context 'propagate_applicant' do
     before do
       allow(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to receive(:new).and_call_original

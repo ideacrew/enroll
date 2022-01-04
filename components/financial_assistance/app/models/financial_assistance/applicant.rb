@@ -717,7 +717,7 @@ module FinancialAssistance
     def covering_applicant_exists?
       return true if claimed_as_tax_dependent_by.blank?
       tax_claimer_present = application.applicants.where(_id: claimed_as_tax_dependent_by).present?
-      errors.add(:base, "Applicant claiming #{applicant.full_name} as tax dependent not present.") if tax_claimer_present.blank?
+      errors.add(:base, "Applicant claiming #{self.full_name} as tax dependent not present.") if tax_claimer_present.blank?
       tax_claimer_present
     end
 
