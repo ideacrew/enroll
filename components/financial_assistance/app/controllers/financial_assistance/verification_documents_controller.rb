@@ -53,7 +53,7 @@ module FinancialAssistance
 
         if (@evidence.documents - [@document]).empty?
           @evidence.move_to_outstanding!
-          @evidence.update_attributes(:update_reason => "all documents deleted", updated_by: current_user.id)
+          @evidence.update_attributes(:update_reason => "all documents deleted", updated_by: current_user.oim_id)
           # update_documents_status(@docs_owner)
           flash[:danger] = "All documents were deleted. Action needed"
         else
@@ -125,7 +125,7 @@ module FinancialAssistance
       document = @evidence.documents.build
       success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
       @evidence.move_to_review!
-      @evidence.update_attributes(:update_reason => "document uploaded", updated_by: current_user.id)
+      @evidence.update_attributes(:update_reason => "document uploaded", updated_by: current_user.oim_id)
       @doc_errors = document.errors.full_messages unless success
       # update_documents_status(@docs_owner)
       @docs_owner.save!

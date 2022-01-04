@@ -210,9 +210,10 @@ class Family
   }
 
   scope :eligibility_determination_family_member_search, ->(search_string) {
-    any_of({ :"eligibility_determination.subjects.last_name" => search_string },
-           { :"eligibility_determination.subjects.first_name" => search_string },
-           { :"eligibility_determination.subjects.hbx_id" => search_string })
+    any_of({ :"eligibility_determination.subjects.last_name".downcase => search_string.downcase },
+           { :"eligibility_determination.subjects.first_name".downcase => search_string.downcase },
+           { :"eligibility_determination.subjects.hbx_id" => search_string },
+           { :"eligibility_determination.subjects.encrypted_ssn" => SymmetricEncryption.encrypt(search_string) })
   }
 
   scope :eligibility_due_date_in_range, ->(start_date, end_date) {

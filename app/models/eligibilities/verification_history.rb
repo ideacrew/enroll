@@ -5,6 +5,7 @@ module Eligibilities
   class VerificationHistory
     include Mongoid::Document
     include Mongoid::Timestamps
+    include GlobalID::Identification
 
     embedded_in :evidence, class_name: '::Eligibilities::Evidence'
 

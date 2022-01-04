@@ -64,7 +64,7 @@ module FinancialAssistance
     private
 
     def add_verification_history(action, update_reason)
-      history = Eligibilities::VerificationHistory.new(action: action, update_reason: update_reason, updated_by: current_user.id)
+      history = Eligibilities::VerificationHistory.new(action: action, update_reason: update_reason, updated_by: current_user.oim_id)
       @evidence.verification_histories << history
       @evidence.save!
     end

@@ -15,7 +15,7 @@ module FinancialAssistance
     end
 
     def admin_verification_action(admin_action, evidence, update_reason)
-      evidence.update(update_reason: update_reason, updated_by: current_user.id)
+      evidence.update(update_reason: update_reason, updated_by: current_user.oim_id)
       evidence.verification_histories << create_verification_history(admin_action, update_reason)
       case admin_action
       when "verify"
@@ -30,7 +30,7 @@ module FinancialAssistance
     end
 
     def create_verification_history(admin_action, update_reason)
-      Eligibilities::VerificationHistory.new(action: admin_action, update_reason: update_reason, updated_by: current_user.id)
+      Eligibilities::VerificationHistory.new(action: admin_action, update_reason: update_reason, updated_by: current_user.oim_id)
     end
 
     def admin_actions_on_faa_documents(evidence)
