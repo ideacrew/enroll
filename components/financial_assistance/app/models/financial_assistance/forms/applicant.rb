@@ -207,7 +207,7 @@ module FinancialAssistance
       end
 
       def relationship_validation
-        return self.errors.add(:base, "select Relationship Type") if relationship.blank?
+        return self.errors.add(:base, "select Relationship Type") if (applicant.id != application.primary_applicant.id && relationship.blank?)
         primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in => ['spouse', 'life_partner'])
         if applicant
           other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }
