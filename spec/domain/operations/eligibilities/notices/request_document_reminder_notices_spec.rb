@@ -66,7 +66,7 @@ RSpec.describe ::Operations::Eligibilities::Notices::RequestDocumentReminderNoti
 
       let(:reminder_notices) do
         EnrollRegistry[:ivl_eligibility_notices].settings(:document_reminders)
-          .item
+                                                .item
       end
 
       it 'should return success' do

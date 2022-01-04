@@ -32,7 +32,7 @@ module Operations
           errors.empty? ? Success(params) : Failure(errors)
         end
 
-        def get_reminder_notices(values)
+        def get_reminder_notices(_values)
           document_reminder_notices =
             EnrollRegistry[:ivl_eligibility_notices].settings(
               :document_reminders

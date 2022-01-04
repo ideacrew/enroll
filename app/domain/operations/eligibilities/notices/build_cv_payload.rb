@@ -62,10 +62,9 @@ module Operations
         end
 
         def document_due_date(family)
-          if (
-               family.min_verification_due_date.present? &&
-                 (family.min_verification_due_date > todays_date)
-             )
+          if family.min_verification_due_date.present? &&
+             (family.min_verification_due_date > todays_date)
+
             family.min_verification_due_date
           else
             min_notice_due_date(family)
@@ -75,7 +74,7 @@ module Operations
         def min_notice_due_date(family)
           due_dates = []
           family.contingent_enrolled_active_family_members
-            .each do |family_member|
+                .each do |family_member|
             family_member.person.verification_types.each do |v_type|
               due_dates << family.document_due_date(v_type)
             end
@@ -90,9 +89,7 @@ module Operations
           due_dates.compact!
           earliest_future_due_date =
             due_dates.select { |due_date| due_date > todays_date }.min
-          if due_dates.present? && earliest_future_due_date.present?
-            earliest_future_due_date.to_date
-          end
+          earliest_future_due_date.to_date if due_dates.present? && earliest_future_due_date.present?
         end
 
         def valid_enrollment_states

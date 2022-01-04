@@ -31,9 +31,7 @@ module Operations
           errors = []
           errors << 'date of record missing' unless params[:date_of_record]
           errors << 'family missing' unless params[:family]
-          unless params[:document_reminder_key]
-            errors << 'document reminder key missing'
-          end
+          errors << 'document reminder key missing' unless params[:document_reminder_key]
 
           errors.empty? ? Success(params) : Failure(errors)
         end
@@ -45,7 +43,7 @@ module Operations
         def build_event(payload, values)
           event_name =
             EnrollRegistry[values[:document_reminder_key]].settings(:event_name)
-              .item
+                                                          .item
           event_key = "events.individual.notices.#{event_name}"
 
           result = event(event_key, attributes: payload)
