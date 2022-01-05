@@ -304,6 +304,62 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 
+  context "PATCH update" do
+    let(:family_member_id2) { BSON::ObjectId.new }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: TimeKeeper.date_of_record - 40.years,
+                        is_primary_applicant: false,
+                        is_claimed_as_tax_dependent: false,
+                        is_self_attested_blind: false,
+                        has_daily_living_help: false,
+                        need_help_paying_bills: false,
+                        family_member_id: family_member_id2)
+    end
+
+    let(:update_params) do
+      {
+        application_id: application.id,
+        id: applicant.id,
+        applicant: {
+          is_applying_coverage: false,
+          relationship: nil,
+          first_name: 'update',
+          last_name: 'updated',
+          gender: 'male',
+          dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+          ssn: nil,
+          addresses_attributes: {'0': {kind: 'home'}},
+          is_consumer_role: false
+        }
+      }
+    end
+
+    before do
+      applicant.update_attributes!(is_applying_coverage: true)
+      applicant2.update_attributes!(is_applying_coverage: true)
+    end
+
+    context "primary applicant updating information" do
+      it "should update primary's information when relationship param is blank" do
+        patch :update, params: update_params
+        applicant.reload
+        expect(applicant.is_applying_coverage).to eq false
+        expect(applicant.first_name).to eq 'update'
+      end
+    end
+
+    context "dependent applicant updating information" do
+      it "should not update applicant's information when relationship param is blank" do
+        update_params[:id] = applicant2.id
+        patch :update, params: update_params
+        applicant.reload
+        expect(applicant.is_applying_coverage).to eq true
+      end
+    end
+  end
+
   context "POST step" do
     before do
       controller.instance_variable_set(:@modal, application)
