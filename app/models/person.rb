@@ -20,6 +20,7 @@ class Person
   include CrmGateway::PersonConcern
   include L10nHelper
   include Eligibilities::Visitors::Visitable
+  include EventSource::Command
 
   # verification history tracking
   include Mongoid::History::Trackable

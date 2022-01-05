@@ -27,7 +27,7 @@ module Subscribers
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         family = enrollment.family
-        application = family.active_financial_assistance_application(enrollment.effective_date.year)
+        application = family.active_financial_assistance_application(enrollment.effective_on.year)
         application&.enrolled_with(enrollment)
       end
 

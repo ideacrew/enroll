@@ -14,6 +14,7 @@ class HbxEnrollment
   include BenefitSponsors::ModelEvents::HbxEnrollment
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
+  include EventSource::Command
 
   belongs_to :household
   # Override attribute accessor as well
@@ -2634,10 +2635,10 @@ class HbxEnrollment
   def generate_enrollment_saved_event
     return if self.shopping?
     cv_enrollment = Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(self)
-    event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment})
+    event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
     event.success.publish if event.success?
   rescue Exception => e
-    Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
+    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 
   private

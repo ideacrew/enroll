@@ -341,7 +341,7 @@ module FinancialAssistance
     def enrolled_with(enrollment)
       verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
       if income_evidence && income_evidence.due_on.blank?
-        income_evience.due_on = TimeKeeper.date_of_record + verification_document_due.days
+        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
         self.save
       end
     end

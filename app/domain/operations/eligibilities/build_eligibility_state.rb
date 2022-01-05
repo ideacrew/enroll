@@ -100,7 +100,10 @@ module Operations
       end
 
       def fetch_earliest_due_date(evidence_states)
-        evidence_states.values.min_by do |evidence_state|
+        evidence_to_compare = evidence_states.values.reject{|value| value[:due_on].blank?}
+        return nil if evidence_to_compare.empty?
+
+        evidence_to_compare.min_by do |evidence_state|
           evidence_state[:due_on]
         end[
           :due_on
