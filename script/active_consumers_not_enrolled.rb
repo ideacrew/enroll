@@ -4,6 +4,7 @@ field_names  = %w(
                communication_preference
                primary_email_address
                application_aasm_state
+               application_aasm_state_date
                external_id
                user_account
                last_page_visited
@@ -43,6 +44,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
               primary_person&.consumer_role&.contact_method,
               primary_person.work_email_or_best,
               application&.aasm_state,
+              application&.workflow_state_transitions&.first&.transition_at,
               family.external_app_id,
               primary_person.user&.email,
               primary_person.user&.last_portal_visited,
