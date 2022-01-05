@@ -338,14 +338,6 @@ module FinancialAssistance
     after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
 
-    def enrolled_with(enrollment)
-      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-      if income_evidence && income_evidence.due_on.blank?
-        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
-        self.save
-      end
-    end
-
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
@@ -1166,6 +1158,35 @@ module FinancialAssistance
       self.send("create_#{key}_evidence", key: key, title: title) if self.send("#{key}_evidence").blank?
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
+    end
+
+    def enrolled_with(enrollment)
+      if income_evidence && income_evidence.pending?
+        set_income_evidence_outstanding
+      end
+    end
+
+    def set_income_evidence_verified
+      return unless income_evidence.may_move_to_verified?
+
+      income_evidence.verification_outstanding = false
+      income_evidence.due_on = nil
+      income_evidence.move_to_verified
+      income_evidence.is_satisfied = true
+      save!
+    end
+
+    def set_income_evidence_outstanding
+      return unless income_evidence.may_move_to_outstanding?
+
+      if income_evidence.due_on.blank?
+        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
+      end
+
+      income_evidence.verification_outstanding = true
+      income_evidence.move_to_outstanding
+      save!
     end
 
     class << self

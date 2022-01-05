@@ -50,15 +50,11 @@ module FinancialAssistance
             end
 
             def update_applicant_evidence(applicant, status)
-              evidence = applicant.income_evidence
-
               case status
               when "verified"
-                evidence.move_to_verified!
-                evidence.update!(is_satisfied: true)
+                applicant.set_income_evidence_verified
               when "outstanding"
-                evidence.move_to_outstanding!
-                evidence.update!(verification_outstanding: true)
+                applicant.set_income_evidence_outstanding
               end
 
               Success(applicant)

@@ -27,8 +27,8 @@ module Eligibilities
           return
         end
 
-        evidence_record = evidence_record_for(current_record, effective_date)
-        @evidence = evidence_state_for(evidence_record)
+        # evidence_record = evidence_record_for(current_record, effective_date)
+        @evidence = evidence_state_for(current_record)
       end
 
       private
