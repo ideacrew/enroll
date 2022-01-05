@@ -45,7 +45,7 @@ module Operations
                 end
               family_hash[:magi_medicaid_applications] = [app_hash]
             end
-            family_hash[:min_verification_due_date] = family.eligibility_determination.outstanding_verification_earliest_due_date
+            family_hash[:min_verification_due_date] = family.eligibility_determination&.outstanding_verification_earliest_due_date
             updated_hash = modify_enrollments_hash(family_hash, family)
             updated_hash = family_hash
             Success(updated_hash)
@@ -77,6 +77,7 @@ module Operations
         end
 
         def get_enrollments_from_determination(family)
+          return [] unless family.eligibility_determination
           enrollment_eligibility_states = ['health_product_enrollment_status', 'dental_product_enrollment_status']
 
           enrollment_gids = family.eligibility_determination.subjects.collect do |subject|
