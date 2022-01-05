@@ -81,7 +81,7 @@ RSpec.describe ::Eligibilities::Visitors::DentalProductEnrollmentStatusVisitor,
       .success
   end
 
-  let(:effective_date) { Date.today }
+  let(:effective_date) { TimeKeeper.date_of_record }
 
   let(:evidence_item) { eligibility_item.evidence_items.first }
 

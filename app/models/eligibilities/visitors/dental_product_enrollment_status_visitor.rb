@@ -25,10 +25,9 @@ module Eligibilities
       private
 
       def hbx_enrollment_instance_for(subject, effective_date)
-        HbxEnrollment
-          .where(
+        HbxEnrollment.where(
             :family_id => subject.family.id,
-            :effective_on.gte => effective_date.beginning_of_day,
+            :effective_on.gte => effective_date.beginning_of_year,
             :effective_on.lte => effective_date.end_of_year
           )
           .by_dental
