@@ -35,12 +35,13 @@ module Eligibilities
 
       def application_instance_for(subject, effective_date)
         year_begin = effective_date.beginning_of_year
+        year_end = effective_date.end_of_year
 
         ::FinancialAssistance::Application.where(
           :family_id => subject.family.id,
           :aasm_state => 'determined',
           :effective_date.gte => DateTime.new(year_begin.year, year_begin.month, year_begin.day),
-          :effective_date.lte => DateTime.new(effective_date.year, effective_date.month, effective_date.day)
+          :effective_date.lte => DateTime.new(year_end.year, year_end.month, year_end.day)
         ).last
       end
 
