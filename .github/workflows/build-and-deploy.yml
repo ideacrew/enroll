@@ -204,9 +204,9 @@ jobs:
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
-            ENROLL_DB_HOST=172.17.0.1
-            RABBITMQ_URL=amqp://172.17.0.1:5672
-            RABBITMQ_HOST=amqp://172.17.0.1
+            ENROLL_DB_HOST_DEFAULT=172.17.0.1
+            RABBITMQ_URL_DEFAULT=amqp://172.17.0.1:5672
+            RABBITMQ_HOST_DEFAULT=amqp://172.17.0.1
 
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
