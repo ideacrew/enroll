@@ -56,12 +56,14 @@ module FinancialAssistance
 
               if applicant_esi_evidence.present?
                 if response_esi_evidence.aasm_state == 'outstanding'
-                  applicant_esi_evidence.move_to_outstanding!
-                  applicant_esi_evidence.update!(verification_outstanding: true)
+                  applicant.set_evidence_outstanding(applicant_esi_evidence)
                 else
-                  applicant_esi_evidence.update!(is_satisfied: true)
+                  applicant_esi_evidence.update!(is_satisfied: true, due_on: nil)
                 end
-                applicant_esi_evidence.request_results << Eligibilities::RequestResult.new(response_esi_evidence.request_results.first.to_h) if response_esi_evidence.request_results.present?
+
+                response_esi_evidence.request_results&.each do |eligibility_result|
+                  applicant_esi_evidence.request_results << Eligibilities::RequestResult.new(eligibility_result.to_h)
+                end
                 applicant.save!
               end
 

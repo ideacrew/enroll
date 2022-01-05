@@ -40,21 +40,20 @@ module FinancialAssistance
               is_ifsv_eligible = response_app_entity.tax_households.first.is_ifsv_eligible
               status = is_ifsv_eligible ? "verified" : "outstanding"
 
-              application.eligibility_determinations.each do |ed|
-                ed.applicants.each do |applicant|
-                  next unless applicant.income_evidence.present?
-                  update_applicant_evidence(applicant, status)
-                end
+              application.applicants.each do |applicant|
+                next unless applicant.income_evidence.present?
+                update_applicant_evidence(applicant, status)
               end
               Success('Successfully updated Applicant with evidence')
             end
 
             def update_applicant_evidence(applicant, status)
+              income_evidence = applicant.income_evidence
               case status
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                applicant.set_income_evidence_outstanding
+                applicant.set_evidence_outstanding(income_evidence)
               end
 
               Success(applicant)

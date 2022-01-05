@@ -1162,7 +1162,7 @@ module FinancialAssistance
 
     def enrolled_with(enrollment)
       if income_evidence && income_evidence.pending?
-        set_income_evidence_outstanding
+        set_evidence_outstanding(income_evidence)
       end
     end
 
@@ -1176,16 +1176,16 @@ module FinancialAssistance
       save!
     end
 
-    def set_income_evidence_outstanding
-      return unless income_evidence.may_move_to_outstanding?
+    def set_evidence_outstanding(evidence)
+      return unless evidence.may_move_to_outstanding?
 
-      if income_evidence.due_on.blank?
+      if evidence.due_on.blank?
         verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
+        evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
       end
 
-      income_evidence.verification_outstanding = true
-      income_evidence.move_to_outstanding
+      evidence.verification_outstanding = true
+      evidence.move_to_outstanding
       save!
     end
 

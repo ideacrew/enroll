@@ -48,10 +48,21 @@ module FinancialAssistance
 
           def update_applicant_verifications(applicant, response_applicant_entity)
             response_evidence = response_applicant_entity.local_mec_evidence
-            applicant_evidence = applicant.local_mec_evidence
-            applicant_evidence.update_attributes(aasm_state: response_evidence.aasm_state)
-            applicant_evidence.request_results << Eligibilities::RequestResult.new(response_evidence.request_results.first.to_h) if response_evidence.request_results.present?
-            applicant.save!
+            applicant_local_mec_evidence = applicant.local_mec_evidence
+
+            if applicant_local_mec_evidence.present?
+              if response_evidence.aasm_state == 'outstanding'
+                applicant.set_evidence_outstanding(applicant_local_mec_evidence)
+              else
+                applicant_local_mec_evidence.update!(is_satisfied: true, due_on: nil)
+              end
+
+              response_evidence.request_results&.each do |eligibility_result|
+                applicant_local_mec_evidence.request_results << Eligibilities::RequestResult.new(eligibility_result.to_h)
+              end
+              applicant.save!
+            end
+
             Success(applicant)
           end
         end
