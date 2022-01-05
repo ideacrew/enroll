@@ -191,15 +191,6 @@ class Person
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
-  before_save :generate_hbx_id
-  before_save :update_full_name
-  before_save :strip_empty_fields
-
-  before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-
-  #after_save :generate_family_search
-  after_create :create_inbox
-
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
 
   index({hbx_id: 1}, {sparse:true, unique: true})
@@ -331,9 +322,17 @@ class Person
 
   validate :consumer_fields_validations
 
+  before_save :generate_hbx_id
+  before_save :update_full_name
+  before_save :strip_empty_fields
+  before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+  #after_save :generate_family_search
+  after_create :create_inbox
   after_create :notify_created
   after_update :notify_updated
   after_update :person_create_or_update_handler
+  after_save :generate_person_saved_event
+
 
   def self.api_staff_roles
     Person.where(
@@ -451,6 +450,14 @@ class Person
 
   def notify_updated
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+  end
+
+  def generate_person_saved_event
+    cv_person = Operations::Transformers::PersonTo::Cv3Person.new.call(self)
+    event = event('events.person_saved', attributes: {gid: self.to_global_id.uri, payload: cv_person})
+    event.success.publish if event.success?
+  rescue Exception => e
+    Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
   end
 
   def person_create_or_update_handler

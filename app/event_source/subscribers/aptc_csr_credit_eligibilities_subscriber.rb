@@ -18,7 +18,7 @@ module Subscribers
         )
 
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, response: #{payload}"
-      logger.info "AptcCsrCreditEligibilitiesSubscriber payload: #{payload}" unless Rails.env.test?
+      # logger.info "AptcCsrCreditEligibilitiesSubscriber payload: #{payload}" unless Rails.env.test?
 
       applicant = GlobalID::Locator.locate(payload[:gid])
       application = applicant.application
@@ -36,14 +36,14 @@ module Subscribers
             result.failure
           end
 
-        logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
+        # logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
         subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
       end
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "AptcCsrCreditEligibilitiesSubscriber: errored & acked. Backtrace: #{e.backtrace}"
+      # logger.info "AptcCsrCreditEligibilitiesSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end

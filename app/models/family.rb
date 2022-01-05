@@ -290,6 +290,11 @@ class Family
     ).distinct(:family_id)
   ) }
 
+  # It fetches active or renewal application for the family based on the year passed
+  def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)
+    ::FinancialAssistance::Application.where(family_id: self.id).by_year(year).determined.max_by(&:created_at)
+  end
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end

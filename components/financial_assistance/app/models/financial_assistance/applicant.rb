@@ -338,6 +338,13 @@ module FinancialAssistance
     after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
 
+    def enrolled_with(enrollment)
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      if income_evidence && income_evidence.due_on.blank?
+        income_evience.due_on = TimeKeeper.date_of_record + verification_document_due.days
+        self.save
+      end
+    end
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?

@@ -9,10 +9,41 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
   end
 
   describe 'build familuy cv payload' do
-    let(:person) { create(:person, :with_consumer_role) }
-    let(:family) do
-      create(:family, :with_primary_family_member, person: person)
+    let!(:person1) do
+      FactoryBot.create(
+        :person,
+        :with_consumer_role,
+        :with_active_consumer_role,
+        first_name: 'test10',
+        last_name: 'test30',
+        gender: 'male'
+      )
     end
+
+    let!(:person2) do
+      person =
+        FactoryBot.create(
+          :person,
+          :with_consumer_role,
+          :with_active_consumer_role,
+          first_name: 'test',
+          last_name: 'test10',
+          gender: 'male'
+        )
+      person1.ensure_relationship_with(person, 'child')
+      person
+    end
+
+    let!(:family) do
+      FactoryBot.create(:family, :with_primary_family_member, person: person1)
+    end
+
+    let!(:family_member) do
+      FactoryBot.create(:family_member, family: family, person: person2)
+    end
+
+    let(:household) { FactoryBot.create(:household, family: family) }
+
     let(:issuer) do
       create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM')
     end
@@ -23,16 +54,21 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
         issuer_profile: issuer
       )
     end
-    let(:enrollment) do
-      create(
+
+    let!(:hbx_enrollment1) do
+      FactoryBot.create(
         :hbx_enrollment,
         :with_enrollment_members,
-        :individual_unassisted,
+        enrollment_members: family.family_members,
+        kind: 'individual',
+        product: product,
+        household: family.latest_household,
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        enrollment_kind: 'open_enrollment',
         family: family,
-        product_id: product.id,
-        applied_aptc_amount: Money.new(44_500),
-        consumer_role_id: person.consumer_role.id,
-        enrollment_members: family.family_members
+        aasm_state: 'coverage_selected',
+        consumer_role: person1.consumer_role,
+        enrollment_signature: true
       )
     end
 
@@ -48,12 +84,17 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
 
     context 'with valid params' do
       before :each do
-        person.consumer_role.verification_types.each do |vt|
+        person1.consumer_role.verification_types.each do |vt|
           vt.update_attributes(
             validation_status: 'outstanding',
             due_date: TimeKeeper.date_of_record - 1.day
           )
         end
+
+        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
+          family: family,
+          effective_date: TimeKeeper.date_of_record
+        )
       end
 
       let(:params) { { family: family } }

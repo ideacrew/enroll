@@ -28,7 +28,7 @@ module Eligibilities
           .where(
             :family_id => subject.family.id,
             :effective_on.gte => effective_date.beginning_of_year,
-            :effective_on.lte => effective_date
+            :effective_on.lte => effective_date.end_of_year
           )
           .by_health
           .enrolled_and_renewing
@@ -43,7 +43,8 @@ module Eligibilities
           meta: {
             coverage_start_on: enrollment_member.coverage_start_on,
             csr_variant_id: enrollment.product.csr_variant_id,
-            enrollment_status: enrollment.aasm_state
+            enrollment_status: enrollment.aasm_state,
+            enrollment_gid: enrollment.to_global_id.uri.to_s
           },
           is_satisfied: true,
           verification_outstanding: false,

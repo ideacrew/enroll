@@ -11,7 +11,7 @@ module Operations
 
       # @param [Hash] opts Options to build eligibility state
       # @option opts [GlobalID] :subject required
-      # @option opts [AcaEntities::Elgibilities::EligibilityItem] :eligibility_item required
+      # @option opts [AcaEntities::Eligibilities::EligibilityItem] :eligibility_item required
       # @option opts [Array<Symbol>] :evidence_item_keys optional
       # @option opts [Date] :effective_date required
       # @return [Dry::Monad] result

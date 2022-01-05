@@ -441,6 +441,13 @@ module FinancialAssistance
       fetch_relationship_matrix
     end
 
+    def enrolled_with(enrollment)
+      enrollment.hbx_enrollment_members.each do |enrollment_member|
+        applicant = applicants.where(family_member_id: enrollment_member.applicant_id).first
+        applicant&.enrolled_with(enrollment)
+      end
+    end
+
     # fetch existing relationships matrix
     def fetch_relationship_matrix
       applicant_ids = active_applicants.map(&:id)

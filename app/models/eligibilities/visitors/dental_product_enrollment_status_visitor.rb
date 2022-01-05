@@ -28,8 +28,8 @@ module Eligibilities
         HbxEnrollment
           .where(
             :family_id => subject.family.id,
-            :effective_on.gte => effective_date.beginning_of_year,
-            :effective_on.lte => effective_date
+            :effective_on.gte => effective_date.beginning_of_day,
+            :effective_on.lte => effective_date.end_of_year
           )
           .by_dental
           .enrolled_and_renewing
@@ -41,7 +41,8 @@ module Eligibilities
           status: 'determined',
           meta: {
             coverage_start_on: enrollment_member.coverage_start_on,
-            enrollment_status: enrollment_member._parent.aasm_state
+            enrollment_status: enrollment_member._parent.aasm_state,
+            enrollment_gid: enrollment_member._parent.to_global_id.uri.to_s
           },
           is_satisfied: true,
           verification_outstanding: false,

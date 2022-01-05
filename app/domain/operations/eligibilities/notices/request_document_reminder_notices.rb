@@ -10,6 +10,7 @@ module Operations
       class RequestDocumentReminderNotices
         send(:include, Dry::Monads[:result, :do])
         include EventSource::Command
+        include EventSource::Logging
 
         # @param [Hash] opts Options to trigger document reminder notice requests
         # @option opts [Date] :date_of_record required

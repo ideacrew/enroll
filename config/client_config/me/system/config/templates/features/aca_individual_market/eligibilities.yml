@@ -150,7 +150,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 93
+            item: 94
           - key: :units
             item: :days
           - key: :event_name

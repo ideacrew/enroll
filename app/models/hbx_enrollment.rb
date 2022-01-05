@@ -13,6 +13,7 @@ class HbxEnrollment
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
   include Eligibilities::Visitors::Visitable
+  include GlobalID::Identification
 
   belongs_to :household
   # Override attribute accessor as well
@@ -479,6 +480,7 @@ class HbxEnrollment
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber, :set_is_any_enrollment_member_outstanding
   after_save :check_created_at
   after_save :notify_on_save
+  after_save :generate_enrollment_saved_event
 
   # def max_aptc
   #   family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
@@ -2627,6 +2629,15 @@ class HbxEnrollment
 
   def couple_enrollee?
     @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| hem.primary_relationship == 'spouse'}
+  end
+
+  def generate_enrollment_saved_event
+    return if self.shopping?
+    cv_enrollment = Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(self)
+    event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment})
+    event.success.publish if event.success?
+  rescue Exception => e
+    Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
   end
 
   private

@@ -45,9 +45,9 @@ module Operations
                 end
               family_hash[:magi_medicaid_applications] = [app_hash]
             end
-            family_hash[:min_verification_due_date] = document_due_date(family)
+            family_hash[:min_verification_due_date] = family.eligibility_determination.outstanding_verification_earliest_due_date
             updated_hash = modify_enrollments_hash(family_hash, family)
-
+            updated_hash = family_hash
             Success(updated_hash)
           else
             result
@@ -61,74 +61,39 @@ module Operations
             .max_by(&:created_at)
         end
 
-        def document_due_date(family)
-          if family.min_verification_due_date.present? &&
-             (family.min_verification_due_date > todays_date)
-
-            family.min_verification_due_date
-          else
-            min_notice_due_date(family)
-          end
-        end
-
-        def min_notice_due_date(family)
-          due_dates = []
-          family.contingent_enrolled_active_family_members
-                .each do |family_member|
-            family_member.person.verification_types.each do |v_type|
-              due_dates << family.document_due_date(v_type)
-            end
-          end
-          application = fetch_application(family)
-          application&.applicants&.each do |applicant|
-            applicant.unverified_evidences.each do |evidence|
-              due_dates << evidence.due_on.to_date
-            end
-          end
-
-          due_dates.compact!
-          earliest_future_due_date =
-            due_dates.select { |due_date| due_date > todays_date }.min
-          earliest_future_due_date.to_date if due_dates.present? && earliest_future_due_date.present?
-        end
-
-        def valid_enrollment_states
-          %w[coverage_selected auto_renewing unverified]
-        end
-
-        def enrollment_criteria(hbx_enrollment, year)
-          valid_enrollment_states.include?(hbx_enrollment[:aasm_state]) &&
-            hbx_enrollment[:product_reference] &&
-            hbx_enrollment[:product_reference][:active_year] == year
-        end
-
         def modify_enrollments_hash(family_hash, family)
           return family_hash unless family.enrollments.present?
 
           family_hash[:households].each do |household|
-            perspective_enrollments =
-              household[:hbx_enrollments].select do |hbx_enrollment|
-                enrollment_criteria(
-                  hbx_enrollment,
-                  TimeKeeper.date_of_record.next_year.year
-                )
-              end.presence
-            current_enrollments =
-              household[:hbx_enrollments].select do |hbx_enrollment|
-                enrollment_criteria(
-                  hbx_enrollment,
-                  TimeKeeper.date_of_record.year
-                )
-              end.presence
-            household[:hbx_enrollments] =
-              perspective_enrollments || current_enrollments
+            household[:hbx_enrollments] = get_enrollments_from_determination(family).collect do |enrollment|
+              transform_hbx_enrollment(enrollment)
+            end
           end
           family_hash
+        end
+
+        def transform_hbx_enrollment(enrollment)
+          ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment).value!
+        end
+
+        def get_enrollments_from_determination(family)
+          enrollment_eligibility_states = ['health_product_enrollment_status', 'dental_product_enrollment_status']
+
+          enrollment_gids = family.eligibility_determination.subjects.collect do |subject|
+            eligibility_states = subject.eligibility_states.where(:eligibility_item_key.in => enrollment_eligibility_states).to_a
+
+            eligibility_states.reduce([]) do |enrollment_gids, es|
+              enrollment_gids += es.evidence_states.collect{|evidence_state| evidence_state.meta[:enrollment_gid]}
+            end
+          end.flatten.compact
+
+          enrollment_gids.uniq.collect{|enrollment_gid| GlobalID::Locator.locate(enrollment_gid)}
         end
 
         def validate_payload(payload)
           result =
             ::AcaEntities::Contracts::Families::FamilyContract.new.call(payload)
+
           return Failure('Unable to validate payload') unless result.success?
 
           Success(result.to_h)
