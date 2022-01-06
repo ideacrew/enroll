@@ -211,6 +211,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+
   scope :outstanding_verification,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
   }
@@ -219,27 +220,18 @@ class Family
     :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
 
-  scope :outstanding_verifications_including_faa_datatable, lambda {
+  scope :outstanding_verifications_including_faa_datatable, ->{
     where(
       :_id.in => (HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id) +
                      FinancialAssistance::Application.families_with_latest_determined_outstanding_verification.pluck(:family_id))
     )
   }
 
-  scope :eligibility_determination_outstanding_verifications,
-    lambda(
-      skip = 0,
-      limit = 50,
-      order_by = { 'eligibility_determination.outstanding_verification_earliest_due_date': :asc }
-      ) {
-        where('eligibility_determination.outstanding_verification_status': 'outstanding')
-          .limit(limit)
-          .skip(skip)
-          .order_by(order_by)
+  scope :eligibility_determination_outstanding_verifications, -> (skip = 0, limit = 50, order_by = { 'eligibility_determination.outstanding_verification_earliest_due_date': :asc }){
+        where('eligibility_determination.outstanding_verification_status': 'outstanding').limit(limit).skip(skip).order_by(order_by)
       }
 
-  scope :eligibility_determination_family_member_search,
-    lambda(search_string) {
+  scope :eligibility_determination_family_member_search, ->(search_string){
       any_of(
         { :"eligibility_determination.subjects.last_name" => /^#{search_string}$/i },
         { :"eligibility_determination.subjects.hbx_id" => /^#{search_string}$/i },
@@ -247,32 +239,12 @@ class Family
       )
     }
 
-  scope :eligibility_due_date_in_range,
-    lambda(
-      start_date = Timekeeper.date_of_record,
-      end_date =  Timekeeper.date_of_record
-      ) {
-        where('eligibility_determination.outstanding_verification_earliest_due_date': {
-          '$gte' => start_date,
-          '$lte' => end_date
-          }
-        )
-    }
+  scope :eligibility_due_date_in_range, ->(start_date = Timekeeper.date_of_record, end_date = Timekeeper.date_of_record){
+        where('eligibility_determination.outstanding_verification_earliest_due_date': { :'$gte' => start_date, :'$lte' => end_date } )}
 
-  scope :eligibility_determination_fully_uploaded,
-    lambda {
-      where('eligibility_determination.outstanding_verification_document_status': 'Fully Uploaded')
-    }
-
-  scope :eligibility_determination_partially_uploaded,
-    lambda {
-      where('eligibility_determination.outstanding_verification_document_status': 'Partially Uploaded')
-    }
-
-  scope :eligibility_determination_none_uploaded,
-    lambda {
-      where('eligibility_determination.outstanding_verification_document_status'.in => ['None', nil])
-    }
+  scope :eligibility_determination_fully_uploaded, -> { where('eligibility_determination.outstanding_verification_document_status': 'Fully Uploaded') }
+  scope :eligibility_determination_partially_uploaded, -> { where('eligibility_determination.outstanding_verification_document_status': 'Partially Uploaded') }
+  scope :eligibility_determination_none_uploaded, -> { where('eligibility_determination.outstanding_verification_document_status'.in => ['None', nil]) }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
