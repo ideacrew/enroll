@@ -109,7 +109,7 @@ end
 file_name =
   "#{Rails.root}/outstanding_verifications_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
-index = 1
+index = 0
 limit = 100
 families_processed = 0
 skip = 0
@@ -118,8 +118,6 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << field_names
 
   while true
-    break if families_processed > 200
-    
     families =
       Family.eligibility_determination_outstanding_verifications(skip, limit)
     break if families.empty?
