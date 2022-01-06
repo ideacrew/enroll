@@ -36,7 +36,7 @@ class IvlHomepage
   end
 
   def self.medicaid_and_tax_credits_btn
-    '.interaction-click-control-medicaid---tax-credits'
+    '.interaction-click-control-go-to-district-direct'
   end
 
   def self.help_signing_up_btn

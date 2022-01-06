@@ -13,11 +13,21 @@ And(/^the consumer navigates to the (.*?) page$/) do |page|
 end
 
 Then(/^they should see the Medicaid and Tax Credits Link tile$/) do
-  expect(page).to have_content("Medicaid & Tax Credits")
+  expect(page).to have_content(AdminHomepage.medicaid_button_text)
+  expect(page).to have_css(IvlHomepage.medicaid_and_tax_credits_btn)
 end
 
 Then(/^they should not see the Medicaid and Tax Credits Link tile$/) do
-  expect(page).to_not have_content("Medicaid & Tax Credits")
+  expect(page).to_not have_content(AdminHomepage.medicaid_button_text)
+  expect(page).to_not have_css(IvlHomepage.medicaid_and_tax_credits_btn)
+end
+
+Then(/^they should see the Medicaid and Tax Credits text$/) do
+  expect(page).to have_content(AdminHomepage.medicaid_banner_text)
+end
+
+Then(/^they should not see the Medicaid and Tax Credits text$/) do
+  expect(page).to_not have_content(AdminHomepage.medicaid_banner_text)
 end
 
 Given(/consumer visits enroll app home page?/) do

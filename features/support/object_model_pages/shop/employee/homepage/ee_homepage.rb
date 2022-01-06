@@ -48,6 +48,6 @@ class EmployeeHomepage
   end
 
   def self.medicaid_btn
-    '.interaction-click-control-medicaid---tax-credits'
+    '.interaction-click-control-go-to-district-direct'
   end
 end

@@ -106,4 +106,12 @@ class AdminHomepage
   def self.log_out_link
     '.interaction-click-control-logout'
   end
+
+  def self.medicaid_banner_text
+    'Want to apply for Medicaid? Go to District Direct to apply, recertify benefits, and view notices'
+  end
+
+  def self.medicaid_button_text
+    'Go to District Direct'
+  end
 end
