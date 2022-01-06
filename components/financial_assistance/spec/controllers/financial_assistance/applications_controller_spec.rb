@@ -534,7 +534,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it "should update application's determination_http_status_code to 999" do
-        expect(application.determination_http_status_code).to eq(999)
+        expect(application.reload.determination_http_status_code).to eq(999)
       end
 
       it 'should render template eligibility_response_error' do
