@@ -522,6 +522,41 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
   end
+
+  describe 'GET eligibility_response_error' do
+    context 'where application did not receive eligibility determination' do
+      before do
+        get :eligibility_response_error, params: { id: application.id }
+      end
+
+      it 'should assign application to instance variable' do
+        expect(assigns(:application)).to eq application
+      end
+
+      it "should update application's determination_http_status_code to 999" do
+        expect(application.determination_http_status_code).to eq(999)
+      end
+
+      it 'should render template eligibility_response_error' do
+        expect(response).to render_template("eligibility_response_error")
+      end
+    end
+
+    context 'where application received eligibility determination' do
+      before do
+        application.update_attributes!(determination_http_status_code: 200, aasm_state: 'determined')
+        get :eligibility_response_error, params: { id: application.id }
+      end
+
+      it 'should assign application to instance variable' do
+        expect(assigns(:application)).to eq application
+      end
+
+      it 'should redirect to eligibility_results if application status is 200/203 and application is in determined state' do
+        expect(response).to redirect_to(eligibility_results_application_path(application.id, cur: 1))
+      end
+    end
+  end
 end
 
 def setup_faa_data

@@ -198,13 +198,14 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
+      redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
     end
 
     def check_eligibility_results_received
       application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
-      render :plain => (application.success_status_codes?(application.determination_http_status_code) && application.determined?).to_s
+      render :plain => eligibility_results_received?(application).to_s
     end
 
     def checklist_pdf
@@ -230,6 +231,10 @@ module FinancialAssistance
     end
 
     private
+
+    def eligibility_results_received?(application)
+      application.success_status_codes?(application.determination_http_status_code) && application.determined?
+    end
 
     def validation_errors_parser(result)
       result.errors.each_with_object([]) do |error, collect|
