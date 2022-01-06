@@ -95,6 +95,9 @@ ENV SECRET_KEY_BASE=$SECRET_KEY_BASE_DEFAULT
 ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL_DEFAULT
 ENV CLIENT=$CLIENT_DEFAULT
 
+ENV RAILS_ENV=production
+ENV NODE_ENV=production
+
 ################################################################################
 ### Builder. Adds node and Yarn. Not necessary in production. ###
 ###############################################################################
@@ -133,18 +136,6 @@ RUN apt-get update -qq \
 ########################################################
 FROM builder as prod_gems_and_assets
 
-# Need all gemfiles and lockfiles
-COPY --chown=nonroot:nonroot ./Gemfile $HOME/Gemfile
-COPY --chown=nonroot:nonroot ./Gemfile.lock $HOME/Gemfile.lock
-COPY --chown=nonroot:nonroot ./components $HOME/components
-COPY --chown=nonroot:nonroot ./project_gems $HOME/project_gems
-
-COPY --chown=nonroot:nonroot package.json $HOME/
-COPY --chown=nonroot:nonroot yarn.lock $HOME/
-
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
-
 RUN apt-get update -qq \
   && apt-get install -yq --no-install-recommends \
   shared-mime-info \
@@ -152,11 +143,61 @@ RUN apt-get update -qq \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && truncate -s 0 /var/log/*log
 
-RUN bundle config set --local without 'development test' \
-  && bundle install
-
+# Need all gemfiles and lockfiles
+COPY --chown=nonroot:nonroot package.json $HOME/
+COPY --chown=nonroot:nonroot yarn.lock $HOME/
 RUN yarn install \
   && (rm -rf /tmp/* || true)
+
+COPY --chown=nonroot:nonroot ./project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec $HOME/project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec
+COPY --chown=nonroot:nonroot ./project_gems/mongoid_userstamp-0.4.0/mongoid_userstamp.gemspec $HOME/project_gems/mongoid_userstamp-0.4.0/mongoid_userstamp.gemspec
+COPY --chown=nonroot:nonroot ./project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb $HOME/project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb
+
+COPY --chown=nonroot:nonroot ./components/ui_helpers/Gemfile $HOME/components/ui_helpers/Gemfile
+COPY --chown=nonroot:nonroot ./components/ui_helpers/Gemfile.lock $HOME/components/ui_helpers/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/ui_helpers/lib/ui_helpers/version.rb $HOME/components/ui_helpers/lib/ui_helpers/version.rb
+COPY --chown=nonroot:nonroot ./components/ui_helpers/ui_helpers.gemspec $HOME/components/ui_helpers/ui_helpers.gemspec
+
+COPY --chown=nonroot:nonroot ./components/transport_profiles/Gemfile $HOME/components/transport_profiles/Gemfile
+COPY --chown=nonroot:nonroot ./components/transport_profiles/Gemfile.lock $HOME/components/transport_profiles/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/transport_profiles/lib/transport_profiles/version.rb $HOME/components/transport_profiles/lib/transport_profiles/version.rb
+COPY --chown=nonroot:nonroot ./components/transport_profiles/transport_profiles.gemspec $HOME/components/transport_profiles/transport_profiles.gemspec
+
+COPY --chown=nonroot:nonroot ./components/transport_gateway/Gemfile $HOME/components/transport_gateway/Gemfile
+COPY --chown=nonroot:nonroot ./components/transport_gateway/Gemfile.lock $HOME/components/transport_gateway/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/transport_gateway/lib/transport_gateway/version.rb $HOME/components/transport_gateway/lib/transport_gateway/version.rb
+COPY --chown=nonroot:nonroot ./components/transport_gateway/transport_gateway.gemspec $HOME/components/transport_gateway/transport_gateway.gemspec
+
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/Gemfile $HOME/components/sponsored_benefits/Gemfile
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/Gemfile.lock $HOME/components/sponsored_benefits/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/lib/sponsored_benefits/version.rb $HOME/components/sponsored_benefits/lib/sponsored_benefits/version.rb
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/sponsored_benefits.gemspec $HOME/components/sponsored_benefits/sponsored_benefits.gemspec
+
+COPY --chown=nonroot:nonroot ./components/notifier/Gemfile $HOME/components/notifier/Gemfile
+COPY --chown=nonroot:nonroot ./components/notifier/Gemfile.lock $HOME/components/notifier/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/notifier/lib/notifier/version.rb $HOME/components/notifier/lib/notifier/version.rb
+COPY --chown=nonroot:nonroot ./components/notifier/notifier.gemspec $HOME/components/notifier/notifier.gemspec
+
+COPY --chown=nonroot:nonroot ./components/benefit_markets/Gemfile $HOME/components/benefit_markets/Gemfile
+COPY --chown=nonroot:nonroot ./components/benefit_markets/Gemfile.lock $HOME/components/benefit_markets/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/benefit_markets/lib/benefit_markets/version.rb $HOME/components/benefit_markets/lib/benefit_markets/version.rb
+COPY --chown=nonroot:nonroot ./components/benefit_markets/benefit_markets.gemspec $HOME/components/benefit_markets/benefit_markets.gemspec
+
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/Gemfile $HOME/components/benefit_sponsors/Gemfile
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/Gemfile.lock $HOME/components/benefit_sponsors/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/lib/benefit_sponsors/version.rb $HOME/components/benefit_sponsors/lib/benefit_sponsors/version.rb
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/benefit_sponsors.gemspec $HOME/components/benefit_sponsors/benefit_sponsors.gemspec
+
+COPY --chown=nonroot:nonroot ./components/financial_assistance/Gemfile $HOME/components/financial_assistance/Gemfile
+COPY --chown=nonroot:nonroot ./components/financial_assistance/Gemfile.lock $HOME/components/financial_assistance/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/financial_assistance/lib/financial_assistance/version.rb $HOME/components/financial_assistance/lib/financial_assistance/version.rb
+COPY --chown=nonroot:nonroot ./components/financial_assistance/financial_assistance.gemspec $HOME/components/financial_assistance/financial_assistance.gemspec
+
+COPY --chown=nonroot:nonroot ./Gemfile $HOME/Gemfile
+COPY --chown=nonroot:nonroot ./Gemfile.lock $HOME/Gemfile.lock
+
+RUN bundle config set --local without 'development test' \
+  && bundle install
 
 COPY --chown=nonroot:nonroot . $HOME
 
@@ -223,5 +264,3 @@ COPY --chown=nonroot:nonroot ./.docker/config/sidekiq.rb $HOME/config/initialize
 
 USER nonroot
 
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
