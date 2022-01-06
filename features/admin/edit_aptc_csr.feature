@@ -17,5 +17,6 @@ Feature: Update APTC and CSR
         Then Hbx Admin should see cat plan error message
 
     Scenario: Admin should see individual level csr percent as integer
-        And Hbx Admin clicks the Edit APTC CSR link
-        Then Hbx Admin should see individual level csr percent
+      Given Tax household member info exists for user
+      And Hbx Admin clicks the Edit APTC CSR link
+      Then Hbx Admin should see individual level csr percent
