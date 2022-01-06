@@ -65,7 +65,7 @@ module Operations
       end
 
       def build_family_member_hash(enrollment)
-        members = enrollment.family&.family_members.map { |family_member| family_member if family_member.is_active } || []
+        members = enrollment.family&.family_members&.map { |family_member| family_member if family_member.person.is_active } || []
         members = members.compact
         family_members_hash = members.collect do |fm|
           person = fm.person
