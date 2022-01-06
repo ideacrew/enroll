@@ -104,11 +104,32 @@ class Family
 
   index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
 
-  index({"eligibility_determination.outstanding_verification_status" => 1,
-         "eligibility_determination.outstanding_verification_earliest_due_date" => 1,
-         "eligibility_determination.effective_date" => 1})
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.outstanding_verification_earliest_due_date': 1},
+        { name: "outstanding_verification_earliest_due_date_index" }
+       )
 
-  index({"eligibility_determination.subjects.last_name" => 1, "eligibility_determination.subjects.first_name" => 1, "eligibility_determination.subjects.hbx_id" => 1 })
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.outstanding_verification_document_status': 1},
+        { name: "outstanding_verification_document_status_index" }
+       )
+
+  index({ 'eligibility_determination.effective_date': 1 })
+
+  index({ 'eligibility_determination.outstanding_verification_status': 1,
+          'eligibility_determination.subjects.last_name': 1},
+          { name: 'outstanding_verification_subjects_last_name' }
+       )
+
+  index({ 'eligibility_determination.outstanding_verification_status': 1,
+          'eligibility_determination.subjects.hbx_id': 1 },
+          { name: 'outstanding_verification_subjects_hbx_id' }
+       )
+
+  index({ 'eligibility_determination.outstanding_verification_status': 1,
+          'eligibility_determination.subjects.encrypted_ssn': 1 },
+          { name: 'outstanding_verification_subjects_encrypted_ssn' }
+       )
 
   # index("households.tax_households_id")
 
@@ -205,32 +226,53 @@ class Family
     )
   }
 
-  scope :eligibility_determination_outstanding_verifications, ->(skip=0, limit=50, order_by={:'eligibility_determination.effective_date' => :asc}) {
-   where(:"eligibility_determination.outstanding_verification_status" => 'outstanding').limit(limit).skip(skip).order_by(order_by)
-  }
+  scope :eligibility_determination_outstanding_verifications,
+    lambda(
+      skip = 0,
+      limit = 50,
+      order_by = { 'eligibility_determination.outstanding_verification_earliest_due_date': :asc }
+      ) {
+        where('eligibility_determination.outstanding_verification_status': 'outstanding')
+          .limit(limit)
+          .skip(skip)
+          .order_by(order_by)
+      }
 
-  scope :eligibility_determination_family_member_search, ->(search_string) {
-    any_of({ :"eligibility_determination.subjects.last_name".downcase => search_string.downcase },
-           { :"eligibility_determination.subjects.first_name".downcase => search_string.downcase },
-           { :"eligibility_determination.subjects.hbx_id" => search_string },
-           { :"eligibility_determination.subjects.encrypted_ssn" => SymmetricEncryption.encrypt(search_string) })
-  }
+  scope :eligibility_determination_family_member_search,
+    lambda(search_string) {
+      any_of(
+        { :"eligibility_determination.subjects.last_name" => /^#{search_string}$/i },
+        { :"eligibility_determination.subjects.hbx_id" => /^#{search_string}$/i },
+        { :"eligibility_determination.subjects.encrypted_ssn" => SymmetricEncryption.encrypt(search_string) }
+      )
+    }
 
-  scope :eligibility_due_date_in_range, ->(start_date, end_date) {
-    where(:"eligibility_determination.outstanding_verification_earliest_due_date" => {:"$gte" => start_date, :"$lte" => end_date})
-  }
+  scope :eligibility_due_date_in_range,
+    lambda(
+      start_date = Timekeeper.date_of_record,
+      end_date =  Timekeeper.date_of_record
+      ) {
+        where('eligibility_determination.outstanding_verification_earliest_due_date': {
+          '$gte' => start_date,
+          '$lte' => end_date
+          }
+        )
+    }
 
-  scope :eligibility_determination_fully_uploaded, ->{
-    where(:"eligibility_determination.outstanding_verification_document_status" => "Fully Uploaded")
-  }
+  scope :eligibility_determination_fully_uploaded,
+    lambda {
+      where('eligibility_determination.outstanding_verification_document_status': 'Fully Uploaded')
+    }
 
-  scope :eligibility_determination_partially_uploaded, ->{
-    where(:"eligibility_determination.outstanding_verification_document_status" => "Partially Uploaded")
-  }
+  scope :eligibility_determination_partially_uploaded,
+    lambda {
+      where('eligibility_determination.outstanding_verification_document_status': 'Partially Uploaded')
+    }
 
-  scope :eligibility_determination_none_uploaded, ->{
-    where(:"eligibility_determination.outstanding_verification_document_status".in => ["None",nil])
-  }
+  scope :eligibility_determination_none_uploaded,
+    lambda {
+      where('eligibility_determination.outstanding_verification_document_status'.in => ['None', nil])
+    }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
