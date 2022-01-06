@@ -6,7 +6,6 @@ on:
     branches:
       - 'trunk'
       - 'release_*'
-      - 'add-libcurl'
     tags:
       - 'v*'
   pull_request:
