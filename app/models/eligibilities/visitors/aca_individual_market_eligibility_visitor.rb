@@ -12,7 +12,7 @@ module Eligibilities
       end
 
       def visit(verification_type)
-        return unless verification_type.type_name == evidence_item.key.camelcase
+        return unless verification_type.type_name.downcase == evidence_item.titleize.downcase
 
         evidence_state_attributes = {
           status: status_for(verification_type),
