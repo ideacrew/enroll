@@ -26,7 +26,7 @@ class AddNewSepToFamily < MongoidMigrationTask
         puts "Person Not Found with hbx_id #{hbx_id}"
         next
       end
-      qle = QualifyingLifeEventKind.where(:market_kind => 'individual', reason: qle_reason).first
+      qle = QualifyingLifeEventKind.where(:market_kind => 'individual', reason: qle_reason).active.last
       raise "Qle with reason #{qle_reason} not found" unless qle.present?
 
       sep = family.special_enrollment_periods.new(effective_on_kind: qle.effective_on_kinds.first,
