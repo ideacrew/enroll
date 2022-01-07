@@ -21,6 +21,7 @@ class Person
   include L10nHelper
   include Eligibilities::Visitors::Visitable
   include EventSource::Command
+  include GlobalID::Identification
 
   # verification history tracking
   include Mongoid::History::Trackable
