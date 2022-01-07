@@ -102,7 +102,7 @@
       <% if @applicant.present? && @applicant.is_applying_coverage %>
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
-            <span class="fa-text-color">Was this person enrolled in Medicaid during the pregnancy? *</span>
+            <span class="fa-text-color">Was this person enrolled in Medicaid during the pregnancy? <%= '*' if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid) %></span>
           </div>
           <div class='col-md-2'>
             <%= f.radio_button("is_enrolled_on_medicaid", true, class: "radio-yml", id: "medicaid_pregnancy_yes") %>
