@@ -227,8 +227,8 @@ class Family
     )
   }
 
-  scope :eligibility_determination_outstanding_verifications, -> (skip = 0, limit = 50, order_by = { 'eligibility_determination.outstanding_verification_earliest_due_date': :asc }){
-        where('eligibility_determination.outstanding_verification_status': 'outstanding').limit(limit).skip(skip).order_by(order_by)
+  scope :eligibility_determination_outstanding_verifications, -> (skip = 0, limit = 50, order_by = { :'eligibility_determination.outstanding_verification_earliest_due_date' => :asc }){
+        where(:'eligibility_determination.outstanding_verification_status' => 'outstanding').limit(limit).skip(skip).order_by(order_by)
       }
 
   scope :eligibility_determination_family_member_search, ->(search_string){
@@ -240,11 +240,11 @@ class Family
     }
 
   scope :eligibility_due_date_in_range, ->(start_date = Timekeeper.date_of_record, end_date = Timekeeper.date_of_record){
-        where('eligibility_determination.outstanding_verification_earliest_due_date': { :'$gte' => start_date, :'$lte' => end_date } )}
+        where(:'eligibility_determination.outstanding_verification_earliest_due_date' => { :'$gte' => start_date, :'$lte' => end_date } )}
 
-  scope :eligibility_determination_fully_uploaded, -> { where('eligibility_determination.outstanding_verification_document_status': 'Fully Uploaded') }
-  scope :eligibility_determination_partially_uploaded, -> { where('eligibility_determination.outstanding_verification_document_status': 'Partially Uploaded') }
-  scope :eligibility_determination_none_uploaded, -> { where('eligibility_determination.outstanding_verification_document_status'.in => ['None', nil]) }
+  scope :eligibility_determination_fully_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status' => 'Fully Uploaded') }
+  scope :eligibility_determination_partially_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status' => 'Partially Uploaded') }
+  scope :eligibility_determination_none_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status'.in => ['None', nil]) }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
