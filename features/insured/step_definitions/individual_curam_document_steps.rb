@@ -4,7 +4,7 @@ When(/^the user navigates to the DOCUMENTS tab$/) do
 end
 
 Then(/^a button will be visible to the user labeled MEDICAID & TAX CREDITS$/) do
-  expect(page).to have_content(AdminHomepage.medicaid_button_text)
+  expect(page).to have_content(l10n("insured.families.medicaid_and_tax_credits"))
 end
 
 When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
