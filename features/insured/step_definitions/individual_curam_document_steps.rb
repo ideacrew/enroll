@@ -12,11 +12,7 @@ When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
 end
 
 Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content(l10n("insured.families.apply_for_medicaid_widget"))
-end
-
-Then(/^there will be messages text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content(l10n("insured.families.apply_for_medicaid_widget"))
+  expect(page).to have_css(AdminHomepage.medicaid_banner_text)
 end
 
 When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
