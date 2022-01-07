@@ -1,0 +1,34 @@
+# Used to run services locally for a production Dockerfile build
+# docker-compose -f docker-compose.build.yml up -d db
+# docker-compose -f docker-compose.build.yml up -d amqp
+# ensure amqp has a virtual host called event_source
+# run docker build
+
+version: '3.4'
+services:
+  db:
+    image: mongo:4.2
+    volumes:
+      - mongodb:/data/db
+      - mongodb_config:/data/db_config
+    ports:
+      - 27017:27017
+  amqp:
+    image: rabbitmq:3.8-management
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE:-123456789}
+      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - 4369
+      - 5672:5672
+      - 25672:25672
+      - 15672:15672
+volumes:
+  mongodb:
+  mongodb_config:
+  bundle:
+  node_modules:
+  rabbitmq_etc:
+  rabbitmq_data:
+  rabbitmq_logs:
