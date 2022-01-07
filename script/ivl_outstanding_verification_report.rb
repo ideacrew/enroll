@@ -107,39 +107,28 @@ def subject_details(determination, subject, primary, index)
 end
 
 file_name =
-  "#{Rails.root}/outstanding_verifications_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+  "#{Rails.root}/ivl_outstanding_verification_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
 index = 0
-limit = 100
-families_processed = 0
-skip = 0
 
 CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << field_names
 
-  while true
-    families =
-      Family.eligibility_determination_outstanding_verifications(skip, limit)
-    break if families.empty?
-
-    families.no_timeout.each do |family|
-      families_processed += 1
-      index += 1
-
-      eligibility_determination = family.eligibility_determination
-
-      primary =
-        eligibility_determination.subjects.detect do |subject|
-          subject.is_primary
-        end
-
-      eligibility_determination.subjects.each do |subject|
-        data = subject_details(eligibility_determination, subject, primary, index)
-        csv << data if data.present?
-        @eligibility_states = nil
-      end
+  Family.where(:'eligibility_determination.outstanding_verification_status' => 'outstanding').no_timeout.each do |family|
+    index += 1
+    if index % 100 == 0
+      puts "processed #{index} families"
     end
 
-    skip = families_processed
+    eligibility_determination = family.eligibility_determination
+    primary = eligibility_determination.subjects.detect{|subject| subject.is_primary }
+
+    eligibility_determination.subjects.each do |subject|
+      data = subject_details(eligibility_determination, subject, primary, index)
+      csv << data if data.present?
+      @eligibility_states = nil
+    end
   end
 end
+
+puts "process completed with #{index} families"
