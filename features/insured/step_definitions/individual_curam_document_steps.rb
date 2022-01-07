@@ -3,20 +3,12 @@ When(/^the user navigates to the DOCUMENTS tab$/) do
   visit verification_insured_families_path
 end
 
-Then(/^a button will be visible to the user labeled MEDICAID & TAX CREDITS$/) do
-  expect(page).to have_content(l10n("insured.families.medicaid_and_tax_credits"))
-end
-
 When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
   find(IvlDocumentsPage.medicare_and_tax_credit_btn).visible?
 end
 
 Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
   expect(page).to have_css(AdminHomepage.medicaid_banner_text)
-end
-
-When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
-  switch_to_window { find('.btn', text: l10n("insured.families.medicaid_and_tax_credits")).click }
 end
 
 Then(/^EA sets a flag in IAM to direct the consumer to the curam\/ drupal login$/) do
