@@ -79,7 +79,7 @@ def subject_details(determination, subject, primary, index)
   @eligibility_states = subject.eligibility_states
   return [] unless health_product_enrollment_status_eligibility || dental_product_enrollment_status_eligibility
 
-  if aptc_csr_credit_eligibility&.is_eligible
+  if aptc_csr_credit_eligibility
     aptc_csr_status = aptc_csr_credit_eligibility.is_eligible ? true : false
   end
 

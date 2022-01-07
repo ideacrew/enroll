@@ -22,15 +22,14 @@ module Eligibilities
 
         outstanding_statuses = %w[unverified outstanding pending review]
 
-        evidence_state_attributes[:due_on] = verification_type.due_date
         if outstanding_statuses.include?(verification_type.validation_status)
           evidence_state_attributes[:is_satisfied] = false
           evidence_state_attributes[:verification_outstanding] = true
-          evidence_state_attributes[:due_on] ||=
-            default_due_date(verification_type.created_at)
+          evidence_state_attributes[:due_on] = verification_type.due_date
         elsif verification_type.type_verified?
           evidence_state_attributes[:is_satisfied] = true
           evidence_state_attributes[:verification_outstanding] = false
+          evidence_state_attributes[:due_on] = nil
         end
 
         @evidence =
@@ -46,12 +45,6 @@ module Eligibilities
         return 'review' if verification_type.validation_status == 'review'
 
         verification_type.type_verified? ? 'determined' : 'outstanding'
-      end
-
-      def default_due_date(created_at = nil)
-        due_in_days = EnrollRegistry[:verification_document_due_in_days].item
-
-        (created_at || DateTime.now).to_date + due_in_days.days
       end
     end
   end
