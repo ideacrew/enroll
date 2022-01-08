@@ -2634,6 +2634,8 @@ class HbxEnrollment
 
   def generate_enrollment_saved_event
     return if self.shopping?
+    return if self.is_shop?
+
     cv_enrollment = Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(self)
     event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
     event.success.publish if event.success?
