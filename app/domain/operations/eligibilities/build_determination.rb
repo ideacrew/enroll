@@ -100,6 +100,7 @@ module Operations
         )
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def outstanding_verification_status_for_subject(subject)
         enrolled = false
         subject[:eligibility_states].each do |eligibility_key, eligibility_state|
@@ -117,6 +118,7 @@ module Operations
 
         'pending'
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def outstanding_verification_status_for_determination(determination)
         subjects = determination[:subjects].values

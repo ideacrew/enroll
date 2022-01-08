@@ -12,6 +12,7 @@ module Effective
         end
       end
 
+      # rubocop:disable Metrics/AbcSize
       def load_verification_type_columns
         table_column :name, :label => 'Name', :proc => proc { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
@@ -27,6 +28,7 @@ module Effective
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
+      # rubocop:enable Metrics/AbcSize
 
       def load_eligibility_determination_columns
         table_column :name, :label => 'Name', :proc => proc { |row| link_to eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id)}, :filter => false, :sortable => true

@@ -1175,6 +1175,7 @@ module FinancialAssistance
       save!
     end
 
+    # rubocop:disable Metrics/Naming/AccessorMethodName
     def set_evidence_outstanding(evidence)
       return unless evidence.may_move_to_outstanding?
 
@@ -1187,6 +1188,7 @@ module FinancialAssistance
       evidence.move_to_outstanding
       save!
     end
+    # rubocop:enable Metrics/Naming/AccessorMethodName
 
     class << self
       def find(id)

@@ -106,30 +106,25 @@ class Family
 
   index({'eligibility_determination.outstanding_verification_status': 1,
          'eligibility_determination.outstanding_verification_earliest_due_date': 1},
-        { name: "outstanding_verification_earliest_due_date_index" }
-       )
+        { name: "outstanding_verification_earliest_due_date_index" })
 
   index({'eligibility_determination.outstanding_verification_status': 1,
          'eligibility_determination.outstanding_verification_document_status': 1},
-        { name: "outstanding_verification_document_status_index" }
-       )
+        { name: "outstanding_verification_document_status_index" })
 
   index({ 'eligibility_determination.effective_date': 1 })
 
-  index({ 'eligibility_determination.outstanding_verification_status': 1,
-          'eligibility_determination.subjects.last_name': 1},
-          { name: 'outstanding_verification_subjects_last_name' }
-       )
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.subjects.last_name': 1},
+        { name: 'outstanding_verification_subjects_last_name' })
 
-  index({ 'eligibility_determination.outstanding_verification_status': 1,
-          'eligibility_determination.subjects.hbx_id': 1 },
-          { name: 'outstanding_verification_subjects_hbx_id' }
-       )
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.subjects.hbx_id': 1 },
+        { name: 'outstanding_verification_subjects_hbx_id' })
 
-  index({ 'eligibility_determination.outstanding_verification_status': 1,
-          'eligibility_determination.subjects.encrypted_ssn': 1 },
-          { name: 'outstanding_verification_subjects_encrypted_ssn' }
-       )
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.subjects.encrypted_ssn': 1 },
+        { name: 'outstanding_verification_subjects_encrypted_ssn' })
 
   # index("households.tax_households_id")
 
@@ -219,7 +214,7 @@ class Family
   scope :outstanding_verification_datatable,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
-
+  # rubocop:disable Style/Lambda, Layout/SpaceInLambdaLiteral, Layout/BlockAlignment
   scope :outstanding_verifications_including_faa_datatable, ->{
     where(
       :_id.in => (HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id) +
@@ -240,8 +235,9 @@ class Family
     }
 
   scope :eligibility_due_date_in_range, ->(start_date = Timekeeper.date_of_record, end_date = Timekeeper.date_of_record){
-        where(:'eligibility_determination.outstanding_verification_earliest_due_date' => { :'$gte' => start_date, :'$lte' => end_date } )}
-
+        where(:'eligibility_determination.outstanding_verification_earliest_due_date' => {:'$gte' => start_date, :'$lte' => end_date})
+      }
+  # rubocop:enable Style/Lambda, Layout/SpaceInLambdaLiteral, Layout/BlockAlignment
   scope :eligibility_determination_fully_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status' => 'Fully Uploaded') }
   scope :eligibility_determination_partially_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status' => 'Partially Uploaded') }
   scope :eligibility_determination_none_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status'.in => ['None', nil]) }

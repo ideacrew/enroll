@@ -47,7 +47,7 @@ module Operations
             end
             family_hash[:min_verification_due_date] = family.eligibility_determination&.outstanding_verification_earliest_due_date
             updated_hash = modify_enrollments_hash(family_hash, family)
-            updated_hash = family_hash
+            # updated_hash = family_hash
             Success(updated_hash)
           else
             result
@@ -84,7 +84,7 @@ module Operations
             eligibility_states = subject.eligibility_states.where(:eligibility_item_key.in => enrollment_eligibility_states).to_a
 
             eligibility_states.reduce([]) do |e_gids, es|
-              e_gids += es.evidence_states.collect{|evidence_state| evidence_state.meta[:enrollment_gid]}
+              e_gids + es.evidence_states.collect{|evidence_state| evidence_state.meta[:enrollment_gid]}
             end
           end.flatten.compact
 
