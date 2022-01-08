@@ -50,9 +50,8 @@ module Operations
         family = values[:family]
         attributes = determination_entity.sanitize_attributes
         model_attributes = transform(attributes)
-        family.eligibility_determination.delete if family.eligibility_determination
-        determination = family.build_eligibility_determination(model_attributes)
-        determination.save
+        determination = ::Eligibilities::Determination.new(model_attributes)
+        family.eligibility_determination = determination
         family.save
 
         Success(determination)
