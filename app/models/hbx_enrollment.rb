@@ -481,7 +481,10 @@ class HbxEnrollment
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber, :set_is_any_enrollment_member_outstanding
   after_save :check_created_at
   after_save :notify_on_save
-  after_save :generate_enrollment_saved_event
+
+  # disabled following callback due to too many events. instead moved this method call to record_transition
+  # FIX ME
+  # after_save :generate_enrollment_saved_event
 
   # def max_aptc
   #   family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
@@ -515,6 +518,8 @@ class HbxEnrollment
   end
 
   def record_transition
+    generate_enrollment_saved_event
+
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
@@ -2635,11 +2640,10 @@ class HbxEnrollment
   def generate_enrollment_saved_event
     return if self.shopping?
     return if self.is_shop?
-
     cv_enrollment = Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(self)
     event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
     event.success.publish if event.success?
-  rescue Exception => e
+  rescue StandardError => e
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 

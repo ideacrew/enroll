@@ -91,10 +91,10 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
           )
         end
 
-        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
-          family: family,
-          effective_date: TimeKeeper.date_of_record
-        )
+        # ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
+        #   family: family,
+        #   effective_date: TimeKeeper.date_of_record
+        # )
       end
 
       let(:params) { { family: family } }
