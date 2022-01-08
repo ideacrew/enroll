@@ -57,7 +57,7 @@ module FinancialAssistance
     CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
     DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
