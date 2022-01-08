@@ -23,8 +23,8 @@ module Queries
       family = klass
       family = family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
-        from_date = Date::strptime(@custom_attributes[:custom_datatable_date_from], "%m/%d/%Y")
-        to_date = Date::strptime(@custom_attributes[:custom_datatable_date_to], "%m/%d/%Y")
+        from_date = Date.strptime(@custom_attributes[:custom_datatable_date_from], "%m/%d/%Y")
+        to_date = Date.strptime(@custom_attributes[:custom_datatable_date_to], "%m/%d/%Y")
         family = family.eligibility_due_date_in_range(from_date, to_date)
       end
       #add other scopes here

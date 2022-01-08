@@ -99,7 +99,7 @@ module Operations
           end
 
           result
-        rescue Exception => e
+        rescue StandardError => e
           Rails
             .logger.info "Error #{e.backtrace} generating #{document_reminder_key} notice for family #{family.hbx_assigned_id}"
         end

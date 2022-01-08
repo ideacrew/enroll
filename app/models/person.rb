@@ -458,7 +458,7 @@ class Person
     cv_person = Operations::Transformers::PersonTo::Cv3Person.new.call(self)
     event = event('events.person_saved', attributes: {gid: self.to_global_id.uri, payload: cv_person})
     event.success.publish if event.success?
-  rescue Exception => e
+  rescue StandardError => e
     Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
   end
 

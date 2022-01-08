@@ -134,7 +134,7 @@ class TimeKeeper
   def send_date_advanced_event
     event = event('events.enterprise.date_advanced', attributes: {date_of_record: TimeKeeper.date_of_record})
     event.success.publish if event.success?
-  rescue Exception => e
+  rescue StandardError => e
     Rails.logger.error { "Couldn't trigger enterprise date advanced event due to #{e.backtrace}" }
   end
 
