@@ -20,9 +20,7 @@ module Subscribers
       subscriber_logger.info "EnterpriseSubscriber, response: #{payload}"
       logger.info "EnterpriseSubscriber payload: #{payload}" unless Rails.env.test?
 
-      if individual_market_is_enabled?
-        Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: payload[:date_of_record])
-      end
+      Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: payload[:date_of_record]) if individual_market_is_enabled?
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e

@@ -83,8 +83,8 @@ module Operations
           enrollment_gids = family.eligibility_determination.subjects.collect do |subject|
             eligibility_states = subject.eligibility_states.where(:eligibility_item_key.in => enrollment_eligibility_states).to_a
 
-            eligibility_states.reduce([]) do |enrollment_gids, es|
-              enrollment_gids += es.evidence_states.collect{|evidence_state| evidence_state.meta[:enrollment_gid]}
+            eligibility_states.reduce([]) do |e_gids, es|
+              e_gids += es.evidence_states.collect{|evidence_state| evidence_state.meta[:enrollment_gid]}
             end
           end.flatten.compact
 

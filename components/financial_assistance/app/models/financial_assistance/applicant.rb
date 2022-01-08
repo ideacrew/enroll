@@ -57,7 +57,7 @@ module FinancialAssistance
     CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
     DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
@@ -975,9 +975,10 @@ module FinancialAssistance
     end
 
     def admin_verification_action(action, v_type, update_reason)
-      if action == "verify"
+      case action
+      when "verify"
         update_verification_type(v_type, update_reason)
-      elsif action == "return_for_deficiency"
+      when "return_for_deficiency"
         return_doc_for_deficiency(v_type, update_reason)
       end
     end
@@ -1160,10 +1161,8 @@ module FinancialAssistance
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
 
-    def enrolled_with(enrollment)
-      if income_evidence && income_evidence.pending?
-        set_evidence_outstanding(income_evidence)
-      end
+    def enrolled_with(_enrollment)
+      set_evidence_outstanding(income_evidence) if income_evidence&.pending?
     end
 
     def set_income_evidence_verified
@@ -1254,7 +1253,7 @@ module FinancialAssistance
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
-        instance_check_method = instance_type + "_exists?"
+        instance_check_method = "#{instance_type}_exists?"
 
         # Add error to attribute that has a nil value.
         errors.add(attribute, "#{attribute.to_s.titleize} can not be a nil") if send(attribute).nil?

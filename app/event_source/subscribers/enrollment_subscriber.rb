@@ -26,9 +26,9 @@ module Subscribers
       return if enrollment.shopping?
 
       # if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
-        family = enrollment.family
-        application = family.active_financial_assistance_application(enrollment.effective_on.year)
-        application&.enrolled_with(enrollment)
+      family = enrollment.family
+      application = family.active_financial_assistance_application(enrollment.effective_on.year)
+      application&.enrolled_with(enrollment)
       # end
 
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(

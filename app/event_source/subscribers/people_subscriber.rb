@@ -23,7 +23,7 @@ module Subscribers
     def redetermine_family_eligibility(payload)
       person = GlobalID::Locator.locate(payload[:gid])
 
-      person.families.each do |family|
+      person.families.each do |_family|
         ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
           family: person.primary_family,
           effective_date: TimeKeeper.date_of_record
@@ -43,6 +43,6 @@ module Subscribers
       Logger.new(
         "#{Rails.root}/log/#{event}_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
       )
-    end    
+    end
   end
 end
