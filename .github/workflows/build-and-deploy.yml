@@ -54,6 +54,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: ideacrew/cme_k8s
+          token: ${{ secrets.GH_PAT }}
 
       # - name: Set up git config
       #   run: |
