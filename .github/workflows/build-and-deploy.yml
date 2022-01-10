@@ -59,9 +59,9 @@ jobs:
       #     git config --global user.email "markgoho@gmail.com"
       #     git config --global user.name "Mark Goho"
 
-      - name: Update image name
-        uses: imranismail/setup-kustomize@v1
-        run: |
+      - uses: imranismail/setup-kustomize@v1
+
+      - run: |
           cd environments/pvt-3/enroll/web
           kustomize edit set image ${{ needs.prep.outputs.tag }}
           cat kustomization.yaml
