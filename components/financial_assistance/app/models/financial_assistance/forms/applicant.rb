@@ -92,7 +92,8 @@ module FinancialAssistance
 
       def save
         return false unless valid?
-        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params)
+        is_living_in_state = validate_in_state_addresses
+        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
@@ -114,6 +115,12 @@ module FinancialAssistance
           end
           [false, applicant_entity.failure]
         end
+      end
+
+      def validate_in_state_addresses
+        symbolize_addresses_attributes = addresses_attributes&.deep_symbolize_keys
+        home_address = symbolize_addresses_attributes&.select{|_k, address| address[:kind] == 'home' && address[:state] == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}
+        home_address.present?
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity
