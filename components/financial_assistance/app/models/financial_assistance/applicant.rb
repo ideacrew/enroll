@@ -1142,8 +1142,8 @@ module FinancialAssistance
 
     def create_evidences
       create_evidence(:local_mec, "Local MEC") if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-      create_evidence(:esi, "ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
-      create_evidence(:non_esi, "Non ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+      create_evidence(:esi_mec, "ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      create_evidence(:non_esi_mec, "Non ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
     end
 
     def create_eligibility_income_evidence
@@ -1156,7 +1156,8 @@ module FinancialAssistance
 
     def create_evidence(key, title)
       return unless is_ia_eligible? || is_applying_coverage
-      self.send("create_#{key}_evidence", key: key, title: title) if self.send("#{key}_evidence").blank?
+      association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
+      self.send("create_#{association_name}_evidence", key: key, title: title) if self.send("#{association_name}_evidence").blank?
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
