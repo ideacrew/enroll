@@ -19,7 +19,7 @@ module Eligibilities
 
       def visit(applicant)
         return unless applicant.family_member_id == subject.id
-        # return unless applicant.is_applying_coverage
+        return if evidence_item[:key].to_s == "income_evidence" && applicant.incomes.blank?
 
         current_record = applicant.send(evidence_item[:key])
         unless current_record
