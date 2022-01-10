@@ -22,8 +22,8 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
   let(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
   # Financial Assistance Stuff
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "draft") }
-  let!(:submitted_application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "submitted") }
-  let!(:submitted_applicant) {FactoryBot.create(:financial_assistance_applicant, application: submitted_application, family_member_id: family.family_members.first.id)}
+  let(:submitted_application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "submitted") }
+  let(:submitted_applicant) {FactoryBot.create(:financial_assistance_applicant, application: submitted_application, family_member_id: family.family_members.first.id)}
   let!(:eligibility_determination1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family.family_members.first.id) }
   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family.family_members.last.id) }
@@ -108,32 +108,29 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
       expect(applicant2.addresses.first.county.blank?).to eq(true)
       county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
       expect(county_people.present?).to eq(true)
+      Rake::Task["migrations:fix_maine_nil_counties"].reenable
       Rake::Task["migrations:fix_maine_nil_counties"].invoke
     end
 
     it "update the applicants with nil county values" do
       [applicant1, applicant2].each do |applicant|
-        applicant.reload
-        expect(applicant.addresses.to_a.select { |address| address.county.blank? }).to eq([])
+        expect(applicant.reload.addresses.to_a.select { |address| address.county.blank? }).to eq([])
       end
       county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
       expect(county_people.present?).to eq(false)
     end
 
     it "update the applicants with zip code outside supported area" do
-      person.reload
       blank_county = Person.where("addresses.county" => "Zip code outside supported area")
       expect(blank_county.count).to eq(0)
     end
 
     it "corrects county with word 'county' in county name" do
-      person2.reload
       extra_county_name = Person.where("addresses.county" => "Monterey County")
       expect(extra_county_name.count).to eq(0)
     end
 
     it "updates the applicants with nil county values in submitted applications" do
-      submitted_applicant.reload
       submitted_county_people = Person.where("addresses.county" => /.*benefitmarkets.*/i)
       expect(submitted_county_people.present?).to eq(false)
     end
