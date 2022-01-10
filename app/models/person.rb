@@ -399,7 +399,7 @@ class Person
   end
 
   def accept(visitor)
-    verification_types.each do |verification_type|
+    verification_types.active.each do |verification_type|
       verification_type.accept(visitor)
     end
   end
