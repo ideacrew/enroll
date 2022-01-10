@@ -81,13 +81,10 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       let!(:family_member_2) { FactoryBot.create(:family_member, person: person_2, family: family)}
       let(:family_members_hash) { Operations::Notices::IvlEnrNoticeTrigger.new.build_family_member_hash(enrollment.reload) }
 
-      before do
-        family.family_members.last.person.is_active = false
-        family.family_members.last.person.addresses = []
-        family.family_members.last.person.save!
-      end
-
       it 'shouldnt include deleted family members' do
+        enrollment.family.family_members.last.is_active = false
+        enrollment.family.family_members.last.person.addresses = []
+        enrollment.family.family_members.last.save!
         expect(family_members_hash.success.count).to eq 1
       end
     end
