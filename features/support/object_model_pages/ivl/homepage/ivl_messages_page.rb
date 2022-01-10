@@ -26,8 +26,4 @@ class IvlDocumentsPage
   def self.successfully_deleted_msg
     'Successfully deleted inbox message.'
   end
-
-  def self.medicaid_and_tax_credits
-    '.interaction-click-control-go-to-district-direct'
-  end
 end
