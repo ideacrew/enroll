@@ -103,9 +103,10 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
   let(:subject_ref) { family_member.to_global_id }
 
   let(:eligibility_item) do
-    Operations::EligibilityItems::Find.new.call(
-      eligibility_item_key: :aptc_csr_credit
-    ).success
+    Operations::EligibilityItems::Find
+      .new
+      .call(eligibility_item_key: :aptc_csr_credit)
+      .success
   end
 
   let(:effective_date) { Date.today }
@@ -145,7 +146,179 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
       eligibility_state = result.success
       expect(eligibility_state.key?(:determined_at)).to be_truthy
       expect(eligibility_state.key?(:evidence_states)).to be_truthy
-      expect(eligibility_state[:evidence_states].keys).to eq eligibility_item.evidence_items.map(&:key).map(&:to_sym)
+      expect(eligibility_state[:evidence_states].keys).to eq eligibility_item
+        .evidence_items
+        .map(&:key)
+        .map(&:to_sym)
+    end
+  end
+
+  context '.fetch_document_status' do
+
+    context 'fully uploaded' do
+      let(:fully_uploaded_evidence_states) do
+        [
+          {
+            income_evidence: {
+              status: 'verified'
+            },
+            esi_evidence: {
+              status: 'attested'
+            },
+            non_esi_evidence: {
+              status: 'attested'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
+          },
+          {
+            income_evidence: {
+              status: 'review'
+            },
+            esi_evidence: {
+              status: 'review'
+            },
+            non_esi_evidence: {
+              status: 'attested'
+            },
+            local_mec_evidence: {
+              status: 'attested'
+            }
+          }
+        ]
+      end
+
+      context 'when all evidence states are in verified or review' do
+        it 'should return fully uploaded' do
+          fully_uploaded_evidence_states.each do |evidence_states|
+            result = subject.send(:fetch_document_status, evidence_states)
+
+            expect(result).to eq 'Fully Uploaded'
+          end
+        end
+      end
+    end
+
+    context 'partially uploaded' do
+      let(:partially_uploaded_evidence_states) do
+        [
+          {
+            income_evidence: {
+              status: 'outstanding'
+            },
+            esi_evidence: {
+              status: 'review'
+            },
+            non_esi_evidence: {
+              status: 'attested'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
+          },
+          {
+            income_evidence: {
+              status: 'outstanding'
+            },
+            esi_evidence: {
+              status: 'review'
+            },
+            non_esi_evidence: {
+              status: 'pending'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
+          }
+        ]
+      end
+
+      context 'when at least one evidence in outstanding and no evidences in review' do
+        it 'should return partially uploaded' do
+          partially_uploaded_evidence_states.each do |evidence_states|
+            result = subject.send(:fetch_document_status, evidence_states)
+
+            expect(result).to eq 'Partially Uploaded'
+          end
+        end
+      end
+    end
+
+    context 'none uploaded' do
+      let(:partially_uploaded_evidence_states) do
+        [
+          {
+            income_evidence: {
+              status: 'outstanding'
+            },
+            esi_evidence: {
+              status: 'attested'
+            },
+            non_esi_evidence: {
+              status: 'attested'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
+          },
+          {
+            income_evidence: {
+              status: 'outstanding'
+            },
+            esi_evidence: {
+              status: 'attested'
+            },
+            non_esi_evidence: {
+              status: 'pending'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
+          }
+        ]
+      end
+
+      context 'when at least one evidence in outstanding and no evidences in review status' do
+        it 'should return none uploaded' do
+          partially_uploaded_evidence_states.each do |evidence_states|
+            result = subject.send(:fetch_document_status, evidence_states)
+
+            expect(result).to eq 'None'
+          end
+        end
+      end
+    end
+
+    context 'Not applicable' do
+      let(:partially_uploaded_evidence_states) do
+        [
+          {
+            income_evidence: {
+              status: 'pending'
+            },
+            esi_evidence: {
+              status: 'attested'
+            },
+            non_esi_evidence: {
+              status: 'attested'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
+          }
+        ]
+      end
+
+      context 'when at least one evidence in pending and no evidences in outstanding/review' do
+        it 'should return NA' do
+          partially_uploaded_evidence_states.each do |evidence_states|
+            result = subject.send(:fetch_document_status, evidence_states)
+
+            expect(result).to eq 'NA'
+          end
+        end
+      end
     end
   end
 end

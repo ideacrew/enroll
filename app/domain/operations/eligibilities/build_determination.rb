@@ -166,14 +166,10 @@ module Operations
 
       def outstanding_verification_document_status_for_determination(determination)
         document_states = eligibility_documents_uploaded_status(determination)
-
-        if document_states.all?('Fully Uploaded')
-          'Fully Uploaded'
-        elsif document_states.any?('Partially Uploaded') || document_states.any?('Fully Uploaded')
-          'Partially Uploaded'
-        else
-          'None'
-        end
+        active_document_states = document_states.reject{|status| status == 'NA'}
+        return 'NA' if active_document_states.empty?
+        return active_document_states.first if active_document_states.uniq.count == 1
+        'Partially Uploaded'
       end
 
       def build_eligibility_states(subject, eligibility_items, values)

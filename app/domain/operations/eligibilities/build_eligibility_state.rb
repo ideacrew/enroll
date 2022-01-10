@@ -78,25 +78,14 @@ module Operations
       end
 
       def fetch_document_status(evidence_states)
-        all_satisfied = evidence_states.values.all? do |evidence_state|
-          evidence_state[:is_satisfied]
-        end
+        evidence_statuses = evidence_states.values.collect { |evidence_state| evidence_state[:status] }
+        non_verified_states = evidence_statuses.reject {|status| ['verified', 'attested', 'determined'].include?(status)}
 
-        if all_satisfied
-          'Fully Uploaded'
-        else
-          evidence_statuses = evidence_states.values.collect { |evidence_state| evidence_state[:status] }
+        return 'Fully Uploaded' if non_verified_states.all?{|status| status == 'review'}
+        return 'Partially Uploaded' if non_verified_states.include?('review')
+        return 'None' if evidence_statuses.include?('outstanding')
 
-          if evidence_statuses.include?('outstanding')
-            if evidence_statuses.include?('review')
-              'Partially Uploaded'
-            else
-              'None'
-            end
-          else
-            'Fully Uploaded'
-          end
-        end
+        'NA'
       end
 
       def fetch_earliest_due_date(evidence_states)

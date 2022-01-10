@@ -153,4 +153,34 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       expect(result.success?).to be_truthy
     end
   end
+
+  context '.outstanding_verification_document_status_for_determination' do
+
+    context 'eligibility states' do
+      let(:eligibility_states) do
+        [
+          [['Fully Uploaded', 'Fully Uploaded'], 'Fully Uploaded'],
+          [['Fully Uploaded', 'Partially Uploaded'], 'Partially Uploaded'],
+          [['Partially Uploaded', 'Partially Uploaded'], 'Partially Uploaded'],
+          [['None', 'Fully Uploaded'], 'Partially Uploaded'],
+          [['None', 'Partially Uploaded'], 'Partially Uploaded'],
+          [['None', 'None'], 'None'],
+          [['NA', 'Fully Uploaded'], 'Fully Uploaded'],
+          [['NA', 'Partially Uploaded'], 'Partially Uploaded'],
+          [['NA', 'None'], 'None'],
+          [['NA', 'NA'], 'NA']
+        ]
+      end
+
+      it 'should return document status' do
+        eligibility_states.each do |evidence_state|
+
+          allow(subject).to receive(:eligibility_documents_uploaded_status).and_return(evidence_state[0])
+          result = subject.send(:outstanding_verification_document_status_for_determination, double)
+
+          expect(result).to eq evidence_state[1]
+        end
+      end
+    end
+  end
 end
