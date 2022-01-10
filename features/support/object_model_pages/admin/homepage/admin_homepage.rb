@@ -110,8 +110,4 @@ class AdminHomepage
   def self.medicaid_banner_text
     '[data-cuke="medicaid-banner-text"]'
   end
-
-  def self.medicaid_button_text
-    '[data-cuke="medicaid-button-text"]'
-  end
 end
