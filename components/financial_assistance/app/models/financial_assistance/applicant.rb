@@ -1232,7 +1232,7 @@ module FinancialAssistance
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?
         # Enrolled on medicaid must check if nil
-        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil? && is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
+        errors.add(:is_enrolled_on_medicaid, "'#{l10n('faa.other_ques.is_enrolled_on_medicaid')}' #{l10n('faa.errors.should_be_answered')}") if is_enrolled_on_medicaid.nil? && is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
