@@ -49,6 +49,7 @@ module FinancialAssistance
     def destroy
       @document.delete if @evidence.type_unverified?
       if @document.destroyed?
+        add_verification_history(@document)
         @docs_owner.save!
 
         if (@evidence.documents - [@document]).empty?
@@ -149,9 +150,17 @@ module FinancialAssistance
     end
 
     def add_verification_history(file)
-      actor = current_user ? current_user.email : "external source or script"
-      action = "Upload #{file_name(file)}" if params[:action] == "upload"
-      @evidence.add_verification_history(action: action, modifier: actor)
+      actor = current_user ? current_user.oim_id : "external source or script"
+      action = case params[:action]
+               when "upload"
+                 "Upload #{file_name(file)}"
+               when "destroy"
+                 "Delete #{file.title}"
+               end
+
+      verification_history = Eligibilities::VerificationHistory.new(action: action, updated_by: actor)
+      @evidence.verification_histories << verification_history
+      @evidence.save!
     end
   end
 end

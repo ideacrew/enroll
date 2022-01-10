@@ -28,6 +28,7 @@ module FinancialAssistance
     def fdsh_hub_request
       result = @evidence.request_determination
       if result
+        @evidence.move_to_pending!
         add_verification_history(params[:admin_action], "Requested Hub for verification")
         key = :success
         message = "request submited successfully"

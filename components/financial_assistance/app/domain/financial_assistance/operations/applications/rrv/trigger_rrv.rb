@@ -27,37 +27,17 @@ module FinancialAssistance
 
           def fetch_application(family)
             ::FinancialAssistance::Application.where(family_id: family.id,
-                                                     assistance_year: TimeKeeper.date_of_record.next_year.year,
+                                                     assistance_year: TimeKeeper.date_of_record.year,
                                                      aasm_state: 'determined').max_by(&:created_at)
           end
 
-          # rubocop:disable Metrics/CyclomaticComplexity
-          def build_evidences(types, applicant, application)
-            types.each do |type|
-              key, title = type
-              case key
-              when :non_esi
-                next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-                applicant.send("create_#{key}_evidence", key: key, title: title) if applicant.send("#{key}_evidence").blank?
-              when :income
-                next unless application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
-                applicant.create_income_evidence(key: key, title: title) if applicant.income_evidence.blank?
-                applicant.income_evidence.move_to_pending! if  applicant.incomes.present?
-              end
-            rescue StandardError => e
-              Rails.logger.error("unable to create #{key} evidence for applicant #{applicant.id} due to #{e.inspect}")
-            end
-          end
-          # rubocop:enable Metrics/CyclomaticComplexity
-
           def create_evidences(application)
-            types = []
-            types << [:non_esi, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
-            types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
-
             application.active_applicants.each do |applicant|
-              build_evidences(types, applicant, application)
+              applicant.create_evidence(:non_esi, "Non ESI MEC")
+              applicant.create_eligibility_income_evidence if application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
               applicant.save!
+            rescue StandardError => e
+              Rails.logger.error("unable to create evidence for applicant #{applicant.id} due to #{e.inspect}")
             end
           end
 
