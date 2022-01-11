@@ -313,6 +313,20 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
             local_mec_evidence: {
               status: 'determined'
             }
+          },
+          {
+            income_evidence: {
+              status: 'verified'
+            },
+            esi_evidence: {
+              status: 'verified'
+            },
+            non_esi_evidence: {
+              status: 'attested'
+            },
+            local_mec_evidence: {
+              status: 'determined'
+            }
           }
         ]
       end

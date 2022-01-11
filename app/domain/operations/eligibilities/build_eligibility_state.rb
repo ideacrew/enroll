@@ -81,6 +81,7 @@ module Operations
         evidence_statuses = evidence_states.values.collect { |evidence_state| evidence_state[:status] }
         non_verified_states = evidence_statuses.reject {|status| ['verified', 'attested', 'determined'].include?(status)}
 
+        return 'NA' if non_verified_states.blank?
         return 'Fully Uploaded' if non_verified_states.all?{|status| status == 'review'}
         return 'Partially Uploaded' if non_verified_states.include?('review')
         return 'None' if evidence_statuses.include?('outstanding')
