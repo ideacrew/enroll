@@ -11,6 +11,7 @@ module Eligibilities
     field :gid, type: String
     field :first_name, type: String
     field :last_name, type: String
+    field :full_name, type: String
     field :is_primary, type: Boolean
     field :hbx_id, type: String
     field :person_id, type: String
@@ -20,6 +21,11 @@ module Eligibilities
 
     accepts_nested_attributes_for :eligibility_states
 
+    before_save :add_full_name
+
+    def add_full_name
+      self.full_name = [first_name, last_name].join(' ')
+    end
   end
 end
 

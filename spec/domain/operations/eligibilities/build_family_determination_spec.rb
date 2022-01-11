@@ -172,5 +172,13 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
       family.reload
       expect(family.eligibility_determination).to eq result.success
     end
+
+    it 'should set full name on subject while saving' do
+      subject.call(required_params)
+      family.reload
+      family.eligibility_determination.subjects.each do |subject|
+        expect(subject.full_name).to eq ("#{subject.first_name} #{subject.last_name}")
+      end
+    end
   end
 end

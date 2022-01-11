@@ -115,8 +115,8 @@ class Family
   index({ 'eligibility_determination.effective_date': 1 })
 
   index({'eligibility_determination.outstanding_verification_status': 1,
-         'eligibility_determination.subjects.last_name': 1},
-        { name: 'outstanding_verification_subjects_last_name' })
+         'eligibility_determination.subjects.full_name': 1},
+        { name: 'outstanding_verification_subjects_full_name' })
 
   index({'eligibility_determination.outstanding_verification_status': 1,
          'eligibility_determination.subjects.hbx_id': 1 },
@@ -228,7 +228,7 @@ class Family
 
   scope :eligibility_determination_family_member_search, ->(search_string){
       any_of(
-        { :"eligibility_determination.subjects.last_name" => /^#{search_string}$/i },
+        { :"eligibility_determination.subjects.full_name" => /^#{search_string}$/i },
         { :"eligibility_determination.subjects.hbx_id" => /^#{search_string}$/i },
         { :"eligibility_determination.subjects.encrypted_ssn" => SymmetricEncryption.encrypt(search_string) }
       )
