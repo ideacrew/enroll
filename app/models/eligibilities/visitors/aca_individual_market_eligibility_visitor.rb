@@ -42,7 +42,7 @@ module Eligibilities
       private
 
       def status_for(verification_type)
-        return 'review' if verification_type.validation_status == 'review'
+        return verification_type.validation_status if ['review', 'pending'].include?(verification_type.validation_status)
 
         verification_type.type_verified? ? 'determined' : 'outstanding'
       end

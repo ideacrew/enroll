@@ -1548,7 +1548,7 @@ module FinancialAssistance
       active_applicants.each do |applicant|
         applicant.create_evidences
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
-        create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
+        # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
     end
 
