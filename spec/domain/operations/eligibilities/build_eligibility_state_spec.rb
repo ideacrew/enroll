@@ -167,7 +167,7 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
         [
           {
             income_evidence: {
-              status: 'verified'
+              status: 'review'
             },
             esi_evidence: {
               status: 'attested'
