@@ -711,4 +711,69 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       expect(::Operations::Families::DropFamilyMember).to_not have_received(:new)
     end
   end
+
+  describe '#is_spouse_of_primary' do
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    context 'applicant2 is spouse to primary_applicant' do
+      let!(:relationship) do
+        application.ensure_relationship_with_primary(applicant2, 'spouse')
+        application.reload
+      end
+
+      it 'should return true' do
+        expect(applicant2.is_spouse_of_primary).to eq(true)
+      end
+    end
+
+    context 'when applicant2 is spouse to primary_applicant and not applicant3' do
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:relationship) do
+        application.ensure_relationship_with_primary(applicant2, 'spouse')
+        application.reload
+      end
+
+      it 'should return false as there is no spouse relationship b/w applicant3 & primary_applicant' do
+        expect(applicant3.is_spouse_of_primary).to eq(false)
+      end
+    end
+
+    context 'applicant2 is spouse to non primary_applicant(applicant3)' do
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:relationship) do
+        application.add_or_update_relationships(applicant2, applicant3, 'spouse')
+        application.reload
+      end
+
+      it 'should return false' do
+        expect(applicant2.is_spouse_of_primary).to eq(false)
+      end
+    end
+
+    context 'when is_spouse_of_primary id called for primary_applicant' do
+      it 'should return false' do
+        expect(application.primary_applicant.is_spouse_of_primary).to eq(false)
+      end
+    end
+  end
 end

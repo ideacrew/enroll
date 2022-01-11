@@ -56,44 +56,15 @@ RUN mkdir $HOME \
 # Configure app home directory
 WORKDIR $HOME
 
-ARG SECRET_KEY_BASE_DEFAULT=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
-
-ARG ENROLL_DB_HOST_DEFAULT=host.docker.internal
-ARG ENROLL_DB_PORT_DEFAULT=27017
-ARG ENROLL_DB_NAME_DEFAULT=enroll_production
-ARG RABBITMQ_URL_DEFAULT=amqp://rabbitmq:5672
-ARG RABBITMQ_HOST_DEFAULT=amqp://rabbitmq
-ARG RABBITMQ_PORT_DEFAULT=5672
-ARG RABBITMQ_VHOST_DEFAULT=event_source
-ARG MITC_HOST_DEFAULT=http://mitc
-ARG MITC_PORT_DEFAULT=3001
-ARG MITC_URL_DEFAULT=http://mitc:3001
-ARG RIDP_CLIENT_KEY_PATH_DEFAULT=./config/fdsh.key
-ARG RIDP_INITIAL_SERVICE_URL_DEFAULT=https://impl.hub.cms.gov/Imp1
-ARG RIDP_CLIENT_CERT_PATH_DEFAULT=./config/fdsh.pem
-ARG RIDP_SERVICE_PASSWORD_DEFAULT=password
-ARG RIDP_SERVICE_USERNAME_DEFAULT=user
-ARG REDIS_HOST_ENROLL_DEFAULT=localhost
+# Putting these variables at the base layer so they're available throughout
 ARG CLIENT_DEFAULT=me
-
-ENV ENROLL_DB_HOST=$ENROLL_DB_HOST_DEFAULT
-ENV ENROLL_DB_PORT=$ENROLL_DB_PORT_DEFAULT
-ENV ENROLL_DB_NAME=$ENROLL_DB_NAME_DEFAULT
-ENV RABBITMQ_URL=$RABBITMQ_URL_DEFAULT
-ENV RABBITMQ_HOST=$RABBITMQ_HOST_DEFAULT
-ENV RABBITMQ_PORT=$RABBITMQ_PORT_DEFAULT
-ENV RABBITMQ_VHOST=$RABBITMQ_VHOST_DEFAULT
-ENV MITC_HOST=$MITC_HOST_DEFAULT
-ENV MITC_PORT=$MITC_PORT_DEFAULT
-ENV MITC_URL=$MITC_URL_DEFAULT
-ENV RIDP_CLIENT_KEY_PATH=$RIDP_CLIENT_KEY_PATH_DEFAULT
-ENV RIDP_INITIAL_SERVICE_URL=$RIDP_INITIAL_SERVICE_URL_DEFAULT
-ENV RIDP_CLIENT_CERT_PATH=$RIDP_CLIENT_CERT_PATH_DEFAULT
-ENV RIDP_SERVICE_PASSWORD=$RIDP_SERVICE_PASSWORD_DEFAULT
-ENV RIDP_SERVICE_USERNAME=$RIDP_SERVICE_USERNAME_DEFAULT
-ENV SECRET_KEY_BASE=$SECRET_KEY_BASE_DEFAULT
-ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL_DEFAULT
 ENV CLIENT=$CLIENT_DEFAULT
+
+ARG SECRET_KEY_BASE_DEFAULT=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
+ENV SECRET_KEY_BASE=$SECRET_KEY_BASE_DEFAULT
+
+ENV RAILS_ENV=production
+ENV NODE_ENV=production
 
 ################################################################################
 ### Builder. Adds node and Yarn. Not necessary in production. ###
@@ -133,18 +104,6 @@ RUN apt-get update -qq \
 ########################################################
 FROM builder as prod_gems_and_assets
 
-# Need all gemfiles and lockfiles
-COPY --chown=nonroot:nonroot ./Gemfile $HOME/Gemfile
-COPY --chown=nonroot:nonroot ./Gemfile.lock $HOME/Gemfile.lock
-COPY --chown=nonroot:nonroot ./components $HOME/components
-COPY --chown=nonroot:nonroot ./project_gems $HOME/project_gems
-
-COPY --chown=nonroot:nonroot package.json $HOME/
-COPY --chown=nonroot:nonroot yarn.lock $HOME/
-
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
-
 RUN apt-get update -qq \
   && apt-get install -yq --no-install-recommends \
   shared-mime-info \
@@ -152,15 +111,81 @@ RUN apt-get update -qq \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && truncate -s 0 /var/log/*log
 
-RUN bundle config set --local without 'development test' \
-  && bundle install
-
+# Need all gemfiles and lockfiles
+COPY --chown=nonroot:nonroot package.json $HOME/
+COPY --chown=nonroot:nonroot yarn.lock $HOME/
 RUN yarn install \
   && (rm -rf /tmp/* || true)
+
+COPY --chown=nonroot:nonroot ./project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec $HOME/project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec
+COPY --chown=nonroot:nonroot ./project_gems/mongoid_userstamp-0.4.0/mongoid_userstamp.gemspec $HOME/project_gems/mongoid_userstamp-0.4.0/mongoid_userstamp.gemspec
+COPY --chown=nonroot:nonroot ./project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb $HOME/project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb
+
+COPY --chown=nonroot:nonroot ./components/ui_helpers/Gemfile $HOME/components/ui_helpers/Gemfile
+COPY --chown=nonroot:nonroot ./components/ui_helpers/Gemfile.lock $HOME/components/ui_helpers/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/ui_helpers/lib/ui_helpers/version.rb $HOME/components/ui_helpers/lib/ui_helpers/version.rb
+COPY --chown=nonroot:nonroot ./components/ui_helpers/ui_helpers.gemspec $HOME/components/ui_helpers/ui_helpers.gemspec
+
+COPY --chown=nonroot:nonroot ./components/transport_profiles/Gemfile $HOME/components/transport_profiles/Gemfile
+COPY --chown=nonroot:nonroot ./components/transport_profiles/Gemfile.lock $HOME/components/transport_profiles/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/transport_profiles/lib/transport_profiles/version.rb $HOME/components/transport_profiles/lib/transport_profiles/version.rb
+COPY --chown=nonroot:nonroot ./components/transport_profiles/transport_profiles.gemspec $HOME/components/transport_profiles/transport_profiles.gemspec
+
+COPY --chown=nonroot:nonroot ./components/transport_gateway/Gemfile $HOME/components/transport_gateway/Gemfile
+COPY --chown=nonroot:nonroot ./components/transport_gateway/Gemfile.lock $HOME/components/transport_gateway/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/transport_gateway/lib/transport_gateway/version.rb $HOME/components/transport_gateway/lib/transport_gateway/version.rb
+COPY --chown=nonroot:nonroot ./components/transport_gateway/transport_gateway.gemspec $HOME/components/transport_gateway/transport_gateway.gemspec
+
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/Gemfile $HOME/components/sponsored_benefits/Gemfile
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/Gemfile.lock $HOME/components/sponsored_benefits/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/lib/sponsored_benefits/version.rb $HOME/components/sponsored_benefits/lib/sponsored_benefits/version.rb
+COPY --chown=nonroot:nonroot ./components/sponsored_benefits/sponsored_benefits.gemspec $HOME/components/sponsored_benefits/sponsored_benefits.gemspec
+
+COPY --chown=nonroot:nonroot ./components/notifier/Gemfile $HOME/components/notifier/Gemfile
+COPY --chown=nonroot:nonroot ./components/notifier/Gemfile.lock $HOME/components/notifier/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/notifier/lib/notifier/version.rb $HOME/components/notifier/lib/notifier/version.rb
+COPY --chown=nonroot:nonroot ./components/notifier/notifier.gemspec $HOME/components/notifier/notifier.gemspec
+
+COPY --chown=nonroot:nonroot ./components/benefit_markets/Gemfile $HOME/components/benefit_markets/Gemfile
+COPY --chown=nonroot:nonroot ./components/benefit_markets/Gemfile.lock $HOME/components/benefit_markets/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/benefit_markets/lib/benefit_markets/version.rb $HOME/components/benefit_markets/lib/benefit_markets/version.rb
+COPY --chown=nonroot:nonroot ./components/benefit_markets/benefit_markets.gemspec $HOME/components/benefit_markets/benefit_markets.gemspec
+
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/Gemfile $HOME/components/benefit_sponsors/Gemfile
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/Gemfile.lock $HOME/components/benefit_sponsors/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/lib/benefit_sponsors/version.rb $HOME/components/benefit_sponsors/lib/benefit_sponsors/version.rb
+COPY --chown=nonroot:nonroot ./components/benefit_sponsors/benefit_sponsors.gemspec $HOME/components/benefit_sponsors/benefit_sponsors.gemspec
+
+COPY --chown=nonroot:nonroot ./components/financial_assistance/Gemfile $HOME/components/financial_assistance/Gemfile
+COPY --chown=nonroot:nonroot ./components/financial_assistance/Gemfile.lock $HOME/components/financial_assistance/Gemfile.lock
+COPY --chown=nonroot:nonroot ./components/financial_assistance/lib/financial_assistance/version.rb $HOME/components/financial_assistance/lib/financial_assistance/version.rb
+COPY --chown=nonroot:nonroot ./components/financial_assistance/financial_assistance.gemspec $HOME/components/financial_assistance/financial_assistance.gemspec
+
+COPY --chown=nonroot:nonroot ./Gemfile $HOME/Gemfile
+COPY --chown=nonroot:nonroot ./Gemfile.lock $HOME/Gemfile.lock
+
+RUN bundle config set --local without 'development test' \
+  && bundle install
 
 COPY --chown=nonroot:nonroot . $HOME
 
 COPY --chown=nonroot:nonroot ./.docker/config/mongoid.yml $HOME/config
+
+# Needed to run client swap script
+ARG ENROLL_DB_HOST_DEFAULT=localhost
+ARG ENROLL_DB_PORT_DEFAULT=27017
+ARG ENROLL_DB_NAME_DEFAULT=enroll_production
+ARG RABBITMQ_URL_DEFAULT=amqp://localhost:5672
+ARG RABBITMQ_HOST_DEFAULT=amqp://localhost
+ARG RABBITMQ_PORT_DEFAULT=5672
+ARG RABBITMQ_VHOST_DEFAULT=event_source
+ENV ENROLL_DB_HOST=$ENROLL_DB_HOST_DEFAULT
+ENV ENROLL_DB_PORT=$ENROLL_DB_PORT_DEFAULT
+ENV ENROLL_DB_NAME=$ENROLL_DB_NAME_DEFAULT
+ENV RABBITMQ_URL=$RABBITMQ_URL_DEFAULT
+ENV RABBITMQ_HOST=$RABBITMQ_HOST_DEFAULT
+ENV RABBITMQ_PORT=$RABBITMQ_PORT_DEFAULT
+ENV RABBITMQ_VHOST=$RABBITMQ_VHOST_DEFAULT
 
 RUN bundle exec rake configuration:client_configuration_toggler client=$CLIENT
 RUN bundle exec rails assets:precompile \
@@ -223,5 +248,3 @@ COPY --chown=nonroot:nonroot ./.docker/config/sidekiq.rb $HOME/config/initialize
 
 USER nonroot
 
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
