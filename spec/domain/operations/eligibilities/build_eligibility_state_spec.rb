@@ -46,6 +46,11 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
     )
   end
 
+  let(:income) do
+    FactoryBot.build(:financial_assistance_income, start_on: Date.new(2020, 6, 1), end_on: nil,
+                                                   amount: 2000, frequency_kind: "monthly")
+  end
+
   let!(:applicant1) do
     FactoryBot.build(
       :financial_assistance_applicant,
@@ -68,7 +73,8 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
       person_hbx_id: person1.hbx_id,
       is_applying_coverage: true,
       citizen_status: 'us_citizen',
-      indian_tribe_member: false
+      indian_tribe_member: false,
+      incomes: [income]
     )
   end
 
@@ -96,7 +102,8 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
       person_hbx_id: person2.hbx_id,
       is_applying_coverage: true,
       citizen_status: 'us_citizen',
-      indian_tribe_member: false
+      indian_tribe_member: false,
+      incomes: [income]
     )
   end
 
