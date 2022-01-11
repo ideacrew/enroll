@@ -42,6 +42,7 @@ RSpec.describe HbxAdminController, :type => :controller do
       person_with_fam_hbx_enrollment.coverage_kind = 'health'
       person_with_fam_hbx_enrollment.save!
       tax_household.effective_starting_on = Date.new(valid_date.year, 10, valid_date.day)
+      tax_household.tax_household_members.build(family_member: person_with_family.primary_family.family_members.first, is_ia_eligible: true)
       tax_household.save!
       eligibility_determination.max_aptc = 100
       eligibility_determination.csr_percent_as_integer = 50
@@ -49,13 +50,15 @@ RSpec.describe HbxAdminController, :type => :controller do
       eligibility_determination.determined_on = Date.new(valid_date.year, 10, valid_date.day)
       eligibility_determination.save!
       allow(Admin::Aptc).to receive(:find_enrollment_effective_on_date).and_return(valid_date)
+      params = {
+        "person": { person_id: person_with_family.id, family_id: family.id, current_year: valid_date.year },
+        "max_aptc": '1000',
+        "csr_percentage": 50,
+        "csr_percentage_#{person_with_family.id}": 73
+      }
       post(
         :update_aptc_csr,
-        params: {
-          person: { person_id: person_with_family.id, family_id: family.id, current_year: valid_date.year },
-          max_aptc: '1000',
-          csr_percentage: 50
-        },
+        params: params,
         format: :js
       )
       family.reload
@@ -75,7 +78,7 @@ RSpec.describe HbxAdminController, :type => :controller do
 
     it 'should update individual csr percentages' do
       family.active_household.tax_households.active_tax_household.first.tax_household_members.each do |thm|
-        expect(thm.csr_percent_as_integer).to eq(50)
+        expect(thm.csr_percent_as_integer).to eq(73)
       end
     end
   end

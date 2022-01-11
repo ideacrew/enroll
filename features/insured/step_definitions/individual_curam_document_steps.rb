@@ -3,24 +3,12 @@ When(/^the user navigates to the DOCUMENTS tab$/) do
   visit verification_insured_families_path
 end
 
-Then(/^a button will be visible to the user labeled MEDICAID & TAX CREDITS$/) do
-  expect(page).to have_content('Medicaid & Tax Credits')
-end
-
 When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
-  find_link('Medicaid & Tax Credits').visible?
+  find(IvlDocumentsPage.medicare_and_tax_credit_btn).visible?
 end
 
 Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content('If you applied for Medicaid and tax credit savings, view additional documents')
-end
-
-Then(/^there will be messages text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content('If you applied for Medicaid and tax credit savings, view additional messages')
-end
-
-When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
-  switch_to_window { find('.btn', text: 'Medicaid & Tax Credits').click }
+  expect(page).to have_css(AdminHomepage.medicaid_banner_text)
 end
 
 Then(/^EA sets a flag in IAM to direct the consumer to the curam\/ drupal login$/) do

@@ -551,8 +551,9 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
+    # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
     def is_spouse_of_primary
-      application.relationships.where(kind: 'spouse', relative_id: application.primary_applicant.id).present?
+      application.relationships.where(applicant_id: id, kind: 'spouse', relative_id: application.primary_applicant.id).present?
     end
 
     def eligibility_determination_of_spouse
