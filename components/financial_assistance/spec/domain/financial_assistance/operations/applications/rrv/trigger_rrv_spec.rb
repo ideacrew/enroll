@@ -55,7 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     applicant
   end
 
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, csr_percent_as_integer: 73) }
 
   let(:premiums_hash) do
     {
@@ -117,7 +117,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     it 'should return success' do
       expect(applicant.income_evidence.present?).to be_falsey
       expect(applicant.non_esi_evidence.present?).to be_falsey
-      result = subject.call(families: [family])
+      result = subject.call(families: Family.all, assistance_year: application.assistance_year)
       expect(result).to be_success
       expect(applicant.reload.income_evidence.present?).to be_truthy
       expect(applicant.reload.non_esi_evidence.present?).to be_truthy
@@ -128,7 +128,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     applicant.update(is_applying_coverage: false, is_ia_eligible: false)
     expect(applicant.income_evidence.present?).to be_falsey
     expect(applicant.non_esi_evidence.present?).to be_falsey
-    result = subject.call(families: [family])
+    result = subject.call(families: Family.all, assistance_year: application.assistance_year)
     expect(result).to be_success
     expect(applicant.reload.income_evidence.present?).to be_falsey
     expect(applicant.reload.non_esi_evidence.present?).to be_falsey

@@ -1256,6 +1256,14 @@ module FinancialAssistance
                        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
 
+    def create_rrv_evidences
+      active_applicants.each do |applicant|
+        applicant.create_evidence(:non_esi_mec, "Non ESI MEC")
+        applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
+        applicant.save!
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,

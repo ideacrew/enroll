@@ -16,7 +16,8 @@ module FinancialAssistance
           include EventSource::Logging
 
           def call(params)
-            applications = yield collect_applications_from_families(params[:families])
+            values = yield validate(params)
+            applications = yield collect_applications_from_families(values)
             event = yield build_event(applications)
             result = yield publish(event)
 
@@ -25,38 +26,42 @@ module FinancialAssistance
 
           private
 
-          def fetch_application(family)
-            ::FinancialAssistance::Application.where(family_id: family.id,
-                                                     assistance_year: TimeKeeper.date_of_record.year,
-                                                     aasm_state: 'determined').max_by(&:created_at)
+          def validate(params)
+            errors = []
+            errors << 'families ref missing' unless params[:families]
+            errors << 'assistance_year ref missing' unless params[:assistance_year]
+
+            errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def create_evidences(application)
-            application.active_applicants.each do |applicant|
-              applicant.create_evidence(:non_esi, "Non ESI MEC")
-              applicant.create_eligibility_income_evidence if application.active_applicants.any?(&:is_ia_eligible?) || application.active_applicants.any?(&:is_applying_coverage)
-              applicant.save!
-            rescue StandardError => e
-              Rails.logger.error("unable to create evidence for applicant #{applicant.id} due to #{e.inspect}")
-            end
+          def fetch_application(family, assistance_year)
+            ::FinancialAssistance::Application.where(assistance_year: assistance_year,
+                                                     aasm_state: 'determined',
+                                                     family_id: family.id).max_by(&:created_at)
           end
 
-          def transform_and_construct(family)
-            application = fetch_application(family)
+          def transform_and_construct(family, assistance_year)
+            application = fetch_application(family, assistance_year)
             payload = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!).value!
           end
 
-          def collect_applications_from_families(families)
+          def is_aptc_or_csr_eligible?(application)
+            eligibility = application.eligibility_determinations.max_by(&:determined_at)
+            eligibility.present? && (eligibility.is_aptc_eligible? || eligibility.is_csr_eligible?)
+          end
+
+          def collect_applications_from_families(params)
             applications_with_evidences = []
             count = 0
             rrv_logger = Logger.new("#{Rails.root}/log/rrv_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
-            families.each do |family|
-              determined_application = fetch_application(family)
-              next unless determined_application.present?
-              create_evidences(determined_application)
-              cv3_application = transform_and_construct(family)
+            params[:families].no_timeout.each do |family|
+              determined_application = fetch_application(family, params[:assistance_year])
+              next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
+
+              determined_application.create_rrv_evidences
+              cv3_application = transform_and_construct(family, params[:assistance_year])
               applications_with_evidences << cv3_application.to_h
               count += 1
               rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
