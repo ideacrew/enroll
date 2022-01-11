@@ -15,11 +15,13 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
   context 'success' do
     context 'with valid application id' do
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:person) { FactoryBot.create(:person)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
       before do
         family.primary_person.emails.create(kind: "home", address: "fakeemail@email.com")
         @application = FactoryBot.create(:financial_assistance_application, transfer_id: transfer_id, family_id: family.id)
+        @applicant = FactoryBot.create(:applicant, application: @application, person_hbx_id: person.hbx_id, transfer_referral_reason: 'Initiated')
         @expected_response =
           {
             family_identifier: family.hbx_assigned_id.to_s,
@@ -45,6 +47,17 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
         it 'should trigger account transfer notice' do
           expect(::Operations::Notices::IvlAccountTransferNotice).to receive_message_chain('new.call').with(family: family)
+          subject.call(@application.id)
+        end
+      end
+
+      context 'when no applicants are initiated' do
+        before do
+          @applicant.transfer_referral_reason = "Rejected"
+        end
+
+        it 'should not trigger account transfer notice' do
+          expect(::Operations::Notices::IvlAccountTransferNotice).not_to receive(:new)
           subject.call(@application.id)
         end
       end
