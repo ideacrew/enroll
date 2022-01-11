@@ -49,7 +49,7 @@ RSpec.describe ::Operations::People::UpdateDueDateOnVlpDocuments, dbclean: :afte
       result = subject.call(valid_params)
 
       expect(result.success?).to be_truthy
-      expect(person.reload.consumer_role.verification_types.all?{ |vt| vt.due_date == due_date }).to be_truthy
+      expect(person.reload.consumer_role.verification_types.all?{ |vt| vt.due_date == due_date && vt.due_date_type == 'notice' }).to be_truthy
     end
   end
 end
