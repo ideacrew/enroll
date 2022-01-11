@@ -25,11 +25,12 @@ jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
-      alphaImage: ${{ steps.prep.outputs.alpha_image }}
+      legacyImage: ${{ steps.prep.outputs.legacy_image }}
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
       tag: ${{ steps.prep.outputs.tag }}
       registry: ${{ steps.prep.outputs.registry }}
       shortSha: ${{ steps.prep.outputs.short_sha}}
+      branchName: ${{ steps.prep.outputs.branch_name }}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -38,15 +39,16 @@ jobs:
         id: prep
         run: |
           SHORT_SHA=$(echo $GITHUB_SHA | head -c7)
-          TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
+          TAG=$(echo $GITHUB_SHA | head -c7)
           IMAGE="public.ecr.aws/ideacrew/enroll"
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
+          echo ::set-output name=legacy_image::${IMAGE}:${TAG}-legacy
           echo ::set-output name=tag::${TAG}
           echo ::set-output name=registry::public.ecr.aws
-          echo ::set-output name=alpha_image::${IMAGE}:${TAG}-alpha
           echo ::set-output name=short_sha::$SHORT_SHA
+          echo ::set-output name=branch_name::${{ env.GIT_BRANCH_NAME }}
 
-  build-and-upload-image:
+  build-and-upload-legacy-image:
     needs: [prep]
     runs-on: ubuntu-latest
     services:
@@ -102,16 +104,16 @@ jobs:
         id: build-image
         run: |
           chmod +x .docker/build_gha.sh
-          .docker/build_gha.sh ${{ needs.prep.outputs.tag }} public.ecr.aws/ideacrew/enroll .
+          .docker/build_gha.sh ${{ needs.prep.outputs.tag }}-legacy public.ecr.aws/ideacrew/enroll .
 
       # Upload Docker Image to Amazon ECR
       - name: Upload Image to ECR
         if: github.event_name != 'pull_request'
         id: upload-image
-        run: docker push ${{ needs.prep.outputs.taggedImage }}
+        run: docker push ${{ needs.prep.outputs.legacyImage }}
 
   # Uses buildx to build and push the image
-  build-and-upload-image-v2:
+  build-and-upload-image:
     needs: [prep]
     runs-on: ubuntu-latest
     services:
@@ -137,7 +139,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      # Check out repository
       - uses: actions/checkout@v2
 
       - name: Add git HEAD info to docker image
@@ -193,10 +194,7 @@ jobs:
           push: ${{ env.SHOULD_DEPLOY }}
           # create local image (for scanning)
           load: false
-
-          ### Adding -alpha to the image tag while this is in testing ###
-          tags: ${{ needs.prep.outputs.alphaImage }}
-
+          tags: ${{ needs.prep.outputs.taggedImage }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
@@ -212,7 +210,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@main
         with:
-          image: ${{ needs.prep.outputs.alphaImage }}
+          image: ${{ needs.prep.outputs.taggedImage }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
@@ -238,6 +236,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }} built from <https://github.com/ideacrew/enroll/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}>'
+          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }} built from <https://github.com/ideacrew/enroll/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName`'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
