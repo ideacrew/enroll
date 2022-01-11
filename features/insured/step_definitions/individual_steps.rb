@@ -54,3 +54,27 @@ When(/^(.*) selects a past qle date$/) do |_name|
     click_link "CONTINUE"
   end
 end
+
+When(/individual has a home and mailing address/) do
+  addresses = Person.first.addresses
+  addresses.last.destroy
+  addresses << FactoryBot.build(:address, :mailing_kind)
+  addresses.last.save!
+end
+
+When(/individual removes mailing address/) do
+  find(IvlPersonalInformation.remove_mailing_address_btn).click
+end
+
+When(/individual edits home address/) do
+  fill_in IvlPersonalInformation.address_line_one, :with => "123 New St"
+end
+
+When(/individual saves personal information changes/) do
+  find_all('.btn-primary').first.click
+end
+
+Then(/information should be saved successfully/) do
+  expect(find_all('.alert-notice').count).to eq 1
+  expect(find_field(IvlPersonalInformation.address_line_one).value).to eq "123 New St"
+end
