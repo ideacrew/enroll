@@ -44,7 +44,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.local_mec_evidence.aasm_state).to eq "verified"
+        expect(@applicant.local_mec_evidence.is_satisfied).to be_truthy
+        expect(@applicant.local_mec_evidence.due_on).to be_nil
         expect(@applicant.local_mec_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
