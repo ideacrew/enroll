@@ -25,12 +25,25 @@ When(/^Hbx Admin click Action button$/) do
   end
 end
 
-When("user enters an invalid SSN and clicks on update") do
-  find('#person_ssn').set("212-31-31")
+When("Admin enters a invalid SSN and clicks on update") do
+  fill_in 'person[ssn]', :with => ''
+  fill_in 'person[ssn]', :with => '212-31-31'
   sleep 1
   page.find_button("Update").click
   page.driver.browser.switch_to.alert.accept
   sleep 1
+end
+
+When(/^Admin will see the Edit DOB SSN button$/) do
+  find_link('Edit DOB / SSN')
+end
+
+When(/^Admin clicks Action for a person on families index page$/) do
+  find('.dropdown.pull-right', text: 'Actions').click
+end
+
+When(%r{^Admin clicks on edit DOB/SSN link$}) do
+  click_link('Edit DOB / SSN')
 end
 
 Given("that a user with a HBX staff role with HBX Staff exists and is logged in") do
@@ -52,17 +65,17 @@ When(/^Hbx Admin enters an invalid SSN and clicks on update$/) do
   page.find_button("Update").click
 end
 
-Then(/^Hbx Admin should see the edit form being rendered again with a validation error message$/) do
+Then(/^Admin should see the edit form being rendered again with a validation error message$/) do
   expect(page).to have_content(/Edit DOB \/ SSN/i)
   expect(page).to have_content(/must have 9 digits/i)
 end
 
-When(/^Hbx Admin enters a valid DOB and SSN and clicks on update$/) do
+When(/^Admin enters a valid DOB and SSN and clicks on update$/) do
   fill_in 'person[ssn]', :with => '212-31-3131'
   page.find_button("Update").click
   page.driver.browser.switch_to.alert.accept
 end
 
-Then(/^Hbx Admin should see the update partial rendered with update sucessful message$/) do
+Then(/^Admin should see the update partial rendered with update sucessful message$/) do
   expect(page).to have_content(/DOB \/ SSN Update Successful/i)
 end
