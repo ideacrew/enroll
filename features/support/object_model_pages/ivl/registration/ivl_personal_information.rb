@@ -323,8 +323,4 @@ class IvlPersonalInformation
   def self.save_and_exit_link
     '.interaction-click-control-save---exit'
   end
-
-  def self.save_link
-    '.interaction-click-control-save'
-  end
 end
