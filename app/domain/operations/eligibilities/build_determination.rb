@@ -142,24 +142,28 @@ module Operations
 
       def outstanding_verification_due_on_for_determination(determination)
         subjects = determination[:subjects].values
+        subjects.reject! do |subject|
+          subject[:outstanding_verification_status] == 'not_enrolled'
+        end
         subjects.reduce([]) do |memo, subject|
           aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
           aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
-          memo << aptc_csr_credit[:earliest_due_date] if aptc_csr_credit && aptc_csr_credit[:earliest_due_date] && !aptc_csr_credit[:is_eligible]
-          memo << aca_individual_market_eligibility[:earliest_due_date] if aca_individual_market_eligibility && aca_individual_market_eligibility[:earliest_due_date] &&
-                                                                           !aca_individual_market_eligibility[:is_eligible]
+          memo << aptc_csr_credit[:earliest_due_date] if aptc_csr_credit && aptc_csr_credit[:earliest_due_date]
+          memo << aca_individual_market_eligibility[:earliest_due_date] if aca_individual_market_eligibility && aca_individual_market_eligibility[:earliest_due_date]
           memo
         end.compact.min
       end
 
       def eligibility_documents_uploaded_status(determination)
         subjects = determination[:subjects].values
+        subjects.reject! do |subject|
+          subject[:outstanding_verification_status] == 'not_enrolled'
+        end
         subjects.reduce([]) do |memo, subject|
           aptc_csr_credit = subject[:eligibility_states][:aptc_csr_credit]
           aca_individual_market_eligibility = subject[:eligibility_states][:aca_individual_market_eligibility]
-          memo << aptc_csr_credit[:document_status] if aptc_csr_credit && aptc_csr_credit[:document_status] && !aptc_csr_credit[:is_eligible]
-          memo << aca_individual_market_eligibility[:document_status] if aca_individual_market_eligibility && aca_individual_market_eligibility[:document_status] &&
-                                                                         !aca_individual_market_eligibility[:is_eligible]
+          memo << aptc_csr_credit[:document_status] if aptc_csr_credit && aptc_csr_credit[:document_status]
+          memo << aca_individual_market_eligibility[:document_status] if aca_individual_market_eligibility && aca_individual_market_eligibility[:document_status]
           memo
         end.compact
       end
