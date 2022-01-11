@@ -228,7 +228,7 @@ class Family
 
   scope :eligibility_determination_family_member_search, ->(search_string){
       any_of(
-        { :"eligibility_determination.subjects.full_name" => /^#{search_string}$/i },
+        { :"eligibility_determination.subjects.full_name" => /#{search_string}/i },
         { :"eligibility_determination.subjects.hbx_id" => /^#{search_string}$/i },
         { :"eligibility_determination.subjects.encrypted_ssn" => SymmetricEncryption.encrypt(search_string) }
       )
