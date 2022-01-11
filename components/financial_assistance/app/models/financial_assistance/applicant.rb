@@ -1163,14 +1163,13 @@ module FinancialAssistance
     end
 
     def enrolled_with(_enrollment)
-      if income_evidence&.pending?
-        if income_evidence.due_on.blank?
-          verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-          income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
-        end
-
-        set_evidence_outstanding(income_evidence)
+      return unless income_evidence&.pending?
+      if income_evidence.due_on.blank?
+        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
       end
+
+      set_evidence_outstanding(income_evidence)
     end
 
     def set_income_evidence_verified
