@@ -33,9 +33,12 @@ module Operations
 
       def update_due_date(family, due_date)
         family.contingent_enrolled_active_family_members.each do |family_member|
-          family_member.person.verification_types.active.each do |verification_type|
-            verification_type.update_attributes!(due_date: due_date, due_date_type: 'notice') if can_update_due_date?(verification_type)
-          end
+          updated_verification_dates =
+            family_member.person.verification_types.active.all? do |verification_type|
+              verification_type.update_attributes!(due_date: due_date, due_date_type: 'notice') if can_update_due_date?(verification_type)
+            end
+
+          family_member.person.save! if updated_verification_dates
         end
         Success(true)
       end
