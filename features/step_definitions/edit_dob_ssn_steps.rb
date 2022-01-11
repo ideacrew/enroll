@@ -34,16 +34,16 @@ When("Admin enters a invalid SSN and clicks on update") do
   sleep 1
 end
 
-When(/^Admin will see the Edit DOB SSN button$/) do
-  find_link('Edit DOB / SSN')
+When(/^Admin will see the (.*?) button$/) do |link|
+  find_link(link)
 end
 
 When(/^Admin clicks Action for a person on families index page$/) do
   find('.dropdown.pull-right', text: 'Actions').click
 end
 
-When(%r{^Admin clicks on edit DOB/SSN link$}) do
-  click_link('Edit DOB / SSN')
+When(/Admin clicks on (.*?)/) do |link|
+  click_link(link)
 end
 
 Given("that a user with a HBX staff role with HBX Staff exists and is logged in") do

@@ -1075,7 +1075,6 @@ And(/Individual signed in to resume enrollment$/) do
 end
 
 Then(/Individual creates a new HBX account via username$/) do
-  sleep 5
   fill_in CreateAccount.email_or_username, :with => "testflow"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
@@ -1083,7 +1082,6 @@ Then(/Individual creates a new HBX account via username$/) do
 end
 
 When(/Individual creates an HBX account with username already in use$/) do
-  sleep 5
   fill_in CreateAccount.email_or_username, :with => "testflow"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
@@ -1091,7 +1089,6 @@ When(/Individual creates an HBX account with username already in use$/) do
 end
 
 When(/Individual creates an HBX account with email already in use$/) do
-  sleep 5
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
