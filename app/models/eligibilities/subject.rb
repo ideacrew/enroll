@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Eligibilities
+  # Subject
   class Subject
     include Mongoid::Document
     include Mongoid::Timestamps

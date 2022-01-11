@@ -177,7 +177,7 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
       subject.call(required_params)
       family.reload
       family.eligibility_determination.subjects.each do |subject|
-        expect(subject.full_name).to eq ("#{subject.first_name} #{subject.last_name}")
+        expect(subject.full_name).to eq("#{subject.first_name} #{subject.last_name}")
       end
     end
   end
