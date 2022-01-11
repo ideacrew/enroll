@@ -35,9 +35,15 @@ module Subscribers
         family: enrollment.family,
         effective_date: TimeKeeper.date_of_record
       )
+
+      update_due_date_on_vlp_documents(family)
     end
 
     private
+
+    def update_due_date_on_vlp_documents(family)
+      ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: family, due_date: TimeKeeper.date_of_record + 95.days)
+    end
 
     def pre_process_message(subscriber_logger, payload)
     #   logger.info '-' * 100 unless Rails.env.test?
