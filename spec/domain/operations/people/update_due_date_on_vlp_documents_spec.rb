@@ -33,7 +33,7 @@ RSpec.describe ::Operations::People::UpdateDueDateOnVlpDocuments, dbclean: :afte
       result = subject.call(invalid_params)
 
       expect(result.success?).to be_falsey
-      expect(result.failure). to eq(["due date missing", "family missing"])
+      expect(result.failure).to eq(["due date missing", "family missing"])
     end
   end
 
