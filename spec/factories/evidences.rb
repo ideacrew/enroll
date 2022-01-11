@@ -8,7 +8,7 @@ FactoryBot.define do
     received_at { DateTime.now }
     is_satisfied { true }
     verification_outstanding { false }
-    aasm_state { :determined }
+    aasm_state { :attested }
     due_on { nil }
 
   end

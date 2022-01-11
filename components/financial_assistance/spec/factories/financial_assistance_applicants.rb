@@ -69,7 +69,7 @@ FactoryBot.define do
     end
 
     trait :with_income_evidence do
-      income_evidence { FactoryBot.build(:evidence, key: :income, title: 'Income') }
+      income_evidence { FactoryBot.build(:evidence, key: :income, title: 'Income', aasm_state: 'pending', is_satisfied: false) }
     end
 
     trait :with_esi_evidence do

@@ -20,6 +20,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
 
   let!(:applicant) do
     FactoryBot.create(:financial_assistance_applicant,
+                      :with_income_evidence,
                       eligibility_determination_id: ed.id,
                       person_hbx_id: '1629165429385938',
                       is_primary_applicant: true,
@@ -36,8 +37,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
 
       before do
         @applicant = application.applicants.first
-        @applicant.build_income_evidence(key: :income, title: "Income", aasm_state: "attested")
-        @applicant.save!
         @result = subject.call(payload: response_payload)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -50,7 +49,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.income_evidence.aasm_state).to eq "verified"
+        income_evidence = @applicant.income_evidence
+        expect(income_evidence.verified?).to be_truthy
+        expect(income_evidence.verification_outstanding).to be_falsey
+        expect(income_evidence.due_on).to be_blank
+        expect(income_evidence.is_satisfied).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
@@ -60,8 +63,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
 
       before do
         @applicant = application.applicants.first
-        @applicant.build_income_evidence(key: :income, title: "Income", aasm_state: "attested")
-        @applicant.save!
         @result = subject.call(payload: response_payload_2)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -74,7 +75,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.income_evidence.aasm_state).to eq "outstanding"
+        income_evidence = @applicant.income_evidence
+        expect(income_evidence.outstanding?).to be_truthy
+        expect(income_evidence.verification_outstanding).to be_truthy
+        expect(income_evidence.is_satisfied).to eq false
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
