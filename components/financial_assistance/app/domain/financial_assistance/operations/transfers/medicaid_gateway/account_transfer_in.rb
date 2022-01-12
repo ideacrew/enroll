@@ -3,8 +3,6 @@
 require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/operations/encryption/decrypt'
-# require '../../../../../../../../../app/helpers/me_county_helper'
-include MeCountyHelper
 
 module FinancialAssistance
   module Operations
@@ -13,6 +11,7 @@ module FinancialAssistance
         # This Operation creates a new family and application draft
         # Operation receives ATP payload from medicaid gateway
         class AccountTransferIn
+          include MeCountyHelper
           include Dry::Monads[:result, :do]
 
           PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
@@ -37,7 +36,7 @@ module FinancialAssistance
           end
 
           def find_specific_county(town_name)
-            maine_counties_and_towns.detect { |key, value| maine_counties_and_towns[key].include?(town_name) }&.first
+            maine_counties_and_towns.detect { |key, _value| maine_counties_and_towns[key].include?(town_name) }&.first
           end
 
           def load_missing_county_names(payload)
@@ -51,15 +50,14 @@ module FinancialAssistance
                 address["county"] = county.first.county_name if county&.count == 1
                 zips_with_missing_counties << zip if county.blank?
 
-                if county.count > 1
-                  town_name = address['city'].titleize
-                  county_name = find_specific_county(town_name)
+                next unless county.count > 1
+                town_name = address['city'].titleize
+                county_name = find_specific_county(town_name)
 
-                  if county_name.present?
-                    address['county'] = county_name
-                  else
-                    zips_with_multiple_counties << zip
-                  end
+                if county_name.present?
+                  address['county'] = county_name
+                else
+                  zips_with_multiple_counties << zip
                 end
               end
             end
