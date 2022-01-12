@@ -197,7 +197,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   describe "GET edit" do
     context "With valid data" do
-      
+
       it "should render" do
         get :edit, params: { id: application.id }
         expect(assigns(:application)).to eq application
@@ -535,7 +535,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         sign_in(hbx_staff_user)
         get :wait_for_eligibility_response, params: { id: application.id }
       end
-      
+
       it "should find application" do
         expect(assigns(:application)).to eq application
       end
@@ -648,14 +648,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it 'should assign application to instance variable' do
-       expect(assigns(:application)).to eq application
+        expect(assigns(:application)).to eq application
       end
 
       it 'should redirect to eligibility_results if application status is 200/203 and application is in determined state' do
         expect(response).to redirect_to(eligibility_results_application_path(application.id, cur: 1))
       end
     end
-    
+
     context "with missing family id" do
       before do
         allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
