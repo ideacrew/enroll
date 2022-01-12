@@ -353,8 +353,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it "should fail during publish application and redirects to error_page" do
+        application2.ensure_relationship_with_primary(application2.applicants[1], 'spouse')
         post :step, params: { id: application2.id, commit: "Submit Application", application: application_valid_params }
-        expect(flash[:error]).to eq(["You must have a complete set of relationships defined among every member."])
+        expect(flash[:error]).to match(/Submission Error: /)
         expect(response).to redirect_to(application_publish_error_application_path(application2))
       end
 
