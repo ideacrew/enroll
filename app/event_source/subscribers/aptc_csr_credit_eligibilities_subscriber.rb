@@ -81,12 +81,10 @@ module Subscribers
       application = GlobalID::Locator.locate(payload[:gid])
       family = application.family
       result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
-
-      if result.failure?
-        errors = result.failure.is_a?(Dry::Validation::Result) ? result.failure.errors.to_h : result.failure
-        logger.info "Error: unable to migrate evidences for applicant: #{applicant.id} in application #{application.id} due to #{errors}"
-        subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
-      end
+      return unless result.failure?
+      errors = result.failure.is_a?(Dry::Validation::Result) ? result.failure.errors.to_h : result.failure
+      logger.info "Error: unable to migrate evidences for applicant: #{applicant.id} in application #{application.id} due to #{errors}"
+      subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
     end
   end
 end
