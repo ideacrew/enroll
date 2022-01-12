@@ -174,13 +174,29 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
-  context "GET edit" do
-    it "should render" do
-      get :edit, params: { id: application.id }
-      expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance_nav)
+  describe "GET edit" do
+    context "With valid data" do
+      
+      it "should render" do
+        get :edit, params: { id: application.id }
+        expect(assigns(:application)).to eq application
+        expect(response).to render_template(:financial_assistance_nav)
+      end
+    end
+
+    context "With missing family id" do
+      before do
+        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+      end
+
+      it "should find the correct application" do
+        get :edit, params: { id: application.id }
+        expect(assigns(:application)).to eq application
+      end
+
     end
   end
+
 
   context "POST step" do
     before do
@@ -481,47 +497,102 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
   end
-
-  context "GET wait_for_eligibility_response" do
-    it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
-      get :wait_for_eligibility_response, params: { id: application.id }
-      expect(assigns(:application)).to eq application
-    end
-  end
-
-  context "GET eligibility_results" do
-    it 'should get eligibility results' do
-      get :eligibility_results, params: {:id => application.id, :cur => 1}
-      expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance_nav)
-    end
-  end
-
-  context "GET application_publish_error" do
-    it 'should get application publish error' do
-      get :application_publish_error, params: { id: application.id }
-      expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance_nav)
-    end
-  end
-
-  context "check eligibility results received" do
-    it "should return false if the Header of the response doesn't have the success status code" do
-      get :check_eligibility_results_received, params: { id: application.id }
-      expect(response.body).to eq "false"
+  describe  "GET wait_for_eligibility_response" do
+    context "With valid data" do
+      it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
+        get :wait_for_eligibility_response, params: { id: application.id }
+        expect(assigns(:application)).to eq application
+      end
     end
 
-    context 'with success status code and determined application' do
+    context "With missing family id" do
       before do
-        application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
-        get :check_eligibility_results_received, params: { id: application.id }
+        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        get :wait_for_eligibility_response, params: { id: application.id }
       end
-
-      it 'should return true for response body' do
-        expect(response.body).to eq 'true'
+      
+      it "should find application" do
+        expect(assigns(:application)).to eq application
       end
     end
   end
+
+  describe "GET eligibility_results" do
+    context "With valid data" do
+      it 'should get eligibility results' do
+        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        expect(assigns(:application)).to eq application
+        expect(response).to render_template(:financial_assistance_nav)
+      end
+    end
+
+    context "With missing family id" do
+      before do
+        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+      end
+
+      it 'should find the correct application' do
+        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        expect(assigns(:application)).to eq application
+      end
+    end
+  end
+
+  describe "GET application_publish_error" do
+    context "With valid data" do
+
+      it 'should get application publish error' do
+        get :application_publish_error, params: { id: application.id }
+        expect(assigns(:application)).to eq application
+        expect(response).to render_template(:financial_assistance_nav)
+      end
+    end
+
+    context "With missing family id" do
+      before do
+        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+      end
+
+      it 'should find application with missing family id' do
+        get :application_publish_error, params: { id: application.id }
+        expect(assigns(:application)).to eq application
+        expect(response).to render_template(:financial_assistance_nav)
+      end
+    end
+  end
+
+  describe "GET check eligibility results received" do
+    context "With valid data" do
+
+      it "should return false if the Header of the response doesn't have the success status code" do
+        get :check_eligibility_results_received, params: { id: application.id }
+        expect(response.body).to eq "false"
+      end
+
+      context 'with success status code and determined application' do
+        before do
+          application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
+          get :check_eligibility_results_received, params: { id: application.id }
+        end
+
+        it 'should return true for response body' do
+          expect(response.body).to eq 'true'
+        end
+      end
+    end
+  end
+
+  context "with missing family id" do
+    before do
+      allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+      get :check_eligibility_results_received, params: { id: application.id }
+    end
+
+    it "should find the correct application" do
+      expect(assigns(:application)).to eq application
+    end
+  end
+
 
   describe 'GET eligibility_response_error' do
     context 'where application did not receive eligibility determination' do
@@ -549,11 +620,22 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it 'should assign application to instance variable' do
-        expect(assigns(:application)).to eq application
+       expect(assigns(:application)).to eq application
       end
 
       it 'should redirect to eligibility_results if application status is 200/203 and application is in determined state' do
         expect(response).to redirect_to(eligibility_results_application_path(application.id, cur: 1))
+      end
+    end
+    
+    context "with missing family id" do
+      before do
+        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        get :eligibility_response_error, params: { id: application.id }
+      end
+
+      it "finds the correct application" do
+        expect(assigns(:application)).to eq application
       end
     end
   end
