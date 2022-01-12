@@ -479,6 +479,41 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
+    context 'is_enrolled_on_medicaid' do
+      before do
+        applicant.update_attributes!({
+                                       is_pregnant: false,
+                                       is_applying_coverage: true,
+                                       is_post_partum_period: true,
+                                       pregnancy_end_on: TimeKeeper.date_of_record - 10.days,
+                                       is_enrolled_on_medicaid: nil
+                                     })
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+      end
+
+      context 'is_enrolled_on_medicaid feature disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:is_enrolled_on_medicaid).and_return(false)
+        end
+
+        it 'should return true without is_enrolled_on_medicaid' do
+          expect(applicant.other_questions_complete?).to eq true
+        end
+      end
+
+      context 'is_enrolled_on_medicaid feature enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:is_enrolled_on_medicaid).and_return(true)
+        end
+
+        it 'should return false without is_enrolled_on_medicaid' do
+          expect(applicant.other_questions_complete?).to eq false
+        end
+      end
+    end
+
     context '#applicant_validation_complete?' do
       before do
         applicant.update_attributes!({is_applying_coverage: true,

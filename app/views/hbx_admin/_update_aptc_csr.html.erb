@@ -5,7 +5,7 @@
 
 
   <div class="row">
-    <%if @eligibility_redetermination_result || @enrollment_update_result%>
+    <% if @eligibility_redetermination_result || @enrollment_update_result || @thm_csr_pct_result %>
       <h3 class="title-inline"> Update Successful </h3>
     <%else%>
       <h3 class="title-inline"> No changes made. Nothing to update.</h3>
