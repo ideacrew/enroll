@@ -71,7 +71,7 @@ When(/individual edits home address/) do
 end
 
 When(/individual saves personal information changes/) do
-  find_all('.btn-primary').first.click
+  find_all(IvlPersonalInformation.personal_save).first.click
 end
 
 Then(/information should be saved successfully/) do
