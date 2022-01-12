@@ -62,11 +62,10 @@ module Subscribers
       application = GlobalID::Locator.locate(payload[:gid])
       application.applicants.each do |applicant|
         result = ::Operations::MigrateEvidences.new.call(applicant: applicant)
-        if result.failure?
-          errors = result.failure.is_a?(Dry::Validation::Result) ? result.failure.errors.to_h : result.failure
-          logger.info "Error: unable to migrate evidences for applicant: #{applicant.id} in application #{application.id} due to #{errors}"
-          subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
-        end
+        next unless result.failure?
+        errors = result.failure.is_a?(Dry::Validation::Result) ? result.failure.errors.to_h : result.failure
+        logger.info "Error: unable to migrate evidences for applicant: #{applicant.id} in application #{application.id} due to #{errors}"
+        subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
       end
       ::Eligibilities::Evidence.set_callback(:save, :after, :generate_evidence_updated_event)
     end

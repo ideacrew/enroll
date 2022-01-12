@@ -17,12 +17,12 @@ class MigrateEvidences < MongoidMigrationTask
       logger.info "processed #{counter} applications" if counter % 200 == 0
 
       event = event(
-            "events.individual.eligibilities.application.applicant.income_evidence_updated",
-            attributes: {
-              gid: application.to_global_id.uri,
-              evidence_migration: true
-            }
-          )
+        "events.individual.eligibilities.application.applicant.income_evidence_updated",
+        attributes: {
+          gid: application.to_global_id.uri,
+          evidence_migration: true
+        }
+      )
 
       event.success.publish if event.success?
 
