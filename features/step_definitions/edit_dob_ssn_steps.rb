@@ -34,7 +34,7 @@ When("Admin enters a invalid SSN and clicks on update") do
   sleep 1
 end
 
-When(/^Admin will see the (.*?) button$/) do |link|
+When(/^HBX Admin will see the (.*?) button$/) do |link|
   find_link(link)
 end
 
@@ -42,7 +42,7 @@ When(/^Admin clicks Action for a person on families index page$/) do
   find('.dropdown.pull-right', text: 'Actions').click
 end
 
-When(/Admin clicks on (.*?)/) do |link|
+When(/^HBX Admin clicks on (.*?)$/) do |link|
   click_link(link)
 end
 

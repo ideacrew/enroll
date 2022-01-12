@@ -16,8 +16,8 @@ Feature: Update DOB and SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And Admin clicks Families tab
     When Admin clicks Action for a person on families index page
-    Then Admin will see the Edit DOB / SSN button
-    When Admin clicks on Edit DOB / SSN
+    Then HBX Admin will see the Edit DOB / SSN button
+    When HBX Admin clicks on Edit DOB / SSN
     When Admin enters a invalid SSN and clicks on update
     Then Admin should see the edit form being rendered again with a validation error message
 
@@ -26,7 +26,7 @@ Feature: Update DOB and SSN
     And EnrollRegistry location_residency_verification_type feature is enabled
     And Admin clicks Families tab
     When Admin clicks Action for a person on families index page
-    Then Admin will see the Edit DOB / SSN button
-    When Admin clicks on Edit DOB / SSN
+    Then HBX Admin will see the Edit DOB / SSN button
+    When HBX Admin clicks on Edit DOB / SSN
     When Admin enters a valid DOB and SSN and clicks on update
     Then Admin should see the update partial rendered with update sucessful message
