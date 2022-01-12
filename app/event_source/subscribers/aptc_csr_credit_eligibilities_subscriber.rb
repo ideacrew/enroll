@@ -18,6 +18,12 @@ module Subscribers
             "#{Rails.root}/log/on_evidence_migration_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
           )
         process_evidence_migration(payload, subscriber_logger)
+      elsif payload[:build_determination]
+        subscriber_logger =
+          Logger.new(
+            "#{Rails.root}/log/on_build_determination_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+          )
+        process_family_determination(payload, subscriber_logger)
       else
         subscriber_logger =
           Logger.new(
@@ -68,6 +74,19 @@ module Subscribers
         subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
       end
       ::Eligibilities::Evidence.set_callback(:save, :after, :generate_evidence_updated_event)
+    end
+
+    def process_family_determination(payload, subscriber_logger)
+      subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, response: #{payload}"
+      application = GlobalID::Locator.locate(payload[:gid])
+      family = application.family
+      result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
+
+      if result.failure?
+        errors = result.failure.is_a?(Dry::Validation::Result) ? result.failure.errors.to_h : result.failure
+        logger.info "Error: unable to migrate evidences for applicant: #{applicant.id} in application #{application.id} due to #{errors}"
+        subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with failure, errors: #{errors}"
+      end
     end
   end
 end
