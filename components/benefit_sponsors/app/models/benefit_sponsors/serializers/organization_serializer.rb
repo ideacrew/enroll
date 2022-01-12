@@ -6,7 +6,7 @@ module BenefitSponsors
       attribute :entity_kind_options
 
       def is_non_exempt_benefit_sponsor?
-        is_general_organization? || is_congress? || is_embassy_or_gov_sponsor?
+        is_general_organization? || is_congress? || is_embassy_or_gov_sponsor? || object.fein.present?
       end
 
       def is_general_organization?
