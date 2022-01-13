@@ -25,6 +25,7 @@ pickle-email-*.html
 
 # Need this for the client toggler script
 !spec/support/federal_holidays_helper.rb
+!spec/test_data
 
 ### Ruby ###
 *.gem
