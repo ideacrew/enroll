@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-start_on = "1/1/2022"
-end_on = "12/31/2022"
+start_on = ENV['start_on']
+end_on = ENV['end_on']
 
 def fpl_percentage(enr, enr_member, effective_year)
   tax_households = enr.household.latest_tax_households_with_year(effective_year).active_tax_household
@@ -16,7 +16,7 @@ def total_responsible_amount(enr)
 end
 
 def member_status(enr)
-  enrollments = enr.family.hbx_enrollments.where(:effective_on.lt => Date.new(2022,1,1),
+  enrollments = enr.family.hbx_enrollments.where(:effective_on.lt => ENV['start_on'],
                                                  :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
                                                  coverage_kind: enr.coverage_kind,
                                                  :external_id.exists => true,
