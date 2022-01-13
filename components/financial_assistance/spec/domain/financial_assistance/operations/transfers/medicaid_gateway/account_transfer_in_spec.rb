@@ -87,8 +87,8 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call(transformed)
       end
 
-      it 'should return failure if zip code matches multiple counties' do
-        expect(@result).to eq(Failure("Unable to match county for [\"04930\"], as multiple counties have this zip code."))
+      it 'should return success' do
+        expect(@result.success?).to eq true
       end
     end
   end
@@ -109,6 +109,21 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       subject.load_missing_county_names(@transformed)
       loaded_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
       expect(loaded_county_name).to eq("Kennebec")
+    end
+
+    context 'when matches more than one county' do
+      before do
+        ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
+      end
+
+      it 'should load missing county name' do
+        county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
+        expect(county_name).to eq(nil)
+
+        subject.load_missing_county_names(@transformed)
+        loaded_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
+        expect(loaded_county_name).to eq("Kennebec")
+      end
     end
   end
 end

@@ -132,6 +132,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(result.value![:notice_options][:send_open_enrollment_notices]).to be_falsey
     end
 
+    it 'should have notice_options with paper_notification set to true' do
+      expect(result.value![:notice_options][:paper_notification]).to be_truthy
+    end
+
     it 'should have applicant with person hbx_id' do
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
     end
