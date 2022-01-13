@@ -30,7 +30,6 @@ module FinancialAssistance
 
     def edit
       save_faa_bookmark(request.original_url)
-      @application = find_application
       set_admin_bookmark_url
       @application = find
       load_support_texts
@@ -178,27 +177,23 @@ module FinancialAssistance
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
-      @application = find
       render layout: 'financial_assistance'
     end
 
     def eligibility_results
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = find
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = find
     end
 
     def eligibility_response_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = find
       redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
