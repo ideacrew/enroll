@@ -30,6 +30,7 @@ module FinancialAssistance
 
     def edit
       save_faa_bookmark(request.original_url)
+      @application = find_application
       set_admin_bookmark_url
       @application = find
       load_support_texts

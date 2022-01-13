@@ -130,6 +130,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   routes { FinancialAssistance::Engine.routes }
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+  let(:person_with_hbx_staff_role) { FactoryBot.create(:person, :with_hbx_staff_role)}
+  let(:hbx_staff_user) { FactoryBot.create(:user, :person => person_with_hbx_staff_role) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: 1234)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -195,7 +197,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   describe "GET edit" do
     context "With valid data" do
-
+      
       it "should render" do
         get :edit, params: { id: application.id }
         expect(assigns(:application)).to eq application
@@ -205,7 +207,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "With missing family id" do
       before do
-        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
+        sign_in(hbx_staff_user)
+        #allow(controller).to receive(:financial_assistance_identifier).and_return("")
       end
 
       it "should find the correct application" do
@@ -527,10 +531,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "With missing family id" do
       before do
-        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
+        sign_in(hbx_staff_user)
         get :wait_for_eligibility_response, params: { id: application.id }
       end
-
+      
       it "should find application" do
         expect(assigns(:application)).to eq application
       end
@@ -548,7 +553,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "With missing family id" do
       before do
-        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
+        sign_in(hbx_staff_user)
       end
 
       it 'should find the correct application' do
@@ -570,7 +576,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "With missing family id" do
       before do
-        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
+        sign_in(hbx_staff_user)
       end
 
       it 'should find application with missing family id' do
@@ -604,7 +611,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "with missing family id" do
     before do
-      allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+      allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
+      sign_in(hbx_staff_user)
       get :check_eligibility_results_received, params: { id: application.id }
     end
 
@@ -640,17 +648,18 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it 'should assign application to instance variable' do
-        expect(assigns(:application)).to eq application
+       expect(assigns(:application)).to eq application
       end
 
       it 'should redirect to eligibility_results if application status is 200/203 and application is in determined state' do
         expect(response).to redirect_to(eligibility_results_application_path(application.id, cur: 1))
       end
     end
-
+    
     context "with missing family id" do
       before do
-        allow(controller).to receive(:financial_assistance_identifiers).and_return([])
+        allow(person_with_hbx_staff_role).to receive(:financial_assistance_identifier).and_return("")
+        sign_in(hbx_staff_user)
         get :eligibility_response_error, params: { id: application.id }
       end
 
