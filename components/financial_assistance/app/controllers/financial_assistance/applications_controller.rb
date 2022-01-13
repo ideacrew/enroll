@@ -201,7 +201,7 @@ module FinancialAssistance
     end
 
     def check_eligibility_results_received
-      application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      application = find_application
       render :plain => eligibility_results_received?(application).to_s
     end
 
