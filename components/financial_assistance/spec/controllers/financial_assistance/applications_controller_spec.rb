@@ -50,6 +50,25 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       get :index
       expect(response).to render_template("index")
     end
+
+    context 'for a person who exists in multiple families(with financial assistance applications)' do
+      let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
+      let!(:application1) { FinancialAssistance::Application.create!(family_id: family_id) }
+      let!(:application2) { FinancialAssistance::Application.create!(family_id: family2.id) }
+      let!(:family_member_2_2) { FactoryBot.create(:family_member, person: person1, family: family2)}
+
+      before do
+        get :index
+      end
+
+      it 'should include applications associated with family1' do
+        expect(assigns(:applications).map(&:id).map(&:to_s)).to include(application1.id.to_s)
+      end
+
+      it 'should NOT include applications associated with family2' do
+        expect(assigns(:applications).map(&:id).map(&:to_s)).not_to include(application2.id.to_s)
+      end
+    end
   end
 
   context "copy an application" do
@@ -162,7 +181,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET Index" do
     it "should assign applications", dbclean: :after_each do
       get :index
-      applications = FinancialAssistance::Application.where(:family_id.in => [family_id])
+      applications = FinancialAssistance::Application.where(family_id: family_id)
       expect(assigns(:applications)).to eq applications
     end
   end
@@ -350,6 +369,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it "should fail during publish application and redirects to error_page" do
+        application2.ensure_relationship_with_primary(application2.applicants[1], 'spouse')
         post :step, params: { id: application2.id, commit: "Submit Application", application: application_valid_params }
         expect(flash[:error]).to match(/Submission Error: /)
         expect(response).to redirect_to(application_publish_error_application_path(application2))
