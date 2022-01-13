@@ -495,21 +495,13 @@ class Person
     primary_family&.id
   end
 
-  def primary_applicant_families
-
-  end
-
   # Get the {Family} where this {Person} is the primary family member
   #
   # family itegrity ensures only one active family can be the primary for a person
   #
   # @return [ Family ] the family member who matches this person
   def primary_family
-    @primary_family ||= primary_applicant_families.first
-  end
-
-  def primary_applicant_families
-    @primary_families ||= Family.find_primary_applicant_by_person(self)
+    @primary_family ||= Family.find_primary_applicant_by_person(self).first
   end
 
   def families
