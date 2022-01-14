@@ -1181,7 +1181,8 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
+      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_pregnant
+      validates_presence_of :is_temporarily_out_of_state, if: EnrollRegistry.feature_enabled?(:living_outside_state)
     end
 
     def driver_question_responses
