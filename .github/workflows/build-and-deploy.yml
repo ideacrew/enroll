@@ -147,7 +147,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@main
         with:
-          image: ${{ needs.prep.outputs.taggedImage }}
+          image: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
