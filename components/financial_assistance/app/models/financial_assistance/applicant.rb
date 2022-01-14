@@ -303,6 +303,7 @@ module FinancialAssistance
     validate :presence_of_attr_other_qns, on: :other_qns
     validate :driver_question_responses, on: :submission
     validates :validate_applicant_information, presence: true, on: :submission
+    validates :validate_is_temporarily_out_of_state, presence: true, on: :submission, if: :living_outside_state?
 
     validate :strictly_boolean
 
@@ -1182,7 +1183,14 @@ module FinancialAssistance
 
     def validate_applicant_information
       validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_pregnant
-      validates_presence_of :is_temporarily_out_of_state, if: EnrollRegistry.feature_enabled?(:living_outside_state)
+    end
+
+    def validate_is_temporarily_out_of_state
+      validates_presence_of :is_temporarily_out_of_state
+    end
+
+    def living_outside_state?
+      EnrollRegistry.feature_enabled?(:living_outside_state)
     end
 
     def driver_question_responses

@@ -536,6 +536,18 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
       end
 
+      context 'has living_outside_state feature disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          applicant.update_attributes!({is_temporarily_out_of_state: nil})
+        end
+
+        it 'should validate applicant as complete' do
+          expect(applicant.applicant_validation_complete?).to eq true
+        end
+      end
+
       context 'has_medicare_cubcare_eligible feature disabled' do
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
