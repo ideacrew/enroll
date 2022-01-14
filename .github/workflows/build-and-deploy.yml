@@ -45,73 +45,12 @@ jobs:
           echo ::set-output name=short_sha::$SHORT_SHA
           echo ::set-output name=branch_name::${{ env.GIT_BRANCH_NAME }}
 
-  build-and-upload-legacy-image:
-    needs: [prep]
-    runs-on: ubuntu-latest
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        ports:
-          - 5672:5672
-          - 15672:15672
-        options: >-
-          --name "rabbitmq"
-          --health-cmd "rabbitmqctl node_health_check"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-
-      # Check out repository
-      - uses: actions/checkout@v2
-
-      - name: Add git HEAD info to docker image
-        run: git show --quiet HEAD > release.txt
-
-      # Adds `docker` to the environment for running commands
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      # Add vhosts to RabbitMQ
-      - run: |
-          docker exec rabbitmq rabbitmqctl add_vhost /
-          docker exec rabbitmq rabbitmqctl add_vhost event_source
-          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
-      # Provide credentials for AWS
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      # Must use docker login in order to specify public registry
-      - name: Login to Public ECR
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ needs.prep.outputs.registry }}
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # Build Docker Image
-      - name: Build Image
-        id: build-image
-        run: |
-          chmod +x .docker/build_gha.sh
-          .docker/build_gha.sh ${{ needs.prep.outputs.tag }}-legacy public.ecr.aws/ideacrew/enroll .
-
-      # Upload Docker Image to Amazon ECR
-      - name: Upload Image to ECR
-        if: github.event_name != 'pull_request'
-        id: upload-image
-        run: docker push ${{ needs.prep.outputs.legacyImage }}
-
   # Uses buildx to build and push the image
   build-and-upload-image:
     needs: [prep]
+    strategy:
+      matrix:
+        client: ['dc', 'me']
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -191,7 +130,7 @@ jobs:
           push: ${{ env.SHOULD_DEPLOY }}
           # create local image (for scanning)
           load: false
-          tags: ${{ needs.prep.outputs.taggedImage }}
+          tags: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
@@ -201,6 +140,7 @@ jobs:
             ENROLL_DB_HOST_DEFAULT=172.17.0.1
             RABBITMQ_URL_DEFAULT=amqp://172.17.0.1:5672
             RABBITMQ_HOST_DEFAULT=amqp://172.17.0.1
+            CLIENT=${{ matrix.client }}
 
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
@@ -227,12 +167,15 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        client: ['dc', 'me']
     steps:
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }} built from <https://github.com/ideacrew/enroll/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`'
+          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} built from <https://github.com/ideacrew/enroll/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
