@@ -65,6 +65,18 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
       result = subject.call(application_id: application.id)
       expect(result.success?).to be_truthy
     end
+
+    context "applicant has penalty_on_early_withdrawal_of_savings deduction" do
+      before do
+        deduction = FactoryBot.build(:financial_assistance_deduction, kind: "penalty_on_early_withdrawal_of_savings", end_on: nil)
+        application.applicants.first.deductions << deduction
+      end
+
+      it "should publish payload successfully" do
+        result = subject.call(application_id: application.id)
+        expect(result.success?).to be_truthy
+      end
+    end
   end
 
   describe 'When Application acceptance terms missing' do
