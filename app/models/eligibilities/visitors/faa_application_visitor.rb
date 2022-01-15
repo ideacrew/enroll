@@ -20,9 +20,7 @@ module Eligibilities
           end
       end
 
-      def visit(_applicant)
-        puts "Evidence: #{subject.resource}, Satisfied? #{subject.is_satisfied}"
-      end
+      def visit(_applicant); end
     end
   end
 end
