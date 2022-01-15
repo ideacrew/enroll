@@ -10,7 +10,7 @@ module FinancialAssistance
       module Rrv
         # operation to manually trigger rrv events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
-        class TriggerRrv
+        class CreateRrvRequest
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging

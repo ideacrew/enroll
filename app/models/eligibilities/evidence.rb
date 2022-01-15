@@ -66,7 +66,8 @@ module Eligibilities
     def request_determination
       application = self.evidenceable.application
       payload = construct_payload(application)
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
+      headers = self.key == :local_mec ? { payload_type: 'application' } : { correlation_id: application.id }
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
       request_event.success? ? request_event.value!.publish : false
     end
 

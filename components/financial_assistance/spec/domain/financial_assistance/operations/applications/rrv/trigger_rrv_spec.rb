@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
@@ -93,7 +93,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::TriggerRrv.new }
+  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new }
 
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
@@ -105,7 +105,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(FinancialAssistance::Operations::Applications::Rrv::TriggerRrv).to receive(:new).and_return(obj)
+    allow(FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
     allow(premiums_double).to receive(:failure?).and_return(false)
