@@ -604,7 +604,7 @@ module FinancialAssistance
       return true unless spouse_relation.present?
       return true if all_relationships.select{|hash| hash[:relation] == "parent" && hash[:relative] == spouse_relation[:relative]}.present?
 
-      spouse_rel_id =  spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
+      spouse_rel_id = spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
       child_ids = primary_parent_relations.map(&:relative_id)
       spouse_parent_relations = relationships.where(:relative_id.in => child_ids.flatten, applicant_id: spouse_rel_id, kind: 'parent')
