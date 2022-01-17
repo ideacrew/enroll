@@ -914,7 +914,8 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
               :mitc_tax_returns => [],
               :notice_options => {
                 :send_eligibility_notices => true,
-                :send_open_enrollment_notices => false
+                :send_open_enrollment_notices => false,
+                :paper_notification => true
               },
               :oe_start_on => oe_start_on,
               :relationships => [],

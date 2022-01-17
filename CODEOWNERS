@@ -1,5 +1,6 @@
-# Client settings need to be approved by our 
+# Client settings need to be approved by our
 # Director of Application Development or Lead
 # Business Analyst
 
 /config/client_config/**/config/settings.yml @angus-irvine @DFos85
+/config/settings.yml @angus-irvine @DFos85

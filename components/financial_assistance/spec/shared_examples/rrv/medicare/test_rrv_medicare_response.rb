@@ -293,7 +293,8 @@ RSpec.shared_context 'FDSH RRV Medicare sample response', :shared_context => :me
       :oe_start_on => Date.new(2020, 10, 0o1),
       :notice_options => {
         :send_eligibility_notices => true,
-        :send_open_enrollment_notices => false
+        :send_open_enrollment_notices => false,
+        :paper_notification => true
       },
       :mitc_households => [
         { :household_id => "1",
@@ -603,7 +604,8 @@ RSpec.shared_context 'FDSH RRV Medicare sample response', :shared_context => :me
       :oe_start_on => Date.new(2020, 10, 0o1),
       :notice_options => {
         :send_eligibility_notices => true,
-        :send_open_enrollment_notices => false
+        :send_open_enrollment_notices => false,
+        :paper_notification => true
       },
       :mitc_households => [
         { :household_id => "1",

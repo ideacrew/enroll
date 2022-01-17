@@ -481,10 +481,6 @@ class Person
     Family.find_all_by_person(self)
   end
 
-  def current_and_past_financial_assistance_identifiers
-    families.map(&:id).map(&:to_s)
-  end
-
   def full_name
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
