@@ -602,7 +602,7 @@ module FinancialAssistance
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
-      return true unless all_relationships.select{|hash| hash[:relation] == "parent"}.present?
+      return true if all_relationships.select{|hash| hash[:relation] == "parent" && hash[:relative] == spouse_relation[:relative]}.present?
 
       spouse_rel_id =  spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
@@ -1103,8 +1103,12 @@ module FinancialAssistance
       matrix = build_relationship_matrix
       is_valid = [find_missing_relationships(matrix).blank?]
       is_valid << applicant_relative_exists_for_relations
-      is_valid << validate_relationships(matrix) if EnrollRegistry.feature_enabled?(:mitc_relationships)
       is_valid.all?(true)
+    end
+
+    def valid_relations?
+      matrix = build_relationship_matrix
+      EnrollRegistry.feature_enabled?(:mitc_relationships) ? validate_relationships(matrix) : true
     end
 
     def is_draft?

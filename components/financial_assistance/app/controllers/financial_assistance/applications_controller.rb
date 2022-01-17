@@ -132,6 +132,10 @@ module FinancialAssistance
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
+      unless @application.valid_relations?
+        redirect_to application_relationships_path(@application)
+        flash[:error] = 'Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.'
+      end
       redirect_to applications_path if @application.blank?
     end
 

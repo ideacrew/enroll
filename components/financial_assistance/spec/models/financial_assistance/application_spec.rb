@@ -781,22 +781,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(application.relationships.count).to eq(@no_of_applicants * (@no_of_applicants - 1))
     end
 
-    if EnrollRegistry.feature_enabled?(:mitc_relationships)
-      context "when there are invalid relationships" do
-        it 'should return false' do
-          set_up_relationships
-          application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(kind: "domestic_partners_child")
-          expect(application.relationships_complete?).to eq(false)
-        end
-      end
-
-      context "when there are valid relationships" do
-        it 'should return true' do
-          expect(application.relationships_complete?).to eq(true)
-        end
-      end
-    end
-
     context "when there are relationships without applicant or relative" do
       it 'should return false' do
         application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(applicant_id: "619ce9d9eab5e7c59bc2485f")
@@ -1698,13 +1682,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  context "relationships_complete?" do
+  context "valid_relations?" do
     let(:family_id) { BSON::ObjectId.new }
     let!(:year) { TimeKeeper.date_of_record.year }
     let!(:relationship_application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
 
     before :each do
+      EnrollRegistry[:mitc_relationships].feature.stub(:is_enabled).and_return(true)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -1722,7 +1707,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
     context "when there is only one applicant" do
       it "should return true" do
-        expect(relationship_application.relationships_complete?).to eq(true)
+        expect(relationship_application.valid_relations?).to eq(true)
       end
     end
 
@@ -1736,7 +1721,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it "should return true" do
         set_up_relationships
-        expect(relationship_application.relationships_complete?).to eq(true)
+        expect(relationship_application.valid_relations?).to eq(true)
       end
     end
 
@@ -1753,7 +1738,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
 
       it "should return true" do
-        expect(relationship_application.relationships_complete?).to eq(true)
+        expect(relationship_application.valid_relations?).to eq(true)
       end
     end
 
@@ -1771,28 +1756,66 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       before do
         set_up_relationships
       end
+
       it "should return true" do
-        expect(relationship_application.relationships_complete?).to eq(true)
+        expect(relationship_application.valid_relations?).to eq(true)
       end
     end
 
-    # context "when there are three applicants with spouse and domestic_partners_child relationship" do
-    #   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
-    #   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
-    #   let(:set_up_relationships) do
-    #     relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
-    #     relationship_application.ensure_relationship_with_primary(applicant2, 'child')
-    #     relationship_application.add_or_update_relationships(applicant1, applicant2, 'domestic_partners_child')
-    #     relationship_application.build_relationship_matrix
-    #     relationship_application.save!
-    #   end
+    context "when there are three applicants with spouse and domestic_partners_child relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'child')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'domestic_partners_child')
+        relationship_application.build_relationship_matrix
+        relationship_application.save!
+      end
 
-    #   before do
-    #     set_up_relationships
-    #   end
-    #   it "should return false" do
-    #     expect(relationship_application.relationships_complete?).to eq(true)
-    #   end
-    # end
+      before do
+        set_up_relationships
+      end
+
+      it "should return false" do
+        expect(relationship_application.valid_relations?).to eq(false)
+      end
+    end
+
+    context 'valid_relations? for a four member family' do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'child')
+        relationship_application.ensure_relationship_with_primary(applicant3, 'child')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'domestic_partners_child')
+        relationship_application.add_or_update_relationships(applicant1, applicant3, 'child')
+        relationship_application.build_relationship_matrix
+        relationship_application.save!
+      end
+
+      context "when there are invalid relationships" do
+
+        it 'should return false' do
+          set_up_relationships
+          expect(relationship_application.valid_relations?).to eq(false)
+        end
+      end
+
+      context "when there are valid relationships" do
+
+        it 'should return true' do
+          set_up_relationships
+          relationship_application.relationships.where(applicant_id: applicant1.id, kind: 'domestic_partners_child').first.update_attributes(kind: 'parent')
+          relationship_application.relationships.where(applicant_id: applicant2.id, kind: 'parents_domestic_partner').first.update_attributes(kind: 'child')
+          relationship_application.relationships.where(applicant_id: applicant1.id, relative_id: applicant3.id, kind: 'child').first.update_attributes(kind: 'parent')
+          relationship_application.relationships.where(applicant_id: applicant3.id, relative_id: applicant1.id, kind: 'parent').first.update_attributes(kind: 'child')
+          expect(relationship_application.valid_relations?).to eq(true)
+        end
+      end
+    end
   end
 end
