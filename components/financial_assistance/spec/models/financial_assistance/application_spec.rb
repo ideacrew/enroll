@@ -1683,7 +1683,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
 
     before :each do
-      EnrollRegistry[:mitc_relationships].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -1744,7 +1744,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         relationship_application.ensure_relationship_with_primary(applicant2, 'child')
         relationship_application.add_or_update_relationships(applicant1, applicant2, 'parent')
         relationship_application.build_relationship_matrix
-        relationship_application.save!
+        relationship_application.save(validate: false)
       end
 
       before do
@@ -1764,7 +1764,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         relationship_application.ensure_relationship_with_primary(applicant2, 'child')
         relationship_application.add_or_update_relationships(applicant1, applicant2, 'domestic_partners_child')
         relationship_application.build_relationship_matrix
-        relationship_application.save!
+        relationship_application.save(validate: false)
       end
 
       before do
@@ -1788,7 +1788,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         relationship_application.add_or_update_relationships(applicant1, applicant2, 'domestic_partners_child')
         relationship_application.add_or_update_relationships(applicant1, applicant3, 'child')
         relationship_application.build_relationship_matrix
-        relationship_application.save!
+        relationship_application.save(validate: false)
       end
 
       context "when there are invalid relationships" do
