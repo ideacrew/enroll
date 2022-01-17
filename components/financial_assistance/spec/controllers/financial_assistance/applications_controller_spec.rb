@@ -328,6 +328,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         end
       end
 
+      before do
+        applicant1 = application2.applicants.first
+        applicant2 = application2.applicants.last
+        application2.add_or_update_relationships(applicant1, applicant2, "spouse")
+      end
+
       it "When model is saved" do
         post :step, params: { id: application.id, application: application_valid_params }
         expect(application.save).to eq true
@@ -411,6 +417,19 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(assigns(:application)).to eq application
       expect(assigns(:application).aasm_state).to eq("draft")
       expect(response).to render_template(:financial_assistance_nav)
+    end
+
+    context 'when the application does not have valid relations' do
+
+      before do
+        allow_any_instance_of(FinancialAssistance::Application).to receive(:valid_relations?).and_return(false)
+      end
+
+      it 'should throw and redirect to relationship page' do
+        application.update_attributes(:aasm_state => "draft")
+        get :review_and_submit, params: { id: application.id }
+        expect(response).to redirect_to(application_relationships_path(application))
+      end
     end
   end
 
