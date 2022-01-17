@@ -36,9 +36,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :income, title: "Income", eligibility_status: "attested")
+        @applicant.build_income_evidence(key: :income, title: "Income")
+        @applicant.save!
         @result = subject.call(payload: response_payload)
-
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
       end
@@ -49,7 +49,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:income).first.eligibility_status).to eq "verified"
+        expect(@applicant.income_evidence.aasm_state).to eq "verified"
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
@@ -59,7 +59,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :income, title: "Income", eligibility_status: "attested")
+        @applicant.build_income_evidence(key: :income, title: "Income")
+        @applicant.save!
         @result = subject.call(payload: response_payload_2)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -72,7 +73,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:income).first.eligibility_status).to eq "outstanding"
+        expect(@applicant.income_evidence.aasm_state).to eq "outstanding"
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
