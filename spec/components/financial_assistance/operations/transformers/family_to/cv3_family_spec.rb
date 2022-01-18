@@ -487,7 +487,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :race => nil
                   },
                   :emails => [],
-                  :evidences => [],
+                  :income_evidence => nil,
+                  :esi_evidence => nil,
+                  :non_esi_evidence => nil,
+                  :local_mec_evidence => nil,
                   :family_member_reference => {
                     :family_member_hbx_id => "732020",
                     :first_name => nil,
@@ -636,7 +639,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :race => nil
                   },
                   :emails => [],
-                  :evidences => [],
+                  :income_evidence => nil,
+                  :esi_evidence => nil,
+                  :non_esi_evidence => nil,
+                  :local_mec_evidence => nil,
                   :family_member_reference => {
                     :family_member_hbx_id => "732021",
                     :first_name => nil,
@@ -778,7 +784,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :race => nil
                   },
                   :emails => [],
-                  :evidences => [],
+                  :income_evidence => nil,
+                  :esi_evidence => nil,
+                  :non_esi_evidence => nil,
+                  :local_mec_evidence => nil,
                   :family_member_reference => {
                     :family_member_hbx_id => "732022",
                     :first_name => nil,
@@ -914,7 +923,8 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
               :mitc_tax_returns => [],
               :notice_options => {
                 :send_eligibility_notices => true,
-                :send_open_enrollment_notices => false
+                :send_open_enrollment_notices => false,
+                :paper_notification => true
               },
               :oe_start_on => oe_start_on,
               :relationships => [],

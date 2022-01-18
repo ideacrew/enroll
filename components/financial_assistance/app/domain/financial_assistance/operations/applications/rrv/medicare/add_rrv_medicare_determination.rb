@@ -51,18 +51,24 @@ module FinancialAssistance
             end
 
             def update_applicant_verifications(applicant, response_applicant_entity)
-              response_esi_evidence = response_applicant_entity.evidences.detect{|evi| evi.key == :non_esi_mec}
+              response_non_esi_evidence = response_applicant_entity.non_esi_evidence
+              applicant_non_esi_evidence = applicant.non_esi_evidence
 
-              applicant_esi_evidence = applicant.evidences.by_name(:non_esi_mec).first
-
-              applicant_esi_evidence.update_attributes(eligibility_status: response_esi_evidence.eligibility_status) if ["outstanding"].include?(response_esi_evidence.eligibility_status)
-
-              if response_esi_evidence.eligibility_results.present?
-                response_esi_evidence.eligibility_results.each do |eligibility_result|
-                  applicant_esi_evidence.eligibility_results << FinancialAssistance::EligibilityResult.new(eligibility_result.to_h)
+              if applicant_non_esi_evidence.present?
+                if response_non_esi_evidence.aasm_state == 'outstanding'
+                  applicant_non_esi_evidence.move_to_outstanding!
+                  applicant_non_esi_evidence.update!(verification_outstanding: true)
+                else
+                  applicant_non_esi_evidence.update!(is_satisfied: true)
                 end
+
+                if response_non_esi_evidence.request_results.present?
+                  response_non_esi_evidence.request_results.each do |eligibility_result|
+                    applicant_non_esi_evidence.request_results << Eligibilities::RequestResult.new(eligibility_result.to_h)
+                  end
+                end
+                applicant.save!
               end
-              applicant.save!
 
               Success(applicant)
             end
