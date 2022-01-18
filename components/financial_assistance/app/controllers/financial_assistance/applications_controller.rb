@@ -134,7 +134,7 @@ module FinancialAssistance
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       unless @application.valid_relations?
         redirect_to application_relationships_path(@application)
-        flash[:error] = 'Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.'
+        flash[:error] = l10n("faa.inconsistent_relationships_error")
       end
       redirect_to applications_path if @application.blank?
     end

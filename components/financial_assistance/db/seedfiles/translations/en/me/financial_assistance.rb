@@ -156,6 +156,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.income_temporary_message" => "<ul><li><strong>Start Date: </strong>If this is income you currently have, you must enter the date you began receiving this income in the 'From' field, or 1/1/%{current_year} (if the income started before this year). Do not enter a date in the future (for example, 1/1/%{next_year}) unless this is income that has not started but you expect to have in the future.</li><li><strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.</li></ul>",
   "en.faa.not_applicable_abbreviation" => "N/A",
   # Flash error display
-  "en.faa.errors.should_be_answered" => "should be answered"
+  "en.faa.errors.should_be_answered" => "should be answered",
+  "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct."
 }.freeze
 # rubocop:enable Layout/LineLength
