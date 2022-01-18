@@ -51,12 +51,13 @@ describe Subscribers::DefaultGaChanged do
       end
 
       it "should do change when employer_profile does not have active general_agency_profile" do
+        pdo.update(has_active_broker_relationship: true)
         pdo.general_agency_accounts.delete_all
         expect(pdo.active_general_agency_account).to eq nil
-        expect(subject.service).to receive(:send_message)
+        expect(subject.service).not_to receive(:send_message)
         subject.call(nil, nil, nil, nil, message)
         pdo.reload
-        expect(pdo.active_general_agency_account.general_agency_profile).to eq new_ga
+        expect(pdo.active_general_agency_account).to eq nil
       end
 
       it "should do not change when employer_profile have active general_agency_profile" do
@@ -64,7 +65,7 @@ describe Subscribers::DefaultGaChanged do
         expect(subject.service).not_to receive(:send_message)
         subject.call(nil, nil, nil, nil, message)
         pdo_with_ga.reload
-        expect(pdo_with_ga.active_general_agency_account.general_agency_profile).not_to eq new_ga
+        expect(pdo_with_ga.active_general_agency_account).not_to eq new_ga
       end
     end
   end
