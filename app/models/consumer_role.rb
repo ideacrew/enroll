@@ -11,6 +11,8 @@ class ConsumerRole
   include Mongoid::History::Trackable
   include DocumentsVerificationStatus
   include Config::AcaIndividualMarketHelper
+  include Eligibilities::Visitors::Visitable
+  include GlobalID::Identification
 
   embedded_in :person
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
@@ -270,6 +272,11 @@ class ConsumerRole
       coverage_purchased!(verification_attr)
     end
   end
+
+  def accept(visitor)
+    visitor.visit(self)
+  end
+
 
   def ssn_or_no_ssn
     errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'

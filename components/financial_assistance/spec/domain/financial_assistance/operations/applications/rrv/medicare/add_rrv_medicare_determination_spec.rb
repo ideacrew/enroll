@@ -30,7 +30,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC", eligibility_status: "attested")
+        @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC")
+        @applicant.save!
         @result = subject.call(payload: response_payload)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -43,7 +44,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:non_esi_mec).first.eligibility_status).to eq "outstanding"
+        expect(@applicant.non_esi_evidence.aasm_state).to eq "outstanding"
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end
@@ -53,7 +54,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC", eligibility_status: "attested")
+        @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC")
+        @applicant.save!
         @result = subject.call(payload: response_payload_2)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -66,7 +68,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:non_esi_mec).first.eligibility_status).to eq "attested"
+        expect(@applicant.non_esi_evidence.aasm_state).to eq "attested"
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end
