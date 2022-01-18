@@ -581,6 +581,29 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
         end
 
+        context 'has negative income amount' do
+          before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            income
+            applicant.incomes.first.update_attributes(amount: -100.00, kind: 'net_self_employment')
+          end
+
+          it 'should return true as amount is negative for income with kind net_self_employment' do
+            expect(applicant.applicant_validation_complete?).to eq true
+          end
+        end
+
+        context 'has nil income amount' do
+          before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            income
+            applicant.incomes.first.update_attributes(amount: nil)
+          end
+
+          it 'should return false as income amount is nil' do
+            expect(applicant.applicant_validation_complete?).to eq false
+          end
+        end
       end
 
       context 'has_medicare_cubcare_eligible feature enabled' do
