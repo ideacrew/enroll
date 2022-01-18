@@ -1158,7 +1158,7 @@ module FinancialAssistance
     def create_evidence(key, title)
       return unless is_ia_eligible? || is_applying_coverage
       association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
-      self.send("create_#{association_name}_evidence", key: key, title: title) if self.send("#{association_name}_evidence").blank?
+      self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
@@ -1184,6 +1184,14 @@ module FinancialAssistance
     end
 
     # rubocop:disable Metrics/Naming/AccessorMethodName
+    def set_evidence_verified(evidence)
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.move_to_verified unless evidence.attested?
+      save!
+    end
+
     def set_evidence_outstanding(evidence)
       return unless evidence.may_move_to_outstanding?
 
