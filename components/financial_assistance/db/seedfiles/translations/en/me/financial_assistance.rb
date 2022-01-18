@@ -157,6 +157,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.not_applicable_abbreviation" => "N/A",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
-  "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct."
+  "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
+  "en.faa.errors.missing_relationships" => "You must have a complete set of relationships defined among every member.",
+  "en.faa.errors.extra_relationship" => "Extra relationship exist without an applicant"
 }.freeze
 # rubocop:enable Layout/LineLength

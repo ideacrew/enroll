@@ -10,6 +10,7 @@ module FinancialAssistance
     require 'securerandom'
     include Eligibilities::Visitors::Visitable
     include GlobalID::Identification
+    include I18n
 
     # belongs_to :family, class_name: "Family"
 
@@ -518,7 +519,7 @@ module FinancialAssistance
           missing_relationships << {id_map[xi] => id_map[yi]} if (xi > yi) && matrix[xi][yi].blank?
         end
       end
-      self.errors[:base] << "You must have a complete set of relationships defined among every member."
+      self.errors[:base] << I18n.t("faa.errors.missing_relationships")
       missing_relationships
     end
 
@@ -593,7 +594,7 @@ module FinancialAssistance
       if result.blank?
         true
       else
-        self.errors[:base] << "Extra relationship exist without an applicant"
+        self.errors[:base] << I18n.t("faa.errors.extra_relationship")
         false
       end
     end
