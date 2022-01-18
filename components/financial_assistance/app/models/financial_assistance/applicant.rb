@@ -1151,7 +1151,12 @@ module FinancialAssistance
       return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
 
       self.create_income_evidence(key: :income, title: "Income")
-      income_evidence.move_to_pending! if incomes.present?
+      if incomes.present?
+        income_evidence.move_to_pending!
+      else
+        income_evidence.is_satisfied = true
+        save!
+      end
       income_evidence
     end
 
