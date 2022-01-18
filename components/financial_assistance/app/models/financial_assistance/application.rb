@@ -613,7 +613,7 @@ module FinancialAssistance
       if spouse_parent_relations.count == child_ids.flatten.count
         true
       else
-        self.errors[:base] << "Invalid set of relationships defined among household members"
+        self.errors[:base] << I18n.t("faa.errors.invalid_household_relationships")
         false
       end
     end

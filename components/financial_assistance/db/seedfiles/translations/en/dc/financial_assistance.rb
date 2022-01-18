@@ -154,6 +154,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
   "en.faa.errors.missing_relationships" => "You must have a complete set of relationships defined among every member.",
-  "en.faa.errors.extra_relationship" => "Extra relationship exist without an applicant"
+  "en.faa.errors.extra_relationship" => "Extra relationship exist without an applicant.",
+  "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members."
 }.freeze
 # rubocop:enable Layout/LineLength
