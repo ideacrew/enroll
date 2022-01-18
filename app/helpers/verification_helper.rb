@@ -75,7 +75,24 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
+    is_unverified_verification_type?(person) || is_unverified_evidences?(person)
+  end
+
+  def is_unverified_verification_type?(person)
     person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.is_type_outstanding?}.any?
+  end
+
+  def is_unverified_evidences?(person)
+    application = FinancialAssistance::Application.where(family_id: person.primary_family.id).determined.order_by(:created_at => 'desc').first
+    aasm_states = []
+    application&.active_applicants&.each do |applicant|
+      FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+        evidence = applicant.send(evidence_type)
+        aasm_states << evidence.aasm_state if evidence.present?
+      end
+    end
+
+    aasm_states.include?('outstanding')
   end
 
   def verification_needed?(person)

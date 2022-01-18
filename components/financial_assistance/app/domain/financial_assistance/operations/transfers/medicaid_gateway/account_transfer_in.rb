@@ -11,6 +11,7 @@ module FinancialAssistance
         # This Operation creates a new family and application draft
         # Operation receives ATP payload from medicaid gateway
         class AccountTransferIn
+          include ::FinancialAssistance::MeCountyHelper
           include Dry::Monads[:result, :do]
 
           PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
@@ -34,6 +35,10 @@ module FinancialAssistance
             ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
           end
 
+          def find_specific_county(town_name)
+            maine_counties_and_towns.detect { |key, _value| maine_counties_and_towns[key].include?(town_name) }&.first
+          end
+
           def load_missing_county_names(payload)
             zips_with_missing_counties = []
             zips_with_multiple_counties = []
@@ -44,7 +49,16 @@ module FinancialAssistance
                 county = county_finder(zip)
                 address["county"] = county.first.county_name if county&.count == 1
                 zips_with_missing_counties << zip if county.blank?
-                zips_with_multiple_counties << zip if county.count > 1
+
+                next unless county.count > 1
+                town_name = address['city'].titleize
+                county_name = find_specific_county(town_name)
+
+                if county_name.present?
+                  address['county'] = county_name
+                else
+                  zips_with_multiple_counties << zip
+                end
               end
             end
             return Failure("Unable to find county objects for zips #{zips_with_missing_counties.uniq}") if zips_with_missing_counties.present?

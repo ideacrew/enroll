@@ -18,8 +18,10 @@ module FinancialAssistance
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
+    # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
+    # DO NOT include applications from other families.
     def index
-      @applications = ::FinancialAssistance::Application.where(:family_id.in => get_current_person.current_and_past_financial_assistance_identifiers)
+      @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
     end
 
     def new
@@ -30,7 +32,6 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
 
       load_support_texts
     end
@@ -105,7 +106,7 @@ module FinancialAssistance
     end
 
     def uqhp_flow
-      ::FinancialAssistance::Application.where(aasm_state: "draft", :family_id.in => financial_assistance_identifiers).destroy_all
+      ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
 
@@ -148,7 +149,7 @@ module FinancialAssistance
         return
       end
 
-      @application = FinancialAssistance::Application.where(id: params['id'], :family_id.in => financial_assistance_identifiers).first
+      @application = FinancialAssistance::Application.where(id: params['id'], family_id: get_current_person.financial_assistance_identifier).first
 
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
@@ -177,34 +178,30 @@ module FinancialAssistance
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       render layout: 'financial_assistance'
     end
 
     def eligibility_results
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
     end
 
     def eligibility_response_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
       redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
     end
 
     def check_eligibility_results_received
-      application = ::FinancialAssistance::Application.find_by(id: params[:id], :family_id.in => financial_assistance_identifiers)
+      application = find_application
       render :plain => eligibility_results_received?(application).to_s
     end
 

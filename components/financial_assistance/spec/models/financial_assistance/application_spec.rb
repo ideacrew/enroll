@@ -612,7 +612,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
     before do
-      allow(valid_app).to receive(:trigger_fdhs_calls).and_return(true)
+      allow(valid_app).to receive(:publish_application_determined).and_return(true)
     end
 
     it 'should allow a sucessful state transition for valid application' do
@@ -658,6 +658,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe '.create_evidences' do
+    let(:income) { FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly") }
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
@@ -666,20 +667,25 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
       allow(applicant1).to receive(:is_ia_eligible?).and_return(true)
+      application.active_applicants.each do |applicant|
+        applicant.incomes << income
+        applicant.save!
+      end
+      application.send(:create_evidences)
     end
 
-    it 'should create MEC evidences, ACES MEC check only if is_ia_eligible? not true' do
-      application.send(:create_evidences)
-      expect(applicant1.evidences.count).to eq 4
-      expect(applicant2.evidences.count).to eq 4
-      expect(applicant1.reload.evidences.where(key: nil).present?).to eq false
+    it 'should create MEC evidence, ACES MEC check only if is_ia_eligible? not true' do
+      application.reload.active_applicants.each do |applicant|
+        expect(applicant.income_evidence.present?).to be_truthy
+        expect(applicant.esi_evidence.present?).to be_truthy
+        expect(applicant.non_esi_evidence.present?).to be_truthy
+        expect(applicant.local_mec_evidence.present?).to be_truthy
+      end
     end
 
     it 'should have both income and mec in pending state' do
       application.active_applicants.each do |applicant|
-        applicant.evidences.each do |type|
-          expect(type.eligibility_status).to eq('attested')
-        end
+        expect(applicant.income_evidence.aasm_state).to eq "pending"
       end
     end
   end

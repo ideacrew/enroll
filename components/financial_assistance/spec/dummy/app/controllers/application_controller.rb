@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
     set_current_person
     bookmark_url = url || request.original_url
     role = current_user.has_hbx_staff_role?
-    @person.consumer_role.update_attributes(:admin_bookmark_url => bookmark_url) if !role.nil? && !prior_ridp_bookmark_urls(bookmark_url) && @person.has_consumer_role?
   end
 
   def save_faa_bookmark(url)
