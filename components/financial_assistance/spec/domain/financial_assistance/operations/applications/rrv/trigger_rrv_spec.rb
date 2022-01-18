@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
@@ -15,7 +15,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
                       family_id: family.id,
                       aasm_state: 'determined',
                       hbx_id: "830293",
-                      assistance_year: TimeKeeper.date_of_record.next_year.year,
+                      assistance_year: TimeKeeper.date_of_record.year,
                       effective_date: TimeKeeper.date_of_record.beginning_of_year,
                       created_at: Date.new(2021, 10, 1))
   end
@@ -55,7 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     applicant
   end
 
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, csr_percent_as_integer: 73) }
 
   let(:premiums_hash) do
     {
@@ -93,7 +93,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::TriggerRrv.new }
+  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new }
 
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
@@ -105,7 +105,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(FinancialAssistance::Operations::Applications::Rrv::TriggerRrv).to receive(:new).and_return(obj)
+    allow(FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
     allow(premiums_double).to receive(:failure?).and_return(false)
@@ -115,18 +115,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::TriggerRrv,
 
   context 'success' do
     it 'should return success' do
-      expect(applicant.evidences.count).to eq 0
-      result = subject.call(families: [family])
+      expect(applicant.income_evidence.present?).to be_falsey
+      expect(applicant.non_esi_evidence.present?).to be_falsey
+      result = subject.call(families: Family.all, assistance_year: application.assistance_year)
       expect(result).to be_success
-      expect(applicant.reload.evidences.count).to eq 2
+      expect(applicant.reload.income_evidence.present?).to be_truthy
+      expect(applicant.reload.non_esi_evidence.present?).to be_truthy
     end
   end
 
   it "when evidences are not created due to applicant ineligible" do
     applicant.update(is_applying_coverage: false, is_ia_eligible: false)
-    expect(applicant.evidences.count).to eq 0
-    result = subject.call(families: [family])
+    expect(applicant.income_evidence.present?).to be_falsey
+    expect(applicant.non_esi_evidence.present?).to be_falsey
+    result = subject.call(families: Family.all, assistance_year: application.assistance_year)
     expect(result).to be_success
-    expect(applicant.reload.evidences.count).to eq 0
+    expect(applicant.reload.income_evidence.present?).to be_falsey
+    expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end
 end

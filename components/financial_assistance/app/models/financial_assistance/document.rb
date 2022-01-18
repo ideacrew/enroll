@@ -10,11 +10,7 @@ module FinancialAssistance
 
     ACCESS_RIGHTS = %w[public pii_restricted].freeze
 
-    ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject"].freeze
-
-    VERIFICATION_REASONS = EnrollRegistry[:verification_reasons].item
-
-    REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "4 weeks", "Too old"].freeze
+    ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject", "View History", "Call HUB", "Extend"].freeze
 
     # Enable polymorphic associations
     embedded_in :documentable, polymorphic: true

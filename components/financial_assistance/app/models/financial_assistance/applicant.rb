@@ -9,6 +9,8 @@ module FinancialAssistance
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
+    include Eligibilities::Visitors::Visitable
+    include GlobalID::Identification
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -89,6 +91,8 @@ module FinancialAssistance
 
     EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
 
+    EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -119,7 +123,6 @@ module FinancialAssistance
     field :is_resident_role, type: Boolean
     field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
-    field :is_consent_applicant, type: Boolean, default: false
     field :is_tobacco_user, type: String, default: 'unknown'
     field :vlp_document_id, type: String
 
@@ -282,7 +285,6 @@ module FinancialAssistance
     field :transfer_referral_reason, type: String
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
-    embeds_many :evidences, class_name: "::FinancialAssistance::Evidence"
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -293,7 +295,15 @@ module FinancialAssistance
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :evidences
+    # depricated, need to remove this after after data migration
+    embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
+
+    embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
@@ -331,6 +341,10 @@ module FinancialAssistance
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
+
+    def accept(visitor)
+      visitor.visit(self)
     end
 
     def csr_percent_as_integer=(new_csr_percent)
@@ -962,9 +976,10 @@ module FinancialAssistance
     end
 
     def admin_verification_action(action, v_type, update_reason)
-      if action == "verify"
+      case action
+      when "verify"
         update_verification_type(v_type, update_reason)
-      elsif action == "return_for_deficiency"
+      when "return_for_deficiency"
         return_doc_for_deficiency(v_type, update_reason)
       end
     end
@@ -1126,6 +1141,59 @@ module FinancialAssistance
       current_month_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
     end
 
+    def create_evidences
+      create_evidence(:local_mec, "Local MEC") if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      create_evidence(:esi_mec, "ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      create_evidence(:non_esi_mec, "Non ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+    end
+
+    def create_eligibility_income_evidence
+      return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
+
+      self.create_income_evidence(key: :income, title: "Income")
+      income_evidence.move_to_pending! if incomes.present?
+      income_evidence
+    end
+
+    def create_evidence(key, title)
+      return unless is_ia_eligible? || is_applying_coverage
+      association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
+      self.send("create_#{association_name}_evidence", key: key, title: title) if self.send("#{association_name}_evidence").blank?
+    rescue StandardError => e
+      Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
+    end
+
+    def enrolled_with(_enrollment)
+      return unless income_evidence&.pending?
+      if income_evidence.due_on.blank?
+        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
+      end
+
+      set_evidence_outstanding(income_evidence)
+    end
+
+    def set_income_evidence_verified
+      return unless income_evidence.may_move_to_verified?
+
+      income_evidence.verification_outstanding = false
+      income_evidence.due_on = nil
+      income_evidence.is_satisfied = true
+      income_evidence.move_to_verified
+      save!
+    end
+
+    # rubocop:disable Metrics/Naming/AccessorMethodName
+    def set_evidence_outstanding(evidence)
+      return unless evidence.may_move_to_outstanding?
+
+      evidence.verification_outstanding = true
+      evidence.is_satisfied = false
+      evidence.move_to_outstanding
+      save!
+    end
+    # rubocop:enable Metrics/Naming/AccessorMethodName
+
     class << self
       def find(id)
         return nil unless id
@@ -1195,7 +1263,7 @@ module FinancialAssistance
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
-        instance_check_method = instance_type + "_exists?"
+        instance_check_method = "#{instance_type}_exists?"
 
         # Add error to attribute that has a nil value.
         errors.add(attribute, "#{attribute.to_s.titleize} can not be a nil") if send(attribute).nil?
@@ -1327,7 +1395,7 @@ module FinancialAssistance
       # return if incomes_changed? || benefits_changed? || deductions_changed?
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
-        create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+        create_or_update_result = ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?

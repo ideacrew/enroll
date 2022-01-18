@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d543a3c8ede35b9bff439775ed3513dd784d1a68
+  revision: c14f804ac536a62d1b7df84e236e6c0e35e3579b
   branch: trunk
   specs:
-    aca_entities (0.9.0)
+    aca_entities (0.10.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -1114,6 +1114,7 @@ DEPENDENCIES
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
+  globalid
   haml (~> 5.0)
   httparty (~> 0.16)
   i18n (~> 1.5)

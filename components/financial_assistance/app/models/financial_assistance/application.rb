@@ -8,6 +8,8 @@ module FinancialAssistance
     include AASM
     include Acapi::Notifiers
     require 'securerandom'
+    include Eligibilities::Visitors::Visitable
+    include GlobalID::Identification
 
     # belongs_to :family, class_name: "Family"
 
@@ -407,6 +409,10 @@ module FinancialAssistance
       end
     end
 
+    def accept(visitor)
+      applicants.collect{|applicant| applicant.accept(visitor) }
+    end
+
     # Related to Relationship Matrix
     def add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
       self.reload
@@ -433,6 +439,13 @@ module FinancialAssistance
       matrix = fetch_relationship_matrix
       apply_rules_and_update_relationships(matrix)
       fetch_relationship_matrix
+    end
+
+    def enrolled_with(enrollment)
+      enrollment.hbx_enrollment_members.each do |enrollment_member|
+        applicant = applicants.where(family_member_id: enrollment_member.applicant_id).first
+        applicant&.enrolled_with(enrollment)
+      end
     end
 
     # fetch existing relationships matrix
@@ -823,7 +836,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
         transitions from: :submitted, to: :determined
       end
 
@@ -967,21 +980,21 @@ module FinancialAssistance
         FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
     end
 
-    def trigger_fdhs_calls
+    def publish_application_determined
       return unless predecessor_id.blank? && can_trigger_fdsh_calls?
 
-      Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+      Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
-      Rails.logger.error { "FAA trigger_fdhs_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+      Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def trigger_aces_call
-      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_aces_call error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
-    def is_aces_mec_checkable?
+    def is_local_mec_checkable?
       return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       self.active_applicants.any?(&:is_ia_eligible?)
     end
@@ -1283,6 +1296,14 @@ module FinancialAssistance
                        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
 
+    def create_rrv_evidences
+      active_applicants.each do |applicant|
+        applicant.create_evidence(:non_esi_mec, "Non ESI MEC")
+        applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
+        applicant.save!
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1553,7 +1574,6 @@ module FinancialAssistance
         end
       end
 
-
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
@@ -1570,61 +1590,35 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
       return if predecessor_id.present?
 
-      types = []
-      types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-      types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
-      types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
-      types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
-
       active_applicants.each do |applicant|
-        applicant.evidences << build_evidences(types, applicant)
-        applicant.save if applicant.evidences
-        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-           family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-
-          family_member_record = family.family_members.where(id: applicant.family_member_id).first
-          next if family_member_record.blank?
-          person_record = family_member_record.person
-          next if person_record.blank?
-          person_record.add_new_verification_type('Income')
-        end
-        from_state = applicant.aasm_state
-        # TODO: revisit
-        applicant.write_attribute(:aasm_state, 'verification_pending')
-        applicant.workflow_state_transitions << WorkflowStateTransition.new(
-          from_state: from_state,
-          to_state: 'verification_pending',
-          event: 'move_to_pending!'
-        )
-      rescue StandardError => e
-        Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
+        applicant.create_evidences
+        applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
+        # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
-    rescue StandardError => e
-      Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
 
-    def build_evidences(types, applicant)
-      evidences = []
-      types.each do |type_array|
-        key = type_array[0]
-        title = type_array[1]
-        next if applicant.evidences.by_name(key).present?
-        case key
-        when :aces_mec, :esi_mec, :non_esi_mec
-          next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-          evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
-        when :income
-          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
-          status = applicant.incomes.blank? ? "attested" : "outstanding"
-          evidences << FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
-        end
-      end
-      evidences
+    def create_income_verification(applicant)
+      return unless family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+
+      family_member_record = family.family_members.where(id: applicant.family_member_id).first
+      return unless family_member_record.present?
+
+      person_record = family_member_record.person
+      return unless person_record.present?
+
+      person_record.add_new_verification_type('Income')
+
+      from_state = applicant.aasm_state
+      # TODO: revisit
+      applicant.write_attribute(:aasm_state, 'verification_pending')
+      applicant.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: from_state,
+        to_state: 'verification_pending',
+        event: 'move_to_pending!'
+      )
     end
 
     def delete_verification_documents
