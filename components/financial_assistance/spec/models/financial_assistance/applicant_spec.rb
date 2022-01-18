@@ -833,7 +833,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                           family_member_id: BSON::ObjectId.new)
       end
 
-      context 'for income evidence' do 
+      context 'for income evidence' do
 
         before do
           applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
@@ -860,7 +860,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
       end
 
-      context 'for esi mec evidence' do 
+      context 'for esi mec evidence' do
 
         before do
           applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
