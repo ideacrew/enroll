@@ -99,12 +99,16 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
       end
     end
   end
-
   describe "coverage household with invalid aasm state" do
-    let(:person) { FactoryBot.create(:person) }
+    let(:person) {FactoryBot.create(:person)}
     let(:primary_family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let(:coverage_household) { primary_family.active_household.coverage_households.first }
+    let(:coverage_household) { primary_family.active_household.coverage_households.first}
     let(:enrollment){ FactoryBot.create(:hbx_enrollment, coverage_household_id: coverage_household.id, family: primary_family, household: primary_family.active_household) }
+
+    before do
+      coverage_household.active_individual_enrollments << enrollment
+      coverage_household.save!
+    end
 
     it "should not throw an exception while in applicant state and there are present enrollments" do
       coverage_household.reload
