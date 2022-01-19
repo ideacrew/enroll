@@ -110,7 +110,9 @@ module FinancialAssistance
                         on: [:step_1, :submission]
 
     validates :amount, presence: true,
-                       numericality: {
+                       on: [:step_1, :submission]
+
+    validates :amount, numericality: {
                          greater_than: 0, message: "%{value} must be greater than $0"
                        },
                        on: [:step_1, :submission], unless: :income_amount_validate
