@@ -1603,10 +1603,11 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.submit!
     end
 
+    let(:haven_determination) { true }
+    let(:medicaid_gateway_determination) { false }
+    let(:app_state) { 'haven_magi_medicaid_eligibility_request_errored' }
+
     context 'haven_determination' do
-      let(:haven_determination) { true }
-      let(:medicaid_gateway_determination) { false }
-      let(:app_state) { 'haven_magi_medicaid_eligibility_request_errored' }
 
       it 'should transition application to submitted' do
         expect(application.reload.submitted?).to be_truthy
@@ -1620,6 +1621,46 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it 'should transition application to submitted' do
         expect(application.reload.submitted?).to be_truthy
+      end
+    end
+
+    context 'when received determination' do
+
+      before do
+        application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+
+        application.active_applicants.each do |applicant|
+          applicant.create_evidences
+        end
+      end
+
+      it 'should create verification histories' do
+        application.active_applicants.each do |applicant|
+          expect(applicant.esi_evidence).to be_present
+          %w(esi_evidence non_esi_evidence local_mec_evidence income_evidence).each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            next unless evidence
+            expect(evidence.verification_histories).to be_empty
+          end
+        end
+
+        application.update_evidence_histories
+
+        application.active_applicants.each do |applicant|
+          expect(applicant.esi_evidence).to be_present
+          %w(esi_evidence non_esi_evidence local_mec_evidence income_evidence).each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            next unless evidence
+            expect(evidence.verification_histories).to be_present
+            history = evidence.verification_histories.first
+            expect(history.action).to eq "application_determined"
+            expect(history.update_reason).to eq "Requested Hub for verification"
+            expect(history.updated_by).to eq "system"
+          end
+        end
       end
     end
   end

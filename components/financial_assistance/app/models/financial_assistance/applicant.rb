@@ -1166,13 +1166,23 @@ module FinancialAssistance
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
 
-    def enrolled_with(_enrollment)
-      return unless income_evidence&.pending?
-      if income_evidence.due_on.blank?
-        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
+    def update_evidence_histories(assistance_evidences)
+      assistance_evidences.each do |evidence_name|
+        evidence_record = self.send(evidence_name)
+        evidence_record&.add_verification_history('application_determined', 'Requested Hub for verification', 'system')
       end
 
+      self.save
+    end
+
+    def schedule_verification_due_on
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      TimeKeeper.date_of_record + verification_document_due.days
+    end
+
+    def enrolled_with(_enrollment)
+      return unless income_evidence&.pending?
+      income_evidence.due_on = schedule_verification_due_on if income_evidence.due_on.blank?
       set_evidence_outstanding(income_evidence)
     end
 
