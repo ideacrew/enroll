@@ -17,14 +17,14 @@ module FinancialAssistance
     def admin_verification_action(admin_action, evidence, update_reason)
       evidence.update(update_reason: update_reason, updated_by: current_user.oim_id)
       evidence.verification_histories << create_verification_history(admin_action, update_reason)
+      applicant = evidence.evidenceable
+
       case admin_action
       when "verify"
-        evidence.move_to_verified!
-        evidence.update!(is_satisfied: true, verification_outstanding: false)
+        applicant.set_evidence_verified(evidence)
         "#{evidence.title} successfully verified."
       when "return_for_deficiency"
-        evidence.move_to_outstanding!
-        evidence.update!(is_satisfied: false, verification_outstanding: true)
+        applicant.set_evidence_outstanding(evidence)
         "#{evidence.title} rejected."
       end
     end

@@ -54,7 +54,7 @@ module FinancialAssistance
               if response_evidence.aasm_state == 'outstanding'
                 applicant.set_evidence_outstanding(applicant_local_mec_evidence)
               else
-                applicant_local_mec_evidence.update!(is_satisfied: true, due_on: nil)
+                applicant.set_evidence_verified(applicant_local_mec_evidence)
               end
 
               response_evidence.request_results&.each do |eligibility_result|
