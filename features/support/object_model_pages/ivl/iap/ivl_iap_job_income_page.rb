@@ -16,7 +16,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.employer_name
-    'EMPLOYER NAME *'
+    'income[employer_name]'
   end
 
   def self.income_amount
@@ -44,11 +44,19 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.income_employer_address_1
-    'income_employer_address_address_1'
+    'income[employer_address][address_1]'
+  end
+
+  def self.calendar
+    'table[class="ui-datepicker-calendar"]'
+  end
+
+  def self.income_employer_address_2
+    'income[employer_address][address_2]'
   end
 
   def self.income_employer_city
-    'income_employer_address_city'
+    'income[employer_address][city]'
   end
 
   def self.income_employer_state_dropdown
@@ -68,7 +76,11 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.income_save_btn
-    'input[class="btn btn-danger interaction-click-control-save"]'
+    '.interaction-click-control-save'
+  end
+
+  def self.add_another_job_income
+    '.interaction-click-control-add-another-job-income'
   end
 
   def self.income_cancel_btn
@@ -99,6 +111,9 @@ class IvlIapJobIncomeInformationPage
     'div[class="selectric interaction-choice-control-income-frequency-kind interaction-choice-control-income-employer-address-state"]'
   end
 
+  def self.self_employed_yearly
+    '#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7'
+  end
   def self.self_employee_income_from
     'income[start_on]'
   end
@@ -120,7 +135,11 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.self_self_employee_save_btn
-    'input[class="btn btn-danger interaction-click-control-save"]'
+    '.interaction-click-control-save'
+  end
+
+  def self.self_add_another_self_employment
+    '.interaction-click-control-add-another--self-employed-income'
   end
 
   def self.self_employee_edit_btn
