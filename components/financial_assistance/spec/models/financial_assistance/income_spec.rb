@@ -24,6 +24,28 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
     }
   end
 
+  describe 'amount' do
+    context 'presence of amount' do
+      before do
+        income.update_attributes!(amount: nil)
+      end
+
+      context 'presence of amount on step_1' do
+        it 'should return false' do
+          expect(income.valid?(:step_1)).to be_falsey
+          expect(income.errors.full_messages).to include("Amount can't be blank")
+        end
+      end
+
+      context 'presence of amount on submission' do
+        it 'should return false' do
+          expect(income.valid?(:submission)).to be_falsey
+          expect(income.errors.full_messages).to include("Amount can't be blank")
+        end
+      end
+    end
+  end
+
   context 'valid income' do
     it 'should save income step_1 and submit' do
       expect(income.valid?(:step_1)).to be_truthy
