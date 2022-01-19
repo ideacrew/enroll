@@ -29,6 +29,7 @@ module Operations
         def validate(params)
           errors = []
           errors << 'date of record missing' unless params[:date_of_record]
+          errors << 'date of record should be an instance of Date' unless params[:date_of_record].is_a?(Date)
 
           errors.empty? ? Success(params) : Failure(errors)
         end
@@ -123,7 +124,7 @@ module Operations
             logger.info('-' * 100)
             logger.info(
               "Enroll Reponse Publisher to external systems(polypress),
-            event_key: #{event_key}, attributes: #{payload.to_h}, result: #{event}"
+            event_key: #{event_key}, attributes: #{results}, result: #{event}"
             )
             logger.info('-' * 100)
           end
