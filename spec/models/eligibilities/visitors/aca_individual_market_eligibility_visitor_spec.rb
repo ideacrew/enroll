@@ -90,9 +90,7 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
 
     before do
       person1.verification_types.each do |verification_type|
-        if verification_type.type_name == "Social Security Number"
-          verification_type.validation_status = 'pending'
-        end
+        verification_type.validation_status = 'pending' if verification_type.type_name == "Social Security Number"
         verification_type.save!
       end
     end

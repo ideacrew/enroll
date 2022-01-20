@@ -164,7 +164,8 @@ class CoverageHousehold
 
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::CoverageHousehold::IndividualMarketVerification.new(self)
-    self.send(eligibility_ruleset.determine_next_state) if eligibility_ruleset.applicable? && self.aasm_state != "applicant"
+    return unless (eligibility_ruleset.applicable? && self.aasm_state != "applicant")
+    self.send(eligibility_ruleset.determine_next_state)
   end
 
   def active_individual_enrollments

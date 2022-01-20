@@ -1632,15 +1632,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
 
-        application.active_applicants.each do |applicant|
-          applicant.create_evidences
-        end
+        application.active_applicants.each(&:create_evidences)
       end
 
       it 'should create verification histories' do
         application.active_applicants.each do |applicant|
           expect(applicant.esi_evidence).to be_present
-          %w(esi_evidence non_esi_evidence local_mec_evidence income_evidence).each do |evidence_name|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
             evidence = applicant.send(evidence_name)
             next unless evidence
             expect(evidence.verification_histories).to be_empty
@@ -1651,7 +1649,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
         application.active_applicants.each do |applicant|
           expect(applicant.esi_evidence).to be_present
-          %w(esi_evidence non_esi_evidence local_mec_evidence income_evidence).each do |evidence_name|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
             evidence = applicant.send(evidence_name)
             next unless evidence
             expect(evidence.verification_histories).to be_present

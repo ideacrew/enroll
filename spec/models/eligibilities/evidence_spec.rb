@@ -49,9 +49,9 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         )
       end
 
-      let(:new_due_date) {
+      let(:new_due_date) do
         applicant.schedule_verification_due_on + 30.days
-      }
+      end
 
       it 'should update due date' do
         evidence = applicant.income_evidence

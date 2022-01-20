@@ -942,7 +942,7 @@ module FinancialAssistance
     end
 
     def update_evidence_histories
-      assistance_evidences = %w(esi_evidence non_esi_evidence local_mec_evidence income_evidence)
+      assistance_evidences = %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence]
 
       active_applicants.each do |applicant|
         applicant.update_evidence_histories(assistance_evidences)
