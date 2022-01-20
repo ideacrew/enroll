@@ -837,7 +837,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
         transitions from: :submitted, to: :determined
       end
 
@@ -973,6 +973,14 @@ module FinancialAssistance
       return unless FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
 
       Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
+    end
+
+    def update_evidence_histories
+      assistance_evidences = %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence]
+
+      active_applicants.each do |applicant|
+        applicant.update_evidence_histories(assistance_evidences)
+      end
     end
 
     def can_trigger_fdsh_calls?

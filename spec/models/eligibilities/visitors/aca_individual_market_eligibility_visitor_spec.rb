@@ -58,10 +58,11 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
   end
 
   let(:evidence_item) { eligibility_item.evidence_items[1] }
+  let(:subject_member) { family.primary_applicant }
 
   subject do
     visitor = described_class.new
-    visitor.subject = family.primary_applicant
+    visitor.subject = subject_member
     visitor.evidence_item = evidence_item
     visitor.effective_date = effective_date
     visitor
@@ -80,6 +81,54 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
     it 'should build evidence state for the given eligibility item' do
       subject.call
       expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
+    end
+  end
+
+  context 'when verification type in pending' do
+
+    let(:evidence_item) { eligibility_item.evidence_items.detect{|evidence_item| evidence_item.key == 'social_security_number'} }
+
+    before do
+      person1.verification_types.each do |verification_type|
+        verification_type.validation_status = 'pending' if verification_type.type_name == "Social Security Number"
+        verification_type.save!
+      end
+    end
+
+    it 'should set verification outstanding false' do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
+      evidence = subject.evidence[evidence_item.key.to_sym]
+      expect(evidence[:status]).to eq 'pending'
+      expect(evidence[:is_satisfied]).to be_truthy
+      expect(evidence[:verification_outstanding]).to be_falsey
+      expect(evidence[:due_on]).to be_nil
+    end
+  end
+
+  context 'when verification type is in unverified' do
+
+    let(:evidence_item) { eligibility_item.evidence_items.detect{|evidence_item| evidence_item.key == 'citizenship'} }
+    let(:due_on) { TimeKeeper.date_of_record }
+
+    before do
+      person1.verification_types.each do |verification_type|
+        if verification_type.type_name == "Citizenship"
+          verification_type.validation_status = 'unverified'
+          verification_type.due_date = due_on
+        end
+        verification_type.save!
+      end
+    end
+
+    it 'should set verification outstanding false' do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
+      evidence = subject.evidence[evidence_item.key.to_sym]
+      expect(evidence[:status]).to eq 'outstanding'
+      expect(evidence[:is_satisfied]).to be_falsey
+      expect(evidence[:verification_outstanding]).to be_truthy
+      expect(evidence[:due_on]).to eq due_on
     end
   end
 end
