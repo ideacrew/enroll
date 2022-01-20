@@ -308,16 +308,16 @@ class Admin::Aptc < ApplicationController
       latest_eligibility_determination = tax_household.latest_eligibility_determination
       max_aptc = latest_eligibility_determination.max_aptc
       csr_percent_as_integer = latest_eligibility_determination.csr_percent_as_integer
-      csr_percentage_param = params[:csr_percentage]&.keys&.first || params[:csr_percentage]
-      csr_percentage_value = csr_percentage_param == "limited" ? -1 : csr_percentage_param.to_i # storing "limited" CSR as -1
-      unless (params[:max_aptc].to_f == max_aptc.to_f) && (csr_percentage_value == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
+      csr_percentage_value = params[:csr_percentage]&.keys&.first || params[:csr_percentage]
+      csr_percentage_param = csr_percentage_value == "limited" ? -1 : csr_percentage_value.to_i # storing "limited" CSR as -1
+      unless (params[:max_aptc].to_f == max_aptc.to_f) && (csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         effective_starting_on = tax_household.effective_starting_on
         if effective_starting_on > TimeKeeper.date_of_record
           eligibility_date = effective_starting_on
         else
           eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
         end
-        build_new_thh_with_determination(tax_household, eligibility_date, params[:max_aptc].to_f, csr_percentage_value)
+        build_new_thh_with_determination(tax_household, eligibility_date, params[:max_aptc].to_f, csr_percentage_param)
         eligibility_redetermination_result = true
       end
       eligibility_redetermination_result
