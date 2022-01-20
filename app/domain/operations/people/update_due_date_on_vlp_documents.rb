@@ -33,8 +33,9 @@ module Operations
 
       def update_due_date(family, due_date)
         family.contingent_enrolled_active_family_members.each do |family_member|
+          consumer_role = family_member.person.consumer_role
           updated_verification_dates =
-            family_member.person.verification_types.active.all? do |verification_type|
+            consumer_role.types_include_to_notices.all? do |verification_type|
               verification_type.update_attributes!(due_date: due_date, due_date_type: 'notice') if can_update_due_date?(verification_type)
             end
 
