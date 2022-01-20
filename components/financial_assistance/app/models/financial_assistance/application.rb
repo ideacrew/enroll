@@ -10,6 +10,7 @@ module FinancialAssistance
     require 'securerandom'
     include Eligibilities::Visitors::Visitable
     include GlobalID::Identification
+    include I18n
 
     # belongs_to :family, class_name: "Family"
 
@@ -518,6 +519,7 @@ module FinancialAssistance
           missing_relationships << {id_map[xi] => id_map[yi]} if (xi > yi) && matrix[xi][yi].blank?
         end
       end
+      self.errors[:base] << I18n.t("faa.errors.missing_relationships")
       missing_relationships
     end
 
@@ -582,6 +584,38 @@ module FinancialAssistance
       set_determination_response_error!
       update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
       log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
+    end
+
+    def applicant_relative_exists_for_relations
+      result = relationships.collect do |relationship|
+        next if FinancialAssistance::Applicant.find(relationship.applicant_id).present? && FinancialAssistance::Applicant.find(relationship.relative_id).present?
+        relationship
+      end.compact
+      if result.blank?
+        true
+      else
+        self.errors[:base] << I18n.t("faa.errors.extra_relationship")
+        false
+      end
+    end
+
+    def validate_relationships(matrix)
+      # validates the child has relationship as parent for 'spouse of the primary'.
+      all_relationships = find_all_relationships(matrix)
+      spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
+      return true unless spouse_relation.present?
+
+      spouse_rel_id = spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
+      primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
+      child_ids = primary_parent_relations.map(&:relative_id)
+      spouse_parent_relations = relationships.where(:relative_id.in => child_ids.flatten, applicant_id: spouse_rel_id, kind: 'parent')
+
+      if spouse_parent_relations.count == child_ids.flatten.count
+        true
+      else
+        self.errors[:base] << I18n.t("faa.errors.invalid_household_relationships")
+        false
+      end
     end
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
@@ -1075,7 +1109,15 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      find_missing_relationships(build_relationship_matrix).blank?
+      matrix = build_relationship_matrix
+      is_valid = [find_missing_relationships(matrix).blank?]
+      is_valid << applicant_relative_exists_for_relations
+      is_valid.all?(true)
+    end
+
+    def valid_relations?
+      matrix = build_relationship_matrix
+      EnrollRegistry.feature_enabled?(:mitc_relationships) ? validate_relationships(matrix) : true
     end
 
     def is_draft?
@@ -1234,7 +1276,6 @@ module FinancialAssistance
       if relationships_complete?
         relationships_validity = true
       else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
         relationships_validity = false
       end
 
