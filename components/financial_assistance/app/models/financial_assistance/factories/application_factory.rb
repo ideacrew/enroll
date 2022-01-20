@@ -50,7 +50,9 @@ module FinancialAssistance
       end
 
       def build_applicant(source_applicant)
-        new_applicant = @new_application.applicants.build(applicant_params(source_applicant))
+        is_living_in_state = has_in_state_home_addresses?(source_applicant.addresses)
+
+        new_applicant = @new_application.applicants.build(applicant_params(source_applicant).merge(is_living_in_state: is_living_in_state))
         source_applicant.incomes.each do |source_income|
           new_applicant.incomes << ::FinancialAssistance::Income.dup_instance(source_income)
         end
@@ -74,6 +76,14 @@ module FinancialAssistance
       end
 
       private
+
+      def has_in_state_home_addresses?(addresses)
+        home_address = addresses.select do |address|
+          address.kind == 'home' && address.state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        end
+
+        home_address.present?
+      end
 
       def drop_inactive_applicants(drop_member_ids)
         inactive_applicants = @new_application.applicants.where(:family_member_id.in => drop_member_ids)

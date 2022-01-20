@@ -499,6 +499,75 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         end
       end
     end
+
+    context 'is_living_in_state' do
+      before :each do
+        [application_11].each do |applin|
+          applin.applicants.first.update_attributes!(is_primary_applicant: true)
+          address_attributes = {
+            kind: 'home',
+            address_1: '3 Awesome Street',
+            address_2: '#300',
+            city: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_city).item,
+            state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+            zip: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_zip_code).item
+          }
+          if EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item == 'county'
+            address_attributes.merge!(
+              county: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_county).item
+            )
+          end
+
+          applin.reload
+          applin.applicants.each do |applicant|
+            applicant.addresses << ::FinancialAssistance::Locations::Address.new(address_attributes)
+            applicant.save!
+          end
+          family_id = applin.family_id
+          family = Family.find(family_id) if family_id.present?
+          family.family_members.each do |fm|
+            main_app_address = Address.new(address_attributes)
+            fm.person.addresses << main_app_address
+            fm.person.save!
+          end
+        end
+      end
+
+      context 'for in state addresses' do
+        before do
+          @new_application = described_class.new(application_11).create_application
+        end
+
+        it 'should set as true' do
+          applicants = @new_application.applicants
+          expect(applicants.map(&:is_living_in_state)).to eq [true,true]
+        end
+      end
+
+      context 'for out of state addresses for one of the dependents' do
+        before do
+          application_11.applicants.first.addresses.update_all(state: 'CA')
+          @new_application = described_class.new(application_11).create_application
+        end
+
+        it 'should set as true' do
+          applicants = @new_application.applicants
+          expect(applicants.map(&:is_living_in_state)).to eq [false,true]
+        end
+      end
+
+      context 'for no addresses for one of the dependents' do
+        before do
+          application_11.applicants.first.addresses.delete_all
+          @new_application = described_class.new(application_11).create_application
+        end
+
+        it 'should set as true' do
+          applicants = @new_application.applicants
+          expect(applicants.map(&:is_living_in_state)).to eq [false,true]
+        end
+      end
+    end
   end
 
   describe 'applicant with incomes, benefits and deductions' do
