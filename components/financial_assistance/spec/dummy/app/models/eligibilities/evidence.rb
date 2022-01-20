@@ -11,7 +11,6 @@ module Eligibilities
     include Dry::Monads[:result, :do, :try]
     include GlobalID::Identification
     include Eligibilities::Eventable
-    include Mongoid::Attributes::Dynamic
 
     DUE_DATE_STATES = %w[review outstanding].freeze
 
