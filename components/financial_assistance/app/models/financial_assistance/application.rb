@@ -600,10 +600,10 @@ module FinancialAssistance
     end
 
     def validate_relationships(matrix)
+      # validates the child has relationship as parent for 'spouse of the primary'.
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
-      return true if all_relationships.select{|hash| hash[:relation] == "parent" && hash[:relative] == spouse_relation[:relative]}.present?
 
       spouse_rel_id = spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
