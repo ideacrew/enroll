@@ -9,6 +9,9 @@ module Eligibilities
     include AASM
     include ::EventSource::Command
     include Dry::Monads[:result, :do, :try]
+    include GlobalID::Identification
+    include Eligibilities::Eventable
+    include Mongoid::Attributes::Dynamic
 
     DUE_DATE_STATES = %w[review outstanding].freeze
 
@@ -23,8 +26,6 @@ module Eligibilities
       :income => 'events.fti.evidences.ifsv_determination_requested',
       :local_mec => "events.iap.mec_check.mec_check_requested"
     }.freeze
-
-    # embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
     embedded_in :evidenceable, polymorphic: true
 
@@ -42,8 +43,8 @@ module Eligibilities
     field :external_service, type: String
     field :updated_by, type: String
 
-    embeds_many :verification_histories, class_name: "::Eligibilities::VerificationHistory"
-    embeds_many :request_results, class_name: "::Eligibilities::RequestResult"
+    embeds_many :verification_histories, class_name: "::Eligibilities::VerificationHistory", cascade_callbacks: true
+    embeds_many :request_results, class_name: "::Eligibilities::RequestResult", cascade_callbacks: true
 
     embeds_many :documents, class_name: "::Document", as: :documentable do
       def uploaded
@@ -59,11 +60,28 @@ module Eligibilities
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
-    def request_determination
+    def eligibility_event_name
+      "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
+    end
+
+    def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
       payload = construct_payload(application)
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
-      request_event.success? ? request_event.value!.publish : false
+      headers = self.key == :local_mec ? { payload_type: 'application' } : { correlation_id: application.id }
+
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
+      return false unless request_event.success?
+      response = request_event.value!.publish
+
+      if response
+        add_verification_history(action_name, update_reason, updated_by)
+        self.save
+      end
+      response
+    end
+
+    def add_verification_history(action, update_reason, updated_by)
+      self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
     end
 
     def construct_payload(application)
@@ -71,8 +89,14 @@ module Eligibilities
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
     end
 
-    def extend_due_on(date = (TimeKeeper.datetime_of_record + 30.days))
-      self.due_on = date
+    def extend_due_on(period = 30.days, updated_by = nil)
+      self.due_on = verif_due_date + period
+      add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
+      self.save
+    end
+
+    def verif_due_date
+      due_on || evidenceable.schedule_verification_due_on
     end
 
     PENDING = [:pending, :attested].freeze
@@ -184,12 +208,8 @@ module Eligibilities
       ["verified", "attested"].include? aasm_state
     end
 
-    def verif_due_date
-      due_on || TimeKeeper.date_of_record + 95.days
-    end
-
-    def add_verification_history(params)
-      verification_history << FinancialAssistance::VerificationHistory.new(params)
+    def is_type_outstanding?
+      aasm_state == "outstanding"
     end
   end
 end
