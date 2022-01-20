@@ -741,7 +741,6 @@ module FinancialAssistance
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
@@ -751,7 +750,6 @@ module FinancialAssistance
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists?
@@ -1151,14 +1149,19 @@ module FinancialAssistance
       return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
 
       self.create_income_evidence(key: :income, title: "Income")
-      income_evidence.move_to_pending! if incomes.present?
+      if incomes.present?
+        income_evidence.move_to_pending!
+      else
+        income_evidence.is_satisfied = true
+        save!
+      end
       income_evidence
     end
 
     def create_evidence(key, title)
       return unless is_ia_eligible? || is_applying_coverage
       association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
-      self.send("create_#{association_name}_evidence", key: key, title: title) if self.send("#{association_name}_evidence").blank?
+      self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
@@ -1184,6 +1187,14 @@ module FinancialAssistance
     end
 
     # rubocop:disable Metrics/Naming/AccessorMethodName
+    def set_evidence_verified(evidence)
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.move_to_verified unless evidence.attested?
+      save!
+    end
+
     def set_evidence_outstanding(evidence)
       return unless evidence.may_move_to_outstanding?
 

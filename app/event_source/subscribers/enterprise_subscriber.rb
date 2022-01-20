@@ -20,7 +20,8 @@ module Subscribers
       subscriber_logger.info "EnterpriseSubscriber, response: #{payload}"
       logger.info "EnterpriseSubscriber payload: #{payload}" unless Rails.env.test?
 
-      Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: payload[:date_of_record]) if individual_market_is_enabled?
+      parsed_date = Date.parse(payload[:date_of_record])
+      Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: parsed_date) if EnrollRegistry.feature_enabled?(:aca_individual_market)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e

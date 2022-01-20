@@ -60,7 +60,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user fills out the required employer information with incorrect dates
     Then the save button should be enabled
     And the user saves the employer information
-    Then I should see a JS alert
+    Then the user should see a JS alert
 
   Scenario: User enters employer information when there is more than one employer
     Given the user has entered at least one job income information
@@ -72,7 +72,6 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the employer information
     Then the new employer information should be saved on the page
 
-  @flaky
   Scenario: User enters self employment information
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information
@@ -80,7 +79,6 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the self employment information
     Then the self employment information should be saved on the page
 
-  @flaky
   Scenario: User enters self employment information with end date less than start date
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information with incorrect dates
@@ -88,7 +86,6 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the self employment information
     # Then I should see a JS alert
 
-  @flaky
   Scenario: User enters self employment information when there is more than one self employment income
     Given the user has entered at least one self employment information
     When the Add Another Self Employment link appears
