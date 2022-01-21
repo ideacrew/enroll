@@ -58,7 +58,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       if @validatable
         @minimum_password_length = resource_class.password_length.min
       end
-      respond_with resource
+      render :new
     end
   end
 
