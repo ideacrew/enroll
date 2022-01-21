@@ -24,7 +24,7 @@ RUN apt-get update \
       fontconfig \
       libcurl4-openssl-dev \
       libffi6 \
-      libsodium-dev \
+      libsodium18 \
       libxext6 \
       libxrender1 \
       libyaml-cpp0.5v5 \
