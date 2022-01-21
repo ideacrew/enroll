@@ -1,6 +1,6 @@
 # Used to run services locally for a production Dockerfile build
-# docker-compose -f docker-compose.build.yml up -d db
-# docker-compose -f docker-compose.build.yml up -d amqp
+# docker-compose -f .docker/docker-compose.build.yml up -d db
+# docker-compose -f .docker/docker-compose.build.yml up -d amqp
 # ensure amqp has a virtual host called event_source
 # run docker build
 

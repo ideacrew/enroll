@@ -139,9 +139,7 @@ jobs:
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
-            ENROLL_DB_HOST_DEFAULT=172.17.0.1
-            RABBITMQ_URL_DEFAULT=amqp://172.17.0.1:5672
-            RABBITMQ_HOST_DEFAULT=amqp://172.17.0.1
+            HOSTNAME=172.17.0.1
             CLIENT=${{ matrix.client }}
       - name: Check encryption
         run: docker run --network="host" ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} /bin/bash .docker/check-encryption.sh
@@ -179,7 +177,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.16.0
         with:
-          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }} '
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
           slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}

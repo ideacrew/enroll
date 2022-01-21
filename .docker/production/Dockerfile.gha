@@ -182,21 +182,15 @@ COPY --chown=nonroot:nonroot . $HOME
 
 COPY --chown=nonroot:nonroot ./.docker/config/mongoid.yml $HOME/config
 
+ARG HOSTNAME=localhost
+
 # Needed to run client swap script
-ARG ENROLL_DB_HOST_DEFAULT=localhost
-ARG ENROLL_DB_PORT_DEFAULT=27017
-ARG ENROLL_DB_NAME_DEFAULT=enroll_production
-ARG RABBITMQ_URL_DEFAULT=amqp://localhost:5672
-ARG RABBITMQ_HOST_DEFAULT=amqp://localhost
-ARG RABBITMQ_PORT_DEFAULT=5672
-ARG RABBITMQ_VHOST_DEFAULT=event_source
-ENV ENROLL_DB_HOST=$ENROLL_DB_HOST_DEFAULT
-ENV ENROLL_DB_PORT=$ENROLL_DB_PORT_DEFAULT
-ENV ENROLL_DB_NAME=$ENROLL_DB_NAME_DEFAULT
-ENV RABBITMQ_URL=$RABBITMQ_URL_DEFAULT
-ENV RABBITMQ_HOST=$RABBITMQ_HOST_DEFAULT
-ENV RABBITMQ_PORT=$RABBITMQ_PORT_DEFAULT
-ENV RABBITMQ_VHOST=$RABBITMQ_VHOST_DEFAULT
+ENV ENROLL_DB_HOST=${HOSTNAME}
+ENV ENROLL_DB_PORT=27017
+ENV ENROLL_DB_NAME=enroll_production
+ENV RABBITMQ_URL=amqp://${HOSTNAME}:5672
+ENV RABBITMQ_HOST=amqp://${HOSTNAME}
+
 
 # The CLIENT variable is required to build an image specific to the client
 ARG CLIENT
@@ -219,6 +213,18 @@ RUN rm -rf $GEM_HOME/bundle/ruby/*/cache
 ################################################################
 
 FROM base as deploy
+
+ARG HOSTNAME=localhost
+
+ENV ENROLL_DB_AUTH=true
+ENV ENROLL_DB_HOST=${HOSTNAME}
+ENV ENROLL_DB_NAME=enroll_production
+ENV ENROLL_DB_PASSWORD=anything
+ENV ENROLL_DB_PORT=27017
+ENV ENROLL_DB_REPLICA_SET_NAME=anything
+ENV ENROLL_DB_USERNAME=anything
+ENV RABBITMQ_HOST=amqp://${HOSTNAME}
+ENV RABBITMQ_URL=amqp://${HOSTNAME}:5672
 
 # Copy prebuilt gems
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $BUNDLE_PATH $BUNDLE_PATH
