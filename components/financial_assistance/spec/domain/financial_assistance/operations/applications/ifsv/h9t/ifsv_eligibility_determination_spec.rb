@@ -54,6 +54,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         expect(income_evidence.verification_outstanding).to be_falsey
         expect(income_evidence.due_on).to be_blank
         expect(income_evidence.is_satisfied).to eq true
+        expect(income_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
@@ -65,8 +66,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         @applicant = application.applicants.first
         @result = subject.call(payload: response_payload_2)
 
-        @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
-        @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
+        @application = ::FinancialAssistance::Application.by_hbx_id(response_payload_2[:hbx_id]).first.reload
+        @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload_2).success
       end
 
       it 'should return success' do
@@ -79,6 +80,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         expect(income_evidence.outstanding?).to be_truthy
         expect(income_evidence.verification_outstanding).to be_truthy
         expect(income_evidence.is_satisfied).to eq false
+        expect(income_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
