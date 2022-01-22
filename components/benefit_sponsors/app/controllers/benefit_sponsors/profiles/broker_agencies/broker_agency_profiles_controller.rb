@@ -213,7 +213,7 @@ module BenefitSponsors
         def send_general_agency_assign_msg(general_agency, employer_profile, status); end
 
         def eligible_brokers
-          broker_profile_ids = BenefitSponsors::Organizations::Organization.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', person_market_kind]).map(&:broker_agency_profile).pluck(:id)
+          broker_profile_ids = BenefitSponsors::Organizations::Organization.broker_agency_profiles.approved_and_accepting_broker_agencies.broker_agencies_by_market_kind(['both', person_market_kind]).map(&:broker_agency_profile).pluck(:id)
           Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id".in => broker_profile_ids, :"broker_role.aasm_state" => "active")
         end
 

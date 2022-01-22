@@ -26,10 +26,10 @@ module FinancialAssistance
     end
 
     def fdsh_hub_request
-      result = @evidence.request_determination
+      result = @evidence.request_determination(params[:admin_action], "Requested Hub for verification", current_user.oim_id)
+
       if result
         @evidence.move_to_pending!
-        add_verification_history(params[:admin_action], "Requested Hub for verification")
         key = :success
         message = "request submited successfully"
       else
@@ -50,11 +50,10 @@ module FinancialAssistance
       @family_member = FamilyMember.find(@evidence.evidenceable.family_member_id)
       enrollment = @family_member.family.enrollments.enrolled.first
       if enrollment.present? && @evidence.type_unverified?
-        new_date = @evidence.verif_due_date + 30.days
-        updated = @evidence.update(:due_on => new_date)
+        @evidence.extend_due_date(30.days, current_user.oim_id)
+
         if updated
           flash[:success] = "#{@evidence.title} verification due date was extended for 30 days."
-          add_verification_history(params[:admin_action], "Extended due date for 30 days")
         end
       else
         flash[:danger] = "Applicant doesn't have active Enrollment to extend verification due date."
@@ -63,12 +62,6 @@ module FinancialAssistance
     end
 
     private
-
-    def add_verification_history(action, update_reason)
-      history = Eligibilities::VerificationHistory.new(action: action, update_reason: update_reason, updated_by: current_user.oim_id)
-      @evidence.verification_histories << history
-      @evidence.save!
-    end
 
     def updateable?
       authorize ::Family, :updateable?

@@ -24,7 +24,6 @@ RSpec.describe ::Operations::People::UpdateDueDateOnVlpDocuments, dbclean: :afte
   end
   let(:due_date) { TimeKeeper.date_of_record + 95.days }
 
-
   describe 'when invalid params are passed in' do
     let(:valid_params) { { due_date: due_date, family: family } }
     let(:invalid_params) { { due_date: nil, family: nil } }
@@ -40,16 +39,35 @@ RSpec.describe ::Operations::People::UpdateDueDateOnVlpDocuments, dbclean: :afte
   describe 'when valid params are passed in' do
     let(:valid_params) { { due_date: due_date, family: family } }
 
-    before :each do
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return(family.family_members)
-      person.consumer_role.verification_types.each { |vt| vt.update_attributes(validation_status: 'outstanding', due_date: nil) }
+    context 'when all the verifications are outstanding' do
+      before :each do
+        allow(family).to receive(:contingent_enrolled_active_family_members).and_return(family.family_members)
+        person.consumer_role.verification_types.each { |vt| vt.update_attributes(validation_status: 'outstanding', due_date: nil) }
+      end
+
+      it 'should update due date on outstanding verification types' do
+        result = subject.call(valid_params)
+
+        expect(result.success?).to be_truthy
+        expect(person.reload.consumer_role.verification_types.all?{ |vt| vt.due_date == due_date && vt.due_date_type == 'notice' }).to be_truthy
+      end
     end
 
-    it 'should update due date on outstanding verification types' do
-      result = subject.call(valid_params)
+    context 'when consumer has verified and outstanding verification types' do
+      before :each do
+        allow(family).to receive(:contingent_enrolled_active_family_members).and_return(family.family_members)
+        @verification_type = person.consumer_role.verification_types[0]
+        @verification_type.update_attributes(validation_status: 'outstanding', due_date: nil)
+      end
 
-      expect(result.success?).to be_truthy
-      expect(person.reload.consumer_role.verification_types.all?{ |vt| vt.due_date == due_date && vt.due_date_type == 'notice' }).to be_truthy
+      it 'should update due date on outstanding verification types' do
+        result = subject.call(valid_params)
+
+        expect(result.success?).to be_truthy
+        person.reload
+        expect(@verification_type.due_date).to eq(due_date)
+        expect(@verification_type.due_date_type).to eq('notice')
+      end
     end
   end
 end

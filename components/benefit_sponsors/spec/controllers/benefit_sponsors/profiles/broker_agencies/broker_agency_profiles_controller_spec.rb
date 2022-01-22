@@ -147,6 +147,30 @@ module BenefitSponsors
       end
     end
 
+    describe "#eligible_brokers" do
+      context "brokers are accepting new clients" do
+        let(:broker_agency_profile_accepting_new_clients) { FactoryBot.create :benefit_sponsors_organizations_broker_agency_profile, accept_new_clients: true, aasm_state: "is_approved", market_kind: "both" }
+        let(:broker_role_accepting_new_clients) { FactoryBot.create :broker_agency_staff_role, broker_agency_profile: broker_agency_profile_accepting_new_clients }
+        let!(:person_accepting_new_clients) { FactoryBot.create :person, broker_role: broker_role_accepting_new_clients }
+
+        let(:broker_agency_profile_not_accepting_new_clients) { FactoryBot.create :benefit_sponsors_organizations_broker_agency_profile, accept_new_clients: false, aasm_state: "is_approved", market_kind: "both" }
+        let(:broker_role_not_accepting_new_clients) { FactoryBot.create :broker_agency_staff_role, broker_agency_profile: broker_agency_profile_not_accepting_new_clients }
+        let!(:person_not_accepting_new_clients) { FactoryBot.create :person, broker_role: broker_role_not_accepting_new_clients }
+
+        before do
+          allow(controller).to receive(:person_market_kind).and_return("individual")
+        end
+
+        it "does not include person not accepting new clients" do
+          expect(controller.send(:eligible_brokers).to_a).to_not include(person_not_accepting_new_clients)
+        end
+
+        it "does include person accepting new clients" do
+          expect(controller.send(:eligible_brokers).to_a).to include(person_accepting_new_clients)
+        end
+      end
+    end
+
     describe "for broker_agency_profile's staff_index" do
       context "with a valid user" do
         before :each do

@@ -20,13 +20,13 @@ module Eligibilities
           evidence_gid: verification_type.to_global_id.uri
         }
 
-        outstanding_statuses = %w[unverified outstanding pending review]
+        outstanding_statuses = %w[unverified outstanding review]
 
         if outstanding_statuses.include?(verification_type.validation_status)
           evidence_state_attributes[:is_satisfied] = false
           evidence_state_attributes[:verification_outstanding] = true
           evidence_state_attributes[:due_on] = verification_type.due_date
-        elsif verification_type.type_verified?
+        elsif verification_type.type_verified? || status_for(verification_type) == 'pending'
           evidence_state_attributes[:is_satisfied] = true
           evidence_state_attributes[:verification_outstanding] = false
           evidence_state_attributes[:due_on] = nil
