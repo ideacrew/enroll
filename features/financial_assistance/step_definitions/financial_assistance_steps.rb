@@ -136,7 +136,7 @@ Given(/^they answer job income question and complete the form with incorrect dat
   # page.find('.darkblue').click
 end
 
-Then(/^I should see a JS alert$/) do
+Then(/^.+ should see a JS alert$/) do
   sleep 1
   page.driver.browser.switch_to.alert.accept
 end

@@ -32,8 +32,11 @@ class EligibilityDetermination
   # Cost-sharing reduction assistance subsidies reduce out-of-pocket expenses by raising
   #   the plan actuarial value (the average out-of-pocket costs an insurer pays on a plan)
   # Available to households with income between 100-250% of FPL and enrolled in Silver plan.
+  # DEPRECATED - both csr_percent_as_integer & csr_eligibility_kind are deprecated.
+  # CSR determination is a member level determination and exists on model 'TaxHouseholdMember'
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
   field :csr_eligibility_kind, type: String, default: 'csr_0'
+  # DEPRECATED - both csr_percent_as_integer & csr_eligibility_kind are deprecated.
 
   field :determined_at, type: DateTime
 

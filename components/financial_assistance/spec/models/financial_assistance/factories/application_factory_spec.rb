@@ -245,16 +245,17 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         end
       end
 
-      context 'for applicant evidences' do
+      context 'for applicant esi evidence' do
         before do
-          applicant.evidences << FinancialAssistance::Evidence.new(key: :esi, title: "MEC", eligibility_status: "Verified")
+          applicant.build_esi_evidence(key: :esi, title: "ESI MEC")
+          applicant.save!
           factory = described_class.new(application)
           duplicate_application = factory.create_application
           @duplicate_applicant = duplicate_application.applicants.first
         end
 
-        it 'should not have evidences' do
-          expect(@duplicate_applicant.evidences).to eq []
+        it 'should not have esi evidence' do
+          expect(@duplicate_applicant.esi_evidence).to eq nil
         end
       end
 

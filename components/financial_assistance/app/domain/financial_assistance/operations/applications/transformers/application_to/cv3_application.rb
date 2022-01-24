@@ -207,7 +207,10 @@ module FinancialAssistance
                            benchmark_premium: benchmark_premiums,
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant, mitc_eligible_incomes),
-                           evidences: applicant.evidences.serializable_hash.map(&:symbolize_keys),
+                           income_evidence: applicant&.income_evidence&.serializable_hash&.deep_symbolize_keys,
+                           esi_evidence: applicant&.esi_evidence&.serializable_hash&.deep_symbolize_keys,
+                           non_esi_evidence: applicant&.non_esi_evidence&.serializable_hash&.deep_symbolize_keys,
+                           local_mec_evidence: applicant&.local_mec_evidence&.serializable_hash&.deep_symbolize_keys,
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes)}
                 result
@@ -795,7 +798,7 @@ module FinancialAssistance
                 next result unless applicant_id.present? || relative_id.present?
                 applicant = FinancialAssistance::Applicant.find(applicant_id)
                 relative = FinancialAssistance::Applicant.find(relative_id)
-                next result unless applicant.present? || relative.present?
+                next result unless applicant.present? && relative.present?
                 result << {kind: rl.kind,
                            applicant_reference: applicant_reference(applicant),
                            relative_reference: applicant_reference(relative),

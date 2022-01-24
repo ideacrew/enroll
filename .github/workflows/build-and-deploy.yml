@@ -16,18 +16,18 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  SHOULD_DEPLOY: ${{ github.event_name != 'pull_request' }}
 
 jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
-      legacyImage: ${{ steps.prep.outputs.legacy_image }}
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
       tag: ${{ steps.prep.outputs.tag }}
       registry: ${{ steps.prep.outputs.registry }}
       shortSha: ${{ steps.prep.outputs.short_sha}}
       branchName: ${{ steps.prep.outputs.branch_name }}
+      latestTag: ${{ steps.prep.outputs.latest_tag }}
+      repositoryName: ${{ steps.prep.outputs.repository_name }}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -36,82 +36,23 @@ jobs:
         id: prep
         run: |
           SHORT_SHA=$(echo $GITHUB_SHA | head -c7)
+          REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
-          IMAGE="public.ecr.aws/ideacrew/enroll"
+          IMAGE=public.ecr.aws/ideacrew/$REPO
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
-          echo ::set-output name=legacy_image::${IMAGE}:${TAG}-legacy
           echo ::set-output name=tag::${TAG}
           echo ::set-output name=registry::public.ecr.aws
           echo ::set-output name=short_sha::$SHORT_SHA
           echo ::set-output name=branch_name::${{ env.GIT_BRANCH_NAME }}
-
-  build-and-upload-legacy-image:
-    needs: [prep]
-    runs-on: ubuntu-latest
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        ports:
-          - 5672:5672
-          - 15672:15672
-        options: >-
-          --name "rabbitmq"
-          --health-cmd "rabbitmqctl node_health_check"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-
-      # Check out repository
-      - uses: actions/checkout@v2
-
-      - name: Add git HEAD info to docker image
-        run: git show --quiet HEAD > release.txt
-
-      # Adds `docker` to the environment for running commands
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      # Add vhosts to RabbitMQ
-      - run: |
-          docker exec rabbitmq rabbitmqctl add_vhost /
-          docker exec rabbitmq rabbitmqctl add_vhost event_source
-          docker exec rabbitmq rabbitmqctl set_permissions -p event_source guest ".*" ".*" ".*"
-      # Provide credentials for AWS
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      # Must use docker login in order to specify public registry
-      - name: Login to Public ECR
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ needs.prep.outputs.registry }}
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # Build Docker Image
-      - name: Build Image
-        id: build-image
-        run: |
-          chmod +x .docker/build_gha.sh
-          .docker/build_gha.sh ${{ needs.prep.outputs.tag }}-legacy public.ecr.aws/ideacrew/enroll .
-
-      # Upload Docker Image to Amazon ECR
-      - name: Upload Image to ECR
-        if: github.event_name != 'pull_request'
-        id: upload-image
-        run: docker push ${{ needs.prep.outputs.legacyImage }}
+          echo ::set-output name=repository_name::$REPO
+          echo ::set-output name=latest_tag::${IMAGE}:latest
 
   # Uses buildx to build and push the image
   build-and-upload-image:
     needs: [prep]
+    strategy:
+      matrix:
+        client: ['dc', 'me']
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -132,6 +73,16 @@ jobs:
         options: >-
           --name "mongo"
           --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -187,27 +138,28 @@ jobs:
           target: deploy
           # needed to access mongo and rabbit on GHA machine
           network: host
-          # send to public registry
-          push: ${{ env.SHOULD_DEPLOY }}
-          # create local image (for scanning)
-          load: false
-          tags: ${{ needs.prep.outputs.taggedImage }}
+          # send to public registry if not a pull request
+          push: ${{ github.event_name != 'pull_request' }}
+          # create local image (for scanning) if it is a pull request
+          load: ${{ github.event_name == 'pull_request' }}
+          tags: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}, ${{ needs.prep.outputs.latestTag }}-${{ matrix.client }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           build-args: |
-            ENROLL_DB_HOST_DEFAULT=172.17.0.1
-            RABBITMQ_URL_DEFAULT=amqp://172.17.0.1:5672
-            RABBITMQ_HOST_DEFAULT=amqp://172.17.0.1
+            HOSTNAME=172.17.0.1
+            CLIENT=${{ matrix.client }}
+      - name: Check encryption
+        run: docker run --network="host" ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} /bin/bash .docker/check-encryption.sh
 
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
         id: scan
         uses: anchore/scan-action@main
         with:
-          image: ${{ needs.prep.outputs.taggedImage }}
+          image: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
@@ -227,12 +179,15 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        client: ['dc', 'me']
     steps:
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.16.0
         with:
-          channel-id: 'docker-images'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }} built from <https://github.com/ideacrew/enroll/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`'
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
+          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}

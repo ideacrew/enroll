@@ -15,14 +15,22 @@ module FinancialAssistance
     end
 
     def admin_verification_action(admin_action, evidence, update_reason)
+      evidence.update(update_reason: update_reason, updated_by: current_user.oim_id)
+      evidence.verification_histories << create_verification_history(admin_action, update_reason)
+      applicant = evidence.evidenceable
+
       case admin_action
       when "verify"
-        evidence.update!(eligibility_status: 'verified', update_reason: update_reason)
+        applicant.set_evidence_verified(evidence)
         "#{evidence.title} successfully verified."
       when "return_for_deficiency"
-        evidence.update!(eligibility_status: 'outstanding', update_reason: update_reason, rejected: true)
+        applicant.set_evidence_outstanding(evidence)
         "#{evidence.title} rejected."
       end
+    end
+
+    def create_verification_history(admin_action, update_reason)
+      Eligibilities::VerificationHistory.new(action: admin_action, update_reason: update_reason, updated_by: current_user.oim_id)
     end
 
     def admin_actions_on_faa_documents(evidence)
@@ -30,10 +38,10 @@ module FinancialAssistance
     end
 
     def build_actions_list(evidence)
-      if evidence.eligibility_status == "outstanding"
-        FinancialAssistance::Document::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
+      if evidence.aasm_state == "outstanding"
+        Eligibilities::Evidence::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
       else
-        FinancialAssistance::Document::ADMIN_VERIFICATION_ACTIONS
+        Eligibilities::Evidence::ADMIN_VERIFICATION_ACTIONS
       end
     end
 
@@ -47,7 +55,7 @@ module FinancialAssistance
       case evidence
       when "ESI MEC"
         "faa.evidence_type_esi"
-      when "ACES MEC"
+      when "Local MEC"
         "faa.evidence_type_aces"
       when "Non ESI MEC"
         "faa.evidence_type_non_esi"
