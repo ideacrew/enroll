@@ -42,7 +42,10 @@ module FinancialAssistance
 
               response_app_entity.applicants.each do |response_applicant_entity|
                 applicant = find_matching_applicant(application, response_applicant_entity)
-                next unless applicant.income_evidence.present?
+                if applicant.income_evidence.blank?
+                  Rails.logger.error("Income Evidence Not Found for applicant with person_hbx_id: #{applicant.person_hbx_id} in application with hbx_id: #{application.hbx_id}")
+                  next
+                end
                 update_applicant_evidence(applicant, status, response_applicant_entity)
               end
               Success('Successfully updated Applicant with evidence')
