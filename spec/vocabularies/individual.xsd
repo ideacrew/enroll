@@ -1501,7 +1501,7 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#alimony_paid"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#deductable_part_of_self_employment_taxes"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#domestic_production_activities"/>
-			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#penalty_on_early_withdrawel_of_savings"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#penalty_on_early_withdrawal_of_savings"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#educator_expenses"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#rent_or_royalties"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_deduction#self_employment_sep_simple_and_qualified_plans"/>

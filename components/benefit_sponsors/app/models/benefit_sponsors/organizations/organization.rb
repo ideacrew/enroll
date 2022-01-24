@@ -137,6 +137,7 @@ module BenefitSponsors
       scope :by_general_agency_profile,       ->(general_agency_profile_id) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
 
       scope :broker_agencies_by_market_kind,  ->(market_kind) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
+      scope :approved_and_accepting_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved', :"profiles.accept_new_clients" => true) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
       scope :approved_general_agencies,        ->{ general_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
 
