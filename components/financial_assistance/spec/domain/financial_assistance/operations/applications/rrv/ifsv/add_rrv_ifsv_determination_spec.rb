@@ -71,7 +71,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
     context "applicant without evidence" do
       it 'should log an error if no income evidence present for an applicant' do
-        log_message ="Income Evidence not found for applicant with person_hbx_id: 1629165429385939 in application with hbx_id: 200000126"
+        log_message = "Income Evidence not found for applicant with person_hbx_id: 1629165429385939 in application with hbx_id: 200000126"
         expect(Rails.logger).to receive(:error).at_least(:once).with(log_message)
         subject.call(payload: response_payload)
       end
