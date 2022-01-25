@@ -32,7 +32,8 @@ module Operations
 
       # Return a failure monad if there are no rating addresses for any members
       def all_members_have_valid_address?(family)
-        family.family_members.all? { |family_member| family_member.rating_address.present? }
+        active_family = family.family_members.where(is_active: true)
+        active_family.all? { |family_member| family_member.rating_address.present? }
       end
 
       def find_addresses(family)

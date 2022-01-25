@@ -14,7 +14,8 @@ RSpec.describe ::Operations::Notices::IvlOeReverificationTrigger, dbclean: :afte
     include_context 'cms ME simple_scenarios test_case_d'
 
     let!(:person) { create(:person, hbx_id: "732020")}
-    let!(:consumer_role) { create(:consumer_role, person: person) }
+    let(:contact_method) { 'Paper and Electronic communications' }
+    let!(:consumer_role) { create(:consumer_role, person: person, contact_method: contact_method) }
     let!(:family) { create(:family, :with_primary_family_member, person: person)}
     let!(:household) { create(:household, family: family) }
     let!(:tax_household) { create(:tax_household, household: household, submitted_at: TimeKeeper.date_of_record) }
@@ -143,6 +144,14 @@ RSpec.describe ::Operations::Notices::IvlOeReverificationTrigger, dbclean: :afte
       it 'should return success' do
         result = subject.call(params)
         expect(result.success?).to be_truthy
+      end
+    end
+
+    context 'build_consumer_role' do
+      let(:payload) { ::Operations::Notices::IvlOeReverificationTrigger.new.send('build_consumer_role', consumer_role) }
+
+      it 'should include contact_method in the hash' do
+        expect(payload[:contact_method]).to eq(contact_method)
       end
     end
   end

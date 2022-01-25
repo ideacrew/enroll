@@ -12,6 +12,9 @@ class HbxEnrollment
   include Mongoid::History::Trackable
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
+  include Eligibilities::Visitors::Visitable
+  include GlobalID::Identification
+  include EventSource::Command
 
   belongs_to :household
   # Override attribute accessor as well
@@ -479,6 +482,10 @@ class HbxEnrollment
   after_save :check_created_at
   after_save :notify_on_save
 
+  # disabled following callback due to too many events. instead moved this method call to record_transition
+  # FIX ME
+  # after_save :generate_enrollment_saved_event
+
   # def max_aptc
   #   family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
   # end
@@ -490,6 +497,10 @@ class HbxEnrollment
       new_is_subscriber_true = hbx_enrollment_members.min_by { |hbx_member| hbx_member.person.dob }
       new_is_subscriber_true.is_subscriber = true
     end
+  end
+
+  def accept(visitor)
+    hbx_enrollment_members.each{|hbx_enrollment_member| hbx_enrollment_member.accept(visitor) }
   end
 
   def generate_hbx_signature
@@ -507,6 +518,8 @@ class HbxEnrollment
   end
 
   def record_transition
+    generate_enrollment_saved_event
+
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
@@ -1520,12 +1533,19 @@ class HbxEnrollment
 
     tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
-    filtered_elected_plans(elected_plans).collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+    filtered_elected_plans(elected_plans, coverage_kind).collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
-  def filtered_elected_plans(elected_plans)
-    elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
-    elected_plans.reject!(&:allows_adult_and_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_adult_and_child_only_offering) && !any_member_greater_than_18?
+  def filtered_elected_plans(elected_plans, coverage_kind)
+    # TODO: Address this more structurally later.  The logic for pediatric
+    #       dental plan eligibilty is not encoded in a way that interacts
+    #       intuitively with the two available values for whether a plan is
+    #       'child only' or 'adult and child only' on the child_only_offering
+    #       property of BenefitMarkets::Products::Product.
+    if coverage_kind == 'dental'
+      elected_plans.reject!(&:allows_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_child_only_offering) && any_member_greater_than_18?
+      elected_plans.reject!(&:allows_adult_and_child_only_offering?) if ::EnrollRegistry.feature_enabled?(:exclude_adult_and_child_only_offering) && !any_member_greater_than_18?
+    end
     elected_plans
   end
 
@@ -2615,6 +2635,16 @@ class HbxEnrollment
 
   def couple_enrollee?
     @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| hem.primary_relationship == 'spouse'}
+  end
+
+  def generate_enrollment_saved_event
+    return if self.shopping?
+    return if self.is_shop?
+    cv_enrollment = Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(self)
+    event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 
   private

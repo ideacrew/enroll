@@ -1,16 +1,23 @@
 {
   "cSpell.words": [
+    "amqp",
     "anchore",
     "buildx",
+    "codeql",
     "getong",
     "interactors",
+    "Mongoid",
     "nanasess",
+    "precompile",
     "rabbitmq",
     "rabbitmqctl",
+    "sarif",
     "serializers",
+    "slackapi",
     "vhost",
     "vhosts",
-    "wbari"
+    "wbari",
+    "YELLR"
   ],
   "git.ignoreLimitWarning": true
 }

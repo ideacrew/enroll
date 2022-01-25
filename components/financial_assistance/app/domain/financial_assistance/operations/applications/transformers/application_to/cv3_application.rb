@@ -80,7 +80,17 @@ module FinancialAssistance
 
             def notice_options_for_app(application)
               renewal_app = application.previously_renewal_draft?
-              Success({ send_eligibility_notices: !renewal_app, send_open_enrollment_notices: renewal_app })
+              Success({ send_eligibility_notices: !renewal_app, send_open_enrollment_notices: renewal_app, paper_notification: paper_notification(application) })
+            end
+
+            def paper_notification(application)
+              family = find_family(application.family_id)
+              consumer_role = family.primary_person&.consumer_role
+
+              # default to paper if we are unable to find out contact method
+              return true unless consumer_role.present? && consumer_role.contact_method.present?
+
+              consumer_role.contact_method.include?("Paper")
             end
 
             def fetch_oe_start_on(application)
@@ -130,9 +140,9 @@ module FinancialAssistance
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
                            native_american_information: native_american_information(applicant),
-                           citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
-                                                                        is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
-                                                                        is_resident_post_092296: applicant.is_resident_post_092296.present?},
+                           citizenship_immigration_status_information: { citizen_status: applicant.citizen_status,
+                                                                         is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
+                                                                         is_resident_post_092296: applicant.is_resident_post_092296.present? },
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
                            is_applying_coverage: applicant.is_applying_coverage.present?,
@@ -197,7 +207,10 @@ module FinancialAssistance
                            benchmark_premium: benchmark_premiums,
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant, mitc_eligible_incomes),
-                           evidences: applicant.evidences.serializable_hash.map(&:symbolize_keys),
+                           income_evidence: applicant&.income_evidence&.serializable_hash&.deep_symbolize_keys,
+                           esi_evidence: applicant&.esi_evidence&.serializable_hash&.deep_symbolize_keys,
+                           non_esi_evidence: applicant&.non_esi_evidence&.serializable_hash&.deep_symbolize_keys,
+                           local_mec_evidence: applicant&.local_mec_evidence&.serializable_hash&.deep_symbolize_keys,
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes)}
                 result
@@ -543,7 +556,7 @@ module FinancialAssistance
                            address_3: address.address_3,
                            city: address.city,
                            county: address.county,
-                          #  county_fips: (address.county.blank? || address.state.blank?) ? nil : address.fetch_county_fips_code,
+                           county_fips: address.fetch_county_fips_code,
                            state: address.state,
                            zip: address.zip,
                            country_name: address.country_name}
@@ -736,7 +749,7 @@ module FinancialAssistance
                 result << {hbx_id: (determination.hbx_assigned_id || FinancialAssistance::HbxIdGenerator.generate_member_id).to_s,
                            max_aptc: determination.max_aptc,
                            is_insurance_assistance_eligible: insurance_assistance_eligible_for(determination),
-                           annual_tax_household_income: determination.aptc_csr_annual_household_income,
+                           annual_tax_household_income: BigDecimal((determination.aptc_csr_annual_household_income || 0).to_s),
                            tax_household_members: get_thh_member(determination, application)}
               end
             end
@@ -759,9 +772,9 @@ module FinancialAssistance
                                                                is_magi_medicaid: app.is_magi_medicaid,
                                                                is_non_magi_medicaid_eligible: app.is_non_magi_medicaid_eligible,
                                                                is_without_assistance: app.is_without_assistance,
-                                                               magi_medicaid_monthly_household_income: app.magi_medicaid_monthly_household_income,
+                                                               magi_medicaid_monthly_household_income: BigDecimal((app.magi_medicaid_monthly_household_income || 0).to_s),
                                                                medicaid_household_size: app.medicaid_household_size,
-                                                               magi_medicaid_monthly_income_limit: app.magi_medicaid_monthly_income_limit,
+                                                               magi_medicaid_monthly_income_limit: BigDecimal((app.magi_medicaid_monthly_income_limit || 0).to_s),
                                                                magi_as_percentage_of_fpl: app.magi_as_percentage_of_fpl,
                                                                magi_medicaid_category: app.magi_medicaid_category}}
                 result
@@ -785,7 +798,7 @@ module FinancialAssistance
                 next result unless applicant_id.present? || relative_id.present?
                 applicant = FinancialAssistance::Applicant.find(applicant_id)
                 relative = FinancialAssistance::Applicant.find(relative_id)
-                next result unless applicant.present? || relative.present?
+                next result unless applicant.present? && relative.present?
                 result << {kind: rl.kind,
                            applicant_reference: applicant_reference(applicant),
                            relative_reference: applicant_reference(relative),

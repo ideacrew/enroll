@@ -510,7 +510,7 @@ registry:
           - key: :plan_shopping
             item: true
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Anthem Blue Cross and Blue Shield'
           - key: :connect_test

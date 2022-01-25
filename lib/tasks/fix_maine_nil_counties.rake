@@ -12,7 +12,7 @@ namespace :migrations do
     # - application county update
 
     def people
-      people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, "", "Zip code outside supported area"]).map(&:_id)
+      people_1_ids = Person.all.where(:addresses.exists => true, :"addresses.county".in => [nil, "", /\w.*\s.*\w/]).map(&:_id)
       # benefitmarkets because previously we erroneously assigned a object instead of ring to county
       people_2_ids = Person.where("addresses.county" => /.*benefitmarkets.*/i).map(&:_id)
       people_ids = (people_1_ids + people_2_ids).flatten
@@ -28,13 +28,15 @@ namespace :migrations do
       counter = 0
       number_of_iterations = (total_count / users_per_iteration).ceil
       CSV.open(file_name, 'w+', headers: true) do |csv|
-        csv << ["person_hbx_id", "zip"]
+        csv << ["person_hbx_id", "zip", "county"]
         while counter < number_of_iterations
           offset_count = users_per_iteration * counter
           output = people.no_timeout.offset(offset_count).each do |person|
             address = person.rating_address
             county = address&.county
-            csv << [person.hbx_id, address&.zip] if county.nil?
+            unless ::BenefitMarkets::Locations::RatingArea.rating_area_for(address)
+              csv << [person.hbx_id, address&.zip, county]
+            end
             counter += 1
           end
         end
@@ -43,8 +45,8 @@ namespace :migrations do
     pull_county
 
     def address_needs_fixing?(address)
-      return false if address.zip.blank? 
-      address.county.blank? || address.county.downcase.include?("benefitmarket") || address.county.downcase.include?("zip code outside supported area")
+      return false if address.zip.blank?
+      address.county.blank? || address.county.downcase.include?("benefitmarket") || (address.county.split(" ").length > 1) || !!(address.county =~ /county/i)
     end
 
     def address_fixer(address)
@@ -62,6 +64,11 @@ namespace :migrations do
         address.save!
         puts("Successfully resolved county by town for #{town_name}")
         :fixed
+      elsif !!(address.county =~ /county/i)
+        puts "removed word 'county' from county name #{address.county}"
+        address.county = county_county_remover(address.county)
+        address.save!
+        :fixed
       elsif counties.count == 0
         puts "No county found for ZIP: #{zip} #{address.state}"
         :no_county_found
@@ -69,6 +76,11 @@ namespace :migrations do
         puts "Unable to resolve multiple counties found for ZIP: #{zip} #{address.state}"
         :multiple_counties_found
       end
+    end
+
+    def county_county_remover(county)
+      # This removes the word 'county' from county name
+      county.gsub(/ county/i, '')
     end
 
     def county_finder(zip)
@@ -102,7 +114,7 @@ namespace :migrations do
 
           counters[:faa_apps] = { fixed: 0, no_county_found: 0, multiple_counties_found: 0, no_fix_needed: 0 }
           if person.primary_family.present?
-            applications = FinancialAssistance::Application.where(family_id: person.primary_family.id, aasm_state: "draft")
+            applications = FinancialAssistance::Application.where(family_id: person.primary_family.id, :"aasm_state".in => ["draft", "submitted"])
             applications.each do |application|
               application.applicants.each do |applicant|
                 applicant.addresses.each do |address|

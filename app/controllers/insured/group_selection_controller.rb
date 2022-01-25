@@ -3,6 +3,7 @@ class Insured::GroupSelectionController < ApplicationController
   include Config::SiteConcern
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
+  before_action :validate_rating_address, only: [:create]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
 
@@ -184,6 +185,8 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_plan
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+    flash[:error] = @self_term_or_cancel_form.errors.full_messages
+    redirect_to family_account_path if @self_term_or_cancel_form.errors.present?
   end
 
   def term_or_cancel
@@ -366,5 +369,17 @@ class Insured::GroupSelectionController < ApplicationController
     options[:contact_method] = person.consumer_role.contact_method
     options[:language_preference] = person.consumer_role.language_preference
     options
+  end
+
+  def validate_rating_address
+    return unless permitted_group_selection_params[:market_kind] == "individual"
+
+    rating_address = @consumer_role&.rating_address
+    rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(@consumer_role.rating_address) if rating_address.present?
+
+    return if rating_area
+
+    flash[:error] = l10n("insured.out_of_state_error_message")
+    redirect_to family_account_path
   end
 end

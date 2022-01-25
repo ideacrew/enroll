@@ -36,25 +36,42 @@ module FinancialAssistance
               application.present? ? Success(application) : Failure("Could not find application with given hbx_id: #{application_entity.hbx_id}")
             end
 
+            def find_matching_applicant(application, res_applicant_entity)
+              application.applicants.detect do |applicant|
+                applicant.person_hbx_id == res_applicant_entity.person_hbx_id
+              end
+            end
+
             def update_applicant(response_app_entity, application)
               is_ifsv_eligible = response_app_entity.tax_households.first.is_ifsv_eligible
               status = is_ifsv_eligible ? "verified" : "outstanding"
 
-              application.eligibility_determinations.each do |ed|
-                ed.applicants.each do |applicant|
-                  next if applicant.evidences.blank?
-                  update_applicant_evidence(applicant, status)
+              response_app_entity.applicants.each do |response_applicant_entity|
+                applicant = find_matching_applicant(application, response_applicant_entity)
+                if applicant.income_evidence.blank?
+                  Rails.logger.error("Income Evidence not found for applicant with person_hbx_id: #{applicant.person_hbx_id} in application with hbx_id: #{application.hbx_id}")
+                  next
                 end
+                update_applicant_evidence(applicant, status, response_applicant_entity)
               end
               Success('Successfully updated Applicant with evidence')
             end
 
-            def update_applicant_evidence(applicant, status)
-              applicant_ifsv_evidence = applicant.evidences.by_name(:income).first
-              applicant_ifsv_evidence.update_attributes(eligibility_status: status)
-              applicant.save!
+            def update_applicant_evidence(applicant, status, response_applicant_entity)
+              response_income_evidence = response_applicant_entity.income_evidence
+              income_evidence = applicant.income_evidence
 
-              Success(applicant)
+              case status
+              when "verified"
+                applicant.set_income_evidence_verified
+              when "outstanding"
+                applicant.set_evidence_outstanding(income_evidence)
+              end
+
+              response_income_evidence.request_results&.each do |request_result|
+                income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
+              end
+              applicant.save!
             end
           end
         end

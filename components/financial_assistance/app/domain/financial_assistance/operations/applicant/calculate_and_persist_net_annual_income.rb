@@ -94,6 +94,7 @@ module FinancialAssistance
         end
 
         def daily_employee_income(employee_cost_frequency, employee_cost)
+          return BigDecimal('0') if employee_cost.blank?
           no_of_days = @assistance_year_end.yday
           annual_amnt =  case employee_cost_frequency
                          when 'weekly' then (employee_cost * 52)

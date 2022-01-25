@@ -124,6 +124,38 @@ Then(/^.+ sees form to enter personal information$/) do
   # screenshot("personal_form")
 end
 
+Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
+  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
+  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
+  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
+  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
+  find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
+  fill_in IvlPersonalInformation.address_line_two, :with => "212"
+  fill_in IvlPersonalInformation.city, :with => "Washington"
+  find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+  #fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
+  sleep 2
+end
+
+Then(/^.+ sees form to enter personal information but doesn't check every box$/) do
+  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
+  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
+  # find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
+  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
+  find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
+  fill_in IvlPersonalInformation.address_line_two, :with => "212"
+  fill_in IvlPersonalInformation.city, :with => "Washington"
+  find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+  fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
+  sleep 2
+end
+
 And(/the individual enters address information$/) do
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
@@ -950,9 +982,9 @@ end
 
 Then(/^.+should see a new renewing enrollment title on home page$/) do
   current_day = TimeKeeper.date_of_record
-  if (Date.new(current_day.year, 11, 1)..Date.new(current_day.year + 1, 1, 31)).include?(current_day)
-    year = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_period.start_on.year
-    expect(page).to have_content year
+  effective_year = Family.application_applicable_year
+  if (Date.new(effective_year - 1, 11, 1)..Date.new(effective_year, 1, 31)).include?(current_day)
+    expect(page).to have_content effective_year
     expect(page).not_to have_content "Auto Renewing"
   else
     expect(page).to have_content "Auto Renewing"
@@ -1040,4 +1072,25 @@ And(/Individual signed in to resume enrollment$/) do
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
+end
+
+Then(/Individual creates a new HBX account via username$/) do
+  fill_in CreateAccount.email_or_username, :with => "testflow"
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  click_button "Create Account"
+end
+
+When(/Individual creates an HBX account with username already in use$/) do
+  fill_in CreateAccount.email_or_username, :with => "testflow"
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  click_button "Create Account"
+end
+
+When(/Individual creates an HBX account with email already in use$/) do
+  fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  click_button "Create Account"
 end

@@ -9,6 +9,7 @@ module FinancialAssistance
     field :action, type: String
     field :modifier, type: String
     field :update_reason, type: String
+    field :updated_by, type: String
 
   end
 end

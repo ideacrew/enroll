@@ -24,7 +24,7 @@ module FinancialAssistance
         end
 
         def find_draft(values)
-          draft_application = ::FinancialAssistance::Application.where(family_id: values[:family_id]).first
+          draft_application = ::FinancialAssistance::Application.where(aasm_state: 'draft', family_id: values[:family_id]).asc(:created_at).last
           draft_application ? Success(draft_application) : Failure('No matching draft application')
         end
       end

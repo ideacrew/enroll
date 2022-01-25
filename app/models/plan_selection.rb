@@ -84,7 +84,8 @@ class PlanSelection
         applicant_id: hbx_enrollment_member.applicant_id,
         eligibility_date: hbx_enrollment.effective_on,
         coverage_start_on: hbx_enrollment.effective_on,
-        is_subscriber: hbx_enrollment_member.is_subscriber
+        is_subscriber: hbx_enrollment_member.is_subscriber,
+        tobacco_use: hbx_enrollment_member.tobacco_use
       })
     end
   end

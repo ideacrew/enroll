@@ -4,6 +4,7 @@ class FamilyMember
   include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
   include ApplicationHelper
+  include GlobalID::Identification
 
   embedded_in :family
 

@@ -314,4 +314,9 @@ module Insured::FamiliesHelper
     end
   end
 
+  def fetch_counties_by_zip(address)
+    return [] unless address&.zip
+
+    BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
+  end
 end

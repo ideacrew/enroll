@@ -183,20 +183,20 @@ RSpec.shared_context 'FDSH ESI MEC sample response', :shared_context => :metadat
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :evidences => [
-            {:key => :esi_mec,
-             :title => "MEC",
-             :description => nil,
-             :eligibility_status => "verified",
-             :due_on => nil,
-             :updated_by => nil,
-             :eligibility_results => [{
-               :result => :eligible,
-               :source => "FDSH",
-               :code => "HS0000000",
-               :code_description => "Applicant is eligible"
-             }]}
-],
+          :esi_evidence => {
+            :key => :esi_mec,
+            :title => "MEC",
+            :description => nil,
+            :aasm_state => "verified",
+            :due_on => nil,
+            :updated_by => nil,
+            :request_results => [{
+              :result => "eligible",
+              :source => "FDSH",
+              :code => "HS0000000",
+              :code_description => "Applicant is eligible"
+            }]
+          },
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
         }
@@ -239,7 +239,8 @@ RSpec.shared_context 'FDSH ESI MEC sample response', :shared_context => :metadat
       :oe_start_on => Date.new(2020, 10, 0o1),
       :notice_options => {
         :send_eligibility_notices => true,
-        :send_open_enrollment_notices => false
+        :send_open_enrollment_notices => false,
+        :paper_notification => true
       },
       :mitc_households => [
         {:household_id => "1",

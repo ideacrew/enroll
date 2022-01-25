@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Given(/^the user answers no to having an income from an employer$/) do
-  choose('has_job_income_false')
+  choose(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn)
   sleep 1
 end
 
@@ -11,7 +11,7 @@ Then(/^the job income form should not show$/) do
 end
 
 Given(/^the user answers no to having self employment income$/) do
-  choose('has_self_employment_income_false')
+  choose(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn)
   sleep 1
 end
 
@@ -20,7 +20,7 @@ Then(/^self employment form should not show$/) do
 end
 
 Given(/^the user answers yes to having and income from an employer$/) do
-  choose('has_job_income_true')
+  choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
   sleep 1
 end
 
@@ -30,7 +30,7 @@ Then(/^the job income form should show$/) do
 end
 
 Given(/^the user answers yes to having self employment income$/) do
-  choose('has_self_employment_income_true')
+  choose(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn)
   sleep 1
 end
 
@@ -39,39 +39,41 @@ Then(/^self employment form should show$/) do
 end
 
 And(/^the user fills out the required employer information$/) do
-  fill_in 'income[employer_name]', with: "Sample Employer"
-  fill_in 'income[amount]', with: '23.3'
-  find_all(".interaction-choice-control-income-frequency-kind")[1].click
-  find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
-  fill_in 'income[start_on]', with: "11/11/2016"
-  fill_in 'income[end_on]', with: "11/11/2017"
-  fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
-  fill_in 'income[employer_address][address_1]', with: "12 main st"
-  fill_in 'income[employer_address][address_2]', with: "beside starbucks"
-  fill_in 'income[employer_address][city]', with: "washington"
-  find_all(".interaction-choice-control-income-employer-address-state")[0].click
-  find_all(".interaction-choice-control-income-employer-address-state-5")[0].click
-  fill_in 'income[employer_address][zip]', with: "22046"
+  fill_in IvlIapJobIncomeInformationPage.employer_name, with: "Sample Employer"
+  fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
+  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.select_yearly).click
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2016"
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2017"
+  find(IvlIapJobIncomeInformationPage.calendar).click
+  fill_in IvlIapJobIncomeInformationPage.income_employer_phone_number, with: "2036548484"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_address_1, with: "12 main st"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_address_2, with: "beside starbucks"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_city, with: "washington"
+  find(IvlIapJobIncomeInformationPage.income_employer_state_dropdown).click
+  find(IvlIapJobIncomeInformationPage.select_va_state).click
+  fill_in IvlIapJobIncomeInformationPage.income_employer_zip, with: "22046"
 end
 
 And(/^the user fills out the required employer information with incorrect dates$/) do
-  fill_in 'income[employer_name]', with: "Sample Employer"
-  fill_in 'income[amount]', with: '23.3'
-  find_all(".interaction-choice-control-income-frequency-kind")[1].click
-  find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
-  fill_in 'income[start_on]', with: "11/11/2017"
-  fill_in 'income[end_on]', with: "11/11/2016"
-  fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
-  fill_in 'income[employer_address][address_1]', with: "12 main st"
-  fill_in 'income[employer_address][address_2]', with: "beside starbucks"
-  fill_in 'income[employer_address][city]', with: "washington"
-  find_all(".interaction-choice-control-income-employer-address-state")[0].click
-  find_all(".interaction-choice-control-income-employer-address-state-5")[0].click
-  fill_in 'income[employer_address][zip]', with: "22046"
+  fill_in IvlIapJobIncomeInformationPage.employer_name, with: "Sample Employer"
+  fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
+  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.select_yearly).click
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2017"
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2016"
+  find(IvlIapJobIncomeInformationPage.calendar).click
+  fill_in IvlIapJobIncomeInformationPage.income_employer_phone_number, with: "2036548484"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_address_1, with: "12 main st"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_address_2, with: "beside starbucks"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_city, with: "washington"
+  find(IvlIapJobIncomeInformationPage.income_employer_state_dropdown).click
+  find(IvlIapJobIncomeInformationPage.select_va_state).click
+  fill_in IvlIapJobIncomeInformationPage.income_employer_zip, with: "22046"
 end
 
 And(/^the user saves the employer information$/) do
-  find('.interaction-click-control-save').click
+  find(IvlIapJobIncomeInformationPage.income_save_btn).click
 end
 
 Then(/^the employer information should be saved on the page$/) do
@@ -81,22 +83,23 @@ Then(/^the employer information should be saved on the page$/) do
 end
 
 Given(/^the user has entered at least one job income information$/) do
-  choose('has_job_income_true')
+  choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
   sleep 1
-  fill_in 'income[employer_name]', with: "Sample Employer1"
-  fill_in 'income[amount]', with: '33.3'
-  find_all(".interaction-choice-control-income-frequency-kind")[1].click
-  find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
-  fill_in 'income[start_on]', with: "11/11/2016"
-  fill_in 'income[end_on]', with: "11/11/2017"
-  fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
-  fill_in 'income[employer_address][address_1]', with: "12 main st"
-  fill_in 'income[employer_address][address_2]', with: "beside starbucks1"
-  fill_in 'income[employer_address][city]', with: "washington"
-  find_all(".interaction-choice-control-income-employer-address-state")[0].click
-  find_all(".interaction-choice-control-income-employer-address-state-5")[0].click
-  fill_in 'income[employer_address][zip]', with: "22046"
-  find('.interaction-click-control-save').click
+  fill_in IvlIapJobIncomeInformationPage.employer_name, with: "Sample Employer1"
+  fill_in IvlIapJobIncomeInformationPage.income_amount, with: '33.3'
+  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.select_yearly).click
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2016"
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2017"
+  find(IvlIapJobIncomeInformationPage.calendar).click
+  fill_in IvlIapJobIncomeInformationPage.income_employer_phone_number, with: "2036548484"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_address_1, with: "12 main st"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_address_2, with: "beside starbucks1"
+  fill_in IvlIapJobIncomeInformationPage.income_employer_city, with: "washington"
+  find(IvlIapJobIncomeInformationPage.income_employer_state_dropdown).click
+  find(IvlIapJobIncomeInformationPage.select_va_state).click
+  fill_in IvlIapJobIncomeInformationPage.income_employer_zip, with: "22046"
+  find(IvlIapJobIncomeInformationPage.income_save_btn).click
 end
 
 When(/^the Add Another Job Income link appears$/) do
@@ -104,7 +107,7 @@ When(/^the Add Another Job Income link appears$/) do
 end
 
 When(/^the user adds another income$/) do
-  find('.interaction-click-control-add-another-job-income').click
+  find(IvlIapJobIncomeInformationPage.add_another_job_income).click
 end
 
 Then(/^the new employer information should be saved on the page$/) do
@@ -117,30 +120,33 @@ Then(/^the new employer information should be saved on the page$/) do
 end
 
 And(/^the user fills out the required self employment information$/) do
-  fill_in 'income[amount]', with: '23.3'
-  find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
-  find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
-  fill_in 'income[start_on]', with: "11/11/2016"
-  fill_in 'income[end_on]', with: "11/11/2017"
+  fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
+  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2016"
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2017"
+  find(IvlIapJobIncomeInformationPage.calendar).click
 end
 
 And(/^the user fills out the required self employment information with incorrect dates$/) do
-  fill_in 'income[amount]', with: '23.3'
-  find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
-  find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
-  fill_in 'income[start_on]', with: "11/11/2017"
-  fill_in 'income[end_on]', with: "11/11/2016"
+  fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
+  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2017"
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2016"
+  find(IvlIapJobIncomeInformationPage.calendar).click
 end
 
 Given(/^the user has entered at least one self employment information$/) do
-  choose('has_self_employment_income_true')
+  choose(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn)
   sleep 1
-  fill_in 'income[amount]', with: '23.3'
-  find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
-  find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
-  fill_in 'income[start_on]', with: "11/11/2016"
-  fill_in 'income[end_on]', with: "11/11/2017"
-  find('.interaction-click-control-save').click
+  fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
+  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2016"
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2017"
+  find(IvlIapJobIncomeInformationPage.calendar).click
+  find(IvlIapJobIncomeInformationPage.self_self_employee_save_btn).click
 end
 
 Then(/^the self employment information should be saved on the page$/) do
@@ -153,11 +159,12 @@ When(/^the Add Another Self Employment link appears$/) do
 end
 
 And(/^the user adds another self employment income$/) do
-  find('.interaction-click-control-add-another--self-employed-income').click
+  sleep 2
+  find(IvlIapJobIncomeInformationPage.self_add_another_self_employment).click
 end
 
 When(/^the user saves the self employment information$/) do
-  find('.interaction-click-control-save').click
+  find(IvlIapJobIncomeInformationPage.income_save_btn).click
 end
 
 Given(/^the user is on the Job Income page$/) do

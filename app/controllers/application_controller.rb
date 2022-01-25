@@ -297,7 +297,7 @@ class ApplicationController < ActionController::Base
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])
       else
-        @person = current_user.person
+        @person = current_user&.person
       end
       redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
     end
@@ -305,12 +305,16 @@ class ApplicationController < ActionController::Base
     def set_current_person_succeeded?
       return true if @person
       message = {}
-      message[:message] = 'Application Exception - person required'
-      message[:session_person_id] = session[:person_id]
-      message[:user_id] = current_user.id
-      message[:oim_id] = current_user.oim_id
-      message[:url] = request.original_url
-      log(message, :severity=>'error')
+      if current_user
+        message[:message] = 'Application Exception - person required'
+        message[:session_person_id] = session[:person_id]
+        message[:user_id] = current_user.id
+        message[:oim_id] = current_user.oim_id
+        message[:url] = request.original_url
+        log(message, :severity => 'error')
+      else
+        message[:message] = "User not logged in"
+      end
       return false
     end
 
