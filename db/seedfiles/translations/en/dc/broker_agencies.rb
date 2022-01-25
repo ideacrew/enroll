@@ -81,6 +81,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_mail" => "Broker Mail",
 	"en.broker_agencies.profiles.first_time_applications_for_medicaid" => "First Time Applications for Medicaid",
 	"en.broker_agencies.profiles.and_premium_tax_credits"=> "and Premium Tax Credits",
+	"en.broker_agencies.profiles.not_accepting_clients" => "This broker is not currently accepting new clients.",
 	"en.broker_messages" => "Broker Messages",
 	"en.broker_agency" => "Broker Agency",
 	"en.broker_agencies.profiles.edit_broker_agency_profile" => "Edit Broker Agency Profile",

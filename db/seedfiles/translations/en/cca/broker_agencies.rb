@@ -40,6 +40,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.profiles.remove_general_agency_assignment" => "This will remove this General Agency assignment.  Are you sure?",
   "en.broker_agencies.profiles.ee_count" => "EE Count",
   "en.broker_agencies.profiles.er_state" => "ER State",
+  "en.broker_agencies.profiles.not_accepting_clients" => "This broker is not currently accepting new clients.",
   "en.general_agency" => "General Agency",
   "en.no_general_agencies_found" => "No General Agencies Found",
   "en.families" => "Families",
