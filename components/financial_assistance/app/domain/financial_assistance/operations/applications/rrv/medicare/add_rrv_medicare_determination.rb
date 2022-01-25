@@ -64,7 +64,7 @@ module FinancialAssistance
 
                 if response_non_esi_evidence.request_results.present?
                   response_non_esi_evidence.request_results.each do |eligibility_result|
-                    applicant_non_esi_evidence.request_results << Eligibilities::RequestResult.new(eligibility_result.to_h)
+                    applicant_non_esi_evidence.submit_request_result(eligibility_result.to_h)
                   end
                 end
                 applicant.save!

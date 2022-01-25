@@ -69,6 +69,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         expect(income_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
+
+      it 'should not store same request result twice' do
+        expect(@app_entity.applicants.first.income_evidence.request_results.count).to eq 2
+        expect(@applicant.reload.income_evidence.request_results.count).to eq 1
+      end
     end
 
     context "applicant without evidence" do

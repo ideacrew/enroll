@@ -69,7 +69,7 @@ module FinancialAssistance
               end
 
               response_income_evidence.request_results&.each do |request_result|
-                income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
+                income_evidence.submit_request_result(request_result.to_h)
               end
               applicant.save!
             end
