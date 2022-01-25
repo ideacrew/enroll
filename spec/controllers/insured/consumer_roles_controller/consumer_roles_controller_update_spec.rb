@@ -133,9 +133,10 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:params) { { is_applying_for_assistance: true } }
       let(:result) { ::Dry::Monads::Result::Success.new(1) }
 
-      context "iap year selection is enabled" do
+      context "iap year selection is enabled and IVL oe end date is in future" do
         before do
           EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(true)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 1, 1))
         end
 
         it "redirects to financial assistance's year selection page" do
@@ -147,9 +148,10 @@ RSpec.describe Insured::ConsumerRolesController do
         end
       end
 
-      context "iap year selection is disabled" do
+      context "iap year selection is disabled and IVL oe end date is in future" do
         before do
           EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(false)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 1, 1))
         end
 
         it "redirects to financial assistance's year selection page" do
