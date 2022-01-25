@@ -98,6 +98,11 @@ module Eligibilities
       due_on || evidenceable.schedule_verification_due_on
     end
 
+    # Idempotent: creates request result only it doesn't exists
+    def submit_request_result(params)
+      request_results.find_or_initialize_by(params)
+    end
+
     PENDING = [:pending, :attested].freeze
     OUTSTANDING = [:outstanding, :review, :errored].freeze
     CLOSED = [:denied, :closed, :expired].freeze
