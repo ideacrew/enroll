@@ -239,8 +239,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         expect(@result).to be_failure
       end
 
-      it 'should transition the application to magi_medicaid_eligibility_request_errored' do
-        expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
+      it 'should transition the application aasm_state' do
+        expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to_not eq("renewal_draft")
       end
 
       it 'should return failure with a message' do
