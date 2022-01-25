@@ -665,6 +665,9 @@ registry:
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: false
+      - key: :external_qna_bot
+        item: :external_qna_bot
+        is_enabled: false
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
