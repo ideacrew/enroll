@@ -86,9 +86,9 @@ registry:
     - :request_determination
     features:
     - key: :haven_determination
-      is_enabled: true
-    - key: :medicaid_gateway_determination
       is_enabled: false
+    - key: :medicaid_gateway_determination
+      is_enabled: true
     - key: :esi_mec_determination
       is_enabled: false
     - key: :non_esi_mec_determination
@@ -99,11 +99,11 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :batch_transfer
-      is_enabled: true
+      is_enabled: false
     - key: :transfer_service
-      is_enabled: true
+      is_enabled: false
       item: "curam"
   - namespace:
     - :documents
