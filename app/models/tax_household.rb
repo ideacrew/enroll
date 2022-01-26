@@ -86,17 +86,7 @@ class TaxHousehold
     latest_eligibility_determination.csr_percent
   end
 
-  def current_max_aptc
-    eligibility_determination = latest_eligibility_determination
-    # TODO: need business rule to decide how to get the max aptc
-    # during open enrollment and determined_at
-    # Please reference ticket 42408 for more info on the determined on to determined_at migration
-    if eligibility_determination.present? #and eligibility_determination.determined_at.year == TimeKeeper.date_of_record.year
-      eligibility_determination.max_aptc
-    else
-      0
-    end
-  end
+
 
   def aptc_members
     tax_household_members.find_all(&:is_ia_eligible?)
@@ -156,33 +146,17 @@ class TaxHousehold
     end
   end
 
-  # to get non aptc fms from given family members
-  def find_non_aptc_fms(family_members)
-    family_members.inject([]) do |array, family_member|
-      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
-      array.flatten
-    end
-  end
 
   def find_aptc_tax_household_members(family_members)
     tax_household_members.where(:applicant_id.in => family_members.pluck(:id), is_ia_eligible: true)
   end
 
-  # to get family members from given enrollment
-  def find_enrolling_fms hbx_enrollment
-    hbx_enrollment.hbx_enrollment_members.map(&:family_member)
-  end
-
-  # to check if all the enrolling family members are not aptc
-  def is_all_non_aptc?(hbx_enrollment)
-    enrolling_family_members = find_enrolling_fms(hbx_enrollment)
-    find_non_aptc_fms(enrolling_family_members).count == enrolling_family_members.count
-  end
 
   def is_member_aptc_eligible?(family_member)
     aptc_members.map(&:family_member).include?(family_member)
   end
-
+  
+  # multitaxhousehold , refactor here
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment, effective_on, excluding_enrollment = nil)
     return 0 if hbx_enrollment.blank?
@@ -199,20 +173,7 @@ class TaxHousehold
     (total < 0.00) ? 0.00 : float_fix(total)
   end
 
-  def monthly_max_aptc(hbx_enrollment, effective_on)
-    monthly_max_aggregate = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
-                              shopping_fm_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
-                              input_params = { family: hbx_enrollment.family,
-                                               effective_on: effective_on,
-                                               shopping_fm_ids: shopping_fm_ids,
-                                               subscriber_applicant_id: hbx_enrollment&.subscriber&.applicant_id }
-                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] {input_params}
-                              monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
-                            else
-                              current_max_aptc.to_f
-                            end
-    float_fix(monthly_max_aggregate)
-  end
+ 
 
   def total_benchmark_amount(tax_household_members, hbx_enrollment)
     total_sum = 0

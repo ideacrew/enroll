@@ -194,11 +194,18 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_eligibility_data
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+    # multitaxhousehold , refactor here
+    #update/refactor this reference to pull all the active tax households fot a given family
+    # shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+    shopping_tax_households = get_shopping_tax_households_from_person(@person, @hbx_enrollment.effective_on.year)
 
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+    if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
+      @tax_households = shopping_tax_households
+      total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      # multitaxhousehold , refactor here
+      # @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+
+
       @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
       session[:max_aptc] = @max_aptc
       default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item

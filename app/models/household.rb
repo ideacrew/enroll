@@ -275,6 +275,7 @@ class Household
     tax_households.where(effective_ending_on: nil, is_eligibility_determined: true)
   end
 
+  # multitaxhousehold , refactor here
   def latest_active_tax_household_with_year(year)
     tax_households.tax_household_with_year(year).active_tax_household.order_by(:created_at.desc).first
   end
@@ -540,5 +541,9 @@ class Household
     end_multiple_thh
 
     save!
+  end
+
+  def active_tax_households_for_year(year)
+    tax_households.where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), effective_ending_on: nil))
   end
 end
