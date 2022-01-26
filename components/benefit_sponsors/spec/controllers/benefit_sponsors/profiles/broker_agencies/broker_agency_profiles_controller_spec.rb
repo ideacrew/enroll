@@ -161,12 +161,8 @@ module BenefitSponsors
           allow(controller).to receive(:person_market_kind).and_return("individual")
         end
 
-        it "does not include person not accepting new clients" do
-          expect(controller.send(:eligible_brokers).to_a).to_not include(person_not_accepting_new_clients)
-        end
-
-        it "does include person accepting new clients" do
-          expect(controller.send(:eligible_brokers).to_a).to include(person_accepting_new_clients)
+        it "does include person not accepting new clients" do
+          expect(controller.send(:eligible_brokers).to_a).to include(person_not_accepting_new_clients)
         end
       end
     end
