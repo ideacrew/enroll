@@ -326,7 +326,8 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def help_paying_coverage_redirect_path(result)
-    return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    ivl_oe_end_date = Settings.aca.individual_market.open_enrollment.end_on
+    return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection) && ivl_oe_end_date >= TimeKeeper.date_of_record
     financial_assistance.application_checklist_application_path(id: result.success)
   end
 
