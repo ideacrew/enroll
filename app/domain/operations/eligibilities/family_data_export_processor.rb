@@ -1,0 +1,116 @@
+# frozen_string_literal: true
+
+require 'dry/monads'
+require 'dry/monads/do'
+require 'csv'
+
+module Operations
+  # export evidences
+  module Eligibilities
+    class FamilyDataExportProcessor
+      include Dry::Monads[:result, :do]
+
+      # @param [Hash] opts Options to update evidence due on dates
+      # @option opts [Integer] :offset required
+      # @option opts [Integer] :limit required
+      # @return [Dry::Monad] result
+      def call(params)
+        values = yield validate(params)
+        family_data = yield construct_family_data(values)
+
+        Success(family_data)
+      end
+
+      private
+
+      def validate(params)
+        return Failure('offset missing') unless params[:offset]
+        return Failure('limit missing') unless params[:limit]
+
+        Success(params)
+      end
+
+      def construct_family_data(values)
+        logger = init_logger
+        file_name = filename(values)
+        index = 0
+        CSV.open(file_name, 'w', force_quotes: true) do |csv|
+          csv << columns
+          Family.all.skip(values[:offset]).limit(values[:limit]).no_timeout.each do |family|
+            index += 1
+            puts "processed #{index} families" if index % 100 == 0
+            logger.info "processed #{index} families" if index % 100 == 0
+
+            family_data = ::Operations::Eligibilities::FamilyEvidencesDataExport.new.call(
+                            family: family,
+                            assistance_year: TimeKeeper.date_of_record.year
+                          ).success
+
+            family_data.each { |member_row| csv << member_row }
+          end
+        end
+
+        Success(file_name)
+      rescue StandardError => e
+        logger.info(e.message) unless Rails.env.test?
+      end
+
+      def init_logger
+        Logger.new(
+          "#{Rails.root}/log/build_family_eligibility_data_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+        )
+      end
+
+      def filename(values)
+        "#{Rails.root}/family_eligibility_data_export_#{values[:offset]}_#{values[:limit]}_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+      end
+
+      def columns
+        [
+          'Family Hbx ID',
+          'Primary Hbx ID',
+          'Is Subscriber?',
+          'Member Hbx ID',
+          'Member First Name',
+          'Member Last Name',
+          'Member SSN',
+          'Member Is Active?',
+          'Health Cov Hbx ID',
+          'Health Cov Effective On',
+          'Health Cov Member Start',
+          'Health Cov Member End',
+          'Other Health Covs',
+          'Dental Cov Hbx ID',
+          'Dental Cov Effective On',
+          'Dental Cov Member Start',
+          'Dental Cov Member End',
+          'Other Dental Covs',
+          'SSN Status',
+          'SSN Due Date',
+          'Is American Ind?',
+          'American Ind Status',
+          'American Ind Due Date',
+          'Is Citizen?',
+          'Citizenship Status',
+          'Citizenship Due Date',
+          'Is Lawfully Present?',
+          'Immigration Status',
+          'Immigration Due Date',
+          'Application Hbx ID',
+          'Aptc Amt',
+          'CSR',
+          'Applicant Applying Coverage?',
+          'Income Amt',
+          'Income Status',
+          'Income Due Date',
+          'Esi Status',
+          'Esi Due Date',
+          'Non Esi Status',
+          'Non Esi Due Date',
+          'Local Mec Status',
+          'Local Mec Due Date'
+        ]
+      end
+    end
+  end
+end
