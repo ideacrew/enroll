@@ -704,3 +704,5 @@ registry:
     features:
       - key: :mitc_relationships
         is_enabled: false
+      - key: :staff_list_back
+        is_enabled: true

@@ -581,6 +581,29 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
         end
 
+        context 'has negative income amount' do
+          before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            income
+            applicant.incomes.first.update_attributes(amount: -100.00, kind: 'net_self_employment')
+          end
+
+          it 'should return true as amount is negative for income with kind net_self_employment' do
+            expect(applicant.applicant_validation_complete?).to eq true
+          end
+        end
+
+        context 'has nil income amount' do
+          before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            income
+            applicant.incomes.first.update_attributes(amount: nil)
+          end
+
+          it 'should return false as income amount is nil' do
+            expect(applicant.applicant_validation_complete?).to eq false
+          end
+        end
       end
 
       context 'has_medicare_cubcare_eligible feature enabled' do
@@ -820,6 +843,71 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     context 'when is_spouse_of_primary id called for primary_applicant' do
       it 'should return false' do
         expect(application.primary_applicant.is_spouse_of_primary).to eq(false)
+      end
+    end
+
+
+    context 'set evidence to verified' do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context 'for income evidence' do
+
+        before do
+          applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        let(:current_evidence) { applicant.income_evidence }
+
+        it 'should set evidence verified' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verified?).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied' do
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).to be_blank
+        end
+      end
+
+      context 'for esi mec evidence' do
+
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        let(:current_evidence) { applicant.esi_evidence }
+
+        it 'should set evidence verified' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verified?).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied' do
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).to be_blank
+        end
       end
     end
   end

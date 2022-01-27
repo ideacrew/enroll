@@ -53,7 +53,7 @@ RSpec.describe HbxAdminController, :type => :controller do
       params = {
         "person": { person_id: person_with_family.id, family_id: family.id, current_year: valid_date.year },
         "max_aptc": '1000',
-        "csr_percentage": 50,
+        "csr_percentage": {"50": ""},
         "csr_percentage_#{person_with_family.id}": 73
       }
       post(

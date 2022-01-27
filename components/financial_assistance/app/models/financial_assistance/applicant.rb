@@ -741,7 +741,6 @@ module FinancialAssistance
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
@@ -751,7 +750,6 @@ module FinancialAssistance
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
-          incomes.all? {|income| income.nil? || (income.amount && income.amount.to_f >= 0.0) } &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
           other_questions_complete? &&
           covering_applicant_exists?
@@ -1150,7 +1148,7 @@ module FinancialAssistance
     def create_eligibility_income_evidence
       return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
 
-      self.create_income_evidence(key: :income, title: "Income")
+      self.create_income_evidence(key: :income, title: "Income", is_satisfied: true)
       income_evidence.move_to_pending! if incomes.present?
       income_evidence
     end
@@ -1158,18 +1156,28 @@ module FinancialAssistance
     def create_evidence(key, title)
       return unless is_ia_eligible? || is_applying_coverage
       association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
-      self.send("create_#{association_name}_evidence", key: key, title: title) if self.send("#{association_name}_evidence").blank?
+      self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
 
-    def enrolled_with(_enrollment)
-      return unless income_evidence&.pending?
-      if income_evidence.due_on.blank?
-        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
+    def update_evidence_histories(assistance_evidences)
+      assistance_evidences.each do |evidence_name|
+        evidence_record = self.send(evidence_name)
+        evidence_record&.add_verification_history('application_determined', 'Requested Hub for verification', 'system')
       end
 
+      self.save
+    end
+
+    def schedule_verification_due_on
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      TimeKeeper.date_of_record + verification_document_due.days
+    end
+
+    def enrolled_with(_enrollment)
+      return unless income_evidence&.pending?
+      income_evidence.due_on = schedule_verification_due_on if income_evidence.due_on.blank?
       set_evidence_outstanding(income_evidence)
     end
 
@@ -1184,6 +1192,14 @@ module FinancialAssistance
     end
 
     # rubocop:disable Metrics/Naming/AccessorMethodName
+    def set_evidence_verified(evidence)
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.move_to_verified unless evidence.attested?
+      save!
+    end
+
     def set_evidence_outstanding(evidence)
       return unless evidence.may_move_to_outstanding?
 

@@ -11,7 +11,11 @@ module FinancialAssistance
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :eligibility_determinations
 
     field :max_aptc, type: Money, default: 0.00
+
+    # DEPRECATED - csr_percent_as_integer is deprecated.
+    # CSR determination is a member level determination and exists on model '::FinancialAssistance::TaxHouseholdMember'
     field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
+
     field :source, type: String
     field :aptc_csr_annual_household_income, type: Money, default: 0.00
     field :aptc_annual_income_limit, type: Money, default: 0.00

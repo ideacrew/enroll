@@ -53,7 +53,8 @@ module FinancialAssistance
         @docs_owner.save!
 
         if (@evidence.documents - [@document]).empty?
-          @evidence.move_to_outstanding!
+          applicant = @evidence.evidenceable
+          applicant.set_evidence_outstanding(@evidence)
           @evidence.update_attributes(:update_reason => "all documents deleted", updated_by: current_user.oim_id)
           # update_documents_status(@docs_owner)
           flash[:danger] = "All documents were deleted. Action needed"

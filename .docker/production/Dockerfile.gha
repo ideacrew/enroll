@@ -12,14 +12,32 @@ ARG BUNDLER_VERSION=2.2.27
 # Must be set as ENV variable to overrride the default
 ENV BUNDLER_VERSION=$BUNDLER_VERSION
 
-RUN apt-get update && \
-    apt-get -yq dist-upgrade && \
-    apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev libffi6 libreadline-dev libsodium-dev \
-                       zlibc libgdbm-dev libncurses-dev autoconf fontconfig unzip zip sshpass bzip2 libxrender1 libxext6 \
-                       build-essential ca-certificates libcurl4-openssl-dev \
-                       # Because devs are requesting these
-                       vim nano && \
-    apt-get autoremove -y
+ARG NODE_MAJOR=14
+ENV NODE_MAJOR=$NODE_MAJOR
+
+# Only add packages that aren't alread in the base image
+# https://github.com/docker-library/ruby/blob/57fbb486ad5a793c83a47a4c1ef36160f7abd28e/2.5/stretch/slim/Dockerfile
+RUN apt-get update \
+    && apt-get -yq dist-upgrade \
+    && apt-get install -y \
+      curl \
+      fontconfig \
+      libcurl4-openssl-dev \
+      libffi6 \
+      libsodium18 \
+      libxext6 \
+      libxrender1 \
+      libyaml-cpp0.5v5 \
+      nano \
+      openssl \
+      sshpass \
+      unzip \
+      vim \
+      zip \
+      zlibc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
 
 # Add NodeJS to sources list
 RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_MAJOR.x | bash -
@@ -27,7 +45,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_MAJOR.x | bash -
 # Install Nodejs & Yarn
 RUN apt-get update -qq \
   && apt-get install -yq --no-install-recommends \
-  nodejs \
+    nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && truncate -s 0 /var/log/*log
@@ -69,30 +87,25 @@ ENV NODE_ENV=production
 ###############################################################################
 FROM base as builder
 
-ARG NODE_MAJOR=12
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -qq \
-  && apt-get install -yq --no-install-recommends \
-  build-essential \
-  curl \
-  libpq-dev \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && truncate -s 0 /var/log/*log
-
-# https://github.com/nodesource/distributions/blob/master/README.md
-RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_MAJOR.x | bash -
+RUN apt-get update -qq && \
+    apt-get install -yq --no-install-recommends \
+      curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
 
 # Add Yarn to the sources list
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-# Install Nodejs & Yarn
 RUN apt-get update -qq \
   && apt-get install -yq --no-install-recommends \
-  nodejs \
-  yarn \
+    build-essential \
+    git \
+    libpq-dev \
+    yarn \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && truncate -s 0 /var/log/*log
@@ -103,11 +116,11 @@ RUN apt-get update -qq \
 FROM builder as prod_gems_and_assets
 
 RUN apt-get update -qq \
-  && apt-get install -yq --no-install-recommends \
-  shared-mime-info \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && truncate -s 0 /var/log/*log
+    && apt-get install -yq --no-install-recommends \
+      shared-mime-info \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
 
 # Need all gemfiles and lockfiles
 COPY --chown=nonroot:nonroot package.json $HOME/
@@ -169,21 +182,15 @@ COPY --chown=nonroot:nonroot . $HOME
 
 COPY --chown=nonroot:nonroot ./.docker/config/mongoid.yml $HOME/config
 
+ARG HOSTNAME=localhost
+
 # Needed to run client swap script
-ARG ENROLL_DB_HOST_DEFAULT=localhost
-ARG ENROLL_DB_PORT_DEFAULT=27017
-ARG ENROLL_DB_NAME_DEFAULT=enroll_production
-ARG RABBITMQ_URL_DEFAULT=amqp://localhost:5672
-ARG RABBITMQ_HOST_DEFAULT=amqp://localhost
-ARG RABBITMQ_PORT_DEFAULT=5672
-ARG RABBITMQ_VHOST_DEFAULT=event_source
-ENV ENROLL_DB_HOST=$ENROLL_DB_HOST_DEFAULT
-ENV ENROLL_DB_PORT=$ENROLL_DB_PORT_DEFAULT
-ENV ENROLL_DB_NAME=$ENROLL_DB_NAME_DEFAULT
-ENV RABBITMQ_URL=$RABBITMQ_URL_DEFAULT
-ENV RABBITMQ_HOST=$RABBITMQ_HOST_DEFAULT
-ENV RABBITMQ_PORT=$RABBITMQ_PORT_DEFAULT
-ENV RABBITMQ_VHOST=$RABBITMQ_VHOST_DEFAULT
+ENV ENROLL_DB_HOST=${HOSTNAME}
+ENV ENROLL_DB_PORT=27017
+ENV ENROLL_DB_NAME=enroll_production
+ENV RABBITMQ_URL=amqp://${HOSTNAME}:5672
+ENV RABBITMQ_HOST=amqp://${HOSTNAME}
+
 
 # The CLIENT variable is required to build an image specific to the client
 ARG CLIENT
@@ -206,6 +213,17 @@ RUN rm -rf $GEM_HOME/bundle/ruby/*/cache
 ################################################################
 
 FROM base as deploy
+
+ARG HOSTNAME=localhost
+
+# Needed to run client swap script
+ENV ENROLL_DB_HOST=${HOSTNAME}
+ENV ENROLL_DB_NAME=enroll_production
+ENV ENROLL_DB_PORT=27017
+ENV REDIS_HOST_ENROLL=${HOSTNAME}
+
+ENV RABBITMQ_HOST=amqp://${HOSTNAME}
+ENV RABBITMQ_URL=amqp://${HOSTNAME}:5672
 
 # Copy prebuilt gems
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $BUNDLE_PATH $BUNDLE_PATH

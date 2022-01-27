@@ -44,6 +44,16 @@ RSpec.describe ::Operations::Eligibilities::Notices::RequestDocumentReminderNoti
         expect(result.failure?).to be_truthy
         expect(result.failure).to include 'date of record missing'
       end
+
+      context 'when invalid date format is passed in' do
+        let(:params) { { date_of_record: Date.today.to_s } }
+
+        it 'should return failure' do
+          result = subject.call(params)
+          expect(result.failure?).to be_truthy
+          expect(result.failure).to include 'date of record should be an instance of Date'
+        end
+      end
     end
 
     context 'with valid params' do

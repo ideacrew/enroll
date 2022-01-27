@@ -65,5 +65,23 @@ RSpec.describe Users::RegistrationsController do
         expect(response).not_to redirect_to(root_path)
       end
     end
+
+    context "with weak password" do
+      let(:email) { "test@test.com"}
+      let(:user) { FactoryBot.create(:user, email: email, person: person, oim_id: email) }
+      let(:person) { FactoryBot.create(:person) }
+
+      before do
+        user.save!
+        @request.env["devise.mapping"] = Devise.mappings[:user]
+        #allow(controller).to receive(:resource).and_return(nil)
+      end
+
+      it "should render the 'new' template" do
+        post :create, params: { user: { oim_id: email, password: 'Password1$', password_confirmation: 'Password1$'} }
+        expect(response).to be_success
+        expect(response).to render_template("new")
+      end
+    end
   end
 end

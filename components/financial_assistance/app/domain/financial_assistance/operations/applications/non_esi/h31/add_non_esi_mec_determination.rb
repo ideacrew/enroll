@@ -58,7 +58,7 @@ module FinancialAssistance
                 if response_non_esi_evidence.aasm_state == 'outstanding'
                   applicant.set_evidence_outstanding(applicant_non_esi_evidence)
                 else
-                  applicant_non_esi_evidence.update!(is_satisfied: true, due_on: nil)
+                  applicant.set_evidence_verified(applicant_non_esi_evidence)
                 end
 
                 response_non_esi_evidence.request_results&.each do |eligibility_result|
