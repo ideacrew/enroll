@@ -36,6 +36,12 @@ RSpec.describe DocumentsController, :type => :controller do
       expect(person.verification_types.by_name("Citizenship").first.vlp_documents).to be_empty
     end
 
+    context 'when person has outstanding verification types' do
+      it 'should move consumer role to verification oustanding' do
+        expect(person.consumer_role.reload.aasm_state).to eq('verification_outstanding')
+      end
+    end
+
     it "redirects if the document doesnt exist" do
       # is already destroyed in the before action
       person.reload
