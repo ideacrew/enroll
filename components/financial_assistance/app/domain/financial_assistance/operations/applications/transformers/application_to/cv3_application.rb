@@ -662,9 +662,9 @@ module FinancialAssistance
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
-              family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
+              # family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
               applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
+              # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
               return premiums if premiums.failure?
 
