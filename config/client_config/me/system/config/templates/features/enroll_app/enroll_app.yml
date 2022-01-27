@@ -682,7 +682,7 @@ registry:
         is_enabled: true
       - key: :external_qna_bot
         item: :external_qna_bot
-        is_enabled: <%= ENV['external_qna_bot'] || false %>
+        is_enabled: <%= ENV['EXTERNAL_QNA_BOT_IS_ENABLED'] || false %>
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
