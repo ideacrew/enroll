@@ -69,20 +69,20 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_
       end
     end
 
-    context "when a family member is deleted" do
-      before do
-        create_instate_addresses
-        create_relationships
-        application.save!
-        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
-        family.family_members.last.delete
-        family.reload
-      end
+    # context "when a family member is deleted" do
+    #   before do
+    #     create_instate_addresses
+    #     create_relationships
+    #     application.save!
+    #     allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
+    #     family.family_members.last.delete
+    #     family.reload
+    #   end
 
-      it "should ignore the application and return an empty array" do
-        expect(subject).to be_empty
-      end
-    end
+    #   it "should ignore the application and return an empty array" do
+    #     expect(subject).to be_empty
+    #   end
+    # end
   end
 
   describe '#transform_households' do
