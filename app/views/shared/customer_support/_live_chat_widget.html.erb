@@ -53,9 +53,9 @@
       window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left);
     }
   </script>
-  <button class="live-chat-button" type="button" id="bot-button" onclick="javascript: openQnaBot();">
+  <button class="live-chat-button" type="button" data-cuke="bot-button" onclick="javascript: openQnaBot();">
 <% else %>
-  <button class="live-chat-button" type="button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">
+  <button class="live-chat-button" type="button" data-cuke="chat-button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">
 <% end %>
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M13.25 14C12.0074 14 11 15.0074 11 16.25V17.752L11.0079 17.8604C11.3186 19.9866 13.2285 21.009 16.4332 21.009C19.6264 21.009 21.5667 19.9983 21.9855 17.8966L22 17.75V16.25C22 15.0074 20.9926 14 19.75 14H13.25ZM16.5 6C14.567 6 13 7.567 13 9.5C13 11.433 14.567 13 16.5 13C18.433 13 20 11.433 20 9.5C20 7.567 18.433 6 16.5 6Z" fill="white"/>

@@ -1233,16 +1233,13 @@ Then(/^I should see Shop for new plan button$/) do
 end
 
 Then(/^they should see the live chat button$/) do
-  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
-  expect(live_chat_button.present?).to eq(true)
+  expect(page).to have_css(AdminHomepage.chat_button)
 end
 
 Then(/^they should see the bot button$/) do
-  bot_button = page.all('button').detect { |button| button[:id] == 'bot-button'}
-  expect(bot_button.present?).to eq(true)
+  expect(page).to have_css(AdminHomepage.bot_button)
 end
 
 Then(/^they should not see the live chat button$/) do
-  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
-  expect(live_chat_button.present?).to eq(false)
+  expect(page).to_not have_css(AdminHomepage.chat_button)
 end

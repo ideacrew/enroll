@@ -1,4 +1,4 @@
-Feature: Email Address Feature
+Feature: Live Chat Feature
     Background: Setup permissions
         Given all permissions are present
 
