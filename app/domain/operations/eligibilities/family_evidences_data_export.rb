@@ -55,7 +55,7 @@ module Operations
               get_family_member_coverage_details(enrollments, family_member)
             family_member_row +=
               get_aca_individual_evidence_data(family_member.person)
-            family_member_row += get_aptc_csr_evidence_data(applicant)
+            family_member_row += get_aptc_csr_evidence_data(family_member, values[:assistance_year], applicant)
             family_member_row
           end
 
@@ -120,9 +120,9 @@ module Operations
 
       def get_person_data(person = nil)
         if person
-          [person.hbx_id, person.first_name, person.last_name]
+          [person.hbx_id, person.ssn, person.first_name, person.last_name]
         else
-          append_nil(3)
+          append_nil(4)
         end
       end
 
@@ -134,7 +134,13 @@ module Operations
           'Immigration status'
         ]
 
-        verification_type_names.collect do |type_name|
+        data = if ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(person.citizen_status)
+          [person.citizen_status, nil]
+        else
+          [nil, person.citizen_status]
+        end
+
+        data + verification_type_names.collect do |type_name|
           verification_type =
             person.verification_types.active.where(type_name: type_name).first
 
@@ -146,8 +152,28 @@ module Operations
         end.flatten
       end
 
-      def get_aptc_csr_evidence_data(applicant = nil)
-        return append_nil(10) unless applicant
+      def tax_household_for(family_member, year)
+        household = family_member.family.active_household
+        tax_households = household.latest_tax_households_with_year(year).order('created DESC')
+
+        tax_households.detect{|th| th.tax_household_members.any?{|thm| thm.family_member == family_member}}
+      end
+
+      def tax_household_eligibility_determination(family_member, year)
+        tax_household = tax_household_for(family_member, year)
+
+        tax_household&.eligibility_determinations&.last
+      end
+
+      def get_aptc_csr_evidence_data(family_member, year, applicant = nil)
+        determination = tax_household_eligibility_determination(family_member, year)
+
+        data = [
+          determination&.max_aptc&.to_f,
+          determination&.csr_percent_as_integer
+        ]
+
+        return (data + append_nil(12)) unless applicant
 
         evidences = %w[
           income_evidence
@@ -156,8 +182,12 @@ module Operations
           local_mec_evidence
         ]
 
-        [applicant.application.hbx_id, applicant.is_applying_coverage] +
-          evidences.collect do |evidence_name|
+        data + [
+          applicant.application.hbx_id,
+          applicant.is_applying_coverage,
+          applicant.current_month_earned_incomes.sum(&:amount),
+          applicant.current_month_unearned_incomes.sum(&:amount)
+        ] + evidences.collect do |evidence_name|
             evidence_record = applicant.send(evidence_name)
             if evidence_record
               [evidence_record.aasm_state, evidence_record.due_on]
