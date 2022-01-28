@@ -1,0 +1,108 @@
+# frozen_string_literal: true
+
+require 'dry/monads'
+require 'dry/monads/do'
+require 'csv'
+
+module Operations
+  # update verification due on dates
+  class UpdateVerificationDueDates
+    include Dry::Monads[:result, :do]
+
+    # @param [Hash] opts Options to update evidence due on dates
+    # @option opts [Family] :family required
+    # @option opts [Integer] :assistance_year required
+    # @option opts [Date] :due_on required
+    # @return [Dry::Monad] result
+    def call(params)
+      values = yield validate(params)
+      family = yield update_aca_individual_eligibility_due_dates(values)
+      _application = yield update_aptc_csr_eligibility_due_dates(values)
+
+      Success(family)
+    end
+
+    private
+
+    def validate(params)
+      return Failure('family missing') unless params[:famiy] || params[:family].is_a?(::Family)
+
+      Success(params)
+    end
+
+    def update_aca_individual_eligibility_due_dates(values)
+      results = values[:family].family_members.active.collect do |family_member|
+        update_person_eligibilities(family_member.person, values[:due_on])
+      end
+
+      if results.all?(&:success?)
+        Success(values[:family])
+      else
+        errors = results.collect{|result| result.failure.errors if result.failure?}.compact
+
+        Failure(errors)
+      end
+    end
+
+    def update_person_eligibilities(person, due_on)
+      outstanding_statuses = %w[unverified outstanding review]
+
+      person.verification_types.active.each do |verification_type|
+        if outstanding_statuses.include?(verification_type.validation_status)
+          verification_type.due_date = due_on
+        end
+      end
+      if person.save
+        Success(person)
+      else
+        Failure(person.errors)
+      end
+    end
+
+    def update_aptc_csr_eligibility_due_dates(values)
+      application =
+        ::FinancialAssistance::Application
+          .where(family_id: values[:family].id)
+          .by_year(values[:assistance_year])
+          .determined
+          .last
+
+      if application
+        results = application.active_applicants.collect do |applicant|
+          update_applicant_evidence_due_dates(applicant, due_on)
+        end
+
+        if results.all?(&:success?)
+          Success(values[:family])
+        else
+          errors = results.collect{|result| result.failure.errors if result.failure?}.compact
+          Failure(errors)
+        end
+      else
+        Success(true)
+      end
+    end
+
+    def update_applicant_evidence_due_dates(applicant, due_on)
+      evidences = %w[
+        income_evidence
+        esi_evidence
+        non_esi_evidence
+        local_mec_evidence
+      ]
+
+      evidences.each do |evidence_name|
+        evidence_record = applicant.send(evidence_name)
+        verify_and_update_evidence_due_on(evidence_record, due_on) if evidence_record
+      end
+
+      applicant.save
+    end
+
+    def verify_and_update_evidence_due_on(evidence_record, due_on)
+      if ::Eligibilites::Evidence::OUTSTANDING.include?(evidence_record.aasm_state.to_sym)
+        evidence_record.change_due_on!(due_on)
+      end
+    end
+  end
+end
