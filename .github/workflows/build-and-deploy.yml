@@ -177,8 +177,7 @@ jobs:
 
   notify-slack:
     if: github.event_name != 'pull_request'
-    needs: [prep]
-    # needs: [prep, build-and-upload-image]
+    needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -191,8 +190,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
         with:
-          # channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
-          channel-id: 'test-better-format'
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
           payload: |
             {
               "blocks": [
