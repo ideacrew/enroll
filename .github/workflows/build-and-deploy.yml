@@ -186,7 +186,8 @@ jobs:
         client: ['dc', 'me']
     steps:
       - run: |
-          echo "CLIENT=${{ matrix.client^^ }}" >> ${GITHUB_ENV}
+          echo "MATRIX_CLIENT=${{ matrix.client }}"
+          echo "CLIENT=${MATRIX_CLIENT^^}" >> ${GITHUB_ENV}
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
