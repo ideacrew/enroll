@@ -47,10 +47,10 @@
     function openQnaBot() {
       let height = 500,
           width = 400,
-          url = '<%= qna_bot_path %>',
+          url = '/qna_bot',
           top = window.innerHeight - height,
           left = window.innerWidth - width
-      window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left);
+      window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left+',fullscreen=no,location=no');
     }
   </script>
   <button class="live-chat-button" type="button" data-cuke="bot-button" onclick="javascript: openQnaBot();">
