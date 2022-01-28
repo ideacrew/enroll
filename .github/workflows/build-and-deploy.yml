@@ -186,7 +186,7 @@ jobs:
         client: ['dc', 'me']
     steps:
       - run: |
-          MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')"
+          MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
           echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
       - name: Post to a Slack channel
         id: slack
