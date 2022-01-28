@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # rake reports:enrollment_service_area_change
 
 require 'csv'
@@ -18,6 +19,7 @@ namespace :reports do
       address
       address_rating_area
       address_changed_on
+      product_offered_in_service_area
     ]
 
     file_name = "#{Rails.root}/enrollment_service_area_change_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
@@ -37,10 +39,16 @@ namespace :reports do
           during: enrollment.effective_on
         ).exchange_provided_code
 
+        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+          rating_address,
+          during: enrollment.effective_on
+        ).map(&:id)
+
         person = enrollment.family.primary_person
         product = enrollment.product
+        product_offered_in_service_area = service_areas.include?(product.service_area_id)
 
-        if enrollment_rating_area != address_rating_area
+        if (enrollment_rating_area != address_rating_area) || !product_offered_in_service_area
           csv << [
             person.hbx_id,
             person.work_phone_or_best,
@@ -51,7 +59,8 @@ namespace :reports do
             enrollment_rating_area,
             rating_address.to_s,
             address_rating_area,
-            rating_address.updated_at
+            rating_address.updated_at,
+            product_offered_in_service_area
           ]
         end
       rescue StandardError => e
