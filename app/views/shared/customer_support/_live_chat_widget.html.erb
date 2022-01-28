@@ -44,16 +44,25 @@
 </style>
 <% if EnrollRegistry.feature_enabled?(:external_qna_bot) %>
   <script type="text/javascript">
+    function prepQnaBot() {
+      if (!window.screenTop && !window.screenY) {
+        console.log("fullscreen!");
+        const cancellFullScreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
+        cancellFullScreen.call(document);
+      } else {
+        openQnaBot()
+      }
+    }
     function openQnaBot() {
       let height = 500,
           width = 400,
-          url = '<%= qna_bot_path %>',
+          url = '/qna_bot',
           top = window.innerHeight - height,
           left = window.innerWidth - width
-      window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left);
+      window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left+',fullscreen=no,popup=yes')
     }
   </script>
-  <button class="live-chat-button" type="button" data-cuke="bot-button" onclick="javascript: openQnaBot();">
+  <button class="live-chat-button" type="button" data-cuke="bot-button" onclick="javascript: prepQnaBot();">
 <% else %>
   <button class="live-chat-button" type="button" data-cuke="chat-button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">
 <% end %>
