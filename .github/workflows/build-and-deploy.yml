@@ -223,6 +223,9 @@ jobs:
                     "type": "mrkdwn",
                     "text": "<https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|Direct link to commit>"
                   }
+                },
+                {
+                  "type": "divider"
                 }
               ]
             }
