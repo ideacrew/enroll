@@ -7,6 +7,7 @@ require 'csv'
 module Operations
   # export evidences
   module Eligibilities
+    # Build evidences data
     class FamilyEvidencesDataExport
       include Dry::Monads[:result, :do]
 
@@ -24,12 +25,8 @@ module Operations
       private
 
       def validate(params)
-        unless params[:famiy] || params[:family].is_a?(::Family)
-          return Failure('family missing')
-        end
-        unless params[:assistance_year]
-          return Failure('assistance year missing')
-        end
+        return Failure('family missing') unless params[:famiy] || params[:family].is_a?(::Family)
+        return Failure('assistance year missing') unless params[:assistance_year]
 
         Success(params)
       end
@@ -41,8 +38,10 @@ module Operations
 
         results =
           values[:family].family_members.collect do |family_member|
-            applicant =
-              find_matching_applicant(application, family_member) if application
+            if application
+              applicant =
+                find_matching_applicant(application, family_member)
+            end
 
             family_member_row = [
               values[:family].hbx_assigned_id,
@@ -101,8 +100,8 @@ module Operations
           if current_coverage
             enrollment_member =
               current_coverage.hbx_enrollment_members
-                .detect do |enrollment_member|
-                enrollment_member.applicant_id == family_member.id
+                              .detect do |enr_member|
+                enr_member.applicant_id == family_member.id
               end
 
             [
@@ -135,10 +134,10 @@ module Operations
         ]
 
         data = if ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(person.citizen_status)
-          [person.citizen_status, nil]
-        else
-          [nil, person.citizen_status]
-        end
+                 [person.citizen_status, nil]
+               else
+                 [nil, person.citizen_status]
+               end
 
         data + verification_type_names.collect do |type_name|
           verification_type =
@@ -188,13 +187,13 @@ module Operations
           applicant.current_month_earned_incomes.sum(&:amount),
           applicant.current_month_unearned_incomes.sum(&:amount)
         ] + evidences.collect do |evidence_name|
-            evidence_record = applicant.send(evidence_name)
-            if evidence_record
-              [evidence_record.aasm_state, evidence_record.due_on]
-            else
-              append_nil(2)
-            end
-          end.flatten
+              evidence_record = applicant.send(evidence_name)
+              if evidence_record
+                [evidence_record.aasm_state, evidence_record.due_on]
+              else
+                append_nil(2)
+              end
+            end.flatten
       end
 
       def append_nil(size)

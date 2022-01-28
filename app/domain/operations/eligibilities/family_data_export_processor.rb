@@ -7,6 +7,7 @@ require 'csv'
 module Operations
   # export evidences
   module Eligibilities
+    # Generate family evidence data report
     class FamilyDataExportProcessor
       include Dry::Monads[:result, :do]
 
@@ -42,9 +43,9 @@ module Operations
             logger.info "processed #{index} families" if index % 100 == 0
 
             family_data = ::Operations::Eligibilities::FamilyEvidencesDataExport.new.call(
-                            family: family,
-                            assistance_year: TimeKeeper.date_of_record.year
-                          ).success
+              family: family,
+              assistance_year: TimeKeeper.date_of_record.year
+            ).success
 
             family_data.each { |member_row| csv << member_row }
           end
