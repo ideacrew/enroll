@@ -100,20 +100,100 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
     )
   end
 
-  let(:effective_date) { Date.today }
+  let(:due_on) { (Date.today + 95.days) }
 
   let(:required_params) do
-    { family: family, assistance_year: 2022, due_on: (Date.today + 95.days) }
+    { family: family, assistance_year: 2022, due_on: due_on }
   end
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
+  let(:evidence_names) do
+    %w[income_evidence esi_evidence non_esi_evidence local_mec_evidence]
+  end
+
+  let(:outstanding_types) { %w[unverified outstanding review] }
+  let(:people) { [person1, person2] }
+  let(:verification_type_names) do
+    [
+      'Social Security Number',
+      'American Indian Status',
+      'Citizenship',
+      'Immigration status'
+    ]
+  end
+
   context 'when valid attributes passed' do
-    it 'should set due on dates' do
+    before do
+      application.active_applicants.each do |applicant|
+        evidence_names.each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          applicant.set_evidence_outstanding(evidence)
+        end
+      end
+    end
+
+    it 'should set due on dates for applicant evidences' do
+      application.reload.active_applicants.each do |applicant|
+        evidence_names.each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          expect(evidence.outstanding?).to be_truthy
+          expect(evidence.due_on).to be_blank
+        end
+      end
+
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
+
+      application.reload.active_applicants.each do |applicant|
+        evidence_names.each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          expect(evidence.outstanding?).to be_truthy
+          expect(evidence.due_on).to eq due_on
+        end
+      end
+    end
+
+    it 'should set due dates on individual verification types' do
+      people.each do |person|
+        person.reload
+        expect(
+          person
+            .verification_types
+            .active
+            .where(:validation_status.in => outstanding_types)
+            .present?
+        ).to be_truthy
+        person.verification_types.active.each do |verification_type|
+          if verification_type_names.include?(verification_type.type_name) &&
+             outstanding_types.include?(verification_type.validation_status)
+            expect(verification_type.due_date).to be_blank
+          end
+        end
+      end
+
+      result = subject.call(required_params)
+      expect(result.success?).to be_truthy
+
+      people.each do |person|
+        person.reload
+        expect(
+          person
+            .verification_types
+            .active
+            .where(:validation_status.in => outstanding_types)
+            .present?
+        ).to be_truthy
+
+        person.verification_types.active.each do |verification_type|
+          if verification_type_names.include?(verification_type.type_name) &&
+             outstanding_types.include?(verification_type.validation_status)
+            expect(verification_type.due_date).to eq due_on
+          end
+        end
+      end
     end
   end
 end
