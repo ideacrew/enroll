@@ -63,6 +63,37 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def has_determination_response?
+      return false if pending?
+      return true  if outstanding? || verified? || non_verified?
+
+      if review?
+        transitions = workflow_state_transitions.where(:to_state => 'review').pluck(:from_state)
+
+        from_pending = transitions.detect{|transition| transition.from_state == 'pending'}
+        if from_pending
+          return true if request_results.where(:created_at.gte => from_pending.transition_at).present?
+          return false
+        end
+
+        from_outstanding = transitions.detect{|transition| transition.from_state == 'outstanding'}
+        return true if from_outstanding
+      end
+
+      if attested?
+        request_history = verification_histories.where(:action.in => ['application_determined', 'call_hub']).last
+
+        if request_history
+          return true if request_results.where(:created_at.gte => request_history.created_at).present?
+          return false
+        end
+      end
+
+      request_results.present? ? true : false
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
+
     def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
       payload = construct_payload(application)
