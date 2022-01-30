@@ -39,7 +39,11 @@ function filterPlanByRange(type, combinedSelectors) {
     return combinedSelectors;
   } else {
     var selectors = combinedSelectors.filter(function(){
-      var premium = parseFloat($(this).data("plan-metal-"+type).toString().replace(/[^\d\.]/g,''));
+      if ($(this).data('can-use-aptc') == true && type == 'premium') {
+        var premium = parseFloat($(this).data("plan-metal-premium-after-aptc").toString().replace(/[^\d\.]/g,''));
+      } else {
+        var premium = parseFloat($(this).data("plan-metal-"+type).toString().replace(/[^\d\.]/g,''));
+      }
       return (premium >= from && premium <= to);
     });
     return selectors;
@@ -155,6 +159,7 @@ function updatePlanCost(elected_aptc) {
       premium_resp_amt = 0;
     }
     premium_resp_amt = premium_resp_amt.toFixed(2);
+    $(plan).data('plan-metal-premium-after-aptc', premium_resp_amt); // added new data attribute to store premium calculated after APTC
     $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
   };
 };
@@ -215,8 +220,6 @@ $(function() {
   });
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
-		applyPlanFilters();
-
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
       var coverage_kind = $("input#coverage_kind").val();
@@ -236,6 +239,7 @@ $(function() {
         },
       });
     };
+    applyPlanFilters();
   });
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
