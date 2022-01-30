@@ -507,6 +507,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
       application.send(:create_evidences)
       @new_application = described_class.new(application).create_application
       @new_applicant = @new_application.applicants.first
