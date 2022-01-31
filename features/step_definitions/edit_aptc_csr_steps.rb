@@ -32,12 +32,18 @@ end
 
 Then(/Hbx Admin should see individual level csr percent/) do
   expect(page.has_css?(EditAptc.csr_pct_as_integer)).to eq true
+  expect(page).to have_select("csr_percentage_#{Person.first.id}", :selected => '0')
 end
 
 Given(/^User with tax household exists$/) do
   create_thh_for_family
 end
 
+Given(/Tax household member info exists for user/) do
+  thm = FactoryBot.create(:tax_household_member, tax_household: Family.first.active_household.tax_households.first)
+  thm.update_attributes!(family_member: Family.first.family_members.first)
+  BenefitMarkets::Products::Product.first.update_attributes!(metal_level_kind: :silver)
+end
 
 When(/^Hbx Admin clicks on the Update APTC CSR button$/) do
   find_link('Edit APTC / CSR').click

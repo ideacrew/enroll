@@ -8,6 +8,6 @@ class IvlDocumentsPage
   end
 
   def self.medicare_and_tax_credit_btn
-    '.interaction-click-control-medicaid---tax-credits'
+    '.interaction-click-control-go-to-district-direct'
   end
 end

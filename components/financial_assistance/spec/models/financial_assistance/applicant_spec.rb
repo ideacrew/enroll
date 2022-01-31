@@ -479,6 +479,41 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
+    context 'is_enrolled_on_medicaid' do
+      before do
+        applicant.update_attributes!({
+                                       is_pregnant: false,
+                                       is_applying_coverage: true,
+                                       is_post_partum_period: true,
+                                       pregnancy_end_on: TimeKeeper.date_of_record - 10.days,
+                                       is_enrolled_on_medicaid: nil
+                                     })
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+      end
+
+      context 'is_enrolled_on_medicaid feature disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:is_enrolled_on_medicaid).and_return(false)
+        end
+
+        it 'should return true without is_enrolled_on_medicaid' do
+          expect(applicant.other_questions_complete?).to eq true
+        end
+      end
+
+      context 'is_enrolled_on_medicaid feature enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:is_enrolled_on_medicaid).and_return(true)
+        end
+
+        it 'should return false without is_enrolled_on_medicaid' do
+          expect(applicant.other_questions_complete?).to eq false
+        end
+      end
+    end
+
     context '#applicant_validation_complete?' do
       before do
         applicant.update_attributes!({is_applying_coverage: true,
@@ -501,6 +536,18 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
       end
 
+      context 'has living_outside_state feature disabled' do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          applicant.update_attributes!({is_temporarily_out_of_state: nil})
+        end
+
+        it 'should validate applicant as complete' do
+          expect(applicant.applicant_validation_complete?).to eq true
+        end
+      end
+
       context 'has_medicare_cubcare_eligible feature disabled' do
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
@@ -516,21 +563,47 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(applicant.applicant_validation_complete?).to eq true
         end
 
-        context 'has nil income' do
+        context 'has 0.00 income' do
           before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            allow(applicant).to receive(:medicare_eligible_qns).and_return(true)
+            allow(applicant).to receive(:valid?).and_return(true)
             applicant.update_attributes!({has_job_income: nil,
                                           has_self_employment_income: nil,
                                           has_other_income: nil,
                                           has_unemployment_income: nil})
             applicant.incomes << income
-            applicant.incomes.first.update_attributes(amount: nil)
+            applicant.incomes.first.update_attributes(amount: Money.new('0.00'))
           end
 
-          it "shouldn't validate applicant as complete" do
-            expect(applicant.applicant_validation_complete?).to eq false
+          it "validates $0 incomes" do
+            expect(applicant.applicant_validation_complete?).to eq true
           end
         end
 
+        context 'has negative income amount' do
+          before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            income
+            applicant.incomes.first.update_attributes(amount: -100.00, kind: 'net_self_employment')
+          end
+
+          it 'should return true as amount is negative for income with kind net_self_employment' do
+            expect(applicant.applicant_validation_complete?).to eq true
+          end
+        end
+
+        context 'has nil income amount' do
+          before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+            income
+            applicant.incomes.first.update_attributes(amount: nil)
+          end
+
+          it 'should return false as income amount is nil' do
+            expect(applicant.applicant_validation_complete?).to eq false
+          end
+        end
       end
 
       context 'has_medicare_cubcare_eligible feature enabled' do
@@ -581,17 +654,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           it 'should validate applicant as complete' do
             expect(applicant.applicant_validation_complete?).to eq true
           end
-        end
-      end
-
-      context "invalid income" do
-        before do
-          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
-          applicant.incomes << income
-          applicant.incomes.first.update_attributes(amount: '0.00')
-        end
-        it "should not validate as complete" do
-          expect(applicant.applicant_validation_complete?).to eq false
         end
       end
 
@@ -649,6 +711,39 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context "#covering_applicant_exists" do
+    before do
+      applicant.update_attributes!({
+                                     first_name: "Dusty",
+                                     last_name: "Roberts",
+                                     is_applying_coverage: true,
+                                     is_required_to_file_taxes: false,
+                                     is_claimed_as_tax_dependent: false,
+                                     has_job_income: false,
+                                     has_self_employment_income: false,
+                                     has_other_income: false,
+                                     has_deductions: false,
+                                     has_enrolled_health_coverage: false,
+                                     has_eligible_health_coverage: false,
+                                     has_unemployment_income: false,
+                                     is_pregnant: false,
+                                     no_ssn: 0,
+                                     ssn: '123456789',
+                                     is_post_partum_period: false
+                                   })
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
+      allow(applicant).to receive(:claimed_as_tax_dependent_by).and_return("1")
+    end
+
+    it "should produce correct error message when tax claimer is not present" do
+      applicant.covering_applicant_exists?
+      expect(applicant.errors.full_messages).to include('Applicant claiming Dusty Roberts as tax dependent not present.')
+    end
+  end
+
   context 'propagate_applicant' do
     before do
       allow(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to receive(:new).and_call_original
@@ -684,6 +779,136 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       applicant.callback_update = true
       applicant.destroy!
       expect(::Operations::Families::DropFamilyMember).to_not have_received(:new)
+    end
+  end
+
+  describe '#is_spouse_of_primary' do
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    context 'applicant2 is spouse to primary_applicant' do
+      let!(:relationship) do
+        application.ensure_relationship_with_primary(applicant2, 'spouse')
+        application.reload
+      end
+
+      it 'should return true' do
+        expect(applicant2.is_spouse_of_primary).to eq(true)
+      end
+    end
+
+    context 'when applicant2 is spouse to primary_applicant and not applicant3' do
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:relationship) do
+        application.ensure_relationship_with_primary(applicant2, 'spouse')
+        application.reload
+      end
+
+      it 'should return false as there is no spouse relationship b/w applicant3 & primary_applicant' do
+        expect(applicant3.is_spouse_of_primary).to eq(false)
+      end
+    end
+
+    context 'applicant2 is spouse to non primary_applicant(applicant3)' do
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:relationship) do
+        application.add_or_update_relationships(applicant2, applicant3, 'spouse')
+        application.reload
+      end
+
+      it 'should return false' do
+        expect(applicant2.is_spouse_of_primary).to eq(false)
+      end
+    end
+
+    context 'when is_spouse_of_primary id called for primary_applicant' do
+      it 'should return false' do
+        expect(application.primary_applicant.is_spouse_of_primary).to eq(false)
+      end
+    end
+
+
+    context 'set evidence to verified' do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context 'for income evidence' do
+
+        before do
+          applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        let(:current_evidence) { applicant.income_evidence }
+
+        it 'should set evidence verified' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verified?).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied' do
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).to be_blank
+        end
+      end
+
+      context 'for esi mec evidence' do
+
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        let(:current_evidence) { applicant.esi_evidence }
+
+        it 'should set evidence verified' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verified?).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied' do
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_verified(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).to be_blank
+        end
+      end
     end
   end
 end

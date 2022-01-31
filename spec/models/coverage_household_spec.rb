@@ -71,6 +71,7 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
 
     before :each do
       allow(::RuleSet::CoverageHousehold::IndividualMarketVerification).to receive(:new).with(matching_coverage_household).and_return(mock_ruleset)
+      allow(matching_coverage_household).to receive(:aasm_state).and_return("enrolled")
       allow(matching_hbx_enrollment).to receive(:evaluate_individual_market_eligiblity).and_return(true)
     end
 
@@ -96,6 +97,22 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
         expect(matching_coverage_household).to receive(recommended_event)
         CoverageHousehold.update_individual_eligibilities_for(mock_consumer_role)
       end
+    end
+  end
+  describe "coverage household with invalid aasm state" do
+    let(:person) {FactoryBot.create(:person)}
+    let(:primary_family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:coverage_household) { primary_family.active_household.coverage_households.first}
+    let(:enrollment){ FactoryBot.create(:hbx_enrollment, coverage_household_id: coverage_household.id, family: primary_family, household: primary_family.active_household) }
+
+    before do
+      coverage_household.active_individual_enrollments << enrollment
+      coverage_household.save!
+    end
+
+    it "should not throw an exception while in applicant state and there are present enrollments" do
+      coverage_household.reload
+      expect(coverage_household.evaluate_individual_market_eligiblity).to be(nil)
     end
   end
 end

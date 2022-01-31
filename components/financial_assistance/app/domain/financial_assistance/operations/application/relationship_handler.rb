@@ -40,7 +40,7 @@ module FinancialAssistance
 
         def transmit_data
           begin
-            Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: @dependent.attributes_for_export, family_id: @application.family_id})
+            ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: @dependent.attributes_for_export, family_id: @application.family_id})
           rescue StandardError => e
             Rails.logger.error {"Unable to deliver due to #{e}"} unless Rails.env.test?
           end

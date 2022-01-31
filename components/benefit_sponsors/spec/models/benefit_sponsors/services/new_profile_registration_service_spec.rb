@@ -75,6 +75,17 @@ module BenefitSponsors
       it_behaves_like "should return form for profile", "general_agency"
     end
 
+    describe '.build should return profile with fein when when profile has fein' do
+      context 'when existing broker agency exists with fein' do
+        it 'should return form for existing broker_agency_profile type with fein' do
+          params = {profile_id: agency("broker_agency").id, profile_type: "broker_agency"}
+          service = subject.new params
+          build_hash = service.build params
+          expect(build_hash[:organization][:fein]).to eq agency("broker_agency").fein
+        end
+      end
+    end
+
     shared_examples_for "should find profile and return form for profile" do |profile_type|
 
       it "should return form for #{profile_type} type" do

@@ -2,15 +2,25 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model do
+RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model, dbclean: :after_each do
 
   before :all do
     DatabaseCleaner.clean
   end
 
+  let!(:person1) { FactoryBot.create(:person, :with_consumer_role, first_name: 'Person_11')}
+  let!(:person2) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
+    person1.ensure_relationship_with(per, 'spouse')
+    person1.save!
+    per
+  end
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1)}
+  let!(:family_member_12) { FactoryBot.create(:family_member, person: person2, family: family)}
+
   let!(:application) do
     FactoryBot.create(:application,
-                      family_id: BSON::ObjectId.new,
+                      family_id: family.id,
                       aasm_state: "determined",
                       effective_date: TimeKeeper.date_of_record)
   end
@@ -20,26 +30,28 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
                       application: application,
                       dob: TimeKeeper.date_of_record - 40.years,
                       is_primary_applicant: true,
-                      family_member_id: BSON::ObjectId.new)
+                      family_member_id: family.family_members[0].id,
+                      person_hbx_id: person1.hbx_id)
   end
 
   let!(:applicant2) do
     FactoryBot.create(:applicant,
                       application: application,
                       dob: TimeKeeper.date_of_record - 10.years,
-                      family_member_id: BSON::ObjectId.new)
+                      family_member_id: family_member_12.id,
+                      person_hbx_id: person2.hbx_id)
   end
 
   context 'duplicate' do
 
-    context 'Should not create relationships for duplicate/new application if there are no relationship for application.' do
+    context 'Should create relationships if there are no relationship for application and relationships present to primary person' do
       before do
         factory = described_class.new(application)
         @duplicate_application = factory.create_application
       end
 
       it 'Should return true to match the relative and applicant ids for relationships' do
-        expect(@duplicate_application.relationships.count).to eq 0
+        expect(@duplicate_application.relationships.count).to eq 2
       end
     end
 
@@ -47,6 +59,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
       before do
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: "child")
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant.id, relative_id: applicant2.id, kind: "parent")
+        application.save!
         factory = described_class.new(application)
         @duplicate_application = factory.create_application
       end
@@ -232,16 +245,17 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         end
       end
 
-      context 'for applicant evidences' do
+      context 'for applicant esi evidence' do
         before do
-          applicant.evidences << FinancialAssistance::Evidence.new(key: :esi, title: "MEC", eligibility_status: "Verified")
+          applicant.build_esi_evidence(key: :esi, title: "ESI MEC")
+          applicant.save!
           factory = described_class.new(application)
           duplicate_application = factory.create_application
           @duplicate_applicant = duplicate_application.applicants.first
         end
 
-        it 'should not have evidences' do
-          expect(@duplicate_applicant.evidences).to eq []
+        it 'should not have esi evidence' do
+          expect(@duplicate_applicant.esi_evidence).to eq nil
         end
       end
 
@@ -429,7 +443,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         end
       end
 
-      context 'New Family member dropped with corresponding applicant' do
+      context 'New Family member dropped with corresponding applicants' do
         before do
           family_11.remove_family_member(family_member_12.person)
           family_11.save!
@@ -442,6 +456,22 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           expect(@new_application_factory.family_members_changed).to eq true
         end
       end
+
+      context 'Exisitng Family Member data need to be in sync with applicants' do
+        it 'should update existing applicants with updated info' do
+          person_11.person_relationships.last.update_attributes(kind: 'child')
+
+          expect(application_11.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).not_to eq person_11.dob
+          expect(application_11.applicants.where(person_hbx_id: person_12.hbx_id).first.relation_with_primary).to eq "spouse"
+          expect(person_11.find_relationship_with(person_12)).to eq "child"
+
+          @new_application_factory = described_class.new(application_11)
+          new_application = @new_application_factory.create_application
+          expect(new_application.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).to eq person_11.dob
+          expect(new_application.applicants.where(person_hbx_id: person_12.hbx_id).first.relation_with_primary).to eq "child"
+        end
+      end
+
     end
 
     context 'claimed_as_tax_dependent_by' do
@@ -468,6 +498,41 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           expect(@claiming_applicant.person_hbx_id).to eq(applicant_11.person_hbx_id)
         end
       end
+    end
+  end
+
+  describe 'applicant with income, esi, non esi and mec evidences' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
+      application.send(:create_evidences)
+      @new_application = described_class.new(application).create_application
+      @new_applicant = @new_application.applicants.first
+    end
+
+    it 'should not create evidences for new application' do
+      expect(@new_applicant.income_evidence).to be_nil
+      expect(@new_applicant.esi_evidence).to be_nil
+      expect(@new_applicant.non_esi_evidence).to be_nil
+      expect(@new_applicant.local_mec_evidence).to be_nil
+    end
+
+    it 'should create evidences when application is determined' do
+      @new_application.applicants.each do |applicant|
+        applicant.update_attributes(is_applying_coverage: true)
+      end
+
+      allow(@new_application).to receive(:is_application_valid?).and_return(true)
+      @new_application.submit!
+      @new_application.determine!
+      applicant = @new_application.applicants.first
+      expect(applicant.income_evidence).not_to be_nil
+      expect(applicant.esi_evidence).not_to be_nil
+      expect(applicant.non_esi_evidence).not_to be_nil
+      expect(applicant.local_mec_evidence).not_to be_nil
     end
   end
 
@@ -538,6 +603,134 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
     it 'should not set eligibilitydetermination_id for new applicants' do
       expect(@new_application.applicants.pluck(:eligibility_determination_id).compact).to be_empty
+    end
+  end
+
+  describe 'family with just two family members for create_application' do
+    let!(:person) do
+      per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 40.years)
+      per.addresses.delete_all
+      per
+    end
+    let!(:person2) do
+      per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
+      person.ensure_relationship_with(per, 'spouse')
+      per.addresses.delete_all
+      person.save!
+      per
+    end
+    let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:family_member) { FactoryBot.create(:family_member, family: family2, person: person2) }
+    let!(:application2) { FactoryBot.create(:financial_assistance_application, family_id: family2.id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'submitted') }
+    let!(:primary_applicant) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        dob: person.dob,
+                        first_name: person.first_name,
+                        last_name: person.last_name,
+                        gender: person.gender,
+                        ssn: person.ssn,
+                        citizen_status: person.citizen_status,
+                        is_incarcerated: person.is_incarcerated,
+                        indian_tribe_member: person.indian_tribe_member,
+                        is_applying_coverage: true,
+                        is_primary_applicant: true,
+                        application: application2,
+                        family_member_id: family2.family_members[0].id,
+                        person_hbx_id: person.hbx_id)
+    end
+    let!(:spouse_applicant) do
+      FactoryBot.create(:applicant,
+                        application: application2,
+                        is_applying_coverage: true,
+                        first_name: person2.first_name,
+                        last_name: person2.last_name,
+                        gender: person2.gender,
+                        ssn: person2.ssn,
+                        dob: person2.dob,
+                        citizen_status: person2.citizen_status,
+                        is_incarcerated: person2.is_incarcerated,
+                        indian_tribe_member: person2.indian_tribe_member,
+                        is_primary_applicant: false,
+                        family_member_id: family_member.id,
+                        person_hbx_id: person2.hbx_id)
+    end
+
+    before do
+      family.family_members.map(&:person).flatten.each do |p|
+        p.addresses.delete_all
+      end
+      [application2].each do |applin|
+        applin.applicants.first.update_attributes!(is_primary_applicant: true)
+        address_attributes = {
+          kind: 'home',
+          address_1: '3 Awesome Street',
+          address_2: '#300',
+          city: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_city).item,
+          state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+          zip: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_zip_code).item
+        }
+        if EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item == 'county'
+          address_attributes.merge!(
+            county: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_county).item
+          )
+        end
+        financial_assistance_address = ::FinancialAssistance::Locations::Address.new(address_attributes)
+        applin.reload
+        applin.applicants.each do |applicant|
+          applicant.addresses << financial_assistance_address
+          applicant.save!
+        end
+        family_id = applin.family_id
+        family = Family.find(family_id) if family_id.present?
+        family.family_members.each do |fm|
+          main_app_address = Address.new(address_attributes)
+          fm.person.addresses << main_app_address
+          fm.person.save!
+        end
+      end
+
+      family.reload
+      application2.reload
+    end
+
+    context "when main app data is same as previous application data" do
+      before do
+        @new_application = described_class.new(application2).create_application
+      end
+
+      it 'should return application without any changes in data' do
+        expect(@new_application.applicants[0].is_applying_coverage).to eq(application2.applicants[0].is_applying_coverage)
+      end
+    end
+
+    context "when primary_member is non applicant" do
+      it 'should return copied primary applicant as non applicant' do
+        person.consumer_role.update_attributes(is_applying_coverage: false)
+        @new_application = described_class.new(application2).create_application
+        expect(@new_application.applicants[0].is_applying_coverage).not_to eq(application2.applicants[0].is_applying_coverage)
+      end
+    end
+
+    context "when spouse_member is non applicant" do
+      before do
+        person2.consumer_role.update_attributes(is_applying_coverage: false)
+        @new_application = described_class.new(application2).create_application
+      end
+
+      it 'should return copied spouse applicant as non applicant' do
+        expect(@new_application.applicants[1].is_applying_coverage).not_to eq(application2.applicants[1].is_applying_coverage)
+      end
+    end
+
+    context "when spouse_applicant is non applicant" do
+      before do
+        application2.applicants[1].update_attributes(is_applying_coverage: false)
+        @new_application = described_class.new(application2).create_application
+      end
+
+      it 'should return copied spouse applicant as non applicant' do
+        expect(@new_application.applicants[0].is_applying_coverage).to eq(application2.applicants[0].is_applying_coverage)
+      end
     end
   end
 end

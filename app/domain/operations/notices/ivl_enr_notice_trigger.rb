@@ -65,7 +65,7 @@ module Operations
       end
 
       def build_family_member_hash(enrollment)
-        members = enrollment.family&.family_members || []
+        members = enrollment.family&.family_members&.where(is_active: true) || []
         family_members_hash = members.collect do |fm|
           person = fm.person
           outstanding_verification_types = person.consumer_role.types_include_to_notices

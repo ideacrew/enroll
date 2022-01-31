@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: a3f2fbeaf278996b20139ba2b4528420b3f74afd
+  revision: 13fce8c3533f1c31e8252571baf806aad16ce0a5
   branch: trunk
   specs:
-    aca_entities (0.9.0)
+    aca_entities (0.10.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -178,7 +178,7 @@ GEM
     database_cleaner-mongoid (2.0.1)
       database_cleaner-core (~> 2.0.0)
       mongoid
-    deep_merge (1.2.1)
+    deep_merge (1.2.2)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     devise (4.7.2)
@@ -262,7 +262,7 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday_middleware (1.2.0)
       faraday (~> 1.0)
-    ffi (1.15.4)
+    ffi (1.15.5)
     font-awesome-rails (4.7.0.5)
       railties (>= 3.2, < 6.1)
     forgery (0.7.0)
@@ -352,7 +352,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.13.10)
+    oj (3.13.11)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)

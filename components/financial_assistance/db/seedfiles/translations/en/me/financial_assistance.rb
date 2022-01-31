@@ -13,6 +13,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   'en.faa.other_ques.is_student' => 'Is this person a full-time student?*',
+  "en.faa.other_ques.is_enrolled_on_medicaid" => 'Was this person enrolled in Medicaid during the pregnancy?',
   "en.faa.medicaid_question" => "Do you want us to submit this application to the ME Department of Health and Human Services (DHHS) to do a full review of your application for Medicaid eligibility?",
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
   'en.faa.edit.remove_warning' => 'This cannot be undone.',
@@ -153,6 +154,12 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
   "en.faa.cancel" => "Cancel",
   "en.faa.income_temporary_message" => "<ul><li><strong>Start Date: </strong>If this is income you currently have, you must enter the date you began receiving this income in the 'From' field, or 1/1/%{current_year} (if the income started before this year). Do not enter a date in the future (for example, 1/1/%{next_year}) unless this is income that has not started but you expect to have in the future.</li><li><strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.</li></ul>",
-  "en.faa.not_applicable_abbreviation" => "N/A"
+  "en.faa.not_applicable_abbreviation" => "N/A",
+  # Flash error display
+  "en.faa.errors.should_be_answered" => "should be answered",
+  "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
+  "en.faa.errors.missing_relationships" => "You must have a complete set of relationships defined among every member.",
+  "en.faa.errors.extra_relationship" => "Extra relationship exist without an applicant.",
+  "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members."
 }.freeze
 # rubocop:enable Layout/LineLength

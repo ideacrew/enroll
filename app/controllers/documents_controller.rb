@@ -71,6 +71,7 @@ class DocumentsController < ApplicationController
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
+      @person.save
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
       update_documents_status(family_member) if family_member
@@ -170,7 +171,7 @@ class DocumentsController < ApplicationController
     if @document.destroyed?
       @person.save!
       if (@verification_type.vlp_documents - [@document]).empty?
-        @verification_type.update_attributes(:validation_status => "outstanding", :update_reason => "all documents deleted")
+        @person.consumer_role.return_doc_for_deficiency(@verification_type, "all documents needed")
         flash[:danger] = "All documents were deleted. Action needed"
       else
         flash[:success] = "Document deleted."

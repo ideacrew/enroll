@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: a3f2fbeaf278996b20139ba2b4528420b3f74afd
+  revision: 13fce8c3533f1c31e8252571baf806aad16ce0a5
   branch: trunk
   specs:
-    aca_entities (0.9.0)
+    aca_entities (0.10.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -459,7 +459,7 @@ GEM
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
     database_cleaner (1.8.3)
-    deep_merge (1.2.1)
+    deep_merge (1.2.2)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     devise (4.7.1)
@@ -734,7 +734,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.10)
+    oj (3.13.11)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
@@ -1114,6 +1114,7 @@ DEPENDENCIES
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
+  globalid
   haml (~> 5.0)
   httparty (~> 0.16)
   i18n (~> 1.5)

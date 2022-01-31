@@ -34,6 +34,7 @@ module FinancialAssistance
         optional(:no_dc_address).filled(:bool) # Fix Me
         optional(:is_homeless).maybe(:bool)
         optional(:is_temporarily_out_of_state).maybe(:bool)
+        optional(:is_living_in_state).maybe(:bool)
 
         optional(:vlp_subject).maybe(:string)
         optional(:vlp_description).maybe(:string)

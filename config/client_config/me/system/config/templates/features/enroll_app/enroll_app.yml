@@ -510,7 +510,7 @@ registry:
           - key: :plan_shopping
             item: true
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Anthem Blue Cross and Blue Shield'
           - key: :connect_test
@@ -680,6 +680,9 @@ registry:
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: true
+      - key: :external_qna_bot
+        item: :external_qna_bot
+        is_enabled: <%= ENV['EXTERNAL_QNA_BOT_IS_ENABLED'] || false %>
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: false
@@ -719,3 +722,5 @@ registry:
     features:
       - key: :mitc_relationships
         is_enabled: true
+      - key: :staff_list_back
+        is_enabled: false

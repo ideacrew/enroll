@@ -21,7 +21,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
   let(:family_member1) { family.primary_family_member }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6), submitted_at: TimeKeeper.date_of_record) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year, submitted_at: TimeKeeper.date_of_record) }
   let!(:applicant1) do
     FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member1.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id, gender: primary_applicant.gender, dob: primary_applicant.dob)
   end
@@ -487,7 +487,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :race => nil
                   },
                   :emails => [],
-                  :evidences => [],
+                  :income_evidence => nil,
+                  :esi_evidence => nil,
+                  :non_esi_evidence => nil,
+                  :local_mec_evidence => nil,
                   :family_member_reference => {
                     :family_member_hbx_id => "732020",
                     :first_name => nil,
@@ -636,7 +639,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :race => nil
                   },
                   :emails => [],
-                  :evidences => [],
+                  :income_evidence => nil,
+                  :esi_evidence => nil,
+                  :non_esi_evidence => nil,
+                  :local_mec_evidence => nil,
                   :family_member_reference => {
                     :family_member_hbx_id => "732021",
                     :first_name => nil,
@@ -778,7 +784,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                     :race => nil
                   },
                   :emails => [],
-                  :evidences => [],
+                  :income_evidence => nil,
+                  :esi_evidence => nil,
+                  :non_esi_evidence => nil,
+                  :local_mec_evidence => nil,
                   :family_member_reference => {
                     :family_member_hbx_id => "732022",
                     :first_name => nil,
@@ -900,7 +909,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 }
               ],
               :aptc_effective_date => application.effective_date,
-              :assistance_year => 2021,
+              :assistance_year => TimeKeeper.date_of_record.year,
               :family_reference => {
                 :hbx_id => family.hbx_assigned_id.to_s
               },
@@ -914,7 +923,8 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
               :mitc_tax_returns => [],
               :notice_options => {
                 :send_eligibility_notices => true,
-                :send_open_enrollment_notices => false
+                :send_open_enrollment_notices => false,
+                :paper_notification => true
               },
               :oe_start_on => oe_start_on,
               :relationships => [],

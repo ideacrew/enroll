@@ -279,7 +279,13 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                             product: active_individual_health_product, effective_on: current_calender_date)
         end
         # BenefitCoveragePeriod will span for a year.
-        let(:coverage_period) { double("BenefitCoveragePeriod", start_on: (Time.now.utc - 1.year), end_on: Time.now.utc)}
+        let(:coverage_period) do
+          double(
+            "BenefitCoveragePeriod",
+            start_on: current_calender_date.beginning_of_year,
+            end_on: current_calender_date.end_of_year
+          )
+        end
 
         it "pull enrollments for both IVL and coverall" do
           query = subject.kollection(["health"], coverage_period)

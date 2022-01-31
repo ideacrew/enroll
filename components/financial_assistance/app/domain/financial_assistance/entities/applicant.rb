@@ -32,6 +32,7 @@ module FinancialAssistance
       attribute :language_code, Types::String.optional.meta(omittable: true)
       attribute :no_dc_address, Types::Strict::Bool.meta(omittable: true)
       attribute :is_homeless, Types::Strict::Bool.meta(omittable: true)
+      attribute :is_living_in_state, Types::Strict::Bool.meta(omittable: true)
 
       attribute :no_ssn, Types::String.optional.meta(omittable: true)
       attribute :citizen_status, Types::String.optional
