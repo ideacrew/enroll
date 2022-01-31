@@ -94,3 +94,20 @@ Feature: IVL plan purchase
     Then consumer should see all the family members names
     And consumer clicked on shop for new plan
     Then employee should see Go To Plan Compare button
+
+  Scenario: Consumer should be able to filter plans using premium amount
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has a dependent in child relationship with age less than 26
+    And consumer has successful ridp
+    When consumer visits home page
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    When ivl clicked continue on household info page
+    Then consumer should see all the family members names
+    And consumer clicked on shop for new plan
+    Then consumer inputs premium amounts for filtering plans
+    Then consumer clicks Apply
+    And consumer should see a list of 4 plans
+    And consumer logs out

@@ -26,6 +26,19 @@ Then(/^\w+ should see Go To Plan Compare button$/) do
   expect(page).to have_content("CHECKBOOK")
 end
 
+Then(/^\w+ inputs premium amounts for filtering plans$/) do
+  find(IvlPlanShopping.premium_amount_from_filter).set(0)
+  find(IvlPlanShopping.premium_amount_to_filter).set(500)
+end
+
+And(/^\w+ should see a list of 4 plans$/) do
+  expect(page).to have_content(IvlPlanShopping.plans_count)
+end
+
+Then(/^consumer clicks Apply$/) do
+  find_all(IvlPlanShopping.apply_button)[0].click
+end
+
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
