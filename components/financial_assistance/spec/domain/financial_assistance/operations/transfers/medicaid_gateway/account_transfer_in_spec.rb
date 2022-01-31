@@ -60,6 +60,19 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           expect(@application_rels.map(&:persisted?)).not_to include(false)
         end
       end
+
+      context 'immediate family coverage household' do
+        before do
+          family = Family.first
+          @immediate_family_members = family.family_members.select { |member| Family::IMMEDIATE_FAMILY.include?(member.primary_relationship) }
+          @immediate_family_coverage_household = family.active_household.immediate_family_coverage_household
+        end
+
+        it 'should add all immediate family members as valid coverage household members' do
+          valid_coverage_household_members = @immediate_family_coverage_household.valid_coverage_household_members
+          expect(valid_coverage_household_members.map(&:family_member_id)).to eq @immediate_family_members.map(&:id)
+        end
+      end
     end
   end
 
