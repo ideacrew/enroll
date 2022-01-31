@@ -18,7 +18,7 @@ class ClientConfigurationToggler < MongoidMigrationTask
   end
 
   def old_configured_state_abbreviation
-    File.read("#{Rails.root}/current_configuration.txt")
+    ENV['CLIENT'] || 'dc'
   end
 
   def target_client_state_abbreviation

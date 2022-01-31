@@ -479,7 +479,7 @@ module ApplicationHelper
 
   def display_carrier_logo(plan, options = {:width => 50})
     carrier_name = carrier_logo(plan)
-    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+    image_tag("logo/carrier/#{ENV['CLIENT'] || 'dc'}/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def digest_logos

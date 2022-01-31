@@ -10,8 +10,8 @@
 @import 'mahc-theme';
 @import 'forms';
 @import 'spacing';
-@import 'cards';
-@import 'jquery-ui';
+@import 'cards_<%= ENV['CLIENT'] || 'dc' %>';
+@import 'jquery-ui_<%= ENV['CLIENT'] || 'dc' %>';
 @import './modules';
 @import './insured';
 @import './brokers';
