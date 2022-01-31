@@ -711,6 +711,6 @@ registry:
       - :relationships
     features:
       - key: :mitc_relationships
-        is_enabled: false
+        is_enabled: true
       - key: :staff_list_back
         is_enabled: true
