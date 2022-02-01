@@ -857,6 +857,8 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? && self_employment_fields_complete if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
+        return false if FinancialAssistanceRegistry.feature_enabled?(:american_indian_alaskan_native_income) && indian_tribe_member && has_american_indian_alaskan_native_income.nil?
+
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income
@@ -1148,13 +1150,8 @@ module FinancialAssistance
     def create_eligibility_income_evidence
       return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
 
-      self.create_income_evidence(key: :income, title: "Income")
-      if incomes.present?
-        income_evidence.move_to_pending!
-      else
-        income_evidence.is_satisfied = true
-        save!
-      end
+      self.create_income_evidence(key: :income, title: "Income", is_satisfied: true)
+      income_evidence.move_to_pending! if incomes.present?
       income_evidence
     end
 
@@ -1166,13 +1163,23 @@ module FinancialAssistance
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
 
-    def enrolled_with(_enrollment)
-      return unless income_evidence&.pending?
-      if income_evidence.due_on.blank?
-        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-        income_evidence.due_on = TimeKeeper.date_of_record + verification_document_due.days
+    def update_evidence_histories(assistance_evidences)
+      assistance_evidences.each do |evidence_name|
+        evidence_record = self.send(evidence_name)
+        evidence_record&.add_verification_history('application_determined', 'Requested Hub for verification', 'system')
       end
 
+      self.save
+    end
+
+    def schedule_verification_due_on
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      TimeKeeper.date_of_record + verification_document_due.days
+    end
+
+    def enrolled_with(_enrollment)
+      return unless income_evidence&.pending?
+      income_evidence.due_on = schedule_verification_due_on if income_evidence.due_on.blank?
       set_evidence_outstanding(income_evidence)
     end
 

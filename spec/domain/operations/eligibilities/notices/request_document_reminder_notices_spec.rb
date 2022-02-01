@@ -68,7 +68,7 @@ RSpec.describe ::Operations::Eligibilities::Notices::RequestDocumentReminderNoti
         allow(Family).to receive(:outstanding_verifications_expiring_on)
           .and_call_original
         allow(Family).to receive(:outstanding_verifications_expiring_on)
-          .with(Date.today + 93.days)
+          .with(Date.today + 94.days)
           .and_return([family])
       end
 
@@ -90,6 +90,18 @@ RSpec.describe ::Operations::Eligibilities::Notices::RequestDocumentReminderNoti
 
         reminder_notices.each do |notice_key|
           expect(payload.key?(notice_key)).to be_truthy
+        end
+      end
+
+      context 'when there is an exception' do
+        before do
+          allow(Operations::Eligibilities::Notices::CreateReminderRequest).to receive_message_chain('new.call')
+            .with(anything).and_raise('Run time error')
+        end
+
+        it 'should return success' do
+          result = subject.call(params)
+          expect(result.success?).to be_truthy
         end
       end
     end

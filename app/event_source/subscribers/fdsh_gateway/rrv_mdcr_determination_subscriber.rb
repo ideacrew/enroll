@@ -7,7 +7,7 @@ module Subscribers
       include EventSource::Logging
       include ::EventSource::Subscriber[amqp: 'fdsh.renewal_eligibilities.medicare']
 
-      subscribe(:on_magi_medicaid_application_renewal_eligibilities_mdcr_determined) do |delivery_info, _metadata, response|
+      subscribe(:on_magi_medicaid_application_renewal_eligibilities_medicare_determined) do |delivery_info, _metadata, response|
         logger.info "FdshGateway::RrvMdcrDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_mdcr_determined with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
 

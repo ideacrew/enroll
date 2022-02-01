@@ -318,10 +318,18 @@ private
   end
 
   def first_of_next_month_coinciding_effective_date
-    if qle_on == qle_on.beginning_of_month
-      qle_on
+    today = TimeKeeper.date_of_record
+
+    if qle_on >= today
+      if qle_on == qle_on.beginning_of_month
+        qle_on
+      else
+        qle_on.end_of_month.next_day
+      end
+    elsif today == today.beginning_of_month
+      today
     else
-      qle_on.end_of_month + 1.day
+      today.end_of_month.next_day
     end
   end
 

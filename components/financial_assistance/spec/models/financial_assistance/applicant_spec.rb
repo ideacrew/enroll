@@ -911,4 +911,68 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  describe '#embedded_document_section_entry_complete?' do
+    context 'other_income' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+      end
+
+      context 'where feature american_indian_alaskan_native_income is enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(true)
+        end
+
+        context 'where applicant is indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false as other_income section is not complete' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'where applicant is not indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: false, has_other_income: false)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
+
+      context 'where feature american_indian_alaskan_native_income is disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(false)
+        end
+
+        context 'where applicant is indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil, has_other_income: false)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
+        end
+
+        context 'where applicant is not indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: false, has_other_income: false)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
+    end
+  end
 end
