@@ -27,8 +27,8 @@ RSpec.describe UserMailer do
       # expect(email.html_part.body).to match(/Dear john/)
     end
 
-    it "should have subject of #{Settings.site.short_name}" do
-      expect(email.subject).to match(/#{Settings.site.short_name}/)
+    it "should have subject of #{EnrollRegistry[:enroll_app].setting(:short_name).item}" do
+      expect(email.subject).to match(/#{EnrollRegistry[:enroll_app].setting(:short_name).item}/)
     end
 
     it "should have one attachment" do
