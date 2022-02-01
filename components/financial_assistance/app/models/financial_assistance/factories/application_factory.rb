@@ -4,6 +4,7 @@ module FinancialAssistance
   module Factories
     # Modify application and sub models data
     class ApplicationFactory
+      include AddressValidator
       attr_accessor :source_application, :applicants, :family_members_changed, :family_members_attributes
 
       APPLICANT_EVIDENCES = [:incomes, :benefits, :deductions].freeze
@@ -50,7 +51,9 @@ module FinancialAssistance
       end
 
       def build_applicant(source_applicant)
-        new_applicant = @new_application.applicants.build(applicant_params(source_applicant))
+        is_living_in_state = has_in_state_home_addresses?(source_applicant.addresses.map(&:attributes).each_with_index.to_h.invert)
+
+        new_applicant = @new_application.applicants.build(applicant_params(source_applicant).merge(is_living_in_state: is_living_in_state))
         source_applicant.incomes.each do |source_income|
           new_applicant.incomes << ::FinancialAssistance::Income.dup_instance(source_income)
         end
