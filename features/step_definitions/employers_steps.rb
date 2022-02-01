@@ -498,7 +498,7 @@ Then(/^.+ should see a plan year successfully saved message$/) do
 end
 
 When(/^.+ clicks? on employer my account link$/) do
-  click_link "My #{Settings.site.short_name}"
+  click_link "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 end
 
 Then(/^.+ should see employee cost modal for current plan year$/) do

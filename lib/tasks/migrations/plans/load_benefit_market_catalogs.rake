@@ -15,7 +15,7 @@ namespace :load do
     if benefit_market_catalog.present?
     else
       benefit_market_catalog = benefit_market.benefit_market_catalogs.create!({
-        title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Benefit Catalog",
+        title: "#{Settings.aca.state_abbreviation} #{EnrollRegistry[:enroll_app].setting(:short_name).item} SHOP Benefit Catalog",
         application_interval_kind: :monthly,
         application_period: Date.new(calender_year,1,1)..Date.new(calender_year,12,31),
         probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS

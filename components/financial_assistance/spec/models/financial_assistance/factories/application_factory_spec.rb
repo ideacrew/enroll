@@ -499,6 +499,110 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         end
       end
     end
+
+    context 'is_living_in_state' do
+      before :each do
+        [application_11].each do |applin|
+          applin.applicants.first.update_attributes!(is_primary_applicant: true)
+          address_attributes = {
+            kind: 'home',
+            address_1: '3 Awesome Street',
+            address_2: '#300',
+            city: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_city).item,
+            state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+            zip: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_zip_code).item
+          }
+          if EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item == 'county'
+            address_attributes.merge!(
+              county: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_county).item
+            )
+          end
+
+          applin.reload
+          applin.applicants.each do |applicant|
+            applicant.addresses << ::FinancialAssistance::Locations::Address.new(address_attributes)
+            applicant.save!
+          end
+          family_id = applin.family_id
+          family = Family.find(family_id) if family_id.present?
+          family.family_members.each do |fm|
+            main_app_address = Address.new(address_attributes)
+            fm.person.addresses << main_app_address
+            fm.person.save!
+          end
+        end
+      end
+
+      context 'for in state addresses' do
+        before do
+          @new_application = described_class.new(application_11).create_application
+        end
+
+        it 'should set as true' do
+          applicants = @new_application.applicants
+          expect(applicants.map(&:is_living_in_state)).to eq [true,true]
+        end
+      end
+
+      context 'for out of state addresses for one of the dependents' do
+        before do
+          application_11.applicants.first.addresses.update_all(state: 'CA')
+          @new_application = described_class.new(application_11).create_application
+        end
+
+        it 'should set as true' do
+          applicants = @new_application.applicants
+          expect(applicants.map(&:is_living_in_state)).to eq [false,true]
+        end
+      end
+
+      context 'for no addresses for one of the dependents' do
+        before do
+          application_11.applicants.first.addresses.delete_all
+          @new_application = described_class.new(application_11).create_application
+        end
+
+        it 'should set as true' do
+          applicants = @new_application.applicants
+          expect(applicants.map(&:is_living_in_state)).to eq [false,true]
+        end
+      end
+    end
+  end
+
+  describe 'applicant with income, esi, non esi and mec evidences' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
+      application.send(:create_evidences)
+      @new_application = described_class.new(application).create_application
+      @new_applicant = @new_application.applicants.first
+    end
+
+    it 'should not create evidences for new application' do
+      expect(@new_applicant.income_evidence).to be_nil
+      expect(@new_applicant.esi_evidence).to be_nil
+      expect(@new_applicant.non_esi_evidence).to be_nil
+      expect(@new_applicant.local_mec_evidence).to be_nil
+    end
+
+    it 'should create evidences when application is determined' do
+      @new_application.applicants.each do |applicant|
+        applicant.update_attributes(is_applying_coverage: true)
+      end
+
+      allow(@new_application).to receive(:is_application_valid?).and_return(true)
+      @new_application.submit!
+      @new_application.determine!
+      applicant = @new_application.applicants.first
+      expect(applicant.income_evidence).not_to be_nil
+      expect(applicant.esi_evidence).not_to be_nil
+      expect(applicant.non_esi_evidence).not_to be_nil
+      expect(applicant.local_mec_evidence).not_to be_nil
+    end
   end
 
   describe 'applicant with incomes, benefits and deductions' do

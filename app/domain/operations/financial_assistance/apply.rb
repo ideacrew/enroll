@@ -62,12 +62,27 @@ module Operations
       end
 
       def applicants_attributes(family)
-
-        family.active_family_members.inject([]) do |members_array, family_member|
+        applicants_attrs = family.active_family_members.inject([]) do |members_array, family_member|
           member_attrs_result = ::Operations::FinancialAssistance::ParseApplicant.new.call({family_member: family_member})
           members_array << member_attrs_result.success if member_attrs_result.success?
           members_array
         end
+
+        applicants_attrs.each do |applicant|
+          is_living_in_state = has_in_state_home_addresses?(applicant[:addresses])
+          applicant.merge!(is_living_in_state: is_living_in_state)
+        end
+
+        applicants_attrs
+      end
+
+      def has_in_state_home_addresses?(addresses_attributes)
+        home_address = addresses_attributes.select do |hash|
+          hash&.deep_symbolize_keys
+          hash[:kind] == 'home' && hash[:state] == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        end
+
+        home_address.present?
       end
     end
   end

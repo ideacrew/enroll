@@ -134,7 +134,6 @@ module FinancialAssistance
                         ::Family.new(family_hash.except('hbx_id', 'foreign_keys', 'broker_accounts', 'magi_medicaid_applications', 'family_members',
                                                         'households', 'ext_app_id'))
                       end
-
             family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
               fm_result = create_member(family_member_hash)
               return fm_result unless fm_result.success?
@@ -211,16 +210,16 @@ module FinancialAssistance
 
             return Success(family_member) if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
 
+            rel_result = create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+            return rel_result unless rel_result.success?
+
             fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
                         is_consent_applicant: family_member_hash['is_consent_applicant'],
                         is_coverage_applicant: family_member_hash['is_coverage_applicant'],
                         is_active: family_member_hash['is_active'] }
-
             family_member = family.add_family_member(person, fm_attr)
-
             family_member.save!
-            rel_result = create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
-            return rel_result unless rel_result.success?
+
             family.save!
             Success(family_member)
           rescue Mongoid::Errors::Validations => e
@@ -236,8 +235,19 @@ module FinancialAssistance
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
+            if relationship_kind == "self"
+              primary_self_relationship = PersonRelationship.new({
+                                                                   :kind => relationship_kind,
+                                                                   :relative_id => person.id
+                                                                 })
+              person.person_relationships << primary_self_relationship
+              primary_self_relationship.save!
+              return Success("created primary relationship to self")
+            end
+
             existing_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
             return Success("checked relationship") if existing_relationship && existing_relationship.kind == relationship_kind
+
             relationships = family.primary_person.ensure_relationship_with(person, relationship_kind)
             relationships&.map(&:save!)
             Success("created relationship")

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserMailer < ApplicationMailer
   ### add_template_helper makes the view helper methods available in the Mailer templates. It does NOT make the methods available in the Mailer itself
   ### Thus we have to use Include in addition to add_template_helper
@@ -14,11 +16,7 @@ class UserMailer < ApplicationMailer
 
 
   def welcome(user)
-    if user.email.present?
-      mail({to: user.email, subject: "Thank you for registering."}) do |format|
-        format.text
-      end
-    end
+    mail({to: user.email, subject: "Thank you for registering."}, &:text) if user.email.present?
   end
 
   def plan_shopping_completed(user, hbx_enrollment, plan_decorator)
@@ -40,10 +38,11 @@ class UserMailer < ApplicationMailer
   #Email will sent to census employees as soon as they are added to the roster
   # TODO: Refactor this as feature with ResourceRegistry
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
-    # TODO - Move logic to model
+    # TODO: - Move logic to model
     benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
-    if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
-      if (census_employee.hired_on > TimeKeeper.date_of_record)
+    # rubocop:disable Style/GuardClause
+    if email.present? && benefit_applications.any?(&:is_submitted?)
+      if census_employee.hired_on > TimeKeeper.date_of_record
         mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{site_short_name}"}) do |format|
           if EnrollRegistry[:enroll_app].setting(:site_key).item
             format.html { render "dc_invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -60,17 +59,20 @@ class UserMailer < ApplicationMailer
           end
         end
       end
+    # rubocop:enable Style/GuardClause
     end
   end
 
   #Email will be sent to census employees when they reach the DOH.
   def send_future_employee_open_enrollment_invitation(email, census_employee, invitation)
     benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
-    if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
+    # rubocop:disable Style/GuardClause
+    if email.present? && benefit_applications.any?(&:is_submitted?)
       mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
         format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
       end
     end
+    # rubocop:enable Style/GuardClause
   end
 
   def renewal_invitation_email(email, census_employee, invitation)
@@ -90,7 +92,7 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def agent_invitation_email(email, person_name, invitation, person_id=nil)
+  def agent_invitation_email(email, person_name, invitation, person_id = nil)
     if email.present?
       mail({to: email, subject: "#{site_short_name} Support Invitation"}) do |format|
         format.html { render "agent_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
@@ -124,7 +126,9 @@ class UserMailer < ApplicationMailer
 
   def send_employee_ineligibility_notice(email, first_name)
     if email.present?
-      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Insurance", from: '#{mail_address}'}) do |format|
+      # rubocop:disable Lint/UselessAssignment
+      message = mail({to: email, subject: "#{EnrollRegistry[:enroll_app].setting(:short_name).item} - Assistance Enrolling in Employer-sponsored Insurance", from: mail_address.to_s}) do |format|
+      # rubocop:enable Lint/UselessAssignment
         format.html {render "employee_ineligibility_notice", locals: {first_name: first_name}}
       end
     end
@@ -147,10 +151,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
-
-  def generic_notice_alert(first_name, notice_subject, email, files_to_attach={})
+  def generic_notice_alert(first_name, notice_subject, email, files_to_attach = {})
     files_to_attach.each do |file_name, file_path|
-      attachments["#{file_name}"] = File.read(file_path)
+      attachments[file_name.to_s] = File.read(file_path)
     end
     message =  mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
@@ -167,8 +170,10 @@ class UserMailer < ApplicationMailer
 
   def generic_notice_alert_to_ba(first_name, email, employer_name)
     if email.present?
-      message = mail({to: email, subject: "You have a new message from #{site_short_name}", from: '#{mail_address}'}) do |format|
-       format.html {render "generic_notice_alert_to_broker", locals: {first_name: first_name, employer_name: employer_name}}
+      # rubocop:disable Lint/UselessAssignment
+      message = mail({to: email, subject: "You have a new message from #{site_short_name}", from: mail_address.to_s}) do |format|
+      # rubocop:enable Lint/UselessAssignment
+        format.html {render "generic_notice_alert_to_broker", locals: {first_name: first_name, employer_name: employer_name}}
       end
     end
   end
@@ -208,11 +213,11 @@ class UserMailer < ApplicationMailer
     subject = l10n(subject_translation_key, site_short_name: site_short_name)
     mail({to: broker_role.email_address, subject: subject}) do |format|
       if broker_role.training && unchecked_carriers.present?
-        format.html { render "broker_pending_completed_training_missing_carrier", :locals => { :applicant_name => broker_role.person.full_name ,:unchecked_carriers => unchecked_carriers}}
+        format.html { render "broker_pending_completed_training_missing_carrier", :locals => { :applicant_name => broker_role.person.full_name,:unchecked_carriers => unchecked_carriers}}
       elsif !broker_role.training && !unchecked_carriers.present?
-        format.html { render "broker_pending_missing_training_completed_carrier", :locals => { :applicant_name => broker_role.person.full_name , :unchecked_carriers => unchecked_carriers}}
+        format.html { render "broker_pending_missing_training_completed_carrier", :locals => { :applicant_name => broker_role.person.full_name, :unchecked_carriers => unchecked_carriers}}
       elsif !broker_role.training && unchecked_carriers.present?
-        format.html { render "broker_pending_missing_training_and_carrier", :locals => { :applicant_name => broker_role.person.full_name , :unchecked_carriers => unchecked_carriers}}
+        format.html { render "broker_pending_missing_training_and_carrier", :locals => { :applicant_name => broker_role.person.full_name, :unchecked_carriers => unchecked_carriers}}
       end
     end
   end

@@ -115,7 +115,7 @@ module SponsoredBenefits
         # label_header_row  = @sheet.row(3)
 
         unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
-          raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template."
+          raise "Unrecognized Employee Census spreadsheet format. Contact #{EnrollRegistry[:enroll_app].setting(:short_name).item} for current template."
         end
 
         census_employees = []
@@ -335,7 +335,7 @@ module SponsoredBenefits
       def parse_ssn(cell)
         cell.blank? ? nil : prepend_zeros(cell.to_s.gsub(/\D/, ''), 9)
       end
-      
+
       def parse_boolean(cell)
         cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
       end

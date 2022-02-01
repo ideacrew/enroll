@@ -40,7 +40,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should match the side bar tabs info on family home page" do
-        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
@@ -75,7 +75,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should match the side bar tabs info on family home page" do
-        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
@@ -112,7 +112,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should match the side bar tabs info on family home page" do
-        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
@@ -149,7 +149,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     end
 
     it "should match the side bar tabs info on family home page" do
-      expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+      expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
       expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
       expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
       expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
