@@ -19,7 +19,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual does not apply for assistance and clicks continue
     And Individual clicks on the Continue button of the Family Information page
     When Individual click the "Had a baby" in qle carousel
-    And Individual selects a past qle date
+    And Individual selects a current qle date
     Then Individual should see confirmation and continue
     And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare

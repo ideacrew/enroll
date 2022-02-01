@@ -33,11 +33,5 @@ module FinancialAssistance
         format.js
       end
     end
-
-    private
-
-    def find_application
-      @application = FinancialAssistance::Application.find_by(id: params[:application_id], family_id: get_current_person.financial_assistance_identifier)
-    end
   end
 end

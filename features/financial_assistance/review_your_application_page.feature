@@ -69,3 +69,10 @@ Feature: Review your application page functionality
     And the CONTINUE button is enabled
     When the user clicks CONTINUE
     Then the user should navigate to the Your Preferences page
+
+  @flaky
+  Scenario: The user navigates to the review and submit page with incomplete applicant information
+    Given the user is on the Family Information page with missing applicant income amount
+    When the user clicks CONTINUE
+    Then the user should see a missing applicant info error message
+    And the CONTINUE button is functionally DISABLED

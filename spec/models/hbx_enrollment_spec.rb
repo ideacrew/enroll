@@ -834,7 +834,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           end
 
           it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
-            hbx_enrollment1.effective_on = date - 10.days
+            hbx_enrollment1.effective_on = date + 5.months
+            hbx_enrollment2.effective_on = date + 6.months
             hbx_enrollment2.select_coverage!
             hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first
             expect(hbx_enrollment1_from_db.coverage_terminated?).to be_truthy
@@ -5160,7 +5161,7 @@ describe ".propogate_cancel" do
     end
 
     subject do
-      enrollment.decorated_elected_plans(enrollment.coverage_kind)
+      enrollment.decorated_elected_plans(coverage_kind)
     end
 
     context 'when disabled' do
@@ -5173,8 +5174,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
         end
 
-        it 'should not exclude child only offering' do
-          expect(subject.size).to eq 2
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
         end
       end
 
@@ -5183,8 +5196,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
         end
 
-        it 'should not exclude child only offering' do
-          expect(subject.size).to eq 2
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
         end
       end
     end
@@ -5199,8 +5224,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
         end
 
-        it 'should exclude child only offering' do
-          expect(subject.size).to eq 1
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should exclude child only offering' do
+            expect(subject.size).to eq 1
+          end
         end
       end
 
@@ -5209,8 +5246,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
         end
 
-        it 'should not exclude child only offering' do
-          expect(subject.size).to eq 2
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should not exclude child only offering' do
+            expect(subject.size).to eq 2
+          end
         end
       end
     end
@@ -5227,7 +5276,7 @@ describe ".propogate_cancel" do
     end
 
     subject do
-      enrollment.decorated_elected_plans(enrollment.coverage_kind)
+      enrollment.decorated_elected_plans(coverage_kind)
     end
 
     context 'when disabled' do
@@ -5240,8 +5289,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
         end
 
-        it 'should not exclude child & adult only offering' do
-          expect(subject.size).to eq 2
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude child & adult only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should not exclude child & adult only offering' do
+            expect(subject.size).to eq 2
+          end
         end
       end
 
@@ -5250,8 +5311,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
         end
 
-        it 'should not exclude adult & child only offering' do
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude adult & child only offering' do
           expect(subject.size).to eq 2
+        end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should not exclude adult & child only offering' do
+            expect(subject.size).to eq 2
+          end
         end
       end
     end
@@ -5266,8 +5339,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return true
         end
 
-        it 'should not exclude adult & child only offering' do
-          expect(subject.size).to eq 2
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude adult & child only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should not exclude adult & child only offering' do
+            expect(subject.size).to eq 2
+          end
         end
       end
 
@@ -5276,8 +5361,20 @@ describe ".propogate_cancel" do
           allow(enrollment).to receive(:any_member_greater_than_18?).and_return false
         end
 
-        it 'should exclude adult & child only offering' do
-          expect(subject.size).to eq 1
+        context 'for health product' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should not exclude adult & child only offering' do
+            expect(subject.size).to eq 2
+          end
+        end
+
+        context 'for dental product' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should exclude adult & child only offering' do
+            expect(subject.size).to eq 1
+          end
         end
       end
     end

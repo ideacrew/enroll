@@ -50,7 +50,6 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       expect(plan_cost_decorator.premium_for(one)).to eq 20.0
     end
 
-
     it "should have a premium for two" do
       expect(plan_cost_decorator.premium_for(two)).to eq 18.0
     end
@@ -189,6 +188,72 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
           it 'should return total_aptc_amount' do
             expect(@upcd_2.total_aptc_amount).to eq 1500
+          end
+        end
+
+        context 'when no premium but allocated aptc ratio for the member is present' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            age = @upcd_2.age_of(hbx_enrollment_member1)
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, age, area, 'NA').and_return(0.0)
+          end
+
+          it 'should return the aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.aptc_amount(hbx_enrollment_member1)).to eq @upcd_2.all_members_aptc[hbx_enrollment_member1.applicant_id.to_s]
+          end
+        end
+      end
+
+      context 'employee_cost_for member' do
+        context 'when premium for member is zero and large family factor is zero' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(0.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(100.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(0.0)
+          end
+
+          it 'should return the negative aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq(- @upcd_2.aptc_amount(hbx_enrollment_member1))
+          end
+        end
+
+        context 'when premium for member is not zero and large family factor is zero' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(100.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(10.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(0.0)
+          end
+
+          it 'should return the difference between premium and aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq 0.0
+          end
+        end
+
+        context 'when premium for member is not zero and large family factor is 1.0' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(100.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(10.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(1.0)
+          end
+
+          it 'should return the difference between premium and aptc amount of the member from individual member aptc hash' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq(@upcd_2.premium_for(hbx_enrollment_member1) - @upcd_2.aptc_amount(hbx_enrollment_member1))
+          end
+        end
+
+        context 'when premium for member is zero and large family factor is 1.0' do
+          before :each do
+            @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
+            allow(@upcd_2).to receive(:premium_for).with(hbx_enrollment_member1).and_return(0.0)
+            allow(@upcd_2).to receive(:aptc_amount).with(hbx_enrollment_member1).and_return(10.0)
+            allow(@upcd_2).to receive(:large_family_factor).with(hbx_enrollment_member1).and_return(1.0)
+          end
+
+          it 'should return 0.0' do
+            expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq 0.0
           end
         end
       end
@@ -487,6 +552,110 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
         it 'should return 0 for large_family_factor for 4th child dependent' do
           expect(@decorator.large_family_factor(hbx_enrollment.hbx_enrollment_members[6])).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe 'family_based_rating, with responsible party' do
+    let(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          rating_method: 'Family-Tier Rates'
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table) { build(:benefit_markets_products_premium_table, rating_area: rating_area) }
+
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let(:spouse) do
+      record = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 20.years)
+      family.primary_applicant.person.ensure_relationship_with(record, "spouse")
+      record
+    end
+    let!(:family_member4) do
+      fm = FactoryBot.create(:family_member, family: family, person: spouse)
+      family.reload
+      fm
+    end
+
+    let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'shopping', product: product, rating_area_id: rating_area.id)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, hbx_enrollment: hbx_enrollment)}
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+    let(:qhp_pt) { FactoryBot.build(:products_qhp_premium_tables, couple_enrollee: 1200.00, primary_enrollee_one_dependent: 1200.00, rate_area_id: rating_area.exchange_provided_code)}
+    let!(:qhp) { FactoryBot.create(:products_qhp, standard_component_id: product.hios_base_id, active_year: product.active_year, qhp_premium_tables: [qhp_pt]) }
+
+    context 'without any aptc' do
+
+      before do
+        @decorator = UnassistedPlanCostDecorator.new(product, hbx_enrollment)
+      end
+
+      it 'should return family tier premium' do
+        expect(@decorator.total_premium).to eq(100.00)
+      end
+    end
+  end
+
+  describe 'zero premium policy, with responsible party' do
+    let(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          rating_method: 'Family-Tier Rates',
+          kind: :dental
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, rating_area: rating_area) }
+
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+    let!(:person4) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 20.years) }
+    let!(:family_member4) { FactoryBot.create(:family_member, family: family, person: person4) }
+    let!(:person5) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years) }
+    let!(:family_member5) { FactoryBot.create(:family_member, family: family, person: person5) }
+    let!(:person6) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 5.years) }
+    let!(:family_member6) { FactoryBot.create(:family_member, family: family, person: person6) }
+    let!(:person7) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 5.years) }
+    let!(:family_member7) { FactoryBot.create(:family_member, family: family, person: person7) }
+    let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'shopping',coverage_kind: "dental", product: product, rating_area_id: rating_area.id)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, hbx_enrollment: hbx_enrollment, is_subscriber: true)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member3) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[3].id, hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member4) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[4].id, hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member5) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[5].id, hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member6) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[6].id, hbx_enrollment: hbx_enrollment)}
+
+    before(:each) do
+      primary_person = family.primary_applicant.person
+      spouse_person = family.family_members[1].person
+      primary_person.ensure_relationship_with(spouse_person, "spouse")
+      family.reload
+      hbx_enrollment.reload
+    end
+
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+    let(:qhp_pt) { FactoryBot.build(:products_qhp_premium_tables, couple_enrollee: 1200.00, primary_enrollee_one_dependent: 1200.00, rate_area_id: rating_area.exchange_provided_code)}
+    let!(:qhp) { FactoryBot.create(:products_qhp, standard_component_id: product.hios_base_id, active_year: product.active_year, qhp_premium_tables: [qhp_pt]) }
+
+    context 'when there are more then 3 dependents with age less then 21' do
+      context 'when zero premium policy disabled' do
+        before do
+          allow(EnrollRegistry[:zero_permium_policy].feature).to receive(:is_enabled).and_return(false)
+          @decorator = UnassistedPlanCostDecorator.new(product, hbx_enrollment)
+        end
+
+        it 'should return 1 for large_family_factor for 4th child dependent' do
+          expect(@decorator.large_family_factor(hbx_enrollment.hbx_enrollment_members[5])).to eq(1)
         end
       end
     end

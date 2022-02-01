@@ -524,6 +524,24 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
+  context "#edit_plan with invalid params" do
+    let(:person1) {FactoryBot.create(:person, addresses: nil)}
+    let(:family1) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1)}
+    let(:enrollment) {HbxEnrollment.all[0] }
+    before :each do
+      family1.primary_person.rating_address.destroy!
+      family1.save!
+    end
+
+    it 'redirects to families account when invalid params are passed through' do
+      sign_in user
+      family1.primary_person.rating_address.destroy!
+      attrs = {hbx_enrollment_id: enrollment.id.to_s, family_id: family1.id}
+      get :edit_plan, params: attrs
+      expect(response).to redirect_to family_account_path
+    end
+  end
+
   context 'IVL Market' do
     before { allow(Person).to receive(:find).and_return(person) }
 
@@ -1093,6 +1111,27 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select at least one Eligible applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+    end
+  end
+
+  context "POST CREATE for IVL" do
+    context "for nil rating area" do
+      before do
+        allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+        allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+        ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        sign_in user
+        @person1 = FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)
+        @family = FactoryBot.create(:family, :with_primary_family_member, :person => @person1)
+        @person1.consumer_role
+        @person1.addresses.update_all(county: nil)
+      end
+
+      it "should redirect to family home page" do
+        post :create, params: { "person_id" => @person1.id, "family_member_ids" => {"0" => @family.primary_applicant.id}, "market_kind" => "individual", "coverage_kind" => "health"}
+        expect(response).to have_http_status(:redirect)
+        expect(flash[:error]).to eq l10n("insured.out_of_state_error_message")
+      end
     end
   end
 end

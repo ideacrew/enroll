@@ -80,6 +80,8 @@ registry:
         is_enabled: true
       - key: :skip_aptc_families_from_document_reminder_notices
         is_enabled: false
+      - key: :non_applicant_citizen_status
+        is_enabled: true
   - namespace:
     - :request_determination
     features:
@@ -235,6 +237,8 @@ registry:
     - key: :voter_registration_through_hbx
       is_enabled: false
     - key: :question_required
+      is_enabled: false
+    - key: :is_enrolled_on_medicaid
       is_enabled: false
   - namespace:
     - :renewals

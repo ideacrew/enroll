@@ -8,6 +8,9 @@ module FinancialAssistance
     include AASM
     include Acapi::Notifiers
     require 'securerandom'
+    include Eligibilities::Visitors::Visitable
+    include GlobalID::Identification
+    include I18n
 
     # belongs_to :family, class_name: "Family"
 
@@ -407,6 +410,10 @@ module FinancialAssistance
       end
     end
 
+    def accept(visitor)
+      applicants.collect{|applicant| applicant.accept(visitor) }
+    end
+
     # Related to Relationship Matrix
     def add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
       self.reload
@@ -428,8 +435,22 @@ module FinancialAssistance
       end
     end
 
-    #Used for RelationshipMatrix
+    #apply rules, update relationships and fetch matrix
     def build_relationship_matrix
+      matrix = fetch_relationship_matrix
+      apply_rules_and_update_relationships(matrix)
+      fetch_relationship_matrix
+    end
+
+    def enrolled_with(enrollment)
+      enrollment.hbx_enrollment_members.each do |enrollment_member|
+        applicant = applicants.where(family_member_id: enrollment_member.applicant_id).first
+        applicant&.enrolled_with(enrollment)
+      end
+    end
+
+    # fetch existing relationships matrix
+    def fetch_relationship_matrix
       applicant_ids = active_applicants.map(&:id)
       matrix_size = applicant_ids.count
       matrix = Array.new(matrix_size){Array.new(matrix_size)}
@@ -441,7 +462,6 @@ module FinancialAssistance
           matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi])
         end
       end
-      apply_rules_and_update_relationships(matrix)
     end
 
     def find_existing_relationship(member_a_id, member_b_id)
@@ -499,6 +519,7 @@ module FinancialAssistance
           missing_relationships << {id_map[xi] => id_map[yi]} if (xi > yi) && matrix[xi][yi].blank?
         end
       end
+      self.errors[:base] << I18n.t("faa.errors.missing_relationships")
       missing_relationships
     end
 
@@ -563,6 +584,38 @@ module FinancialAssistance
       set_determination_response_error!
       update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
       log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
+    end
+
+    def applicant_relative_exists_for_relations
+      result = relationships.collect do |relationship|
+        next if FinancialAssistance::Applicant.find(relationship.applicant_id).present? && FinancialAssistance::Applicant.find(relationship.relative_id).present?
+        relationship
+      end.compact
+      if result.blank?
+        true
+      else
+        self.errors[:base] << I18n.t("faa.errors.extra_relationship")
+        false
+      end
+    end
+
+    def validate_relationships(matrix)
+      # validates the child has relationship as parent for 'spouse of the primary'.
+      all_relationships = find_all_relationships(matrix)
+      spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
+      return true unless spouse_relation.present?
+
+      spouse_rel_id = spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
+      primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
+      child_ids = primary_parent_relations.map(&:relative_id)
+      spouse_parent_relations = relationships.where(:relative_id.in => child_ids.flatten, applicant_id: spouse_rel_id, kind: 'parent')
+
+      if spouse_parent_relations.count == child_ids.flatten.count
+        true
+      else
+        self.errors[:base] << I18n.t("faa.errors.invalid_household_relationships")
+        false
+      end
     end
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
@@ -784,7 +837,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :trigger_fdhs_calls, :trigger_aces_call] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
         transitions from: :submitted, to: :determined
       end
 
@@ -922,27 +975,35 @@ module FinancialAssistance
       Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
     end
 
+    def update_evidence_histories
+      assistance_evidences = %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence]
+
+      active_applicants.each do |applicant|
+        applicant.update_evidence_histories(assistance_evidences)
+      end
+    end
+
     def can_trigger_fdsh_calls?
       FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination) ||
         FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination) ||
         FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
     end
 
-    def trigger_fdhs_calls
+    def publish_application_determined
       return unless predecessor_id.blank? && can_trigger_fdsh_calls?
 
-      Operations::Applications::Verifications::FdshVerificationRequest.new.call(application_id: id)
+      Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
-      Rails.logger.error { "FAA trigger_fdhs_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+      Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def trigger_aces_call
-      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_aces_mec_checkable?
+      ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_aces_call error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
-    def is_aces_mec_checkable?
+    def is_local_mec_checkable?
       return unless FinancialAssistanceRegistry.feature_enabled?(:mec_check)
       self.active_applicants.any?(&:is_ia_eligible?)
     end
@@ -1048,7 +1109,15 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      find_missing_relationships(build_relationship_matrix).blank?
+      matrix = build_relationship_matrix
+      is_valid = [find_missing_relationships(matrix).blank?]
+      is_valid << applicant_relative_exists_for_relations
+      is_valid.all?(true)
+    end
+
+    def valid_relations?
+      matrix = build_relationship_matrix
+      EnrollRegistry.feature_enabled?(:mitc_relationships) ? validate_relationships(matrix) : true
     end
 
     def is_draft?
@@ -1071,22 +1140,10 @@ module FinancialAssistance
       CLOSED_STATUSES.include?(aasm_state)
     end
 
-    # Need to make sure that claimed_as_tax_dependent_by, which holds an applicant ID, actually exists for the
-    # applicants associated with the application.
-    def all_tax_dependent_claiming_applicants_exist?
-      return true if active_applicants.count == 1 && active_applicants.first.applicant_validation_complete? ||
-                     active_applicants.all? { |applicant| applicant.claimed_as_tax_dependent_by.blank? }
-      claimed_as_tax_dependent_by_ids = active_applicants.map { |applicant| applicant.claimed_as_tax_dependent_by.to_s }.compact.uniq
-      claiming_applicants = applicants.where(:_id.in => claimed_as_tax_dependent_by_ids).to_a.uniq
-      errors.add(:base, "Missing all tax claiming dependents.") if claimed_as_tax_dependent_by_ids.length != claiming_applicants.length
-      claimed_as_tax_dependent_by_ids.length == claiming_applicants.length
-    end
-
     def incomplete_applicants?
       active_applicants.each do |applicant|
         return true unless applicant.applicant_validation_complete?
       end
-      return true unless all_tax_dependent_claiming_applicants_exist?
       false
     end
 
@@ -1219,7 +1276,6 @@ module FinancialAssistance
       if relationships_complete?
         relationships_validity = true
       else
-        self.errors[:base] << "You must have a complete set of relationships defined among every member."
         relationships_validity = false
       end
 
@@ -1247,6 +1303,14 @@ module FinancialAssistance
       return unless assistance_year.blank?
       update_attribute(:assistance_year,
                        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
+    end
+
+    def create_rrv_evidences
+      active_applicants.each do |applicant|
+        applicant.create_evidence(:non_esi_mec, "Non ESI MEC")
+        applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
+        applicant.save!
+      end
     end
 
     private
@@ -1330,7 +1394,11 @@ module FinancialAssistance
           next if child_relation.nil? || child_relation.relative_id != each_relation.relative_id
           parents_domestic_partner = applicants.where(id: each_relation.applicant_id).first
           domestic_partners_child = applicants.where(id: other_applicant_id).first
-          add_or_update_relationships(parents_domestic_partner, domestic_partners_child, 'parents_domestic_partner')
+          # pivotal ticket: 180576660 domestic_partner should be able to select parent for primary's child_dependent or vice versa
+          #  MemberA is domestic_partner to MemberB
+          #  MemberA is parent to MemberC
+          #  MemberB should be able to select MemberC as parent
+          # add_or_update_relationships(parents_domestic_partner, domestic_partners_child, 'parents_domestic_partner')
           missing_relationships -= [rel] #Remove Updated Relation from list of missing relationships
         end
       end
@@ -1515,7 +1583,6 @@ module FinancialAssistance
         end
       end
 
-
       tax_dependents.each do |applicant|
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
         applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
@@ -1532,60 +1599,35 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     def create_evidences
       return if predecessor_id.present?
 
-      types = []
-      types << [:aces_mec, "ACES MEC"] if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-      types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
-      types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
-      types << [:income, "Income"] if FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination)
-
       active_applicants.each do |applicant|
-        applicant.evidences << build_evidences(types, applicant)
-        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
-           family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
-
-          family_member_record = family.family_members.where(id: applicant.family_member_id).first
-          next if family_member_record.blank?
-          person_record = family_member_record.person
-          next if person_record.blank?
-          person_record.add_new_verification_type('Income')
-        end
-        from_state = applicant.aasm_state
-        # TODO: revisit
-        applicant.write_attribute(:aasm_state, 'verification_pending')
-        applicant.workflow_state_transitions << WorkflowStateTransition.new(
-          from_state: from_state,
-          to_state: 'verification_pending',
-          event: 'move_to_pending!'
-        )
-      rescue StandardError => e
-        Rails.logger.error("unable to create evidences for #{id} due to #{e.inspect}")
+        applicant.create_evidences
+        applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
+        # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
-    rescue StandardError => e
-      Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
 
-    def build_evidences(types, applicant)
-      evidences = types.collect do |type|
-        key, title = type
+    def create_income_verification(applicant)
+      return unless family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
 
-        next if applicant.evidences.by_name(key).present?
-        case key
-        when :aces_mec, :esi_mec, :non_esi_mec
-          next unless applicant.is_ia_eligible? || applicant.is_applying_coverage
-          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
-        when :income
-          next unless active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(:is_applying_coverage)
-          status = applicant.incomes.blank? ? "attested" : "outstanding"
-          FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: status)
-        end
-      end
+      family_member_record = family.family_members.where(id: applicant.family_member_id).first
+      return unless family_member_record.present?
 
-      evidences.compact || []
+      person_record = family_member_record.person
+      return unless person_record.present?
+
+      person_record.add_new_verification_type('Income')
+
+      from_state = applicant.aasm_state
+      # TODO: revisit
+      applicant.write_attribute(:aasm_state, 'verification_pending')
+      applicant.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: from_state,
+        to_state: 'verification_pending',
+        event: 'move_to_pending!'
+      )
     end
 
     def delete_verification_documents

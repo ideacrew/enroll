@@ -24,11 +24,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerIneligibilityNotice
   before do
     allow(model_instance).to receive(:is_renewing?).and_return(true)
     census_employee.update_attributes(:employee_role_id => employee_role.id )
-    Person.skip_callback(:save, :after, :trigger_primary_subscriber_publish)
-  end
-
-  after do
-    Person.set_callback(:save, :after, :trigger_primary_subscriber_publish)
   end
 
   describe "ModelEvent" do

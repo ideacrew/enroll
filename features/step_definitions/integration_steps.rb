@@ -1152,7 +1152,8 @@ Then(/Employee should see the correct employee contribution on plan tile/) do
 end
 
 Then(/Employee should see their current plan/) do
-  expect(page).to have_content "YOUR CURRENT #{TimeKeeper.date_of_record.year} PLAN"
+  year = Person.first.primary_family.hbx_enrollments.first.effective_on.year
+  expect(page).to have_content "YOUR CURRENT #{year} PLAN"
 end
 
 Then("user will click on New Employee Paper Application link") do
@@ -1232,11 +1233,13 @@ Then(/^I should see Shop for new plan button$/) do
 end
 
 Then(/^they should see the live chat button$/) do
-  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
-  expect(live_chat_button.present?).to eq(true)
+  expect(page).to have_css(AdminHomepage.chat_button)
+end
+
+Then(/^they should see the bot button$/) do
+  expect(page).to have_css(AdminHomepage.bot_button)
 end
 
 Then(/^they should not see the live chat button$/) do
-  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
-  expect(live_chat_button.present?).to eq(false)
+  expect(page).to_not have_css(AdminHomepage.chat_button)
 end

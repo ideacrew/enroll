@@ -9,6 +9,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
                       application: application,
                       eligibility_determination_id: ed.id,
                       is_ia_eligible: true,
+                      is_claimed_as_tax_dependent: false,
+                      is_required_to_file_taxes: true,
                       first_name: 'Test',
                       last_name: 'Test10')
   end
@@ -18,8 +20,27 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
                       application: application,
                       eligibility_determination_id: ed.id,
                       is_ia_eligible: true,
+                      is_claimed_as_tax_dependent: true,
                       first_name: 'TEst2',
                       last_name: 'Test10')
+  end
+
+  describe 'claim_eligible_tax_dependents' do
+    let!(:applicant3) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        eligibility_determination_id: ed.id,
+                        is_ia_eligible: true,
+                        is_claimed_as_tax_dependent: true,
+                        first_name: 'TEst3',
+                        last_name: 'Test10')
+    end
+
+    it "doesn't include is_claimed_as_tax_dependent true applicants (applicant 2)" do
+      assign(:application, application)
+      assign(:applicant, applicant3)
+      expect(helper.claim_eligible_tax_dependents.map(&:first).flatten).to_not include("TEst2 Test10")
+    end
   end
 
   describe 'total_aptc_across_eligibility_determinations' do
@@ -250,6 +271,44 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
       it "should return applicant's full name" do
         expect(@result).to include(applicant.full_name)
+      end
+    end
+  end
+
+  context '#fetch_counties_by_zip', dbclean: :after_each do
+    let!(:county) {BenefitMarkets::Locations::CountyZip.create(zip: "04642", county_name: "Hancock")}
+
+    context 'for 9 digit zip' do
+      it "should return county" do
+        applicant.addresses.create(zip: "04642-3116", county: 'Hancock', state: 'ME')
+        address = applicant.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq ['Hancock']
+      end
+    end
+
+    context 'for 5 digit zip' do
+      it "should return county" do
+        applicant.addresses.create(zip: "04642", county: 'Hancock', state: 'ME')
+        address = applicant.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq ['Hancock']
+      end
+    end
+
+    context 'for nil address' do
+      it "should return empty array" do
+        result = helper.fetch_counties_by_zip(nil)
+        expect(result).to eq []
+      end
+    end
+
+    context 'for nil zip' do
+      it "should return empty array" do
+        applicant.addresses.update_all(zip: nil, county: 'Hancock')
+        address = applicant.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq []
       end
     end
   end

@@ -20,6 +20,7 @@ class HbxAdminController < ApplicationController
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
     @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
+    @household_csrs = build_thhm_csr_hash(@active_tax_household_for_current_year)
     @year_options = Admin::Aptc::years_with_tax_household(@family)
     respond_to do |format|
       format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
@@ -33,9 +34,11 @@ class HbxAdminController < ApplicationController
       if @family.present? #&& TimeKeeper.date_of_record.year == year
         @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, @current_year)
         @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(@family, params, @current_year)
+        @thm_csr_pct_result = false
         active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
         active_tax_household_for_current_year.tax_household_members.each do |thm|
-          thm.update_attributes!(csr_percent_as_integer: params['csr_percentage']) if thm.is_ia_eligible?
+          @thm_csr_pct_result = true if thm.csr_percent_as_integer != params["csr_percentage_#{thm.person.id}"] && thm.is_ia_eligible?
+          thm.update_attributes!(csr_percent_as_integer: params["csr_percentage_#{thm.person.id}"]) if thm.is_ia_eligible?
         end
       end
       respond_to do |format|
@@ -80,5 +83,12 @@ class HbxAdminController < ApplicationController
 
   def validate_aptc
     @aptc_errors = Admin::Aptc.build_error_messages(params[:max_aptc], params[:csr_percentage], params[:applied_aptcs_array], @current_year, @hbxs)
+  end
+
+  def build_thhm_csr_hash(tax_household)
+    tax_household.tax_household_members.inject({}) do |hash, thhm|
+      hash[thhm.person.id.to_s] = thhm.csr_percent_as_integer
+      hash
+    end
   end
 end

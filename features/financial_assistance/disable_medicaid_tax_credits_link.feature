@@ -8,7 +8,7 @@ Feature: Assisted consumer home page medicaid and tax credits link
    Scenario: consumer home page and the the medicaid tax credits link is enabled
      Given medicaid tax credits link feature is enabled
      Given consumer visits home page
-     Then they should see the Medicaid and Tax Credits Link tile
+     Then MEDICAID & TAX CREDITS button is visible to the user
 
    Scenario: consumer home page and the the medicaid tax credits link is disabled
      Given medicaid tax credits link feature is disabled
@@ -19,7 +19,7 @@ Feature: Assisted consumer home page medicaid and tax credits link
      Given medicaid tax credits link feature is enabled
      Given consumer visits home page
      And the consumer navigates to the Documents page
-     Then they should see the Medicaid and Tax Credits Link tile
+     Then MEDICAID & TAX CREDITS button is visible to the user
 
    Scenario: consumer vists documents page and the the medicaid tax credits link is disabled
      Given medicaid tax credits link feature is disabled
@@ -31,7 +31,7 @@ Feature: Assisted consumer home page medicaid and tax credits link
      Given medicaid tax credits link feature is enabled
      Given consumer visits home page
      And the consumer navigates to the Messages page
-    Then they should see the Medicaid and Tax Credits Link tile
+    Then MEDICAID & TAX CREDITS button is visible to the user
 
    Scenario: consumer vists messages page and the the medicaid tax credits link is disabled
      Given medicaid tax credits link feature is disabled

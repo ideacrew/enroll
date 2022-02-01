@@ -29,7 +29,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Esi::H14::AddEsi
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :esi_mec, title: "MEC")
+        @applicant.build_esi_evidence(key: :esi_mec, title: "ESI MEC")
+        @applicant.save!
         @result = subject.call(payload: response_payload)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -42,8 +43,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Esi::H14::AddEsi
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:esi_mec).first.eligibility_status).to eq "verified"
-        expect(@applicant.evidences.by_name(:esi_mec).first.eligibility_results.present?).to eq true
+        expect(@applicant.esi_evidence.aasm_state).to eq "attested"
+        expect(@applicant.esi_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end

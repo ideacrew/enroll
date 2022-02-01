@@ -76,6 +76,19 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       end
     end
 
+    context '#build_family_member_hash with deleted family member' do
+      let(:person_2) { FactoryBot.create(:person, :with_consumer_role) }
+      let!(:family_member_2) { FactoryBot.create(:family_member, person: person_2, family: family)}
+      let(:family_members_hash) { Operations::Notices::IvlEnrNoticeTrigger.new.build_family_member_hash(enrollment.reload) }
+
+      it 'shouldnt include deleted family members' do
+        enrollment.family.family_members.last.is_active = false
+        enrollment.family.family_members.last.person.addresses = []
+        enrollment.family.family_members.last.save!
+        expect(family_members_hash.success.count).to eq 1
+      end
+    end
+
     context 'with valid params when in special enrollment period' do
       let(:qualifying_life_event_kind) { FactoryBot.create(:qualifying_life_event_kind, start_on: Date.today.prev_day) }
       let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: qualifying_life_event_kind) }

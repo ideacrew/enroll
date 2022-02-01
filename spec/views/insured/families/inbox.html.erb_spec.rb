@@ -116,11 +116,11 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
         end
 
         it "should verify if the LEFT text exists on the page" do
-          expect(rendered).to have_content("If you applied for Medicaid and tax credit savings, view additional messages")
+          expect(rendered).to have_content(l10n("insured.families.apply_for_medicaid_widget"))
         end
 
         it "should verify if the Curam navigation link exists on the page" do
-          expect(rendered).to have_link('Medicaid & Tax Credits')
+          expect(rendered).to have_link(l10n("insured.families.medicaid_and_tax_credits"))
         end
       end
     end
