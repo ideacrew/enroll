@@ -113,6 +113,7 @@ module ApplicationHelper
   end
 
   #Shopping enrollment family premium (plan shopping page)
+  # rubocop:disable Style/OptionalBooleanParameter
   def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc = true)
     return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
 
@@ -120,6 +121,7 @@ module ApplicationHelper
     cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min)
     cost > 0 ? cost.round(2) : 0
   end
+  # rubocop:enable Style/OptionalBooleanParameter
 
   def datepicker_control(f, field_name, options = {}, value = "")
     sanitized_field_name = field_name.to_s.sub(/\?$/,"")
@@ -240,11 +242,7 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
   def prepend_glyph_to_text(test)
-    # rubocop:disable Lint/Syntax
-    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test),
-                                                                                                                                    target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to
-test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
-    # rubocop:enable Lint/Syntax
+    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
@@ -305,11 +303,15 @@ test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".
     "#{li_start}#{link_to(label, path)}</li>"
   end
 
+  # rubocop:disable Naming/MethodParameterName
   def active_dropdown_classes(*args)
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
+  # rubocop:enable Naming/MethodParameterName
 
+  # rubocop:disable Naming/MethodParameterName
   def link_to_add_fields(name, f, association, classes = '')
+  # rubocop:enable Naming/MethodParameterName
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
 
@@ -660,11 +662,13 @@ test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".
     value.present? ? value.join(", ") : ""
   end
 
+  # rubocop:disable Style/StringConcatenation
   def incarceration_cannot_purchase(family_member)
     pronoun = family_member.try(:gender) == 'male' ? ' he ' : ' she '
     name = family_member.try(:first_name) || ''
     "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{EnrollRegistry[:enroll_app].setting(:short_name).item}.<br/> Other family members may still be eligible to enroll."
   end
+  # rubocop:enable Style/StringConcatenation
 
   def purchase_or_confirm
     'Confirm'
