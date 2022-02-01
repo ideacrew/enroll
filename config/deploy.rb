@@ -53,7 +53,7 @@ namespace :assets do
         with rails_env: fetch(:rails_env) do
           puts("Setting to review environment.") if ENV['ENROLL_REVIEW_ENVIRONMENT']
           execute("cd #{release_path} && rm -rf node_modules && rm -f package-lock.json")
-          execute("cd #{release_path} && nvm use 12 && yarn install")
+          execute("cd #{release_path} && nvm use 12 && npm install --global yarn && yarn install")
           execute :rake, "assets:clobber"
           execute("cd #{release_path} && nvm use 12 && RAILS_ENV=production NODE_ENV=production bundle exec rake assets:precompile")
           execute :rake, "seed:translations[db/seedfiles/english_translations_seed.rb]"

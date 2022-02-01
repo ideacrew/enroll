@@ -2,7 +2,9 @@ $("#inbox .col-md-10").html("<%= escape_javascript render "benefit_sponsors/prof
 $('#inbox').removeClass("hide")
 $('#help_list').addClass('hide')
 $('#help_type').html('Broker')
-$('#back_to_help').removeClass('hide')
+<% if EnrollRegistry.feature_enabled?(:staff_list_back) %>
+  $('#back_to_help').removeClass('hide')
+<% end %>
 
 function show_broker(broker_id) {
   $("#broker_index_view").addClass('hide')

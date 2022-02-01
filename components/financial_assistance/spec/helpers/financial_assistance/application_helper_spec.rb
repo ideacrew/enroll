@@ -274,4 +274,42 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
   end
+
+  context '#fetch_counties_by_zip', dbclean: :after_each do
+    let!(:county) {BenefitMarkets::Locations::CountyZip.create(zip: "04642", county_name: "Hancock")}
+
+    context 'for 9 digit zip' do
+      it "should return county" do
+        applicant.addresses.create(zip: "04642-3116", county: 'Hancock', state: 'ME')
+        address = applicant.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq ['Hancock']
+      end
+    end
+
+    context 'for 5 digit zip' do
+      it "should return county" do
+        applicant.addresses.create(zip: "04642", county: 'Hancock', state: 'ME')
+        address = applicant.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq ['Hancock']
+      end
+    end
+
+    context 'for nil address' do
+      it "should return empty array" do
+        result = helper.fetch_counties_by_zip(nil)
+        expect(result).to eq []
+      end
+    end
+
+    context 'for nil zip' do
+      it "should return empty array" do
+        applicant.addresses.update_all(zip: nil, county: 'Hancock')
+        address = applicant.addresses.first
+        result = helper.fetch_counties_by_zip(address)
+        expect(result).to eq []
+      end
+    end
+  end
 end

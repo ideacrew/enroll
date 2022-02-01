@@ -187,11 +187,14 @@ module Enrollments
                         base_enrollment.hbx_enrollment_members
                       end
         enr_members.inject([]) do |members, hbx_enrollment_member|
+          is_tobacco_user = hbx_enrollment_member&.family_member&.person&.is_tobacco_user
+          tobacco_use = is_tobacco_user == 'unknown' ? 'NA' : is_tobacco_user
           members << HbxEnrollmentMember.new({
                                                  applicant_id: hbx_enrollment_member.applicant_id,
                                                  eligibility_date: new_effective_date,
                                                  coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
-                                                 is_subscriber: hbx_enrollment_member.is_subscriber
+                                                 is_subscriber: hbx_enrollment_member.is_subscriber,
+                                                 tobacco_use: tobacco_use
                                              })
         end
       end

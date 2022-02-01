@@ -34,6 +34,7 @@ module FinancialAssistance
         optional(:no_dc_address).filled(:bool) # Fix Me
         optional(:is_homeless).maybe(:bool)
         optional(:is_temporarily_out_of_state).maybe(:bool)
+        optional(:is_living_in_state).maybe(:bool)
 
         optional(:vlp_subject).maybe(:string)
         optional(:vlp_description).maybe(:string)
@@ -61,6 +62,7 @@ module FinancialAssistance
         optional(:phones).maybe(:array)
         optional(:emails).maybe(:array)
         optional(:immigration_doc_statuses).maybe(:array)
+        optional(:transfer_referral_reason).maybe(:string)
       end
 
       rule(:addresses).each do

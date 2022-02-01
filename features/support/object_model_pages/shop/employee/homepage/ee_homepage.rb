@@ -46,8 +46,4 @@ class EmployeeHomepage
   def self.qle_continue_btn
     '#qle_submit'
   end
-
-  def self.medicaid_btn
-    '.interaction-click-control-medicaid---tax-credits'
-  end
 end

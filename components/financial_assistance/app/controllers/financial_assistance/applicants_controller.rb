@@ -176,14 +176,6 @@ module FinancialAssistance
       model.valid?(:other_qns) ? nil : model.errors.messages.first[1][0].titleize
     end
 
-    def find_application
-      @application = if current_user.try(:person).try(:agent?) && !session[:person_id].present?
-                       FinancialAssistance::Application.find_by(id: params[:application_id])
-                     else
-                       FinancialAssistance::Application.find_by(id: params[:application_id], family_id: get_current_person.financial_assistance_identifier)
-                     end
-    end
-
     def find
       # TODO: Not sure about this, added the @model definition because it wasn't defined
       @applicant = find_application.active_applicants.where(id: params[:id]).last || find_application.applicants.last || nil

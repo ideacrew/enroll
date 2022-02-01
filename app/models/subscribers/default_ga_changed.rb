@@ -13,7 +13,7 @@ module Subscribers
       if broker_agency_profile.present?
         if broker_agency_profile.default_general_agency_profile_id.present?
           #change
-          plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(broker_agency_profile.id)
+          plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(broker_agency_profile.id).where(has_active_broker_relationship: true)
           service.assign_default_general_agency(broker_agency_profile, plan_design_organizations.map(&:id))
         else
           #clear
@@ -28,7 +28,6 @@ module Subscribers
               }
             }
           )
-
           service.fire_general_agency(plan_design_organizations.map(&:id))
         end
       end

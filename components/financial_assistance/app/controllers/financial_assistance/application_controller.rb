@@ -18,6 +18,15 @@ module FinancialAssistance
 
     private
 
+    def find_application
+      application_id = params[:application_id] || params[:id]
+      @application = if current_user.try(:person).try(:agent?)
+                       FinancialAssistance::Application.find_by(id: application_id)
+                     else
+                       FinancialAssistance::Application.find_by(id: application_id, family_id: get_current_person.financial_assistance_identifier)
+                     end
+    end
+
     def verify_financial_assistance_enabled
       return render(file: 'public/404.html', status: 404) unless ::EnrollRegistry.feature_enabled?(:financial_assistance)
       true

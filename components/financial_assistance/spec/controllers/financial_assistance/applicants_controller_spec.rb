@@ -58,6 +58,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   end
 
   before do
+    # Tests to make sure it can handle admin user
+    allow(user).to receive(:has_hbx_staff_role?).and_return(true)
     sign_in(user)
   end
 
@@ -188,6 +190,16 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         }
       end
 
+      let(:partum_period_params_with_out_enrolled_on_medicaid_params) do
+        {
+          "is_pregnant" => "false",
+          "pregnancy_due_on" => "",
+          "children_expected_count" => "",
+          "is_post_partum_period" => "true",
+          "pregnancy_end_on" => (TimeKeeper.date_of_record - 1.month).strftime("%m/%d/%Y")
+        }
+      end
+
       it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_post_partum_period_params }
         expect(response).to have_http_status(302)
@@ -195,14 +207,14 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
       end
 
-      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with end date nill", dbclean: :after_each do
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with end date nil", dbclean: :after_each do
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_without_preg_end_date }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'other_questions'
         expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
       end
 
-      it "should save and redirects to redirects to edit_financial_assistance_application_path with enrolled_on_medicaid nill", dbclean: :after_each do
+      it "should save and redirects to redirects to edit_financial_assistance_application_path with enrolled_on_medicaid nil", dbclean: :after_each do
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_enrolled_on_medicaid_nil }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'edit'
@@ -214,6 +226,16 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'edit'
         expect(response).to redirect_to(edit_application_path(application))
+      end
+
+      context "when applicant not applying for coverage and in post_partum_period" do
+        it "should not return Was This Person On Medicaid During Pregnancy?' Should Be Answered error" do
+          applicant.update_attributes(is_enrolled_on_medicaid: nil, is_applying_coverage: false)
+          get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: partum_period_params_with_out_enrolled_on_medicaid_params }
+          expect(response).to have_http_status(302)
+          expect(response.headers['Location']).to have_content 'edit'
+          expect(response).to redirect_to(edit_application_path(application))
+        end
       end
     end
 
@@ -278,6 +300,62 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'edit'
         expect(response).to redirect_to(edit_application_path(application))
+      end
+    end
+  end
+
+  context "PATCH update" do
+    let(:family_member_id2) { BSON::ObjectId.new }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: TimeKeeper.date_of_record - 40.years,
+                        is_primary_applicant: false,
+                        is_claimed_as_tax_dependent: false,
+                        is_self_attested_blind: false,
+                        has_daily_living_help: false,
+                        need_help_paying_bills: false,
+                        family_member_id: family_member_id2)
+    end
+
+    let(:update_params) do
+      {
+        application_id: application.id,
+        id: applicant.id,
+        applicant: {
+          is_applying_coverage: false,
+          relationship: nil,
+          first_name: 'update',
+          last_name: 'updated',
+          gender: 'male',
+          dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+          ssn: nil,
+          addresses_attributes: {'0': {kind: 'home'}},
+          is_consumer_role: false
+        }
+      }
+    end
+
+    before do
+      applicant.update_attributes!(is_applying_coverage: true)
+      applicant2.update_attributes!(is_applying_coverage: true)
+    end
+
+    context "primary applicant updating information" do
+      it "should update primary's information when relationship param is blank" do
+        patch :update, params: update_params
+        applicant.reload
+        expect(applicant.is_applying_coverage).to eq false
+        expect(applicant.first_name).to eq 'update'
+      end
+    end
+
+    context "dependent applicant updating information" do
+      it "should not update applicant's information when relationship param is blank" do
+        update_params[:id] = applicant2.id
+        patch :update, params: update_params
+        applicant.reload
+        expect(applicant.is_applying_coverage).to eq true
       end
     end
   end

@@ -2,6 +2,8 @@ class VerificationType
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::History::Trackable
+  include Eligibilities::Visitors::Visitable
+  include GlobalID::Identification
 
   embedded_in :person
 
@@ -11,6 +13,8 @@ class VerificationType
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
   OUTSTANDING_STATES = %w[outstanding].freeze
   DUE_DATE_STATES = %w[review outstanding].freeze
+  SATISFIED_STATES = %w[verified attested valid curam].freeze
+
 
   field :type_name, type: String
   field :validation_status, type: String
@@ -46,12 +50,16 @@ class VerificationType
     end
   end
 
+  def accept(visitor)
+    visitor.visit(self)
+  end
+
   def type_unverified?
     !type_verified?
   end
 
   def type_verified?
-    ["verified", "attested", "valid", "curam"].include? validation_status
+    SATISFIED_STATES.include? validation_status
   end
 
   def is_type_outstanding?

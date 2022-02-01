@@ -6,6 +6,7 @@ module FinancialAssistance
       include ActiveModel::Model
       include ActiveModel::Validations
       include Config::AcaModelConcern
+      include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
                     :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
@@ -92,7 +93,8 @@ module FinancialAssistance
 
       def save
         return false unless valid?
-        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params)
+        is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
+        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
@@ -207,7 +209,7 @@ module FinancialAssistance
       end
 
       def relationship_validation
-        return self.errors.add(:base, "select Relationship Type") if relationship.blank?
+        return self.errors.add(:base, "select Relationship Type") if !applicant&.is_primary_applicant && relationship.blank?
         primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in => ['spouse', 'life_partner'])
         if applicant
           other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }

@@ -290,7 +290,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 187,
+          "line": 190,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -482,7 +482,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 187,
+          "line": 190,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -818,6 +818,26 @@
       "note": ""
     },
     {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "c91b6616e76312d2e686dfb12ae27d00ddca89d40690b61f5798edcb37aa6ad5",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "components/financial_assistance/app/controllers/financial_assistance/verification_documents_controller.rb",
+      "line": 113,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "@docs_owner.send(params[:evidence_kind])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "FinancialAssistance::VerificationDocumentsController",
+        "method": "find_type"
+      },
+      "user_input": "params[:evidence_kind]",
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "cd6894cae7988763b05d81ee9348df6b72d3f4b900c4db77c473c27b077d1424",
@@ -916,8 +936,28 @@
       "user_input": "EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier",
       "confidence": "Medium",
       "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "fe091e35222c7350dd304ed5916f06adccf2544e596f991c680011db3bcd801f",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "components/financial_assistance/app/controllers/financial_assistance/evidences_controller.rb",
+      "line": 83,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "@docs_owner.send(params[:evidence_kind])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "FinancialAssistance::EvidencesController",
+        "method": "find_type"
+      },
+      "user_input": "params[:evidence_kind]",
+      "confidence": "High",
+      "note": ""
     }
   ],
-  "updated": "2021-12-07 11:56:02 -0500",
+  "updated": "2021-12-27 17:20:42 -0500",
   "brakeman_version": "5.1.1"
 }

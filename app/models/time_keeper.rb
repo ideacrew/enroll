@@ -4,6 +4,7 @@ class TimeKeeper
   include Singleton
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include EventSource::Command
 
   CACHE_KEY = "timekeeper/date_of_record"
 
@@ -103,11 +104,13 @@ class TimeKeeper
 
   def push_date_of_record
     notify_logger("TimeKeeper advance day started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
+
     FinancialAssistance::Application.advance_day(self.date_of_record)
     BenefitSponsorship.advance_day(self.date_of_record)
     BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
     # EmployerProfile.advance_day(self.date_of_record)
     Family.advance_day(self.date_of_record) if individual_market_is_enabled?
+    send_date_advanced_event
     HbxEnrollment.advance_day(self.date_of_record)
     CensusEmployee.advance_day(self.date_of_record)
     ConsumerRole.advance_day(self.date_of_record)
@@ -126,6 +129,13 @@ class TimeKeeper
   def notify_logger(message)
     Rails.logger.info(message)
     log(message)
+  end
+
+  def send_date_advanced_event
+    event = event('events.enterprise.date_advanced', attributes: {date_of_record: TimeKeeper.date_of_record})
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't trigger enterprise date advanced event due to #{e.backtrace}" }
   end
 
   def self.with_cache

@@ -238,6 +238,8 @@ registry:
       is_enabled: false
     - key: :question_required
       is_enabled: false
+    - key: :is_enrolled_on_medicaid
+      is_enabled: false
   - namespace:
     - :renewals
     features:

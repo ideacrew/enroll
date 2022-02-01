@@ -5,6 +5,8 @@ class HbxEnrollmentMember
   include Insured::GroupSelectionHelper
   include Insured::EmployeeRolesHelper
   include ApplicationHelper
+  include Eligibilities::Visitors::Visitable
+  include GlobalID::Identification
 
   embedded_in :hbx_enrollment
 
@@ -20,7 +22,7 @@ class HbxEnrollmentMember
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
-  # Allowed values are 'Y', 'N', or nil for 'NA'
+  # Allowed values are 'Y', 'N', or NA for nil/unknown
   field :tobacco_use, type: String
 
   validates_presence_of :applicant_id, :is_subscriber, :eligibility_date,# :premium_amount,
@@ -35,9 +37,13 @@ class HbxEnrollmentMember
   def family
     hbx_enrollment.family if hbx_enrollment.present?
   end
-  
+
   def covered?
     (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
+  end
+
+  def accept(visitor)
+    visitor.visit(self)
   end
 
   def family_member
@@ -68,7 +74,7 @@ class HbxEnrollmentMember
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
     return unless coverage_start_on.present?
-    
+
     age = calculate_age(coverage_start_on,dob)
     @age_on_effective_date = age
   end

@@ -9,21 +9,13 @@
       <td><%=@slcsp_value%></span></td>
 
       <td width="50px;"></td>
-      
+
       <th >Max APTC</th>
       <td width = "15px;" ></td>
       <td><%= text_field_tag "max_aptc", max_aptc, class: @aptc_errors.present? ? 'form-control error-styling': 'form-control', size: '8px', onchange: "APTCModule.calculateAvailableAPTC('household')", max: 2000%></td>
 
       <td width="50px;"></td>
-
-      <th>CSR % as Integer</th>
-      <td width = "15px;" ></td>
-      <td width="18%" style="border: thin solid;">
-        <div class="selectric-labeled">
-          <%= select_tag "csr_percentage", options_for_select(csr_percentage_options_for_select, csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
-        </div>
-        
-      </td>
+      <%= hidden_field "csr_percentage", csr_percent_as_integer %>
     </tr>
-  </table>  
+  </table>
 </div>

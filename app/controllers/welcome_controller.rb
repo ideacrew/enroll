@@ -11,6 +11,11 @@ class WelcomeController < ApplicationController
   def index
   end
 
+  def qna_bot
+    render :layout => false
+  end
+
+
   def form_template
     # created for generic form template access at '/templates/form-template'
   end

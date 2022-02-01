@@ -23,8 +23,10 @@ logger_field_names = %w[id Backtrace]
 date = TimeKeeper.date_of_record
 report_file_name = "#{Rails.root}/daily_faa_submission_report_#{date.strftime('%m_%d_%Y')}.csv"
 logger_file_name = "#{Rails.root}/daily_faa_submission_report_logger_#{date.strftime('%m_%d_%Y')}.csv"
-start_time = date.prev_day.beginning_of_day
-end_time = date.prev_day.end_of_day
+start_on = ENV['start_on']
+end_on = ENV['end_on']
+start_time = start_on ? Time.parse(start_on).beginning_of_day : date.prev_day.beginning_of_day
+end_time = end_on ? Time.parse(end_on).end_of_day : date.prev_day.end_of_day
 
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
