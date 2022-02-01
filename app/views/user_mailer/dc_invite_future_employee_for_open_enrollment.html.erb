@@ -1,15 +1,15 @@
 <html>
 <body>
-<b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through <%= Settings.site.short_name %></b>
+<b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %></b>
 <br/>
 <br/>
 <div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
 <br/><br/>
-Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored health insurance through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
+Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored health insurance through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>
 <br/>
 <div>
-  You are able to begin plan shopping on <%= census_employee.hired_on.to_formatted_s %> for coverage that will start on <%= census_employee.coverage_effective_on(shop_under_current: true).to_date.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= Settings.site.short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
+  You are able to begin plan shopping on <%= census_employee.hired_on.to_formatted_s %> for coverage that will start on <%= census_employee.coverage_effective_on(shop_under_current: true).to_date.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
   <br/>
   <br/>
   <b> What is New Hire Open Enrollment? </b>
@@ -18,7 +18,7 @@ Congratulations! <%= census_employee.employer_profile.legal_name %> has invited 
   <br/>
   <b>To See Plan Options and Enroll: </b>
   <br/>
-  To complete the application process, please follow the steps below. You can also use <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this guide</a> for <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">New Hires to Enroll in Health Coverage through <% Settings.site.short_name %></a> for additional assistance.
+  To complete the application process, please follow the steps below. You can also use <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this guide</a> for <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">New Hires to Enroll in Health Coverage through <% EnrollRegistry[:enroll_app].setting(:short_name).item %></a> for additional assistance.
   <br/>
   <table class="total_table" border="0">
     <tbody>
@@ -45,13 +45,13 @@ Congratulations! <%= census_employee.employer_profile.legal_name %> has invited 
 
   <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Doing so preserves your right to enroll in your employer-sponsored health insurance through a special enrollment period (SEP), if you qualify, at a later date this year. Instructions for how to waive coverage are included in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this walkthrough guide</a>.
 
-  <b>What If I Already Have Coverage through <%= Settings.site.short_name %>?</b>
-  If you currently have individual market coverage through <%= Settings.site.short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage with <%= Settings.site.short_name %>, you will need to contact <%= Settings.site.short_name %> at <%= Settings.contact_center.phone_number %>.  To end individual market coverage through <%= Settings.site.short_name %>, you need to submit a request to terminate your plan.
+  <b>What If I Already Have Coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>?</b>
+  If you currently have individual market coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage with <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>, you will need to contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= Settings.contact_center.phone_number %>.  To end individual market coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>, you need to submit a request to terminate your plan.
 
   <h2 style="color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>">
     For Questions or Assistance:
   </h2>
-  You can contact <%= Settings.site.short_name %> with any questions:
+  You can contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> with any questions:
   <br/>
   <ul style="list-style-type:circle">
     <li>By calling <%= Settings.contact_center.phone_number %></li>
@@ -129,7 +129,7 @@ Congratulations! <%= census_employee.employer_profile.legal_name %> has invited 
     </tr>
     <tr>
       <td style="width: 15%"></td>
-      <td style="width: 85%"><%= Settings.site.short_name %> Contact Center</td>
+      <td style="width: 85%"><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> Contact Center</td>
     </tr>
     <tr>
       <td style="width: 15%"></td>
