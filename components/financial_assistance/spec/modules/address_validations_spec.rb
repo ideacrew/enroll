@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::AddressValidations, :type => :helper, dbclean: :after_each do
+RSpec.describe ::AddressValidator, :type => :helper, dbclean: :after_each do
 
   context '#has_in_state_home_addresses?', dbclean: :after_each do
 

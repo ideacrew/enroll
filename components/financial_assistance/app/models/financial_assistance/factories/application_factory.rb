@@ -4,7 +4,7 @@ module FinancialAssistance
   module Factories
     # Modify application and sub models data
     class ApplicationFactory
-      include AddressValidations
+      include AddressValidator
       attr_accessor :source_application, :applicants, :family_members_changed, :family_members_attributes
 
       APPLICANT_EVIDENCES = [:incomes, :benefits, :deductions].freeze

@@ -6,7 +6,7 @@ module FinancialAssistance
       include ActiveModel::Model
       include ActiveModel::Validations
       include Config::AcaModelConcern
-      include AddressValidations
+      include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
                     :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
