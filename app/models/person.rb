@@ -738,7 +738,11 @@ class Person
   end
 
   def age_on(date)
-    age = date.year - dob.year
+    begin
+      age = date.year - dob.year
+    rescue
+      flash_message = { :error => "Please provide a valid birthdate."}
+    end
     if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
       age - 1
     else
