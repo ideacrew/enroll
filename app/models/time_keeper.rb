@@ -62,7 +62,7 @@ class TimeKeeper
         number_of_days.times do
           instance.set_date_of_record(instance.date_of_record + 1.day)
           instance.push_date_of_record
-          instance.push_date_change_event
+          # instance.push_date_change_event
         end
       end
     end
@@ -105,16 +105,16 @@ class TimeKeeper
   def push_date_of_record
     notify_logger("TimeKeeper advance day started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
 
-    FinancialAssistance::Application.advance_day(self.date_of_record)
-    BenefitSponsorship.advance_day(self.date_of_record)
-    BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
+    # FinancialAssistance::Application.advance_day(self.date_of_record)
+    # BenefitSponsorship.advance_day(self.date_of_record)
+    # BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
     # EmployerProfile.advance_day(self.date_of_record)
-    Family.advance_day(self.date_of_record) if individual_market_is_enabled?
+    # Family.advance_day(self.date_of_record) if individual_market_is_enabled?
     send_date_advanced_event
-    HbxEnrollment.advance_day(self.date_of_record)
-    CensusEmployee.advance_day(self.date_of_record)
-    ConsumerRole.advance_day(self.date_of_record)
-    QualifyingLifeEventKind.advance_day(self.date_of_record)
+    # HbxEnrollment.advance_day(self.date_of_record)
+    # CensusEmployee.advance_day(self.date_of_record)
+    # ConsumerRole.advance_day(self.date_of_record)
+    # QualifyingLifeEventKind.advance_day(self.date_of_record)
     notify_logger("TimeKeeper advance day ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
   end
 
