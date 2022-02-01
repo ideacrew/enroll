@@ -40,7 +40,7 @@ RSpec.describe "insured/families/home.html.erb" do
   it "should display the title" do
     render file: "insured/families/home.html.erb"
     allow(family).to receive(:active_seps).and_return(false)
-    expect(rendered).to have_selector('h1', text: "My #{Settings.site.short_name}")
+    expect(rendered).to have_selector('h1', text: "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   end
 
   it "should have plan-summary area" do

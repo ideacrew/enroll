@@ -42,9 +42,9 @@
           </td>
           <td style="width: 75%;">
             <% if ivl.is_medicaid_chip_eligible %>
-              <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>. People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage.</p>
+              <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>. People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage.</p>
             <% else %>
-              <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>.</p>
+              <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>.</p>
             <% end %>
           </td>
         </tr>
@@ -79,7 +79,7 @@
                 </li>
               </ul>
               <p>
-                Call <%= Settings.site.short_name %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= Settings.site.short_name %> can check again to see if <%= ivl.first_name%> would be eligible.
+                Call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> can check again to see if <%= ivl.first_name%> would be eligible.
               </p>
             <% end %>
             <% if ivl.no_aptc_because_of_mec %>
@@ -127,7 +127,7 @@
               </li>
             </ul>
             <p>
-              Call <%= Settings.site.short_name %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= Settings.site.short_name %> can check again to see if <%= ivl.first_name%> would be eligible.
+              Call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> can check again to see if <%= ivl.first_name%> would be eligible.
             </p>
           <% end %>
           <% if ivl.no_csr_because_of_mec %>
@@ -143,7 +143,7 @@
             <b>Ineligible for Medicaid and Private Health Insurance</b>
           </td>
           <td style="width: 75%;">
-            <p><%= ivl.first_name %> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>."</p>
+            <p><%= ivl.first_name %> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= notice.hbe.phone %>."</p>
           </td>
         </tr>
       <% end %>

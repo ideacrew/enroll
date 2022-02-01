@@ -55,7 +55,7 @@ module Notifier
         reason_for_ineligibility << "this person doesn’t have an eligible immigration status,
                                   but may be eligible for a local medical assistance program
                                   called the DC Health Care Alliance. For more information, please
-                                  contact #{Settings.site.short_name} at (855) 532-5465."
+                                  contact #{EnrollRegistry[:enroll_app].setting(:short_name).item} at (855) 532-5465."
       end
       reason_for_ineligibility
     end

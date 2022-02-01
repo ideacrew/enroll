@@ -134,7 +134,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone in your household enrolled in a private health insurance plan through #{Settings.site.short_name} in #{previous_year}."} %>
+content: "This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone in your household enrolled in a private health insurance plan through #{EnrollRegistry[:enroll_app].setting(:short_name).item} in #{previous_year}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through 2018. The #{Settings.aca.state_name} now has an individual responsibility requirement. This means that DC residents must have qualifying health coverage all year. If you don't have coverage, and don't qualify for an exemption, you’ll have to pay a penalty when you file your DC taxes. For more information: <a href= #{Settings.site.ivl_responsibility_url}>https://dchealthlink.com/individual-responsibility-requirement</a>."} %>
@@ -144,10 +144,10 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 
 <% if notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{Settings.site.short_name} last year. Since you received an advance premium tax credit, your Form 1095-A also shows how much of your tax credit was applied to your premium each month."} %>
+  content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item} last year. Since you received an advance premium tax credit, your Form 1095-A also shows how much of your tax credit was applied to your premium each month."} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{Settings.site.short_name} last year."} %>
+  content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item} last year."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -175,7 +175,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You may receive more than one Form 1095-A if you:",
-    listings: ["Also had a plan from another health insurance marketplace during the year.", "Changed from one plan offered by #{Settings.site.short_name} to another during the year.", "Had family members enrolled in different plans through #{Settings.site.short_name}."]} %>
+    listings: ["Also had a plan from another health insurance marketplace during the year.", "Changed from one plan offered by #{EnrollRegistry[:enroll_app].setting(:short_name).item} to another during the year.", "Had family members enrolled in different plans through #{EnrollRegistry[:enroll_app].setting(:short_name).item}."]} %>
 
 <div style="page-break-inside: avoid;">
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -201,11 +201,11 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
- contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and #{Settings.site.short_name}. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."],
+ contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and #{EnrollRegistry[:enroll_app].setting(:short_name).item}. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."],
    heading: 'If You Think This Form is Wrong', sub_heading: '', top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. #{Settings.site.short_name} cannot provide tax advice. For more information on these topics, consult a tax adviser."],
+ contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. #{EnrollRegistry[:enroll_app].setting(:short_name).item} cannot provide tax advice. For more information on these topics, consult a tax adviser."],
    heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <div style="page-break-inside: avoid;">
@@ -213,7 +213,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
   content: "If you have questions or concerns, we’re here to help."} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+  content: "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team <br></br> _____________________________________________________________________________________________________________"} %>
 </div>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {

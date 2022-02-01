@@ -150,9 +150,9 @@ end
 
 And(/^.+ should receive an invitation email$/) do
   subject = if EnrollRegistry.feature_enabled?(:broker_approval_period)
-              "Invitation to create your Broker account on #{Settings.site.short_name}"
+              "Invitation to create your Broker account on #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
             else
-              "Important information for accessing your new broker account through the #{Settings.site.short_name}"
+              "Important information for accessing your new broker account through the #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
             end
   broker_email_address = Person.all.detect(&:broker_role).emails.first.address
   open_email(
@@ -192,7 +192,7 @@ Then(/^.+ should see bank information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Your account has been created.")
   current_broker_legal_name = Person.all.detect(&:broker_role).broker_role.broker_agency_profile.legal_name
   expect(page).to have_content("Broker Agency : #{current_broker_legal_name}")
 end
@@ -348,7 +348,7 @@ Then(/^.+ should see (.*?) as family and click on name$/) do |name|
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  expect(page).to have_content("My #{Settings.site.short_name}")
+  expect(page).to have_content("My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
 end
 
 Then(/^Primary Broker should see (.*?) account$/) do |name|

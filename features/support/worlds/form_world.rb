@@ -161,7 +161,7 @@ When(/^the user clicks the 'Confirm' button on the Employer Registration Form$/)
   sleep(3)
   find('form#new_agency input[type="submit"]').click
   # expect(page).to have_css('legend', text: 'Balscssc')
-  find('.alert', text: "Welcome to #{Settings.site.short_name}. Your account has been created.")
+  find('.alert', text: "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Your account has been created.")
 end
 
 Given(/^user goes to the Broker Registration form$/) do

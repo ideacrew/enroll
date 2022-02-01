@@ -270,7 +270,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
       it "with no benefit_group_id" do
         post :update, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: census_employee_params}
-        expect(flash[:notice]).to eq "Census Employee is successfully updated. Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group."
+        expect(flash[:notice]).to eq "Census Employee is successfully updated. Note: new employee cannot enroll on #{EnrollRegistry[:enroll_app].setting(:short_name).item} until they are assigned a benefit group."
       end
     end
 

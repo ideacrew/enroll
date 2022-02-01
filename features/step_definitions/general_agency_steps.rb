@@ -142,7 +142,7 @@ When(/^.+ registers? with valid information for staff$/) do
 end
 
 Then(/^.+ should see successful message with general agency home page$/) do
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Your account has been created.")
   expect(page).to have_content('General Agency : Housecare Inc')
 end
 
@@ -178,12 +178,12 @@ When(/^.+ registers with valid information for ga flow$/) do
 end
 
 Then(/^.+ should receive an invitation email for ga flow$/) do
-  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name}")
+  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   expect(current_email.to).to eq(["broker.martin@example.com"])
 end
 
 Then(/^.+ should see successful message with broker agency home page for ga flow$/) do
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Your account has been created.")
   expect(page).to have_content('Broker Agency : CareFirst Inc')
 end
 
