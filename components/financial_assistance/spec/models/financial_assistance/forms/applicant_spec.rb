@@ -259,7 +259,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       end
 
       it 'should return true' do
-        expect(@applicant_form.validate_in_state_addresses).to be_truthy
+        expect(@applicant_form.has_in_state_home_addresses?(params2[:addresses_attributes])).to be_truthy
       end
     end
 
@@ -300,7 +300,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       end
 
       it 'should return false' do
-        expect(@applicant_form.validate_in_state_addresses).to be_falsey
+        expect(@applicant_form.has_in_state_home_addresses?(params2[:addresses_attributes])).to be_falsey
       end
     end
 
@@ -334,7 +334,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       end
 
       it 'should return false' do
-        expect(@applicant_form.validate_in_state_addresses).to be_falsey
+        expect(@applicant_form.has_in_state_home_addresses?(params2[:addresses_attributes])).to be_falsey
       end
     end
 
@@ -375,7 +375,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       end
 
       it 'should return false' do
-        expect(@applicant_form.validate_in_state_addresses).to be_falsey
+        expect(@applicant_form.has_in_state_home_addresses?(params2[:addresses_attributes])).to be_falsey
       end
     end
   end
