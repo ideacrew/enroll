@@ -18,7 +18,6 @@ site:
   logo_file_name: "logo.png"
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "dchealthlink.jpg"
-  employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dchbx"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
