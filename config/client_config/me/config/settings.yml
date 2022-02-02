@@ -40,7 +40,6 @@ site:
   short_name: 'CoverME.gov'
   sign_in_routes: ['/families/home']
   staging_tax_info_url: ''
-  statewide_area: 'DC Metro'
   support_for_ie_browser: false
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
   terms_and_conditions_url: ''

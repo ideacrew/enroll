@@ -35,7 +35,6 @@ site:
   mail_address: 'info@dchealthlink.com'
   publisher: 'dchl'
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
-  statewide_area: 'DC Metro'
   support_for_ie_browser: true
   terms_and_conditions_url: 'https://www.dchealthlink.com/terms'
   website_url: 'www.healthcare.gov'
