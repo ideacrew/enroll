@@ -26,6 +26,6 @@ CLIENT=me
 
 echo "Building image ${REPO}:${TAG}-${CLIENT}"
 
-docker build --build-arg CLIENT=${CLIENT} -f .docker/production/Dockerfile -t ${REPO}:${TAG}-${CLIENT} --network=host .
+docker build --build-arg CLIENT=${CLIENT} -f .docker/production/Dockerfile.gha -t ${REPO}:${TAG}-${CLIENT} --network=host .
 
 echo "Image built. Push to ECR with docker push ${REPO}:${TAG}-${CLIENT}"
