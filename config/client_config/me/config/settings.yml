@@ -17,7 +17,6 @@ site:
   exchange_hbx_id: "ME0"
   faa_enabled: false # TODO: Remove this after configuring the settings.
   header_message: "Maine's Official Health Insurance Marketplace"
-  home_forms_url: "https://dchealthlink.com/forms"
   invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   irs_url: "https://www.irs.gov/"
   ivl_responsibility_url: ""

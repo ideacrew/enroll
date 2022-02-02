@@ -24,7 +24,6 @@ site:
   curam_enabled?: true
   exchange_hbx_id: "DC0"
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  home_forms_url: "https://dchealthlink.com/forms"
   irs_url: "https://www.irs.gov/"
   ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
   late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
