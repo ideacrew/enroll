@@ -105,7 +105,6 @@ plan_option_titles:
   metal_level: 'By Metal Level'
   single_carrier: 'By Carrier'
   single_plan: 'Single Plan'
-  multi_product: 'Custom'
   single_issuer: 'By Carrier'
 
 plan_option_descriptions:
