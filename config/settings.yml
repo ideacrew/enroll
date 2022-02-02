@@ -1,12 +1,7 @@
 site:
   key: :dc
   home_url: "https://www.dchealthlink.com/"
-  # copyright_period_start: "2013"
   help_url: "https://www.dchealthlink.com/help"
-  # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
-  # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
-  # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
-  # policies_url: "https://dchealthlink.com/"
   main_web_address_url: "https://www.dchealthlink.com/"
   invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
@@ -24,35 +19,34 @@ site:
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   sign_in_routes: ['/families/home']
-  shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
-  terms_and_conditions_url: "https://www.dchealthlink.com/terms"
+  block_ie_browser_after: <%= Date.new(2020,6,1) %>
+  block_ie_browser: false
   certification_url: "https://www.dchealthlink.com/brokers/overview"
-  registration_path: "https://www.dchealthlink.com/smallbusiness"
-  home_forms_url: "https://dchealthlink.com/forms"
+  curam_enabled?: true
+  elligibile_immigration_statuses_url: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
+  exchange_hbx_id: "DC0"
+  exchange_name: "Washington DC Health Benefit Exchange"
+  faa_enabled: false # TODO: Remove this after configuring the settings.
   forms_name: "DCHealthLink.com/forms"
-  short_url: "dchealthlink.com"
   forms: "https://dchealthlink.com/forms#en"
-  website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
+  home_forms_url: "https://dchealthlink.com/forms"
   irs_url: "https://www.irs.gov/"
-  exchange_hbx_id: "DC0"
+  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
+  late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
   mail_address: "info@dchealthlink.com"
   privacy_policy: "https://dchealthlink.com/"
-  late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
-  faa_enabled: false # TODO: Remove this after configuring the settings.
-  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
-  curam_enabled?: true
-  support_for_ie_browser: true
-  block_ie_browser: false
-  block_ie_browser_after: <%= Date.new(2020,6,1) %>
-  publisher: "dchl"
   prod_tax_info: "https://dchealthlink.com/individuals/tax-documents"
+  publisher: "dchl"
+  registration_path: "https://www.dchealthlink.com/smallbusiness"
+  shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
+  short_url: "dchealthlink.com"
   staging_tax_info_url: "https://staging.dchealthlink.com/individuals/tax-documents"
   statewide_area: "DC Metro"
-  assistance_estimate_url: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
-  elligibile_immigration_statuses_url: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
-  exchange_name: "Washington DC Health Benefit Exchange"
+  support_for_ie_browser: true
+  terms_and_conditions_url: "https://www.dchealthlink.com/terms"
+  website_url: "www.healthcare.gov"
   social_media:
     facebook_url: ""
 contact_center:
