@@ -98,7 +98,6 @@ plan_option_titles:
   metal_level: 'By Metal Level'
   single_carrier: 'By Carrier'
   single_plan: 'Single Plan'
-  plan_year_tooltip: 'Employer premium contribution for Employee Only Health Plans must be at least'
   multi_product: 'Custom'
   single_issuer: 'By Carrier'
 
