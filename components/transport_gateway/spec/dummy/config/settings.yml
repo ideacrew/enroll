@@ -30,7 +30,6 @@ site:
   registration_path: "https://www.dchealthlink.com/smallbusiness"
   home_forms_url: "https://dchealthlink.com/forms"
   short_url: "dchealthlink.com"
-  forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
