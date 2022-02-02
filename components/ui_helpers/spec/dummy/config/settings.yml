@@ -1,7 +1,6 @@
 site:
   key: :me
   home_url: "https://cme.enroll.openhbx.org/"
-  home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   # copyright_period_start: "2013"
   help_url: "https://www.coverme.gov/help/"
   # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
@@ -11,11 +10,8 @@ site:
   main_web_address_url: "https://www.dchealthlink.com/"
   invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
-  user_sign_in_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   website_name: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   main_web_address: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
-  health_care_website: "www.healthcare.gov"
-  health_care_website_url: "https://www.healthcare.gov"
   short_name: "Maine Cover ME"
   byline: "Maine's Official Health Insurance Marketplace"
   long_name: "Maine Cover ME"
