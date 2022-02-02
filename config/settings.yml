@@ -25,7 +25,6 @@ site:
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
-  document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.dchealthlink.com/terms"
   certification_url: "https://www.dchealthlink.com/brokers/overview"
   registration_path: "https://www.dchealthlink.com/smallbusiness"
