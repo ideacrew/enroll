@@ -19,7 +19,6 @@ site:
   logo_file_name: "logo_me.svg"
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
   mailer_logo_file_name: "logo_me.svg"
-  s3_prefix: "dchbx"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   guidance_for_business_owners_url: ""
