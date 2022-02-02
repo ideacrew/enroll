@@ -17,7 +17,6 @@ site:
   long_name: "Maine Cover ME"
   header_message: "Maine's Official Health Insurance Marketplace"
   logo_file_name: "logo_me.svg"
-  make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
   mailer_logo_file_name: "logo_me.svg"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"

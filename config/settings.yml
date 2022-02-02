@@ -16,7 +16,6 @@ site:
   long_name: "District of Columbia Health Link"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
-  make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "dchealthlink.jpg"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
