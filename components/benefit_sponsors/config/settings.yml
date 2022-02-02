@@ -28,7 +28,6 @@ site:
   terms_and_conditions_url: "https://www.dchealthlink.com/terms"
   registration_path: "https://www.dchealthlink.com/smallbusiness"
   home_forms_url: "https://dchealthlink.com/forms"
-  forms_name: "DCHealthLink.com/forms"
   short_url: "dchealthlink.com"
   forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
