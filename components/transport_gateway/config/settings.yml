@@ -125,7 +125,6 @@ aca:
   dental_market_enabled: true
   calendar_enabled: true
   dental_plan_years_available: ['']
-  minimum_primary_contribution_percentage: 50
   address_query_county: false
   display_county: true
   broker_routing_information: false

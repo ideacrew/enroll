@@ -112,7 +112,6 @@ aca:
     ['bronze', 'silver', 'gold', 'platinum', 'dental']
   general_agency_enabled: true
   market_kinds: ['shop', 'individual', 'fehb']
-  minimum_primary_contribution_percentage: 50
   nationwide_markets: true
   plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
   recaptcha_enabled: false
