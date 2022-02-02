@@ -578,11 +578,13 @@
               <div class="col-md-12">YOUR PREFERENCES</div>
             </div>
 
-            <% if @cfl_service.displayable_field?('application', @application.id, :is_requesting_voter_registration_application_in_mail) %>
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Would you like to register to vote in DC or update your current registration?</div>
-                <div class="col-md-6"><%= human_boolean(@application.is_requesting_voter_registration_application_in_mail) %></div>
-              </div>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:voter_registration_through_hbx) %>
+              <% if @cfl_service.displayable_field?('application', @application.id, :is_requesting_voter_registration_application_in_mail) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Would you like to register to vote in DC or update your current registration?</div>
+                  <div class="col-md-6"><%= human_boolean(@application.is_requesting_voter_registration_application_in_mail) %></div>
+                </div>
+              <% end %>
             <% end %>
 
             <% if @cfl_service.displayable_field?('application', @application.id, :years_to_renew) %>
