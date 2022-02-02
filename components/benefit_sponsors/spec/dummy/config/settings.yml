@@ -1,7 +1,5 @@
 site:
   key: :me
-  subdomain: "cme"
-  domain_name: "cme.enroll.openhbx.org"
   site_title: "Maine Cover ME"
   home_url: "https://cme.enroll.openhbx.org/"
   home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
@@ -93,7 +91,7 @@ contact_center:
   non_discrimination_email: "info@coverme.gov"
 
   appeals: "info@coverme.gov"
-  
+
   # Voting Info for FA Engine Steps
   # TOOD: This needs to be updated. These are pulled of Maine government website.
   # # https://www.maine.gov/sos/cec/elec/voter-info/index.html

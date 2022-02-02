@@ -44,7 +44,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
   end
 
   describe "type can be updated" do
-    let(:due_date) { TimeKeeper.date_of_record + 95.days }
+    let(:due_date) { TimeKeeper.date_of_record + 96.days }
 
     before do
       person.verification_types.each{|type| type.fail_type}
