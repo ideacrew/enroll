@@ -20,7 +20,6 @@ site:
   mailer_logo_file_name: "dchealthlink.jpg"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
-  guidance_for_business_owners_url: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
