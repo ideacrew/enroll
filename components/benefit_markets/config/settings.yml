@@ -43,7 +43,6 @@ site:
   publisher: 'dchl'
 
 contact_center:
-  state_and_city: 'Washington, DC'
   name: "DC Health Link's Customer Care Center"
   alt_name: 'DC Health Link Customer Service'
   po_box: 'PO Box 97022'
@@ -99,8 +98,6 @@ plan_option_titles:
   metal_level: 'By Metal Level'
   single_carrier: 'By Carrier'
   single_plan: 'Single Plan'
-  plan_year_tooltip: 'Employer premium contribution for Employee Only Health Plans must be at least'
-  multi_product: 'Custom'
   single_issuer: 'By Carrier'
 
 plan_option_descriptions:
@@ -122,16 +119,12 @@ aca:
   state_name: 'District of Columbia'
   state_abbreviation: 'DC'
   market_kinds: ['shop', 'individual', 'fehb']
-
-  hbx_abbreviation: 'DC Health Benefit Exchange'
   nationwide_markets: true
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
   calendar_enabled: true
   dental_plan_years_available: ['']
-  minimum_primary_contribution_percentage: 50
-  minimum_family_contribution_percentage: 30
   address_query_county: false
   broker_routing_information: false
   recaptcha_enabled: false
@@ -145,8 +138,6 @@ aca:
     ['bronze', 'silver', 'gold', 'platinum', 'dental']
   carrier_hios_logo_variant:
     '': ''
-  ## acceptable options are ["platinum", "gold", "silver", "dental"]
-
   plan_option_years:
     single_carriers_available: ['2018', '2019']
     sole_source_carriers_available: ['2017', '2018', '2019']
@@ -191,34 +182,6 @@ aca:
 
     employee:
       default_contact_method: 'Only Electronic communications'
-
-    binder_payment_dates:
-      [
-        { '2019-01-01': '2018,12,12' },
-        { '2019-02-01': '2019,1,14' },
-        { '2019-03-01': '2019,2,12' },
-        { '2019-04-01': '2019,3,12' },
-        { '2019-05-01': '2019,4,12' },
-        { '2019-06-01': '2019,5,14' },
-        { '2019-07-01': '2019,6,12' },
-        { '2019-08-01': '2019,7,12' },
-        { '2019-09-01': '2019,8,13' },
-        { '2019-10-01': '2019,9,12' },
-        { '2019-11-01': '2019,10,15' },
-        { '2019-12-01': '2019,11,13' },
-        { '2020-01-01': '2019,12,13' },
-        { '2020-02-01': '2020,1,14' },
-        { '2020-03-01': '2020,2,12' },
-        { '2020-04-01': '2020,3,12' },
-        { '2020-05-01': '2020,4,14' },
-        { '2020-06-01': '2020,5,12' },
-        { '2020-07-01': '2020,6,12' },
-        { '2020-08-01': '2020,7,14' },
-        { '2020-09-01': '2020,8,12' },
-        { '2020-10-01': '2020,9,14' },
-        { '2020-11-01': '2020,10,14' },
-        { '2020-12-01': '2020,11,13' },
-      ]
 
     earliest_enroll_prior_to_effective_on:
       days: -30

@@ -37,31 +37,30 @@ site:
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   support_for_ie_browser: true
 contact_center:
-  state_and_city: 'Washington, DC'
-  name: "DC Health Link's Customer Care Center"
-  alt_name: 'DC Health Link Customer Service'
-  po_box: 'PO Box 97022'
-  phone_number: '1-855-532-5465'
-  fax: '1-617-933-3099'
   alt_fax: '617-722-4033'
-  tty_number: '711'
-  short_number: '(855) 532-5465'
-  tty: '771'
+  alt_name: 'DC Health Link Customer Service'
   alt_phone_number: '1-855-532-LINK'
-  payment_phone_number: '855-532-LINK'
-  ivl_number: '1-877-623-6765'
-  ivl_phone_number: '1-877-623-6765'
-  email_address: 'info@dchealthlink.com'
-  city: 'Washington'
-  state: 'DC'
-  zip_code: '20090'
-  small_business_email: 'info@dchealthlink.com'
-  non_discrimination_email: 'info@dchealthlink.com'
   appeals: 'info@dchealthlink.com'
-  board_of_elections_entity: 'DC Board of Elections'
   board_of_elections_address: '1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>'
   board_of_elections_email: ''
+  board_of_elections_entity: 'DC Board of Elections'
   board_of_elections_phone_number: '(202) 727-2525'
+  city: 'Washington'
+  email_address: 'info@dchealthlink.com'
+  fax: '1-617-933-3099'
+  ivl_number: '1-877-623-6765'
+  ivl_phone_number: '1-877-623-6765'
+  name: "DC Health Link's Customer Care Center"
+  non_discrimination_email: 'info@dchealthlink.com'
+  payment_phone_number: '855-532-LINK'
+  phone_number: '1-855-532-5465'
+  po_box: 'PO Box 97022'
+  short_number: '(855) 532-5465'
+  small_business_email: 'info@dchealthlink.com'
+  state: 'DC'
+  tty_number: '711'
+  tty: '771'
+  zip_code: '20090'
   mailing_address:
     name: 'DC Health Link'
     address_1: 'PO Box 97022'
@@ -87,8 +86,6 @@ plan_option_titles:
   metal_level: 'By Metal Level'
   single_carrier: 'By Carrier'
   single_plan: 'Single Plan'
-  plan_year_tooltip: 'Employer premium contribution for Employee Only Health Plans must be at least'
-  multi_product: 'Custom'
   single_issuer: 'By Carrier'
 plan_option_descriptions:
   sole_source: 'Choose one plan and your contribution amount. All employees can enroll in that plan.'
@@ -103,40 +100,34 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
   minimum_invoice_display_year: 2015
 aca:
-  state_key: 'dc'
-  state_name: 'District of Columbia'
-  state_abbreviation: 'DC'
-  market_kinds: ['shop', 'individual', 'fehb']
-  hbx_abbreviation: 'DC Health Benefit Exchange'
-  nationwide_markets: true
-  general_agency_enabled: true
-  broker_carrier_appointments_enabled: true
-  dental_market_enabled: true
-  calendar_enabled: true
-  dental_plan_years_available: ['']
-  minimum_primary_contribution_percentage: 50
-  minimum_family_contribution_percentage: 30
   address_query_county: false
+  broker_carrier_appointments_enabled: true
   broker_routing_information: false
-  recaptcha_enabled: false
-  security_questions: false
-  user_accounts_enabled: true
-  plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
-  dental_plan_options_available: ['multi_product', 'single_issuer']
+  calendar_enabled: true
   default_dental_option_kind: 'multi_product'
-  ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+  dental_market_enabled: true
+  dental_plan_options_available: ['multi_product', 'single_issuer']
+  dental_plan_years_available: ['']
   enabled_metal_levels_for_single_carrier:
     ['bronze', 'silver', 'gold', 'platinum', 'dental']
+  general_agency_enabled: true
+  market_kinds: ['shop', 'individual', 'fehb']
+  nationwide_markets: true
+  plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
+  recaptcha_enabled: false
+  security_questions: false
+  state_abbreviation: 'DC'
+  state_key: 'dc'
+  state_name: 'District of Columbia'
+  user_accounts_enabled: true
   carrier_hios_logo_variant:
     '': ''
-  ## acceptable options are ["platinum", "gold", "silver", "dental"]
   plan_option_years:
     single_carriers_available: ['2018', '2019']
     sole_source_carriers_available: ['2017', '2018', '2019']
     metal_level_carriers_available: ['2018', '2019']
   qle:
     with_in_sixty_days: 60
-  #
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
@@ -149,8 +140,6 @@ aca:
     dc_resident_application: true
     transition_family_members_link:
       true
-      # dc_resident_application: true
-      # transition_family_members_link: true
     upcoming_open_enrollment:
       start_on: <%= Date.new(2021,11,1) %>
       end_on: <%= Date.new(2022,01,31) %>
@@ -170,33 +159,6 @@ aca:
     auto_cancel_ineligible: false
     employee:
       default_contact_method: 'Only Electronic communications'
-    binder_payment_dates:
-      [
-        { '2019-01-01': '2018,12,12' },
-        { '2019-02-01': '2019,1,14' },
-        { '2019-03-01': '2019,2,12' },
-        { '2019-04-01': '2019,3,12' },
-        { '2019-05-01': '2019,4,12' },
-        { '2019-06-01': '2019,5,14' },
-        { '2019-07-01': '2019,6,12' },
-        { '2019-08-01': '2019,7,12' },
-        { '2019-09-01': '2019,8,13' },
-        { '2019-10-01': '2019,9,12' },
-        { '2019-11-01': '2019,10,15' },
-        { '2019-12-01': '2019,11,13' },
-        { '2020-01-01': '2019,12,13' },
-        { '2020-02-01': '2020,1,14' },
-        { '2020-03-01': '2020,2,12' },
-        { '2020-04-01': '2020,3,12' },
-        { '2020-05-01': '2020,4,14' },
-        { '2020-06-01': '2020,5,12' },
-        { '2020-07-01': '2020,6,12' },
-        { '2020-08-01': '2020,7,14' },
-        { '2020-09-01': '2020,8,12' },
-        { '2020-10-01': '2020,9,14' },
-        { '2020-11-01': '2020,10,14' },
-        { '2020-12-01': '2020,11,13' },
-      ]
     earliest_enroll_prior_to_effective_on:
       days: -30
     latest_enroll_after_effective_on:
