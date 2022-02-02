@@ -31,10 +31,8 @@ site:
   plan_options_title_for_ma: true
   prod_tax_info: ""
   publisher: "dchl"
-  registration_path: "https://www.dchealthlink.com/smallbusiness"
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
   short_name: "CoverME.gov"
-  short_url: "dchealthlink.com"
   sign_in_routes: ['/families/home']
   staging_tax_info_url: ""
   statewide_area: "DC Metro"

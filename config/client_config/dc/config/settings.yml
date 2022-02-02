@@ -26,8 +26,6 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
   terms_and_conditions_url: "https://www.dchealthlink.com/terms"
-  registration_path: "https://www.dchealthlink.com/smallbusiness"
-  short_url: "dchealthlink.com"
   website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"

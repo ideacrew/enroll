@@ -34,9 +34,7 @@ site:
   late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
   mail_address: 'info@dchealthlink.com'
   publisher: 'dchl'
-  registration_path: 'https://www.dchealthlink.com/smallbusiness'
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
-  short_url: 'dchealthlink.com'
   staging_tax_info_url: 'https://staging.dchealthlink.com/individuals/tax-documents'
   statewide_area: 'DC Metro'
   support_for_ie_browser: true
