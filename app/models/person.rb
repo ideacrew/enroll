@@ -741,7 +741,7 @@ class Person
     begin
       age = date.year - dob.year
     rescue StandardError
-      flash[:error] = "Please provide a valid birthdate."
+      flash[:error] = l10n("exceptions.valid_birthdate")
     end
     if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
       age - 1
