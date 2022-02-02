@@ -15,7 +15,7 @@ registry:
               - :health_product_enrollment_status
               - :dental_product_enrollment_status
       - key: :verification_document_due_in_days
-        item: 95
+        item: 96
         is_enabled: true
       - key: :ivl_eligibility_notices
         is_enabled: false
@@ -150,7 +150,7 @@ registry:
         is_enabled: false
         settings:
           - key: :offset_prior_to_due_date
-            item: 94
+            item: 95
           - key: :units
             item: :days
           - key: :event_name
