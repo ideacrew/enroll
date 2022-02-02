@@ -1,6 +1,5 @@
 site:
   key: :me
-  site_title: "CoverME.gov"
   home_url: "https://cme.enroll.openhbx.org/"
   home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   # copyright_period_start: "2013"
