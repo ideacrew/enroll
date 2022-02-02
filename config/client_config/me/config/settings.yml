@@ -47,7 +47,6 @@ site:
   website_name: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
 
 contact_center:
-  state_and_city: 'Augusta, ME'
   name: "CoverME.gov's Customer Care Center"
   alt_name: 'CoverME.gov Customer Service'
   po_box: 'PO Box 97022'

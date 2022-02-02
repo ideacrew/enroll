@@ -43,7 +43,6 @@ site:
   publisher: 'dchl'
 
 contact_center:
-  state_and_city: 'Washington, DC'
   name: "DC Health Link's Customer Care Center"
   alt_name: 'DC Health Link Customer Service'
   po_box: 'PO Box 97022'
