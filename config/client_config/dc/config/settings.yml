@@ -2,7 +2,6 @@ site:
   key: :dc
   domain_name: "dchealthlink.com"
   site_title: "DC's Online Health Insurance Marketplace"
-  home_url: "https://www.dchealthlink.com/"
   home_business_url: "https://www.dchealthlink.com/smallbusiness/overview"
   # copyright_period_start: "2013"
   help_url: "https://www.dchealthlink.com/help"

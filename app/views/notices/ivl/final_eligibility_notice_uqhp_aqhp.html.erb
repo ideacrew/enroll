@@ -154,9 +154,9 @@
                "<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."]} %>
 
 <% if notice.renewal_csr_enrollments.present? %>
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Your plan has extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Your plan has extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use.", top_margin: '5px'} %>
@@ -181,7 +181,7 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "To report life changes, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{EnrollRegistry[:enroll_app].setting(:short_name).item}.", top_margin: '5px'} %>
+    content: "To report life changes, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call #{EnrollRegistry[:enroll_app].setting(:short_name).item}.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: ["You can end your insurance for any reason. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{EnrollRegistry[:enroll_app].setting(:short_name).item} first. We can help you find out if there are other options to make your coverage more affordable."],
@@ -194,7 +194,7 @@
     content: "If you end your health plan, and don’t replace it, you may have to pay a penalty on your DC taxes for the months you don’t have health insurance.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{EnrollRegistry[:enroll_app].setting(:short_name).item}.", top_margin: '5px'} %>
+    content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call #{EnrollRegistry[:enroll_app].setting(:short_name).item}.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
     contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],

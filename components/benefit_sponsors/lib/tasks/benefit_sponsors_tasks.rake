@@ -10,7 +10,7 @@ def initialize_site
     s.short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
     s.byline = Settings.site.byline
     s.domain_name = Settings.site.domain_name
-    s.home_url = Settings.site.home_url
+    s.home_url = EnrollRegistry[:enroll_app].setting(:home_url).item
     s.help_url = Settings.site.help_url
     s.faqs_url = Settings.site.faq_url
     s.logo_file_name = Settings.site.logo_file_name
@@ -18,7 +18,7 @@ def initialize_site
 
   p "Creating HBX parent organization..."
   owner_org = BenefitSponsors::Organizations::ExemptOrganization.new.tap do |org|
-    org.home_page = Settings.site.home_url
+    org.home_page = EnrollRegistry[:enroll_app].setting(:home_url).item
     org.legal_name = Settings.site.long_name
     org.dba = "12345"
     org.entity_kind = :health_insurance_exchange
