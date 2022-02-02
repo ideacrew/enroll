@@ -1,6 +1,5 @@
 site:
   key: :me
-  subdomain: "cme"
   domain_name: "cme.enroll.openhbx.org"
   site_title: "CoverME.gov"
   home_url: "https://cme.enroll.openhbx.org/"
