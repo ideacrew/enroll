@@ -45,8 +45,6 @@ site:
   terms_and_conditions_url: ''
   use_default_devise_path: true
   website_name: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
-  social_media:
-    facebook_url: ''
 
 contact_center:
   state_and_city: 'Augusta, ME'

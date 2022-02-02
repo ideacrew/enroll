@@ -45,8 +45,6 @@ site:
   publisher: 'dchl'
   prod_tax_info: ''
   staging_tax_info_url: ''
-  social_media:
-    facebook_url: ''
 
 contact_center:
   state_and_city: 'Augusta, ME'
