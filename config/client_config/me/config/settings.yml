@@ -126,8 +126,6 @@ aca:
   state_name: 'Maine'
   state_abbreviation: 'ME'
   market_kinds: ['individual']
-
-  hbx_abbreviation: 'CoverME.gov'
   nationwide_markets: true
   general_agency_enabled: false # Soon to be deprrecated
   broker_carrier_appointments_enabled: true

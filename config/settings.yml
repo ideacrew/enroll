@@ -100,40 +100,36 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
   minimum_invoice_display_year: 2015
 aca:
-  state_key: 'dc'
-  state_name: 'District of Columbia'
-  state_abbreviation: 'DC'
-  market_kinds: ['shop', 'individual', 'fehb']
-  hbx_abbreviation: 'DC Health Benefit Exchange'
-  nationwide_markets: true
-  general_agency_enabled: true
-  broker_carrier_appointments_enabled: true
-  dental_market_enabled: true
-  calendar_enabled: true
-  dental_plan_years_available: ['']
-  minimum_primary_contribution_percentage: 50
-  minimum_family_contribution_percentage: 30
   address_query_county: false
+  broker_carrier_appointments_enabled: true
   broker_routing_information: false
-  recaptcha_enabled: false
-  security_questions: false
-  user_accounts_enabled: true
-  plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
-  dental_plan_options_available: ['multi_product', 'single_issuer']
+  calendar_enabled: true
   default_dental_option_kind: 'multi_product'
-  ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+  dental_market_enabled: true
+  dental_plan_options_available: ['multi_product', 'single_issuer']
+  dental_plan_years_available: ['']
   enabled_metal_levels_for_single_carrier:
     ['bronze', 'silver', 'gold', 'platinum', 'dental']
+  general_agency_enabled: true
+  market_kinds: ['shop', 'individual', 'fehb']
+  minimum_family_contribution_percentage: 30
+  minimum_primary_contribution_percentage: 50
+  nationwide_markets: true
+  plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
+  recaptcha_enabled: false
+  security_questions: false
+  state_abbreviation: 'DC'
+  state_key: 'dc'
+  state_name: 'District of Columbia'
+  user_accounts_enabled: true
   carrier_hios_logo_variant:
     '': ''
-  ## acceptable options are ["platinum", "gold", "silver", "dental"]
   plan_option_years:
     single_carriers_available: ['2018', '2019']
     sole_source_carriers_available: ['2017', '2018', '2019']
     metal_level_carriers_available: ['2018', '2019']
   qle:
     with_in_sixty_days: 60
-  #
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:

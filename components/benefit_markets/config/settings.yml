@@ -119,8 +119,6 @@ aca:
   state_name: 'District of Columbia'
   state_abbreviation: 'DC'
   market_kinds: ['shop', 'individual', 'fehb']
-
-  hbx_abbreviation: 'DC Health Benefit Exchange'
   nationwide_markets: true
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true
@@ -142,8 +140,6 @@ aca:
     ['bronze', 'silver', 'gold', 'platinum', 'dental']
   carrier_hios_logo_variant:
     '': ''
-  ## acceptable options are ["platinum", "gold", "silver", "dental"]
-
   plan_option_years:
     single_carriers_available: ['2018', '2019']
     sole_source_carriers_available: ['2017', '2018', '2019']
