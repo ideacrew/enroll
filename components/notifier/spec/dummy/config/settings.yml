@@ -32,7 +32,6 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   terms_and_conditions_url: ''
-  website_url: 'www.healthcare.gov'
   irs_url: 'https://www.irs.gov/'
   exchange_hbx_id: 'ME0'
   mail_address: 'info@coverme.gov'

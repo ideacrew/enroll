@@ -45,7 +45,6 @@ site:
   terms_and_conditions_url: ''
   use_default_devise_path: true
   website_name: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
-  website_url: 'www.healthcare.gov'
   social_media:
     facebook_url: ''
 

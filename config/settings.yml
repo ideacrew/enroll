@@ -36,7 +36,6 @@ site:
   publisher: 'dchl'
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   support_for_ie_browser: true
-  website_url: 'www.healthcare.gov'
   social_media:
     facebook_url: ''
 contact_center:
