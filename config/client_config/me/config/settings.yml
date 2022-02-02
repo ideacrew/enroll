@@ -29,7 +29,6 @@ site:
   main_web_address: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
   plan_options_title_for_ma: true
-  privacy_policy: "https://www.coverme.gov"
   prod_tax_info: ""
   publisher: "dchl"
   registration_path: "https://www.dchealthlink.com/smallbusiness"

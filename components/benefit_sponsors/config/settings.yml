@@ -32,7 +32,6 @@ site:
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
   mail_address: "info@dchealthlink.com"
-  privacy_policy: "https://dchealthlink.com/"
   late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
