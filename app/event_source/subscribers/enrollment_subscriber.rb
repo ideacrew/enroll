@@ -30,13 +30,12 @@ module Subscribers
         application = family.active_financial_assistance_application(enrollment.effective_on.year)
         application&.enrolled_with(enrollment)
       end
+      update_due_date_on_vlp_documents(family)
 
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
         family: enrollment.family,
         effective_date: TimeKeeper.date_of_record
       )
-
-      update_due_date_on_vlp_documents(family)
     end
 
     private
