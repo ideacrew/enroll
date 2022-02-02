@@ -34,10 +34,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       it { expect(rendered).to have_selector('h3', text: 'TAX INFORMATION FOR YOUR CATASTROPHIC HEALTH PLAN') }
       it { expect(rendered).to match(/Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through 2018./) }
       it { expect(rendered).to match(/Dear #{person.first_name}:/) }
-      it { expect(rendered).to match(/You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}./) }
+      it { expect(rendered).to match(/You are receiving this letter because you were enrolled in a catastrophic health plan through #{EnrollRegistry[:enroll_app].setting(:short_name).item} in #{previous_year}./) }
       it { expect(rendered).to match(/You may receive a tax form from your health insurance company./) }
       it { expect(rendered).to match(/If you have questions or concerns, we’re here to help./) }
-      it { expect(rendered).to match(/The #{Settings.site.short_name} Team/) }
+      it { expect(rendered).to match(/The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team/) }
     end
 
     context 'for partials' do
@@ -45,7 +45,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       it { render partial: 'notices/shared/logo_and_address_shop', locals: local_data }
       it { render partial: 'notices/shared/date', locals: local_data }
       it { render partial: 'notices/shared/address', locals: local_data }
-      it { render partial: 'notices/shared/paragraph', locals: {content: "The #{Settings.site.short_name} Team"} }
+      it { render partial: 'notices/shared/paragraph', locals: {content: "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team"} }
       it { render partial: 'notices/shared/reference_paragraph', locals: {contents: ['']} }
     end
   end

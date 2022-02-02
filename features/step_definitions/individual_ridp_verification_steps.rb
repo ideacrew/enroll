@@ -227,7 +227,7 @@ And(/^HBX admin click on back to my account button$/) do
 end
 
 Then(/^HBX admin should land on home page$/) do
-  expect(page).to have_content Settings.site.short_name
+  expect(page).to have_content EnrollRegistry[:enroll_app].setting(:short_name).item
 end
 
 And(/^I click on Continue button$/) do

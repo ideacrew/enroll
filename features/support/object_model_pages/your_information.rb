@@ -21,7 +21,7 @@ class YourInformation
   end
 
   def self.welcome_sign_in_message
-    "Welcome to #{Settings.site.short_name} Your account has been created."
+    "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item} Your account has been created."
   end
 
   def self.continue_btn

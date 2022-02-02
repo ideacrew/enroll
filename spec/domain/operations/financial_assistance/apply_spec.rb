@@ -41,4 +41,32 @@ RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :a
       expect(result.success.is_a?(BSON::ObjectId)).to be_truthy
     end
   end
+
+  context 'with in-state address' do
+    it 'should set is_living_in_state to true' do
+      result = subject.call({family_id: family.id})
+      applicants = FinancialAssistance::Application.where(id: result.success).first.applicants
+      expect(applicants.map(&:is_living_in_state)).to eq [true,true]
+    end
+  end
+
+  context 'with out-of-state address for one of the dependents' do
+    it 'should set is_living_in_state to true' do
+      person.addresses.update_all(state: "CA")
+      family.reload
+      result = subject.call({family_id: family.id})
+      applicants = FinancialAssistance::Application.where(id: result.success).first.applicants
+      expect(applicants.map(&:is_living_in_state)).to eq [false,true]
+    end
+  end
+
+  context 'without addresses for one of the dependents' do
+    it 'should set is_living_in_state to true' do
+      person.addresses.delete_all
+      family.reload
+      result = subject.call({family_id: family.id})
+      applicants = FinancialAssistance::Application.where(id: result.success).first.applicants
+      expect(applicants.map(&:is_living_in_state)).to eq [false,true]
+    end
+  end
 end

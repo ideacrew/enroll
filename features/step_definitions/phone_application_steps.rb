@@ -15,7 +15,7 @@ And(/^the Admin is on the Personal Info page for the family$/) do
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
 
-  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{Settings.site.short_name}. Select CONTINUE.")
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
   find('.interaction-click-control-continue', wait: 10).click
 end
 

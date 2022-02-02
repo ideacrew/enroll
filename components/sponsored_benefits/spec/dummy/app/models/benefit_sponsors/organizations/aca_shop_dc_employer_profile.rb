@@ -39,8 +39,8 @@ module BenefitSponsors
       def build_nested_models
         build_inbox if inbox.blank?
         #TODO: After migration uncomment the lines below to get Welcome message for Initial Inbox creation
-        # welcome_subject = "Welcome to #{Settings.site.short_name}"
-        # welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        # welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
+        # welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
         # inbox.messages.new(subject: welcome_subject, body: welcome_body)
       end
     end

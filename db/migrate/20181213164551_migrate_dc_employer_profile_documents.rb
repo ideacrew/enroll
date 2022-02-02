@@ -109,7 +109,7 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
 
   def self.build_inbox_messages(old_profile, new_profile)
 
-    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+    welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
     welcome_message = new_profile.inbox.messages.where(body: welcome_body).first
     welcome_message.update_attributes(message_read: true, created_at: new_profile.created_at) if welcome_message.present?
 

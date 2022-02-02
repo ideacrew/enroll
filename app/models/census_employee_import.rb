@@ -112,7 +112,7 @@ class CensusEmployeeImport
     # label_header_row  = @sheet.row(3)
 
     unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
-      raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template."
+      raise "Unrecognized Employee Census spreadsheet format. Contact #{EnrollRegistry[:enroll_app].setting(:short_name).item} for current template."
     end
 
     census_employees = []
