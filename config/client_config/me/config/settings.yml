@@ -12,7 +12,6 @@ site:
   broker_claim_quoting_enabled: true
   broker_quoting_enabled: false
   byline: "Maine's Official Health Insurance Marketplace"
-  certification_url: "https://www.dchealthlink.com/brokers/overview"
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   curam_enabled?: true
   elligibile_immigration_statuses_url: ""

@@ -26,7 +26,6 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
   terms_and_conditions_url: "https://www.dchealthlink.com/terms"
-  certification_url: "https://www.dchealthlink.com/brokers/overview"
   registration_path: "https://www.dchealthlink.com/smallbusiness"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"

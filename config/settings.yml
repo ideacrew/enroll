@@ -21,7 +21,6 @@ site:
   sign_in_routes: ['/families/home']
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   block_ie_browser: false
-  certification_url: "https://www.dchealthlink.com/brokers/overview"
   curam_enabled?: true
   elligibile_immigration_statuses_url: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
   exchange_hbx_id: "DC0"
