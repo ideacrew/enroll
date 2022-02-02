@@ -49,9 +49,7 @@ site:
   prod_tax_info: "https://dchealthlink.com/individuals/tax-documents"
   staging_tax_info_url: "https://staging.dchealthlink.com/individuals/tax-documents"
   statewide_area: "DC Metro"
-  elligibile_immigration_statuses_url: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
 
-  exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
     facebook_url: ""
 

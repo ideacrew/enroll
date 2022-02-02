@@ -22,9 +22,7 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   block_ie_browser: false
   curam_enabled?: true
-  elligibile_immigration_statuses_url: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
   exchange_hbx_id: "DC0"
-  exchange_name: "Washington DC Health Benefit Exchange"
   faa_enabled: false # TODO: Remove this after configuring the settings.
   forms_name: "DCHealthLink.com/forms"
   forms: "https://dchealthlink.com/forms#en"

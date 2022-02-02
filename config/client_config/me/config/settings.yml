@@ -14,9 +14,7 @@ site:
   byline: "Maine's Official Health Insurance Marketplace"
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   curam_enabled?: true
-  elligibile_immigration_statuses_url: ""
   exchange_hbx_id: "ME0"
-  exchange_name: "CoverME.gov"
   faa_enabled: false # TODO: Remove this after configuring the settings.
   forms_name: "DCHealthLink.com/forms"
   forms: "https://dchealthlink.com/forms#en"

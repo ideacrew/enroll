@@ -50,9 +50,8 @@ site:
   prod_tax_info: ""
   staging_tax_info_url: ""
   statewide_area: "DC Metro"
-  elligibile_immigration_statuses_url: ""
+  "
 
-  exchange_name: "Maine Cover ME"
   social_media:
     facebook_url: ""
 
