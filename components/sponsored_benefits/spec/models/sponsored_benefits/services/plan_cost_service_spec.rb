@@ -98,9 +98,23 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
       allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
     end
+
     it "should return total monthly employer contribution amount" do
       # Er contribution 80%. No.of Employees = 2
       expect(subject.monthly_employer_contribution_amount).to eq (0.8*2*78.0)
+    end
+
+    context 'relationship_benefit premium pct change.' do
+      before :each do
+        benefit_group.relationship_benefits.each do |rb|
+          rb.update_attributes(premium_pct: 50.0)
+        end
+      end
+
+      it "should return total monthly employer contribution amount with 50%" do
+        # Er contribution 50%. No.of Employees = 2
+        expect(subject.monthly_employer_contribution_amount).to eq(0.5 * 2 * 78.0)
+      end
     end
   end
 
