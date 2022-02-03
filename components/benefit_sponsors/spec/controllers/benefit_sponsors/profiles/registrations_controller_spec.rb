@@ -117,6 +117,8 @@ module BenefitSponsors
         }}
     end
 
+    let(:setting) { double }
+
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
@@ -126,7 +128,10 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false)
-      allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(item: :dc))
+      # I couldn't get this to work, but since the default is :dc anyway, I'm leaving it here for now.
+      # This spec should ultimately be refactored to remove any reference to a client in it
+      # allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+      # allow(setting).to receive(:setting).with(:site_key).and_return(double(item: :dc))
       allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
 
