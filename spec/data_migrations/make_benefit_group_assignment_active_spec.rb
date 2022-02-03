@@ -13,7 +13,7 @@ describe MakeBenefitGroupAssignmentActive, dbclean: :after_each do
   end
 
   describe 'creates an inactive benefit group assignment' do
-    let(:site_key)                  { Settings.site.key.to_sym }
+    let(:site_key)                  { EnrollRegistry[:enroll_app].setting(:site_key).item.to_sym }
     let(:site)                      { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
     let(:benefit_sponsor)           { create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile_initial_application".to_sym, site: site) }
     let(:benefit_sponsorship)       { benefit_sponsor.active_benefit_sponsorship }

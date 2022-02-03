@@ -3,7 +3,7 @@ namespace :load do
 
     [:aca_shop, :fehb].each do |kind|
 
-      benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: kind).first
+      benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => EnrollRegistry[:enroll_app].setting(:site_key).item, kind: kind).first
 
       calender_year = args[:year].present? ? args[:year].to_i : 2022
 

@@ -2,7 +2,7 @@
 # Run it with this: bundle exec rake app:seed:load_faa_translations
 
 # site_key = ::EnrollRegistry[:enroll_app].settings(:site_key).item
-site_key = Settings.site.key
+site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
 
 require 'rake'
 require_relative "../../db/seedfiles/translations/en/#{site_key}/financial_assistance"

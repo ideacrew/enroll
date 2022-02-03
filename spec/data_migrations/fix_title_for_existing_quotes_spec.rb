@@ -13,8 +13,8 @@ describe FixTitleForExistingQuotes, dbclean: :around_each do
   end
 
   describe "fix title for existing quotes", dbclean: :around_each do
-    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
     let!(:org_benefit_sponsorship) do
       bs = organization.employer_profile.add_benefit_sponsorship
       bs.save

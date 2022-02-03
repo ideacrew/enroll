@@ -55,7 +55,7 @@ namespace :employers do
 
       broker_account = benefit_sponsorship.broker_agency_accounts.first
       broker_role = broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
-      
+
       plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(profile.id).where(has_active_broker_relationship: true).first
       general_agency_account = plan_design_organization.active_general_agency_account if plan_design_organization.present?
 
@@ -162,7 +162,7 @@ namespace :employers do
 
     end
 
-    if Rails.env.production? && Settings.site.key == :cca
+    if Rails.env.production? && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
       pubber = Publishers::Legacy::EmployerExportPublisher.new
       pubber.publish URI.join("file://", file_name)
     end
