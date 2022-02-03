@@ -388,7 +388,7 @@ Then(/consumer should enrollment submitted confirmation page/) do
 end
 
 Then(/cosumer should see the home page/) do
-  expect(page).to have_content "My #{Settings.site.short_name}"
+  expect(page).to have_content "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 end
 
 When(/(.*) clicked continue on household info page/) do |role|

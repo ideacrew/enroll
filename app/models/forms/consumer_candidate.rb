@@ -102,7 +102,7 @@ module Forms
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob
-        errors.add(:base, l10n("insured.ssn_configuration_warning", site_short_name: Settings.site.short_name, site_phone_number: Settings.contact_center.phone_number, site_tty_number: Settings.contact_center.tty_number))
+        errors.add(:base, l10n("insured.ssn_configuration_warning", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, site_phone_number: Settings.contact_center.phone_number, site_tty_number: Settings.contact_center.tty_number))
         log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end

@@ -25,7 +25,7 @@
               </ul>
             </p>
           <% else %>
-            <p>If you submit this application as is, the small business application may be ineligible for coverage through the <%= Settings.site.short_name %> because it does not meet the eligibility reason(s) identified below: </p>
+            <p>If you submit this application as is, the small business application may be ineligible for coverage through the <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> because it does not meet the eligibility reason(s) identified below: </p>
             <p><ul class="application-warnings"></ul></p>
             <p>Click Cancel if you want to go back and review your application information for accuracy. If the information provided on your application is accurate, you may click Publish Anyways to proceed. If you choose to proceed and the application is determined to be ineligible, you will be notified with the reason for the eligibility determination along with what your options are to appeal this determination.</p>
           <% end %>
@@ -42,7 +42,7 @@
       <%else%>
         <div class="modal-body">
           <p>
-            As submitted, this application is ineligible for coverage under the <%= Settings.site.short_name %> exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by <%= Settings.site.short_name %> officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
+            As submitted, this application is ineligible for coverage under the <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
           </p>
           <ul class="application-warnings"></ul>
         </div>

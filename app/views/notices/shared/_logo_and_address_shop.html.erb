@@ -3,12 +3,12 @@
     <tr>
       <td>
         <% if notice.shop? %>
-          <b><%= Settings.site.short_name %></b><br>
+          <b><%= EnrollRegistry[:enroll_app].setting(:short_name).item %></b><br>
              <%= Settings.notices.shop_market.mail_address.address_1 %><br>
              <%= Settings.notices.shop_market.mail_address.address_2 %><br>
              <%= Settings.notices.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.notices.shop_market.mail_address.zip_code %><br>
         <% else %>
-          <b><%= Settings.site.short_name %> Contact Center</b><br>
+          <b><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> Contact Center</b><br>
              <%= ::EnrollRegistry[:ivl_notices].setting(:mailing_address_1).item %><br>
              <%= ::EnrollRegistry[:ivl_notices].setting(:mailing_address_city).item %>, <%= Settings.aca.state_abbreviation %> <%= ::EnrollRegistry[:ivl_notices].setting(:mailing_address_zip).item %><br>
         <% end %>

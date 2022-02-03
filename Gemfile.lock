@@ -642,7 +642,7 @@ GEM
       kaminari-core (~> 1.0)
       mongoid
     kgio (2.11.3)
-    kostya-sigar (2.0.8)
+    kostya-sigar (2.0.10)
     language_list (1.2.1)
     launchy (2.5.0)
       addressable (~> 2.7)
@@ -727,7 +727,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
-    nio4r (2.5.5)
+    nio4r (2.5.8)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.1)
@@ -1005,10 +1005,10 @@ GEM
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.11.3)
-    thor (1.1.0)
+    thor (1.2.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    timers (4.3.2)
+    timers (4.3.3)
     ttfunk (1.0.3)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -1107,7 +1107,7 @@ DEPENDENCIES
   effective_datatables!
   email_spec (~> 2)
   event_source!
-  eye (= 0.10.0)
+  eye (~> 0.10.0)
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi

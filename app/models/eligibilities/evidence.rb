@@ -98,6 +98,11 @@ module Eligibilities
       due_on || evidenceable.schedule_verification_due_on
     end
 
+    # bypasses regular guards for changing the date
+    def change_due_on!(new_date)
+      self.due_on = new_date
+    end
+
     PENDING = [:pending, :attested].freeze
     OUTSTANDING = [:outstanding, :review, :errored].freeze
     CLOSED = [:denied, :closed, :expired].freeze
