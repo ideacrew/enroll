@@ -14,7 +14,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       aasm_state: 'submitted',
                       hbx_id: "830293",
                       assistance_year: TimeKeeper.date_of_record.year,
-                      effective_date: DateTime.new(2021,1,1,4,5,6))
+                      effective_date: TimeKeeper.date_of_record.beginning_of_year)
   end
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,

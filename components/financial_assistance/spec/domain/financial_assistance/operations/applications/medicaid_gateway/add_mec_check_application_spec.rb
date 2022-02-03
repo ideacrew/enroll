@@ -30,7 +30,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       before do
         @applicant = application.applicants.first
-        @applicant.evidences << FinancialAssistance::Evidence.new(key: :aces_mec, title: "ACES MEC")
+        @applicant.build_local_mec_evidence(key: :local_mec, title: "Local MEC")
+        @applicant.save
         @result = subject.call(response_payload)
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
@@ -43,8 +44,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.evidences.by_name(:aces_mec).first.eligibility_status).to eq "verified"
-        expect(@applicant.evidences.by_name(:aces_mec).first.eligibility_results.present?).to eq true
+        expect(@applicant.local_mec_evidence.is_satisfied).to be_truthy
+        expect(@applicant.local_mec_evidence.due_on).to be_nil
+        expect(@applicant.local_mec_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end

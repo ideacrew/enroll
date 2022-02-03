@@ -12,12 +12,8 @@ And(/^the consumer navigates to the (.*?) page$/) do |page|
   expect(page).to have_content(page)
 end
 
-Then(/^they should see the Medicaid and Tax Credits Link tile$/) do
-  expect(page).to have_content("Medicaid & Tax Credits")
-end
-
 Then(/^they should not see the Medicaid and Tax Credits Link tile$/) do
-  expect(page).to_not have_content("Medicaid & Tax Credits")
+  expect(page).to_not have_css(IvlHomepage.medicaid_and_tax_credits_btn)
 end
 
 Given(/consumer visits enroll app home page?/) do

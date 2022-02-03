@@ -27,7 +27,7 @@ module FinancialAssistance
         end
 
         def find_draft_application(family_id)
-          application = ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').first
+          application = ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').asc(:created_at).last
           if application
             Success(application)
           else
@@ -76,7 +76,9 @@ module FinancialAssistance
                       else
                         @application.applicants.build
                       end
-          applicant.assign_attributes(values.to_h)
+
+          applicant.assign_attributes(values.to_h.except(:relationship))
+          applicant.callback_update = true
 
           if applicant.save
             @application.ensure_relationship_with_primary(applicant, values.to_h[:relationship]) unless applicant.is_primary_applicant

@@ -41,7 +41,8 @@ module Operations
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: transform_households(family.households)) if family.households.present?
-
+          failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
+          return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
           Success(payload)
         end
 
@@ -49,10 +50,13 @@ module Operations
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
           member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
           applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
-          applications.collect do |application|
-            applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
-            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value! if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
+          transformed_applications = applications.collect do |application|
+            # applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
+            # next unless member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
+            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact
+          return Failure("Could not transform applications for family with hbx_id #{family.hbx_assigned_id}: #{transformed_applications.select(&:failure?).map(&:failure)}") unless transformed_applications.all?(&:success?)
+          transformed_applications.map(&:value!)
         end
 
         def transform_special_enrollment_periods(special_enrollment_periods)
@@ -182,6 +186,7 @@ module Operations
 
         def transform_households(households)
           households.collect do |household|
+            enrollments = household.hbx_enrollments.where(:aasm_state.ne => "shopping", :product_id.ne => nil)
             household_data = {
               start_date: household.effective_starting_on,
               end_date: household.effective_ending_on,
@@ -190,7 +195,7 @@ module Operations
               tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households)
             }
-            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(household.hbx_enrollments)) if household.hbx_enrollments.present?
+            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(enrollments)) if enrollments.present?
             household_data
           end
         end

@@ -854,7 +854,12 @@ $(document).on('click', '#address_info + span.form-action', function(){
     $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip, #dependent_addresses_1_city").each(function() {
       $(this).prop('required', false);
     })
-    $("#person_addresses_attributes_1__destroy").val(true);
+    // Mailing address form may appear before or after home address form
+    if ($("#person_addresses_attributes_1__destroy").siblings('#person_addresses_attributes_1_kind')[0].value == "mailing") {
+      $("#person_addresses_attributes_1__destroy").val(true);
+    } else {
+      $("#person_addresses_attributes_0__destroy").val(true);
+    }
   }
 });
 

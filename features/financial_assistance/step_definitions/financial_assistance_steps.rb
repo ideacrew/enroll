@@ -136,7 +136,7 @@ Given(/^they answer job income question and complete the form with incorrect dat
   # page.find('.darkblue').click
 end
 
-Then(/^I should see a JS alert$/) do
+Then(/^.+ should see a JS alert$/) do
   sleep 1
   page.driver.browser.switch_to.alert.accept
 end
@@ -609,6 +609,14 @@ end
 And(/^the user should click on the destroy applicant icon$/) do
   find_all('.close-2')[2].click
   find('.fa-times').click
+end
+
+Then(/^user should see need help paying question$/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.need_help_paying_bills)
+end
+
+And(/^user should have an answer related to applicant$/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.applicant_paying_bills)
 end
 
 Then(/^the user should see the popup for the remove applicant confirmation$/) do

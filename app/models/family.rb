@@ -21,6 +21,7 @@ class Family
   include DocumentsVerificationStatus
   include RemoveFamilyMember
   include CrmGateway::FamilyConcern
+  include GlobalID::Identification
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -58,10 +59,11 @@ class Family
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   # embeds_many :broker_agency_accounts #depricated
-  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
+  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount", cascade_callbacks: true
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
   has_many :payment_transactions
+  embeds_one :eligibility_determination, class_name: "::Eligibilities::Determination", as: :determinable, cascade_callbacks: true
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -101,6 +103,29 @@ class Family
   index({"family_members.person_id" => 1, hbx_assigned_id: 1})
 
   index({"broker_agency_accounts.broker_agency_profile_id" => 1, "broker_agency_accounts.is_active" => 1}, {name: "broker_families_search_index"})
+
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.outstanding_verification_earliest_due_date': 1},
+        { name: "outstanding_verification_earliest_due_date_index" })
+
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.outstanding_verification_document_status': 1},
+        { name: "outstanding_verification_document_status_index" })
+
+  index({ 'eligibility_determination.effective_date': 1 })
+
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.subjects.full_name': 1},
+        { name: 'outstanding_verification_subjects_full_name' })
+
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.subjects.hbx_id': 1 },
+        { name: 'outstanding_verification_subjects_hbx_id' })
+
+  index({'eligibility_determination.outstanding_verification_status': 1,
+         'eligibility_determination.subjects.encrypted_ssn': 1 },
+        { name: 'outstanding_verification_subjects_encrypted_ssn' })
+
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
@@ -181,6 +206,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+
   scope :outstanding_verification,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
   }
@@ -188,13 +214,33 @@ class Family
   scope :outstanding_verification_datatable,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
-
-  scope :outstanding_verifications_including_faa_datatable, lambda {
+  # rubocop:disable Style/Lambda, Layout/SpaceInLambdaLiteral, Layout/BlockAlignment
+  scope :outstanding_verifications_including_faa_datatable, ->{
     where(
       :_id.in => (HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id) +
                      FinancialAssistance::Application.families_with_latest_determined_outstanding_verification.pluck(:family_id))
     )
   }
+
+  scope :eligibility_determination_outstanding_verifications, -> (skip = 0, limit = 50, order_by = { :'eligibility_determination.outstanding_verification_earliest_due_date' => :asc }){
+        where(:'eligibility_determination.outstanding_verification_status' => 'outstanding').limit(limit).skip(skip).order_by(order_by)
+      }
+
+  scope :eligibility_determination_family_member_search, ->(search_string){
+      any_of(
+        { :"eligibility_determination.subjects.full_name" => /#{search_string}/i },
+        { :"eligibility_determination.subjects.hbx_id" => /^#{search_string}$/i },
+        { :"eligibility_determination.subjects.encrypted_ssn" => SymmetricEncryption.encrypt(search_string) }
+      )
+    }
+
+  scope :eligibility_due_date_in_range, ->(start_date = Timekeeper.date_of_record, end_date = Timekeeper.date_of_record){
+        where(:'eligibility_determination.outstanding_verification_earliest_due_date' => {:'$gte' => start_date, :'$lte' => end_date})
+      }
+  # rubocop:enable Style/Lambda, Layout/SpaceInLambdaLiteral, Layout/BlockAlignment
+  scope :eligibility_determination_fully_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status' => 'Fully Uploaded') }
+  scope :eligibility_determination_partially_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status' => 'Partially Uploaded') }
+  scope :eligibility_determination_none_uploaded, -> { where(:'eligibility_determination.outstanding_verification_document_status'.in => ['None', nil]) }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
@@ -206,6 +252,10 @@ class Family
         :kind => 'individual'
       }
     ).distinct(:family_id))
+  }
+
+  scope :outstanding_verifications_expiring_on, lambda {|date|
+    where(:"eligibility_determination.outstanding_verification_earliest_due_date" => date.beginning_of_day)
   }
 
   # Replaced scopes for moving HbxEnrollment to top level
@@ -249,6 +299,11 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
+  # It fetches active or renewal application for the family based on the year passed
+  def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)
+    ::FinancialAssistance::Application.where(family_id: self.id).by_year(year).determined.max_by(&:created_at)
+  end
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
@@ -908,8 +963,8 @@ class Family
       initialize_ivl_enrollment_service.enrollment_notice_for_ivl_families(new_date)
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
-      initialize_ivl_enrollment_service.send_enrollment_notice_for_ivl(new_date)
+    def send_enr_or_dr_notice_to_ivl(new_date)
+      initialize_ivl_enrollment_service.send_enr_or_dr_notice_to_ivl(new_date)
     end
 
     def find_by_employee_role(employee_role)
@@ -1063,6 +1118,19 @@ class Family
         due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
+
+    if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+      application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
+      application&.active_applicants&.each do |applicant|
+        FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+          evidence = applicant.send(evidence_type)
+          next unless evidence.present? && Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state)
+
+          due_dates << evidence.verif_due_date
+        end
+      end
+    end
+
     due_dates.compact!
     due_dates.uniq.sort
   end
@@ -1125,11 +1193,15 @@ class Family
       application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
 
       application&.active_applicants&.each do |applicant|
-        outstanding_types += applicant.evidences.select{|evidence| ["outstanding", "pending"].include? evidence.eligibility_status }
-        in_review += applicant.evidences.select{|evidence| ["review"].include? evidence.eligibility_status }
-        fully_uploaded += applicant.evidences.select(&:type_verified?)
-      end
+        FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+          evidence = applicant.send(evidence_type)
+          next unless evidence.present?
 
+          (outstanding_types += [evidence]) if ["outstanding", "pending"].include? evidence.aasm_state
+          (in_review += [evidence]) if ["review"].include? evidence.aasm_state
+          (fully_uploaded += [evidence]) if evidence.type_verified?
+        end
+      end
     end
 
     if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?

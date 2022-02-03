@@ -92,7 +92,8 @@ module FinancialAssistance
 
       def save
         return false unless valid?
-        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params)
+        is_living_in_state = validate_in_state_addresses
+        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
@@ -103,14 +104,23 @@ module FinancialAssistance
             applicant = application.applicants.build(values)
             applicant.save!
           end
+
+          # reloading the application to fetch the latest data updated through applicant callbacks to avoid duplicate relationships
+          application.reload
           application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?
           [true, applicant]
         else
-          applicant_entity.failure.errors.to_h.collect{|key, msg| "#{key} #{msg[0]}"}.each do |error_msg|
+          applicant_entity.failure.collect{|key, msg| "#{key} #{msg[0]}"}.each do |error_msg|
             errors.add(:base, error_msg)
           end
           [false, applicant_entity.failure]
         end
+      end
+
+      def validate_in_state_addresses
+        symbolize_addresses_attributes = addresses_attributes&.deep_symbolize_keys
+        home_address = symbolize_addresses_attributes&.select{|_k, address| address[:kind] == 'home' && address[:state] == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}
+        home_address.present?
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity
@@ -204,7 +214,7 @@ module FinancialAssistance
       end
 
       def relationship_validation
-        return self.errors.add(:base, "select Relationship Type") if relationship.blank?
+        return self.errors.add(:base, "select Relationship Type") if !applicant&.is_primary_applicant && relationship.blank?
         primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in => ['spouse', 'life_partner'])
         if applicant
           other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }

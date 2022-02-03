@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 91025af75e7622d1c62c17eaca011ebb906e834b
+  revision: 13fce8c3533f1c31e8252571baf806aad16ce0a5
   branch: trunk
   specs:
-    aca_entities (0.9.0)
+    aca_entities (0.10.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -57,16 +57,6 @@ GIT
       ox (~> 2.14)
       resque-bus (~> 0.7.0)
       typhoeus (~> 1.4.0)
-
-GIT
-  remote: https://github.com/ideacrew/keycloak-client.git
-  revision: a18d27ba97a873d7c036a433d024694733e67889
-  branch: support_relay_state
-  specs:
-    keycloak (3.2.2)
-      json (~> 2.5.0)
-      jwt (~> 2.2.3)
-      rest-client (~> 2.1.0)
 
 GIT
   remote: https://github.com/ideacrew/openhbx_cv2.git
@@ -351,7 +341,7 @@ GEM
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
     bindex (0.8.1)
-    bootsnap (1.9.1)
+    bootsnap (1.4.8)
       msgpack (~> 1.0)
     brakeman (5.0.0)
     browser (2.7.0)
@@ -468,8 +458,8 @@ GEM
     curl (0.0.9)
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
-    database_cleaner (1.99.0)
-    deep_merge (1.2.1)
+    database_cleaner (1.8.3)
+    deep_merge (1.2.2)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     devise (4.7.1)
@@ -483,8 +473,6 @@ GEM
       warden-jwt_auth (~> 0.3.6)
     diff-lcs (1.4.4)
     docile (1.3.2)
-    domain_name (0.5.20190701)
-      unf (>= 0.0.5, < 1.0.0)
     dry-auto_inject (0.6.1)
       dry-container (>= 0.3.4)
     dry-configurable (0.9.0)
@@ -607,9 +595,6 @@ GEM
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
-    http-accept (1.7.0)
-    http-cookie (1.0.4)
-      domain_name (~> 0.5)
     httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
@@ -645,7 +630,7 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.5.1)
     jsonapi-renderer (0.2.2)
-    jwt (2.2.3)
+    jwt (2.2.1)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -741,7 +726,6 @@ GEM
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
-    netrc (0.11.0)
     newrelic_rpm (5.7.0.350)
     nio4r (2.5.5)
     nokogiri (1.10.10)
@@ -750,7 +734,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.9)
+    oj (3.13.11)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
@@ -767,9 +751,9 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    public_suffix (4.0.6)
-    puma (3.12.6)
-    pundit (2.1.1)
+    public_suffix (4.0.3)
+    puma (3.12.4)
+    pundit (2.1.0)
       activesupport (>= 3.0.0)
     queue-bus (0.12.0)
       multi_json
@@ -874,11 +858,6 @@ GEM
       redis (>= 3.3)
       resque (>= 1.26)
       rufus-scheduler (~> 3.2)
-    rest-client (2.1.0)
-      http-accept (>= 1.7.0, < 2.0)
-      http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
     rexml (3.2.4)
     roo (2.1.1)
       nokogiri (~> 1)
@@ -997,7 +976,7 @@ GEM
       rake
       serverengine (~> 2.0.5)
       thor
-    spring (2.1.1)
+    spring (1.7.2)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
       spring (>= 1.2, < 3.0)
@@ -1040,16 +1019,12 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.8)
     unicode-display_width (2.0.0)
     unicorn (4.9.0)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
     unidecoder (1.1.2)
-    vcr (3.0.3)
     vegas (0.1.11)
       rack (>= 1.0.0)
     virtus (1.0.5)
@@ -1139,6 +1114,7 @@ DEPENDENCIES
   ffaker
   financial_assistance!
   forgery (~> 0.7.0)
+  globalid
   haml (~> 5.0)
   httparty (~> 0.16)
   i18n (~> 1.5)
@@ -1147,11 +1123,10 @@ DEPENDENCIES
   interactor-rails (~> 2.2)
   jbuilder (~> 2.7)
   jquery-rails (~> 4.3)
-  jwt
+  jwt (~> 2.2.1)
   kaminari
   kaminari-actionview
   kaminari-mongoid
-  keycloak!
   language_list (~> 1)
   listen (>= 3.0.5, < 3.2)
   loofah (~> 2.3.1)
@@ -1221,7 +1196,6 @@ DEPENDENCIES
   uglifier (>= 4)
   ui_helpers!
   unicorn (~> 4.8)
-  vcr (~> 3.0, >= 3.0.1)
   virtus (~> 1.0)
   warden (~> 1.2.7)
   watir (~> 6.10.3)

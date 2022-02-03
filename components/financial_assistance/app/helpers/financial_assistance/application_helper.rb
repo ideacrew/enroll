@@ -103,10 +103,9 @@ module FinancialAssistance
 
     def claim_eligible_tax_dependents
       return if @application.blank? || @applicant.blank?
-      eligible_applicants = @application.active_applicants.map! do |applicant|
+      @application.active_applicants.where(is_claimed_as_tax_dependent: false).map! do |applicant|
         [applicant.full_name, applicant.id.to_s] if applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id
       end
-      eligible_applicants
     end
 
     def frequency_kind_options
@@ -275,7 +274,7 @@ module FinancialAssistance
     end
 
     def member_name_by_id(id)
-      ::FinancialAssistance::Applicant.find(id).full_name
+      ::FinancialAssistance::Applicant.find(id)&.full_name
     end
 
     def immigration_document_options_submission_url(application, model)
@@ -317,6 +316,12 @@ module FinancialAssistance
       return 'Submission Error' if application.mitc_magi_medicaid_eligibility_request_errored?
 
       application.aasm_state.titleize
+    end
+
+    def fetch_counties_by_zip(address)
+      return [] unless address&.zip
+
+      BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
     end
   end
 end

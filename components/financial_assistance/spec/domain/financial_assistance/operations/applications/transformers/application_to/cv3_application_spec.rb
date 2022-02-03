@@ -8,7 +8,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
   let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -130,6 +130,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should have notice_options with send_open_enrollment_notices set to false' do
       expect(result.value![:notice_options][:send_open_enrollment_notices]).to be_falsey
+    end
+
+    it 'should have notice_options with paper_notification set to true' do
+      expect(result.value![:notice_options][:paper_notification]).to be_truthy
     end
 
     it 'should have applicant with person hbx_id' do
@@ -380,13 +384,39 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income.to_f)
       end
     end
+
+    context 'nil money amounts' do
+      let!(:nil_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, aptc_csr_annual_household_income: nil) }
+
+      before do
+        applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination: nil_determination)
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+      end
+
+      it 'outputs 0.00 for nil magi_medicaid_monthly_household_income amounts' do
+        expect(@result.value!.dig(:tax_households, -1, :tax_household_members, -1, :product_eligibility_determination, :magi_medicaid_monthly_household_income)).to eql(0.00)
+      end
+
+      it 'outputs 0.00 for nil magi_medicaid_monthly_income_limit amounts' do
+        expect(@result.value!.dig(:tax_households, -1, :tax_household_members, -1, :product_eligibility_determination, :magi_medicaid_monthly_income_limit)).to eql(0.00)
+      end
+
+      it 'outputs 0.00 for nil amounts' do
+        expect(@result.value!.dig(:tax_households, 0, :annual_tax_household_income)).to eql(0.00)
+      end
+
+      it 'should return a valid entitiy' do
+        expect(@entity_init.success?).to be_truthy
+      end
+    end
   end
 
   context 'for renewal application' do
     let(:result) { subject.call(application) }
 
     before :each do
-      family.family_members.first.update_attributes(person_id: person.hbx_id)
+      family.family_members.first.update_attributes(person_id: person.id)
       applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
       application.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: 'renewal_draft',
@@ -1030,6 +1060,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         end
       end
     end
+
+    context 'applicant addresses' do
+      before do
+        @applicants = subject.call(application.reload).value![:applicants]
+      end
+
+      it 'should include county fips' do
+        addresses = @applicants.map {|applicant| applicant[:addresses]}.flatten
+        addresses.each do |address|
+          expect(address.keys.include?(:county_fips)).to eq true
+        end
+      end
+    end
   end
 
   context 'for mitc_income' do
@@ -1455,6 +1498,103 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'should return adjusted_gross_income for mitc_income' do
       expect(@mitc_income[:adjusted_gross_income]).to be_a Float
       expect(@mitc_income[:adjusted_gross_income]).not_to be_a Money
+    end
+  end
+
+  describe "#applicant_benchmark_premium" do
+    let(:result) { subject.call(application) }
+    context "when all applicants are valid" do
+
+      it "should successfully submit a cv3 application" do
+        expect(result).to be_success
+      end
+    end
+
+    # context "when a family member is deleted" do
+    #   before do
+    #     family.family_members.last.delete
+    #     family.reload
+    #   end
+
+    #   it "should unsuccessfully submit a cv3 application and get a failure response" do
+    #     expect(result).to_not be_success
+    #   end
+    # end
+  end
+
+  describe "#applicant is not applying for coverage" do
+    let!(:create_esi_benefit) do
+      emp_add = FinancialAssistance::Locations::Address.new({
+                                                              :address_1 => "123",
+                                                              :kind => "work",
+                                                              :city => "was",
+                                                              :state => "DC",
+                                                              :zip => "21312"
+                                                            })
+      emp_phone = FinancialAssistance::Locations::Phone.new({
+                                                              :kind => "work",
+                                                              :area_code => "131",
+                                                              :number => "2323212",
+                                                              :full_phone_number => "1312323212"
+                                                            })
+      benefit = ::FinancialAssistance::Benefit.new({
+                                                     :employee_cost => 500.00,
+                                                     :employer_id => '12-2132133',
+                                                     :kind => "is_enrolled",
+                                                     :insurance_kind => "employer_sponsored_insurance",
+                                                     :employer_name => "er1",
+                                                     :is_esi_waiting_period => false,
+                                                     :is_esi_mec_met => true,
+                                                     :esi_covered => "self",
+                                                     :start_on => Date.today.prev_year.beginning_of_month,
+                                                     :end_on => nil,
+                                                     :employee_cost_frequency => "monthly"
+                                                   })
+      benefit.employer_address = emp_add
+      benefit.employer_phone = emp_phone
+      applicant.benefits << benefit
+      applicant.update_attributes(is_applying_coverage: false, indian_tribe_member: true, tribal_name: "test",
+                                  tribal_state: 'DC', has_eligible_medicaid_cubcare: true, medicaid_cubcare_due_on: Date.today,
+                                  has_eligibility_changed: true, has_household_income_changed: true, medicaid_chip_ineligible: true, immigration_status_changed: true)
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @applicant = result.success[:applicants].first
+      @benefit = result.success[:applicants].first[:benefits].first
+    end
+
+    context 'with non-applicants' do
+      it 'should successfully generate a cv3 application with benefits' do
+        expect(@benefit).not_to be_nil
+      end
+
+      it 'should successfully generate a cv3 application with medicaid_and_chip information' do
+        expect(@applicant[:medicaid_and_chip]).not_to be_nil
+      end
+
+      it 'should successfully generate a cv3 application without ethnicity and race' do
+        expect(@applicant[:demographic][:ethnicity]).to eq []
+        expect(@applicant[:demographic][:race]).to be_nil
+      end
+
+      it 'should successfully generate a cv3 application without vlp_document' do
+        expect(@applicant[:vlp_document]).to be_nil
+      end
+
+      it 'should successfully generate a cv3 application with native_american_information' do
+        expect(@applicant[:native_american_information]).not_to be_nil
+      end
+
+      it 'should successfully generate a cv3 application with is_self_attested_long_term_care' do
+        expect(@applicant[:is_self_attested_long_term_care]).not_to be_nil
+      end
+
+      it 'should successfully generate a cv3 application with citizenship_immigration_status_information' do
+        expect(@applicant[:citizenship_immigration_status_information].present?).to eq true
+      end
     end
   end
 end

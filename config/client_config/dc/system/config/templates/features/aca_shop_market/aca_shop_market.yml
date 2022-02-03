@@ -13,7 +13,7 @@ registry:
         is_enabled: false
       - key: :benefit_application_reinstate
         item: BenefitSponsors::Operations::BenefitApplications::Reinstate.new
-        is_enabled: false
+        is_enabled: true
         settings:
            - key: :offset_months
              item: 0
@@ -57,10 +57,10 @@ registry:
           - key: :months
             item: 6
       - key: :prior_plan_year_shop_sep
-        is_enabled: false
+        is_enabled: true
         item: Operations::GeneratePriorPlanYearShopRenewals.new
         settings:
           - key: :offset_months
             item: 12
       - key: :admin_shop_end_date_changes
-        is_enabled: false
+        is_enabled: true

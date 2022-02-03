@@ -58,7 +58,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
     end
     let!(:hbx_enrollments) {[hbx_with_aptc_1]}
     before do
-      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_month + 14.days)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(start_on.year, 11,1) + 14.days)
       EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(true)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
       FactoryBot.create(:eligibility_determination, tax_household: tax_household)
@@ -110,6 +110,19 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       ed = FactoryBot.build(:eligibility_determination, tax_household: tax_household)
       expect(ed.persisted?).to be_falsey
       expect(::Operations::Individual::ApplyAggregateToEnrollment).not_to receive(:new)
+    end
+
+    context "for nil rating area id" do
+      before do
+        person.addresses.update_all(kind: "Zip code outside supported area")
+        ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+        @ed = FactoryBot.create(:eligibility_determination, tax_household: tax_household)
+        @ed.send(:apply_aptc_aggregate)
+      end
+
+      it 'should not create reinstatement enrollment' do
+        expect(family.hbx_enrollments.count).to eq 1
+      end
     end
   end
 

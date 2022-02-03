@@ -52,7 +52,17 @@ module Operations
           end
         end
 
-        Success(result)
+        incomplete_results = result.find_all do |_hbx_id, premium_hash|
+          premium_hash[:health_only_lcsp_premiums].blank? &&
+            premium_hash[:health_and_dental_lcsp_premiums].blank? &&
+            premium_hash[:health_and_ped_dental_lcsp_premiums].blank?
+        end
+
+        if incomplete_results.empty?
+          Success(result)
+        else
+          Failure("Could not calculate LCS premiums for #{incomplete_results.map(&:first).join(' ')}")
+        end
       end
     end
   end

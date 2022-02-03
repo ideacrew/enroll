@@ -5,7 +5,7 @@ require 'dry/monads/do'
 require 'rails_helper'
 
 RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_each do
-  let(:primary_applicant) { FactoryBot.create(:person, hbx_id: "732020") }
+  let(:primary_applicant) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "732020") }
   let(:dependent1) { FactoryBot.create(:person, hbx_id: "732021") }
   let(:dependent2) { FactoryBot.create(:person, hbx_id: "732022") }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
@@ -42,28 +42,80 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_
   describe '#transform_applications' do
 
     subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family) }
-    before do
-      create_instate_addresses
-      create_relationships
-      application.save!
-      allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
+
+    context "when application is invalid" do
+      before do
+        create_instate_addresses
+        create_relationships
+        application.save!
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
+      end
+
+      it "should throw a failure if cv3 application throws failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
     end
 
     context "when all applicants are valid" do
+      before do
+        create_instate_addresses
+        create_relationships
+        application.save!
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
+      end
 
       it "should successfully submit a cv3 application and get a response back" do
         expect(subject).to include(application)
       end
     end
 
-    context "when a family member is deleted" do
-      before do
-        family.family_members.last.delete
-        family.reload
-      end
+    # context "when a family member is deleted" do
+    #   before do
+    #     create_instate_addresses
+    #     create_relationships
+    #     application.save!
+    #     allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
+    #     family.family_members.last.delete
+    #     family.reload
+    #   end
 
-      it "should ignore the application and return an empty array" do
-        expect(subject).to be_empty
+    #   it "should ignore the application and return an empty array" do
+    #     expect(subject).to be_empty
+    #   end
+    # end
+  end
+
+  describe '#transform_households' do
+    let(:aasm_state) { 'coverage_selected' }
+    let!(:shopping_enrollment) do
+      create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :individual_unassisted,
+        family: family,
+        aasm_state: aasm_state,
+        product_id: product.id,
+        applied_aptc_amount: Money.new(44_500),
+        consumer_role_id: primary_applicant.consumer_role.id,
+        enrollment_members: family.family_members
+      )
+    end
+    let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
+    let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
+
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households) }
+
+    context 'when enrollment is in shopping state' do
+      let(:aasm_state) { 'shopping' }
+      it 'should not include hbx_enrollments in the hash' do
+        expect(subject[0][:hbx_enrollments]).to be_nil
+      end
+    end
+
+    context 'when enrollment is coverage_selected state' do
+      let(:aasm_state) { 'coverage_selected' }
+      it 'should include hbx_enrollments in the hash' do
+        expect(subject[0][:hbx_enrollments]).to be_present
       end
     end
   end

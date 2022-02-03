@@ -5,8 +5,7 @@ class PaymentTransactionsController < ApplicationController
 
   def generate_saml_response
     issuer = issuer_name(params[:enrollment_id])
-    connect_test = HTTParty.post(SamlInformation.send("#{issuer}_pay_now_url")) #checks to see if EA can connect to carrier payment portal.
-    status = connect_test.code if Rails.env.production?
+    status = carrier_connect_test(issuer) if Rails.env.production? #checks to see if EA can connect to carrier payment portal.
     result = Operations::GenerateSamlResponse.new.call({enrollment_id: params[:enrollment_id], source: params[:source]})
     if result.success?
       render json: {"SAMLResponse": result.value![:SAMLResponse], status: status, error: nil}
@@ -18,6 +17,11 @@ class PaymentTransactionsController < ApplicationController
   end
 
   private
+
+  def carrier_connect_test(issuer)
+    key = "#{issuer}_pay_now".to_sym
+    EnrollRegistry[key].setting(:connect_test).item ? HTTParty.post(SamlInformation.send("#{issuer}_pay_now_url")).code : 200
+  end
 
   def issuer_name(enr_id)
     enrollment = HbxEnrollment.by_hbx_id(enr_id).last if enr_id.present?

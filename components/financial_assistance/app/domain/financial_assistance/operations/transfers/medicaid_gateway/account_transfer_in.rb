@@ -11,6 +11,7 @@ module FinancialAssistance
         # This Operation creates a new family and application draft
         # Operation receives ATP payload from medicaid gateway
         class AccountTransferIn
+          include ::FinancialAssistance::MeCountyHelper
           include Dry::Monads[:result, :do]
 
           PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
@@ -30,9 +31,50 @@ module FinancialAssistance
 
           private
 
+          def county_finder(zip)
+            ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
+          end
+
+          def find_specific_county(town_name)
+            maine_counties_and_towns.detect { |key, _value| maine_counties_and_towns[key].include?(town_name) }&.first
+          end
+
+          def load_missing_county_names(payload)
+            zips_with_missing_counties = []
+            zips_with_multiple_counties = []
+            payload.dig("family", "family_members").each do |person|
+              addresses = person.dig("person", "addresses")
+              addresses.each do |address|
+                zip = address["zip"]
+                county = county_finder(zip)
+                address["county"] = county.first.county_name if county&.count == 1
+                zips_with_missing_counties << zip if county.blank?
+
+                next unless county.count > 1
+                town_name = address['city'].titleize
+                county_name = find_specific_county(town_name)
+
+                if county_name.present?
+                  address['county'] = county_name
+                else
+                  zips_with_multiple_counties << zip
+                end
+              end
+            end
+            return Failure("Unable to find county objects for zips #{zips_with_missing_counties.uniq}") if zips_with_missing_counties.present?
+            return Failure("Unable to match county for #{zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if zips_with_multiple_counties.present?
+            Success(payload)
+          rescue StandardError => e
+            Failure("load_missing_county_names #{e}")
+          end
+
           def load_data(payload = {})
             payload = payload.to_h.deep_stringify_keys!
-            decrypt_ssns(payload)
+            result = load_missing_county_names(payload)
+            return result if result.failure?
+
+            updated_payload = result.value!
+            decrypt_ssns(updated_payload)
           rescue StandardError => e
             Failure("load_data #{e}")
           end
@@ -194,9 +236,10 @@ module FinancialAssistance
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
-            exiting_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
-            return Success("checked relationship") if exiting_relationship && exiting_relationship.kind == relationship_kind
-            family.primary_person.ensure_relationship_with(person, relationship_kind)
+            existing_relationship = family.primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
+            return Success("checked relationship") if existing_relationship && existing_relationship.kind == relationship_kind
+            relationships = family.primary_person.ensure_relationship_with(person, relationship_kind)
+            relationships&.map(&:save!)
             Success("created relationship")
           rescue StandardError => e
             Failure("create_or_update_relationship: #{e}")
@@ -208,10 +251,10 @@ module FinancialAssistance
 
             compare_keys = ["address_1", "address_2", "city", "state", "zip"]
             sas = member.is_homeless? == primary.is_homeless? &&
-              member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
-              member.home_address.attributes.select {|k, _v| compare_keys.include? k} == primary.home_address.attributes.select do |k, _v|
-                                                                                           compare_keys.include? k
-                                                                                         end
+                  member.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
+                  member&.home_address&.attributes&.select {|k, _v| compare_keys.include? k} == primary&.home_address&.attributes&.select do |k, _v|
+                                                                                                  compare_keys.include? k
+                                                                                                end
             Success(sas)
           rescue StandardError => e
             Failure("same_address_with_primary: #{e}")
@@ -329,7 +372,8 @@ module FinancialAssistance
                 indian_tribe_member: applicant_hash['indian_tribe_member'],
                 tribal_id: applicant_hash['tribal_id'],
                 tribal_name: applicant_hash['tribal_name'],
-                tribal_state: applicant_hash['tribal_state']
+                tribal_state: applicant_hash['tribal_state'],
+                transfer_referral_reason: applicant_hash['transfer_referral_reason']
               }
             end
             Success(sanitize_params)
@@ -357,7 +401,7 @@ module FinancialAssistance
               date_of_death: person_hash['person_demographics']['date_of_death'],
               dob_check: person_hash['person_demographics']['dob_check'],
               race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
-              ethnicity: consumer_role_hash['is_applying_coverage'] ? [person_hash['race']] : nil,
+              ethnicity: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['ethnicity'] : nil,
               is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
               tribal_id: person_hash['person_demographics']['tribal_id'],
               tribal_name: person_hash['person_demographics']['tribal_name'],
@@ -442,14 +486,19 @@ module FinancialAssistance
               persisted_applicant.has_deductions = applicant[:has_deductions]
               persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
               persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
-
               persisted_applicant.incomes = applicant[:incomes]
               persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
               persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
+              persisted_applicant.transfer_referral_reason = applicant[:transfer_referral_reason]
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
+              ::FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant)
               persisted_applicant.save(validate: false)
+              persisted_applicant.relationships.each do |rel|
+                rel.save(validate: false)
+              end
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant, raise: false) # TODO: remove raise: false after FFE migration
+              ::FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant)
             end
             Success("Successfully transferred in account")
           rescue Mongoid::Errors::Validations => e

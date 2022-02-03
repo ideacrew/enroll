@@ -10,7 +10,8 @@ module Services
     def process_enrollments(new_date)
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments if new_date == new_date.beginning_of_year
-      send_enrollment_notice_for_ivl(new_date)
+      # Deprecate following methods when DC moved to new eligibilities model
+      send_enr_or_dr_notice_to_ivl(new_date)
       send_reminder_notices_for_ivl(new_date)
     end
 
@@ -78,21 +79,22 @@ module Services
       )
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
-      return [] unless EnrollRegistry[:legacy_enrollment_trigger].enabled?
-
+    # Triggers ENR or DR notice based on the application setting
+    def send_enr_or_dr_notice_to_ivl(new_date)
       @logger.info '*' * 50
-      @logger.info "Started send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
+      @logger.info "Started send_enr_or_dr_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
         begin
           person = family.primary_applicant.person
-          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+          if EnrollRegistry[:legacy_enrollment_trigger].enabled?
+            IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+          end
         rescue Exception => e
           Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
         end
       end
-      @logger.info "Ended send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
+      @logger.info "Ended send_enr_or_dr_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families
     end
 
@@ -107,9 +109,6 @@ module Services
           IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name)
           @logger.info "Sent #{event_name} to #{person.hbx_id}" unless Rails.env.test?
         end
-      elsif EnrollRegistry[:document_reminder_notice_trigger].enabled?
-        result = ::Operations::Notices::IvlDocumentReminderNotice.new.call(family: family)
-        reminder_notice_logger(result, person, event_name)
       end
     rescue StandardError => e
       @logger.info "Unable to trigger document reminder notice for hbx_id: #{person.hbx_id} due to #{e.inspect}"
@@ -139,7 +138,12 @@ module Services
     end
 
     def send_reminder_notices_for_ivl(date)
-      families = Family.outstanding_verification_datatable
+      families =
+        if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+          Family.outstanding_verifications_including_faa_datatable
+        else
+          Family.outstanding_verification_datatable
+        end
       return if families.blank?
 
       @logger.info '*' * 50
@@ -147,7 +151,7 @@ module Services
 
       families.each do |family|
         begin
-          next if family.has_valid_e_case_id? #skip assisted families
+          next if EnrollRegistry.feature_enabled?(:skip_aptc_families_from_document_reminder_notices) && family.has_valid_e_case_id? #skip assisted families
           consumer_role = family.primary_applicant.person.consumer_role
           person = family.primary_applicant.person
           if consumer_role.present? && family.best_verification_due_date.present? && (family.best_verification_due_date > date)

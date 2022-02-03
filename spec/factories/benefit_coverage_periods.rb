@@ -22,8 +22,8 @@ FactoryBot.define do
     trait :no_open_enrollment_coverage_period do
       start_on                 { Date.new(coverage_year, 1, 1) }
       end_on                   { Date.new(coverage_year, 12, 31) }
-      open_enrollment_start_on { Date.new(coverage_year, 1, 1) }
-      open_enrollment_end_on   { Date.new(coverage_year, 1, 1) }
+      open_enrollment_start_on { Date.new(coverage_year - 1, 11, 1) }
+      open_enrollment_end_on   { Date.new(coverage_year - 1, 12, 31) }
       benefit_packages { [FactoryBot.build(:benefit_package, coverage_year: coverage_year)] }
     end
 

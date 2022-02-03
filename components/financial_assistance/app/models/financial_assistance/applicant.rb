@@ -9,6 +9,8 @@ module FinancialAssistance
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
+    include Eligibilities::Visitors::Visitable
+    include GlobalID::Identification
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -89,6 +91,8 @@ module FinancialAssistance
 
     EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
 
+    EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -119,7 +123,6 @@ module FinancialAssistance
     field :is_resident_role, type: Boolean
     field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
-    field :is_consent_applicant, type: Boolean, default: false
     field :is_tobacco_user, type: String, default: 'unknown'
     field :vlp_document_id, type: String
 
@@ -279,8 +282,9 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
+    field :transfer_referral_reason, type: String
+
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
-    embeds_many :evidences, class_name: "::FinancialAssistance::Evidence"
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -291,7 +295,15 @@ module FinancialAssistance
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :evidences
+    # depricated, need to remove this after after data migration
+    embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
+
+    embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+    embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
+
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
@@ -301,6 +313,7 @@ module FinancialAssistance
     validate :presence_of_attr_other_qns, on: :other_qns
     validate :driver_question_responses, on: :submission
     validates :validate_applicant_information, presence: true, on: :submission
+    validate :is_temporarily_out_of_state, on: :submission, if: :living_outside_state?
 
     validate :strictly_boolean
 
@@ -316,7 +329,7 @@ module FinancialAssistance
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
 
-    attr_accessor :relationship
+    attr_accessor :relationship, :callback_update
 
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
@@ -328,6 +341,10 @@ module FinancialAssistance
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
+
+    def accept(visitor)
+      visitor.visit(self)
     end
 
     def csr_percent_as_integer=(new_csr_percent)
@@ -549,6 +566,11 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
+    # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
+    def is_spouse_of_primary
+      application.relationships.where(applicant_id: id, kind: 'spouse', relative_id: application.primary_applicant.id).present?
+    end
+
     def eligibility_determination_of_spouse
       return nil unless has_spouse
       spouse_relationship.relative.eligibility_determination
@@ -705,18 +727,32 @@ module FinancialAssistance
       eligibility_determination
     end
 
+    # If there is no claimed_as_tax_dependent_by, return true
+    # if there is a claimed_as_tax_dependent_by, make sure that the application
+    # has an applicant with that id
+    def covering_applicant_exists?
+      return true if claimed_as_tax_dependent_by.blank?
+      tax_claimer_present = application.applicants.where(_id: claimed_as_tax_dependent_by).present?
+      errors.add(:base, "Applicant claiming #{self.full_name} as tax dependent not present.") if tax_claimer_present.blank?
+      tax_claimer_present
+    end
+
     def applicant_validation_complete?
       if is_applying_coverage
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           benefits.all? {|benefit| benefit.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists? &&
+          ssn_present? &&
+          (FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) ? medicare_eligible_qns : true)
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? &&
+          covering_applicant_exists?
       end
     end
 
@@ -729,7 +765,12 @@ module FinancialAssistance
     end
 
     def format_citizen
-      CITIZEN_KINDS[citizen_status.to_sym]
+      return "" unless citizen_status.present?
+      if !is_applying_coverage && citizen_status == "not_lawfully_present_in_us" && FinancialAssistanceRegistry.feature_enabled?(:non_applicant_citizen_status)
+        l10n("faa.not_applicable_abbreviation")
+      else
+        CITIZEN_KINDS[citizen_status.to_sym]
+      end
     end
 
     def student_age_satisfied?
@@ -750,7 +791,10 @@ module FinancialAssistance
       questions_array << is_physically_disabled if is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:question_required)
       questions_array << pregnancy_due_on if is_pregnant && FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required)
       questions_array << children_expected_count if is_pregnant
-      questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
+      if is_post_partum_period && is_applying_coverage
+        questions_array << pregnancy_end_on
+        questions_array << is_enrolled_on_medicaid if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
+      end
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
@@ -760,6 +804,14 @@ module FinancialAssistance
       !is_required_to_file_taxes.nil? &&
         !is_claimed_as_tax_dependent.nil? &&
         filing_as_head
+    end
+
+    def tax_info_complete_unmarried_child?
+      filing_as_head = (!FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && is_claimed_as_tax_dependent == false)
+      !is_required_to_file_taxes.nil? &&
+        !is_claimed_as_tax_dependent.nil? &&
+        filing_as_head &&
+        !is_joint_tax_filing.nil?
     end
 
     def incomes_complete?
@@ -905,6 +957,7 @@ module FinancialAssistance
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && person_coverage_end_on.blank?
       return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
       return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
       return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
@@ -921,9 +974,10 @@ module FinancialAssistance
     end
 
     def admin_verification_action(action, v_type, update_reason)
-      if action == "verify"
+      case action
+      when "verify"
         update_verification_type(v_type, update_reason)
-      elsif action == "return_for_deficiency"
+      when "return_for_deficiency"
         return_doc_for_deficiency(v_type, update_reason)
       end
     end
@@ -1085,6 +1139,77 @@ module FinancialAssistance
       current_month_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
     end
 
+    def create_evidences
+      create_evidence(:local_mec, "Local MEC") if FinancialAssistanceRegistry.feature_enabled?(:mec_check)
+      create_evidence(:esi_mec, "ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      create_evidence(:non_esi_mec, "Non ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+    end
+
+    def create_eligibility_income_evidence
+      return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
+
+      self.create_income_evidence(key: :income, title: "Income", is_satisfied: true)
+      income_evidence.move_to_pending! if incomes.present?
+      income_evidence
+    end
+
+    def create_evidence(key, title)
+      return unless is_ia_eligible? || is_applying_coverage
+      association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
+      self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
+    rescue StandardError => e
+      Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
+    end
+
+    def update_evidence_histories(assistance_evidences)
+      assistance_evidences.each do |evidence_name|
+        evidence_record = self.send(evidence_name)
+        evidence_record&.add_verification_history('application_determined', 'Requested Hub for verification', 'system')
+      end
+
+      self.save
+    end
+
+    def schedule_verification_due_on
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      TimeKeeper.date_of_record + verification_document_due.days
+    end
+
+    def enrolled_with(_enrollment)
+      return unless income_evidence&.pending?
+      income_evidence.due_on = schedule_verification_due_on if income_evidence.due_on.blank?
+      set_evidence_outstanding(income_evidence)
+    end
+
+    def set_income_evidence_verified
+      return unless income_evidence.may_move_to_verified?
+
+      income_evidence.verification_outstanding = false
+      income_evidence.due_on = nil
+      income_evidence.is_satisfied = true
+      income_evidence.move_to_verified
+      save!
+    end
+
+    # rubocop:disable Metrics/Naming/AccessorMethodName
+    def set_evidence_verified(evidence)
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.move_to_verified unless evidence.attested?
+      save!
+    end
+
+    def set_evidence_outstanding(evidence)
+      return unless evidence.may_move_to_outstanding?
+
+      evidence.verification_outstanding = true
+      evidence.is_satisfied = false
+      evidence.move_to_outstanding
+      save!
+    end
+    # rubocop:enable Metrics/Naming/AccessorMethodName
+
     class << self
       def find(id)
         return nil unless id
@@ -1107,6 +1232,12 @@ module FinancialAssistance
     #use this method to check what evidences needs to be included on notices
     def unverified_evidences
       evidences.find_all(&:type_unverified?)
+    end
+
+    def ssn_present?
+      errors.add(:base, 'no ssn present.') if no_ssn == '0' && ssn.blank?
+      return false if no_ssn == '0' && ssn.blank?
+      true
     end
 
     private
@@ -1135,7 +1266,11 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
+      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_pregnant
+    end
+
+    def living_outside_state?
+      EnrollRegistry.feature_enabled?(:living_outside_state)
     end
 
     def driver_question_responses
@@ -1144,7 +1279,7 @@ module FinancialAssistance
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
-        instance_check_method = instance_type + "_exists?"
+        instance_check_method = "#{instance_type}_exists?"
 
         # Add error to attribute that has a nil value.
         errors.add(attribute, "#{attribute.to_s.titleize} can not be a nil") if send(attribute).nil?
@@ -1166,7 +1301,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_step_1
-      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
+      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && is_spouse_of_primary
 
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 
@@ -1187,7 +1322,8 @@ module FinancialAssistance
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?
         # Enrolled on medicaid must check if nil
-        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
+        is_enrolled_on_medicaid_not_answered = is_enrolled_on_medicaid.nil? && is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
+        errors.add(:is_enrolled_on_medicaid, "'#{l10n('faa.other_ques.is_enrolled_on_medicaid')}' #{l10n('faa.errors.should_be_answered')}") if is_enrolled_on_medicaid_not_answered
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
@@ -1273,9 +1409,9 @@ module FinancialAssistance
 
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
-      if is_active
+      if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
-        create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+        create_or_update_result = ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
@@ -1286,6 +1422,7 @@ module FinancialAssistance
     end
 
     def propagate_destroy
+      return if callback_update
       delete_params = {:family_id => application.family_id, :person_hbx_id => person_hbx_id}
       ::Operations::Families::DropFamilyMember.new.call(delete_params)
 

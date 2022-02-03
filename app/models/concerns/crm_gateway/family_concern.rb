@@ -5,7 +5,12 @@ module CrmGateway
   module FamilyConcern
     extend ActiveSupport::Concern
     included do
-      after_save :trigger_crm_family_update_publish
+      after_save :trigger_async_publish
+    end
+
+    def trigger_async_publish
+      return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
+      CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_crm_family_update_publish)
     end
 
     def trigger_crm_family_update_publish

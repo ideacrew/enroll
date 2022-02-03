@@ -274,7 +274,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 190,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -372,6 +372,26 @@
       "note": ""
     },
     {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "5422444e7f2f2ee38545a0181b07ead8b4b7e5304f41a594778fe1c48b1c190b",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/exceptions_controller.rb",
+      "line": 21,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(file => \"public/#{(params[:code] or 500)}.html\", { :status => ((params[:code] or 500)), :layout => false })",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ExceptionsController",
+        "method": "show"
+      },
+      "user_input": "params[:code]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "552c3f77ff5d9e92a4efe636c41cb51596c1387ff9f57ba4e19b553f874d6706",
@@ -446,7 +466,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 186,
+          "line": 190,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -686,6 +706,22 @@
       "note": ""
     },
     {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 121,
+      "fingerprint": "9a3951031616a07c8e02c86652f537e92c08685da97f5ec2b12d5d3602b55bb8",
+      "check_name": "EOLRuby",
+      "message": "Support for Ruby 2.5.1 ended on 2021-03-31",
+      "file": "Gemfile.lock",
+      "line": 770,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "b122d2f7957b4b965ade2855ead1eda0b76571257de543ed1ead416bd5a54418",
@@ -726,6 +762,26 @@
       "note": ""
     },
     {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "c91b6616e76312d2e686dfb12ae27d00ddca89d40690b61f5798edcb37aa6ad5",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "components/financial_assistance/app/controllers/financial_assistance/verification_documents_controller.rb",
+      "line": 113,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "@docs_owner.send(params[:evidence_kind])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "FinancialAssistance::VerificationDocumentsController",
+        "method": "find_type"
+      },
+      "user_input": "params[:evidence_kind]",
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "cd6894cae7988763b05d81ee9348df6b72d3f4b900c4db77c473c27b077d1424",
@@ -743,6 +799,26 @@
       },
       "user_input": "@target_config_folder",
       "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "cf976b939c38f3829acf6b61bdac9f275d30d87a17ef72a6b18ca4bed60d7626",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/exceptions_controller.rb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(action => (params[:code] or 500).to_s, { :status => ((params[:code] or 500)) })",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ExceptionsController",
+        "method": "show"
+      },
+      "user_input": "params[:code]",
+      "confidence": "High",
       "note": ""
     },
     {
@@ -824,8 +900,28 @@
       "user_input": "EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier",
       "confidence": "Medium",
       "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "fe091e35222c7350dd304ed5916f06adccf2544e596f991c680011db3bcd801f",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "components/financial_assistance/app/controllers/financial_assistance/evidences_controller.rb",
+      "line": 83,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "@docs_owner.send(params[:evidence_kind])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "FinancialAssistance::EvidencesController",
+        "method": "find_type"
+      },
+      "user_input": "params[:evidence_kind]",
+      "confidence": "High",
+      "note": ""
     }
   ],
-  "updated": "2021-11-15 12:22:31 -0500",
-  "brakeman_version": "5.0.0"
+  "updated": "2021-12-27 17:20:42 -0500",
+  "brakeman_version": "5.1.1"
 }

@@ -106,4 +106,16 @@ class AdminHomepage
   def self.log_out_link
     '.interaction-click-control-logout'
   end
+
+  def self.medicaid_banner_text
+    '[data-cuke="medicaid-banner-text"]'
+  end
+
+  def self.chat_button
+    '[data-cuke="chat-button"]'
+  end
+
+  def self.bot_button
+    '[data-cuke="bot-button"]'
+  end
 end

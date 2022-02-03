@@ -110,7 +110,7 @@ describe "match a person in db" do
       expect(subject.match_person).to eq db_person
     end
 
-    it 'matches the person ingoring case' do
+    it 'matches the person ignoring case' do
       subject.first_name.upcase!
       subject.last_name.downcase!
       expect(subject.match_person).to eq db_person
@@ -138,6 +138,22 @@ describe "match a person in db" do
       expect(subject.match_person).to eq db_person
     end
 
+    it 'matches the person ingoring case' do
+      subject.first_name.upcase!
+      subject.last_name.downcase!
+      expect(subject.match_person).to eq db_person
+    end
+
+    it 'should pass validation when names passed with case mismatch' do
+      allow(subject).to receive(:state_based_policy_satisfied?).and_return(true)
+
+      subject.first_name.upcase!
+      subject.last_name.downcase!
+
+      expect(subject.state_based_policy_satisfied?).to be_truthy
+      expect(subject.valid?).to be_truthy
+    end
+
     it 'does not find the person if payload has a different ssn from the person' do
       subject.ssn = "888891234"
       expect(subject.match_person).to eq nil
@@ -158,9 +174,31 @@ describe "match a person in db" do
     end
     let!(:db_person) { Person.create!(first_name: "test",   last_name: "o",   dob: "1943-05-14", ssn: "517994321")}
 
+    let(:person_match_policy) do
+      double(
+        settings: [
+          {
+            key: :ssn_present,
+            item: %w[first_name last_name dob encrypted_ssn]
+          },
+          { key: :dob_present, item: %w[first_name last_name dob] }
+        ],
+        enabled?: true
+      )
+    end
+
+    let(:enroll_app) { double }
+
     it 'should be invalid' do
       allow(described_class).to receive(:state_based_policy_satisfied?).and_return(true)
       described_class.instance_variable_set(:@configuration, {ssn_present: ["first_name", "last_name", "dob", "encrypted_ssn"]})
+      allow(enroll_app).to receive(:settings).and_return(double(item: 'test'))
+      allow(EnrollRegistry).to receive(:[])
+        .with(:person_match_policy)
+        .and_return(person_match_policy)
+      allow(EnrollRegistry).to receive(:[])
+        .with(:enroll_app)
+        .and_return(enroll_app)
       expect(described_class.valid?).to eq false
     end
   end

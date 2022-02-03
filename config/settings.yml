@@ -192,7 +192,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2020,11,1) %>
-      end_on: <%= Date.new(2021,10,31) %>
+      end_on: <%= Date.new(2022,2,4) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
@@ -342,9 +342,9 @@ aca:
 notices:
   individual_market:
     mail_address:
-      address_1: "1225 I Street NW, Suite 400"
+      address_1: "PO Box 44018"
       city: "Washington"
-      zip_code: "20005"
+      zip_code: "20026"
 
   shop_market:
     mail_address:

@@ -10,11 +10,11 @@ RSpec.describe "insured/families/_navigate_to_curam_for_documents.html.erb" do
     end
 
     it "should have text" do
-      expect(rendered).to have_content("Medicaid & Tax Credits")
+      expect(rendered).to have_content(l10n("insured.families.medicaid_and_tax_credits"))
     end
 
     it "should have a link" do
-      expect(rendered).to have_link('Medicaid & Tax Credits')
+      expect(rendered).to have_link(l10n("insured.families.medicaid_and_tax_credits"))
     end
 
     it "should have text for documents" do

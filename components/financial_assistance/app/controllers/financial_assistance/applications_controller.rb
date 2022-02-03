@@ -5,6 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
+    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
@@ -17,6 +18,8 @@ module FinancialAssistance
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
+    # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
+    # DO NOT include applications from other families.
     def index
       @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
     end
@@ -29,8 +32,6 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      # @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id])
 
       load_support_texts
     end
@@ -44,6 +45,7 @@ module FinancialAssistance
       model_params = params[model_name]
       @model.clean_conditional_params(model_params) if model_params.present?
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
+      @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
 
       # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)
@@ -55,13 +57,25 @@ module FinancialAssistance
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
               return
             end
-            @application.submit! if @application.complete? && @application.may_submit?
-            publish_result = determination_request_class.new.call(application_id: @application.id)
-            if publish_result.success?
-              redirect_to wait_for_eligibility_response_application_path(@application)
+            if @application.complete? && @application.may_submit?
+              @application.submit!
+              publish_result = determination_request_class.new.call(application_id: @application.id)
+              if publish_result.success?
+                redirect_to wait_for_eligibility_response_application_path(@application)
+              else
+                @application.unsubmit! if @application.may_unsubmit?
+                flash_message = case publish_result.failure
+                                when Dry::Validation::Result
+                                  { error: validation_errors_parser(publish_result.failure) }
+                                when Exception
+                                  { error: publish_result.failure.message }
+                                else
+                                  { error: "Submission Error: #{publish_result.failure}" }
+                                end
+                redirect_to application_publish_error_application_path(@application), flash: flash_message
+              end
             else
-              @application.unsubmit! if @application.may_unsubmit?
-              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: #{publish_result.failure}" }
+              redirect_to application_publish_error_application_path(@application), flash: { error: build_error_messages(@model) }
             end
           else
             render 'workflow/step'
@@ -69,7 +83,7 @@ module FinancialAssistance
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
-          flash[:error] = build_error_messages(@model)
+          flash[:error] = build_error_messages(@model).join(", ")
           render 'workflow/step'
         end
       else
@@ -101,14 +115,12 @@ module FinancialAssistance
     end
 
     def application_year_selection
-      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance'
     end
 
     def application_checklist
-      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
@@ -116,10 +128,15 @@ module FinancialAssistance
     def review_and_submit
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       @all_relationships = @application.relationships
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
+      flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
+
+      unless @application.valid_relations?
+        redirect_to application_relationships_path(@application)
+        flash[:error] = l10n("faa.errors.inconsistent_relationships_error")
+      end
       redirect_to applications_path if @application.blank?
     end
 
@@ -137,12 +154,11 @@ module FinancialAssistance
         return
       end
 
-      @application = FinancialAssistance::Application.where(id: params['id']).first
+      @application = FinancialAssistance::Application.where(id: params['id'], family_id: get_current_person.financial_assistance_identifier).first
 
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
       else
-        redirect_to applications_path unless @application.family_id == get_current_person.financial_assistance_identifier
 
         @applicants = @application.active_applicants
         @all_relationships = @application.relationships
@@ -167,34 +183,31 @@ module FinancialAssistance
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       render layout: 'financial_assistance'
     end
 
     def eligibility_results
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
     end
 
     def eligibility_response_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
     end
 
     def check_eligibility_results_received
-      application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
-      render :plain => (application.success_status_codes?(application.determination_http_status_code) && application.determined?).to_s
+      application = find_application
+      render :plain => eligibility_results_received?(application).to_s
     end
 
     def checklist_pdf
@@ -220,6 +233,34 @@ module FinancialAssistance
     end
 
     private
+
+    def eligibility_results_received?(application)
+      application.success_status_codes?(application.determination_http_status_code) && application.determined?
+    end
+
+    def validation_errors_parser(result)
+      result.errors.each_with_object([]) do |error, collect|
+        collect << if error.is_a?(Dry::Schema::Message)
+                     message = error.path.reduce("The ") do |attribute_message, path|
+                       next_element = error.path[(error.path.index(path) + 1)]
+                       attribute_message + if next_element.is_a?(Integer)
+                                             "#{(next_element + 1).ordinalize} #{path.to_s.humanize.downcase}'s "
+                                           elsif path.is_a? Integer
+                                             ""
+                                           else
+                                             "#{path.to_s.humanize.downcase}:"
+                                           end
+                     end
+                     message + " #{error.text}."
+                   else
+                     error.flatten.flatten.join(',').gsub(",", " ").titleize
+                   end
+      end
+    end
+
+    def build_error_messages(model)
+      model.errors.full_messages
+    end
 
     def haven_determination_is_enabled?
       FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
@@ -255,10 +296,6 @@ module FinancialAssistance
       end
     end
 
-    def build_error_messages(model)
-      model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
-    end
-
     def hash_to_param(param_hash)
       ActionController::Parameters.new(param_hash)
     end
@@ -268,7 +305,7 @@ module FinancialAssistance
     end
 
     def find
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier) if params.key?(:id)
+      find_application
     end
 
     def save_faa_bookmark(url)
@@ -301,11 +338,11 @@ module FinancialAssistance
       jobs.each do |job|
         job_hash[job.id] = {
           "Employer Name" => job.employer_name,
-          "EMPLOYER ADDRESSS LINE 1" => job.employer_address&.address_1,
-          "EMPLOYER ADDRESSS LINE 2" => job.employer_address&.address_2,
-          "CITY" => job.employer_address&.city,
-          "STATE" => job.employer_address&.state,
-          "ZIP" => job.employer_address&.zip,
+          "EMPLOYER ADDRESSS LINE 1" => job&.employer_address&.address_1,
+          "EMPLOYER ADDRESSS LINE 2" => job&.employer_address&.address_2,
+          "CITY" => job&.employer_address&.city,
+          "STATE" => job&.employer_address&.state,
+          "ZIP" => job&.employer_address&.zip,
           "EMPLOYER PHONE " => job.employer_phone&.full_phone_number
         }
       end

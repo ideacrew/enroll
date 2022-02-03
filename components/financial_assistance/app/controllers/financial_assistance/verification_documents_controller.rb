@@ -7,7 +7,7 @@ module FinancialAssistance
     include VerificationHelper
 
     before_action :fetch_applicant
-    before_action :updateable?, :find_type, only: [:upload, :update_evidence]
+    before_action :updateable?, :find_type, only: [:upload, :update_evidence, :download]
     before_action :set_document, only: [:destroy]
 
     def upload
@@ -46,30 +46,17 @@ module FinancialAssistance
       end
     end
 
-    def update_evidence
-      update_reason = params[:verification_reason]
-      admin_action = params[:admin_action]
-      reasons_list = FinancialAssistance::Document::VERIFICATION_REASONS + FinancialAssistance::Document::REJECT_REASONS
-      if reasons_list.include?(update_reason)
-        verification_result = admin_verification_action(admin_action, @evidence, update_reason)
-        message = (verification_result.is_a? String) ? verification_result : "Verification successfully approved."
-        flash[:success] =  message
-        update_documents_status(@applicant) if @applicant
-      else
-        flash[:error] = "Please provide a verification reason."
-      end
-
-      redirect_to main_app.verification_insured_families_path
-    end
-
     def destroy
       @document.delete if @evidence.type_unverified?
       if @document.destroyed?
+        add_verification_history(@document)
         @docs_owner.save!
 
         if (@evidence.documents - [@document]).empty?
-          @evidence.update_attributes(:eligibility_status => "outstanding", :update_reason => "all documents deleted")
-          update_documents_status(@docs_owner)
+          applicant = @evidence.evidenceable
+          applicant.set_evidence_outstanding(@evidence)
+          @evidence.update_attributes(:update_reason => "all documents deleted", updated_by: current_user.oim_id)
+          # update_documents_status(@docs_owner)
           flash[:danger] = "All documents were deleted. Action needed"
         else
           flash[:success] = "Document deleted."
@@ -125,7 +112,7 @@ module FinancialAssistance
     def find_type
       fetch_applicant
       find_docs_owner
-      @evidence = @docs_owner.evidences.find(params[:evidence]) if params[:evidence]
+      @evidence = @docs_owner.send(params[:evidence_kind]) if @docs_owner.respond_to?(params[:evidence_kind])
     end
 
     def file_path(file)
@@ -136,22 +123,18 @@ module FinancialAssistance
       file.original_filename
     end
 
-    def update_documents_status(applicant)
-      family = applicant.family
-      family.update_family_document_status!
-    end
-
     def update_documents(title, file_uri)
       document = @evidence.documents.build
       success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
-      @evidence.update_attributes(:rejected => false, :eligibility_status => "review", :update_reason => "document uploaded")
+      @evidence.move_to_review!
+      @evidence.update_attributes(:update_reason => "document uploaded", updated_by: current_user.oim_id)
       @doc_errors = document.errors.full_messages unless success
-      update_documents_status(@docs_owner)
+      # update_documents_status(@docs_owner)
       @docs_owner.save!
     end
 
     def get_document(key)
-      documents = @applicant.evidences.flat_map(&:documents)
+      documents = @evidence.documents
 
       documents.detect do |doc|
         next if doc.identifier.blank?
@@ -168,9 +151,17 @@ module FinancialAssistance
     end
 
     def add_verification_history(file)
-      actor = current_user ? current_user.email : "external source or script"
-      action = "Upload #{file_name(file)}" if params[:action] == "upload"
-      @evidence.add_verification_history(action: action, modifier: actor)
+      actor = current_user ? current_user.oim_id : "external source or script"
+      action = case params[:action]
+               when "upload"
+                 "Upload #{file_name(file)}"
+               when "destroy"
+                 "Delete #{file.title}"
+               end
+
+      verification_history = Eligibilities::VerificationHistory.new(action: action, updated_by: actor)
+      @evidence.verification_histories << verification_history
+      @evidence.save!
     end
   end
 end

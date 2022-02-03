@@ -69,11 +69,7 @@ module Queries
     def klass
       return @klass if defined? @klass
 
-      @klass = if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
-                 Family.outstanding_verifications_including_faa_datatable
-               else
-                 Family.outstanding_verification_datatable
-               end
+      @klass = Family.outstanding_verification_datatable
     end
 
     def size

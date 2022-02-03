@@ -12,22 +12,21 @@ Feature: Update DOB and SSN
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
     And Patrick Doe has a consumer role and IVL enrollment
 
-  @flaky
   Scenario: Admin enters invalid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And Admin clicks Families tab
-    When the user clicks Action for a person on families index page
-    Then the user will see the Edit DOB SSN button
-    When user clicks on edit DOB/SSN link
-    When user enters an invalid SSN and clicks on update
-    Then Hbx Admin should see the edit form being rendered again with a validation error message
+    When Admin clicks Action for a person on families index page
+    Then HBX Admin will see the Edit DOB / SSN button
+    When HBX Admin clicks on Edit DOB / SSN
+    When Admin enters a invalid SSN and clicks on update
+    Then Admin should see the edit form being rendered again with a validation error message
 
   Scenario: Admin enters valid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And EnrollRegistry location_residency_verification_type feature is enabled
     And Admin clicks Families tab
-    When the user clicks Action for a person on families index page
-    Then the user will see the Edit DOB SSN button
-    When user clicks on edit DOB/SSN link
-    When Hbx Admin enters a valid DOB and SSN and clicks on update
-    Then Hbx Admin should see the update partial rendered with update sucessful message
+    When Admin clicks Action for a person on families index page
+    Then HBX Admin will see the Edit DOB / SSN button
+    When HBX Admin clicks on Edit DOB / SSN
+    When Admin enters a valid DOB and SSN and clicks on update
+    Then Admin should see the update partial rendered with update sucessful message

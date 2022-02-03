@@ -1,15 +1,17 @@
+<% evidence_type = evidence.title %>
+
 <!-- ***** Verification reason ***** -->
 <div class="row">
   <div class="verification-update-reason col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}"%>>
     <div class="col-md-6">
       Provide verification reason:
     </div>
-    <%= form_tag financial_assistance.application_applicant_verification_documents_update_evidence_path(application, applicant), method: :put do %>
+    <%= form_tag financial_assistance.application_applicant_evidences_update_evidence_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
-        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'verify' %>
         <div class="form-group col-md-3">
-          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Document::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
+          <%= select_tag :verification_reason, options_for_select(::Eligibilities::Evidence::VERIFY_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -25,12 +27,12 @@
     <div class="col-md-6">
       Reject reason:
     </div>
-    <%= form_tag financial_assistance.application_applicant_verification_documents_update_evidence_path(application, applicant), method: :put do %>
+    <%= form_tag financial_assistance.application_applicant_evidences_update_evidence_path(application, applicant), method: :put do %>
         <%= hidden_field_tag 'applicant_id', applicant.id  %>
-        <%= hidden_field_tag 'evidence', evidence.id %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
         <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
         <div class="form-group col-md-3">
-          <%= select_tag :verification_reason, options_for_select(FinancialAssistance::Document::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
+          <%= select_tag :verification_reason, options_for_select(::Eligibilities::Evidence::REJECT_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
@@ -39,4 +41,112 @@
   </div>
 </div>
 <!-- ==== reject reason ==== -->
+
+<!-- ***** FDSH hub request ***** -->
+<div class="row">
+  <div class="fedhub-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-hub"%>>
+    <div class="col-md-9">
+       <p>New request to the FDSH will be sent.</p>
+    </div>
+    <%= form_tag financial_assistance.application_applicant_evidences_fdsh_hub_request_path(application, applicant), method: :post do %>
+        <%= hidden_field_tag 'applicant_id', applicant.id  %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
+        <%= hidden_field_tag 'admin_action', 'hub_request' %>
+        <div class="col-md-3">
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+        </div>
+    <%end%>
+  </div>
+</div>
+<!-- ====  FDSH hub request ==== -->
+
+<!-- ***** Extend ***** -->
+<div class="row">
+  <div class="extend-request col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-extend"%>>
+    <div class="col-md-6">
+      <p>Do you want to Extend Due Date for verification type</p>
+    </div>
+    <%= form_tag financial_assistance.application_applicant_evidences_extend_due_date_path(application, applicant), method: :put do %>
+        <%= hidden_field_tag 'applicant_id', applicant.id  %>
+        <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
+        <%= hidden_field_tag 'admin_action', 'extend' %>
+
+        <div class="col-md-3">
+          <%= link_to "Cancel", main_app.verification_insured_families_path, class: "btn btn-default v-type-confirm-button" %>
+        </div>
+        <div class="col-md-3">
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+        </div>
+    <%end%>
+  </div>
+</div>
+<!-- ==== Extend request ==== -->
+
+<!-- ***** View History ***** -->
+<div class="row">
+  <div class="view-history col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-history"%>>
+    <div>
+      <h5>Verification History</h5>
+      <table class="table table-bordered table-hover table-responsive">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Date</th>
+          <th scope="col">Action</th>
+          <th scope="col">Modifier/Transaction Id</th>
+          <th scope="col">Update Reason</th>
+          <th scope="col">Details</th>
+        </tr>
+        </thead>
+        <tbody>
+          <% evidence.verification_histories.each_with_index do |record, index| %>
+            <tr>
+              <th scope="row"><%= index + 1 %></th>
+              <td><%= record.created_at.in_time_zone('Eastern Time (US & Canada)') %></td>
+              <td><%= record.action.capitalize %></td>
+              <td><%= record.updated_by %></td>
+              <td><%= record.update_reason %></td>
+            </tr>
+          <% end %>
+          <% evidence.request_results.each_with_index do |record, index| %>
+            <tr>
+              <th scope="row"><%= index + 1 %></th>
+              <td><%= record.created_at.in_time_zone('Eastern Time (US & Canada)') %></td>
+              <td><%= "Hub Call" %></td>
+              <td><%= record.source_transaction_id %></td>
+              <td><%= "Fdsh HUb Call" %></td>
+              <td>
+                <% if record.raw_payload.present? %>
+                    <button type="button" data-toggle="modal" data-target=<%="#record_details_#{record.id}" %>>Payload</button>
+                <% end %>
+              </td>
+            </tr>
+            <div class="modal fade" id=<%="record_details_#{record.id}" %>  tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title"><%= "#{evidence.title.capitalize} payload" %></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <%= JSON.parse(record.raw_payload) if record.raw_payload.present? %>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ==== view history ==== -->
+
+
+
 

@@ -21,19 +21,19 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the job income form should not show
     And NO should be selected again for job income
 
-  
+
   Scenario: User answers no to having job income
     Given the user answers no to having an income from an employer
     Then the job income form should not show
-  
+
   Scenario: User answers no to having self employment income
     Given the user answers no to having self employment income
     Then self employment form should not show
-  
+
   Scenario: User answers yes to having job income
     Given the user answers yes to having and income from an employer
     Then the job income form should show
-  
+
   Scenario: "Continue" button should be enabled after selecting "No" on both income questions
     Given the user answers no to having an income from an employer
     Then the job income form should not show
@@ -43,25 +43,25 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     When the user clicks CONTINUE
     Then the user will be on the Other Income page
     And there will be a checkmark next to the completed Job Income page link
-  
+
   Scenario: User answers yes to having self employment income
     Given the user answers yes to having self employment income
     Then self employment form should show
-  
+
   Scenario: User enters employer information
     Given the user answers yes to having and income from an employer
     And the user fills out the required employer information
     Then the save button should be enabled
     And the user saves the employer information
     Then the employer information should be saved on the page
-  
+
   Scenario: User enters employer information with end date less than start date
     Given the user answers yes to having and income from an employer
     And the user fills out the required employer information with incorrect dates
     Then the save button should be enabled
     And the user saves the employer information
-    Then I should see a JS alert
-  
+    Then the user should see a JS alert
+
   Scenario: User enters employer information when there is more than one employer
     Given the user has entered at least one job income information
     When the Add Another Job Income link appears
@@ -71,8 +71,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the save button should be enabled
     And the user saves the employer information
     Then the new employer information should be saved on the page
-  
-  @flaky
+
   Scenario: User enters self employment information
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information
@@ -80,14 +79,13 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the self employment information
     Then the self employment information should be saved on the page
 
-  
   Scenario: User enters self employment information with end date less than start date
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information with incorrect dates
     Then the save button should be enabled
     And the user saves the self employment information
     # Then I should see a JS alert
-  
+
   Scenario: User enters self employment information when there is more than one self employment income
     Given the user has entered at least one self employment information
     When the Add Another Self Employment link appears
@@ -97,15 +95,15 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the save button should be enabled
     And the user saves the self employment information
     Then the self employment information should be saved on the page
-  
+
   Scenario: Confirmation pop-up functionality
     When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
     Then a modal should show asking the user are you sure you want to leave this page
-  
+
   Scenario: "Not sure?" popups open as expected
     Given the user is on the Job Income page
     When the user clicks the Not sure link next to the employer income question
     Then the user should see the popup for the employer income question
     And the user closes the open income question modal
     When the user clicks the Not sure link next to the self employment income question
-    Then the user should see the popup for the self employment income question    
+    Then the user should see the popup for the self employment income question

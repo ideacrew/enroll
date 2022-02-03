@@ -2,6 +2,7 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
+
 module Operations
   module Accounts
     # Find Keycloak Account(s) that match criteria
@@ -15,7 +16,6 @@ module Operations
         by_last_name
         by_any
         count_all
-        by_realm_role
       ].freeze
 
       # @param [Hash] acct {AcaEntities::Accounts::Account}-related parameters
@@ -68,14 +68,7 @@ module Operations
             Keycloak::Admin.count_users.to_i
           else
             query_params = search_scope(values).merge(pagination(values))
-            if values[:scope_name] == :by_realm_role
-              Keycloak::Admin.get_users_by_role_name(
-                values[:criterion],
-                query_params
-              )
-            else
-              Keycloak::Admin.get_users(query_params)
-            end
+            Keycloak::Admin.get_users(query_params)
           end
         end.bind { |result| result ? Success(result) : Failure(result) }
         # rubocop:enable Style/MultilineBlockChain
@@ -93,7 +86,7 @@ module Operations
 
       def search_scope(params)
         case params[:scope_name]
-        when :all, :by_realm_role
+        when :all
           {}
         when :by_username
           { username: params[:criterion] }
@@ -110,7 +103,11 @@ module Operations
 
       def pagination(values)
         max = values[:page_size] || 100
-        offset = values[:page_number] ? (values[:page_number] - 1) * max : 0
+        offset = if values[:page_number]
+                   (values[:page_number] - 1) * max
+                 else
+                   0
+                 end
 
         { first: offset, max: max }
       end

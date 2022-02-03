@@ -6,7 +6,7 @@ RSpec.describe Operations::Individual::OpenEnrollmentStartOn do
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-  let!(:effective_on) { Date.new(2021,1,1) }
+  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
 
   before :each do
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile

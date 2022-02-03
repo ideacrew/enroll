@@ -22,8 +22,10 @@ logger_field_names = %w[Family_ID Backtrace]
 report_file_name = "#{Rails.root}/daily_eligibility_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 logger_file_name = "#{Rails.root}/daily_eligibility_report_logger_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 previous_day = Time.now.getlocal.prev_day
-start_time = previous_day.beginning_of_day.utc
-end_time = previous_day.end_of_day.utc
+start_on = ENV['start_on']
+end_on = ENV['end_on']
+start_time = start_on ? Time.parse(start_on).beginning_of_day.utc : previous_day.beginning_of_day.utc
+end_time = end_on ? Time.parse(end_on).end_of_day.utc : previous_day.end_of_day.utc
 
 source_mapper = { 'Renewals' => 'Renewals', 'Admin' =>  'Create Eligibility or Edit Aptc Csr', 'Curam' => 'Curam'}
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
