@@ -99,3 +99,21 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Employee should see the list of plans
     Then Employee should see their current plan
     Then Employee should see the correct employee contribution on plan tile
+
+
+  Scenario: Employee filters plan based on state
+
+    Given there exists Patrick Doe employee for employer ABC Widgets
+    And renewal employer ABC Widgets has expired and renewal active benefit applications
+    And employee Patrick Doe has past hired on date
+    And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
+    When Employee click the "Had a baby" in qle carousel
+    And Employee select a qle date based on expired plan year
+    Then Employee should see confirmation and clicks continue
+    Then Employee should see family members page and clicks continue
+    Then Employee should see the group selection page
+    When Employee clicks continue on group selection page
+    Then Employee should see the list of plans
+    Then Employee selects nationwide filter
+    Then Employee clicks on apply button
+    Then Employee should see a list of 4 plans
