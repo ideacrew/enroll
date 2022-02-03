@@ -99,17 +99,24 @@ module Operations
           'Aptc Amt',
           'CSR',
           'Application Hbx ID',
+          'Application Created At',
           'Applicant Applying Coverage?',
           'Cur Mth Earned Income Amt',
           'Cur Mth UnEarned Income Amt',
           'Income Status',
           'Income Due Date',
+          'Income Response',
           'Esi Status',
           'Esi Due Date',
+          'Esi Response',
           'Non Esi Status',
           'Non Esi Due Date',
+          'Non Esi Response',
           'Local Mec Status',
-          'Local Mec Due Date'
+          'Local Mec Due Date',
+          'Local Mec Response',
+          'Esi Updated?',
+          'Local Mec Updated?'
         ]
       end
     end

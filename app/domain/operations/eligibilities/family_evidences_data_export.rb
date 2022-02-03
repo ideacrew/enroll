@@ -172,7 +172,7 @@ module Operations
           determination&.csr_percent_as_integer
         ]
 
-        return (data + append_nil(12)) unless applicant
+        return (data + append_nil(18)) unless applicant
 
         evidences = %w[
           income_evidence
@@ -183,17 +183,25 @@ module Operations
 
         data + [
           applicant.application.hbx_id,
+          applicant.application.created_at,
           applicant.is_applying_coverage,
           applicant.current_month_earned_incomes.sum(&:amount),
           applicant.current_month_unearned_incomes.sum(&:amount)
         ] + evidences.collect do |evidence_name|
               evidence_record = applicant.send(evidence_name)
               if evidence_record
-                [evidence_record.aasm_state, evidence_record.due_on]
+                [evidence_record.aasm_state, evidence_record.due_on, evidence_record.has_determination_response?]
               else
-                append_nil(2)
+                append_nil(3)
               end
-            end.flatten
+            end.flatten + old_evidence_updated?(applicant)
+      end
+
+      def old_evidence_updated?(applicant)
+        [:esi_mec, :aces_mec].collect do |key|
+          evidence = applicant.evidences.detect{|evidence| evidence.key == key}
+          (evidence && evidence.created_at != evidence.updated_at) ? true : false
+        end
       end
 
       def append_nil(size)
