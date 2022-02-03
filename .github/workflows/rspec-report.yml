@@ -1,7 +1,7 @@
 name: rspec report
 on:
-  # push:
-  workflow_dispatch:
+  push:
+  # workflow_dispatch:
 
 jobs:
   rspec-report:
