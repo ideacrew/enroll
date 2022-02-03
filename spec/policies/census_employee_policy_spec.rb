@@ -242,9 +242,9 @@ describe CensusEmployeePolicy, dbclean: :after_each do
       context "current user is broker of employer_profile" do
 
         let!(:employee) { FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: bs_employer_profile.id, aasm_state: "eligible", employer_profile_id: '', benefit_sponsorship: benefit_sponsorship) }
-        let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+        let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
         let(:start_on) { TimeKeeper.date_of_record }
-        let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+        let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
         let!(:bs_employer_profile)    { organization.employer_profile }
         let!(:benefit_sponsorship) do
           bs = bs_employer_profile.add_benefit_sponsorship
@@ -341,7 +341,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
       let!(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, person: staff_person, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
 
       context 'current user is a broker staff role of employer_profile' do
-        
+
         before :each do
            broker_person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
           employer_profile.organization.benefit_sponsorships.first.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, writing_agent_id: broker_person.id, start_on: TimeKeeper.date_of_record)

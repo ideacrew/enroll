@@ -1,5 +1,4 @@
 site:
-  key: :dc
   home_url: 'https://www.dchealthlink.com/'
   help_url: 'https://www.dchealthlink.com/help'
   main_web_address_url: 'https://www.dchealthlink.com/'
@@ -138,8 +137,7 @@ aca:
       start_on: <%= Date.new(2020,11,1) %>
       end_on: <%= Date.new(2022,2,4) %>
     dc_resident_application: true
-    transition_family_members_link:
-      true
+    transition_family_members_link: true
     upcoming_open_enrollment:
       start_on: <%= Date.new(2021,11,1) %>
       end_on: <%= Date.new(2022,01,31) %>
