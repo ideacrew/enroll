@@ -65,16 +65,20 @@ module Operations
       def terminate_enrollment(params)
         return Success('Enrollment updated') if @enrollment.cancel_terminated_enrollment(@termination_date, params['edi_required'].present?)
 
-        enrollment = if !@enrollment.coverage_expired? && (@termination_date > @enrollment.terminated_on)
-                       reinstate_enrollment
-                     else
-                       update_end_date
-                     end
-        Success(enrollment)
+        if !@enrollment.coverage_expired? && (@termination_date > @enrollment.terminated_on)
+          reinstate_enrollment
+        else
+          update_end_date
+        end
       end
 
       def reinstate_enrollment
         reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(@enrollment, @enrollment.terminated_on.next_day).build
+
+        unless reinstate_enrollment.is_shop?
+          return Failure('No Rating area Found') if reinstate_enrollment.rating_area_id.blank?
+          return Failure('No Service area Found') unless product_offered_in_service_area?(reinstate_enrollment)
+        end
 
         if reinstate_enrollment.may_reinstate_coverage?
           reinstate_enrollment.reinstate_coverage!
@@ -84,7 +88,20 @@ module Operations
           #transition enrollment to term state if PY terminated
           reinstate_enrollment.term_or_expire_enrollment(@termination_date)
         end
-        reinstate_enrollment
+        Success(reinstate_enrollment)
+      end
+
+      def product_offered_in_service_area?(enrollment)
+        rating_address = (enrollment.consumer_role || enrollment.resident_role).rating_address
+
+        return false if rating_address.blank?
+
+        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+          rating_address,
+          during: enrollment.effective_on
+        ).map(&:id)
+
+        service_areas.include?(enrollment.product.service_area_id)
       end
 
       def update_end_date
@@ -96,7 +113,7 @@ module Operations
           @enrollment.terminate_coverage!(@termination_date)
         end
         cancel_renewal_enrollments(@enrollment) if state == 'coverage_expired'
-        @enrollment
+        Success(@enrollment)
       end
 
       def check_if_overlapping_coverage_exists?

@@ -62,10 +62,29 @@ module Insured
           log("ERROR in SelfServiceFactory: Rating_area_id is nil, cannot create reinstatement enrollment. person_hbx_id: #{enrollment.family.primary_person.hbx_id}, enrollment_hbx_id: #{enrollment.hbx_id}")
           raise
         end
+
+        unless product_offered_in_service_area?(reinstatement)
+          log("ERROR in SelfServiceFactory: ServiceArea changed. person_hbx_id: #{enrollment.family.primary_person.hbx_id}, enrollment_hbx_id: #{enrollment.hbx_id}")
+          raise
+        end
+
         reinstatement.save!
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
 
         reinstatement.select_coverage!
+      end
+
+      def self.product_offered_in_service_area?(enrollment)
+        rating_address = (enrollment.consumer_role || enrollment.resident_role).rating_address
+
+        return false if rating_address.blank?
+
+        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+          rating_address,
+          during: enrollment.effective_on
+        ).map(&:id)
+
+        service_areas.include?(enrollment.product.service_area_id)
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)

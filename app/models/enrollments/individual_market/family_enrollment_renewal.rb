@@ -2,6 +2,7 @@
 
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
+
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
 
   def initialize
@@ -13,6 +14,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
     begin
       renewal_enrollment = clone_enrollment
+
+      raise "Cannot renew enrollment #{enrollment.hbx_id}. Product not available in latest service area" unless can_renew_enrollment?(renewal_enrollment)
+
+      save_renewal_enrollment(renewal_enrollment)
+      # elected aptc should be the minimun between applied_aptc and EHB premium.
+      renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted
+
       if is_dependent_dropped?
         renewal_enrollment.aasm_state = 'coverage_selected'
         renewal_enrollment.workflow_state_transitions.build(from_state: 'shopping', to_state: 'coverage_selected')
@@ -44,12 +52,23 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
-    save_renewal_enrollment(renewal_enrollment)
-
-    # elected aptc should be the minimun between applied_aptc and EHB premium.
-    renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted
 
     renewal_enrollment
+  end
+
+  def can_renew_enrollment?(renewal_enrollment)
+    return false if renewal_enrollment.rating_area_id.blank?
+
+    rating_address = (renewal_enrollment.consumer_role || renewal_enrollment.resident_role).rating_address
+
+    return false if rating_address.blank?
+
+    service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+      rating_address,
+      during: renewal_enrollment.effective_on
+    ).map(&:id)
+
+    service_areas.include?(renewal_enrollment.product.service_area_id)
   end
 
   def fetch_product_id(renewal_enrollment)
@@ -197,7 +216,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def clone_enrollment_members
     old_enrollment_members = eligible_enrollment_members
-    raise  "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
+    raise "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
 
     old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
       member_tobacco_use = hbx_enrollment_member&.person&.is_tobacco_user
