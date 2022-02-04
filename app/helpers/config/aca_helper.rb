@@ -300,10 +300,10 @@ module Config::AcaHelper
   end
 
   def payment_pdf_helper
-    if EnrollRegistry[:enroll_app].setting(::payment_pdf_url).item.match("http")
-      EnrollRegistry[:enroll_app].setting(::payment_pdf_url).item
+    if EnrollRegistry[:enroll_app].setting(:payment_pdf_url).item.match("http")
+      EnrollRegistry[:enroll_app].setting(:payment_pdf_url).item
     else
-      asset_path(EnrollRegistry[:enroll_app].setting(::payment_pdf_url).item)
+      asset_path(EnrollRegistry[:enroll_app].setting(:payment_pdf_url).item)
     end
   end
 

@@ -121,7 +121,7 @@ CKEDITOR.addTemplates('default', {
         '<ul>' +
         '<li>By calling #{contact_center_phone_number}</li>' +
         '<li>TTY: #{Settings.contact_center.tty_number}</li>' +
-        "<li>Online at: <a href='#{EnrollRegistry[:enroll_app].setting(:home_url).item}'>#{Settings.site.website_name}</a></li>" +
+        "<li>Online at: <a href='#{EnrollRegistry[:enroll_app].setting(:home_url).item}'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a></li>" +
         '</ul>',
     },
     {

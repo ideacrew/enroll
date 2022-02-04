@@ -38,7 +38,6 @@ site:
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
   terms_and_conditions_url: ''
   use_default_devise_path: true
-  website_name: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
 
 contact_center:
   name: "CoverME.gov's Customer Care Center"
