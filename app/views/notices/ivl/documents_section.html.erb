@@ -61,7 +61,7 @@
   </tr>
   <tr valign="top">
     <td>
-      Login to your account at <a href= <%= Settings.site.home_url %> > <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
+      Login to your account at <a href= <%= EnrollRegistry[:enroll_app].setting(:home_url).item %> > <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
     </td>
     <td>
       <p><%= site_short_name%></p>
