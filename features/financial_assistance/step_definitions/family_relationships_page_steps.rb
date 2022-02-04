@@ -117,16 +117,16 @@ end
 When(/^the user populates the drop down with a value$/) do
   @relationship = find_all(:css, ".missing_relation").first
   @relationship.find("span", :text => "choose").click
-  @relationship.find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Parent')]").click
+  @relationship.find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
 end
 
 
 Then(/^the relationship is saved$/) do
   begin
-    expect(@relationship.find(:css, ".selectric .label").text).to eq("Parent")
+    expect(@relationship.find(:css, ".selectric .label").text).to eq("Sibling")
   rescue Selenium::WebDriver::Error::StaleElementReferenceError
     sleep 10
-    expect(@relationship.find(:css, ".selectric .label").text).to eq("Parent")
+    expect(@relationship.find(:css, ".selectric .label").text).to eq("Sibling")
   end
 end
 
