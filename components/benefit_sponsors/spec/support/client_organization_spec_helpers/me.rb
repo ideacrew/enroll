@@ -80,7 +80,7 @@ module BenefitSponsors
 
       def with_aca_shop_employer_profile(site)
         general_organization_properties(site)
-        # FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)
+        # FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site)
       end
     end
   end

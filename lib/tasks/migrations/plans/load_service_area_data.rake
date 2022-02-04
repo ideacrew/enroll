@@ -1,7 +1,7 @@
 namespace :load_service_reference do
 
   task :run_all_service_areas => :environment do
-    if Settings.site.key.to_s == "dc"
+    if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc"
       Rake::Task['load_service_reference:dc_service_areas'].invoke
     else
       files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/service_areas", "**", "*.xlsx"))

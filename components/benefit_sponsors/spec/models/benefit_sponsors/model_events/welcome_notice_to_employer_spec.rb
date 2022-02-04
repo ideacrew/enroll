@@ -48,7 +48,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload) do
       {
-        "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+        "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile",
         "event_object_id" => employer_profile.id
       }
     end

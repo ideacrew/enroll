@@ -33,7 +33,7 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
         :with_benefit_market,
         :with_benefit_market_catalog_and_product_packages,
         :as_hbx_profile,
-        Settings.site.key,
+        EnrollRegistry[:enroll_app].setting(:site_key).item,
         application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
       )
     end
@@ -105,7 +105,7 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
     let(:sponsor_profile) { organization.employer_profile }
 
     let(:organization) do
-      org = FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)
+      org = FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site)
       bs = org.employer_profile.add_benefit_sponsorship
       bs.save
       org

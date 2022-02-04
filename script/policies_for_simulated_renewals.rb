@@ -35,7 +35,7 @@ def matching_plan_details(enrollment, other_hbx_enrollment, product_cache)
   return false if other_hbx_enrollment.product_id.blank?
   new_plan = product_cache[enrollment.product_id]
   old_plan = product_cache[other_hbx_enrollment.product_id]
-  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s && Settings.site.key.to_s == "cca"
+  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s && EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "cca"
   (old_plan.issuer_profile_id == new_plan.issuer_profile_id) && (old_plan.active_year == new_plan.active_year - 1) && (old_plan.kind == new_plan.kind)
 end
 

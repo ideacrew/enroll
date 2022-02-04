@@ -5,8 +5,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
   let!(:termination_date) {(TimeKeeper.date_of_record)}
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
 
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
@@ -32,7 +32,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
                         employee_role_id: employee_role.id)
   }
 
-  
+
   before do
     model_instance.update_attributes(employee_role_id: employee_role.id)
   end
@@ -54,7 +54,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
     context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_terminated_from_roster, model_instance, {}) }
-      
+
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_terminated_from_roster"
@@ -105,7 +105,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
         allow(subject).to receive(:resource).and_return(terminated_employee.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
       end
-      
+
       it "should retrun merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end

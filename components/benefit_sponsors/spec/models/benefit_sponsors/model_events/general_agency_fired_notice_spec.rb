@@ -6,8 +6,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
 
   let(:start_on) { TimeKeeper.date_of_record }
   let(:person) { FactoryBot.create(:person) }
-  let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+  let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let(:employer_profile)    { organization.employer_profile }
   let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
@@ -103,7 +103,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
         it "should trigger notice event" do
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.general_agency.general_agency_fired_confirmation_to_agency"
-            expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+            expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
             expect(payload[:event_object_id]).to eq employer_profile.id.to_s
           end
           subject.process_ga_account_events(general_agency_account, model_event)
@@ -146,7 +146,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
 
       let(:payload) do
         {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id.to_s,
           "notice_params" => { "general_agency_account_id" => general_agency_account.id.to_s }
         }

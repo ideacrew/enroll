@@ -284,7 +284,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:effective_date) { predecessor_application.effective_period.min }
 
       before do
-        allow(benefit_sponsorship.profile).to receive(:employer_attestation).and_return(double(:blank? => true)) if Settings.site.key == :cca
+        allow(benefit_sponsorship.profile).to receive(:employer_attestation).and_return(double(:blank? => true)) if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
       end
 
       around do |example|

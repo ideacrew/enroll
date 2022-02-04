@@ -3,9 +3,9 @@
 # rubocop:disable Lint/UselessAssignment
 module BenefitSponsors
   module ModelEvents
+    # here's a comment
     module BenefitApplication
-
-      APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
+      APPLICATION_EXCEPTION_STATES = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
 
       REGISTERED_EVENTS_ON_SAVE = [
         :application_submitted,
@@ -42,25 +42,19 @@ module BenefitSponsors
       OTHER_EVENTS = [].freeze
 
       # Events triggered by state changes on individual instances
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def notify_on_save
         return if self.is_conversion?
+        # rubocop:disable Style/GuardClause
         if aasm_state_changed?
 
-          if is_transition_matching?(to: :enrollment_closed, from: [:enrollment_open, :enrollment_extended], event: :end_open_enrollment)
-            is_employer_open_enrollment_completed = true
-          end
+          is_employer_open_enrollment_completed = true if is_transition_matching?(to: :enrollment_closed, from: [:enrollment_open, :enrollment_extended], event: :end_open_enrollment)
 
-          if is_transition_matching?(to: :pending, from: :draft, event: :submit_for_review)
-            is_ineligible_application_submitted = true
-          end
+          is_ineligible_application_submitted = true if is_transition_matching?(to: :pending, from: :draft, event: :submit_for_review)
 
-          if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :approve_application)
-            is_application_submitted = true
-          end
+          is_application_submitted = true if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :approve_application)
 
-          if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
-            is_application_denied = true
-          end
+          is_application_denied = true if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
 
           is_initial_employee_plan_selection_confirmation = true if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
 
@@ -72,13 +66,13 @@ module BenefitSponsors
 
           is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: [:canceled, :retroactive_canceled], from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
           is_benefit_coverage_period_reinstated = true if is_transition_matching?(to: :active, from: :reinstated, event: :activate_enrollment)
-          if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
-            is_renewal_application_autosubmitted = true
-          end
+          is_renewal_application_autosubmitted = true if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
 
-          # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
+          # TODO: -- encapsulated notify_observers to recover from errors raised by any of the observers
           (REGISTERED_EVENTS_ON_SAVE + EMPLOYER_EDI_EVENTS_ON_SAVE).each do |event|
-            next unless (event_fired = instance_eval("is_" + event.to_s))
+            # rubocop:disable Style/DocumentDynamicEvalDefinition, Style/EvalWithLocation
+            next unless (event_fired = instance_eval("is_#{event}"))
+            # rubocop:enable Style/DocumentDynamicEvalDefinition, Style/EvalWithLocation
 
             event_options = EMPLOYER_EDI_EVENTS_ON_SAVE.include?(event) ? {observer_klass: BenefitSponsors::Observers::EdiObserver} : {}
             notify_observers(ModelEvent.new(event, self, event_options))
@@ -87,15 +81,17 @@ module BenefitSponsors
             raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
           end
         end
+        # rubocop:enable Style/GuardClause
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def notify_on_create
-        if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
-          is_renewal_application_created = true
-        end
+        is_renewal_application_created = true if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
 
         REGISTERED_EVENTS_ON_CREATE.each do |event|
-          next unless (event_fired = instance_eval("is_" + event.to_s))
+          # rubocop:disable Style/DocumentDynamicEvalDefinition, Style/EvalWithLocation
+          next unless (event_fired = instance_eval("is_#{event}"))
+          # rubocop:enable Style/DocumentDynamicEvalDefinition, Style/EvalWithLocation
 
           event_options = {}
           notify_observers(ModelEvent.new(event, self, event_options))
@@ -106,10 +102,12 @@ module BenefitSponsors
       end
 
       def trigger_model_event(event_name, event_options = {})
+        # rubocop:disable Style/GuardClause
         if OTHER_EVENTS.include?(event_name)
           BenefitSponsors::BenefitApplications::BenefitApplication.add_observer(BenefitSponsors::Observers::NoticeObserver.new, [:process_application_events])
           notify_observers(ModelEvent.new(event_name, self, event_options))
         end
+        # rubocop:enable Style/GuardClause
       end
 
       def is_transition_matching?(from: nil, to: nil, event: nil)
@@ -125,9 +123,10 @@ module BenefitSponsors
         base.extend ClassMethods
       end
 
+      # why is a module hanging out down here?
       module ClassMethods
+        # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         def date_change_event(new_date)
-
           if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2 #2 days before soft dead line i.e 3th of the month
             is_renewal_employer_first_reminder_to_publish_plan_year = true
           elsif new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1 #one day before advertised soft deadline i.e 4th of the month
@@ -140,9 +139,11 @@ module BenefitSponsors
           scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
           binder_next_day = scheduler.calculate_open_enrollment_date(false, TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
 
-          if (Settings.site.key == :cca && new_date.day == binder_next_day) || ([:dc, :me].include?(Settings.site.key) && new_date.day == Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month)
+          # rubocop:disable Layout/LineLength
+          if (EnrollRegistry[:enroll_app].setting(:site_key).item == :cca && new_date.day == binder_next_day) || ([:dc, :me].include?(EnrollRegistry[:enroll_app].setting(:site_key).item) && new_date.day == Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month)
             is_initial_employer_no_binder_payment_received = true
           end
+          # rubocop:enable Layout/LineLength
 
           if (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 2 days prior to advertised deadline(1st) of month
             is_initial_employer_first_reminder_to_publish_plan_year = true
@@ -158,7 +159,9 @@ module BenefitSponsors
           is_open_enrollment_end_reminder_and_low_enrollment = true
 
           DATE_CHANGE_EVENTS.each do |event|
-            next unless (event_fired = instance_eval("is_" + event.to_s))
+            # rubocop:disable Style/EvalWithLocation, Style/DocumentDynamicEvalDefinition
+            next unless (event_fired = instance_eval("is_#{event}"))
+            # rubocop:enable Style/EvalWithLocation, Style/DocumentDynamicEvalDefinition
 
             event_options = {}
             new.notify_observers(ModelEvent.new(event, self, event_options))
@@ -167,6 +170,7 @@ module BenefitSponsors
             raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
           end
         end
+        # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       end
     end
   end
