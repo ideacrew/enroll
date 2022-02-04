@@ -52,6 +52,8 @@ module FinancialAssistance
       if enrollment.present? && @evidence.type_unverified?
         if @evidence.extend_due_on(30.days, current_user.oim_id)
           flash[:success] = "#{@evidence.title} verification due date was extended for 30 days."
+        else
+          flash[:danger] = "Unable to extend due date"
         end
       else
         flash[:danger] = "Applicant doesn't have active Enrollment to extend verification due date."
