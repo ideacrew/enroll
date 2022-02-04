@@ -20,7 +20,6 @@ site:
   irs_url: 'https://www.irs.gov/'
   ivl_responsibility_url: ''
   late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
-  logo_file_name: 'logo_me.svg'
   mail_address: 'info@coverme.gov'
   mailer_logo_file_name: 'logo_me.svg'
   plan_options_title_for_ma: true

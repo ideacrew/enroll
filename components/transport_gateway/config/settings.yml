@@ -4,7 +4,6 @@ site:
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
   # policies_url: "https://dchealthlink.com/"
-  logo_file_name: 'logo.png'
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: 'dchealthlink.jpg'
   broker_quoting_enabled: false

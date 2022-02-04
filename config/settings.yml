@@ -1,5 +1,4 @@
 site:
-  logo_file_name: 'logo.png'
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: 'dchealthlink.jpg'
   broker_quoting_enabled: false
