@@ -855,11 +855,11 @@ Then(/^.+ selects nationwide filter$/) do
 end
 
 Then(/^.+ clicks on apply button$/) do
-  find(EmployeeChoosePlan.apply_btn, wait: 10).click
+  page.first(EmployeeChoosePlan.apply_btn, wait: 10).click
 end
 
-Then(/^.+ should see a list of 5 plans$/) do
-  expect(page).to have_content(5)
+Then(/^\w+ should see plans count listed$/) do
+  find_all(EmployeeChoosePlan.plan_count).present?
 end
 
 When(/^.+ sorts by (.*)/) do |sort|

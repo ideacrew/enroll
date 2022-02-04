@@ -39,11 +39,11 @@ class EmployeeChoosePlan
     'label[for="checkbox-12"]'
   end
 
-  def self.dc_metro
+  def self.nationwide
     'label[for="checkbox-15"]'
   end
 
-  def self.nationwide
+  def self.dc_metro
     'label[for="checkbox-16"]'
   end
 
@@ -101,5 +101,9 @@ class EmployeeChoosePlan
 
   def self.save_and_exit_link
     '.interaction-click-control-save---exit'
+  end
+
+  def self.plan_count
+    '[data-cuke="plan-count"]'
   end
 end
