@@ -50,9 +50,7 @@ module FinancialAssistance
       @family_member = FamilyMember.find(@evidence.evidenceable.family_member_id)
       enrollment = @family_member.family.enrollments.enrolled.first
       if enrollment.present? && @evidence.type_unverified?
-        @evidence.extend_due_date(30.days, current_user.oim_id)
-
-        if updated
+        if @evidence.extend_due_on(30.days, current_user.oim_id)
           flash[:success] = "#{@evidence.title} verification due date was extended for 30 days."
         end
       else
