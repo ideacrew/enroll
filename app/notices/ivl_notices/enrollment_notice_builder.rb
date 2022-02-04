@@ -57,9 +57,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
-    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+    begin
+      bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+      notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+      notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+    rescue StandardException => e
+      Rails.logger.error { "Could not append open enrollment data due to #{e} for HBX Profile #{hbx.cms_id}. Benefit Coverage period for this user starts on #{bc_period.start_on}" }
+    end
   end
 
   def append_member_information(people)
