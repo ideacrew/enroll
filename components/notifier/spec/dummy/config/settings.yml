@@ -6,7 +6,6 @@ site:
   # policies_url: "https://dchealthlink.com/"
   short_name: 'Maine Cover ME'
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
-  mailer_logo_file_name: 'logo_me.svg'
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
@@ -20,7 +19,6 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   terms_and_conditions_url: ''
-  irs_url: 'https://www.irs.gov/'
   exchange_hbx_id: 'ME0'
   mail_address: 'info@coverme.gov'
   late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'

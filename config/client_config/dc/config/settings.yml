@@ -5,7 +5,6 @@ site:
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
   # policies_url: "https://dchealthlink.com/"
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: 'dchealthlink.jpg'
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
@@ -18,7 +17,6 @@ site:
     ]
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
-  irs_url: 'https://www.irs.gov/'
   exchange_hbx_id: 'DC0'
   mail_address: 'info@dchealthlink.com'
   late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'

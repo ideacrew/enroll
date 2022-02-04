@@ -158,7 +158,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
   content: "Because you received a tax credit in #{previous_year}, you must complete IRS Premium Tax Credit Form 8962 when you file your federal taxes.  You’ll need the information on Form 1095-A to fill out Form 8962."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "The IRS requires you to use Form 8962 to report the amount of advance premium tax credit you received in #{previous_year}. You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
+  content: "The IRS requires you to use Form 8962 to report the amount of advance premium tax credit you received in #{previous_year}. You can download Form 8962 directly from the IRS website at <a href=#{EnrollRegistry[:enroll_app].setting(:irs_url).item}>IRS.gov</a>."} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "If your income is higher than what you told us when you applied for the tax credit, you may have to repay some or all of the tax credit to the IRS. If your income is lower than what you told us, you may get an additional credit on your tax return.", bottom_margin: '8px', top_margin: '10px'} %>
@@ -170,7 +170,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 
 <% if !notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "You’ll use the information on your Form 1095-A to show that you or someone in your household had health insurance in #{previous_year}. If you want to see if you qualify for a premium tax credit, you’ll need the information on your Form 1095-A to complete the IRS Premium Tax Credit Form 8962.  You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>.", bottom_margin: '8px'} %>
+  content: "You’ll use the information on your Form 1095-A to show that you or someone in your household had health insurance in #{previous_year}. If you want to see if you qualify for a premium tax credit, you’ll need the information on your Form 1095-A to complete the IRS Premium Tax Credit Form 8962.  You can download Form 8962 directly from the IRS website at <a href=#{EnrollRegistry[:enroll_app].setting(:irs_url).item}>IRS.gov</a>.", bottom_margin: '8px'} %>
 <% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
