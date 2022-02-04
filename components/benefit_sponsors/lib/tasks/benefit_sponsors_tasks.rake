@@ -11,7 +11,7 @@ def initialize_site
     s.byline = Settings.site.byline
     s.domain_name = EnrollRegistry[:enroll_app].setting(:domain_name).item
     s.home_url = EnrollRegistry[:enroll_app].setting(:home_url).item
-    s.help_url = Settings.site.help_url
+    s.help_url = EnrollRegistry[:enroll_app].setting(:help_url).item
     s.faqs_url = Settings.site.faq_url
     s.logo_file_name = Settings.site.logo_file_name
   end
