@@ -3,7 +3,7 @@
   <div class="row">
     <% if product_rates_available?(@benefit_sponsorship) %>
     <div class="alert alert-info" role="alert">
-      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= Settings.site.late_rates_message %></strong>
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= EnrollRegistry[:enroll_app].setting(:late_rates_message).item %></strong>
     </div>
     <% end %>
     <div class="col-xs-8">

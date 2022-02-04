@@ -1,21 +1,10 @@
 site:
   # copyright_period_start: "2013"
-  help_url: 'https://www.dchealthlink.com/help'
   # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
   # policies_url: "https://dchealthlink.com/"
-  main_web_address_url: 'https://www.dchealthlink.com/'
-  invoice_bill_url: 'https://www.e-billexpress.com/ebpp/DCHEALTHPAY/'
-  payment_pdf_url: 'pdf/employers_paying_your_premiums_online.pdf'
-  website_name: 'www.DCHealthLink.com'
-  main_web_address: 'www.DCHealthLink.com'
-  byline: "Welcome to the District's Health Insurance Marketplace"
-  long_name: 'District of Columbia Health Link'
-  header_message: "Welcome to the District's Health Insurance Marketplace"
-  logo_file_name: 'logo.png'
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: 'dchealthlink.jpg'
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
@@ -28,12 +17,9 @@ site:
     ]
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
-  irs_url: 'https://www.irs.gov/'
   exchange_hbx_id: 'DC0'
   mail_address: 'info@dchealthlink.com'
-  late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  ivl_responsibility_url: 'https://dchealthlink.com/individual-responsibility-requirement'
   curam_enabled?: true
   support_for_ie_browser: true
   block_ie_browser: false

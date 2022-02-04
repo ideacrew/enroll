@@ -241,7 +241,7 @@ module Config
     end
 
     def site_main_web_address_text
-      Settings.site.main_web_address_text
+      EnrollRegistry[:enroll_app].setting(:main_web_address).item
     end
 
     def site_website_address

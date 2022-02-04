@@ -86,7 +86,7 @@
       <td>____________________________________________________________________________________________________</td>
     </tr>
     <tr>
-      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= Settings.contact_center.phone_number %>/TTY: <%= Settings.contact_center.tty %>, or go to <%= Settings.site.website_name %>.</td>
+      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= Settings.contact_center.phone_number %>/TTY: <%= Settings.contact_center.tty %>, or go to <%= EnrollRegistry[:enroll_app].setting(:website_name).item %>.</td>
     </tr>
   </table>
 </body>

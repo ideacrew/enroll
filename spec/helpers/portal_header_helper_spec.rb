@@ -32,7 +32,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
       it "should have Welcome prompt when user has no active role" do
         allow(current_user).to receive(:has_employer_staff_role?).and_return(false)
-        expect(portal_display_name(controller)).to eq "<a class='portal'>#{Settings.site.byline}</a>"
+        expect(portal_display_name(controller)).to eq "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:byline).item}</a>"
       end
 
       context "user with active employer staff roles && employee roles" do
@@ -91,7 +91,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
       it "should have Welcome prompt when user has no active role" do
         allow(current_user).to receive(:has_general_agency_staff_role?).and_return(false)
-        expect(portal_display_name(controller)).to eq "<a class='portal'>#{Settings.site.byline}</a>"
+        expect(portal_display_name(controller)).to eq "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:byline).item}</a>"
       end
     end
 
