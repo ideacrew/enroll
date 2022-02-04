@@ -18,7 +18,6 @@ site:
   exchange_hbx_id: 'ME0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: ''
-  late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
   mail_address: 'info@coverme.gov'
   plan_options_title_for_ma: true
   prod_tax_info: ''

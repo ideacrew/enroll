@@ -19,7 +19,6 @@ site:
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   exchange_hbx_id: 'DC0'
   mail_address: 'info@dchealthlink.com'
-  late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   curam_enabled?: true
   support_for_ie_browser: true

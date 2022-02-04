@@ -1,7 +1,7 @@
 <% if can_employee_shop?(f.object.effective_date.try(:to_date)) %>
  <div class="alert alert-info" role="alert">
    <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-      <%= Settings.site.late_rates_message %>
+      <%= EnrollRegistry[:enroll_app].setting(:late_rates_message).item %>
    </strong>
  </div>
 <% end %>
