@@ -83,7 +83,8 @@ class VerificationType
   end
 
   def verif_due_date
-    due_date || TimeKeeper.date_of_record + 95.days
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    due_date || TimeKeeper.date_of_record + verification_document_due.days
   end
 
   def move_type_to_curam

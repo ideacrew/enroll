@@ -22,7 +22,9 @@ RSpec.describe ::Operations::People::UpdateDueDateOnVlpDocuments, dbclean: :afte
       enrollment_members: family.family_members
     )
   end
-  let(:due_date) { TimeKeeper.date_of_record + 95.days }
+
+  let(:verification_document_due) { EnrollRegistry[:verification_document_due_in_days].item }
+  let(:due_date) { TimeKeeper.date_of_record + verification_document_due.days }
 
   describe 'when invalid params are passed in' do
     let(:valid_params) { { due_date: due_date, family: family } }
