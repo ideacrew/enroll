@@ -43,7 +43,7 @@ class EmployeeChoosePlan
     'label[for="checkbox-15"]'
   end
 
-  def self.dc_metro
+  def self.metro
     'label[for="checkbox-16"]'
   end
 
