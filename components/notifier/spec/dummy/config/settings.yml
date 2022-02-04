@@ -5,7 +5,6 @@ site:
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
   # policies_url: "https://dchealthlink.com/"
   short_name: 'Maine Cover ME'
-  byline: "Maine's Official Health Insurance Marketplace"
   long_name: 'Maine Cover ME'
   header_message: "Maine's Official Health Insurance Marketplace"
   logo_file_name: 'logo_me.svg'

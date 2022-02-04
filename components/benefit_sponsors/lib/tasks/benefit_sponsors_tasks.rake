@@ -8,7 +8,7 @@ def initialize_site
     s.site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
     s.long_name = Settings.site.long_name
     s.short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
-    s.byline = Settings.site.byline
+    s.byline = EnrollRegistry[:enroll_app].setting(:byline).item
     s.domain_name = EnrollRegistry[:enroll_app].setting(:domain_name).item
     s.home_url = EnrollRegistry[:enroll_app].setting(:home_url).item
     s.help_url = EnrollRegistry[:enroll_app].setting(:help_url).item

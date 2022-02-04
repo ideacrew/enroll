@@ -8,7 +8,6 @@ site:
   block_ie_browser: true
   broker_claim_quoting_enabled: true
   broker_quoting_enabled: false
-  byline: "Maine's Official Health Insurance Marketplace"
   create_routes:
     [
       '/insured/employee/privacy',
