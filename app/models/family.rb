@@ -1171,7 +1171,8 @@ class Family
   end
 
   def self.min_verification_due_date_range(start_date,end_date)
-    timekeeper_date = TimeKeeper.date_of_record + 95.days
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    timekeeper_date = TimeKeeper.date_of_record + verification_document_due.days
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
       self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
     else
@@ -1243,11 +1244,12 @@ class Family
   end
 
   def set_due_date_on_verification_types
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
     family_members.each do |family_member|
       person = family_member.person
       person.consumer_role.verification_types.each do |v_type|
         next if !(v_type.type_unverified?)
-        v_type.update_attributes(due_date: (TimeKeeper.date_of_record + 95.days),
+        v_type.update_attributes(due_date: TimeKeeper.date_of_record + verification_document_due.days,
                                  updated_by: nil,
                                  due_date_type:  "notice" )
         person.save!

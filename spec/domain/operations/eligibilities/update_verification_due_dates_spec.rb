@@ -100,7 +100,8 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
     )
   end
 
-  let(:due_on) { (Date.today + 95.days) }
+  let(:verification_document_due) { EnrollRegistry[:verification_document_due_in_days].item }
+  let(:due_on) { TimeKeeper.date_of_record + verification_document_due.days }
 
   let(:required_params) do
     { family: family, assistance_year: 2022, due_on: due_on }
