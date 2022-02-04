@@ -26,7 +26,6 @@ site:
   long_name: 'CoverME.gov'
   mail_address: 'info@coverme.gov'
   mailer_logo_file_name: 'logo_me.svg'
-  main_web_address: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
   plan_options_title_for_ma: true
   prod_tax_info: ''
   publisher: 'dchl'

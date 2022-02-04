@@ -33,7 +33,7 @@ module Notifier
     end
 
     def site_main_web_address_business
-      Settings.site.main_web_address_business
+      EnrollRegistry[:enroll_app].setting(:main_web_address).item_business
     end
 
     def site_faqs_url
