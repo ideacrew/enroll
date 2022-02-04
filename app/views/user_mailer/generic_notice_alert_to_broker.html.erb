@@ -1,8 +1,8 @@
 Dear <%=first_name%>,
 <br/><br/>
-You have a new message from <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> regarding your client <%= employer_name %>. Please log in to your account at <a href="<%= Settings.site.home_url %>"><%= EnrollRegistry[:enroll_app].setting(:short_name).item %><a/> to read this message.
+You have a new message from <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> regarding your client <%= employer_name %>. Please log in to your account at <a href="<%= EnrollRegistry[:enroll_app].setting(:home_url).item %>"><%= EnrollRegistry[:enroll_app].setting(:short_name).item %><a/> to read this message.
 <br><br/>
-Questions? Call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> Customer Service at <%= Settings.contact_center.phone_number %>, or go to <a href="<%= Settings.site.home_url %>"><%= EnrollRegistry[:enroll_app].setting(:short_name).item %><a/>.
+Questions? Call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> Customer Service at <%= Settings.contact_center.phone_number %>, or go to <a href="<%= EnrollRegistry[:enroll_app].setting(:home_url).item %>"><%= EnrollRegistry[:enroll_app].setting(:short_name).item %><a/>.
 <br/><br/>
 
 <p><i><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> is strongly committed to maintaining the privacy of your personal information and the security of our computer systems. With respect to the collection, use and disclosure of personal information, <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> makes every effort to ensure compliance with applicable Federal law.</i></p>
