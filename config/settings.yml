@@ -1,5 +1,4 @@
 site:
-  invoice_bill_url: 'https://www.e-billexpress.com/ebpp/DCHEALTHPAY/'
   payment_pdf_url: 'pdf/employers_paying_your_premiums_online.pdf'
   website_name: 'www.DCHealthLink.com'
   main_web_address: 'www.DCHealthLink.com'

@@ -282,7 +282,7 @@ module Config::AcaHelper
   end
 
   def invoice_bill_url_helper
-    Settings.site.invoice_bill_url
+    EnrollRegistry[:enroll_app].setting(:invoice_bill_url).item
   end
 
   def payment_phone_number
