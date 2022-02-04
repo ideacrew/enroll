@@ -79,7 +79,7 @@ namespace :migrations do
           unless mailing.nil?
             updated_address_hash = person.addresses.reject { |a| a[:kind] =="mailing" } if matching_address(person)
           end
-          addresses = mailing.present? && updated_address_hash != person.addresses
+          addresses = mailing.present? && updated_address_hash && updated_address_hash != person.addresses
           counters[:person][:address_fix] += 1 if addresses
           if addresses || isnt_homeless
             person.is_homeless = false if isnt_homeless
@@ -102,7 +102,7 @@ namespace :migrations do
               unless a_mailing.nil?
                 a_updated_address_hash = applicant.addresses.reject { |a| a[:kind] =="mailing" } if matching_address(applicant)
               end
-              a_addresses = a_mailing.present? && a_updated_address_hash != applicant.addresses
+              a_addresses = a_mailing.present? && a_updated_address_hash && a_updated_address_hash != applicant.addresses
               counters[:faa_apps][:address_fix] += 1 if a_addresses
               same_as_primary = same_address_with_primary(applicant, primary) unless primary.nil?
               a_same_as_primary = primary.present? && same_as_primary != applicant.same_with_primary

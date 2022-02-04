@@ -52,7 +52,7 @@ module BenefitSponsors
 
         it 'should return hash with dates based on exchange' do
           ba_schedular = subject.start_on_options_with_schedule(false, false)
-          if Settings.site.key == :cca
+          if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
             expect(ba_schedular.keys).to eq [Date.new(2019, 3, 1)]
           else
             expect(ba_schedular.keys).to eq [Date.new(2019, 3, 1), Date.new(2019, 4, 1)]
@@ -82,7 +82,7 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return dates based on exchange' do
-            if Settings.site.key == :cca
+            if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
               expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 3, 1)]
             else
               expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 3, 1), Date.new(2019, 4, 1)]
@@ -92,7 +92,7 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return dates based on exchange' do
-            if Settings.site.key == :cca
+            if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
               expect(subject.calculate_start_on_dates(true)).to eq both_dates
             else
               expect(subject.calculate_start_on_dates(true)).to eq dc_dates
@@ -108,7 +108,7 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return dates based on exchange' do
-            if Settings.site.key == :cca
+            if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
               expect(subject.calculate_start_on_dates).to eq both_dates
             else
               expect(subject.calculate_start_on_dates).to eq dates
@@ -118,7 +118,7 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return correct dates based on exchange' do
-            if Settings.site.key == :cca
+            if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
               expect(subject.calculate_start_on_dates(true)).to eq both_dates
             else
               expect(subject.calculate_start_on_dates(true)).to eq dates

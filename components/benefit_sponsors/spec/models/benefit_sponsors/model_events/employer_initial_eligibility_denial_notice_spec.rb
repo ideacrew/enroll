@@ -10,8 +10,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNo
   let(:valid_effective_date)   { (prior_month_open_enrollment_start - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
   let(:benefit_application_end_on)   { (valid_effective_date + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day) }
 
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship) do
     sponsorship = employer_profile.add_benefit_sponsorship
@@ -78,13 +78,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNo
   describe "NoticeBuilder" do
 
     let(:data_elements) {
-      [ 
-        "employer_profile.notice_date", 
+      [
+        "employer_profile.notice_date",
         "employer_profile.employer_name",
-        "employer_profile.broker.primary_fullname", 
-        "employer_profile.broker.organization", 
-        "employer_profile.broker.phone", 
-        "employer_profile.broker.email", 
+        "employer_profile.broker.primary_fullname",
+        "employer_profile.broker.organization",
+        "employer_profile.broker.phone",
+        "employer_profile.broker.email",
         "employer_profile.broker_present?"
       ]
     }

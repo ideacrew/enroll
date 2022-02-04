@@ -10,7 +10,7 @@ namespace :reports do
       organizations = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"hbx_id".nin => [100101, 100102, 118510])
       build_csv_report('er_roster_report', 'ERROSTER', organizations)
 
-      if Settings.site.key == :dc
+      if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
         organizations = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"hbx_id".in => [100101, 100102, 118510])
         build_csv_report('congressional_er_roster_report', 'CONGRESSIONALERROSTER', organizations)
       end

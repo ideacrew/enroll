@@ -2,7 +2,7 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
 
   [:aca_shop, :fehb].each do |kind|
 
-    benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: kind).first
+    benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => EnrollRegistry[:enroll_app].setting(:site_key).item, kind: kind).first
 
     [2014, 2015, 2016, 2017, 2018, 2019].each do |calender_year|
 

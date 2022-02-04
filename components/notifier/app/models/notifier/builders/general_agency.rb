@@ -65,7 +65,7 @@ module Notifier
     def employer
       return @employer if defined? @employer
 
-      return unless payload['event_object_kind'] == "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+      return unless payload['event_object_kind'] == "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
 
       @employer = BenefitSponsors::Organizations::Profile.find payload['event_object_id']
     end

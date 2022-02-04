@@ -1,5 +1,4 @@
 site:
-  key: :me
   home_url: 'https://cme.enroll.openhbx.org/'
   # copyright_period_start: "2013"
   help_url: 'https://www.coverme.gov/help/'

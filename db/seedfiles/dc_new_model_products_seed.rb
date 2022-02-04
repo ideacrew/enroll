@@ -1,6 +1,6 @@
 site = BenefitSponsors::Site.all.first
 if site.blank?
-  site = BenefitSponsors::Site.new(site_key: "#{Settings.site.key}")
+  site = BenefitSponsors::Site.new(site_key: "#{EnrollRegistry[:enroll_app].setting(:site_key).item}")
 end
 
 # Clear the current models

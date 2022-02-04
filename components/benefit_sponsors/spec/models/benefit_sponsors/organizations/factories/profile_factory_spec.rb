@@ -289,7 +289,7 @@ module BenefitSponsors
       context 'when type is benefit sponsor' do
 
         let!(:abc_organization) do
-          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, :with_broker_agency_profile, site: site)
+          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, :with_broker_agency_profile, site: site)
         end
         let!(:benefit_sponsorship) do
           benefit_sponsorship = employer_profile.add_benefit_sponsorship
