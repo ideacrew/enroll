@@ -129,7 +129,7 @@ module BradysAfterAll
     attr_reader :carols_benefit_group, :carols_plan_year, :carols_census_employee, :carols_census_family, :carols_hired_on
 
     def create_brady_census_families
-      @site = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key.to_sym)
+      @site = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item.to_sym)
 
       create_brady_coverage_households
       create_brady_employers
@@ -144,7 +144,7 @@ module BradysAfterAll
                                                 issuer_profile: issuer_profile,
                                                 application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
                                               )
-                                          
+
       package_kind             = :single_issuer
       effective_period         = current_effective_date..current_effective_date.next_year.prev_day
       open_enrollment_period   = effective_period.min.prev_month..(effective_period.min - 10.days)
@@ -153,7 +153,7 @@ module BradysAfterAll
       @mikes_benefit_sponsorship.save
 
       recorded_service_areas  = mikes_benefit_sponsorship.service_areas_on(effective_period.min)
-  
+
       @mikes_plan_year        = create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                         :with_benefit_package,
                                         benefit_sponsorship: mikes_benefit_sponsorship,
@@ -164,7 +164,7 @@ module BradysAfterAll
                                         recorded_service_areas: recorded_service_areas
                                       )
 
-      @mikes_benefit_group   = @mikes_plan_year.benefit_packages[0] 
+      @mikes_benefit_group   = @mikes_plan_year.benefit_packages[0]
 
       # @mikes_benefit_group = FactoryBot.build(:benefit_group, plan_year: nil)
       # @mikes_plan_year = FactoryBot.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])
@@ -174,11 +174,11 @@ module BradysAfterAll
       #                                                      start_on: @mikes_plan_year.start_on,
       #                                                      aasm_state: "initialized"
       #                                                      )
-      
+
       @mikes_census_employee = FactoryBot.create(:census_employee, :with_active_assignment,
                                                   first_name: mike.first_name,  last_name: mike.last_name,
                                                   dob: mike.dob, address: mike.addresses.first, hired_on: mikes_hired_on,
-                                                  benefit_sponsorship: @mikes_benefit_sponsorship, employer_profile: @mikes_employer, 
+                                                  benefit_sponsorship: @mikes_benefit_sponsorship, employer_profile: @mikes_employer,
                                                   benefit_group: @mikes_benefit_group
                                                 )
 
@@ -206,7 +206,7 @@ module BradysAfterAll
         :person => mike,
         benefit_sponsors_employer_profile_id: mikes_employer.id,
         employer_profile_id: nil,
-        hired_on: @mikes_census_employee.hired_on, 
+        hired_on: @mikes_census_employee.hired_on,
         census_employee_id: @mikes_census_employee.id)
     end
 
@@ -220,7 +220,7 @@ module BradysAfterAll
     attr_reader :mikes_organization, :carols_organization
     def create_brady_work_organizations
       create_brady_office_locations
-      @mikes_organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, 
+      @mikes_organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization,
                                                :with_aca_shop_cca_employer_profile, site: @site,
                                                legal_name: "Mike's Architects Limited",
                                                dba: "MAL"

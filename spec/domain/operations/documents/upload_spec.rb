@@ -18,7 +18,7 @@ module Operations
       end
 
       let(:user)             { FactoryBot.create(:user) }
-      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
       let(:employer_profile) {organization.employer_profile}
       let(:doc_storage) do
