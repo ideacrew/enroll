@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class IvlNotice < Notice
 
   include ActionView::Helpers::NumberHelper
   include Acapi::Notifiers
 
-  Required= Notice::Required + []
+  Required = Notice::Required + []
 
-  def initialize(options ={})
+  def initialize(options = {})
     super
   end
 
@@ -19,13 +21,9 @@ class IvlNotice < Notice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -42,7 +40,7 @@ class IvlNotice < Notice
 
   def pdf_options_custom
     options = {
-      margin:  {
+      margin: {
         top: 15,
         bottom: 20,
         left: 22,
@@ -55,19 +53,19 @@ class IvlNotice < Notice
       encoding: 'utf8',
       header: {
         content: ApplicationController.new.render_to_string({
-          template: 'notices/shared/header_for_documents.html.erb',
-          layout: false,
-          locals: { recipient: recipient, notice: notice}
-          }),
-        }
+                                                              template: 'notices/shared/header_for_documents.html.erb',
+                                                              layout: false,
+                                                              locals: { recipient: recipient, notice: notice}
+                                                            })
+      }
     }
     options.merge!({footer: {
-      content: ApplicationController.new.render_to_string({
-        template: "notices/shared/footer_ivl.html.erb",
-        layout: false,
-        locals: {notice: notice}
-      })
-    }})
+                     content: ApplicationController.new.render_to_string({
+                                                                           template: "notices/shared/footer_ivl.html.erb",
+                                                                           layout: false,
+                                                                           locals: {notice: notice}
+                                                                         })
+                   }})
     options
   end
 
@@ -87,11 +85,11 @@ class IvlNotice < Notice
 
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
-      url: Settings.site.home_url,
-      phone: phone_number_format(Settings.contact_center.phone_number),
-      email: Settings.contact_center.email_address,
-      short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com",
-    })
+                                         url: Settings.site.home_url,
+                                         phone: phone_number_format(Settings.contact_center.phone_number),
+                                         email: Settings.contact_center.email_address,
+                                         short_url: "#{EnrollRegistry[:enroll_app].setting(:short_name).item.gsub(/[^0-9a-z]/i,'').downcase}.com"
+                                       })
   end
 
   def phone_number_format(number)
@@ -119,7 +117,7 @@ class IvlNotice < Notice
   end
 
   def join_pdfs_with_path(pdfs, path = nil)
-    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf = File.exist?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
     pdf << CombinePDF.load(pdfs[1])
     path_to_save = path.nil? ? notice_path : path
     pdf.save path_to_save
@@ -144,12 +142,12 @@ class IvlNotice < Notice
 
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
+                                                               street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
+                                                               street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
+                                                               city: primary_address.city.titleize,
+                                                               state: primary_address.state,
+                                                               zip: primary_address.zip
+                                                             })
   end
 
   def check(value)

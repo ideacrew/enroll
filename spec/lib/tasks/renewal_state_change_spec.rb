@@ -3,7 +3,7 @@
 require 'rails_helper'
 require Rails.root.join('spec/shared_contexts/enrollment.rb')
 
-describe 'rake renewal_state_change:ivl_users',type: :task, :dbclean => :around_each, :if => (Settings.site.key.to_s == "dc") do
+describe 'rake renewal_state_change:ivl_users',type: :task, :dbclean => :around_each, :if => (EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc") do
   include_context "setup families enrollments"
 
   before :all do

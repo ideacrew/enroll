@@ -71,6 +71,11 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         expect(history.update_reason).to eq "Extended due date to #{evidence.due_on.strftime('%m/%d/%Y')}"
         expect(history.updated_by).to eq 'system'
       end
+
+      it 'should update default due date for 30 days' do
+        evidence = applicant.income_evidence
+        expect(evidence.extend_due_on).to be_truthy
+      end
     end
 
     context '.request_determination' do

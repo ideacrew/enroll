@@ -5,11 +5,11 @@
 def initialize_site
   p "Creating base site..."
   site = BenefitSponsors::Site.new.tap do |s|
-    s.site_key = Settings.site.key
+    s.site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
     s.long_name = Settings.site.long_name
-    s.short_name = Settings.site.short_name
+    s.short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
     s.byline = Settings.site.byline
-    s.domain_name = Settings.site.domain_name
+    s.domain_name = EnrollRegistry[:enroll_app].setting(:domain_name).item
     s.home_url = Settings.site.home_url
     s.help_url = Settings.site.help_url
     s.faqs_url = Settings.site.faq_url

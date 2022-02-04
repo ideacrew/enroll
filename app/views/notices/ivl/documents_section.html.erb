@@ -259,7 +259,7 @@
 <!-- Indian Inconsistency/American Indian or Alaskan Native-->
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong>"} %>
+  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "<br></br>_____________________________________________________________________________________________________________"} %>

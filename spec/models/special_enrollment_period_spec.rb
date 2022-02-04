@@ -1145,12 +1145,19 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         context 'qle_on past month, submitted date after qle date' do
           let(:qle_on) { TimeKeeper.date_of_record.last_month }
           let(:reporting_date) { TimeKeeper.date_of_record }
+          let(:effective_date) do
+            if reporting_date == reporting_date.beginning_of_month
+              reporting_date
+            else
+              reporting_date.end_of_month.next_day
+            end
+          end
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
           end
 
           it 'should set effective date as next month beginning of month from qle' do
-            expect(new_sep.effective_on).to eq qle_on.end_of_month + 1.day
+            expect(new_sep.effective_on).to eq effective_date
           end
         end
 
@@ -1177,6 +1184,64 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
             expect(new_sep.effective_on).to eq TimeKeeper.date_of_record.beginning_of_month
           end
         end
+
+        context 'qle_on in more than one month in the past' do
+
+          context 'and reporting date is first of month' do
+            let(:current_date) { TimeKeeper.date_of_record.beginning_of_month }
+            let(:qle_on) { current_date - 45.days }
+            let!(:reporting_date) { current_date }
+
+            before do
+              TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+            end
+
+            it 'should set effective date as today' do
+              expect(new_sep.effective_on).to eq current_date
+            end
+          end
+
+          context 'and reporting date is after first of month' do
+            let(:date) { TimeKeeper.date_of_record.beginning_of_month }
+            let(:qle_on) { date - 45.days }
+            let!(:reporting_date) { date.next_day }
+
+            before do
+              TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+            end
+
+            it 'should set effective date as today' do
+              expect(new_sep.effective_on).to eq date.next_month
+            end
+          end
+        end
+
+        context 'qle_on & submitted date first of month, but qle_on is in the past' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+          let!(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month.next_day }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as beginning of next month' do
+            expect(new_sep.effective_on).to eq TimeKeeper.date_of_record.beginning_of_month.next_month
+          end
+        end
+
+        context 'qle_on in more than one month from now' do
+          let(:date) { TimeKeeper.date_of_record.beginning_of_month }
+          let(:qle_on) { date + 45.days }
+          let!(:reporting_date) { date.prev_day }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as beginning of corresponding month' do
+            expect(new_sep.effective_on).to eq qle_on.end_of_month.next_day
+          end
+        end
       end
 
       context "SHOP" do
@@ -1195,12 +1260,20 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         context 'qle_on past month, submitted date after qle date' do
           let(:qle_on) { TimeKeeper.date_of_record.last_month }
           let(:reporting_date) { TimeKeeper.date_of_record }
+          let(:effective_date) do
+            if reporting_date == reporting_date.beginning_of_month
+              reporting_date
+            else
+              reporting_date.end_of_month.next_day
+            end
+          end
+
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
           end
 
           it 'should set effective date as next month beginning of month from qle' do
-            expect(new_sep.effective_on).to eq qle_on.end_of_month + 1.day
+            expect(new_sep.effective_on).to eq effective_date
           end
         end
 

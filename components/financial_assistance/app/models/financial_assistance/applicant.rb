@@ -857,6 +857,8 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? && self_employment_fields_complete if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
+        return false if FinancialAssistanceRegistry.feature_enabled?(:american_indian_alaskan_native_income) && indian_tribe_member && has_american_indian_alaskan_native_income.nil?
+
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income

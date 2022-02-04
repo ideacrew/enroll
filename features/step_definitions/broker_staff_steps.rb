@@ -44,7 +44,7 @@ Then(/^Broker should see the staff successfully approved message$/) do
 end
 
 Then(/^Broker Staff should receive an invitation email from his Employer$/) do
-  open_email("ricky.martin@example.com", :with_subject => "Set up your #{Settings.site.short_name} account")
+  open_email("ricky.martin@example.com", :with_subject => "Set up your #{EnrollRegistry[:enroll_app].setting(:short_name).item} account")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
 end
 

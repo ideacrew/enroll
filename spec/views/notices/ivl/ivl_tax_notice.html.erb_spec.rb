@@ -42,10 +42,10 @@ RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
     it { expect(rendered).not_to match(/Dear #{person.full_name}:/) }
     it { expect(rendered).to match(/This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone/) }
     it { expect(rendered).to match(/If you have questions or concerns, we’re here to help./) }
-    it { expect(rendered).to match(/The #{Settings.site.short_name} Team/) }
+    it { expect(rendered).to match(/The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team/) }
     it { expect(rendered).to match(/#{Settings.site.ivl_responsibility_url}/) }
     it { expect(rendered).to match(/Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through 2018./) }
-    it { expect(rendered).not_to match(/#{Settings.site.short_name} does not control the individual mandate/) }
+    it { expect(rendered).not_to match(/#{EnrollRegistry[:enroll_app].setting(:short_name).item} does not control the individual mandate/) }
   end
 
   context 'template text for assisted only' do
@@ -67,7 +67,7 @@ RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
     it { render partial: 'notices/shared/logo_and_address_shop', locals: {notice: notice} }
     it { render partial: "notices/shared/date", locals: {notice: notice} }
     it { render partial: "notices/shared/address", locals: {notice: notice} }
-    it { render partial: 'notices/shared/paragraph', locals: {content: "The #{Settings.site.short_name} Team"} }
+    it { render partial: 'notices/shared/paragraph', locals: {content: "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team"} }
     it { render partial: 'notices/shared/reference_paragraph', locals: {contents: ['']} }
     it { render partial: 'notices/shared/unordered_list', locals: { previous: "You may receive more than one Form 1095-A if you:", listings: ['Also had a plan from ', 'Changed from one plan', 'Had family members']} }
     it { render partial: 'notices/shared/paragraph_with_headers', locals: { contents: [''], heading: 'Understanding Form 1095-A', sub_heading: ''} }

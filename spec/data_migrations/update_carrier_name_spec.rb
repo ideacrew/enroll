@@ -27,7 +27,7 @@ describe UpdateCarrierName, dbclean: :after_each do
   end
 
   describe "update carrier legal name in exempt_organization" do
-    let(:site) { build(:benefit_sponsors_site, :with_owner_exempt_organization, Settings.site.key) }
+    let(:site) { build(:benefit_sponsors_site, :with_owner_exempt_organization, EnrollRegistry[:enroll_app].setting(:site_key).item) }
     let(:issuer_profile) { create(:benefit_sponsors_organizations_issuer_profile, organization: site.owner_organization, abbrev: "abcxyz") }
 
     let(:new_legal_name) { "New Legal Name" }

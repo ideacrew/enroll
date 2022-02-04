@@ -7,7 +7,7 @@
           | &times;
         h4.modal-title Confirm Publish Plan Year
       .modal-body
-        p As submitted, this application is ineligible for coverage under the "#{Settings.site.short_name}"  exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by "#{Settings.site.short_name}" officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
+        p As submitted, this application is ineligible for coverage under the "#{EnrollRegistry[:enroll_app].setting(:short_name).item}"  exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by "#{EnrollRegistry[:enroll_app].setting(:short_name).item}" officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
         ul.application-warnings
       .modal-footer
         = link_to 'Force Publish', employers_employer_profile_plan_year_force_publish_path(@employer_profile,benefit_application), method: :post, :class => 'btn btn-danger'

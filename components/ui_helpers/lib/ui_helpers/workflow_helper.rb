@@ -94,7 +94,7 @@ module UIHelpers
       text.gsub! '<board_of_elections_phone_number-placeholder>', Settings.contact_center.board_of_elections_phone_number
       text.gsub! '<contact-center-phone_number-placeholder>', Settings.contact_center.phone_number
       text.gsub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
-      text.gsub! '<short-name-placeholder>', Settings.site.short_name
+      text.gsub! '<short-name-placeholder>', EnrollRegistry[:enroll_app].setting(:short_name).item
       text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
       text.gsub! '<reviewed-information>', l10n('insured.review_information')
 

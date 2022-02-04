@@ -38,9 +38,9 @@ RSpec.describe 'notices/ivl/ivl_vta_notice.html.erb' do
   context "for template's text" do
     it { expect(rendered).to have_selector('h3', text: 'NOTICE - VOID FORM 1095-A TAX FORM') }
     it { expect(rendered).not_to match(/Dear #{person.full_name}:/) }
-    it { expect(rendered).to match(/You previously received a Form 1095-A from #{Settings.site.short_name} with information about your #{previous_year} health insurance coverage./) }
+    it { expect(rendered).to match(/You previously received a Form 1095-A from #{EnrollRegistry[:enroll_app].setting(:short_name).item} with information about your #{previous_year} health insurance coverage./) }
     it { expect(rendered).to match(/If you believe your Form 1095-A was voided by mistake please call/) }
-    it { expect(rendered).to match(/The #{Settings.site.short_name} Team/) }
+    it { expect(rendered).to match(/The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team/) }
   end
 
   context 'text display for void active' do
@@ -62,6 +62,6 @@ RSpec.describe 'notices/ivl/ivl_vta_notice.html.erb' do
     it { render partial: 'notices/shared/logo_and_address_shop', locals: {notice: notice} }
     it { render partial: 'notices/shared/date', locals: {notice: notice} }
     it { render partial: 'notices/shared/address', locals: {notice: notice} }
-    it { render partial: 'notices/shared/paragraph', locals: {content: "The #{Settings.site.short_name} Team"} }
+    it { render partial: 'notices/shared/paragraph', locals: {content: "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team"} }
   end
 end

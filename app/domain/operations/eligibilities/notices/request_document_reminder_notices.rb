@@ -46,36 +46,26 @@ module Operations
         def request_notices(values, notices)
           response =
             notices.reduce({}) do |notices_output, document_reminder_key|
-              offset_prior_due_date =
-                offset_prior_to_due_date(document_reminder_key)
+              offset_prior_due_date = offset_prior_to_due_date(document_reminder_key)
               families =
                 Family.outstanding_verifications_expiring_on(
                   values[:date_of_record] + offset_prior_due_date
                 )
 
               result_set =
-                families.reduce(
-                  { successes: [], failures: [] }
-                ) do |results, family|
-                  result =
-                    process_notice_request(
-                      family,
-                      document_reminder_key,
-                      values
-                    )
+                families.reduce({ successes: [], failures: [] }) do |results, family|
+                  begin
+                    result = process_notice_request(family, document_reminder_key, values)
 
-                  if result.success?
-                    results[:successes].push(
-                      { family_hbx_id: family.hbx_assigned_id }
-                    )
-                  else
-                    results[:failures].push(
-                      {
-                        family_hbx_id: family.hbx_assigned_id,
-                        error: result.failure
-                      }
-                    )
+                    if result.success?
+                      results[:successes].push({ family_hbx_id: family.hbx_assigned_id })
+                    else
+                      results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: result.failure })
+                    end
+                  rescue StandardError => e
+                    results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: "Failed due to unknow exception - #{e.inspect}" })
                   end
+
                   results
                 end
 

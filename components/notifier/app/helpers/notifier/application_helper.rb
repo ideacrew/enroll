@@ -45,7 +45,7 @@ module Notifier
     end
 
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
     #TODO: Add a similar notice attachment setting for DC

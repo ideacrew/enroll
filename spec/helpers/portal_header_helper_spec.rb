@@ -7,7 +7,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
     let(:signed_in?){ true }
 
     context "has_employer_staff_role?" do
-      let(:site_key)         { Settings.site.key }
+      let(:site_key)         { EnrollRegistry[:enroll_app].setting(:site_key).item }
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
       let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:employer_profile)    { benefit_sponsor.employer_profile }

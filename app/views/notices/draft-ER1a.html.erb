@@ -26,7 +26,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Subject: <%= Settings.site.short_name %> Plan Year 2016 Open Enrollment &amp; Preliminary Renewal Notice</h3></td>
+      <td><h3>Subject: <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> Plan Year 2016 Open Enrollment &amp; Preliminary Renewal Notice</h3></td>
     </tr>
     <tr class="fssizeuser">
       <td>Dear <%= notice.primary_fullname.strip %>,</td>
@@ -36,13 +36,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr class="widn">
-      <td><%= Settings.site.short_name %> has started the process of renewing eligibility for the 2016 plan year, which begins on January 1, 2016.  This involves two steps.</td>
+      <td><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> has started the process of renewing eligibility for the 2016 plan year, which begins on January 1, 2016.  This involves two steps.</td>
     </tr>
     <tr class="widn">
       <td>
         <ol>
           <li>
-              We need to make sure that the information we have about you is up to date. This notice tells you whether you and any other individuals in your household are eligible to purchase a <%= Settings.site.short_name %> plan in 2016.  If you disagree with any of the information we used to make this determination, you should update us using the process described below.
+              We need to make sure that the information we have about you is up to date. This notice tells you whether you and any other individuals in your household are eligible to purchase a <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> plan in 2016.  If you disagree with any of the information we used to make this determination, you should update us using the process described below.
             </li>
             <li>
               You will have the opportunity to select a different health plan for 2016 once open enrollment for 2016 starts on November 1, 2015. This notice includes additional information about open enrollment.
@@ -180,7 +180,7 @@ Your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settin
     </tr>
 
     <tr class="mar20 fssizeuser">
-      <td>If you do not have a "My Account", you can create one at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>  On the main page, click on "Apply Now" and enter your information.  Once the account is created, select "Find an already submitted application" and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to Your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= Settings.site.short_name %>.</td>
+      <td>If you do not have a "My Account", you can create one at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>  On the main page, click on "Apply Now" and enter your information.  Once the account is created, select "Find an already submitted application" and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to Your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>.</td>
     </tr>
     </tbody>
     </table>
@@ -200,7 +200,7 @@ Your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settin
 <tr><td></br></br></td></tr>
 <tr class="mar20 fssizeuser">
       <td style="text-align:center;">
-<h4>APPLYING TO REGISTER OR DECLINING TO REGISTER TO VOTE WILL NOT AFFECT THE AMOUNT OF ASSISTANCE THAT YOU WILL BE PROVIDED BY <%= Settings.site.short_name %>.</h4>
+<h4>APPLYING TO REGISTER OR DECLINING TO REGISTER TO VOTE WILL NOT AFFECT THE AMOUNT OF ASSISTANCE THAT YOU WILL BE PROVIDED BY <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>.</h4>
 </td>
 </tr>
 
