@@ -189,7 +189,7 @@ module BenefitSponsors
         ]
 
         CSV.generate(headers: true) do |csv|
-          csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
+          csv << (["#{EnrollRegistry[:enroll_app].setting(:long_name).item} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
           csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
           csv << columns
           all.each do |census_employee|

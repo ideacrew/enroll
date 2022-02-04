@@ -6,7 +6,7 @@ def initialize_site
   p "Creating base site..."
   site = BenefitSponsors::Site.new.tap do |s|
     s.site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
-    s.long_name = Settings.site.long_name
+    s.long_name = EnrollRegistry[:enroll_app].setting(:long_name).item
     s.short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
     s.byline = EnrollRegistry[:enroll_app].setting(:byline).item
     s.domain_name = EnrollRegistry[:enroll_app].setting(:domain_name).item
@@ -19,7 +19,7 @@ def initialize_site
   p "Creating HBX parent organization..."
   owner_org = BenefitSponsors::Organizations::ExemptOrganization.new.tap do |org|
     org.home_page = EnrollRegistry[:enroll_app].setting(:home_url).item
-    org.legal_name = Settings.site.long_name
+    org.legal_name = EnrollRegistry[:enroll_app].setting(:long_name).item
     org.dba = "12345"
     org.entity_kind = :health_insurance_exchange
     org.profiles << BenefitSponsors::Organizations::HbxProfile.new(cms_id: "12345", us_state_abbreviation: Settings.aca.state_abbreviation)
