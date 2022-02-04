@@ -43,7 +43,7 @@ RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
     it { expect(rendered).to match(/This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone/) }
     it { expect(rendered).to match(/If you have questions or concerns, we’re here to help./) }
     it { expect(rendered).to match(/The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team/) }
-    it { expect(rendered).to match(/#{Settings.site.ivl_responsibility_url}/) }
+    it { expect(rendered).to match(/#{EnrollRegistry[:enroll_app].setting(:ivl_responsibility_url).item}/) }
     it { expect(rendered).to match(/Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through 2018./) }
     it { expect(rendered).not_to match(/#{EnrollRegistry[:enroll_app].setting(:short_name).item} does not control the individual mandate/) }
   end
