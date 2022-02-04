@@ -93,9 +93,9 @@ module ApplicationHelper
 
   def copyright_notice
     copyright_attribution = if TimeKeeper.date_of_record.year.to_s == site_copyright_period_start.to_s
-                              "#{site_copyright_period_start} #{Settings.site.long_name}"
+                              "#{site_copyright_period_start} #{EnrollRegistry[:enroll_app].setting(:long_name).item}"
                             else
-                              "#{site_copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+                              "#{site_copyright_period_start}-#{TimeKeeper.date_of_record.year} #{EnrollRegistry[:enroll_app].setting(:long_name).item}"
                             end
     raw("<span class='copyright'><i class='far fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end

@@ -6,20 +6,20 @@ def initialize_site
   p "Creating base site..."
   site = BenefitSponsors::Site.new.tap do |s|
     s.site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
-    s.long_name = Settings.site.long_name
+    s.long_name = EnrollRegistry[:enroll_app].setting(:long_name).item
     s.short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
-    s.byline = Settings.site.byline
+    s.byline = EnrollRegistry[:enroll_app].setting(:byline).item
     s.domain_name = EnrollRegistry[:enroll_app].setting(:domain_name).item
-    s.home_url = Settings.site.home_url
-    s.help_url = Settings.site.help_url
+    s.home_url = EnrollRegistry[:enroll_app].setting(:home_url).item
+    s.help_url = EnrollRegistry[:enroll_app].setting(:help_url).item
     s.faqs_url = Settings.site.faq_url
-    s.logo_file_name = Settings.site.logo_file_name
+    s.logo_file_name = EnrollRegistry[:enroll_app].setting(:logo_file_name).item
   end
 
   p "Creating HBX parent organization..."
   owner_org = BenefitSponsors::Organizations::ExemptOrganization.new.tap do |org|
-    org.home_page = Settings.site.home_url
-    org.legal_name = Settings.site.long_name
+    org.home_page = EnrollRegistry[:enroll_app].setting(:home_url).item
+    org.legal_name = EnrollRegistry[:enroll_app].setting(:long_name).item
     org.dba = "12345"
     org.entity_kind = :health_insurance_exchange
     org.profiles << BenefitSponsors::Organizations::HbxProfile.new(cms_id: "12345", us_state_abbreviation: Settings.aca.state_abbreviation)

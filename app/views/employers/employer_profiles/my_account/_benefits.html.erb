@@ -3,7 +3,7 @@
   <div class="row">
     <% if flag == 'blocking' %>
     <div class="alert alert-info" role="alert">
-      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= Settings.site.late_rates_message %></strong>
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= EnrollRegistry[:enroll_app].setting(:late_rates_message).item %></strong>
     </div>
     <% end %>
     <div class="col-xs-8">
@@ -125,7 +125,7 @@
         </div>
       </div>
     <% end %>
-    
+
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
     <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">

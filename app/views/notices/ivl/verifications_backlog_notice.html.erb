@@ -217,5 +217,5 @@
 </div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{EnrollRegistry[:enroll_app].setting(:short_name).item} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling #{EnrollRegistry[:enroll_app].setting(:short_name).item} Customer Service toll-free <br>at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the #{EnrollRegistry[:enroll_app].setting(:short_name).item} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>. You can get help with logging in or creating an account by calling #{EnrollRegistry[:enroll_app].setting(:short_name).item} Customer Service toll-free <br>at 1-855-532-5465."],
     heading: 'Your Secure User Account', sub_heading: ''} %>

@@ -1,7 +1,5 @@
 site:
-  home_url: 'https://cme.enroll.openhbx.org/'
   # copyright_period_start: "2013"
-  help_url: 'https://www.coverme.gov/help/'
   # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
@@ -10,7 +8,6 @@ site:
   block_ie_browser: true
   broker_claim_quoting_enabled: true
   broker_quoting_enabled: false
-  byline: "Maine's Official Health Insurance Marketplace"
   create_routes:
     [
       '/insured/employee/privacy',
@@ -20,18 +17,8 @@ site:
   curam_enabled?: true
   exchange_hbx_id: 'ME0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  header_message: "Maine's Official Health Insurance Marketplace"
-  invoice_bill_url: 'https://www.e-billexpress.com/ebpp/DCHEALTHPAY/'
-  irs_url: 'https://www.irs.gov/'
   ivl_responsibility_url: ''
-  late_rates_message: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
-  logo_file_name: 'logo_me.svg'
-  long_name: 'CoverME.gov'
   mail_address: 'info@coverme.gov'
-  mailer_logo_file_name: 'logo_me.svg'
-  main_web_address_url: 'https://www.dchealthlink.com/'
-  main_web_address: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
-  payment_pdf_url: 'pdf/employers_paying_your_premiums_online.pdf'
   plan_options_title_for_ma: true
   prod_tax_info: ''
   publisher: 'dchl'
@@ -43,7 +30,6 @@ site:
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
   terms_and_conditions_url: ''
   use_default_devise_path: true
-  website_name: 'https://www.accesshealthct.com/AHCT/LandingPageCTHIX'
 
 contact_center:
   name: "CoverME.gov's Customer Care Center"

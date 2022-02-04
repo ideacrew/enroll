@@ -82,10 +82,10 @@
 <% if notice.aqhp_individuals.present? %>
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
   <% end %>
 <% end %>
 
@@ -96,10 +96,10 @@
 
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
   <% end %>
 <% end %>
 
@@ -121,10 +121,10 @@
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
+                 "Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to enroll now."]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.coverage_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
+    content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.coverage_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
   <% else %>
 
     <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
@@ -134,15 +134,15 @@
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
+                 "Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to enroll now."]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "To find out if those who qualify can enroll now, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
+    content: "To find out if those who qualify can enroll now, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
 
   <% end %>
 
   <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-   contents: ["#{EnrollRegistry[:enroll_app].setting(:short_name).item} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
+   contents: ["#{EnrollRegistry[:enroll_app].setting(:short_name).item} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>."],
      heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '12px'} %>
 <% end %>
 

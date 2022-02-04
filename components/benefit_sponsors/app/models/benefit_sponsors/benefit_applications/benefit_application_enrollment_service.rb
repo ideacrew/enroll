@@ -23,7 +23,7 @@ module BenefitSponsors
     def revert_application
       if benefit_application.may_revert_application?
         benefit_application.revert_application!
-        
+
         [true, benefit_application, {}]
       else
         [false, benefit_application]
@@ -70,7 +70,7 @@ module BenefitSponsors
       if business_policy_satisfied_for?(:force_submit_benefit_application) && is_application_eligible?
         if benefit_application.may_approve_application?
           benefit_application.auto_approve_application!
-          
+
           if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment!
             @messages['notice'] = 'Employer(s) Plan Year was successfully published.'
@@ -289,7 +289,7 @@ module BenefitSponsors
 
     def hbx_enrollments_by_month(date)
       end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
-      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten      
+      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten
       enrollments = nil
       s_benefits.each do |sponsored_benefit|
         enrollments_by_month = HbxEnrollment.by_benefit_application_and_sponsored_benefit(
@@ -323,7 +323,7 @@ module BenefitSponsors
           if employer_attestation.blank? || employer_attestation.unsubmitted?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
           elsif employer_attestation.denied?
-            warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+            warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{EnrollRegistry[:enroll_app].setting(:long_name).item}"})
           else
             warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_attestation.aasm_state.humanize}. Please contact customer service."})
           end
@@ -342,7 +342,7 @@ module BenefitSponsors
     def submit_application_warnings
       [application_errors.values + application_eligibility_warnings.values].flatten.reject(&:blank?)
     end
-    
+
     def force_publish_warnings
       submit_warnings = []
       submit_warnings += business_policy.fail_results.values unless business_policy.fail_results.values.blank?

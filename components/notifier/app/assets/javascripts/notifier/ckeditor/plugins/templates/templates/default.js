@@ -29,7 +29,7 @@ CKEDITOR.addTemplates('default', {
         '<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>' +
         "<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
         '</ul>' +
-        "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
+        "<p>You can also find more information on our website at <a href='http://​#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}'>#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}</a></p>" +
         '<p>[[ if employer_profile.broker_present? ]]</p>' +
         "<table border='0'cellpadding='0' cellspacing='0' style='height:auto; width:auto'>" +
         '<tbody>' +
@@ -78,7 +78,7 @@ CKEDITOR.addTemplates('default', {
         '<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>' +
         "<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
         '</ul>' +
-        "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
+        "<p>You can also find more information on our website at <a href='http://​#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}'>#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}</a></p>" +
         '[[ if employee_profile.broker_present? ]]' +
         "<table border='0'cellpadding='0' cellspacing='0' style='height:auto; width:auto'>" +
         '<tbody>' +
@@ -121,7 +121,7 @@ CKEDITOR.addTemplates('default', {
         '<ul>' +
         '<li>By calling #{contact_center_phone_number}</li>' +
         '<li>TTY: #{Settings.contact_center.tty_number}</li>' +
-        "<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
+        "<li>Online at: <a href='#{EnrollRegistry[:enroll_app].setting(:home_url).item}'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a></li>" +
         '</ul>',
     },
     {

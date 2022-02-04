@@ -2,12 +2,12 @@
   .alert.alert-info role="alert"
     strong
       i.fa.fa-exclamation-triangle aria-hidden="true"
-      = Settings.site.late_rates_message
+      = EnrollRegistry[:enroll_app].setting(:late_rates_message).item
 - show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 .col-md-12.col-xs-12
   .row
-    h1.heading-text.mt-0 
+    h1.heading-text.mt-0
 		| Benefit Application Details
     span.blocking
       .row.row-form-wrapper.col-md-12.ml-1
@@ -45,4 +45,3 @@
 .pull-right
   = link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(f.parent.service.benefit_sponsorship, f.service.benefit_application), remote: true, class: "btn btn-default pull-right mrz mr-1", id:'editPlanYearButton'
 
-        
