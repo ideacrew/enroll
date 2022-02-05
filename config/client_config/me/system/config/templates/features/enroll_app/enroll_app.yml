@@ -175,6 +175,8 @@ registry:
             item: "Nationwide"
           - key: :statewide_area
             item: "Maine/Regional"
+          - key: :nationwide_area
+            item: "Nationwide"
           - key: :standard_plan_label
             item: "CLEAR CHOICE PLAN"
           - key: :exchange_name
