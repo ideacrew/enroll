@@ -740,13 +740,13 @@ class Person
   def age_on(date)
     begin
       age = date.year - dob.year
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
+      else
+        age
+      end
     rescue StandardError
-      self.errors.add(:base, "exceptions.valid_birthdate")
-    end
-    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
-      age - 1
-    else
-      age
+      self.errors.add(:base, l10n("exceptions.valid_birthdate"))
     end
   end
 
