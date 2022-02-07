@@ -59,6 +59,7 @@ end
 
 And(/^employer clicks OK in warning modal$/) do
   # find('.swal-button swal-button--confirm swal-button--danger', text: "OK").click
+  find_button('OK').visible?
   click_button 'OK'
 end
 
