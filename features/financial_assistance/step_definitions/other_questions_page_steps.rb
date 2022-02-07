@@ -104,6 +104,20 @@ Then(/^the have you applied for an SSN question should display$/) do
   expect(page).to have_content('Has this person applied for an SSN *')
 end
 
+And(/^the is primary caregiver question should display$/) do
+  expect(page).to have_css('#is_primary_caregiver_no')
+end
+
+Given(/^the is primary caregiver default value is nil$/) do
+  EnrollRegistry[:primary_caregiver_default_value].feature.stub(:is_enabled).and_return(false)
+  EnrollRegistry[:primary_caregiver_default_value].feature.stub(:item).and_return(nil)
+end
+
+Then(/^there should not be a default value$/) do
+  expect(page).to_not have_css('#is_primary_caregiver_no[checked]')
+
+end
+
 And(/^the user answers no to the have you applied for an SSN question$/) do
   choose('is_ssn_applied_no')
 end
