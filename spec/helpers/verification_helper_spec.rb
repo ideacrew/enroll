@@ -229,6 +229,14 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
+  describe "#default_verification_due_date" do
+    let(:due_date) { TimeKeeper.date_of_record + 96.days }
+
+    it "returns due date" do
+      expect(helper.default_verification_due_date).to eq(due_date)
+    end
+  end
+
   describe "#documents uploaded" do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do

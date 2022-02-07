@@ -182,7 +182,7 @@ module IvlNotices
 
     def append_hbe
       notice.hbe = PdfTemplates::Hbe.new({
-                                           url: Settings.site.home_url,
+                                           url: EnrollRegistry[:enroll_app].setting(:home_url).item,
                                            phone: phone_number_format(Settings.contact_center.phone_number),
                                            email: Settings.contact_center.email_address,
                                            short_url: "#{EnrollRegistry[:enroll_app].setting(:short_name).item.gsub(/[^0-9a-z]/i,'').downcase}.com"

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  do
   let(:user) { FactoryBot.create(:user, oim_id: "test@enroll.com") }
 
-  unless Settings.site.key == :cca
+  unless EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
     describe "a signed in user" do
       before :each do
         sign_in user

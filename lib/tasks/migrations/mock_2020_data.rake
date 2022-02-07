@@ -28,7 +28,7 @@ namespace :new_model do
 
     [:aca_shop, :fehb].each do |kind|
       puts "Reseting #{kind} benefit_market_catalog for Period #{mock_year}" unless Rails.env.test?
-      BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: kind)
+      BenefitMarkets::BenefitMarket.where(:site_urn => EnrollRegistry[:enroll_app].setting(:site_key).item, kind: kind)
                                    .first
                                    .benefit_market_catalogs
                                    .select { |a| a.application_period.first.year.to_s == mock_year.to_s }

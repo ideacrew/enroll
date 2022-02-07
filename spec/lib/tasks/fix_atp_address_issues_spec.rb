@@ -7,33 +7,47 @@ Rake::Task.define_task(:environment)
 RSpec.describe 'migrations:fix_atp_address_issues', :type => :task, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "12345", addresses: [address1]) }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let(:address1) do 
+  let(:address1) do
     FactoryBot.build(
-        :address,
-        :address_1 => '1111 Awesome Street NE',
-        :address_2 => '#111',
-        :address_3 => '',
-        :city => "Houlton",
-        :country_name => '',
-        :kind => 'home',
-        :state => "ME",
-        :zip => "04730",
-        county: "Aroostook"
-      )
+      :address,
+      :address_1 => '1111 Awesome Street NE',
+      :address_2 => '#111',
+      :address_3 => '',
+      :city => "Houlton",
+      :country_name => '',
+      :kind => 'home',
+      :state => "ME",
+      :zip => "04730",
+      county: "Aroostook"
+    )
   end
-  let(:address2) do 
+  let(:address2) do
     FactoryBot.build(
-        :address,
-        :address_1 => '1111 Awesome Street NE',
-        :address_2 => '#111',
-        :address_3 => '',
-        :city => "Houlton",
-        :country_name => '',
-        :kind => 'mailing',
-        :state => "ME",
-        :zip => "04730",
-        county: "Aroostook"
-      )
+      :address,
+      :address_1 => '1111 Awesome Street NE',
+      :address_2 => '#111',
+      :address_3 => '',
+      :city => "Houlton",
+      :country_name => '',
+      :kind => 'mailing',
+      :state => "ME",
+      :zip => "04730",
+      county: "Aroostook"
+    )
+  end
+  let(:address3) do
+    FactoryBot.build(
+      :financial_assistance_address,
+      :address_1 => '1111 Excellent Ave NW',
+      :address_2 => '#111',
+      :address_3 => '',
+      :city => "Houlton",
+      :country_name => '',
+      :kind => 'mailing',
+      :state => "ME",
+      :zip => "04730",
+      county: "Aroostook"
+    )
   end
   let(:dup_addresses) {[address1, address2]}
   let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role, is_homeless: true, addresses: dup_addresses) }
@@ -53,6 +67,11 @@ RSpec.describe 'migrations:fix_atp_address_issues', :type => :task, dbclean: :af
     applicant2.addresses = dup_addresses
     applicant2.save!
     application.save!
+  end
+  let(:create_non_dup_addresses) do
+    # Applicant addresses are updated via callbacks
+    person.addresses = [address1, address3]
+    person.save!    
   end
   let(:rake) {Rake::Task["migrations:fix_atp_address_issues"]}
 
@@ -86,6 +105,26 @@ RSpec.describe 'migrations:fix_atp_address_issues', :type => :task, dbclean: :af
       dependent_person.reload
       applicant2.reload
       expect(applicant2.same_with_primary).to eq(true)
+    end
+
+    context "non-duplicate addresses" do
+      it "should not update the person addresses" do
+        create_non_dup_addresses
+        person.reload
+        original_addresses = person.addresses
+        rake.invoke
+        person.reload        
+        expect(person.addresses).to eq(original_addresses)
+      end
+      
+      it "should not update the applicant addresses" do
+        create_non_dup_addresses
+        applicant1.reload
+        original_addresses = applicant1.addresses
+        rake.invoke
+        applicant1.reload
+        expect(applicant1.addresses).to eq(original_addresses)
+      end
     end
   end
 end

@@ -8,8 +8,8 @@ class UpdateMinimumContributionFactorOnContributionUnit < MongoidMigrationTask
     raise 'Please provide minimum contribution factor' if ENV['min_contribution_factor'].blank?
     date = Date.strptime(ENV['benefit_market_catalog_application_date'], "%m/%d/%Y")
     min_contribution_factor = ENV['min_contribution_factor'].to_i
-    sites = BenefitSponsors::Site.by_site_key(Settings.site.key)
-    raise "Unable to find site for site key - #{Settings.site.key}" if sites.blank?
+    sites = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item)
+    raise "Unable to find site for site key - #{EnrollRegistry[:enroll_app].setting(:site_key).item}" if sites.blank?
 
     benefit_sponsors_site = sites.first
     benefit_market = benefit_sponsors_site.benefit_markets.where(kind: :aca_shop).first

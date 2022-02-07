@@ -123,7 +123,6 @@ registry:
             item: ""
           - key: :forms
             item: ""
-            item: ""
           - key: :forms_name
             item: ""
           - key: :short_url
@@ -634,7 +633,7 @@ registry:
         is_enabled: true
       - key: :tobacco_user_field
         item: :tobacco_user_field
-        is_enabled: true 
+        is_enabled: true
       - key: :in_person_application_enabled
         item: :in_person_application_enabled
         is_enabled: false

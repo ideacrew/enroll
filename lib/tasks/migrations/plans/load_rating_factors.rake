@@ -3,7 +3,7 @@ require 'rake'
 namespace :load_rating_factors do
 
   task :run_all_rating_factors => :environment do
-    if Settings.site.key.to_s == "dc"
+    if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc"
       Rake::Task['load_rating_factors:dc_rating_factors'].invoke
     else
       files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_factors", "**", "*.xlsx"))
@@ -26,7 +26,7 @@ namespace :load_rating_factors do
 
   desc "DC rating factors"
   task :dc_rating_factors, [:active_year] => :environment do |t, args|
-    if Settings.site.key.to_s == "dc"
+    if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc"
       years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2021)
       years.each do |year|
         puts "creating dc rating factors for #{year}" unless Rails.env.test?

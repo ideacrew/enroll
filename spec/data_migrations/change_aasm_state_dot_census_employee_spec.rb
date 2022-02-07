@@ -11,7 +11,7 @@ describe ChangeAasmStateDotCensusEmployee, dbclean: :after_each do
   describe 'census employee not in terminated state' do
     subject {ChangeAasmStateDotCensusEmployee.new('change_aasm_state_dot_census_employee', double(:current_scope => nil)) }
 
-    let(:site_key)              { Settings.site.key.to_sym }
+    let(:site_key)              { EnrollRegistry[:enroll_app].setting(:site_key).item.to_sym }
     let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
     let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile_initial_application".to_sym, site: site) }
     let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
@@ -22,7 +22,7 @@ describe ChangeAasmStateDotCensusEmployee, dbclean: :after_each do
     before :each do
       census_employee.update_attributes!(aasm_state:'employment_terminated',employment_terminated_on:TimeKeeper.date_of_record,coverage_terminated_on:TimeKeeper.date_of_record)
     end
-    
+
     it 'should change dot of ce not in employment termination state' do
       ClimateControl.modify census_employee_id: census_employee.id do
         subject.migrate
@@ -32,5 +32,5 @@ describe ChangeAasmStateDotCensusEmployee, dbclean: :after_each do
         expect(census_employee.aasm_state).to eq 'employee_role_linked'
       end
     end
-  end 
+  end
 end

@@ -41,7 +41,8 @@ module Subscribers
     private
 
     def update_due_date_on_vlp_documents(family)
-      ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: family, due_date: TimeKeeper.date_of_record + 95.days)
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: family, due_date: TimeKeeper.date_of_record + verification_document_due.days)
     end
 
     def pre_process_message(subscriber_logger, payload)

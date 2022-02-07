@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+# rubocop:disable Style/MixinUsage
 include ActionView::Context
+# rubocop:enable Style/MixinUsage
 
 RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
 
@@ -43,7 +45,7 @@ RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
     it { expect(rendered).to match(/This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone/) }
     it { expect(rendered).to match(/If you have questions or concerns, we’re here to help./) }
     it { expect(rendered).to match(/The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team/) }
-    it { expect(rendered).to match(/#{Settings.site.ivl_responsibility_url}/) }
+    it { expect(rendered).to match(/#{EnrollRegistry[:enroll_app].setting(:ivl_responsibility_url).item}/) }
     it { expect(rendered).to match(/Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through 2018./) }
     it { expect(rendered).not_to match(/#{EnrollRegistry[:enroll_app].setting(:short_name).item} does not control the individual mandate/) }
   end
@@ -51,15 +53,27 @@ RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
   context 'template text for assisted only' do
     it { expect(rendered).to match(/You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}./) }
     it { expect(rendered).to match(/Since you received an advance premium tax credit, your Form 1095-A also shows how much of your tax credit was applied to your premium each month./) }
-    it { expect(rendered).to match("The IRS requires you to use Form 8962 to report the amount of advance premium tax credit you received in #{previous_year}. You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>.") }
+    it {
+      # rubocop:disable Layout/LineLength
+      expect(rendered).to match("The IRS requires you to use Form 8962 to report the amount of advance premium tax credit you received in #{previous_year}. You can download Form 8962 directly from the IRS website at <a href=#{EnrollRegistry[:enroll_app].setting(:irs_url).item}>IRS.gov</a>.")
+      # rubocop:enable Layout/LineLength
+    }
     it { expect(rendered).to match("The back of your Form 1095-A has instructions on how to fill out Form 8962. You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}.") }
   end
 
   context 'template text for unassisted only' do
     let(:true_or_false) { false }
 
-    it { expect(rendered).to match(/includes information about the primary recipient. Your spouse’s information is not listed because you didn’t receive an advance premium tax credit, and the IRS tells us not to include their information here. Part I also lists when your health insurance started and ended./) }
-    it { expect(rendered).to match("You’ll use the information on your Form 1095-A to show that you or someone in your household had health insurance in #{previous_year}. If you want to see if you qualify for a premium tax credit, you’ll need the information on your Form 1095-A to complete the IRS Premium Tax Credit Form 8962.  You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>.") }
+    it {
+      # rubocop:disable Layout/LineLength
+      expect(rendered).to match(/includes information about the primary recipient. Your spouse’s information is not listed because you didn’t receive an advance premium tax credit, and the IRS tells us not to include their information here. Part I also lists when your health insurance started and ended./)
+      # rubocop:enable Layout/LineLength
+    }
+    it {
+      # rubocop:disable Layout/LineLength
+      expect(rendered).to match("You’ll use the information on your Form 1095-A to show that you or someone in your household had health insurance in #{previous_year}. If you want to see if you qualify for a premium tax credit, you’ll need the information on your Form 1095-A to complete the IRS Premium Tax Credit Form 8962.  You can download Form 8962 directly from the IRS website at <a href=#{EnrollRegistry[:enroll_app].setting(:irs_url).item}>IRS.gov</a>.")
+      # rubocop:enable Layout/LineLength
+    }
   end
 
   context 'for rendering partials' do

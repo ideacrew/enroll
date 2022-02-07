@@ -582,7 +582,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def no_products_message(plan_year)
-    "Unable to continue application, as this employer is either ineligible to enroll on the #{Settings.site.long_name}, or no products are available for a benefit plan year starting #{plan_year.start_on}"
+    "Unable to continue application, as this employer is either ineligible to enroll on the #{EnrollRegistry[:enroll_app].setting(:long_name).item}, or no products are available for a benefit plan year starting #{plan_year.start_on}"
   end
 
 end

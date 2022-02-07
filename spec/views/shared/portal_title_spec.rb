@@ -12,9 +12,9 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :around_each do
   let(:signed_in?){ true }
   let(:broker_role) { FactoryBot.create(:broker_role, :aasm_state => 'active', broker_agency_profile: this_broker_agency_profile) }
   let(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
-  #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
+  #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: EnrollRegistry[:enroll_app].setting(:header_message).item) }
   before do
-    Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
+    Translation.create(key: "en.welcome.index.byline", value: "\"#{EnrollRegistry[:enroll_app].setting(:header_message).item}\"")
   end
   before(:each) do
     sign_in current_user
@@ -67,7 +67,7 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :around_each do
 
   it 'identifies default controller' do
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/#{Settings.site.header_message}/)
+    expect(rendered).to match(/#{EnrollRegistry[:enroll_app].setting(:header_message).item}/)
   end
 
 end
