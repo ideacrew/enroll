@@ -747,7 +747,6 @@ class Person
   rescue StandardError
     self.errors.add(:base, l10n("exceptions.valid_birthdate"))
   end
-  end
 
   def is_homeless?
     is_homeless
