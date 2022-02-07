@@ -108,11 +108,6 @@ And(/^the is primary caregiver question should display$/) do
   expect(page).to have_css('#is_primary_caregiver_no')
 end
 
-Given(/^the is primary caregiver default value is nil$/) do
-  EnrollRegistry[:primary_caregiver_default_value].feature.stub(:is_enabled).and_return(false)
-  EnrollRegistry[:primary_caregiver_default_value].feature.stub(:item).and_return(nil)
-end
-
 Then(/^there should not be a default value$/) do
   expect(page).to_not have_css('#is_primary_caregiver_no[checked]')
 
@@ -173,6 +168,7 @@ And(/^the user fills out the required other questions and submits it$/) do
   choose('is_veteran_or_active_military_no')
   choose("is_resident_post_092296_no")
   choose("radio_physically_disabled_no")
+  choose("is_primary_caregiver_no")
   choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
   find('[name=commit]').click
 end
