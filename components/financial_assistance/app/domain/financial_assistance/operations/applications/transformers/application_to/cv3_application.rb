@@ -617,8 +617,22 @@ module FinancialAssistance
               end
             end
 
+            def benefits_eligible_for_determination(applicant)
+              kinds_query = if applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+                              {}
+                            elsif applicant.has_enrolled_health_coverage? && !applicant.has_eligible_health_coverage?
+                              { kind: :is_enrolled }
+                            elsif !applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+                              { kind: :is_eligible }
+                            else
+                              { :kind.nin => [:is_enrolled, :is_eligible] }
+                            end
+
+              applicant.benefits.where(kinds_query)
+            end
+
             def benefits(applicant)
-              applicant.benefits.inject([]) do |result, benefit|
+              benefits_eligible_for_determination(applicant).inject([]) do |result, benefit|
                 result << { name: benefit.title,
                             kind: benefit.insurance_kind,
                             status: benefit.kind,
@@ -662,9 +676,9 @@ module FinancialAssistance
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
-              family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
+              # family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
               applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
+              # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
               return premiums if premiums.failure?
 

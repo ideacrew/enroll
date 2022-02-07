@@ -226,7 +226,7 @@ describe Forms::FamilyMember do
 
         it "call update when current address present " do
 
-          expect(person.addresses).to receive(:update).and_return true
+          expect(addr3).to receive(:update).and_return true
           employee_dependent.assign_person_address(person)
         end
 
@@ -238,6 +238,26 @@ describe Forms::FamilyMember do
 
           expect(_addresses).to receive(:create).and_return true
           employee_dependent.assign_person_address(person)
+        end
+      end
+
+      context "when dependent has mailing and home address" do
+        let(:person) {FactoryBot.create(:person, :with_mailing_address)}
+        let(:home_address) { { "kind" => 'home', "address_1" => "new-home-address", "city" => "home-city", "county" => "Hampden", "state" => "DC", "zip" => "01001" } }
+        let(:mailing_address) { { "kind" => 'mailing', "address_1" => "new-mailing-address", "city" => "mailing-city", "county" => "Hampden", "state" => "DC", "zip" => "01001" } }
+        let(:addresses) { ActionController::Parameters.new({ "0" => home_address, "1" => mailing_address }) }
+
+        before :each do
+          allow(employee_dependent).to receive(:addresses).and_return(addresses)
+          allow(addresses).to receive(:values).and_return [mailing_address]
+        end
+
+        context 'when updating addresses' do
+          it "should not delete any address" do
+            employee_dependent.assign_person_address(person)
+            expect(person.reload.home_address.address_1).to eq('new-home-address')
+            expect(person.reload.mailing_address.address_1).to eq('new-mailing-address')
+          end
         end
       end
     end

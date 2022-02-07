@@ -171,7 +171,7 @@ class DocumentsController < ApplicationController
     if @document.destroyed?
       @person.save!
       if (@verification_type.vlp_documents - [@document]).empty?
-        @verification_type.update_attributes(:validation_status => "outstanding", :update_reason => "all documents deleted")
+        @person.consumer_role.return_doc_for_deficiency(@verification_type, "all documents needed")
         flash[:danger] = "All documents were deleted. Action needed"
       else
         flash[:success] = "Document deleted."

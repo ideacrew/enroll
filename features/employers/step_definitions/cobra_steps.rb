@@ -224,7 +224,7 @@ Then(/^Jack Employee should see the receipt page and verify employer contributio
 end
 
 Then(/^.+ should see my account page$/) do
-  expect(page).to have_content("My #{Settings.site.short_name}")
+  expect(page).to have_content("My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   expect(page).to have_content('My Account')
 end
 

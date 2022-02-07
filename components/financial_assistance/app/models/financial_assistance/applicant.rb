@@ -857,6 +857,8 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? && self_employment_fields_complete if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
+        return false if FinancialAssistanceRegistry.feature_enabled?(:american_indian_alaskan_native_income) && indian_tribe_member && has_american_indian_alaskan_native_income.nil?
+
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income
@@ -1148,13 +1150,8 @@ module FinancialAssistance
     def create_eligibility_income_evidence
       return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
 
-      self.create_income_evidence(key: :income, title: "Income")
-      if incomes.present?
-        income_evidence.move_to_pending!
-      else
-        income_evidence.is_satisfied = true
-        save!
-      end
+      self.create_income_evidence(key: :income, title: "Income", is_satisfied: true)
+      income_evidence.move_to_pending! if incomes.present?
       income_evidence
     end
 

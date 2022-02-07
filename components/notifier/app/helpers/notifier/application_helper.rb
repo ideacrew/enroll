@@ -2,7 +2,7 @@ module Notifier
   module ApplicationHelper
     def portal_display_name(controller)
       if current_user.nil?
-        "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
+        "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:header_message).item}</a>".html_safe
       elsif current_user.try(:has_hbx_staff_role?)
         link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
       elsif current_user.person.try(:broker_role)
@@ -24,7 +24,7 @@ module Notifier
       elsif current_user.has_general_agency_staff_role?
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
       else
-        "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
+        "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:header_message).item}</a>".html_safe
       end
     end
 
@@ -33,7 +33,7 @@ module Notifier
     end
 
     def site_main_web_address_business
-      Settings.site.main_web_address_business
+      EnrollRegistry[:enroll_app].setting(:main_web_address).item_business
     end
 
     def site_faqs_url
@@ -45,7 +45,7 @@ module Notifier
     end
 
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
     #TODO: Add a similar notice attachment setting for DC

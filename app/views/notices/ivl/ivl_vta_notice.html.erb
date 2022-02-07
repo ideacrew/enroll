@@ -132,7 +132,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You previously received a Form 1095-A from #{Settings.site.short_name} with information about your #{previous_year} health insurance coverage. After sending you that form, you or your insurance company told us you didn’t make any premium payments for the plan(s) with the Marketplace-assigned policy number(s) listed below. You’re receiving this notice and the enclosed voided Form 1095-A to reflect this updated information."} %>
+content: "You previously received a Form 1095-A from #{EnrollRegistry[:enroll_app].setting(:short_name).item} with information about your #{previous_year} health insurance coverage. After sending you that form, you or your insurance company told us you didn’t make any premium payments for the plan(s) with the Marketplace-assigned policy number(s) listed below. You’re receiving this notice and the enclosed voided Form 1095-A to reflect this updated information."} %>
 </br></br></br></br>
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: 'We have also told the IRS to disregard information we sent about your enrollment in the plan(s) listed above. You should not use the Form 1095-A for any of the above plans when you file your taxes. This Form 1095-A is now void, as shown in the upper right corner of the enclosed form. If you’ve already filed your taxes using this Form 1095-A, you may need to file an amended tax return.'} %>
@@ -147,17 +147,17 @@ content: 'We have also told the IRS to disregard information we sent about your 
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
- contents: ["If you believe your Form 1095-A was voided by mistake please call #{Settings.site.short_name} at #{Settings.contact_center.short_number}. #{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. For more information on these topics, consult a tax adviser or the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."], heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
+ contents: ["If you believe your Form 1095-A was voided by mistake please call #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{Settings.contact_center.short_number}. #{EnrollRegistry[:enroll_app].setting(:short_name).item} does not control the individual mandate and cannot provide tax advice. For more information on these topics, consult a tax adviser or the IRS website at <a href=#{EnrollRegistry[:enroll_app].setting(:irs_url).item}>IRS.gov</a>."], heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{Settings.contact_center.short_number}."], heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
+ contents: ["Go to <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call us at #{Settings.contact_center.short_number}."], heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <div style="page-break-inside: avoid;">
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: 'If you have questions or concerns, we’re here to help.'} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+  content: "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team <br></br> _____________________________________________________________________________________________________________"} %>
 </div>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {

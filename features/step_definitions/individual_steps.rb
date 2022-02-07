@@ -443,7 +443,7 @@ end
 
 Then(/I should land on home page$/) do
   sleep 1
-  expect(page).to have_content "My #{Settings.site.short_name}"
+  expect(page).to have_content "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 end
 
 And(/I click on log out link$/) do
@@ -451,7 +451,7 @@ And(/I click on log out link$/) do
 end
 
 And(/^.+ click on Sign In$/) do
-  expect(page).to have_content Settings.site.header_message
+  expect(page).to have_content EnrollRegistry[:enroll_app].setting(:header_message).item
 end
 
 And(/I signed in$/) do
@@ -539,12 +539,12 @@ end
 
 And(/I should see the individual home page/) do
   sleep 5
-  expect(page).to have_content "My #{Settings.site.short_name}"
+  expect(page).to have_content "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
   # screenshot("my_account")
   # something funky about these tabs in JS
   # click_link "Documents"
   # click_link "Manage Family"
-  # click_link "My #{Settings.site.short_name}"
+  # click_link "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 end
 
 Then(/^Individual clicks on Add New Person$/) do
@@ -926,7 +926,7 @@ end
 
 Then(/the individual should see the elected aptc amount applied to enrollment in the Individual home page/) do
   wait_for_ajax
-  expect(page).to have_content "My #{Settings.site.short_name}"
+  expect(page).to have_content "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
   expect(page).to have_content '$50.00'
   expect(page).to have_content IvlHomepage.aptc_amount_text
   screenshot("my_account")
@@ -1052,7 +1052,7 @@ end
 
 Then(/Individual should land on Home page$/) do
   sleep 1
-  expect(page).to have_content "My #{Settings.site.short_name}"
+  expect(page).to have_content "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 end
 
 When(/Individual clicks on Go To My Account button$/) do

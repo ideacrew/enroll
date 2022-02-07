@@ -59,7 +59,8 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def due_date_for_type(type)
-    type.due_date ||  TimeKeeper.date_of_record + 95.days
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    type.due_date || TimeKeeper.date_of_record + verification_document_due.days
   end
 
   def no_active_enrollments(person)

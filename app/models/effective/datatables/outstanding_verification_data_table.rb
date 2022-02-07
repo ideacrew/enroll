@@ -20,7 +20,7 @@ module Effective
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| row.vlp_documents_status}, :filter => false, :sortable => true
-        table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(TimeKeeper.date_of_record + 95.days) }, :filter => false, :sortable => true
+        table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]
@@ -37,7 +37,7 @@ module Effective
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| document_status_for(row)}, :filter => false, :sortable => true
-        table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(eligibility_earliest_due_date(row)) || format_date(TimeKeeper.date_of_record + 95.days) }, :filter => false, :sortable => true
+        table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => eligibility_primary_family_member(row).person_id),"static"]
@@ -125,6 +125,11 @@ module Effective
           {scope: 'eligibility_determination_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
           {scope: 'all', label: 'All', title: "All outstanding verifications"}
         ]
+      end
+
+      def default_verification_due_date
+        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+        TimeKeeper.date_of_record + verification_document_due.days
       end
 
       def nested_filter_definition

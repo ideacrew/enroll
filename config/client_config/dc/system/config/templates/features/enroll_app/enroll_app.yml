@@ -161,6 +161,8 @@ registry:
             item: "https://staging.dchealthlink.com/individuals/tax-documents"
           - key: :statewide_area
             item: "DC-Metro"
+          - key: :nationwide_area
+            item: "Nationwide"
           - key: :standard_plan_label
             item: "STANDARD PLAN"
           - key: :exchange_name
@@ -665,6 +667,9 @@ registry:
       - key: :live_chat_widget
         item: :live_chat_widget
         is_enabled: false
+      - key: :external_qna_bot
+        item: :external_qna_bot
+        is_enabled: <%= ENV['EXTERNAL_QNA_BOT_IS_ENABLED'] || false %>
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
@@ -704,3 +709,5 @@ registry:
     features:
       - key: :mitc_relationships
         is_enabled: false
+      - key: :staff_list_back
+        is_enabled: true

@@ -83,7 +83,8 @@ class VerificationType
   end
 
   def verif_due_date
-    due_date || TimeKeeper.date_of_record + 95.days
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    due_date || TimeKeeper.date_of_record + verification_document_due.days
   end
 
   def move_type_to_curam
@@ -100,7 +101,15 @@ class VerificationType
   end
 
   def fail_type
-    update_attributes(:validation_status => "outstanding")
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    attrs =
+      if EnrollRegistry.feature_enabled?(:set_due_date_upon_response_from_hub)
+        {:validation_status => "outstanding", :due_date => (TimeKeeper.date_of_record + verification_document_due.days), :due_date_type => 'response_from_hub'}
+      else
+        {:validation_status => "outstanding"}
+      end
+
+    update_attributes(attrs)
   end
 
   def pending_type

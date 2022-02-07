@@ -6,6 +6,7 @@ module FinancialAssistance
       include ActiveModel::Model
       include ActiveModel::Validations
       include Config::AcaModelConcern
+      include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
                     :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
@@ -92,7 +93,7 @@ module FinancialAssistance
 
       def save
         return false unless valid?
-        is_living_in_state = validate_in_state_addresses
+        is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
@@ -115,12 +116,6 @@ module FinancialAssistance
           end
           [false, applicant_entity.failure]
         end
-      end
-
-      def validate_in_state_addresses
-        symbolize_addresses_attributes = addresses_attributes&.deep_symbolize_keys
-        home_address = symbolize_addresses_attributes&.select{|_k, address| address[:kind] == 'home' && address[:state] == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}
-        home_address.present?
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity

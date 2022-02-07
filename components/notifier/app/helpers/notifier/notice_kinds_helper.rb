@@ -6,7 +6,7 @@ module Notifier
     end
 
     def site_home_url
-      Settings.site.home_url
+      EnrollRegistry[:enroll_app].setting(:home_url).item
     end
 
     def site_home_link
@@ -14,7 +14,7 @@ module Notifier
     end
 
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
     def employer_name

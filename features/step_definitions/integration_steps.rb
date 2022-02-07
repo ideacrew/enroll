@@ -850,6 +850,18 @@ And(/^.+ should see the Metal Level filter$/) do
   expect(page).to have_content('Metal Level')
 end
 
+Then(/^.+ selects nationwide filter$/) do
+  find(EmployeeChoosePlan.nationwide).click
+end
+
+Then(/^.+ clicks on apply button$/) do
+  page.first(EmployeeChoosePlan.apply_btn, wait: 10).click
+end
+
+Then(/^\w+ should see plans count listed$/) do
+  find_all(EmployeeChoosePlan.plan_count).present?
+end
+
 When(/^.+ sorts by (.*)/) do |sort|
   @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
@@ -1233,11 +1245,13 @@ Then(/^I should see Shop for new plan button$/) do
 end
 
 Then(/^they should see the live chat button$/) do
-  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
-  expect(live_chat_button.present?).to eq(true)
+  expect(page).to have_css(AdminHomepage.chat_button)
+end
+
+Then(/^they should see the bot button$/) do
+  expect(page).to have_css(AdminHomepage.bot_button)
 end
 
 Then(/^they should not see the live chat button$/) do
-  live_chat_button = page.all('button').detect { |button| button[:id] == 'chat-button'}
-  expect(live_chat_button.present?).to eq(false)
+  expect(page).to_not have_css(AdminHomepage.chat_button)
 end

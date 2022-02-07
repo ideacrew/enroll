@@ -124,4 +124,3 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       Then Employee should see the receipt page
       Then Employee should see the "my account" page
       And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the off cycle benefit application
-      

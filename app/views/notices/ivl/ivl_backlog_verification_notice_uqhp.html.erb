@@ -21,21 +21,21 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "You enrolled in or renewed a plan through #{Settings.site.short_name} for #{notice.coverage_year}. We're writing to let you know that you must submit documents if you want to keep your insurance. "} %>
+    content: "You enrolled in or renewed a plan through #{EnrollRegistry[:enroll_app].setting(:short_name).item} for #{notice.coverage_year}. We're writing to let you know that you must submit documents if you want to keep your insurance. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "#{Settings.site.short_name} is required by federal law to be sure that people who enroll in health insurance through our system are eligible.  ", top_margin: '10px'} %>
+    content: "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is required by federal law to be sure that people who enroll in health insurance through our system are eligible.  ", top_margin: '10px'} %>
 
 <% if notice.documents_needed %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Send Us Documents</strong>", top_margin: '5px', bottom_margin: '5px'} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
-        previous: "You need to send documents to #{Settings.site.short_name}. <b> The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline. </b>",
+        previous: "You need to send documents to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. <b> The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline. </b>",
         listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
 <% end %>
 
 <br>
 <%= render partial: 'notices/shared/paragraph_with_margins', locals:
-    { content: "If you have questions or concerns, we're here to help.<br></br>""The #{Settings.site.short_name} Team"}%>
+    { content: "If you have questions or concerns, we're here to help.<br></br>""The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team"}%>
 

@@ -72,8 +72,8 @@ module BenefitSponsors
           broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_organization.broker_agency_profile.id)
           @broker_inbox = broker_person.build_inbox
           @broker_inbox.save!
-          welcome_subject = "Welcome to #{Settings.site.short_name}"
-          welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+          welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
+          welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
           broker_message = @broker_inbox.messages.create(subject: welcome_subject, body: welcome_body)
           sign_in broker_user
         end
@@ -109,8 +109,8 @@ module BenefitSponsors
           broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_organization.broker_agency_profile.id)
           @broker_inbox = broker_person.build_inbox
           @broker_inbox.save!
-          welcome_subject = "Welcome to #{Settings.site.short_name}"
-          welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+          welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
+          welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
           broker_message = @broker_inbox.messages.create(subject: welcome_subject, body: welcome_body)
           sign_in admin_user
         end

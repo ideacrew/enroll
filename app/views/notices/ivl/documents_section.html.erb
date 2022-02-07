@@ -61,7 +61,7 @@
   </tr>
   <tr valign="top">
     <td>
-      Login to your account at <a href= <%= Settings.site.home_url %> > <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
+      Login to your account at <a href= <%= EnrollRegistry[:enroll_app].setting(:home_url).item %> > <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
     </td>
     <td>
       <p><%= site_short_name%></p>
@@ -259,7 +259,7 @@
 <!-- Indian Inconsistency/American Indian or Alaskan Native-->
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong>"} %>
+  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "<br></br>_____________________________________________________________________________________________________________"} %>

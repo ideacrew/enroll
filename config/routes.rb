@@ -53,7 +53,7 @@ Rails.application.routes.draw do
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
-
+  get "qna_bot", to: 'welcome#qna_bot'
   post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
 
   namespace :users do

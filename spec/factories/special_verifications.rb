@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :special_verification do
-    due_date {TimeKeeper.date_of_record + 95.days}
+    due_date {TimeKeeper.date_of_record + 96.days}
     verification_type { "Citizenship" }
     updated_by { FactoryBot.build(:user).id}
     type { "admin" }

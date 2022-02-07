@@ -29,7 +29,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Open enrollment for health insurance plans for 2016 begins on November 1, 2015 and ends on January
   31, 2016. Based on the information we have in our records for you and your household, we will renew your
-  #{Settings.site.short_name} coverage for 2016. However, this renewal is conditional because we need to see documentation
+  #{EnrollRegistry[:enroll_app].setting(:short_name).item} coverage for 2016. However, this renewal is conditional because we need to see documentation
   from you for some of your information."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -38,7 +38,7 @@
     If you don’t pick a new plan, we will renew your coverage in the same plan or a similar one for 2016.",
     "<strong>Pay your premiums:</strong> You must continue to pay your premiums for your 2015 plan on time to have your coverage renewed for 2016.
     You must also make sure to update your payments for your 2016 plan(s).",
-    "<strong>Provide proof:</strong> If you received an earlier notice from #{Settings.site.short_name} indicating that we need documentation of certain information,
+    "<strong>Provide proof:</strong> If you received an earlier notice from #{EnrollRegistry[:enroll_app].setting(:short_name).item} indicating that we need documentation of certain information,
     please be sure to submit those documents if you haven’t already.  An outstanding document request will not impact your renewal.
     However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future."]
   } %>
@@ -130,7 +130,7 @@
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number
-    of every person who is applying for Medicaid and #{Settings.site.short_name}. We will only use your Social Security Number to verify the
+    of every person who is applying for Medicaid and #{EnrollRegistry[:enroll_app].setting(:short_name).item}. We will only use your Social Security Number to verify the
     information you told us on your application or renewal form. We will check your information in the #{Settings.aca.state_name} and Federal databases,
     and the databases of other #{Settings.aca.state_name}, Federal agencies, and a consumer reporting agency."} %>
 
@@ -404,7 +404,7 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You can send the necessary documents either online, through U.S. Postal mail, or in-person.",
   listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.",
-             "U.S. Postal Mail: <span style='margin-left: 10px;'>#{Settings.site.short_name}</span><br>
+             "U.S. Postal Mail: <span style='margin-left: 10px;'>#{EnrollRegistry[:enroll_app].setting(:short_name).item}</span><br>
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
              <span style='margin-left:96px;'>Washington, DC 20090</span><br>
@@ -415,7 +415,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account
-  on <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a> or by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}.
+  on <a href='http://www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a> or by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}.
   You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end.<br><br>
 
   Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates
@@ -426,8 +426,8 @@
     heading: 'Ending Your Health Insurance Coverage', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already,
-    you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling
+  contents: ["Important information is stored in your account on the #{EnrollRegistry[:enroll_app].setting(:short_name).item} website.  If you don’t have an account already,
+    you can create one by going to <a href='http://www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>. You can get help with logging in or creating an account by calling
     #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
