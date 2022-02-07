@@ -1,8 +1,9 @@
 Feature: A dedicated page that gives the user access to Tax Info page for a given applicant as well as Financial application forms for each household member.
 
   Background: User can edit tax info page for a household member
-    Given a plan year, with premium tables, exists
-    Given the FAA feature configuration is enabled
+  Given a plan year, with premium tables, exists
+  Given the FAA feature configuration is enabled
+  Given the date is within open enrollment
 	Given that the user is on the FAA Household Info page
 	And the applicant has no saved data
 	When the user clicks the ADD Info Button for a given household member
