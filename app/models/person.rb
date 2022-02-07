@@ -738,16 +738,15 @@ class Person
   end
 
   def age_on(date)
-    begin
-      age = date.year - dob.year
-      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
-        age - 1
-      else
-        age
-      end
-    rescue StandardError
-      self.errors.add(:base, l10n("exceptions.valid_birthdate"))
+    age = date.year - dob.year
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+      age - 1
+    else
+      age
     end
+  rescue StandardError
+    self.errors.add(:base, l10n("exceptions.valid_birthdate"))
+  end
   end
 
   def is_homeless?
