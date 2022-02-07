@@ -122,6 +122,10 @@ Then(/the user will navigate to the Application Checklist/) do
   expect(page).to have_content("Application Checklist")
 end
 
+And(/^the date is within open enrollment$/) do
+  allow(Settings.aca.individual_market.open_enrollment).to receive(:end_on).and_return(TimeKeeper.date_of_record + 1.day)
+end
+
 Then(/the user will navigate to the assistance year selection page/) do
   expect(page).to have_content(l10n("faa.year_selection_header"))
 end
