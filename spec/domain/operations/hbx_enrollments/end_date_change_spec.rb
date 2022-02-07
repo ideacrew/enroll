@@ -129,7 +129,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
         it 'should return failure & not create enrollment' do
           expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
           expect(subject).not_to be_success
-          expect(subject.failure).to eq('No Rating area Found')
+          expect(subject.failure).to eq('Rating Area Is Blank')
           expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
         end
       end
@@ -144,7 +144,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
         it 'should return failure & not create enrollment' do
           expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
           expect(subject).not_to be_success
-          expect(subject.failure).to eq('No Service area Found')
+          expect(subject.failure).to eq('Product is NOT offered in service area')
           expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
         end
       end

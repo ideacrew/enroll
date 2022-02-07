@@ -75,10 +75,8 @@ module Operations
       def reinstate_enrollment
         reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(@enrollment, @enrollment.terminated_on.next_day).build
 
-        unless reinstate_enrollment.is_shop?
-          return Failure('No Rating area Found') if reinstate_enrollment.rating_area_id.blank?
-          return Failure('No Service area Found') unless product_offered_in_service_area?(reinstate_enrollment)
-        end
+        can_reinstate = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
+        return can_reinstate unless can_reinstate.success?
 
         if reinstate_enrollment.may_reinstate_coverage?
           reinstate_enrollment.reinstate_coverage!
@@ -89,19 +87,6 @@ module Operations
           reinstate_enrollment.term_or_expire_enrollment(@termination_date)
         end
         Success(reinstate_enrollment)
-      end
-
-      def product_offered_in_service_area?(enrollment)
-        rating_address = (enrollment.consumer_role || enrollment.resident_role).rating_address
-
-        return false if rating_address.blank?
-
-        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
-          rating_address,
-          during: enrollment.effective_on
-        ).map(&:id)
-
-        service_areas.include?(enrollment.product.service_area_id)
       end
 
       def update_end_date

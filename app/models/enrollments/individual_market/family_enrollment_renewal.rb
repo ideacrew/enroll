@@ -15,7 +15,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     begin
       renewal_enrollment = clone_enrollment
 
-      raise "Cannot renew enrollment #{enrollment.hbx_id}. Product not available in latest service area" unless can_renew_enrollment?(renewal_enrollment)
+      can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: renewal_enrollment})
+
+      raise "Cannot renew enrollment #{enrollment.hbx_id}. Error: #{can_renew.failure}" unless can_renew.success?
 
       save_renewal_enrollment(renewal_enrollment)
       # elected aptc should be the minimun between applied_aptc and EHB premium.
@@ -54,21 +56,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
 
     renewal_enrollment
-  end
-
-  def can_renew_enrollment?(renewal_enrollment)
-    return false if renewal_enrollment.rating_area_id.blank?
-
-    rating_address = (renewal_enrollment.consumer_role || renewal_enrollment.resident_role).rating_address
-
-    return false if rating_address.blank?
-
-    service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
-      rating_address,
-      during: renewal_enrollment.effective_on
-    ).map(&:id)
-
-    service_areas.include?(renewal_enrollment.product.service_area_id)
   end
 
   def fetch_product_id(renewal_enrollment)
