@@ -20,7 +20,6 @@ site:
   ivl_responsibility_url: ''
   plan_options_title_for_ma: true
   prod_tax_info: ''
-  publisher: 'dchl'
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   short_name: 'CoverME.gov'
   sign_in_routes: ['/families/home']
