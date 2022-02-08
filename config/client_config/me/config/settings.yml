@@ -8,19 +8,12 @@ site:
   block_ie_browser: true
   broker_claim_quoting_enabled: true
   broker_quoting_enabled: false
-  create_routes:
-    [
-      '/insured/employee/privacy',
-      '/employers/employer_profiles/new',
-      '/insured/consumer_role/privacy',
-    ]
   curam_enabled?: true
   exchange_hbx_id: 'ME0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: ''
   plan_options_title_for_ma: true
   prod_tax_info: ''
-  shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   short_name: 'CoverME.gov'
   sign_in_routes: ['/families/home']
   staging_tax_info_url: ''

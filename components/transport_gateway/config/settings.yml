@@ -9,14 +9,7 @@ site:
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
-  create_routes:
-    [
-      '/insured/employee/privacy',
-      '/employers/employer_profiles/new',
-      '/insured/consumer_role/privacy',
-    ]
   sign_in_routes: ['/families/home']
-  shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   exchange_hbx_id: 'DC0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   curam_enabled?: true

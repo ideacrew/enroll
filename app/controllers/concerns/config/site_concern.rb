@@ -8,7 +8,7 @@ module Config::SiteConcern
   end
 
   def site_create_routes
-    Settings.site.create_routes
+    EnrollRegistry[:enroll_app].setting(:create_routes).item
   end
 
   def site_sign_in_routes
