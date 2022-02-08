@@ -24,6 +24,7 @@ Feature: Cost Savings -  Start New Application
     Given the iap year selection feature is enabled
     Given a consumer exists
     And the consumer is logged in
+    And the date is within open enrollment
     And consumer has successful ridp
     And the FAA feature configuration is enabled
     When consumer visits home page

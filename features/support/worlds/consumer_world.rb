@@ -50,6 +50,7 @@ module ConsumerWorld
     EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).stub(:item).and_return('single')
     EnrollRegistry[:service_area].setting(:service_area_model).stub(:item).and_return('single')
     prior_coverage_year = Date.today.year - 1
+    current_coverage_year = Date.today.year
     hbx_profile = FactoryBot.create(:hbx_profile,
                                     :no_open_enrollment_coverage_period,
                                     coverage_year: prior_coverage_year)
@@ -63,13 +64,12 @@ module ConsumerWorld
     renewal_benefit_package = renewal_benefit_coverage_period.benefit_packages.first
 
     prior_product = BenefitMarkets::Products::Product.find(prior_benefit_package.benefit_ids.first)
-    current_product = BenefitMarkets::Products::Product.find(current_benefit_package.benefit_ids.first)
-
+    current_product = BenefitMarkets::Products::Product.by_year(current_coverage_year).find(current_benefit_package.benefit_ids.last)
     prior_product.renewal_product_id = current_product.id
     prior_product.save!
     prior_product.reload
 
-    renewal_product = BenefitMarkets::Products::Product.find(renewal_benefit_package.benefit_ids.first)
+    renewal_product = BenefitMarkets::Products::Product.by_year(current_coverage_year + 1).find(renewal_benefit_package.benefit_ids.last)
     current_product.renewal_product_id = renewal_product.id
     current_product.save!
     current_product.reload
