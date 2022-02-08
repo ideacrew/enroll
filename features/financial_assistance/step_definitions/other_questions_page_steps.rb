@@ -110,7 +110,6 @@ end
 
 Then(/^there should not be a default value$/) do
   expect(page).to have_css(IvlIapOtherQuestions.no_primary_caregiver_radiobtn_not_checked)
-  # .is_primary_caregiver_no:not(:checked)
 end
 
 And(/^the user answers no to the have you applied for an SSN question$/) do
