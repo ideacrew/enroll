@@ -20,7 +20,6 @@ site:
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   terms_and_conditions_url: ''
   exchange_hbx_id: 'ME0'
-  mail_address: 'info@coverme.gov'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: ''
   curam_enabled?: true

@@ -18,7 +18,6 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   exchange_hbx_id: 'DC0'
-  mail_address: 'info@dchealthlink.com'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   curam_enabled?: true
   support_for_ie_browser: true
