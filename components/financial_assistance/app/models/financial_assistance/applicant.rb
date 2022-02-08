@@ -223,7 +223,7 @@ module FinancialAssistance
     field :pregnancy_due_on, type: Date
     field :pregnancy_end_on, type: Date
 
-    field :is_primary_caregiver, type: Boolean, default: false
+    field :is_primary_caregiver, type: Boolean
 
     field :is_subject_to_five_year_bar, type: Boolean, default: false
     field :is_five_year_bar_met, type: Boolean, default: false
