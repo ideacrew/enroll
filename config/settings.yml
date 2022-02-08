@@ -4,21 +4,11 @@ site:
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
-  create_routes:
-    [
-      '/insured/employee/privacy',
-      '/employers/employer_profiles/new',
-      '/insured/consumer_role/privacy',
-    ]
-  sign_in_routes: ['/families/home']
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   block_ie_browser: false
   curam_enabled?: true
   exchange_hbx_id: 'DC0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  mail_address: 'info@dchealthlink.com'
-  publisher: 'dchl'
-  shop_find_your_doctor_url: 'https://dc.checkbookhealth.org/dc/'
   support_for_ie_browser: true
 contact_center:
   alt_fax: '617-722-4033'

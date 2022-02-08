@@ -1,6 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
 
-  default from: Settings.site.mail_address
+  default from: EnrollRegistry[:enroll_app].setting(:mail_address).item
 
   if Rails.env.production?
     self.delivery_method = :soa_mailer
