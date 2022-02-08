@@ -398,6 +398,10 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
+  def is_offering_dental(employee)
+    employee.benefit_package.is_offering_dental?
+  end
+
   def fetch_benefit_package_for_sep(employee_role)
     return unless employee_role.present?
 
