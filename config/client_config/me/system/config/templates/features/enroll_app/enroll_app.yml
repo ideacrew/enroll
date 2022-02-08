@@ -171,6 +171,8 @@ registry:
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :staging_tax_info_url
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
+          - key: :nationwide_area
+            item: "Nationwide"
           - key: :statewide_area
             item: "Maine/Regional"
           - key: :standard_plan_label
