@@ -169,7 +169,7 @@ And(/^the user fills out the required other questions and submits it$/) do
   choose('is_veteran_or_active_military_no')
   choose("is_resident_post_092296_no")
   choose("radio_physically_disabled_no")
-  choose("is_primary_caregiver_no")
+  choose("is_primary_caregiver_no") if page.all(".is_primary_caregiver_no").present?
   choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
   find('[name=commit]').click
 end
