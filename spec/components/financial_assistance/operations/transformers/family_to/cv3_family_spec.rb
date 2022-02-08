@@ -43,6 +43,15 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
     end
     application.save!
   end
+
+  let(:is_primary_caregiver) do
+    application.applicants.each do |appl|
+      appl.is_primary_caregiver = false
+      appl.save!
+    end
+    application.save!
+  end
+
   let(:create_relationships) do
     application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
     application.ensure_relationship_with_primary(applicant2, 'child')
@@ -61,6 +70,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
     subject { FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.call(family) }
 
     before :each do
+      is_primary_caregiver
       BenefitMarkets::Locations::CountyZip.delete_all
       BenefitMarkets::Locations::RatingArea.delete_all
       products
