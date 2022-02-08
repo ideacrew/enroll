@@ -4,7 +4,6 @@ site:
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
-  sign_in_routes: ['/families/home']
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   block_ie_browser: false
   curam_enabled?: true

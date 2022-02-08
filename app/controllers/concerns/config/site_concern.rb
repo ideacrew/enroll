@@ -12,7 +12,7 @@ module Config::SiteConcern
   end
 
   def site_sign_in_routes
-    Settings.site.sign_in_routes
+    EnrollRegistry[:enroll_app].setting(:sign_in_routes).item
   end
 
   def site_redirect_on_timeout_route

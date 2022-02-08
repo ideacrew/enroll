@@ -9,7 +9,6 @@ site:
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
-  sign_in_routes: ['/families/home']
   exchange_hbx_id: 'DC0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   curam_enabled?: true

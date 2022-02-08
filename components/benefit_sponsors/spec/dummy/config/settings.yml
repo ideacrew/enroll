@@ -4,23 +4,17 @@ site:
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
   # policies_url: "https://dchealthlink.com/"
-  short_name: 'Maine Cover ME'
   tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
-  sign_in_routes: ['/families/home']
-  terms_and_conditions_url: ''
   exchange_hbx_id: 'ME0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  ivl_responsibility_url: ''
   curam_enabled?: true
   support_for_ie_browser: true
   block_ie_browser: false
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
-  prod_tax_info: ''
-  staging_tax_info_url: ''
 
 contact_center:
   name: "Maine Cover ME's Customer Care Center"
