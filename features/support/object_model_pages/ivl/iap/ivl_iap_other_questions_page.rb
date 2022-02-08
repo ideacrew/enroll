@@ -7,6 +7,14 @@ class IvlIapOtherQuestions
     'is_pregnant_no'
   end
 
+  def self.no_primary_caregiver_radiobtn
+    'input[id="is_primary_caregiver_no"]'
+  end
+
+  def self.no_primary_caregiver_radiobtn_not_checked
+    '#is_primary_caregiver_no:not(:checked)'
+  end
+
   def self.is_post_partum_period_no_radiobtn
     'is_post_partum_period_no'
   end
