@@ -36,20 +36,10 @@ module Operations
       end
 
       def generate_enrollments(enrollments, eligibility_determination)
-        current_max_aptc = eligibility_determination.max_aptc.to_f
+        latest_tax_household = eligibility_determination.tax_household
         enrollments.each do |enrollment|
-          max_aptc = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
-                       date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
-                       shopping_fm_ids = enrollment.hbx_enrollment_members.pluck(:applicant_id)
-                       input_params = { family: enrollment.family,
-                                        effective_on: date,
-                                        shopping_fm_ids: shopping_fm_ids,
-                                        subscriber_applicant_id: enrollment&.subscriber&.applicant_id }
-                       monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] {input_params}
-                       monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
-                     else
-                       current_max_aptc.to_f
-                     end
+          date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
+          max_aptc = latest_tax_household.monthly_max_aptc(enrollment, date)
           default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
           applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
           applied_aptc = float_fix(max_aptc * applied_percentage)

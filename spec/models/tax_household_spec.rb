@@ -305,12 +305,28 @@ RSpec.describe TaxHousehold, type: :model do
         hbx_enrollment_aptc.update_attributes!(effective_on: TimeKeeper.date_of_record.beginning_of_year, applied_aptc_amount: 150.00)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
         EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(false)
         @result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc, TimeKeeper.date_of_record)
       end
 
       it 'should return monthly aggregate amount' do
         expect(@result).to eq(294)
+      end
+
+      context 'when thhms are different for two 2 thhs' do
+        let!(:new_tax_household) { create(:tax_household, created_at: (tax_household.created_at + 1.day), effective_starting_on: (tax_household.effective_starting_on + 10.days), household: household, effective_ending_on: nil) }
+        let!(:new_tax_household_member1) {new_tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
+        let!(:new_tax_household_member2) {new_tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[1].id)}
+        let!(:new_tax_household_member3) {new_tax_household.tax_household_members.create!(is_ia_eligible: false, applicant_id: person.primary_family.family_members[2].id)}
+        let!(:new_eligibility) { FactoryBot.create(:eligibility_determination, tax_household: new_tax_household, max_aptc: 250) }
+
+        before do
+          tax_household.update_attributes(effective_ending_on: new_tax_household.effective_starting_on - 1.day)
+          @result = new_tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc, TimeKeeper.date_of_record)
+        end
+
+        it 'should return max aptc' do
+          expect(@result).to eq(250)
+        end
       end
     end
   end
