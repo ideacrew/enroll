@@ -58,14 +58,31 @@ module Insured
 
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
-        if reinstatement.rating_area_id.nil?
-          log("ERROR in SelfServiceFactory: Rating_area_id is nil, cannot create reinstatement enrollment. person_hbx_id: #{enrollment.family.primary_person.hbx_id}, enrollment_hbx_id: #{enrollment.hbx_id}")
+
+        can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstatement})
+
+        unless can_renew.success?
+          log("ERROR in SelfServiceFactory: #{can_renew.failure}, cannot create reinstatement enrollment. person_hbx_id: #{enrollment.family.primary_person.hbx_id}, enrollment_hbx_id: #{enrollment.hbx_id}")
           raise
         end
+
         reinstatement.save!
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
 
         reinstatement.select_coverage!
+      end
+
+      def self.product_offered_in_service_area?(enrollment)
+        rating_address = (enrollment.consumer_role || enrollment.resident_role).rating_address
+
+        return false if rating_address.blank?
+
+        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+          rating_address,
+          during: enrollment.effective_on
+        ).map(&:id)
+
+        service_areas.include?(enrollment.product.service_area_id)
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)

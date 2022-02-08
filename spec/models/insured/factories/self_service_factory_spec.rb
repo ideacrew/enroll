@@ -266,7 +266,8 @@ module Insured
         tax_household_member2 = tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
 
         @product = product
-        @product.update_attributes(ehb: 0.9844, application_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
+        service_area = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on.year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+        @product.update_attributes(ehb: 0.9844, application_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year, service_area_id: service_area.id)
         premium_table = @product.premium_tables.first
         premium_table.update_attributes(effective_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
         @product.save!
@@ -292,6 +293,22 @@ module Insured
         end
 
         it 'should not create new enrollment' do
+          expect(family.active_household.hbx_enrollments.count).to eq 1
+          expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
+          enrollment.reload
+          family.reload
+          expect(family.active_household.hbx_enrollments.count).to eq 1
+        end
+      end
+
+      context 'for nil service area' do
+        let(:setting) { double }
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(setting)
+          allow(setting).to receive(:settings).with(:service_area_model).and_return(double(item: 'county'))
+        end
+
+        it 'should not create new enrollment and raises error' do
           expect(family.active_household.hbx_enrollments.count).to eq 1
           expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
           enrollment.reload

@@ -4,6 +4,7 @@ Feature: A dedicated page that gives the user access to household member creatio
     Given EnrollRegistry show_download_tax_documents feature is enabled
     And EnrollRegistry medicaid_tax_credits_link feature is enabled
     Given the FAA feature configuration is enabled
+    Given the date is within open enrollment
     Given a plan year, with premium tables, exists
     Given that the user is on FAA Household Info: Family Members page
       

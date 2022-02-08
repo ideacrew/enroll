@@ -200,6 +200,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                             application_period: next_year_date.beginning_of_year..next_year_date.end_of_year,
                             hios_base_id: renewal_product.hios_base_id,
                             csr_variant_id: '05',
+                            service_area_id: renewal_service_area.id,
                             hios_id: "#{renewal_product.hios_base_id}-05")
         end
 
@@ -237,6 +238,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                             application_period: next_year_date.beginning_of_year..next_year_date.end_of_year,
                             hios_base_id: renewal_product.hios_base_id,
                             csr_variant_id: '03',
+                            service_area_id: renewal_service_area.id,
                             hios_id: "#{renewal_product.hios_base_id}-03")
         end
 
@@ -295,6 +297,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       let!(:renewal_product) do
         FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
                           :ivl_product,
+                          service_area_id: renewal_service_area.id,
                           application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
       end
 

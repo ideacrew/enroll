@@ -86,8 +86,16 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:renewal_benefit_coverage_period) {benefit_coverage_period.successor}
   let(:renewal_benefit_package) {renewal_benefit_coverage_period.benefit_packages.first}
 
+  let(:start_on) { ivl_enrollment.effective_on }
+  let(:address) { consumer_role.rating_address }
+  let(:renewal_service_area) do
+    ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on.next_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: start_on.next_year.year)
+  end
+
   let(:renewal_product) do
     r_product = BenefitMarkets::Products::Product.find(renewal_benefit_package.benefit_ids.first)
+    r_product.service_area_id = renewal_service_area.id
+    r_product.save
     product.renewal_product_id = r_product.id
     product.save!
     product.reload
@@ -352,8 +360,28 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     include_context 'family with one member and one enrollment and one renewal enrollment'
 
     context 'new enrollment in existing plan year' do
+      let(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+      end
+      let(:service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+      end
+
+      let(:address) { enrollment.consumer_role.rating_address }
+
+      let(:start_on) { enrollment.effective_on.beginning_of_year }
+
+      let!(:renewal_rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on.next_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: start_on.next_year.year)
+      end
+      let!(:renewal_service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on.next_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: start_on.next_year.year)
+      end
 
       before do
+        enrollment.update_attributes(rating_area_id: rating_area.id)
+        enrollment.product.update_attributes(service_area_id: service_area.id)
+        enrollment.product.renewal_product.update_attributes(service_area_id: renewal_service_area.id)
         product_selection = Entities::ProductSelection.new({:enrollment => enrollment, :product => enrollment.product, :family => family})
         @result = subject.call(product_selection)
       end
