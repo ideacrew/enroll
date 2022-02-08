@@ -21,11 +21,6 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the user answers no to the have you applied for an SSN question
     Then the reason why question is displayed
 
-  Scenario: Is primary caregiver question
-    Given the user will navigate to the Other Questions page for the corresponding applicant
-    And the is primary caregiver question should display
-    Then there should not be a default value
-  
   Scenario: Answered yes to military question
     Given the user answers yes to having an eligible immigration status
     And user answers no to the military veteran question
@@ -34,3 +29,4 @@ Feature: Start a new Financial Assistance Application and answers questions on O
   Scenario: User gives no answer to blind, daily help, help with bills, and physically disabled
     Given the user fills out the required other questions and submits it
     Then the user should see text that the info is complete
+ 

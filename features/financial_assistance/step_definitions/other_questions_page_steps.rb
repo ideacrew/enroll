@@ -104,14 +104,6 @@ Then(/^the have you applied for an SSN question should display$/) do
   expect(page).to have_content('Has this person applied for an SSN *')
 end
 
-And(/^the is primary caregiver question should display$/) do
-  expect(page).to have_css(IvlIapOtherQuestions.no_primary_caregiver_radiobtn)
-end
-
-Then(/^there should not be a default value$/) do
-  expect(page).to have_css(IvlIapOtherQuestions.no_primary_caregiver_radiobtn_not_checked)
-end
-
 And(/^the user answers no to the have you applied for an SSN question$/) do
   choose('is_ssn_applied_no')
 end
