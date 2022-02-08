@@ -57,10 +57,10 @@ When(/^user clicks submit button$/) do
   find('.plan-year-submit', text: 'SUBMIT', wait: 5).click
 end
 
-And(/^employer clicks OK in warning modal$/) do
+And(/^employer clicks (.*) in warning modal$/) do |button_text|
   # find('.swal-button swal-button--confirm swal-button--danger', text: "OK").click
-  find_button('OK').visible?
-  click_button 'OK'
+  find_button(button_text).visible?
+  click_button button_text
 end
 
 And(/^employer clicks Add Plan Year link$/) do
