@@ -237,7 +237,7 @@ module Config
     end
 
     def find_your_doctor_url
-      Settings.site.shop_find_your_doctor_url
+      EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item
     end
 
     def site_main_web_address_text
