@@ -110,10 +110,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
     end
     let!(:renewal_rating_area) do
-      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on.next_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on.next_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: start_on.next_year.year)
     end
     let!(:renewal_service_area) do
-      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on.next_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on.next_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: start_on.next_year.year)
     end
     let(:start_on) { current_benefit_coverage_period.start_on }
     let(:address) { family.primary_person.rating_address }
@@ -313,6 +313,28 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal = subject.renew
           expect(renewal.kind).to eq('coverall')
           expect(renewal.resident_role_id.present?).to eq true
+        end
+      end
+
+      context "when renewal rating area doesn't exist" do
+        before do
+          renewal_rating_area.destroy!
+        end
+
+        it 'should return nil and log an error' do
+          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with Exception: /i)
+          expect(subject.renew).to eq nil
+        end
+      end
+
+      context "when renewal service area doesn't exist" do
+        before do
+          renewal_service_area.destroy!
+        end
+
+        it 'should return nil and log an error' do
+          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with Exception: /i)
+          expect(subject.renew).to eq nil
         end
       end
     end

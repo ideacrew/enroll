@@ -82,11 +82,24 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     end
 
     context 'prior year terminated enrollment where termination date is greater than than enrollment termination' do
+      include_context 'prior, current and next year benefit coverage periods and products'
       let(:address) { family.primary_person.rating_address }
       let(:current_year) { TimeKeeper.date_of_record.beginning_of_year.year }
       let!(:current_rating_area) do
         ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: current_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_year)
       end
+      let!(:current_service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: current_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: current_year)
+      end
+
+      let(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_date.year) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: start_date.year)
+      end
+
+      let(:service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_date.year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: start_date.year)
+      end
+
       let(:prior_coverage_year) { Date.today.year - 1}
       let!(:prior_hbx_profile) do
         FactoryBot.create(:hbx_profile,
@@ -95,16 +108,54 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
       end
       let(:start_date) {(Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).beginning_of_month}
       let(:termination_date) { (Date.new(TimeKeeper.date_of_record.year, 11,1) - 1.year).end_of_month }
+      let(:product) do
+        product = BenefitMarkets::Products::Product.by_year(start_date.year).first
+        product.update_attributes(service_area_id: service_area.id)
+        product
+      end
       let(:terminated_enrollment) do
-        FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual',
-                                           effective_on: start_date, terminated_on: termination_date, consumer_role_id: family.primary_person.consumer_role.id)
+        FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual', rating_area_id: rating_area.id,
+                                           effective_on: start_date, terminated_on: termination_date, consumer_role_id: family.primary_person.consumer_role.id, product_id: product.id)
       end
       let(:params) {{ "enrollment_id" => terminated_enrollment.id.to_s, "new_termination_date" => (termination_date + 10.days).to_s}}
 
-      it 'should return success and create a new terminated enrollment' do
-        expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
-        expect(subject).to be_success
-        expect(terminated_enrollment.family.hbx_enrollments.count).to eq 2
+      context 'no rating area found' do
+
+        before do
+          allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+          address.update_attributes(county: "Zip code outside supported area", state: 'MA')
+        end
+
+        it 'should return failure & not create enrollment' do
+          expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
+          expect(subject).not_to be_success
+          expect(subject.failure).to eq('Rating Area Is Blank')
+          expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
+        end
+      end
+
+      context 'no service area found' do
+        let(:setting) { double }
+        before :each do
+          allow(EnrollRegistry[:service_area].setting(:service_area_model)).to receive(:item).and_return('county')
+          address.update_attributes(county: "Zip code outside supported area", state: 'MA')
+        end
+
+        it 'should return failure & not create enrollment' do
+          expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
+          expect(subject).not_to be_success
+          expect(subject.failure).to eq('Product is NOT offered in service area')
+          expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
+        end
+      end
+
+      context 'with service & rating area' do
+
+        it 'should return success and create a new terminated enrollment' do
+          expect(terminated_enrollment.family.hbx_enrollments.count).to eq 1
+          expect(subject).to be_success
+          expect(terminated_enrollment.family.hbx_enrollments.count).to eq 2
+        end
       end
     end
 
