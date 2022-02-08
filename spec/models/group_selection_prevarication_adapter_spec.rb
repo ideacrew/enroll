@@ -7,7 +7,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
   include_context "setup employees with benefits"
-  
+
   let(:product_kinds)  { [:health, :dental] }
   let(:dental_sponsored_benefit) { true }
   let(:roster_size) { 2 }
@@ -27,11 +27,11 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
   let(:employee_role) { person.active_employee_roles.first }
 
   let(:group_selection_params) { {
-    "person_id"=> person.id, 
-    "market_kind"=>"shop", 
-    "employee_role_id"=> employee_role.id, 
-    "coverage_kind"=>"dental", 
-    "change_plan"=>"change_by_qle"
+    "person_id" => person.id,
+    "market_kind" => "shop",
+    "employee_role_id" => employee_role.id,
+    "coverage_kind" => "dental",
+    "change_plan" => "change_by_qle"
   } }
 
   let(:params) { ActionController::Parameters.new(group_selection_params) }
@@ -40,7 +40,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
 
   describe ".is_eligible_for_dental?" do
 
-    context "when employee making changes to existing enrollment" do 
+    context "when employee making changes to existing enrollment" do
 
       let!(:hbx_enrollment) {
         FactoryBot.create(:hbx_enrollment,
@@ -60,10 +60,8 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
       }
 
       let(:params) { ActionController::Parameters.new(
-        group_selection_params.merge({
-          "hbx_enrollment_id"=>hbx_enrollment.id, 
-          "change_plan"=>"change_plan"
-          })
+        group_selection_params.merge({"hbx_enrollment_id" => hbx_enrollment.id,
+                                      "change_plan" => "change_plan"})
       )}
 
       it "checks if dental offered using existing enrollment benefit package and returns true" do
@@ -72,7 +70,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
       end
     end
 
-    context "when employee purchasing coverage through qle" do 
+    context "when employee purchasing coverage through qle" do
 
       let(:qualifying_life_event_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
       let(:qle_on) { TimeKeeper.date_of_record - 2.days }
@@ -88,7 +86,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
         special_enrollment
       }
 
-      context "employer offering dental" do 
+      context "employer offering dental" do
 
         it "checks if dental eligible using SEP and returns true" do
           result = adapter.is_eligible_for_dental?(employee_role, 'change_by_qle', nil, qle_on)
@@ -96,7 +94,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
         end
       end
 
-      context "employer not offering dental" do 
+      context "employer not offering dental" do
         let(:dental_sponsored_benefit) { false }
 
         it "checks if dental eligible using SEP and returns false" do
@@ -122,8 +120,8 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
         special_enrollment
       }
 
-      context "employer offering dental" do 
-        it "returns true" do 
+      context "employer offering dental" do
+        it "returns true" do
           result = adapter.is_eligible_for_dental?(employee_role, 'change_by_qle', nil, qle_on)
           expect(result).to be_truthy
         end
@@ -132,11 +130,27 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
       context "employer not offering dental" do
         let(:dental_sponsored_benefit) { false }
 
-        it "returns false" do 
+        it "returns false" do
           result = adapter.is_eligible_for_dental?(employee_role, 'change_by_qle', nil, qle_on)
           expect(result).to be_falsey
-        end 
-      end 
+        end
+      end
+
+      context 'is_offering_dental with dental' do
+        it 'should return true when offering dental' do
+          expect(adapter.is_offering_dental(employee_role)).to be_truthy
+        end
+      end
+
+      context 'is_offering_dental without dental' do
+        before do
+          employee_role.benefit_package.sponsored_benefits.where(_type: 'BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit').last.delete
+        end
+
+        it 'should return true when offering dental' do
+          expect(adapter.is_offering_dental(employee_role)).to be_falsey
+        end
+      end
     end
   end
 

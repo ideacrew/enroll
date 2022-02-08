@@ -104,6 +104,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:shop_health_and_dental_attributes).with(family_member2, employee_role, effective_on, nil).and_return([false, true])
         allow(adapter).to receive(:shop_health_and_dental_attributes).with(family_member3, employee_role, effective_on, nil).and_return([true, true])
         allow(adapter).to receive(:shop_health_and_dental_attributes).with(family_member4, employee_role, effective_on, nil).and_return([false, true])
+        allow(adapter).to receive(:is_offering_dental).with(employee_role).and_return(true)
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member1, nil, effective_on, nil).and_return("ineligible_dental_row_#{employee_role.id} is_primary")
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member2, nil, effective_on, nil).and_return("ineligible_health_row_#{employee_role.id} ineligible_dental_row_#{employee_role.id}")
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member3, nil, effective_on, nil).and_return("ineligible_dental_row_#{employee_role.id}")
