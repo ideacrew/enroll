@@ -26,7 +26,7 @@
               <p>
                 <%= l10n("faa.see_if_you_qualify_1") %>
                 <%= FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value! %>
-                <%= l10n("faa.see_if_you_qualify_2") %>
+                <%= l10n("faa.see_if_you_qualify_2", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
               </p>
               <p>
                 <b><%= l10n("faa.year_selection_oe_range_from") %></b>
@@ -41,7 +41,7 @@
                 <i class="fas fa-info-circle"></i>
               </div>
               <div>
-                <p><%= l10n("faa.year_selection_learn_more") %></p>
+                <p><%= l10n("faa.year_selection_learn_more", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
               </div>
             </div>
           </div>
