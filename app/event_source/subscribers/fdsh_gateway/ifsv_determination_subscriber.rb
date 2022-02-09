@@ -16,12 +16,11 @@ module Subscribers
 
         if result.success?
           logger.info "FdshGateway::IfsvDeterminationSubscriber: on_fdsh_eligibilities_ifsv_determined acked with success: #{result.success}"
-          ack(delivery_info.delivery_tag)
         else
           errors = result.failure&.errors&.to_h
           logger.info "FdshGateway::IfsvDeterminationSubscriber: on_fdsh_eligibilities_ifsv_determined acked with failure, errors: #{errors}"
-          ack(delivery_info.delivery_tag)
         end
+        ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
         logger.info "FTIGateway::IfsvDeterminationSubscriberr: on_fdsh_eligibilities_ifsv_determined error: #{e.backtrace}"
