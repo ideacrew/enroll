@@ -64,7 +64,7 @@ namespace :migrations do
     def update_addresses
       puts("Beginning fixing addresses")
       Person.skip_callback(:update, :after, :person_create_or_update_handler)
-      # FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
+      FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
       file_name = "#{Rails.root}/update_address_fixes.csv"
       total_count = @people.count
       users_per_iteration = 10_000.0
@@ -127,7 +127,7 @@ namespace :migrations do
         end
       end
       Person.set_callback(:update, :after, :person_create_or_update_handler)
-      # FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
+      FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
     end
     update_addresses unless ENV['report_only'].present?
   end
