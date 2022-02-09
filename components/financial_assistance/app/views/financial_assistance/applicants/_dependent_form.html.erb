@@ -14,7 +14,7 @@
               <ul>
                 <% @applicant.errors.full_messages.each do |msg| %>
                     <% msg = (msg == "Gender can't be blank" && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? "Sex can't be blank" : msg %>
-                    <% msg = (msg == "ssn") ? "SSN" : msg %>
+                    <% msg = (msg == "ssn is missing") ? "SSN is missing" : msg %>
                     <li> <%= msg %> </li>
                 <% end %>
               </ul>
