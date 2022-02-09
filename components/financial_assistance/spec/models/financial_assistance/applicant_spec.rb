@@ -25,6 +25,12 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     applicant.incomes << income
   end
 
+  context "is primary caregiver" do
+    it "should not have a default value" do
+      expect(applicant.is_primary_caregiver).to be(nil)
+    end
+  end
+
   describe 'after_update' do
     context 'callbacks' do
 
