@@ -19,11 +19,11 @@ module Subscribers
           ack(delivery_info.delivery_tag)
         else
           errors = result.failure&.errors&.to_h
-          logger.info "FdshGateway::RrvIfsvDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_ifsv_determined nacked with failure, errors: #{errors}"
-          nack(delivery_info.delivery_tag)
+          logger.info "FdshGateway::RrvIfsvDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_ifsv_determined acked with failure, errors: #{errors}"
+          ack(delivery_info.delivery_tag)
         end
       rescue StandardError => e
-        nack(delivery_info.delivery_tag)
+        ack(delivery_info.delivery_tag)
         logger.info "FdshGateway::RrvIfsvDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_ifsv_determined error: #{e.backtrace}"
       end
     end

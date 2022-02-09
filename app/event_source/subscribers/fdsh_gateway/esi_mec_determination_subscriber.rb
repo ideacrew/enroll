@@ -19,11 +19,11 @@ module Subscribers
           ack(delivery_info.delivery_tag)
         else
           errors = result.failure&.errors&.to_h
-          logger.info "FdshGateway::ESIMECDeterminationSubscriber: on_esi_mec_determination nacked with failure, errors: #{errors}"
-          nack(delivery_info.delivery_tag)
+          logger.info "FdshGateway::ESIMECDeterminationSubscriber: on_esi_mec_determination acked with failure, errors: #{errors}"
+          ack(delivery_info.delivery_tag)
         end
       rescue StandardError => e
-        nack(delivery_info.delivery_tag)
+        ack(delivery_info.delivery_tag)
         logger.info "FdshGateway::ESIMECDeterminationSubscriber: on_esi_mec_determination error: #{e.backtrace}"
       end
     end
