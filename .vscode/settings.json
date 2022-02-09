@@ -4,6 +4,8 @@
     "anchore",
     "buildx",
     "codeql",
+    "curam",
+    "dchl",
     "getong",
     "interactors",
     "Mongoid",
