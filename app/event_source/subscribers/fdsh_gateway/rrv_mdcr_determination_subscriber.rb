@@ -9,10 +9,10 @@ module Subscribers
 
       subscribe(:on_magi_medicaid_application_renewal_eligibilities_medicare_determined) do |delivery_info, _metadata, response|
         logger.info "FdshGateway::RrvMdcrDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_mdcr_determined with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
-        payload = JSON.parse(response, :symbolize_names => true)
+        fdsh_response = JSON.parse(response, :symbolize_names => true)
 
 
-        result = FinancialAssistance::Operations::Applications::Rrv::Medicare::AddRrvMedicareDetermination.new.call(payload: payload)
+        result = FinancialAssistance::Operations::Applications::Rrv::Medicare::AddRrvMedicareDetermination.new.call(fdsh_response)
 
         if result.success?
           logger.info "FdshGateway::RrvMdcrDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_mdcr_determined acked with success: #{result.success}"
