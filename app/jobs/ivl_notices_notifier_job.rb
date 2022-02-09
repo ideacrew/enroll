@@ -16,6 +16,7 @@ class IvlNoticesNotifierJob < ActiveJob::Base
     }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
   rescue StandardError => e
     Rails.logger.error { "Could not generate IVL open enrollment notice event #{event} due to #{e} for Person: #{person_id}\n#{e.backtrace.join("\n")}" }
+    raise e
   end
 
   def notice_class(notice_type)
