@@ -21,6 +21,19 @@ module Subscribers
       ack(delivery_info.delivery_tag)
     end
 
+    subscribe(:on_enroll_individual_enrollments) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_enrollments)
+      payload = JSON.parse(response, symbolize_names: true)
+
+      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, response: #{payload}"
+
+      ack(delivery_info.delivery_tag)
+    rescue StandardError, SystemStackError => e
+      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, ack: #{payload}"
+      ack(delivery_info.delivery_tag)
+    end
+
     def redetermine_family_eligibility(payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
       return if enrollment.shopping?
