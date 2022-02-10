@@ -38,6 +38,11 @@ module Subscribers
 
       payload = JSON.parse(response, symbolize_names: true)
 
+      subscriber_logger =
+        Logger.new(
+          "#{Rails.root}/log/on_enroll_enterprise_events_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+        )
+
       subscriber_logger.info "EnterpriseSubscriber#on_enroll_enterprise_events, response: #{payload}"
       logger.info "EnterpriseSubscriber#on_enroll_enterprise_events payload: #{payload}" unless Rails.env.test?
 
