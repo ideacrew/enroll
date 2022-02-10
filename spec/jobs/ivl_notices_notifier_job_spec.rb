@@ -9,7 +9,7 @@ RSpec.describe ::IvlNoticesNotifierJob, dbclean: :after_each do
 
     it 'performs the enrollment notice data appendment' do
       expect(Rails.logger).to receive(:error).at_least(:once)
-      IvlNoticesNotifierJob.new.perform(person.id, 'fake')
+      expect { IvlNoticesNotifierJob.new.perform(person.id, 'fake') }.to raise_error
     end
   end
 end
