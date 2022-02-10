@@ -16,7 +16,7 @@ module FinancialAssistance
           include EventSource::Logging
 
           def call(params)
-            values = validate(params)
+            values = yield validate(params)
             families = find_families(values)
             submit(params, families)
 
@@ -34,7 +34,7 @@ module FinancialAssistance
           end
 
           def find_families(params)
-            family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: 2022).distinct(:family_id)
+            family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
             Family.where(:_id.in => family_ids).all
           end
 
