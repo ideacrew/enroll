@@ -30,6 +30,13 @@ def is_retro_renewal_enrollment?(hbx_id)
   enrollment.workflow_state_transitions.where(from_state: 'auto_renewing', to_state: 'coverage_selected').present?
 end
 
+def can_transmit?(hbx_id)
+  enrollment = HbxEnrollment.by_hbx_id(hbx_id).first
+
+  offered_in_service_area = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: enrollment})
+  offered_in_service_area.success?
+end
+
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
 active_statuses = %w[coverage_selected auto_renewing renewing_coverage_selected]
 
@@ -44,6 +51,7 @@ purchases = HbxEnrollment.collection.aggregate([
         }
       }
     },
+    "rating_area_id" => {"$ne" => nil},
     "kind" => {"$nin" => enrollment_kinds}
   }},
   {"$group" => {
@@ -70,7 +78,8 @@ terms = HbxEnrollment.collection.aggregate([
         }
       }
     },
-    "kind" => {"$nin" => enrollment_kinds}
+    "rating_area_id" => {"$ne" => nil},
+    "kind" => {"$nin" => enrollment_kinds},
   }},
   {"$group" => {
       "_id" => "$hbx_id",
@@ -85,6 +94,10 @@ puts terms.count
 purchase_event = "acapi.info.events.hbx_enrollment.coverage_selected"
 purchases.each do |rec|
   pol_id = rec["_id"]
+  unless can_transmit?(pol_id)
+    Rails.logger.info "0$ premium issue - cannot trasmit purchase #{pol_id}"
+    next
+  end
   if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_year)
     enrollment = HbxEnrollment.where(hbx_id: pol_id).first
     next if enrollment.coverage_year == EnrollRegistry[:gate_enrollments_to_edidb_for_year].setting(:year).item
@@ -96,15 +109,23 @@ purchases.each do |rec|
   else
     IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
   end
+rescue StandardError => e
+  Rails.logger.info "Error while processing purchase #{rec['_id']} - #{e}"
 end
 
 term_event = "acapi.info.events.hbx_enrollment.terminated"
 terms.each do |rec|
   pol_id = rec["_id"]
+  unless can_transmit?(pol_id)
+    Rails.logger.info "0$ premium issue - cannot trasmit term #{pol_id}"
+    next
+  end
   if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_year)
     enrollment = HbxEnrollment.where(hbx_id: pol_id).first
     next if enrollment.coverage_year == EnrollRegistry[:gate_enrollments_to_edidb_for_year].setting(:year).item
   end
   Rails.logger.info "-----publishing #{pol_id}"
   IvlEnrollmentsPublisher.publish_action(term_event, pol_id, "urn:openhbx:terms:v1:enrollment#terminate_enrollment")
+rescue StandardError => e
+  Rails.logger.info "Error while processing term #{rec['_id']} - #{e}"
 end
