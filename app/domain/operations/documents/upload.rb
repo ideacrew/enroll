@@ -57,8 +57,8 @@ module Operations
         document_body = {
           subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}],
           'document_type': 'notice',
-          'creator': Settings.site.publisher,
-          'publisher': Settings.site.publisher,
+          'creator': EnrollRegistry[:enroll_app].setting(:publisher).item,
+          'publisher': EnrollRegistry[:enroll_app].setting(:publisher).item,
           'type': 'text',
           'source': 'enroll_system',
           'language': 'en',

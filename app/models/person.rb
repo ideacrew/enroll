@@ -744,6 +744,8 @@ class Person
     else
       age
     end
+  rescue StandardError
+    self.errors.add(:base, l10n("exceptions.valid_birthdate"))
   end
 
   def is_homeless?
