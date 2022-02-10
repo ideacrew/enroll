@@ -211,14 +211,16 @@ describe "given cancel event to cancel terminated coverage" do
       :resource_instance_uri => "urn:some_thing:policy#policy_id",
       :hbx_enrollment_ids => JSON.dump(["1234"]),
       :qualifying_reason => "non_payment",
-      :event_effective_date => termination_date.strftime("%Y%m%d"),
+      :event_effective_date => termination_date.strftime("%Y%m%d")
     }
   end
   let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, effective_on: Date.new(2022,1,1),
-                                          hbx_id: '1234', household: family.active_household,
-                                          terminated_on: Date.new(2022,1,31),
-                                          aasm_state: "coverage_terminated", family: family)}
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, effective_on: Date.new(2022,1,1),
+                                       hbx_id: '1234', household: family.active_household,
+                                       terminated_on: Date.new(2022,1,31),
+                                       aasm_state: "coverage_terminated", family: family)
+  end
 
   it "should cancel terminated enrollment" do
     Subscribers::PolicyTerminationsSubscriber.new.call(cancelation_event_name, nil, nil, nil, cancelation_payload)
@@ -236,14 +238,16 @@ describe "given term event to cancel terminated coverage" do
       :resource_instance_uri => "urn:some_thing:policy#policy_id",
       :hbx_enrollment_ids => JSON.dump(["4321"]),
       :qualifying_reason => "non_payment",
-      :event_effective_date => termination_date.strftime("%Y%m%d"),
+      :event_effective_date => termination_date.strftime("%Y%m%d")
     }
   end
   let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, effective_on: Date.new(2022,2,1),
-                                           hbx_id: '4321', household: family.active_household,
-                                           terminated_on: Date.new(2022,2,28),
-                                           aasm_state: "coverage_terminated", family: family)}
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, effective_on: Date.new(2022,2,1),
+                                       hbx_id: '4321', household: family.active_household,
+                                       terminated_on: Date.new(2022,2,28),
+                                       aasm_state: "coverage_terminated", family: family)
+  end
 
   it "should cancel terminated enrollment" do
     Subscribers::PolicyTerminationsSubscriber.new.call(term_event_name, nil, nil, nil, term_payload)
