@@ -54,7 +54,7 @@ namespace :reports do
     end
 
     enrollments = HbxEnrollment.where(
-      :aasm_state.nin => ["coverage_canceled", 'shopping'],
+      :aasm_state.nin => ['shopping'],
       :effective_on => { "$gte" => Date.strptime(start_on, "%m/%d/%Y"), "$lt" => Date.strptime(end_on, "%m/%d/%Y")}
     )
     count = 0
@@ -63,7 +63,7 @@ namespace :reports do
     total_count = enrollments.size
     timestamp = Time.now.strftime('%Y%m%d%H%M')
     CSV.open("enrollment_report_#{timestamp}.csv", 'w') do |csv|
-      csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Subscriber ID " "Status", "Member Status",
+      csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Subscriber ID ", "Status", "Member Status",
               "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type",
               "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name",
               "Premium Amount", "Premium Total", "Policy APTC", "Responsible Premium Amt", "FPL",
