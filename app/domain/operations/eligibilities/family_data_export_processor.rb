@@ -14,6 +14,7 @@ module Operations
       # @param [Hash] opts Options to update evidence due on dates
       # @option opts [Integer] :offset required
       # @option opts [Integer] :limit required
+      # @option opts [Integer] :assistance_year optional
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
@@ -27,6 +28,7 @@ module Operations
       def validate(params)
         return Failure('offset missing') unless params[:offset]
         return Failure('limit missing') unless params[:limit]
+        return Failure('assistance year missing') unless params[:assistance_year]
 
         Success(params)
       end
@@ -44,7 +46,7 @@ module Operations
 
             family_data = ::Operations::Eligibilities::FamilyEvidencesDataExport.new.call(
               family: family,
-              assistance_year: TimeKeeper.date_of_record.year
+              assistance_year: params[:assistance_year] || TimeKeeper.date_of_record.year
             ).success
 
             family_data.each { |member_row| csv << member_row }

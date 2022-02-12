@@ -163,7 +163,7 @@ RSpec.describe ::Operations::Eligibilities::FamilyDataExportProcessor,
   end
 
   let(:required_params) do
-    { offset: 0, limit: 100 }
+    { offset: 0, limit: 100, assistance_year: TimeKeeper.date_of_record.year }
   end
 
   it 'should be a container-ready operation' do
