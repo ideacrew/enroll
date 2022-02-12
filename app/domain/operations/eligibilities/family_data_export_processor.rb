@@ -66,6 +66,7 @@ module Operations
         "#{Rails.root}/family_eligibility_data_export_#{values[:offset]}_#{values[:limit]}_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
       end
 
+      # rubocop:disable Metrics/MethodLength
       def columns
         [
           'Family Hbx ID',
@@ -119,6 +120,7 @@ module Operations
           'Local Mec Updated?'
         ]
       end
+      # rubocop:enable Metrics/MethodLength
     end
   end
 end

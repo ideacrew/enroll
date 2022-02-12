@@ -199,7 +199,7 @@ module Operations
 
       def old_evidence_updated?(applicant)
         [:esi_mec, :aces_mec].collect do |key|
-          evidence = applicant.evidences.detect{|evidence| evidence.key == key}
+          evidence = applicant.evidences.detect{|rec| rec.key == key}
           (evidence && evidence.created_at != evidence.updated_at) ? true : false
         end
       end

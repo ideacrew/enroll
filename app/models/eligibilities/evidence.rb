@@ -102,6 +102,7 @@ module Eligibilities
       self.due_on = new_date
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
     def has_determination_response?
       return false if pending?
       return true  if outstanding? || verified? || non_verified?
@@ -130,6 +131,7 @@ module Eligibilities
 
       request_results.present? ? true : false
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     PENDING = [:pending, :attested].freeze
     OUTSTANDING = [:outstanding, :review, :errored].freeze
