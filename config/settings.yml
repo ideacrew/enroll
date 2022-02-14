@@ -32,7 +32,6 @@ contact_center:
   short_number: '(855) 532-5465'
   small_business_email: 'info@dchealthlink.com'
   state: 'DC'
-  tty_number: '711'
   tty: '771'
   zip_code: '20090'
   mailing_address:

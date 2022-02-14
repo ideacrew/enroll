@@ -20,7 +20,7 @@
               br
               span
                 i.fas.fa-phone.mr-1
-              strong = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{Settings.contact_center.tty_number}"
+              strong = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}"
           - if signed_in?
             li
               span.my-portal-links

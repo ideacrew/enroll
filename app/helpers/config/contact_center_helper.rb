@@ -64,7 +64,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_tty_number
-    Settings.contact_center.tty_number
+    EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
   end
 
   def small_businesss_email

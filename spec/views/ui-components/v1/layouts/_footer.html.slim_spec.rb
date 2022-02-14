@@ -17,7 +17,7 @@ RSpec.describe "_footer.html.slim", :type => :view, dbclean: :after_each  do
     end
 
     it "should display TTY numer" do
-      expect(rendered).to have_text(Settings.contact_center.tty_number)
+      expect(rendered).to have_text(EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item)
     end
 
     it "should display copy-right logo" do
