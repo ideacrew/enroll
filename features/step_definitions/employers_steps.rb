@@ -1089,8 +1089,8 @@ And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn
   end
 end
 
-And(/^employer clicks Create Plan Year$/) do
-  click_button 'Create Plan Year'
+And(/^employer clicks on Create Plan Year$/) do
+  find(EmployerBenefitPackageSetUp.create_plan_year_btn).click
 end
 
 
