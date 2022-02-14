@@ -996,7 +996,7 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content('Your employer contributes')
     expect(page).to have_content("Thank you for enrolling in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
     # In the email signature
-    [EnrollRegistry[:enroll_app].setting(:short_name).item, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+    [EnrollRegistry[:enroll_app].setting(:short_name).item, EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)
     end
   end

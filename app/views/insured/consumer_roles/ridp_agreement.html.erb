@@ -11,7 +11,7 @@
       <div class="panel-body">
         <%= l10n("insured.consumer_roles.ridp_agreement.ridp_agreement_html") %>
         <div class="disagree_placeholder_text" style="display: none">
-          <%= "Please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number} for more information" %>
+          <%= "Please contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{Settings.contact_center.phone_number} for more information" %>
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">

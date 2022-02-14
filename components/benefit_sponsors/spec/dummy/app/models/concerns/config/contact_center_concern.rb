@@ -12,7 +12,7 @@ module Config::ContactCenterConcern
 
   class_methods do
     def contact_center_name
-      @@contact_center_name ||= Settings.contact_center.name
+      @@contact_center_name ||= EnrollRegistry[:enroll_app].setting(:contact_center_name).item
     end
 
     def contact_center_phone_number
