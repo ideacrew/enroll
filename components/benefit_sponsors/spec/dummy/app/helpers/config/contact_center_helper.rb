@@ -60,7 +60,7 @@ module Config::ContactCenterHelper
   end
 
   def small_businesss_email
-    Settings.contact_center.small_business_email
+    EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
   end
 
   def small_business_email_link

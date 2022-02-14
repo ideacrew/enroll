@@ -27,7 +27,6 @@ contact_center:
   payment_phone_number: '855-532-LINK'
   phone_number: '1-855-532-5465'
   short_number: '(855) 532-5465'
-  small_business_email: 'info@dchealthlink.com'
   state: 'DC'
   tty: '771'
   mailing_address:

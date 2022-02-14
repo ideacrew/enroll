@@ -29,7 +29,6 @@ contact_center:
   ivl_phone_number: '1-877-623-6765'
   email_address: 'info@dchealthlink.com'
   state: 'DC'
-  small_business_email: 'info@dchealthlink.com'
   non_discrimination_email: 'info@dchealthlink.com'
 
   appeals: 'info@dchealthlink.com'

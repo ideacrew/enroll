@@ -27,7 +27,7 @@ CKEDITOR.addTemplates('default', {
         '<p>Please contact your broker for further assistance. You can also contact the #{site_short_name} with any questions:</p>' +
         '<ul>' +
         '<li>By calling #{Settings.contact_center.phone_number}. TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}</li>' +
-        "<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
+        "<li>By email: <a href='mailto:#{EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item}'>#{EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item}</a></li>" +
         '</ul>' +
         "<p>You can also find more information on our website at <a href='http://​#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}'>#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}</a></p>" +
         '<p>[[ if employer_profile.broker_present? ]]</p>' +
@@ -76,7 +76,7 @@ CKEDITOR.addTemplates('default', {
         '<p>You can also contact the #{site_short_name} with any questions:</p>' +
         '<ul>' +
         '<li>By calling #{Settings.contact_center.phone_number}. TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}</li>' +
-        "<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
+        "<li>By email: <a href='mailto:#{EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item}'>#{EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item}</a></li>" +
         '</ul>' +
         "<p>You can also find more information on our website at <a href='http://​#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}'>#{EnrollRegistry[:enroll_app].setting(:main_web_address).item}</a></p>" +
         '[[ if employee_profile.broker_present? ]]' +
