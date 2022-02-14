@@ -35,7 +35,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "For more information, go to #{EnrollRegistry[:enroll_app].setting(:website_name).item} and click on “Get Help”. Click on “Read the GET HELP” and search for “Special Enrollment Periods”."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>You may submit a new request for a special enrollment period at any time, with new information, by calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}.</strong>"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>You may submit a new request for a special enrollment period at any time, with new information, by calling #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} at #{Settings.contact_center.phone_number}.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["The 2016 Open Enrollment Season ended on January 31, 2016.  If you are already active on another enrollment, this denial does not impact that enrollment.  <u>You must make sure to pay all currently due premiums on that new plan selection to make sure it is active.</u>  Call your health insurance company at the numbers below to make sure your payments are active."], heading: '2016 Open Enrollment', sub_heading: ''} %>
 
