@@ -25,10 +25,10 @@ h1.heading-text Benefit Package - Set Up
     button.btn.btn-default.ml-1#dentalBenefits type="submit" name="#{action}_dental_benefits" value="true" #{action.humanize} Dental Benefits
   / button.btn.btn-default#editDentalBenefits type="submit" name="edit_dental_benefits" value="true" Edit Dental Benefits
   span.tool-tip.pull-right data-toggle="tooltip" data-placement="top"
-    button.btn.btn-primary.submit-benefit-package#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" Create Plan Year
+    button.btn.btn-primary.submit-benefit-package#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" data-cuke="create_plan_year_button" Create Plan Year
 
 
-  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
+  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', :data => { :cuke => 'cancel_benefit_package_button' },  id:'cancelBenefitPackage'
 
 javascript:
   var disableSelectric = false;

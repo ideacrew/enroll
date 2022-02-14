@@ -44,7 +44,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_name
-    Settings.contact_center.name
+    EnrollRegistry[:enroll_app].setting(:contact_center_name).item
   end
 
   def contact_center_mailing_address_name
@@ -56,11 +56,11 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_tty_number
-    Settings.contact_center.tty_number
+    EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
   end
 
   def small_businesss_email
-    Settings.contact_center.small_business_email
+    EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
   end
 
   def small_business_email_link

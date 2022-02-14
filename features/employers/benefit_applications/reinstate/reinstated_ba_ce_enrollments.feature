@@ -11,7 +11,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee enrollments
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And census employee Patrick Doe has a past DOH
+    And census employee Patrick Doe has a past date of hire
     And employees for employer ABC Widgets have selected a coverage
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
@@ -53,7 +53,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee enrollments
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And census employee Patrick Doe has a past DOH
+    And census employee Patrick Doe has a past date of hire
     And employees for employer ABC Widgets have selected a coverage
     And initial employer ABC Widgets application <to_state>
     And that a user with a HBX staff role with Super Admin subrole exists and is logged in

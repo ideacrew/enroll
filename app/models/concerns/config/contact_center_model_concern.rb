@@ -25,7 +25,7 @@ module Config::ContactCenterModelConcern
     end
 
     def contact_center_tty_number
-      @contact_center_tty_number ||= Settings.contact_center.tty_number
+      @contact_center_tty_number ||= EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
     end
   end
 end

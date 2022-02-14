@@ -689,6 +689,12 @@ describe Person, :dbclean => :after_each do
       it "should know its age tomorrow" do
         expect(greg.age_on(1.day.from_now.to_date)).to eq gregs_age
       end
+
+      it "should have an error saved to their person if the age isn't imported properly" do
+        greg.update_attributes!(dob: nil)
+        greg.age_on(Date.today)
+        expect(greg.errors.full_messages.first).to eq l10n("exceptions.valid_birthdate")
+      end
     end
 
     context "Person#primary_family" do

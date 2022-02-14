@@ -272,7 +272,22 @@
         title: "Warning",
         text: "If you choose to continue any previous draft/ineligible plan years will be canceled",
         icon: "warning",
-        buttons: true,
+        buttons: {
+          cancel: {
+            text: "Cancel",
+            value: true,
+            visible: true,
+            className: "data-cuke-swal-cancel-button",
+            closeModal: true,
+          },
+          confirm: {
+            text: "OK",
+            value: true,
+            visible: true,
+            className: "data-cuke-swal-okay-button",
+            closeModal: true,
+          }
+        },
         dangerMode: true
       })
       .then((willDelete) => {

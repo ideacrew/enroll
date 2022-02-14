@@ -18,14 +18,13 @@ module Subscribers
 
         if result.success?
           logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination acked with success: #{result.success}"
-          ack(delivery_info.delivery_tag)
         else
           errors = result.failure&.errors&.to_h
-          logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination nacked with failure, errors: #{errors}"
-          nack(delivery_info.delivery_tag)
+          logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination acked with failure, errors: #{errors}"
         end
+        ack(delivery_info.delivery_tag)
       rescue StandardError => e
-        nack(delivery_info.delivery_tag)
+        ack(delivery_info.delivery_tag)
         logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination error: #{e.backtrace}"
       end
 
@@ -40,14 +39,13 @@ module Subscribers
 
         if result.success?
           logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination acked with success: #{result.success}"
-          ack(delivery_info.delivery_tag)
         else
           errors = result.failure&.errors&.to_h
-          logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination nacked with failure, errors: #{errors}"
-          nack(delivery_info.delivery_tag)
+          logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination acked with failure, errors: #{errors}"
         end
+        ack(delivery_info.delivery_tag)
       rescue StandardError => e
-        nack(delivery_info.delivery_tag)
+        ack(delivery_info.delivery_tag)
         logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination error: #{e.backtrace}"
       end
     end

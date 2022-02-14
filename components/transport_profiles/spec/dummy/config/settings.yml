@@ -17,24 +17,17 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
 
 contact_center:
-  name: "Maine Cover ME's Customer Care Center"
   alt_name: 'Maine Cover ME Customer Service'
-  po_box: 'PO Box 97022'
   phone_number: '(866) 636-0355'
   fax: '1-617-933-3099'
   alt_fax: '617-722-4033'
-  tty_number: '711'
-  short_number: '(866) 636-0355'
   tty: '771'
   alt_phone_number: '1-855-532-LINK'
   payment_phone_number: '855-532-LINK'
   ivl_number: '1-877-623-6765'
   ivl_phone_number: '1-877-623-6765'
   email_address: 'smallbusiness@coverme.gov'
-  city: 'Augusta'
   state: 'ME'
-  zip_code: '04330'
-  small_business_email: 'smallbusiness@coverme.gov'
   non_discrimination_email: 'info@coverme.gov'
 
   appeals: 'info@coverme.gov'

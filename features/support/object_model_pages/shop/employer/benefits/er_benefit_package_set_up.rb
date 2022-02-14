@@ -26,4 +26,12 @@ class EmployerBenefitPackageSetUp
   def self.single_plan_btn
     'a[class="interaction-click-control-single-plan"]'
   end
+
+  def self.create_plan_year_btn
+    '[data-cuke="create_plan_year_button"]'
+  end
+
+  def self.cancel_btn
+    '[data-cuke="cancel_benefit_package_button"]'
+  end
 end

@@ -72,19 +72,6 @@ module Insured
         reinstatement.select_coverage!
       end
 
-      def self.product_offered_in_service_area?(enrollment)
-        rating_address = (enrollment.consumer_role || enrollment.resident_role).rating_address
-
-        return false if rating_address.blank?
-
-        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
-          rating_address,
-          during: enrollment.effective_on
-        ).map(&:id)
-
-        service_areas.include?(enrollment.product.service_area_id)
-      end
-
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
         applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
         cost_decorator = UnassistedPlanCostDecorator.new(reinstatement.product, reinstatement, applied_aptc_amount)

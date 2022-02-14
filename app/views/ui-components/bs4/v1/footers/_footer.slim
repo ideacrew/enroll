@@ -10,7 +10,7 @@ footer.footer-wrapper class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIR
                 span
                   i.fas.fa-phone.fa-lg.fa-rotate-90
                   | &nbsp;
-                  = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{Settings.contact_center.tty_number}"
+                  = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}"
             - if contact_center_email_address_is_enabled?
               li.mr-3
                 = mail_to contact_center_email_address, target: '_blank' do

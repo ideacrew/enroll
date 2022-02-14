@@ -18,4 +18,12 @@ class EmployerCoverageYouOffer
   def self.revert_plan_year_btn
     'a[class="btn btn-primary mtz  btn-small interaction-click-control-revert-plan-year"]'
   end
+
+  def self.okay_btn
+    'data-cuke-swal-okay-button'
+  end
+
+  def self.cancel_btn
+    'data-cuke-swal-cancel-button'
+  end
 end
