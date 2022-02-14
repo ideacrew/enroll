@@ -77,7 +77,7 @@ module FinancialAssistance
       end
 
       rule(:ssn, :no_ssn) do
-        key.failure(text: "is missing") if values[:ssn].blank? && values[:no_ssn] == '0' && values[:is_applying_coverage]
+        base.failure("SSN is missing") if values[:ssn].blank? && values[:no_ssn] == '0' && values[:is_applying_coverage]
       end
 
       rule(:is_primary_applicant) do
