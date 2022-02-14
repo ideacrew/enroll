@@ -40,7 +40,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_short_number
-    Settings.contact_center.short_number
+    EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
   end
 
   def contact_center_ivl_phone_number

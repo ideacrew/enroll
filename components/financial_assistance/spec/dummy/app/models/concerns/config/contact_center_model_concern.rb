@@ -22,7 +22,7 @@ module Config::ContactCenterModelConcern
     end
 
     def contact_center_short_number
-      @contact_center_short_number ||= Settings.contact_center.short_number
+      @contact_center_short_number ||= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
     end
 
     def contact_center_tty_number

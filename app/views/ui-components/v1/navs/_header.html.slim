@@ -15,7 +15,7 @@
             h4 = get_header_text(controller_name)
         ul.nav.navbar-nav.navbar-right
           li
-            a.call-customer-service href="tel:#{Settings.contact_center.short_number}"
+            a.call-customer-service href="tel:#{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}"
               span.header-text = l10n(".call_customer_service")
               br
               span
