@@ -4,7 +4,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_po_box
-    Settings.contact_center.po_box
+    EnrollRegistry[:enroll_app].setting(:contact_center_po_box).item
   end
 
   def contact_center_alt_name

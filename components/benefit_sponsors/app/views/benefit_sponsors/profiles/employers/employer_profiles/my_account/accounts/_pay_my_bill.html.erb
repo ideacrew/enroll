@@ -35,7 +35,7 @@
         <%= BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item %>
       </div>
       <div class="row col-md-offset-1">
-        <%= Settings.contact_center.po_box %>
+        <%= EnrollRegistry[:enroll_app].setting(:contact_center_po_box).item %>
       </div>
       <div class="row col-md-offset-1">
         <%= Settings.contact_center.city %>, <%= Settings.contact_center.state %> <%= Settings.contact_center.zip_code %>
@@ -46,4 +46,4 @@
 <h4>**Please include your account number on your check.</h4>
 <h4>Check that your mailing address is up to date - click on
   <%= link_to 'Update Business Info', edit_profiles_registration_path(@employer_profile.id, :tab=>'profile', add_staff: 'no') %>.
-</h4> 
+</h4>
