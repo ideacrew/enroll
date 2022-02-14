@@ -56,7 +56,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_name
-    Settings.contact_center.name
+    EnrollRegistry[:enroll_app].setting(:contact_center_name).item
   end
 
   def contact_center_mailing_address_name

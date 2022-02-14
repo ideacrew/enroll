@@ -17,7 +17,6 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
 
 contact_center:
-  name: "Maine Cover ME's Customer Care Center"
   alt_name: 'Maine Cover ME Customer Service'
   phone_number: '(866) 636-0355'
   fax: '1-617-933-3099'
