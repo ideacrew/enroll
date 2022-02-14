@@ -20,6 +20,7 @@ namespace :reports do
       address_rating_area
       address_changed_on
       product_offered_in_service_area
+      premium
     ]
 
     file_name = "#{Rails.root}/enrollment_service_area_change_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
@@ -60,7 +61,8 @@ namespace :reports do
             rating_address.to_s,
             address_rating_area,
             rating_address.updated_at,
-            product_offered_in_service_area
+            product_offered_in_service_area,
+            enrollment.total_premium
           ]
         end
       rescue StandardError => e
