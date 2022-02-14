@@ -19,7 +19,6 @@ contact_center:
   board_of_elections_email: ''
   board_of_elections_entity: 'DC Board of Elections'
   board_of_elections_phone_number: '(202) 727-2525'
-  city: 'Washington'
   email_address: 'info@dchealthlink.com'
   fax: '1-617-933-3099'
   ivl_number: '1-877-623-6765'

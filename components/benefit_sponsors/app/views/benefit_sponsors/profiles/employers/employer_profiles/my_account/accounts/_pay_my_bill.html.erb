@@ -38,7 +38,7 @@
         <%= EnrollRegistry[:enroll_app].setting(:contact_center_po_box).item %>
       </div>
       <div class="row col-md-offset-1">
-        <%= Settings.contact_center.city %>, <%= Settings.contact_center.state %> <%= Settings.contact_center.zip_code %>
+        <%= EnrollRegistry[:enroll_app].setting(:contact_center_city).item %>, <%= Settings.contact_center.state %> <%= Settings.contact_center.zip_code %>
       </div>
     </li>
   </ol>

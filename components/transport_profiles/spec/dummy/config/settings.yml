@@ -29,7 +29,6 @@ contact_center:
   ivl_number: '1-877-623-6765'
   ivl_phone_number: '1-877-623-6765'
   email_address: 'smallbusiness@coverme.gov'
-  city: 'Augusta'
   state: 'ME'
   zip_code: '04330'
   small_business_email: 'smallbusiness@coverme.gov'
