@@ -32,6 +32,6 @@ class EmployerBenefitPackageSetUp
   end
 
   def self.cancel_btn
-    '#cancelBenefitPackage'
+    '[data-cuke="cancel_benefit_package_button"]'
   end
 end
