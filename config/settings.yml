@@ -30,7 +30,6 @@ contact_center:
   small_business_email: 'info@dchealthlink.com'
   state: 'DC'
   tty: '771'
-  zip_code: '20090'
   mailing_address:
     name: 'DC Health Link'
     address_1: 'PO Box 97022'
