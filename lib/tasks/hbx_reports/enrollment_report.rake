@@ -61,13 +61,12 @@ namespace :reports do
     batch_size = 1000
     offset = 0
     total_count = enrollments.size
-    timestamp = Time.now.strftime('%Y%m%d%H%M')
-    CSV.open("enrollment_report_#{timestamp}.csv", 'w') do |csv|
+    CSV.open("enroll_enrollment_report.csv", 'w') do |csv|
       csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Subscriber ID ", "Status", "Member Status",
-              "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type",
-              "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name",
+              "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type", "Tobacco Status",
+              "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name", "Rating Area",
               "Premium Amount", "Premium Total", "Policy APTC", "Responsible Premium Amt", "FPL",
-              "Coverage Start", "Coverage End",
+              "Purchase Date", "Coverage Start", "Coverage End",
               "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Broker NPN",
               "Race", "Ethnicity", "Citizen Status",
               "Broker Assisted"]
@@ -98,9 +97,12 @@ namespace :reports do
                   per.gender,
                   en.primary_relationship,
                   enr.coverage_kind,
+                  per.is_tobacco_user,
                   product.name, product.hios_id, product.metal_level, product.carrier_profile.abbrev,
+                  enr&.rating_area&.exchange_provided_code,
                   premium_amount, enr.total_premium, enr.applied_aptc_amount, total_responsible_amount(enr),
                   fpl_percentage(enr, en, enr.effective_on.year),
+                  enr.created_at.blank? ? nil : enr.created_at.to_s,
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
                   enr.terminated_on.blank? ? nil : enr.terminated_on.strftime("%Y%m%d"),
                   per.home_address&.full_address || enr.subscriber.person.home_address&.full_address,
