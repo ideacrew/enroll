@@ -52,8 +52,12 @@ module FinancialAssistance
             end
           end
 
+          def build_event(payload)
+            event('events.iap.applications.request_family_rrv_determination', attributes: payload)
+          end
+
           def publish(payload)
-            event = event('events.iap.applications.request_family_rrv_determination', attributes: payload)
+            event = build_event(payload)
             event.success.publish
 
             Success("Successfully published the rrv payload")
