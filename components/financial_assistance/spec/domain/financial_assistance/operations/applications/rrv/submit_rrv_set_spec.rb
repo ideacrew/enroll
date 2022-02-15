@@ -93,7 +93,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSe
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new }
+  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSet.new }
 
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
@@ -105,7 +105,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSe
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest).to receive(:new).and_return(obj)
+    allow(FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSet).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
     allow(premiums_double).to receive(:failure?).and_return(false)
@@ -119,8 +119,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSe
       expect(applicant.non_esi_evidence.present?).to be_falsey
       result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
       expect(result).to be_success
-      expect(applicant.reload.income_evidence.present?).to be_truthy
-      expect(applicant.reload.non_esi_evidence.present?).to be_truthy
     end
   end
 
@@ -130,7 +128,5 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSe
     expect(applicant.non_esi_evidence.present?).to be_falsey
     result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
     expect(result).to be_success
-    expect(applicant.reload.income_evidence.present?).to be_falsey
-    expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end
 end
