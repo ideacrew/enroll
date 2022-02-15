@@ -29,10 +29,20 @@ module Subscribers
           enrollments.each do |en|
             if is_cancel
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as cancel" }
+              next if en.coverage_canceled?
               if en.may_cancel_for_non_payment? && qr_uri=='non_payment'
                 en.cancel_for_non_payment!
               elsif en.may_cancel_coverage?
                 en.cancel_coverage!
+              else
+                # cancel termed coverage
+                prevs_state = en.aasm_state
+                en.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
+                en.workflow_state_transitions << WorkflowStateTransition.new(
+                  from_state: prevs_state,
+                  to_state: "coverage_canceled",
+                  reason: "carrier initiated term"
+                )
               end
             else
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as termination" }
@@ -52,7 +62,17 @@ module Subscribers
                 if end_effective_date
 
                   if en.effective_on > end_effective_date
-                    en.cancel_coverage! if en.may_cancel_coverage?
+                    if en.may_cancel_coverage?
+                      en.cancel_coverage!
+                    else
+                      # cancel terminated coverage
+                      prevs_state = en.aasm_state
+                      en.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
+                      en.workflow_state_transitions << WorkflowStateTransition.new(
+                        from_state: prevs_state,
+                        to_state: "coverage_canceled"
+                      )
+                    end
                   else
                     next if en.terminated_on.present? && end_effective_date >= en.terminated_on
                     en.update_attributes(terminated_on: end_effective_date) if en.terminated_on.present?
@@ -64,7 +84,7 @@ module Subscribers
           end
         else
           Rails.logger.error("PolicyTerminationsSubscriber") { "Ignoring event #{event_name}" }
-        end 
+        end
       rescue Exception => e
         Rails.logger.error("PolicyTerminationsSubscriber") { e.to_s } unless Rails.env.test?
       end
