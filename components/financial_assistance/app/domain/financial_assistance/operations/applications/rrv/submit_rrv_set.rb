@@ -44,12 +44,23 @@ module FinancialAssistance
 
             while skip < families.count
               criteria = families.skip(skip).limit(applications_per_event)
-              ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new.call(families: criteria, assistance_year: params[:assistance_year])
+              publish({families: criteria.pluck(:id), assistance_year: params[:assistance_year]})
               puts "Total number of records processed #{skip + criteria.pluck(:id).length}"
               skip += applications_per_event
 
               break if params[:max_applications].present? && params[:max_applications] > skip
             end
+          end
+
+          def build_event(payload)
+            event('events.iap.applications.request_family_rrv_determination', attributes: payload)
+          end
+
+          def publish(payload)
+            event = build_event(payload)
+            event.success.publish
+
+            Success("Successfully published the rrv payload")
           end
         end
       end
