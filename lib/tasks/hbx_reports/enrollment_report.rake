@@ -102,7 +102,7 @@ namespace :reports do
                   enr&.rating_area&.exchange_provided_code,
                   premium_amount, enr.total_premium, enr.applied_aptc_amount, total_responsible_amount(enr),
                   fpl_percentage(enr, en, enr.effective_on.year),
-                  enr.created_at.blank? ? nil : enr.created_at.to_s,
+                  enr&.time_of_purchase&.to_s,
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
                   enr.terminated_on.blank? ? nil : enr.terminated_on.strftime("%Y%m%d"),
                   per.home_address&.full_address || enr.subscriber.person.home_address&.full_address,
