@@ -89,6 +89,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
     end
@@ -109,6 +110,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
     end
@@ -198,5 +200,59 @@ describe Subscribers::PolicyTerminationsSubscriber do
         subject.call(termination_event_name, nil, nil, nil, termination_payload)
       end
     end
+  end
+end
+
+describe "given cancel event to cancel terminated coverage" do
+  let(:termination_date) { Date.new(2022, 1, 1) }
+  let(:cancelation_event_name) { "acapi.info.events.policy.canceled" }
+  let(:cancelation_payload) do
+    {
+      :resource_instance_uri => "urn:some_thing:policy#policy_id",
+      :hbx_enrollment_ids => JSON.dump(["1234"]),
+      :qualifying_reason => "non_payment",
+      :event_effective_date => termination_date.strftime("%Y%m%d")
+    }
+  end
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, effective_on: Date.new(2022,1,1),
+                                       hbx_id: '1234', household: family.active_household,
+                                       terminated_on: Date.new(2022,1,31),
+                                       aasm_state: "coverage_terminated", family: family)
+  end
+
+  it "should cancel terminated enrollment" do
+    Subscribers::PolicyTerminationsSubscriber.new.call(cancelation_event_name, nil, nil, nil, cancelation_payload)
+    hbx_enrollment.reload
+    expect(hbx_enrollment.terminated_on).to eq nil
+    expect(hbx_enrollment.coverage_canceled?).to eq true
+  end
+end
+
+describe "given term event to cancel terminated coverage" do
+  let(:termination_date) { Date.new(2022, 1, 1) }
+  let(:term_event_name) { "acapi.info.events.policy.terminated" }
+  let(:term_payload) do
+    {
+      :resource_instance_uri => "urn:some_thing:policy#policy_id",
+      :hbx_enrollment_ids => JSON.dump(["4321"]),
+      :qualifying_reason => "non_payment",
+      :event_effective_date => termination_date.strftime("%Y%m%d")
+    }
+  end
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, effective_on: Date.new(2022,2,1),
+                                       hbx_id: '4321', household: family.active_household,
+                                       terminated_on: Date.new(2022,2,28),
+                                       aasm_state: "coverage_terminated", family: family)
+  end
+
+  it "should cancel terminated enrollment" do
+    Subscribers::PolicyTerminationsSubscriber.new.call(term_event_name, nil, nil, nil, term_payload)
+    hbx_enrollment.reload
+    expect(hbx_enrollment.terminated_on).to eq nil
+    expect(hbx_enrollment.coverage_canceled?).to eq true
   end
 end

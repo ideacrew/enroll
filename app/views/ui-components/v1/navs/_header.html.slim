@@ -15,12 +15,12 @@
             h4 = get_header_text(controller_name)
         ul.nav.navbar-nav.navbar-right
           li
-            a.call-customer-service href="tel:#{Settings.contact_center.short_number}"
+            a.call-customer-service href="tel:#{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}"
               span.header-text = l10n(".call_customer_service")
               br
               span
                 i.fas.fa-phone.mr-1
-              strong = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{Settings.contact_center.tty_number}"
+              strong = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}"
           - if signed_in?
             li
               span.my-portal-links

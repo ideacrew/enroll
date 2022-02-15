@@ -131,7 +131,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     end
 
     it "form should contain error" do
-      expect(@applicant_form.errors.full_messages).to include('ssn is missing')
+      expect(@applicant_form.errors.full_messages.first).to include('SSN is missing')
     end
   end
 
