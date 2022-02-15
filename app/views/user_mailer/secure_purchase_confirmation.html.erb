@@ -12,7 +12,7 @@
       Thank you for enrolling in coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>.<br/><br/>
 
       <%= EnrollRegistry[:enroll_app].setting(:short_name).item %><br/>
-      <%= Settings.contact_center.short_number %><br/>
+      <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %><br/>
       TTY: <%= Settings.contact_center.tty %><br/>
     </p>
   </div>
@@ -32,7 +32,7 @@
       Thank you for enrolling in coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>.<br/><br/>
 
       <%= EnrollRegistry[:enroll_app].setting(:short_name).item %><br/>
-      <%= Settings.contact_center.short_number %><br/>
+      <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %><br/>
       TTY: <%= Settings.contact_center.tty %><br/>
     </p>
   </div>

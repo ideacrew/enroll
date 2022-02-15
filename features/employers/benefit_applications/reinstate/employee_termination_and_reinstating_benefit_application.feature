@@ -12,7 +12,7 @@ Feature: Admin reinstating benefit application and terminating census employee w
   Scenario Outline: Employer terminating census employee and Admin reinstating benefit application
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And census employee Patrick Doe has a past DOH
+    And census employee Patrick Doe has a past date of hire
     And employees for employer ABC Widgets have selected a coverage
     And initial employer ABC Widgets application terminated
     And staff role person logged in

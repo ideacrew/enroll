@@ -1,19 +1,19 @@
 #dchbx_enroll_date_of_record.d-none = TimeKeeper.date_of_record.iso8601
 
 nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
-  .container 
+  .container
     a.navbar-brand.pr-3.pt-3.pb-3 href="#" = image_pack_tag "#{EnrollRegistry[:enroll_app].settings(:header_logo).item}"
     button.navbar-toggler aria-controls="navbarNav" aria-expanded="false" aria-label=("Toggle navigation") data-target="#navbarNav" data-toggle="collapse" type="button"
       span.navbar-toggler-icon
 
     #navbarNav.collapse.navbar-collapse
-      ul.navbar-nav 
+      ul.navbar-nav
         li.nav-item.active
           a.nav-link.pt-0.portal
             = get_header_text(controller_name)
 
     ul.list-group.list-group-flush
-      li.list-group-item.user-actions.pt-0.pb-0 href="tel: #{Settings.contact_center.short_number}" class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
+      li.list-group-item.user-actions.pt-0.pb-0 href="tel: #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}" class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
         .header-text class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
           = l10n(".call_customer_service")
       li.list-group-item.user-actions.pt-0.pb-0 class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")

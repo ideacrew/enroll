@@ -10,7 +10,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and allow
     And Qualifying life events are present
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And census employee Patrick Doe has a past DOH
+    And census employee Patrick Doe has a past date of hire
     And employees for employer ABC Widgets have selected a coverage
 
 Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application
