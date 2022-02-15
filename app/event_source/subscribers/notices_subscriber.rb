@@ -14,15 +14,20 @@ module Subscribers
 
       subscriber_logger =
         Logger.new(
-          "#{Rails.root}/log/on_date_advanced_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+          "#{Rails.root}/log/on_request_batch_verification_reminders#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
         )
 
       subscriber_logger.info "NoticesSubscriber, response: #{payload}"
       logger.info "NoticesSubscriber payload: #{payload}" unless Rails.env.test?
 
-      parsed_date = Date.parse(payload[:date_of_record])
-      Operations::Eligibilities::Notices::RequestBatchVerificationReminders.new.call(date_of_record: parsed_date) if EnrollRegistry.feature_enabled?(:aca_individual_market)
+      family = Family.find(payload[:family_id])
 
+      Operations::Eligibilities::Notices::CreateReminderRequest.new.call(
+        document_reminder_key: payload[:document_reminder_key],
+        family: family,
+        date_of_record: payload[:date_of_record]
+      )
+      subscriber_logger.info "Successfully processed NoticesSubscriber, response: #{payload}"
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       subscriber_logger.info "NoticesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"

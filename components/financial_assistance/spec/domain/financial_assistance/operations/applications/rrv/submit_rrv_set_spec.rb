@@ -119,8 +119,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSe
       expect(applicant.non_esi_evidence.present?).to be_falsey
       result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
       expect(result).to be_success
-      expect(applicant.reload.income_evidence.present?).to be_truthy
-      expect(applicant.reload.non_esi_evidence.present?).to be_truthy
     end
   end
 
@@ -130,7 +128,5 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::SubmitRrvSe
     expect(applicant.non_esi_evidence.present?).to be_falsey
     result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
     expect(result).to be_success
-    expect(applicant.reload.income_evidence.present?).to be_falsey
-    expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end
 end
