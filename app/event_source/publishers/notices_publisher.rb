@@ -19,5 +19,6 @@ module Publishers
     register_event 'mixed_determination_on_reverification'
     register_event 'account_transferred'
     register_event 'final_renewal_eligibility_determined'
+    register_event 'request_batch_verification_reminders'
   end
 end
