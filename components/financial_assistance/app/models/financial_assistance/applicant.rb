@@ -330,7 +330,7 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
 
     # When callback_update is set to true, then both propagate_applicant and propagate_destroy are skipped.
-    # This looks weird but this is how this works.
+    # This looks weird but this is how it works per implementation.
     attr_accessor :relationship, :callback_update
 
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
