@@ -100,7 +100,7 @@ module Insured
     end
 
     def find_response(event_kind)
-      ::Fdsh::Ridp::EligibilityResponseModel.where(event_kind: event_kind, primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id).to_a.max_by(&:deleted_at)
+      ::Fdsh::Ridp::EligibilityResponseModel.where(event_kind: event_kind, primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id, :deleted_at.nin => [nil]).to_a.max_by(&:deleted_at)
     end
 
     def service_unavailable
