@@ -540,8 +540,11 @@
                   <% end %>
                 </div>
               </div>
-
+              <% spouses = [] %>
               <% @all_relationships.each do |er| %>
+                <% if spouses.select { |spouse| spouse == er.relative_id }.present? %>
+                  <% next %>
+                <% end %>
                 <% if member_name_by_id(er.applicant_id).present? %>
                   <div class="review-relations">
                     <div class="row review-relation-headers">
@@ -568,6 +571,7 @@
                     </div>
                   </div>
                 <% end %>
+                <% spouses << er.applicant_id %>
               <% end %>
             <% end %>
           <% end %>
