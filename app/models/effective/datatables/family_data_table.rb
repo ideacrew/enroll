@@ -35,6 +35,7 @@ module Effective
            #cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), terminate_enrollment_type(row, pundit_allow(Family, :can_terminate_enrollment?))],
            #terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Drop Enrollment Members', drop_enrollment_member_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), drop_enrollment_member_type(row, pundit_allow(Family, :can_terminate_enrollment?))],
            ['Change Enrollment End Date', view_enrollment_to_update_end_date_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             update_terminated_enrollment_type(row, pundit_allow(Family, :change_enrollment_end_date?))],
            ['Reinstate', view_terminated_hbx_enrollments_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
@@ -131,6 +132,12 @@ module Effective
       def terminate_enrollment_type(family, allow)
         return 'disabled' unless allow
         terminate_eligibles = family.admin_dt_enrollments.any?(&:is_admin_terminate_eligible?)
+        terminate_eligibles ? 'ajax' : 'disabled'
+      end
+
+      def drop_enrollment_member_type(family, allow)
+        return 'disabled' unless allow
+        terminate_eligibles = family.hbx_enrollments.individual_market.any?(&:is_admin_terminate_eligible?)
         terminate_eligibles ? 'ajax' : 'disabled'
       end
 

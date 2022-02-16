@@ -6,6 +6,7 @@ module Forms
     attr_reader :result
     attr_reader :row
     attr_reader :family_id
+    attr_reader :enrollment_id
     attr_reader :params
     attr_reader :config
 
@@ -14,6 +15,7 @@ module Forms
       @result = {success: [], failure: []}
       @row = @params[:family_actions_id]
       @family_id = @params[:family_id]
+      @enrollment_id = @params[:enrollment_id]
       @config = Rails.application.config.acapi
     end
 
@@ -55,6 +57,28 @@ module Forms
         end
       end
       terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
+    end
+
+    def drop_enrollment_members
+      if @params.keys.to_s[/terminate_member_.*/]
+        hbx_enrollment = HbxEnrollment.find(@enrollment_id)
+        begin
+          dropped_enr_members = @params.select{|string| string.include?("terminate_member")}.values
+          all_enr_members = hbx_enrollment.hbx_enrollment_members
+          eligible_members = all_enr_members.reject!{ |member| dropped_enr_members.include?(member.id.to_s) }
+          effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx_enrollment.effective_on).to_date
+          if hbx_enrollment.applied_aptc_amount > 0
+            tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
+            applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
+          end
+
+          applied_aptc = applied_aptc.present? ? applied_aptc : 0
+          reinstatement = Enrollments::Replicator::Reinstatement.new(hbx_enrollment, effective_date, applied_aptc, eligible_members).build
+          reinstatement.save!
+        rescue
+          @result[:failure] << hbx_enrollment
+        end
+      end
     end
 
     def transition_family_members
