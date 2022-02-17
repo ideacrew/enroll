@@ -11,7 +11,7 @@ describe Insured::FdshRidpVerificationsController do
     let!(:primary_event) { ::Fdsh::Ridp::EligibilityResponseModel.create(event_kind: 'primary', primary_member_hbx_id: person.hbx_id, deleted_at: DateTime.now) }
     let!(:secondary_event) {::Fdsh::Ridp::EligibilityResponseModel.create(event_kind: 'primary', primary_member_hbx_id: person.hbx_id, deleted_at: nil)}
     let!(:third_event) {::Fdsh::Ridp::EligibilityResponseModel.create(event_kind: 'primary', primary_member_hbx_id: person1.hbx_id, deleted_at: DateTime.now)}
-    let!(:fourth_event) {::Fdsh::Ridp::EligibilityResponseModel.create(event_kind: 'primary', primary_member_hbx_id: person1.hbx_id, deleted_at: nil)}
+    let!(:fourth_event) {::Fdsh::Ridp::EligibilityResponseModel.create(event_kind: 'primary', primary_member_hbx_id: person1.hbx_id, deleted_at: DateTime.now - 2.day)}
     let!(:fifth_event) { ::Fdsh::Ridp::EligibilityResponseModel.create(event_kind: 'secondary', primary_member_hbx_id: person.hbx_id, deleted_at: DateTime.now) }
 
     before do
@@ -53,8 +53,8 @@ describe Insured::FdshRidpVerificationsController do
 
     context "with different event kinds" do
 
-      it "should only return 'primary' event kind" do
-        expect(controller.find_response('primary')).to eql(primary_event)
+      it "should only return one event kind" do
+        expect(controller.find_response('secondary')).to eql(fifth_event)
       end
     end
   end
