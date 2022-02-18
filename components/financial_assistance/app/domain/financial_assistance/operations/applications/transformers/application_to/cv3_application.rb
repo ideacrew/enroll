@@ -116,6 +116,7 @@ module FinancialAssistance
                          notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
+              payload.merge!({full_medicaid_determination: application.full_medicaid_determination}) if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
               Success(payload)
             end
 
