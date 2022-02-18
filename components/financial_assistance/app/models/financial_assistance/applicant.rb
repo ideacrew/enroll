@@ -89,8 +89,6 @@ module FinancialAssistance
       'None of these'
     ].freeze
 
-    EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
-
     EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
 
     field :name_pfx, type: String
@@ -285,9 +283,9 @@ module FinancialAssistance
     field :transfer_referral_reason, type: String
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
-    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+    embeds_many :incomes,     class_name: "::FinancialAssistance::Income", cascade_callbacks: true, validate: true
+    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction", cascade_callbacks: true, validate: true
+    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit", cascade_callbacks: true, validate: true
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :addresses, cascade_callbacks: true, validate: true, class_name: "::FinancialAssistance::Locations::Address"
     embeds_many :phones, class_name: "::FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true

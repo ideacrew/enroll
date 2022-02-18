@@ -83,10 +83,17 @@ RSpec.describe FinancialAssistance::Validators::AddressContract,  dbclean: :afte
 
   describe "all valid fields" do
 
-    let(:params) { { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', city: 'test', state: 'DC', zip: '12345', county: '', county_name: '' }}
+    let(:params) do
+      { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', city: 'test', state: 'DC', zip: '12345', county: '', county_name: '', quadrant: 'NW' }
+    end
 
     it "passes" do
       expect(subject).to be_success
+    end
+
+    it 'should return valud for quadrant' do
+      expect(subject[:quadrant]).to eq(params[:quadrant])
+      expect(subject[:quadrant]).not_to be_nil
     end
   end
 end
