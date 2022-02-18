@@ -113,9 +113,9 @@ module FinancialAssistance
 
     field :has_mec_check_response, type: Boolean, default: false
 
-    embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
-    embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
-    embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
+    embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination', cascade_callbacks: true, validate: true
+    embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship', cascade_callbacks: true, validate: true
+    embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant', cascade_callbacks: true, validate: true
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
