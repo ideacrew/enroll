@@ -23,3 +23,5 @@ registry:
           is_enabled: false
         - key: :no_transition_families
           is_enabled: false
+        - key: :drop_enrollment_members
+          is_enabled: true
