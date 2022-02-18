@@ -188,7 +188,7 @@ class IvlIapHealthCoveragePage
   end
 
   def self.continue
-    '#btn-continue'
+    '.interaction-click-control-continue'
   end
 
   def self.back_to_all_house_members

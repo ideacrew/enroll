@@ -116,7 +116,7 @@ class IvlIapOtherQuestions
   end
 
   def self.continue_btn
-    'input[class="btn btn-lg btn-primary btn-block interaction-click-control-continue"]'
+    '.interaction-click-control-continue'
   end
 
   def self.save_and_exit

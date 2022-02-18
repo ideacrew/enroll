@@ -18,7 +18,7 @@
     <div class="col-md-3 fa-select select-box">
       <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
       <%= f.label :frequency_kind, 'HOW OFTEN *', class: "label-color" %>
-      <div class="fa-frequency-kind">
+      <div class="fa-frequency-kind" data-cuke="unemployment-income-how-often-dropdown">
         <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {include_blank: "Choose"}, {:disabled => false, :required => true}) %>
       </div>
     </div>
@@ -37,7 +37,7 @@
         <% else %>
           <% "checkDate('#{income_id}')" %>
         <% end %>
-      <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", onclick: onclick_save_event %>
+      <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", :data => { :cuke => "unemployment-income-save-button" }, onclick: onclick_save_event %>
     </div>
   </div>
 </div>
