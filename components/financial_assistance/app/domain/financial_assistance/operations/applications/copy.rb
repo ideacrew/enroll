@@ -11,9 +11,9 @@ module FinancialAssistance
         include Dry::Monads[:result, :do, :try]
         include EventSource::Command
         include AddressValidator
-        include FinancialAssistance::L10nHelper
+        include I18n
 
-        VALID_APPLICATION_STATES = ['submitted', 'determination_response_error', 'determined'].freeze
+        VALID_APPLICATION_STATES = ['submitted', 'determination_response_error', 'determined', 'imported'].freeze
         # FamilyMembers, Relationships, claimed_as_tax_dependent_by are the things that could change.
         attr_reader :family_members_changed
 
@@ -32,10 +32,10 @@ module FinancialAssistance
         private
 
         def validate_input_params(params)
-          return Failure(l10n('faa.errors.missing_application_id_key_error')) unless params.key?(:application_id)
+          return Failure(I18n.t('faa.errors.missing_application_id_key_error')) unless params.key?(:application_id)
           application = ::FinancialAssistance::Application.where(id: params[:application_id]).first
-          return Failure(l10n('faa.errors.unable_to_find_application_error')) if application.blank?
-          return Failure(l10n('faa.errors.given_application_is_not_submitted_error')) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
+          return Failure(I18n.t('faa.errors.unable_to_find_application_error')) if application.blank?
+          return Failure(I18n.t('faa.errors.given_application_is_not_submitted_error')) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
 
           Success(application)
         end
