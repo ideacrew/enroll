@@ -24,7 +24,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.income_how_often_dropdown
-    '[data-cuke="job-income-how-often-dropdown"]'
+    'div[class="selectric-wrapper selectric-interaction-choice-control-income-frequency-kind"] span'
   end
 
   def self.select_bi_weekly
@@ -60,7 +60,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.income_employer_state_dropdown
-    '[data-cuke="job-income-state-dropdown"]'
+    'div[class="selectric-wrapper selectric-interaction-choice-control-income-employer-address-state"]'
   end
 
   def self.select_dc
@@ -68,7 +68,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.select_va_state
-    'li[class="interaction-choice-control-income-employer-address-state-46 interaction-choice-control-income-frequency-kind-46"]'
+    'li[class="interaction-choice-control-income-employer-address-state-47 interaction-choice-control-income-frequency-kind-47"]'
   end
 
   def self.income_employer_zip
