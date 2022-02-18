@@ -89,6 +89,7 @@ module FinancialAssistance
               years_to_renew: application.years_to_renew || 0,
               renewal_base_year: calculated_renewal_base_year,
               predecessor_id: application.id,
+              full_medicaid_determination: application.full_medicaid_determination,
               effective_date: Date.new(validated_params[:renewal_year])
             )
 
