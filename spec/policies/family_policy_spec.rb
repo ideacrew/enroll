@@ -276,6 +276,13 @@ describe 'user permission' do
     end
   end
 
+  context 'can_drop_enrollment_members?' do
+    let(:permission) { instance_double(Permission, :can_drop_enrollment_members => true) }
+    it 'should return true' do
+      expect(subject.can_drop_enrollment_members?).to be_truthy
+    end
+  end
+
   context 'change_enrollment_end_date?' do
     let(:permission) { instance_double(Permission, :can_view_username_and_email => true) }
     it 'should return true' do

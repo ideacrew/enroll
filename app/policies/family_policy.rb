@@ -102,6 +102,11 @@ class FamilyPolicy < ApplicationPolicy
     role.permission.change_enrollment_end_date
   end
 
+  def can_drop_enrollment_members?
+    return false unless role
+    role.permission.can_drop_enrollment_members
+  end
+
   def can_view_username_and_email?
     permission_role = role || user&.person&.csr_role
     return false unless permission_role
