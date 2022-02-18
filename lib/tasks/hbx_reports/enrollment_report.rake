@@ -68,7 +68,7 @@ namespace :reports do
               "Premium Amount", "Premium Total", "Policy APTC", "Responsible Premium Amt", "FPL",
               "Purchase Date", "Coverage Start", "Coverage End",
               "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Broker NPN",
-              "Race", "Ethnicity", "Citizen Status",
+              "Broker Assignment Date","Race", "Ethnicity", "Citizen Status",
               "Broker Assisted"]
       while offset <= total_count
         enrollments.offset(offset).limit(batch_size).no_timeout.each do |enr|
@@ -112,6 +112,7 @@ namespace :reports do
                   per.work_phone_or_best || enr.subscriber.person&.work_phone_or_best,
                   family.active_broker_agency_account&.writing_agent&.person&.full_name,
                   family.active_broker_agency_account&.writing_agent&.npn,
+                  family.active_broker_agency_account&.start_on&.to_s,
                   per.ethnicity,
                   ethnicity_status(per.ethnicity),
                   per.citizen_status,
