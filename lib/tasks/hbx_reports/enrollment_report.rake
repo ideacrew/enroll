@@ -62,7 +62,7 @@ namespace :reports do
     offset = 0
     total_count = enrollments.size
     CSV.open("enroll_enrollment_report.csv", 'w') do |csv|
-      csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Subscriber ID ", "Status", "Member Status",
+      csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Last Updated", "Policy Subscriber ID ", "Status", "Member Status",
               "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type", "Tobacco Status",
               "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name", "Rating Area",
               "Premium Amount", "Premium Total", "Policy APTC", "Responsible Premium Amt", "FPL",
@@ -87,7 +87,8 @@ namespace :reports do
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en) : (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
                 next if per.blank?
                 csv << [
-                  primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr.subscriber.hbx_id, enr.aasm_state,
+                  primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr&.updated_at&.to_s,
+                  enr.subscriber.hbx_id, enr.aasm_state,
                   member_status(enr),
                   per.first_name,
                   per.last_name,
