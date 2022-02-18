@@ -209,20 +209,8 @@ module FinancialAssistance
 
         def build_new_benefits(source_applicant, new_applicant)
           source_applicant.benefits.each do |benefit|
-            benefit_params = benefit.attributes.slice(:title,
-                                                      :esi_covered,
-                                                      :kind,
-                                                      :insurance_kind,
-                                                      :hra_type,
-                                                      :is_employer_sponsored,
-                                                      :is_esi_waiting_period,
-                                                      :is_esi_mec_met,
-                                                      :employee_cost,
-                                                      :employee_cost_frequency,
-                                                      :start_on,
-                                                      :end_on,
-                                                      :employer_name,
-                                                      :employer_id)
+            benefit_params = benefit.attributes.slice(:title, :esi_covered, :kind, :insurance_kind, :hra_type, :is_employer_sponsored, :is_esi_waiting_period,
+                                                      :is_esi_mec_met, :employee_cost, :employee_cost_frequency, :start_on, :end_on, :employer_name, :employer_id)
 
             new_benefit = new_applicant.benefits.build(benefit_params)
             build_new_employer_address(benefit.employer_address, new_benefit) if new_benefit.employer_address.present?
@@ -249,20 +237,8 @@ module FinancialAssistance
 
         def build_new_incomes(source_applicant, new_applicant)
           source_applicant.incomes.each do |income|
-            income_params = income.attributes.slice(:title,
-                                                    :kind,
-                                                    :wage_type,
-                                                    :hours_per_week,
-                                                    :amount,
-                                                    :amount_tax_exempt,
-                                                    :frequency_kind,
-                                                    :start_on,
-                                                    :end_on,
-                                                    :is_projected,
-                                                    :tax_form,
-                                                    :employer_name,
-                                                    :employer_id,
-                                                    :has_property_usage_rights)
+            income_params = income.attributes.slice(:title, :kind, :wage_type, :hours_per_week, :amount, :amount_tax_exempt, :frequency_kind, :start_on,
+                                                    :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights)
 
             new_income = new_applicant.incomes.build(income_params)
             build_new_employer_address(income.employer_address, new_income) if income.employer_address.present?
@@ -271,18 +247,9 @@ module FinancialAssistance
         end
 
         def fetch_app_params(source_application)
-          source_app_params = source_application.attributes.slice(:family_id,
-                                                                  :is_renewal_authorized,
-                                                                  :years_to_renew,
-                                                                  :is_requesting_voter_registration_application_in_mail,
-                                                                  :benchmark_product_id,
-                                                                  :medicaid_terms,
-                                                                  :medicaid_insurance_collection_terms,
-                                                                  :report_change_terms,
-                                                                  :parent_living_out_of_home_terms,
-                                                                  :attestation_terms,
-                                                                  :submission_terms,
-                                                                  :request_full_determination)
+          source_app_params = source_application.attributes.slice(:family_id, :is_renewal_authorized, :years_to_renew, :is_requesting_voter_registration_application_in_mail,
+                                                                  :benchmark_product_id, :medicaid_terms, :medicaid_insurance_collection_terms, :report_change_terms,
+                                                                  :parent_living_out_of_home_terms, :attestation_terms, :submission_terms, :request_full_determination)
 
           source_app_params.merge({ aasm_state: 'draft',
                                     hbx_id: FinancialAssistance::HbxIdGenerator.generate_application_id })
