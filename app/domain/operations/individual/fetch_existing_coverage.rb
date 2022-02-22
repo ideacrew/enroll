@@ -41,7 +41,7 @@ module Operations
         family_ids = []
         enrollment_members.each do |enr_member|
           person = enr_member.person
-          family_ids << Family.find_all_by_person(person).pluck(:id)
+          family_ids << Family.find_all_by_person(person).pluck(:id) if person.present?
         end
         family_ids.count > 0 ? Success(family_ids.uniq.flatten) : Failure('No families found for members')
       end
@@ -49,7 +49,6 @@ module Operations
       def prior_enrollments(family_ids, enrollment)
         all_enrollments = HbxEnrollment.where({:family_id.in => family_ids, :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES }, coverage_kind:  enrollment.first.coverage_kind, kind:  enrollment.first.kind})
         existing_enrollments = all_enrollments - enrollment
-
         Success(existing_enrollments)
       end
 
