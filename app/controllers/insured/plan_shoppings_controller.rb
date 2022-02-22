@@ -122,10 +122,8 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         ""
       end
-
     dependents_with_existing_coverage(@enrollment) if @market_kind == 'individual' && EnrollRegistry.feature_enabled?(:fetch_existing_coverage)
     #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
-
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
@@ -345,7 +343,7 @@ class Insured::PlanShoppingsController < ApplicationController
     existing_coverages = ::Operations::Individual::FetchExistingCoverage.new.call({enrollment_id: enrollment.id})
     existing_enrollments = existing_coverages.success? ? existing_coverages.value! : []
     primary_subscriber = enrollment.subscriber
-    existing_dependent_enrollments = existing_enrollments.select{ |enr| enr.subscriber.applicant_id != primary_subscriber.applicant_id }
+    existing_dependent_enrollments = existing_enrollments.reject{ |enr| enr.subscriber.applicant_id == primary_subscriber.applicant_id }
     return [] if existing_dependent_enrollments.nil? || existing_dependent_enrollments.count == 0
     applicant_ids = existing_dependent_enrollments.map(&:hbx_enrollment_members).flatten.map(&:hbx_id).uniq
     @dependent_members = enrollment.hbx_enrollment_members.select{|member| applicant_ids.include?(member.hbx_id)}

@@ -391,6 +391,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.years' => "years",
   :'en.site_url' => "dc.gov",
   :'en.coverage_info_msg' => "The following person currently has coverge on",
+  :'en.coverage_info_msg_2' => "Enrolling in a new plan will remove existing coverage for these persons",
   :'en.age' => "Age",
   :'en.employer_contribution' => "Employer Contribution",
   :'en.you_pay' => "You Pay",

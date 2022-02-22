@@ -3,15 +3,18 @@
   <div class="row">
     <div class="col-md-11 col-sm-12 col-xs-12">
         <div class="container">
-       	<h4><%= l10n("coverage_info_msg") %> <%= l10n("site_url") %></h4>		
-		<ul>
-		  <% @dependent_members&.each do |member| %> 
-		    <li>
-		      <p><b><%= member.person.full_name %> (<%= l10n("age")%>: <%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %> <%= l10n("years")%>)</b> </p>
-		    </li>
-		  <% end %>
-		</ul>
-	    </div>
+        	<h4><%= l10n("coverage_info_msg") %> <%= l10n("site_url") %></h4>
+					<ul>
+					  <% @dependent_members&.each do |member| %>
+					    <li>
+					      <p><b><%= member.person.full_name %> (<%= l10n("age")%>: <%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %> <%= l10n("years")%>)</b> </p>
+					    </li>
+					  <% end %>
+					</ul>
+	      </div>
+	      <div class="container">
+	      <h4><%= l10n("coverage_info_msg_2") %></h4>
+	      </div>
     </div>
   </div>
 </div>
