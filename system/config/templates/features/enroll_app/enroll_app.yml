@@ -245,6 +245,8 @@ registry:
             item: "(855) 532-5465"
           - key: :verifiable_immigration_statuses
             item: false
+          - key: :years
+            item: 'years'
           - key: :appeal_link
             item: "https://www.dchealthlink.com/sites/default/files/v2/forms/Appeals_Rights_IVL.pdf"
           - key: :find_expert_link
@@ -690,6 +692,9 @@ registry:
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: false
+      - key: :fetch_existing_coverage
+        item: :fetch_existing_coverage
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:

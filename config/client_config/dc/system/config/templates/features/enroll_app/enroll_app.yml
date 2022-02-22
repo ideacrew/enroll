@@ -690,6 +690,9 @@ registry:
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: false
+      - key: :fetch_existing_coverage
+        item: :fetch_existing_coverage
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:
