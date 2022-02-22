@@ -387,6 +387,9 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.interactive_identity_verifications.failed_validation.step_2' => "Provide your reference number: %{transaction_id}",
   :'en.insured.interactive_identity_verifications.failed_validation.step_3' => "Answer Experian’s questions to verify your identity.",
 
+  :'en.years' => "years",
+  :'en.site_url' => "dc.gov",
+  :'en.coverage_info_msg' => "The following person currently has coverge on",
   :'en.age' => "Age",
   :'en.employer_contribution' => "Employer Contribution",
   :'en.you_pay' => "You Pay",

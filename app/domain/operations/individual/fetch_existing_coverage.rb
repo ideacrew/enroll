@@ -5,11 +5,12 @@ require 'dry/monads/do'
 
 module Operations
   module Individual
-    class FetchExistingCoverages
+    class FetchExistingCoverage
       send(:include, Dry::Monads[:result, :do])
 
       def call(params)
-        enrollment           =  yield fetch_enrollment(params[:enrollment_id])
+        values               = yield validate(params)
+        enrollment           =  yield fetch_enrollment(values)
         enrollment_members   =  yield fetch_enrollment_members(enrollment)
 
         family_ids           =  yield fetch_all_family_ids(enrollment_members)
@@ -20,16 +21,19 @@ module Operations
 
       private
 
-      def fetch_enrollment(enrollment_id)
-        return Failure('Given object is not a valid enrollment object') unless enrollment_id.is_a?(BSON::ObjectId)
+       def validate(params)
+        return Failure("Given input is not a valid enrollment id") unless params[:enrollment_id].is_a?(BSON::ObjectId)
 
-        enrollment = ::HbxEnrollment.where(_id: enrollment_id.to_s).first
+        Success(params)
+      end
 
-        enrollment ? Success(enrollment) : Failure('Enrollment not found')
+      def fetch_enrollment(values)
+        enrollment = ::HbxEnrollment.where(_id: values[:enrollment_id].to_s)
+        enrollment.present? ? Success(enrollment) : Failure("Enrollment Not Found")
       end
 
       def fetch_enrollment_members(enrollment)
-        members = enrollment.hbx_enrollment_members
+        members = enrollment.first.hbx_enrollment_members
         members.count > 0 ? Success(members) : Failure('Enrollment does not include dependents')
       end
 
@@ -37,17 +41,21 @@ module Operations
         family_ids = []
         enrollment_members.each do |enr_member|
           person = enr_member.person
-          family_ids << Family.find_all_by_person(person).pluck(:id).to_s
+          family_ids << Family.find_all_by_person(person).pluck(:id)
         end
-        family_ids.count > 0 ? Success(family_ids.uniq) : Failure('No families found for members')
+        family_ids.count > 0 ? Success(family_ids.uniq.flatten) : Failure('No families found for members')
       end
 
       def prior_enrollments(family_ids, enrollment)
-        all_enrollments = HbxEnrollment.where({:family_id.in => family_ids, coverage_kind: enrollment.coverage_kind, market_kind: enrollment.market_kind}).enrolled_and_renewing
+        all_enrollments = HbxEnrollment.where({:family_id.in => family_ids, :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES }, coverage_kind:  enrollment.first.coverage_kind, kind:  enrollment.first.kind})
         existing_enrollments = all_enrollments - enrollment
 
         Success(existing_enrollments)
       end
+
     end
   end
 end
+
+
+
