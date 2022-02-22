@@ -96,4 +96,32 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
       end
     end
   end
+
+  describe 'propagate_applicant' do
+    before do
+      allow(FinancialAssistance::Operations::Application::RelationshipHandler).to receive(:new).and_call_original
+    end
+
+    context 'application is in draft' do
+      before do
+        application.reload
+        application.update_or_build_relationship(applicant1, applicant2, 'spouse')
+      end
+
+      it 'should trigger operation call as application is in draft state' do
+        expect(FinancialAssistance::Operations::Application::RelationshipHandler).to have_received(:new)
+      end
+    end
+
+    context 'application is not in draft' do
+      before do
+        application.update_attributes!(aasm_state: 'submitted')
+        application.update_or_build_relationship(applicant1, applicant2, 'spouse')
+      end
+
+      it 'should not trigger operation call as application is in draft state' do
+        expect(FinancialAssistance::Operations::Application::RelationshipHandler).to_not have_received(:new)
+      end
+    end
+  end
 end
