@@ -327,7 +327,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.verify_identity' => "Verify Identity",
   :'en.insured.interactive_identity_verifications.new.answer_the_following_questions_when_you_finish' => "Please answer the following security questions. When you're finished click SUBMIT.",
   :'en.years' => "years",
-  :'en.site_url' => "mhc.gov",
+  :'en.site_url' => "mahealthconnector.org",
   :'en.coverage_info_msg' => "The following person currently has coverge on",
   :'en.coverage_info_msg_2' => "Enrolling in a new plan will remove existing coverage for these persons",
   :'en.age' => "Age",

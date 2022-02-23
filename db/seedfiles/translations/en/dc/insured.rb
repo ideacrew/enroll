@@ -389,7 +389,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.interactive_identity_verifications.failed_validation.step_3' => "Answer Experian’s questions to verify your identity.",
 
   :'en.years' => "years",
-  :'en.site_url' => "dc.gov",
+  :'en.site_url' => "dchealthlink.com",
   :'en.coverage_info_msg' => "The following person currently has coverge on",
   :'en.coverage_info_msg_2' => "Enrolling in a new plan will remove existing coverage for these persons",
   :'en.age' => "Age",
