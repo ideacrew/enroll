@@ -84,6 +84,11 @@ module FinancialAssistance
       end
     end
 
+    def duplicate_instance(new_applicant)
+      deduction_params = self.attributes.slice(:title, :kind, :amount, :start_on, :end_on, :frequency_kind)
+      new_applicant.deductions.build(deduction_params)
+    end
+
     private
 
     def set_submission_timestamp

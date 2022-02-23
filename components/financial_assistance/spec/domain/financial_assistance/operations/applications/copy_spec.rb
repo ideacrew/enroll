@@ -78,6 +78,30 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
     end
 
+    context 'relationships unchanged with some duplicates' do
+      before do
+        application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: 'spouse')
+        application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: 'spouse')
+        application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant.id, relative_id: applicant2.id, kind: 'spouse')
+        application.save!
+        @copied_application = subject.call(application_id: application.id).success
+      end
+
+      it 'should only return 2 relationships' do
+        expect(@copied_application.relationships.count).to eq 2
+      end
+
+      it 'should return valid relationships only' do
+        expect(
+          @copied_application.relationships.reject{ |rel| rel.applicant_id == rel.relative_id }.count
+        ).to eq(2)
+      end
+
+      it 'should return created_at timestamps for both relationships' do
+        expect(@copied_application.relationships.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
     context 'for application' do
       context 'for determination_http_status_code, has_eligibility_response, eligibility_response_payload & eligibility_request_payload' do
         let(:mocked_params) do
@@ -631,10 +655,14 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
     let!(:create_esi_benefit) do
       benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_enrolled',
-                                                     insurance_kind: 'peace_corps_health_benefits',
+                                                     insurance_kind: 'employer_sponsored_insurance',
                                                      start_on: Date.today.prev_year,
-                                                     end_on: TimeKeeper.date_of_record.prev_month })
+                                                     end_on: TimeKeeper.date_of_record.prev_month,
+                                                     employer_name: 'Testing employer' })
       applicant.benefits = [benefit]
+      benefit = applicant.benefits.first
+      benefit.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
+      benefit.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
       applicant.save!
     end
 
@@ -682,10 +710,34 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
     end
 
-    it 'should create benefit for applicant' do
-      expect(@new_applicant.benefits.first).not_to be_nil
-      expect(@new_applicant.benefits.first.kind).to eq(applicant.benefits.first.kind)
-      expect(@new_applicant.benefits.first.created_at).not_to be_nil
+    context 'for benefit' do
+      it 'should create benefit for applicant' do
+        expect(@new_applicant.benefits.first).not_to be_nil
+      end
+
+      it 'should populate kind for benefit' do
+        expect(@new_applicant.benefits.first.kind).to eq(applicant.benefits.first.kind)
+      end
+
+      it 'should populate created_at' do
+        expect(@new_applicant.benefits.first.created_at).not_to be_nil
+      end
+
+      it 'should create employer_address' do
+        expect(@new_applicant.benefits.first.employer_address).not_to be_nil
+      end
+
+      it 'should create employer_address with created_at' do
+        expect(@new_applicant.benefits.first.employer_address.created_at).not_to be_nil
+      end
+
+      it 'should create employer_phone' do
+        expect(@new_applicant.benefits.first.employer_phone).not_to be_nil
+      end
+
+      it 'should create employer_phone with created_at' do
+        expect(@new_applicant.benefits.first.employer_phone.created_at).not_to be_nil
+      end
     end
 
     it 'should create deduction for applicant' do

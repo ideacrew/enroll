@@ -209,7 +209,25 @@ module FinancialAssistance
     end
     # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
+    def duplicate_instance(new_applicant)
+      income_params = self.attributes.slice(:title, :kind, :wage_type, :hours_per_week, :amount, :amount_tax_exempt, :frequency_kind, :start_on,
+                                            :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights)
+      new_income = new_applicant.incomes.build(income_params)
+      build_new_employer_address(new_income) if employer_address.present?
+      build_new_employer_phone(new_income) if employer_phone.present?
+    end
+
     private
+
+    def build_new_employer_address(new_income)
+      empl_address_params = employer_address.attributes.slice(:kind, :address_1, :address_2, :address_3, :city, :county, :state, :zip, :country_name, :quadrant)
+      new_income.build_employer_address(empl_address_params)
+    end
+
+    def build_new_employer_phone(new_income)
+      empl_phone_params = employer_phone.attributes.slice(:kind, :country_code, :area_code, :number, :extension, :primary, :full_phone_number)
+      new_income.build_employer_phone(empl_phone_params)
+    end
 
     def set_submission_timestamp
       write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?

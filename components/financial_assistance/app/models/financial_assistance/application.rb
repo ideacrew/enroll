@@ -394,6 +394,7 @@ module FinancialAssistance
 
     def update_or_build_relationship(applicant, relative, relation_kind)
       return if applicant.blank? || relative.blank? || relation_kind.blank?
+      return if applicant == relative
 
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?

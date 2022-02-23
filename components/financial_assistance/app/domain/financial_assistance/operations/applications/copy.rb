@@ -8,13 +8,12 @@ module FinancialAssistance
     module Applications
       # This Operation creates a new application for a given application identifier(BSON ID),
       class Copy
-        include Dry::Monads[:result, :do, :try]
-        include EventSource::Command
+        include Dry::Monads[:result, :do]
         include AddressValidator
         include I18n
 
         VALID_APPLICATION_STATES = ['submitted', 'determination_response_error', 'determined', 'imported'].freeze
-        # FamilyMembers, Relationships, claimed_as_tax_dependent_by are the things that could change.
+        # FamilyMembers, Relationships, claimed_as_tax_dependent_by are the things that might need user interaction to update.
         attr_reader :family_members_changed
 
         # @param [Hash] opts The options to generate draft application
@@ -52,7 +51,7 @@ module FinancialAssistance
         end
 
         def copy_application(application, active_fms_applicant_params)
-          draft_app = create_new_application(application, active_fms_applicant_params)
+          draft_app = build_application(application, active_fms_applicant_params)
 
           if draft_app.valid?
             draft_app.save!
@@ -60,14 +59,14 @@ module FinancialAssistance
             Success(draft_app)
           else
             # Log additional information
-            Failure(l10n('faa.errors.invalid_application'))
+            Failure(I18n.t('faa.errors.invalid_application'))
           end
         rescue StandardError => _e
           # Log additional information
-          Failure(l10n('faa.errors.copy_application_error'))
+          Failure(I18n.t('faa.errors.copy_application_error'))
         end
 
-        def create_new_application(source_application, active_fms_applicant_params)
+        def build_application(source_application, active_fms_applicant_params)
           new_app_params = fetch_app_params(source_application)
           new_app = ::FinancialAssistance::Application.new(new_app_params)
           build_application_embeded_documents(source_application, new_app, active_fms_applicant_params)
@@ -80,7 +79,11 @@ module FinancialAssistance
           claimed_applicants.each do |new_appl|
             new_appl.callback_update = true # avoiding callback to enroll in copy feature
             new_matching_applicant = claiming_applicant(source_application, new_appl)
-            new_appl.update_attributes(claimed_as_tax_dependent_by: new_matching_applicant.id) if new_matching_applicant
+
+            if new_matching_applicant.present?
+              new_appl.claimed_as_tax_dependent_by = new_matching_applicant.id
+              new_appl.save!
+            end
           end
         end
 
@@ -94,42 +97,35 @@ module FinancialAssistance
         end
 
         def build_application_embeded_documents(source_application, new_app, active_fms_applicant_params)
-          build_new_applicants(source_application, new_app, active_fms_applicant_params)
-          build_new_relationships(source_application, new_app, active_fms_applicant_params)
+          build_applicants(source_application, new_app, active_fms_applicant_params)
+          build_relationships(source_application, new_app, active_fms_applicant_params)
         end
 
-        def build_new_relationships(source_application, new_app, active_fms_applicant_params)
+        def build_relationships(source_application, new_app, active_fms_applicant_params)
           primary = new_app.primary_applicant
+          dependent_applicant_params = active_fms_applicant_params.select { |fm_applicant_params| fm_applicant_params[:is_primary_applicant] }
 
-          @relationships_changed = active_fms_applicant_params.any? do |fm_applicant_params|
-            next fm_applicant_params if fm_applicant_params[:is_primary_applicant]
-
-            new_appl = new_app.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
-            relation_kind = source_application.relationships.where(applicant_id: new_appl.id, relative_id: primary.id)
+          @relationships_changed = dependent_applicant_params.any? do |fm_applicant_params|
+            dependent_applicant = source_application.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
+            relation_kind = source_application.relationships.where(applicant_id: dependent_applicant&.id, relative_id: source_application&.primary_applicant&.id).first&.kind
             fm_applicant_params[:relationship] != relation_kind
           end
 
           if @relationships_changed
             create_relationships_bw_primary_and_dependents(new_app, active_fms_applicant_params, primary)
           else
-            copy_relationships_from_source_app(source_application, new_app, primary)
+            copy_relationships_from_source_app(source_application, new_app)
           end
         end
 
-        def copy_relationships_from_source_app(source_application, new_app, primary)
+        def copy_relationships_from_source_app(source_application, new_app)
           source_application.relationships.each do |source_relationship|
             next source_relationship if source_relationship.applicant.nil? || source_relationship.relative.nil?
 
-            new_applicant = fetch_matching_applicant(@new_application, source_relationship.applicant)
-            new_relative = fetch_matching_applicant(@new_application, source_relationship.relative)
+            new_applicant = fetch_matching_applicant(new_app, source_relationship.applicant)
+            new_relative = fetch_matching_applicant(new_app, source_relationship.relative)
             rel_params = { kind: source_relationship.kind, applicant_id: new_applicant.id, relative_id: new_relative.id }
-            new_app.relationships.build(rel_params) if new_app.relationships.where(rel_params).blank?
-            inverse_rel_kind = ::FinancialAssistance::Relationship::INVERSE_MAP[source_relationship.kind]
-            next source_relationship if inverse_rel_kind.blank?
-
-            inverse_rel_params = { kind: inverse_rel_kind, applicant_id: primary.id, relative_id: new_appl.id }
-            new_app.relationships.build(inverse_rel_params) if new_app.relationships.where(inverse_rel_params).blank?
-            @new_application.update_or_build_relationship(new_applicant, new_relative, source_relationship.kind)
+            new_app.relationships.build(rel_params) if new_app.relationships.where(rel_params).blank? && new_applicant.id != new_relative.id
           end
         end
 
@@ -138,11 +134,11 @@ module FinancialAssistance
             next fm_applicant_params if fm_applicant_params[:is_primary_applicant]
             new_appl = new_app.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
             rel_params = { kind: fm_applicant_params[:relationship], applicant_id: new_appl.id, relative_id: primary.id }
-            new_app.relationships.build(rel_params)
+            new_app.relationships.build(rel_params) if new_app.relationships.where(rel_params).blank?
             inverse_rel_kind = ::FinancialAssistance::Relationship::INVERSE_MAP[fm_applicant_params[:relationship]]
             next fm_applicant_params if inverse_rel_kind.blank?
             inverse_rel_params = { kind: inverse_rel_kind, applicant_id: primary.id, relative_id: new_appl.id }
-            new_app.relationships.build(inverse_rel_params)
+            new_app.relationships.build(inverse_rel_params) if new_app.relationships.where(inverse_rel_params).blank?
           end
         end
 
@@ -166,7 +162,7 @@ module FinancialAssistance
           new_application.applicants.where(search_params).first
         end
 
-        def build_new_applicants(source_application, new_app, active_fms_applicant_params)
+        def build_applicants(source_application, new_app, active_fms_applicant_params)
           active_fms_applicant_params.each do |fm_params|
             source_applicant = source_application.applicants.where(family_member_id: fm_params[:family_member_id]).first
             new_appli_params = fetch_applicant_params(source_applicant, fm_params)
@@ -209,40 +205,19 @@ module FinancialAssistance
 
         def build_new_benefits(source_applicant, new_applicant)
           source_applicant.benefits.each do |benefit|
-            benefit_params = benefit.attributes.slice(:title, :esi_covered, :kind, :insurance_kind, :hra_type, :is_employer_sponsored, :is_esi_waiting_period,
-                                                      :is_esi_mec_met, :employee_cost, :employee_cost_frequency, :start_on, :end_on, :employer_name, :employer_id)
-
-            new_benefit = new_applicant.benefits.build(benefit_params)
-            build_new_employer_address(benefit.employer_address, new_benefit) if new_benefit.employer_address.present?
-            build_new_employer_phone(benefit.employer_phone, new_benefit) if new_benefit.employer_phone.present?
+            benefit.duplicate_instance(new_applicant)
           end
-        end
-
-        def build_new_employer_address(source_instance, new_instance)
-          employer_address_params = source_instance.attributes.slice(:kind, :address_1, :address_2, :address_3, :city, :county, :state, :zip, :country_name, :quadrant)
-          new_instance.build_employer_address(employer_address_params)
-        end
-
-        def build_new_employer_phone(source_instance, new_instance)
-          employer_phone_params = source_instance.attributes.slice(:kind, :country_code, :area_code, :number, :extension, :primary, :full_phone_number)
-          new_instance.build_employer_phone(employer_phone_params)
         end
 
         def build_new_deductions(source_applicant, new_applicant)
           source_applicant.deductions.each do |deduction|
-            deduction_params = deduction.attributes.slice(:title, :kind, :amount, :start_on, :end_on, :frequency_kind)
-            new_applicant.deductions.build(deduction_params)
+            deduction.duplicate_instance(new_applicant)
           end
         end
 
         def build_new_incomes(source_applicant, new_applicant)
           source_applicant.incomes.each do |income|
-            income_params = income.attributes.slice(:title, :kind, :wage_type, :hours_per_week, :amount, :amount_tax_exempt, :frequency_kind, :start_on,
-                                                    :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights)
-
-            new_income = new_applicant.incomes.build(income_params)
-            build_new_employer_address(income.employer_address, new_income) if income.employer_address.present?
-            build_new_employer_phone(income.employer_phone, new_income) if income.employer_phone.present?
+            income.duplicate_instance(new_applicant)
           end
         end
 
@@ -283,6 +258,7 @@ module FinancialAssistance
                                                                   :health_service_through_referral, :health_service_eligible, :tribal_state, :tribal_name, :is_medicaid_cubcare_eligible,
                                                                   :has_eligible_medicaid_cubcare, :medicaid_cubcare_due_on, :has_eligibility_changed, :has_household_income_changed,
                                                                   :person_coverage_end_on, :has_dependent_with_coverage, :dependent_job_end_on, :transfer_referral_reason)
+          source_appli_params.deep_symbolize_keys!
           source_appli_params.merge(applicant_mergable_params)
         end
       end
