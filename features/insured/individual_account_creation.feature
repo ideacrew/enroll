@@ -40,4 +40,4 @@ Feature: UI validations for Email, Username and SSN already in use
     Then Individual logs out
     When Individual visits the Consumer portal during open enrollment
     And Individual creates an HBX account with SSN already in use
-    Then Individual should see error message The Social Security number entered is associated with an existing use
+    Then Individual should see error message The Social Security number entered is associated with an existing user
