@@ -297,27 +297,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
 
       before do
-        allow(user).to receive(:person).and_return(person)
         allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment_2)
-        allow(BenefitMarkets::Products::Product).to receive(:find).with("plan_id").and_return(product)
-        allow(hbx_enrollment_2).to receive(:product).and_return(product)
-        allow(hbx_enrollment_2).to receive(:rating_area).and_return(rating_area)
-        allow(hbx_enrollment_2).to receive(:is_shop?).and_return(false)
-        allow(hbx_enrollment_2).to receive(:benefit_group).and_return(benefit_group)
-        allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
-        allow(PlanCostDecorator).to receive(:new).and_return(true)
-        allow(person).to receive(:primary_family).and_return(family)
-        allow(hbx_enrollment_2).to receive(:can_complete_shopping?).and_return(true)
-        allow(hbx_enrollment_2).to receive(:employee_role).and_return(double)
-        allow(hbx_enrollment_2).to receive(:is_special_enrollment?).and_return false
-        allow(hbx_enrollment_2).to receive(:can_select_coverage?).and_return(true)
-        allow(hbx_enrollment_2).to receive(:build_plan_premium).and_return(true)
-        allow(hbx_enrollment_2).to receive(:set_special_enrollment_period).and_return(true)
-        allow(hbx_enrollment_2).to receive(:reset_dates_on_previously_covered_members).and_return(true)
-        allow(hbx_enrollment_2).to receive(:sponsored_benefit).and_return(sponsored_benefit)
-        allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
-        allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment_2).and_return(cost_calculator)
-        allow(cost_calculator).to receive(:groups_for_products).with([product]).and_return([member_group])
       end
 
       if EnrollRegistry.feature_enabled?(:fetch_existing_coverage)
