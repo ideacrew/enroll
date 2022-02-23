@@ -300,15 +300,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment_2)
       end
 
-      if EnrollRegistry.feature_enabled?(:fetch_existing_coverage)
+      if EnrollRegistry.feature_enabled?(:existing_coverage_warning)
         it "when enrollment kind is ivl" do
           sign_in(user)
           get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: 'individual'}
           expect(assigns(:dependent_members)).to eq [hbx_enrollment_member_1]
         end
 
-        it "when fetch_existing_coverage setting is on is true & market kind is shop" do
-          EnrollRegistry[:fetch_existing_coverage].feature.stub(:is_enabled).and_return(true)
+        it "when existing_coverage_warning setting is on is true & market kind is shop" do
+          EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(true)
           sign_in(user)
           get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: "shop"}
           expect(assigns(:dependent_members)).to eq nil
@@ -321,8 +321,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(assigns(:dependent_members)).to eq nil
       end
 
-      it "when fetch_existing_coverage setting is on is false & market kind is shop" do
-        EnrollRegistry[:fetch_existing_coverage].feature.stub(:is_enabled).and_return(false)
+      it "when existing_coverage_warning setting is on is false & market kind is shop" do
+        EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(false)
         sign_in(user)
         get :thankyou, params: {id: "id", plan_id: "plan_id"}
         expect(assigns(:dependent_members)).to eq nil

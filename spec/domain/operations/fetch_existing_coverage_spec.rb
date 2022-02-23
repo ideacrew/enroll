@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::Individual::FetchExistingCoverage do
+RSpec.describe Operations::FetchExistingCoverage do
   subject do
     described_class.new.call(params)
   end
@@ -15,7 +15,6 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
     let!(:household) { FactoryBot.create(:household, family: family) }
     let(:effective_on) {TimeKeeper.date_of_record.beginning_of_year - 1.year}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
-    let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :dental, csr_variant_id: '01') }
 
     let(:hbx_en_member1) do
       FactoryBot.build(:hbx_enrollment_member,
@@ -29,12 +28,6 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
                        coverage_start_on: effective_on,
                        applicant_id: dependents.last.id)
     end
-    let(:hbx_en_member3) do
-      FactoryBot.build(:hbx_enrollment_member,
-                       eligibility_date: effective_on + 6.months,
-                       coverage_start_on: effective_on + 6.months,
-                       applicant_id: dependents.last.id)
-    end
     let!(:enrollment1) do
       FactoryBot.create(:hbx_enrollment,
                         family: family,
@@ -42,7 +35,6 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
                         household: family.active_household,
                         coverage_kind: "health",
                         effective_on: effective_on,
-                        terminated_on: effective_on.next_month.end_of_month,
                         kind: 'individual',
                         hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
                         aasm_state: 'coverage_selected')
@@ -56,7 +48,6 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
                         coverage_kind: "health",
                         hbx_enrollment_members: [hbx_en_member2],
                         effective_on: effective_on + 2.months,
-                        terminated_on: (effective_on + 5.months).end_of_month,
                         aasm_state: 'shopping')
     end
     let!(:enrollment3) do
@@ -66,9 +57,8 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
                         household: family.active_household,
                         coverage_kind: "health",
                         effective_on: effective_on + 6.months,
-                        terminated_on: effective_on.end_of_year,
                         kind: 'individual',
-                        hbx_enrollment_members: [hbx_en_member1, hbx_en_member2, hbx_en_member3],
+                        hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
                         aasm_state: 'coverage_selected')
     end
     let!(:enrollment4) do
@@ -78,35 +68,9 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
                         household: family.active_household,
                         coverage_kind: "health",
                         effective_on: effective_on + 6.months,
-                        terminated_on: effective_on.end_of_year,
                         kind: 'employer_sponsored',
                         hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
                         aasm_state: 'coverage_selected')
-    end
-
-    let!(:enrollment5) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        product: product2,
-                        household: family.active_household,
-                        coverage_kind: "dental",
-                        effective_on: effective_on,
-                        terminated_on: effective_on.next_month.end_of_month,
-                        kind: 'individual',
-                        hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
-                        aasm_state: 'coverage_selected')
-    end
-    let!(:enrollment6) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        product: product2,
-                        kind: 'individual',
-                        household: family.active_household,
-                        coverage_kind: "dental",
-                        hbx_enrollment_members: [hbx_en_member2],
-                        effective_on: effective_on + 2.months,
-                        terminated_on: (effective_on + 5.months).end_of_month,
-                        aasm_state: 'shopping')
     end
 
     let(:params) do
@@ -143,20 +107,48 @@ RSpec.describe Operations::Individual::FetchExistingCoverage do
       end
     end
 
-    context "hbx enrollment members with shopping enrollment" do
-      it "returns success" do
-        expect(subject).to be_success
-        expect(subject.success).to eq [enrollment1, enrollment3]
-        # SHOP Enrollment not included
-        expect(subject.success).not_to include [enrollment4]
+    context "passing enrollment with no families associated to members" do
+      before :each do
+        family.family_members.last.person_id = nil
+        family.family_members.last.save(validate: false)
+      end
+
+      it "returns failure" do
+        expect(subject).not_to be_success
+        expect(subject.failure).to eq "No families found for members"
       end
     end
 
-    context "hbx enrollment members with dental shopping enrollment" do
-      let(:params) { { :enrollment_id => enrollment6.id } }
-      it "returns success" do
+    context "passing ivl enrollment as input returns ivl related enrollments" do
+      it "returns failure" do
         expect(subject).to be_success
-        expect(subject.success).to eq [enrollment5]
+        expect(subject.success).to eq [enrollment1, enrollment3]
+      end
+    end
+
+    context "passing shop enrollment as input returns shop related enrollments" do
+      before :each do
+        enrollment2.update_attributes(kind: 'employer_sponsored')
+        enrollment2.save!
+      end
+
+      it "returns failure" do
+        expect(subject).to be_success
+        expect(subject.success).to eq [enrollment4]
+      end
+    end
+
+    context "passing dental enrollment as input returns dental related enrollments" do
+      before :each do
+        enrollment2.update_attributes(coverage_kind: 'dental')
+        enrollment2.save!
+        enrollment1.update_attributes(coverage_kind: 'dental')
+        enrollment1.save!
+      end
+
+      it "returns failure" do
+        expect(subject).to be_success
+        expect(subject.success).to eq [enrollment1]
       end
     end
   end
