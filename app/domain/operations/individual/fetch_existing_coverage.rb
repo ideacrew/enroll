@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Individual
+    # get active enrollments based on family_ids, aasm_state, market kind && coverage kind.
     class FetchExistingCoverage
       send(:include, Dry::Monads[:result, :do])
 
@@ -21,7 +22,7 @@ module Operations
 
       private
 
-       def validate(params)
+      def validate(params)
         return Failure("Given input is not a valid enrollment id") unless params[:enrollment_id].is_a?(BSON::ObjectId)
 
         Success(params)
