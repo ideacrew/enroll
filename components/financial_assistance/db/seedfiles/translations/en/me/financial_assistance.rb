@@ -5,11 +5,11 @@
 # rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
-     on Maine Cover ME. Please call Maine Cover ME at (866) 636-0355 to make updates to that application.
-      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+     on #{EnrollRegistry[:enroll_app].setting(:long_name).item}. Please call #{EnrollRegistry[:enroll_app].setting(:long_name).item} at (866) 636-0355 to make updates to that application.
+      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on #{EnrollRegistry[:enroll_app].setting(:long_name).item}, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid.
-     Please call Maine Cover ME at (866) 636-0355 to make updates to your case.
-     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+     Please call #{EnrollRegistry[:enroll_app].setting(:long_name).item} at (866) 636-0355 to make updates to your case.
+     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on #{EnrollRegistry[:enroll_app].setting(:long_name).item}, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   'en.faa.other_ques.is_student' => 'Is this person a full-time student?*',
@@ -43,7 +43,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
   "en.faa.does_not_qualify" => "Does not qualify",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
-  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through Maine Cover ME:",
+  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through #{EnrollRegistry[:enroll_app].setting(:long_name).item}:",
   "en.faa.private_health_insurance" => "Private Health Insurance",
   "en.faa.qualified_to_enroll" => "These people <span> qualify to enroll </span> in a private health insurance plan:",
   "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. Find out more about the appeal process or get assistance by contacting us directly.",
