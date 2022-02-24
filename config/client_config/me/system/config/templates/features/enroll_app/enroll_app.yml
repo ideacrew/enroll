@@ -704,6 +704,9 @@ registry:
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: true
+      - key: :existing_coverage_warning
+        item: :existing_coverage_warning
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:
