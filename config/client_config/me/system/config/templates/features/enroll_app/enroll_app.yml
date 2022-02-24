@@ -706,7 +706,7 @@ registry:
         is_enabled: true
       - key: :existing_coverage_warning
         item: :existing_coverage_warning
-        is_enabled: false
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:

@@ -692,7 +692,7 @@ registry:
         is_enabled: false
       - key: :existing_coverage_warning
         item: :existing_coverage_warning
-        is_enabled: true
+        is_enabled: false
   - namespace:
       - :person_matching_feature
     features:
