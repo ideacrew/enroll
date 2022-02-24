@@ -767,6 +767,28 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       applicant.save!
       expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
     end
+
+    context 'application is in draft' do
+      before do
+        application.reload
+        application.applicants.first.save!
+      end
+
+      it 'should trigger operation call as application is in draft state' do
+        expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to have_received(:new)
+      end
+    end
+
+    context 'application is not in draft' do
+      before do
+        application.update_attributes!(aasm_state: 'submitted')
+        application.applicants.first.save!
+      end
+
+      it 'should not trigger operation call as application is in draft state' do
+        expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
+      end
+    end
   end
 
   context 'propagate_destroy' do
@@ -785,6 +807,28 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       applicant.callback_update = true
       applicant.destroy!
       expect(::Operations::Families::DropFamilyMember).to_not have_received(:new)
+    end
+
+    context 'application is in draft' do
+      before do
+        application.reload
+        applicant.destroy!
+      end
+
+      it 'should trigger operation call as application is in draft state' do
+        expect(Operations::Families::DropFamilyMember).to have_received(:new)
+      end
+    end
+
+    context 'application is not in draft' do
+      before do
+        application.update_attributes!(aasm_state: 'submitted')
+        applicant.destroy!
+      end
+
+      it 'should not trigger operation call as application is in draft state' do
+        expect(Operations::Families::DropFamilyMember).to_not have_received(:new)
+      end
     end
   end
 
