@@ -16,13 +16,13 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let(:consumer_role) { ConsumerRole.new }
     let(:rating_address) { FactoryBot.build(:address) }
     let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five], consumer_role: consumer_role, rating_area: rating_area)}
-    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self", tobacco_use: nil)}
-    let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, employee_relationship: "spouse", tobacco_use: nil)}
-    let!(:one)             {double("one", dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child", tobacco_use: nil)}
-    let!(:two)             {double("two", dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child", tobacco_use: nil)}
-    let!(:three)           {double("three", dob: 13.years.ago, age_on_effective_date: 13, employee_relationship: "child", tobacco_use: nil)}
-    let!(:four)            {double("four", dob: 11.years.ago, age_on_effective_date: 11, employee_relationship: "child", tobacco_use: nil)}
-    let!(:five)            {double("five", dob: 4.years.ago, age_on_effective_date: 4, employee_relationship: "child", tobacco_use: nil)}
+    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self", tobacco_use: nil, is_subscriber?: true)}
+    let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, employee_relationship: "spouse", tobacco_use: nil, is_subscriber?: false, primary_relationship: "spouse")}
+    let!(:one)             {double("one", dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
+    let!(:two)             {double("two", dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
+    let!(:three)           {double("three", dob: 13.years.ago, age_on_effective_date: 13, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
+    let!(:four)            {double("four", dob: 11.years.ago, age_on_effective_date: 11, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
+    let!(:five)            {double("five", dob: 4.years.ago, age_on_effective_date: 4, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
     let!(:relationship_benefit_for) do
       { "self" => double("self", :offered? => true),
         "spouse" => double("spouse", :offered? => true),
@@ -517,16 +517,16 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let!(:family_member5) { FactoryBot.create(:family_member, family: family, person: person5) }
     let!(:person6) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 5.years) }
     let!(:family_member6) { FactoryBot.create(:family_member, family: family, person: person6) }
-    let!(:person7) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 5.years) }
+    let!(:person7) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 3.years) }
     let!(:family_member7) { FactoryBot.create(:family_member, family: family, person: person7) }
     let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'shopping',coverage_kind: "dental", product: product, rating_area_id: rating_area.id)}
     let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, hbx_enrollment: hbx_enrollment)}
-    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, hbx_enrollment: hbx_enrollment)}
-    let!(:hbx_enrollment_member3) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, hbx_enrollment: hbx_enrollment)}
-    let!(:hbx_enrollment_member4) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[3].id, hbx_enrollment: hbx_enrollment)}
-    let!(:hbx_enrollment_member5) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[4].id, hbx_enrollment: hbx_enrollment)}
-    let!(:hbx_enrollment_member6) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[5].id, hbx_enrollment: hbx_enrollment)}
-    let!(:hbx_enrollment_member7) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[6].id, hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, hbx_enrollment: hbx_enrollment, is_subscriber: false)}
+    let!(:hbx_enrollment_member3) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, hbx_enrollment: hbx_enrollment, is_subscriber: false)}
+    let!(:hbx_enrollment_member4) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[3].id, hbx_enrollment: hbx_enrollment, is_subscriber: false)}
+    let!(:hbx_enrollment_member5) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[4].id, hbx_enrollment: hbx_enrollment, is_subscriber: false)}
+    let!(:hbx_enrollment_member6) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[5].id, hbx_enrollment: hbx_enrollment, is_subscriber: false)}
+    let!(:hbx_enrollment_member7) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[6].id, hbx_enrollment: hbx_enrollment, is_subscriber: false)}
 
     let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let(:qhp_pt) { FactoryBot.build(:products_qhp_premium_tables, couple_enrollee: 1200.00, primary_enrollee_one_dependent: 1200.00, rate_area_id: rating_area.exchange_provided_code)}
@@ -543,7 +543,6 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           expect(@decorator.large_family_factor(hbx_enrollment.hbx_enrollment_members[6])).to eq(1)
         end
       end
-
       context 'when zero premium pollicy enabled' do
         before do
           allow(EnrollRegistry[:zero_permium_policy].feature).to receive(:is_enabled).and_return(true)

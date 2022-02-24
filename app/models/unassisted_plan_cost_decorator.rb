@@ -5,6 +5,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   attr_reader :hbx_enrollment, :elected_aptc, :tax_household, :child_age_limit
 
+  DISCOUNT_EXEMPT_RELATIONSHIPS = [
+    "spouse",
+    "domestic_partner",
+    "life_partner"
+  ].freeze
+
   def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
     super(plan)
     @hbx_enrollment = hbx_enrollment
@@ -26,8 +32,20 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     member.age_on_effective_date
   end
 
+  def ordered_children
+    @ordered_children ||= begin
+      non_spouse_or_subscribers = members.reject do |m|
+        m.is_subscriber? || DISCOUNT_EXEMPT_RELATIONSHIPS.include?(m.primary_relationship)
+      end
+      not_too_old = non_spouse_or_subscribers.select do |mem|
+        age_of(mem) <= child_age_limit
+      end
+      not_too_old.sort_by { |m| age_of(m) }.reverse
+    end
+  end
+
   def child_index(member)
-    @children = members.select {|mem| age_of(mem) <= child_age_limit} unless defined?(@children)
+    @children ||= ordered_children
     @children.index(member)
   end
 
@@ -36,7 +54,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
     if (age_of(member) > child_age_limit) || (kind == :dental && zero_permium_policy_disabled)
       1.00
-    elsif child_index(member) > 2
+    elsif child_index(member).present? && child_index(member) > 2
       0.00
     else
       1.00
