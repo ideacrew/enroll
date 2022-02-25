@@ -1151,6 +1151,91 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     it_behaves_like 'POST update_terminate_enrollment', 'coverage_terminated', ::TimeKeeper.date_of_record.prev_day.to_s
   end
 
+  describe 'POST update_enrollment_member_drop', :dbclean => :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:benefit_package)  { initial_application.benefit_packages.first }
+    let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
+    let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
+    let(:census_employee) do
+      FactoryBot.create(:census_employee,
+                        employer_profile: benefit_sponsorship.profile,
+                        benefit_sponsorship: benefit_sponsorship,
+                        benefit_group_assignments: [benefit_group_assignment])
+    end
+
+    let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryBot.create(:person)}
+    let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person)}
+    let!(:household) { FactoryBot.create(:household, family: family) }
+
+    let(:hbx_enrollment_member1) do
+      FactoryBot.build(:hbx_enrollment_member,
+                       is_subscriber:true,
+                       applicant_id: family.family_members.first.id,
+                       coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
+                       eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+    end
+    let(:hbx_enrollment_member2) do
+      FactoryBot.build(:hbx_enrollment_member,
+                       is_subscriber:true,
+                       applicant_id: family.family_members.last.id,
+                       coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
+                       eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+    end
+
+    let!(:enrollment) do
+      hbx_enrollment = FactoryBot.create(:hbx_enrollment,
+                                         :with_product,
+                                         family: family,
+                                         household: family.active_household,
+                                         hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2],
+                                         aasm_state: "coverage_selected",
+                                         effective_on: initial_application.start_on,
+                                         rating_area_id: initial_application.recorded_rating_area_id,
+                                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                         benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                                         employee_role_id: employee_role.id)
+      hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+      hbx_enrollment.save!
+      hbx_enrollment
+    end
+
+
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    shared_examples_for "POST update_enrollment_member_drop" do |aasm_state, terminated_date|
+      context 'shop enrollment' do
+        it 'should render template' do
+          post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+                                                         "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
+                                                         enrollment_id: enrollment.id }, format: :js, xhr: true
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      it "enrollment should be moved to #{aasm_state}" do
+        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+                                                       "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
+                                                       enrollment_id: enrollment.id }, format: :js, xhr: true
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq aasm_state
+        expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
+        expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 1
+      end
+    end
+
+    # TODO: multiple people dropped
+    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
+    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.prev_day.to_s
+  end
+
   describe 'aasm_state#handle_edi_transmissions', dbclean: :after_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"

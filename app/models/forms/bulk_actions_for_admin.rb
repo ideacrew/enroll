@@ -59,23 +59,54 @@ module Forms
       terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
     end
 
+    # drop action
     def drop_enrollment_members
       if @params.keys.to_s[/terminate_member_.*/]
         hbx_enrollment = HbxEnrollment.find(@enrollment_id)
         begin
+          terminate_date = Date.strptime(@params["termination_date_#{hbx_enrollment.id}"], "%m/%d/%Y")
           dropped_enr_members = @params.select{|string| string.include?("terminate_member")}.values
+
+          dropped_member_info = []
+          dropped_enr_members.each do |member_id|
+            hem = hbx_enrollment.hbx_enrollment_members.where(id: member_id).first
+            person = hem.family_member.person
+            dropped_member_info << {hbx_id: member_id, full_name: person.full_name, terminated_on: terminate_date}
+          end
+
           all_enr_members = hbx_enrollment.hbx_enrollment_members
           eligible_members = all_enr_members.reject!{ |member| dropped_enr_members.include?(member.id.to_s) }
-          effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx_enrollment.effective_on).to_date
+          effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(::TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx_enrollment.effective_on).to_date
           if hbx_enrollment.applied_aptc_amount > 0
             tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
             applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
           end
 
           applied_aptc = applied_aptc.present? ? applied_aptc : 0
+
+          if hbx_enrollment.may_terminate_coverage?
+            hbx_enrollment.terminate_coverage!
+            hbx_enrollment.update_attributes!(terminated_on: terminate_date)
+          end
+
           reinstatement = Enrollments::Replicator::Reinstatement.new(hbx_enrollment, effective_date, applied_aptc, eligible_members).build
+
+          previous_enrollment_state = hbx_enrollment.aasm_state
+          reinstatement.update_attributes!(aasm_state: previous_enrollment_state)
+
+          # extra update in the event enrollment gets updated in the reinstatement
+          hbx_enrollment.update_attributes!(terminated_on: terminate_date)
+          hbx_enrollment.save!
+
           reinstatement.save!
-        rescue
+
+          transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id.to_s}") ? true : false
+          handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
+
+          dropped_member_info.each do |member_info|
+            @result[:success] << member_info
+          end
+        rescue => error
           @result[:failure] << hbx_enrollment
         end
       end

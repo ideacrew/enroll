@@ -479,6 +479,7 @@ def employer_poc
     end
   end
 
+  # drop action
   def drop_enrollment_member
     @hbxs = Family.find(params[:family]).all_enrollments.individual_market.can_terminate
     @row = params[:family_actions_id]
@@ -494,7 +495,7 @@ def employer_poc
     @family_id = params_parser.family_id
     params_parser.drop_enrollment_members
     respond_to do |format|
-      format.js { render :file => "datatables/terminate_enrollment_result.js.erb"}
+      format.js { render :file => "datatables/drop_enrollment_member_result.js.erb"}
     end
   end
 
@@ -900,7 +901,7 @@ def employer_poc
   end
 
   def uniq_enrollment_member_drop_params
-    params.keys.map { |key| key.match(/terminate_member_.*/) || key.match(/termination_date_.*/) || key.match(/family_.*/) || key.match(/enrollment_id/) }.compact.map(&:to_s)
+    params.keys.map { |key| key.match(/terminate_member_.*/) || key.match(/termination_date_.*/) || key.match(/family_.*/) || key.match(/enrollment_id/) || key.match(/transmit_hbx_.*/) }.compact.map(&:to_s)
   end
 
   def uniq_cancel_params

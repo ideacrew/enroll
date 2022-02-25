@@ -35,7 +35,6 @@ module Effective
            #cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), terminate_enrollment_type(row, pundit_allow(Family, :can_terminate_enrollment?))],
            #terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
-           ['Drop Enrollment Members', drop_enrollment_member_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), drop_enrollment_member_type(row, pundit_allow(Family, :can_terminate_enrollment?))],
            ['Change Enrollment End Date', view_enrollment_to_update_end_date_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             update_terminated_enrollment_type(row, pundit_allow(Family, :change_enrollment_end_date?))],
            ['Reinstate', view_terminated_hbx_enrollments_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
@@ -45,6 +44,10 @@ module Effective
             (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), no_transition_families_is_enabled? ? 'ajax' : '']
            ]
+
+          if !::EnrollRegistry.feature_enabled?(:drop_enrollment_members)
+            dropdown.insert(5, [l10n('admin_actions.drop_enrollment_members'), drop_enrollment_member_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), drop_enrollment_member_type(row, pundit_allow(Family, :can_drop_enrollment_members?))])
+          end
 
           if ::EnrollRegistry.feature_enabled?(:send_secure_message_family)
             dropdown.insert(8, ['Send Secure Message', new_secure_message_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
@@ -137,8 +140,8 @@ module Effective
 
       def drop_enrollment_member_type(family, allow)
         return 'disabled' unless allow
-        terminate_eligibles = family.hbx_enrollments.individual_market.any?(&:is_admin_terminate_eligible?)
-        terminate_eligibles ? 'ajax' : 'disabled'
+        ivl_enrollments = family.hbx_enrollments.individual_market.select{ |enr| enr.is_admin_terminate_eligible? && enr.hbx_enrollment_members.count > 1 }
+        ivl_enrollments.any? ? 'ajax' : 'disabled'
       end
 
       def new_eligibility_family_member_link_type(row, allow)
