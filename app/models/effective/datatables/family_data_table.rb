@@ -45,7 +45,7 @@ module Effective
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), no_transition_families_is_enabled? ? 'ajax' : '']
            ]
 
-          if !::EnrollRegistry.feature_enabled?(:drop_enrollment_members)
+          if ::EnrollRegistry.feature_enabled?(:drop_enrollment_members)
             dropdown.insert(5, [l10n('admin_actions.drop_enrollment_members'), drop_enrollment_member_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), drop_enrollment_member_type(row, pundit_allow(Family, :can_drop_enrollment_members?))])
           end
 
