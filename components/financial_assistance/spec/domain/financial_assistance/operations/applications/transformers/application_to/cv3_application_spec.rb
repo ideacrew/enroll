@@ -1722,4 +1722,23 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe 'FinancialAssistanceRegistry' do
+    let(:result) { subject.call(application) }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
+    end
+
+    it 'should check FinancialAssistanceRegistry for full_medicaid_determination_step feature' do
+      expect(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
+      result
+    end
+
+    it 'should check FinancialAssistanceRegistry for indian_alaskan_tribe_details feature' do
+      expect(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
+      result
+    end
+  end
 end
