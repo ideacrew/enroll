@@ -942,7 +942,8 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
               :submitted_at => application.submitted_at,
               :tax_households => [],
               :us_state => "DC",
-              :years_to_renew => nil
+              :years_to_renew => nil,
+              :full_medicaid_determination => nil
             }
           ],
           :documents => [],
