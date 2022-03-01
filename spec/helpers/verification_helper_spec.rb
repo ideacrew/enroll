@@ -548,9 +548,11 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "request response details", "Citizenship", "ssa_request", "ssa_verification_request"
     it_behaves_like "request response details", "Immigration status", "vlp_request", "lawful_presence_request"
     it_behaves_like "request response details", EnrollRegistry[:enroll_app].setting(:state_residency).item, "local_residency_response", "residency_verification_response"
-    it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
-    it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
-    it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
+    unless EnrollRegistry.feature_enabled?(:ssa_h3)
+      it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
+      it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
+    end
+    it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response" unless EnrollRegistry.feature_enabled?(:vlp_h92)
   end
 
   describe "#build_reject_reason_list" do
