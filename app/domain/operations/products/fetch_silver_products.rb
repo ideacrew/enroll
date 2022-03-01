@@ -53,7 +53,8 @@ module Operations
                   :'premium_tables.rating_area_id' => rating_area_id,
                   :service_area_id.in => service_area_ids,
                   :'application_period.min'.lte => effective_date,
-                  :'application_period.max'.gte => effective_date
+                  :'application_period.max'.gte => effective_date,
+                  :benefit_market_kind => :aca_individual
                 })
       end
 

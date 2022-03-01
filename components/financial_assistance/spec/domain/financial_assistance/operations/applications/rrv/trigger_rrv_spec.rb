@@ -96,6 +96,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRe
   let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new }
 
   before do
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
