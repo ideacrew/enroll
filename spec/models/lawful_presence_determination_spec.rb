@@ -80,7 +80,9 @@ describe LawfulPresenceDetermination do
     subject { LawfulPresenceDetermination.new(citizen_status: "us_citizen", :ivl_role => ConsumerRole.new(:person => person)) }
 
     it "should invoke the ssa workflow event when asked to begin the lawful presence process" do
-      expect(subject).to receive(:notify).with(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+      unless EnrollRegistry.feature_enabled?(:ssa_h3)
+        expect(subject).to receive(:notify).with(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+      end
       subject.start_ssa_process
     end
   end
@@ -88,7 +90,9 @@ describe LawfulPresenceDetermination do
   describe "given a citizen status of naturalized_citizen" do
     subject { LawfulPresenceDetermination.new(citizen_status: "naturalized_citizen", :ivl_role => ConsumerRole.new(:person => person)) }
     it "should invoke the vlp workflow event when asked to begin the lawful presence process" do
-      expect(subject).to receive(:notify).with(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => person, :coverage_start_date => requested_start_date})
+      unless EnrollRegistry.feature_enabled?(:vlp_h92)
+        expect(subject).to receive(:notify).with(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => person, :coverage_start_date => requested_start_date})
+      end
       subject.start_vlp_process(requested_start_date)
     end
   end
