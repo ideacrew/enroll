@@ -75,7 +75,7 @@ registry:
         item: :primary_caregiver_other_question
         is_enabled: false
       - key: :mec_check
-        is_enabled: false
+        is_enabled: true
       - key: :include_faa_outstanding_verifications
         is_enabled: false
       - key: :skip_aptc_families_from_document_reminder_notices
@@ -90,11 +90,11 @@ registry:
     - key: :medicaid_gateway_determination
       is_enabled: true
     - key: :esi_mec_determination
-      is_enabled: false
+      is_enabled: true
     - key: :non_esi_mec_determination
-      is_enabled: false
+      is_enabled: true
     - key: :ifsv_determination
-      is_enabled: false
+      is_enabled: true
   - namespace:
     - :account_transfer
     features:
