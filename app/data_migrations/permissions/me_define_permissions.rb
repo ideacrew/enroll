@@ -41,11 +41,7 @@ class MeDefinePermissions < MigrationTask
                           can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false, can_reset_password: false,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false,
-<<<<<<< HEAD
-                          can_view_sep_history: true, can_reinstate_enrollment: false, can_cancel_enrollment: false, can_terminate_enrollment: false, change_enrollment_end_date: false)
-=======
-                          can_view_sep_history: true, can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true, can_drop_enrollment_members: false, can_drop_enrollment_members: true)
->>>>>>> 45d6e23578 (Add permission for can_drop_emrollment_members)
+                          can_view_sep_history: true, can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true, can_drop_enrollment_members: true)
   end
 
   def initial_hbx
