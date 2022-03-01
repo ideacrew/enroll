@@ -1184,13 +1184,20 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                        coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
                        eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
     end
+    let(:hbx_enrollment_member3) do
+      FactoryBot.build(:hbx_enrollment_member,
+                       is_subscriber:true,
+                       applicant_id: family.family_members[1].id,
+                       coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
+                       eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+    end
 
     let!(:enrollment) do
       hbx_enrollment = FactoryBot.create(:hbx_enrollment,
                                          :with_product,
                                          family: family,
                                          household: family.active_household,
-                                         hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2],
+                                         hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
                                          aasm_state: "coverage_selected",
                                          effective_on: initial_application.start_on,
                                          rating_area_id: initial_application.recorded_rating_area_id,
@@ -1227,11 +1234,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         enrollment.reload
         expect(enrollment.aasm_state).to eq aasm_state
         expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
+        expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 2
+      end
+
+      it "should handle multiple dropped members" do
+        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+                                                       "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
+                                                       "terminate_member_#{enrollment.hbx_enrollment_members[1].id}".to_sym => enrollment.hbx_enrollment_members[1].id.to_s,
+                                                       enrollment_id: enrollment.id }, format: :js, xhr: true
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq aasm_state
+        expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
         expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 1
       end
     end
 
-    # TODO: multiple people dropped
     it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
     it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.prev_day.to_s
   end
