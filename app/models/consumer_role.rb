@@ -693,7 +693,7 @@ class ConsumerRole
     return if skip_residency_verification == true
     if sci_verified?
       pass_residency!
-    elsif person.ssn.present? || is_native?
+    elsif (person.ssn.present? || is_native?) && self.may_ssn_valid_citizenship_valid?
       self.ssn_valid_citizenship_valid! verification_attr(args.first)
     else
       self.pass_dhs! verification_attr(args.first)
