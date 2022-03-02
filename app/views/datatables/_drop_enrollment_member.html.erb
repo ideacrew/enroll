@@ -1,14 +1,4 @@
 <script type="text/javascript">
-  jQuery('[id^="terminate_member_"]').click(function($) {
-    if (this.checked) {
-      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', false);
-    }
-    else {
-      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', true);
-      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('checked', false);
-    }
-  });
-
   $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
     if($('input[id^="termination_date_picker"]').val().length !=0)
       this.submit();
@@ -26,7 +16,8 @@
         <h3 class='title'><%= l10n('admin_actions.drop_enrollment_members') %></h3>
         <p class='title'><b><%= l10n('admin_actions.enrollment_hbx_id') %>:</b> <%= hbx.hbx_id %></p>
         <p class='title'><b><%= l10n('plan') %>:</b> <%= hbx.product.title %></p>
-        <p><%= l10n('termination_date') %>: <%= text_field_tag "termination_date_#{hbx.id}", nil, readonly: true, value:  set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_effective_on(hbx), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx) %></p>
+        <p><%= l10n('termination_date') %>: <%= text_field_tag "termination_date_#{hbx.id}", nil, value:  set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_effective_on(hbx), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx) %></p>
+        <p><%= l10n('exchange.employer_applications.transmit_to_carrier') %>? <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false %></p>
         <br />
         <table  class="table table-striped">
           <tr>
@@ -36,7 +27,6 @@
             <th><%= l10n('hbx_id') %></th>
             <th><%= l10n('effective_date') %></th>
             <th><%= l10n('admin_actions.drop_member') %>?</th>
-            <th><%= l10n('exchange.employer_applications.transmit_to_carrier') %>?</th>
           </tr>
           <% hbx.hbx_enrollment_members.each do |member| %>
             <% person = member.family_member.person%>
@@ -47,7 +37,6 @@
               <td><%= hbx.hbx_id %></td>
               <td><%= hbx.effective_on %></td>
               <td><%= check_box_tag "terminate_member_#{member.id}", member.id %></td>
-              <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
             </tr>
           <% end %>
           <tr>
