@@ -103,7 +103,7 @@ module FinancialAssistance
 
         def build_relationships(source_application, new_app, active_fms_applicant_params)
           primary = new_app.primary_applicant
-          dependent_applicant_params = active_fms_applicant_params.select { |fm_applicant_params| fm_applicant_params[:is_primary_applicant] }
+          dependent_applicant_params = active_fms_applicant_params.select { |fm_applicant_params| !fm_applicant_params[:is_primary_applicant] }
 
           @relationships_changed = dependent_applicant_params.any? do |fm_applicant_params|
             dependent_applicant = source_application.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
@@ -121,11 +121,9 @@ module FinancialAssistance
         def copy_relationships_from_source_app(source_application, new_app)
           source_application.relationships.each do |source_relationship|
             next source_relationship if source_relationship.applicant.nil? || source_relationship.relative.nil?
-
             new_applicant = fetch_matching_applicant(new_app, source_relationship.applicant)
             new_relative = fetch_matching_applicant(new_app, source_relationship.relative)
-            rel_params = { kind: source_relationship.kind, applicant_id: new_applicant.id, relative_id: new_relative.id }
-            new_app.relationships.build(rel_params) if new_app.relationships.where(rel_params).blank? && new_applicant.id != new_relative.id
+            new_app.build_relationship(new_applicant, source_relationship.kind, new_relative)
           end
         end
 
@@ -133,12 +131,10 @@ module FinancialAssistance
           active_fms_applicant_params.each do |fm_applicant_params|
             next fm_applicant_params if fm_applicant_params[:is_primary_applicant]
             new_appl = new_app.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
-            rel_params = { kind: fm_applicant_params[:relationship], applicant_id: new_appl.id, relative_id: primary.id }
-            new_app.relationships.build(rel_params) if new_app.relationships.where(rel_params).blank?
+            new_app.build_relationship(new_appl, fm_applicant_params[:relationship], primary)
             inverse_rel_kind = ::FinancialAssistance::Relationship::INVERSE_MAP[fm_applicant_params[:relationship]]
             next fm_applicant_params if inverse_rel_kind.blank?
-            inverse_rel_params = { kind: inverse_rel_kind, applicant_id: primary.id, relative_id: new_appl.id }
-            new_app.relationships.build(inverse_rel_params) if new_app.relationships.where(inverse_rel_params).blank?
+            new_app.build_relationship(primary, inverse_rel_kind, new_appl)
           end
         end
 

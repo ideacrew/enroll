@@ -240,7 +240,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
       end
 
       it 'should transition the application to magi_medicaid_eligibility_request_errored' do
-        expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to be_truthy
+        @renewal_app.reload
+        expect(
+          @renewal_app.haven_magi_medicaid_eligibility_request_errored? || @renewal_app.mitc_magi_medicaid_eligibility_request_errored?
+        ).to be_truthy
       end
 
       it 'should return failure with a message' do

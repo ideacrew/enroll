@@ -862,24 +862,6 @@ module FinancialAssistance
       end
     end
 
-    # def applicant
-    #   return nil unless tax_household_member
-    #   tax_household_member.family_member
-    # end
-
-    # The following methods will need to be refactored as there are multiple eligibility determinations - per THH
-    # def eligibility_determination=(ed_instance)
-    #   return unless ed_instance.is_a? EligibilityDetermination
-    #   self.eligibility_determination_id = ed_instance._id
-    #   @eligibility_determination = ed_instance
-    # end
-
-    # def eligibility_determination
-    #   return nil unless tax_household_member
-    #   return @eligibility_determination if defined? @eligibility_determination
-    #   @eligibility_determination = tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
-    # end
-
     # Evaluate if receiving Alternative Benefits this year
     def is_receiving_benefit?
       return_value = false
@@ -1312,6 +1294,12 @@ module FinancialAssistance
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
         applicant.save!
       end
+    end
+
+    def build_relationship(applicant, rel_kind, relative)
+      rel_params = { applicant_id: applicant&.id, kind: rel_kind, relative_id: relative&.id }
+      return if rel_params.values.include?(nil)
+      relationships.build(rel_params) if relationships.where(rel_params).blank?
     end
 
     private
