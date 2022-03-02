@@ -4,7 +4,7 @@ puts "::: Beginning creating IVL QualifyingLifeEventKinds :::"
 QualifyingLifeEventKind.find_or_create_by(
   title: "Had a baby"
 ).tap do |qlek|
-  qlek.update_attributes( 
+  qlek.update_attributes(
     tool_tip: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
     action_kind: "add_member",
     market_kind: "individual",
@@ -153,10 +153,10 @@ QualifyingLifeEventKind.find_or_create_by(
 end
 
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Enrollment error caused by #{Settings.site.short_name}"
+  title: "Enrollment error caused by #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 ).tap do |qlek|
   qlek.update_attributes(
-    tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by #{Settings.site.short_name} or the Department of Health and Human Services",
+    tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by #{EnrollRegistry[:enroll_app].setting(:short_name).item} or the Department of Health and Human Services",
     action_kind: "add_member",
     market_kind: "individual",
     ordinal_position: 70,
@@ -177,7 +177,7 @@ QualifyingLifeEventKind.find_or_create_by(
   title: "Change in income that may impact my tax credits/cost-sharing reductions"
 ).tap do |qlek|
   qlek.update_attributes(
-    tool_tip: "Increases or decreases to income that may impact eligibility for or the dollar amount of household tax credits or cost-sharing reductions. (Only applies to those currently enrolled in a plan through #{Settings.site.short_name}).",
+    tool_tip: "Increases or decreases to income that may impact eligibility for or the dollar amount of household tax credits or cost-sharing reductions. (Only applies to those currently enrolled in a plan through #{EnrollRegistry[:enroll_app].setting(:short_name).item}).",
     action_kind: "change_benefit",
     market_kind: "individual",
     event_kind_label: "Date of change",
@@ -345,7 +345,7 @@ end
 QualifyingLifeEventKind.find_or_create_by(
   title: "Enrollment error caused by someone providing me with enrollment assistance").tap do |qlek|
   qlek.update_attributes(
-  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by #{Settings.site.short_name}",
+  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by #{EnrollRegistry[:enroll_app].setting(:short_name).item}",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -385,7 +385,7 @@ end
 QualifyingLifeEventKind.find_or_create_by(
   title: "Found ineligible for employer-sponsored insurance after open enrollment ended").tap do |qlek|
   qlek.update_attributes(
-  tool_tip: "Did not enroll in individual or family coverage because employer was applying to provide coverage through #{Settings.site.short_name} during open enrollment",
+  tool_tip: "Did not enroll in individual or family coverage because employer was applying to provide coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item} during open enrollment",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -448,7 +448,7 @@ QualifyingLifeEventKind.find_or_create_by(
   title: "System outage prevented enrollment"
 ).tap do |qlek|
   qlek.update_attributes(
-  tool_tip: "A #{Settings.site.short_name} outage or outage in federal or local data sources close to an open enrollment or special enrollment deadline prevented enrollment",
+  tool_tip: "A #{EnrollRegistry[:enroll_app].setting(:short_name).item} outage or outage in federal or local data sources close to an open enrollment or special enrollment deadline prevented enrollment",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,

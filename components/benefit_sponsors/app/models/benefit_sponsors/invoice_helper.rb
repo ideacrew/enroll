@@ -38,7 +38,7 @@ module BenefitSponsors
 
       @pdf=Prawn::Document.new
       cheque_amount_path = 'app/assets/images/cheque_amount.png'
-      logopath = "app/assets/images/#{Settings.site.mailer_logo_file_name}"
+      logopath = "app/assets/images/#{EnrollRegistry[:enroll_app].setting(:mailer_logo_file_name).item}"
       initial_y = @pdf.cursor
       initialmove_y = 25
       address_x = 15
@@ -233,7 +233,7 @@ module BenefitSponsors
 
     def payment_page_for_initial_employer
       cheque_amount_path = 'app/assets/images/cheque_amount.png'
-      logopath = "app/assets/images/#{Settings.site.mailer_logo_file_name}"
+      logopath = "app/assets/images/#{EnrollRegistry[:enroll_app].setting(:mailer_logo_file_name).item}"
       initial_y = @pdf.cursor
       initialmove_y = 25
       address_x = 15

@@ -258,6 +258,77 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(response).to have_http_status(:success)
     end
 
+    context "thankyou" do
+      let(:member_group) { double("MEMBERGROUP")}
+      let!(:person) { FactoryBot.create(:person)}
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+      let(:primary) { family.primary_family_member }
+      let(:dependents) { family.dependents }
+      let!(:household) { FactoryBot.create(:household, family: family) }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+
+      let(:hbx_enrollment_member) do
+        FactoryBot.build(:hbx_enrollment_member,
+                         applicant_id: dependents.first.id)
+      end
+      let(:hbx_enrollment_member_1) do
+        FactoryBot.build(:hbx_enrollment_member,
+                         applicant_id: dependents.last.id)
+      end
+      let!(:hbx_enrollment_1) do
+        FactoryBot.create(:hbx_enrollment,
+                          family: family,
+                          product: product,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          kind: 'individual',
+                          hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_1],
+                          aasm_state: 'coverage_selected')
+      end
+      let!(:hbx_enrollment_2) do
+        FactoryBot.create(:hbx_enrollment,
+                          family: family,
+                          product: product,
+                          kind: 'individual',
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          hbx_enrollment_members: [hbx_enrollment_member_1],
+                          aasm_state: 'shopping')
+      end
+
+      before do
+        allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment_2)
+      end
+
+      if EnrollRegistry.feature_enabled?(:existing_coverage_warning)
+        it "when enrollment kind is ivl" do
+          sign_in(user)
+          get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: 'individual'}
+          expect(assigns(:dependent_members)).to eq [hbx_enrollment_member_1]
+        end
+
+        it "when existing_coverage_warning setting is on is true & market kind is shop" do
+          EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(true)
+          sign_in(user)
+          get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: "shop"}
+          expect(assigns(:dependent_members)).to eq nil
+        end
+      end
+
+      it "when enrollment kind is shop" do
+        sign_in(user)
+        get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: "shop"}
+        expect(assigns(:dependent_members)).to eq nil
+      end
+
+      it "when existing_coverage_warning setting is on is false & market kind is shop" do
+        EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(false)
+        sign_in(user)
+        get :thankyou, params: {id: "id", plan_id: "plan_id"}
+        expect(assigns(:dependent_members)).to eq nil
+      end
+    end
+
     context "when not eligible to complete shopping" do
       before do
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)

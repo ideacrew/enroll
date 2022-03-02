@@ -54,21 +54,21 @@ namespace :reports do
     end
 
     enrollments = HbxEnrollment.where(
-      :aasm_state.nin => ["coverage_canceled", 'shopping'],
+      :aasm_state.nin => ['shopping'],
       :effective_on => { "$gte" => Date.strptime(start_on, "%m/%d/%Y"), "$lt" => Date.strptime(end_on, "%m/%d/%Y")}
     )
     count = 0
     batch_size = 1000
     offset = 0
     total_count = enrollments.size
-    timestamp = Time.now.strftime('%Y%m%d%H%M')
-    CSV.open("enrollment_report_#{timestamp}.csv", 'w') do |csv|
-      csv << ["Subscriber ID", "Member ID", "Policy ID",  "Status", "Member Status",
-              "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type",
-              "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name",
+    CSV.open("enroll_enrollment_report.csv", 'w') do |csv|
+      csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Last Updated", "Policy Subscriber ID ", "Status", "Member Status",
+              "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type", "Tobacco Status",
+              "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name", "Rating Area",
               "Premium Amount", "Premium Total", "Policy APTC", "Responsible Premium Amt", "FPL",
-              "Coverage Start", "Coverage End",
-              "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Race", "Ethnicity", "Citizen Status",
+              "Purchase Date", "Coverage Start", "Coverage End",
+              "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Broker NPN",
+              "Broker Assignment Date","Race", "Ethnicity", "Citizen Status",
               "Broker Assisted"]
       while offset <= total_count
         enrollments.offset(offset).limit(batch_size).no_timeout.each do |enr|
@@ -87,7 +87,8 @@ namespace :reports do
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en) : (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
                 next if per.blank?
                 csv << [
-                  primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr.aasm_state,
+                  primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr&.updated_at&.to_s,
+                  enr.subscriber.hbx_id, enr.aasm_state,
                   member_status(enr),
                   per.first_name,
                   per.last_name,
@@ -97,9 +98,12 @@ namespace :reports do
                   per.gender,
                   en.primary_relationship,
                   enr.coverage_kind,
+                  per.is_tobacco_user,
                   product.name, product.hios_id, product.metal_level, product.carrier_profile.abbrev,
+                  enr&.rating_area&.exchange_provided_code,
                   premium_amount, enr.total_premium, enr.applied_aptc_amount, total_responsible_amount(enr),
                   fpl_percentage(enr, en, enr.effective_on.year),
+                  enr&.time_of_purchase&.to_s,
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
                   enr.terminated_on.blank? ? nil : enr.terminated_on.strftime("%Y%m%d"),
                   per.home_address&.full_address || enr.subscriber.person.home_address&.full_address,
@@ -108,6 +112,8 @@ namespace :reports do
                   per.home_email&.address || enr.subscriber.person.home_email&.address,
                   per.work_phone_or_best || enr.subscriber.person&.work_phone_or_best,
                   family.active_broker_agency_account&.writing_agent&.person&.full_name,
+                  family.active_broker_agency_account&.writing_agent&.npn,
+                  family.active_broker_agency_account&.start_on&.to_s,
                   per.ethnicity,
                   ethnicity_status(per.ethnicity),
                   per.citizen_status,

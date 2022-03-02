@@ -850,6 +850,18 @@ And(/^.+ should see the Metal Level filter$/) do
   expect(page).to have_content('Metal Level')
 end
 
+Then(/^.+ selects nationwide filter$/) do
+  find(EmployeeChoosePlan.nationwide).click
+end
+
+Then(/^.+ clicks on apply button$/) do
+  page.first(EmployeeChoosePlan.apply_btn, wait: 10).click
+end
+
+Then(/^\w+ should see plans count listed$/) do
+  find_all(EmployeeChoosePlan.plan_count).present?
+end
+
 When(/^.+ sorts by (.*)/) do |sort|
   @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
@@ -984,7 +996,7 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content('Your employer contributes')
     expect(page).to have_content("Thank you for enrolling in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
     # In the email signature
-    [EnrollRegistry[:enroll_app].setting(:short_name).item, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+    [EnrollRegistry[:enroll_app].setting(:short_name).item, EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)
     end
   end

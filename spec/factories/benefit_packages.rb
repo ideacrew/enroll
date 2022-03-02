@@ -19,7 +19,8 @@ FactoryBot.define do
                                      metal_level_kind: "bronze",
                                      application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                      csr_variant_id: "01",
-                                     issuer_profile: issuer_profile)
+                                     issuer_profile: issuer_profile,
+                                     service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: evaluator.coverage_year))
       ivl_silver = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                      title: 'IVL Test Plan Silver',
                                      benefit_market_kind: :aca_individual,
@@ -28,7 +29,8 @@ FactoryBot.define do
                                      metal_level_kind: "silver",
                                      application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                      csr_variant_id: "01",
-                                     issuer_profile: issuer_profile)
+                                     issuer_profile: issuer_profile,
+                                     service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: evaluator.coverage_year))
       ivl_gold = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                    title: 'IVL Test Plan Gold',
                                    benefit_market_kind: :aca_individual,
@@ -36,7 +38,8 @@ FactoryBot.define do
                                    metal_level_kind: "gold",
                                    application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                    csr_variant_id: "01",
-                                   issuer_profile: issuer_profile)
+                                   issuer_profile: issuer_profile,
+                                   service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: evaluator.coverage_year))
       ivl_plat = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                    title: 'IVL Test Plan Plat',
                                    benefit_market_kind: :aca_individual,
@@ -45,7 +48,8 @@ FactoryBot.define do
                                    metal_level_kind: "platinum",
                                    application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                    csr_variant_id: "01",
-                                   issuer_profile: issuer_profile)
+                                   issuer_profile: issuer_profile,
+                                   service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: evaluator.coverage_year))
       future_ivl_bronze = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                             title: 'IVL Test Plan Bronze',
                                             benefit_market_kind: :aca_individual,
@@ -54,7 +58,8 @@ FactoryBot.define do
                                             metal_level_kind: "bronze",
                                             csr_variant_id: "01",
                                             application_period: (Date.new(evaluator.coverage_year + 1, 1, 1)..Date.new(evaluator.coverage_year + 1, 12, 31)),
-                                            issuer_profile: issuer_profile)
+                                            issuer_profile: issuer_profile,
+                                            service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: (evaluator.coverage_year + 1)))
       future_ivl_silver = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                             title: 'IVL Test Plan Silver',
                                             benefit_market_kind: :aca_individual,
@@ -62,7 +67,8 @@ FactoryBot.define do
                                             metal_level_kind: "silver",
                                             csr_variant_id: "01",
                                             application_period: (Date.new(evaluator.coverage_year + 1, 1, 1)..Date.new(evaluator.coverage_year + 1, 12, 31)),
-                                            issuer_profile: issuer_profile)
+                                            issuer_profile: issuer_profile,
+                                            service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: (evaluator.coverage_year + 1)))
       future_ivl_gold = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                           title: 'IVL Test Plan Gold',
                                           benefit_market_kind: :aca_individual,
@@ -71,7 +77,8 @@ FactoryBot.define do
                                           metal_level_kind: "gold",
                                           csr_variant_id: "01",
                                           application_period: (Date.new(evaluator.coverage_year + 1, 1, 1)..Date.new(evaluator.coverage_year + 1, 12, 31)),
-                                          issuer_profile: issuer_profile)
+                                          issuer_profile: issuer_profile,
+                                          service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: (evaluator.coverage_year + 1)))
       future_ivl_plat = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                           title: 'IVL Test Plan Plat',
                                           benefit_market_kind: :aca_individual,
@@ -80,7 +87,8 @@ FactoryBot.define do
                                           metal_level_kind: "platinum",
                                           csr_variant_id: "01",
                                           application_period: (Date.new(evaluator.coverage_year + 1, 1, 1)..Date.new(evaluator.coverage_year + 1, 12, 31)),
-                                          issuer_profile: issuer_profile)
+                                          issuer_profile: issuer_profile,
+                                          service_area: FactoryBot.create(:benefit_markets_locations_service_area, active_year: (evaluator.coverage_year + 1)))
       bp.benefit_ids = [ivl_bronze.id, ivl_silver.id, ivl_gold.id, ivl_plat.id, future_ivl_bronze.id, future_ivl_silver.id, future_ivl_gold.id, future_ivl_plat.id ]
     end
 

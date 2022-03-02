@@ -7,7 +7,7 @@
       .navbar-header
         button.navbar-toggle.collapsed type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"
           span.sr-only Toggle navigation
-        a.navbar-brand href="#" = image_tag Settings.site.logo_file_name
+        a.navbar-brand href="#" = image_tag EnrollRegistry[:enroll_app].setting(:logo_file_name).item
       // Collect the nav links, forms, and other content for toggling
       .collapse.navbar-collapse#bs-example-navbar-collapse-1
         ul.nav.navbar-nav
@@ -15,17 +15,17 @@
             h4 = get_header_text(controller_name)
         ul.nav.navbar-nav.navbar-right
           li
-            a.call-customer-service href="tel:#{Settings.contact_center.short_number}"
+            a.call-customer-service href="tel:#{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}"
               span.header-text = l10n(".call_customer_service")
               br
               span
                 i.fas.fa-phone.mr-1
-              strong = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{Settings.contact_center.tty_number}"
+              strong = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}"
           - if signed_in?
             li
               span.my-portal-links
                 = render partial: "shared/my_portal_links"
-                span = link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'header-text'
+                span = link_to l10n(".help"), EnrollRegistry[:enroll_app].setting(:help_url).item, target: '_blank', class: 'header-text'
                 span  |&nbsp;
                 span = link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text"
                 br

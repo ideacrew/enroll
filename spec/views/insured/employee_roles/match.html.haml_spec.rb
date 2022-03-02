@@ -26,7 +26,7 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
     # expect(rendered).to have_selector("input[type=submit][value='This is my employer']")
     # expect(rendered).to have_selector('dt', text: 'Employer :')
     # expect(rendered).to have_selector("input", value: 'This is my employer')
-    # expect(rendered).to have_selector('div', text: "Check your personal information and try again OR contact #{Settings.site.short_name}'s Customer Care Center: 1-855-532-5465.")
+    # expect(rendered).to have_selector('div', text: "Check your personal information and try again OR contact #{EnrollRegistry[:enroll_app].setting(:short_name).item}'s Customer Care Center: 1-855-532-5465.")
   end
 
   it "should not display the text for multiple ER's" do

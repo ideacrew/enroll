@@ -21,6 +21,19 @@ module Subscribers
       ack(delivery_info.delivery_tag)
     end
 
+    subscribe(:on_enroll_individual_enrollments) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_enrollments)
+      payload = JSON.parse(response, symbolize_names: true)
+
+      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, response: #{payload}"
+
+      ack(delivery_info.delivery_tag)
+    rescue StandardError, SystemStackError => e
+      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, ack: #{payload}"
+      ack(delivery_info.delivery_tag)
+    end
+
     def redetermine_family_eligibility(payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
       return if enrollment.shopping?
@@ -30,19 +43,19 @@ module Subscribers
         application = family.active_financial_assistance_application(enrollment.effective_on.year)
         application&.enrolled_with(enrollment)
       end
+      update_due_date_on_vlp_documents(family)
 
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
         family: enrollment.family,
         effective_date: TimeKeeper.date_of_record
       )
-
-      update_due_date_on_vlp_documents(family)
     end
 
     private
 
     def update_due_date_on_vlp_documents(family)
-      ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: family, due_date: TimeKeeper.date_of_record + 95.days)
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: family, due_date: TimeKeeper.date_of_record + verification_document_due.days)
     end
 
     def pre_process_message(subscriber_logger, payload)

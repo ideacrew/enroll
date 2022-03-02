@@ -44,12 +44,47 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
   end
 
   describe "type can be updated" do
+    let(:due_date) { TimeKeeper.date_of_record + 96.days }
+
     before do
       person.verification_types.each{|type| type.fail_type}
     end
     it "fail verification type" do
       expect(person.verification_types.all?{|type| type.is_type_outstanding?}).to be true
     end
+
+    context 'when setting verification_document_due_in_days is enabled' do
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(true)
+        person.verification_types.each(&:fail_type)
+      end
+
+      it "should set due date" do
+        expect(person.reload.verification_types.all?{ |type| type.due_date == due_date }).to be_truthy
+      end
+
+      it "should set due date type" do
+        expect(person.reload.verification_types.all?{ |type| type.due_date_type == 'response_from_hub' }).to be_truthy
+      end
+    end
+
+    context 'when setting verification_document_due_in_days is disabled' do
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(false)
+        person.verification_types.each(&:fail_type)
+      end
+
+      it "should not set due date" do
+        expect(person.reload.verification_types.all?{ |type| type.due_date.nil? }).to be_truthy
+      end
+
+      it "should not set due date type" do
+        expect(person.reload.verification_types.all?{ |type| type.due_date_type.nil? }).to be_truthy
+      end
+    end
+
     it "pass verification type" do
       person.verification_types.each{|type| type.pass_type}
       expect(person.verification_types.all?{|type| type.type_verified?}).to be true

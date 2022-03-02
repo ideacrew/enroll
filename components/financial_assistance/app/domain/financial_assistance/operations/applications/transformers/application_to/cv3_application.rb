@@ -116,6 +116,7 @@ module FinancialAssistance
                          notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
+              payload.merge!({full_medicaid_determination: application.full_medicaid_determination}) if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
               Success(payload)
             end
 
@@ -617,8 +618,22 @@ module FinancialAssistance
               end
             end
 
+            def benefits_eligible_for_determination(applicant)
+              kinds_query = if applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+                              {}
+                            elsif applicant.has_enrolled_health_coverage? && !applicant.has_eligible_health_coverage?
+                              { kind: :is_enrolled }
+                            elsif !applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+                              { kind: :is_eligible }
+                            else
+                              { :kind.nin => [:is_enrolled, :is_eligible] }
+                            end
+
+              applicant.benefits.where(kinds_query)
+            end
+
             def benefits(applicant)
-              applicant.benefits.inject([]) do |result, benefit|
+              benefits_eligible_for_determination(applicant).inject([]) do |result, benefit|
                 result << { name: benefit.title,
                             kind: benefit.insurance_kind,
                             status: benefit.kind,

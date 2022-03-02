@@ -113,6 +113,11 @@ module VerificationHelper
     person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| VerificationType::DUE_DATE_STATES.include?(type.validation_status)}.any?
   end
 
+  def default_verification_due_date
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    TimeKeeper.date_of_record + verification_document_due.days
+  end
+
   def documents_uploaded
     @person.primary_family.active_family_members.all? { |member| docs_uploaded_for_all_types(member) }
   end

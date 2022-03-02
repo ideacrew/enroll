@@ -19,7 +19,7 @@ module FinancialAssistance
     field :title, type: String, default: "untitled"
 
     # Entity responsible for making the resource - person, organization or service
-    field :creator, type: String, default: Settings.site.publisher
+    field :creator, type: String, default: EnrollRegistry[:enroll_app].setting(:publisher).item
 
     # Controlled vocabulary w/classification codes. Mapped to ConsumerRole::VLP_DOCUMENT_KINDS
     field :subject, type: String
@@ -28,7 +28,7 @@ module FinancialAssistance
     field :description, type: String
 
     # Entity responsible for making the resource available - person, organization or service
-    field :publisher, type: String, default: Settings.site.publisher
+    field :publisher, type: String, default: EnrollRegistry[:enroll_app].setting(:publisher).item
 
     # Entity responsible for making contributions to the resource - person, organization or service
     field :contributor, type: String

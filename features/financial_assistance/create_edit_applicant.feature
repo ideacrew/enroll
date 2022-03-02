@@ -2,6 +2,7 @@ Feature: User can create/edit personal info (dob, address, etc.) of applicant an
 
   Background: Household Info page
     Given the FAA feature configuration is enabled
+    Given the date is within open enrollment
     When that the user is on FAA Household Info: Family Members page
     When the user clicks ADD/EDIT INCOME & COVERAGE INFO button for a given household member
     Then the user will navigate to the Tax Info page for the corresponding applicant.

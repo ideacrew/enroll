@@ -31,7 +31,7 @@ module BenefitMarkets
       end
 
       def self.rating_area_for(address, during: TimeKeeper.date_of_record)
-        if Settings.site.key == :dc
+        if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
           where(
             "active_year" => during.year
           ).first

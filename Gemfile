@@ -183,7 +183,7 @@ group :test do
 end
 
 group :production do
-  gem 'eye',          '0.10.0'
+  gem 'eye',          '~> 0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'

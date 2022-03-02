@@ -248,7 +248,7 @@ And(/^creates a consumer with SEP$/) do
   fill_in IvlPersonalInformation.city, with: "Washington"
   find(IvlPersonalInformation.select_state_dropdown, wait: 5).click
   find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
-  fill_in "person[addresses_attributes][0][zip]", with: Settings.contact_center.zip_code
+  fill_in "person[addresses_attributes][0][zip]", with: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   find(IvlPersonalInformation.continue_btn, wait: 10).click
   visit '/insured/consumer_role/upload_ridp_document'
   visit '/insured/consumer_role/upload_ridp_document'

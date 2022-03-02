@@ -6,12 +6,12 @@ footer.footer-wrapper#footer-uic class=("#{"pre_prod_nav_color" if ENV['ENROLL_R
     .col-md-6
       .row
         ul.list-unstyled.list-inline.pull-right
-          li 
+          li
             a.call-customer-service href="tel:#{contact_center_short_number}"
               span
                 i.fas.fa-phone.fa-lg
-                | &nbsp; 
-                = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{Settings.contact_center.tty_number}"
+                | &nbsp;
+                = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}"
           - if contact_center_email_address_is_enabled?
             li
               = mail_to contact_center_email_address, target: '_blank' do
@@ -19,8 +19,8 @@ footer.footer-wrapper#footer-uic class=("#{"pre_prod_nav_color" if ENV['ENROLL_R
                   i.fas.fa-envelope.fa-lg
                   | &nbsp;
                   = EnrollRegistry[:enroll_app].setting(:mail_address).item
-          li 
+          li
             = link_to site_faqs_url, target: '_blank' do
               i.fas.fa-question.fa-lg
-              | &nbsp; 
+              | &nbsp;
               | GET HELP

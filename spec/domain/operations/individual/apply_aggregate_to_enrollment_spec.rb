@@ -161,6 +161,29 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     end
   end
 
+  context 'when previous tax_household does not have the same thhm as present one' do
+    let!(:new_tax_household) do
+      new_tax_household = FactoryBot.create(:tax_household, created_at: (tax_household.created_at + 1.day), effective_starting_on: (tax_household.effective_starting_on + 10.day), effective_ending_on: nil, household: family.households.first)
+      FactoryBot.create(:tax_household_member, tax_household: new_tax_household, applicant_id: family_member1.id, is_ia_eligible: true)
+      new_tax_household
+    end
+    let(:new_sample_max_aptc_1) {1500}
+    let(:new_sample_csr_percent_1) {87}
+    let!(:new_eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: new_tax_household, max_aptc: new_sample_max_aptc_1, csr_percent_as_integer: new_sample_csr_percent_1)}
+
+    before do
+      tax_household.update_attributes(effective_ending_on: new_tax_household.effective_starting_on - 1.day)
+      tax_household.tax_household_members.first.update_attributes(is_ia_eligible: false)
+    end
+
+    it 'returns monthly aggregate amount' do
+      input_params = {eligibility_determination: new_eligibility_determination}
+      @result = subject.call(input_params)
+      expect(@result.success).to eq "Aggregate amount applied on to enrollments"
+      expect(family.hbx_enrollments.to_a.first.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
+    end
+  end
+
   context 'prospective year enrollment' do
     before(:each) do
       current_year = Date.today.year

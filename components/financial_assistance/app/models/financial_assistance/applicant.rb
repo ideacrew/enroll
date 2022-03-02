@@ -223,7 +223,7 @@ module FinancialAssistance
     field :pregnancy_due_on, type: Date
     field :pregnancy_end_on, type: Date
 
-    field :is_primary_caregiver, type: Boolean, default: false
+    field :is_primary_caregiver, type: Boolean
 
     field :is_subject_to_five_year_bar, type: Boolean, default: false
     field :is_five_year_bar_met, type: Boolean, default: false
@@ -329,6 +329,8 @@ module FinancialAssistance
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
 
+    # When callback_update is set to true, then both propagate_applicant and propagate_destroy are skipped.
+    # This looks weird but this is how it works per implementation.
     attr_accessor :relationship, :callback_update
 
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
@@ -857,6 +859,8 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? && self_employment_fields_complete if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
+        return false if FinancialAssistanceRegistry.feature_enabled?(:american_indian_alaskan_native_income) && indian_tribe_member && has_american_indian_alaskan_native_income.nil?
+
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income
@@ -1407,8 +1411,10 @@ module FinancialAssistance
       # CoverageHousehold.update_eligibility_for_family(family)
     end
 
+    # Changes should flow to Main App only when application is in draft state.
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
+      return unless application.draft?
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
         create_or_update_result = ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
@@ -1421,7 +1427,9 @@ module FinancialAssistance
       e.message
     end
 
+    # Changes should flow to Main App only when application is in draft state.
     def propagate_destroy
+      return unless application.draft?
       return if callback_update
       delete_params = {:family_id => application.family_id, :person_hbx_id => person_hbx_id}
       ::Operations::Families::DropFamilyMember.new.call(delete_params)

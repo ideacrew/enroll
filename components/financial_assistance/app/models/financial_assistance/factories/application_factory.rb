@@ -4,6 +4,7 @@ module FinancialAssistance
   module Factories
     # Modify application and sub models data
     class ApplicationFactory
+      include AddressValidator
       attr_accessor :source_application, :applicants, :family_members_changed, :family_members_attributes
 
       APPLICANT_EVIDENCES = [:incomes, :benefits, :deductions].freeze
@@ -50,7 +51,9 @@ module FinancialAssistance
       end
 
       def build_applicant(source_applicant)
-        new_applicant = @new_application.applicants.build(applicant_params(source_applicant))
+        is_living_in_state = has_in_state_home_addresses?(source_applicant.addresses.map(&:attributes).each_with_index.to_h.invert)
+
+        new_applicant = @new_application.applicants.build(applicant_params(source_applicant).merge(is_living_in_state: is_living_in_state))
         source_applicant.incomes.each do |source_income|
           new_applicant.incomes << ::FinancialAssistance::Income.dup_instance(source_income)
         end
@@ -199,6 +202,7 @@ module FinancialAssistance
       def reject_applicant_params
         %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types
            evidences verification_status verification_history eligibility_results
+           income_evidence esi_evidence non_esi_evidence local_mec_evidence
            medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
            magi_medicaid_monthly_household_income is_without_assistance is_ia_eligible is_medicaid_chip_eligible
            is_totally_ineligible is_eligible_for_non_magi_reasons is_non_magi_medicaid_eligible

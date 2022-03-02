@@ -1,6 +1,6 @@
 site = BenefitSponsors::Site.all.first
 if site.blank?
-  site = BenefitSponsors::Site.new(site_key: "#{Settings.site.key}")
+  site = BenefitSponsors::Site.new(site_key: "#{EnrollRegistry[:enroll_app].setting(:site_key).item}")
 end
 
 # Clear the current models
@@ -111,15 +111,15 @@ end
 puts "Creating Benefit Market..."
 benefit_market = ::BenefitMarkets::BenefitMarket.create!({
   kind: :aca_shop,
-  title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Market",
+  title: "#{Settings.aca.state_abbreviation} #{EnrollRegistry[:enroll_app].setting(:short_name).item} SHOP Market",
   site_urn: "#{Settings.aca.state_abbreviation}",
-  description: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} Shop Market",
+  description: "#{Settings.aca.state_abbreviation} #{EnrollRegistry[:enroll_app].setting(:short_name).item} Shop Market",
   configuration: BenefitMarkets::Configurations::Configuration.new
 })
 
 puts "Creating Benefit Market Catalog..."
 benefit_market_catalog = benefit_market.benefit_market_catalogs.create!({
-  title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Benefit Catalog",
+  title: "#{Settings.aca.state_abbreviation} #{EnrollRegistry[:enroll_app].setting(:short_name).item} SHOP Benefit Catalog",
   application_interval_kind: :monthly,
   application_period: Date.new(2018,1,1)..Date.new(2018,12,31),
   probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS

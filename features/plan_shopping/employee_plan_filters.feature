@@ -27,3 +27,13 @@ Feature: Employee products sorted when employee click on Plan name, Premium Amou
     Then Employee should see plans filtered by Carrier
     And user clicks Go To Plans link
     Then user should see the Plan Compare modal
+
+  Scenario: Employee filters plans via checkbox
+    Given employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
+    When Employee clicks "Shop for Plans" on my account page
+    Then Employee should see the group selection page
+    When Employee clicks continue on group selection page
+    Then Employee should see the list of plans
+    Then Employee selects nationwide filter
+    Then Employee clicks on apply button
+    And Employee should see plans count listed

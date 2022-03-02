@@ -779,6 +779,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       benefit.employer_address = emp_add
       benefit.employer_phone = emp_phone
       applicant.benefits << benefit
+      applicant.has_enrolled_health_coverage = true
       applicant.save!
     end
 
@@ -808,6 +809,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                      employer_name: "er1",
                                                      employer_id: '23-2675213' })
       applicant.benefits << benefit
+      applicant.has_enrolled_health_coverage = true
       applicant.save!
     end
 
@@ -834,6 +836,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                      start_on: Date.today.prev_year
                                                    })
       applicant.benefits << benefit
+      applicant.has_enrolled_health_coverage = true
       applicant.save!
     end
 
@@ -1555,7 +1558,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       applicant.benefits << benefit
       applicant.update_attributes(is_applying_coverage: false, indian_tribe_member: true, tribal_name: "test",
                                   tribal_state: 'DC', has_eligible_medicaid_cubcare: true, medicaid_cubcare_due_on: Date.today,
-                                  has_eligibility_changed: true, has_household_income_changed: true, medicaid_chip_ineligible: true, immigration_status_changed: true)
+                                  has_eligibility_changed: true, has_household_income_changed: true, medicaid_chip_ineligible: true,
+                                  immigration_status_changed: true, has_enrolled_health_coverage: true)
       applicant.save!
     end
 
@@ -1595,6 +1599,146 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should successfully generate a cv3 application with citizenship_immigration_status_information' do
         expect(@applicant[:citizenship_immigration_status_information].present?).to eq true
       end
+    end
+  end
+
+  # Eligible Benefits based on answers to driver questions
+  describe 'benefits' do
+    context 'with enrolled benefit and without answer to driver question' do
+      let!(:create_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_enrolled',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year })
+        applicant.benefits << benefit
+        applicant.has_enrolled_health_coverage = false
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @benefits = @entity_init.success.applicants.first.benefits.to_a
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      it 'should not include any benefits as answer to driver question is false' do
+        expect(@benefits).to be_empty
+      end
+    end
+
+    context 'with eligible benefit and without answer to driver question' do
+      let!(:create_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_eligible',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year })
+        applicant.benefits << benefit
+        applicant.has_eligible_health_coverage = false
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @benefits = @entity_init.success.applicants.first.benefits.to_a
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      it 'should not include any benefits as answer to driver question is false' do
+        expect(@benefits).to be_empty
+      end
+    end
+
+    context 'with has_enrolled_health_coverage set to true and has_eligible_health_coverage set to false' do
+      let!(:create_enrolled_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_enrolled',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year })
+        applicant.benefits << benefit
+        applicant.has_enrolled_health_coverage = true
+        applicant.save!
+      end
+
+      let!(:create_eligible_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_eligible',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year })
+        applicant.benefits << benefit
+        applicant.has_eligible_health_coverage = false
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @benefits = @entity_init.success.applicants.first.benefits.to_a
+      end
+
+      it 'should include only enrolled benefits' do
+        expect(@benefits.count).to eq(1)
+      end
+
+      it 'should include only enrolled benefits as driver question for eligible is answered false' do
+        expect(@benefits.map(&:status).uniq).to eq(['is_enrolled'])
+      end
+    end
+
+    context 'with has_eligible_health_coverage set to true and has_enrolled_health_coverage set to false' do
+      let!(:create_enrolled_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_enrolled',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year })
+        applicant.benefits << benefit
+        applicant.has_enrolled_health_coverage = false
+        applicant.save!
+      end
+
+      let!(:create_eligible_esi_benefit) do
+        benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_eligible',
+                                                       insurance_kind: 'peace_corps_health_benefits',
+                                                       start_on: Date.today.prev_year })
+        applicant.benefits << benefit
+        applicant.has_eligible_health_coverage = true
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @benefits = @entity_init.success.applicants.first.benefits.to_a
+      end
+
+      it 'should include only enrolled benefits' do
+        expect(@benefits.count).to eq(1)
+      end
+
+      it 'should include only eligible benefits as driver question for eligible is answered false' do
+        expect(@benefits.map(&:status).uniq).to eq(['is_eligible'])
+      end
+    end
+  end
+
+  describe 'FinancialAssistanceRegistry' do
+    let(:result) { subject.call(application) }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
+    end
+
+    it 'should check FinancialAssistanceRegistry for full_medicaid_determination_step feature' do
+      expect(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
+      result
+    end
+
+    it 'should check FinancialAssistanceRegistry for indian_alaskan_tribe_details feature' do
+      expect(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
+      result
     end
   end
 end

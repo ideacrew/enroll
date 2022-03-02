@@ -32,7 +32,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
         @applicant = application.applicants.first
         @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC")
         @applicant.save!
-        @result = subject.call(payload: response_payload)
+        @result = subject.call({payload: response_payload, applicant_identifier: '1629165429385938'})
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
@@ -56,7 +56,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
         @applicant = application.applicants.first
         @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC")
         @applicant.save!
-        @result = subject.call(payload: response_payload_2)
+        @result = subject.call(payload: response_payload_2, applicant_identifier: '1629165429385938')
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success

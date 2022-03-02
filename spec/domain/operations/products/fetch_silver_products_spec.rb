@@ -26,7 +26,8 @@ RSpec.describe ::Operations::Products::FetchSilverProducts, dbclean: :after_each
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let(:rating_address) { person.consumer_role.rating_address }
 
-    let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+    let!(:ivl_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver, benefit_market_kind: :aca_individual) }
+    let!(:shop_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver, benefit_market_kind: :aca_shop) }
     let(:effective_date) { TimeKeeper.date_of_record }
 
     let(:params) do
@@ -46,6 +47,11 @@ RSpec.describe ::Operations::Products::FetchSilverProducts, dbclean: :after_each
       it 'should return a hash of products' do
         result = subject.call(params)
         expect(result.value!.is_a?(Hash)).to eq true
+      end
+
+      it 'should return only ivl products' do
+        result = subject.call(params).value!
+        expect(result[:products].map(&:benefit_market_kind).uniq).to eq [:aca_individual]
       end
     end
   end

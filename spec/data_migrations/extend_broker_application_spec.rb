@@ -16,7 +16,7 @@ describe ExtendBrokerApplication, dbclean: :after_each do
 
   describe 'extend broker application' do
 
-    let(:site)                                  { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let(:site)                                  { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
     let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
     let(:broker_agency_profile)                 { broker_organization.broker_agency_profile }
     let(:primary_broker_role)                   { broker_agency_profile.primary_broker_role }

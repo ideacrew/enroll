@@ -3,7 +3,7 @@ namespace :load do
 
     [:aca_shop, :fehb].each do |kind|
 
-      benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: kind).first
+      benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => EnrollRegistry[:enroll_app].setting(:site_key).item, kind: kind).first
 
       calender_year = args[:year].present? ? args[:year].to_i : 2022
 
@@ -16,7 +16,7 @@ namespace :load do
       if benefit_market_catalog.present?
       else
         benefit_market_catalog = benefit_market.benefit_market_catalogs.create!({
-          title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Benefit Catalog",
+          title: "#{Settings.aca.state_abbreviation} #{EnrollRegistry[:enroll_app].setting(:short_name).item} SHOP Benefit Catalog",
           application_interval_kind: :monthly,
           application_period: Date.new(calender_year,1,1)..Date.new(calender_year,12,31),
           probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS

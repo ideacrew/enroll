@@ -6,7 +6,7 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeCoverageTermination', dbcl
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:start_on)                { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
   let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item }
-  let!(:site)                   { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+  let!(:site)                   { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
   let!(:organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key.downcase}_employer_profile".to_sym, site: site) }
   let(:employer_profile)        { organization.employer_profile }
   let(:benefit_sponsorship)     { employer_profile.add_benefit_sponsorship }

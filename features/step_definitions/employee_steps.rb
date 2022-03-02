@@ -3,7 +3,7 @@
 Given("a matched Employee exists with only employee role") do
   FactoryBot.create(:user)
   person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
-  site = FactoryBot.build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+  site = FactoryBot.build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
   benefit_sponsor = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_initial_application, site: site)
   benefit_sponsorship = benefit_sponsor.active_benefit_sponsorship
   employer_profile = benefit_sponsorship.profile
@@ -240,7 +240,7 @@ And(/employee staff role person clicks employee (.*?)$/) do |_named_person|
   expect(page.current_path).to include("census_employee")
 end
 
-Given(/census employee (.*?) has a past DOH$/) do |named_person|
+Given(/census employee (.*?) has a past date of hire$/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   ce.update_attributes!(created_at: TimeKeeper.date_of_record.prev_year, updated_at: TimeKeeper.date_of_record.prev_year)

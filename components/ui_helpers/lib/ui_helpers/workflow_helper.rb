@@ -94,7 +94,7 @@ module UIHelpers
       text.gsub! '<board_of_elections_phone_number-placeholder>', Settings.contact_center.board_of_elections_phone_number
       text.gsub! '<contact-center-phone_number-placeholder>', Settings.contact_center.phone_number
       text.gsub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
-      text.gsub! '<short-name-placeholder>', Settings.site.short_name
+      text.gsub! '<short-name-placeholder>', EnrollRegistry[:enroll_app].setting(:short_name).item
       text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
       text.gsub! '<reviewed-information>', l10n('insured.review_information')
 
@@ -103,14 +103,14 @@ module UIHelpers
       text.gsub! '<last-step-1>', l10n('faa.last_step_1')
       text.gsub! '<last-step-2>', l10n('faa.last_step_2')
       text.gsub! '<i-understand-eligibility>', l10n('faa.i_understand_eligibility')
-      text.gsub! '<renewal-process-1>', l10n('faa.renewal_process_1')
+      text.gsub! '<renewal-process-1>', l10n('faa.renewal_process_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
       text.gsub! '<renewal-process-2>', l10n('faa.renewal_process_2')
-      text.gsub! '<send-notice-1>', l10n('faa.send_notice_1')
+      text.gsub! '<send-notice-1>', l10n('faa.send_notice_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
       text.gsub! '<send-notice-2>', l10n('faa.send_notice_2')
       text.gsub! '<send-notice-3>', l10n('faa.send_notice_3')
       text.gsub! '<i-agree>', l10n('faa.i_agree')
       text.gsub! '<i-understand-eligibility-changes>', l10n('faa.i_understand_eligibility_changes')
-      text.gsub! '<report-changes-1>', l10n('faa.report_changes_1')
+      text.gsub! '<report-changes-1>', l10n('faa.report_changes_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
       text.gsub! '<report-changes-2>', l10n('faa.report_changes_2')
       text.gsub! '<signature-line-below-1>', l10n('faa.signature_line_below_1')
       text.gsub! '<signature-line-below-2>', l10n('faa.signature_line_below_2')

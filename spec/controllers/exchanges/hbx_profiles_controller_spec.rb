@@ -360,10 +360,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Force Publish" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
       end
       let(:employer_organization) do
-        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
@@ -398,10 +398,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Submit in Force Publish window" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
       end
       let(:employer_organization) do
-        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
@@ -709,7 +709,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     let(:person) { FactoryBot.create(:person, :with_family) }
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
-    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let(:employer_profile) {organization.employer_profile}
 
@@ -1593,9 +1593,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let!(:hbx_staff_role)      { FactoryBot.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole:permission.name) }
     let!(:rating_area)         { FactoryBot.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)        { FactoryBot.create_default :benefit_markets_locations_service_area }
-    let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
     let!(:benefit_market)      { site.benefit_markets.first }
-    let!(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+    let!(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
     let!(:employer_profile)    { organization.employer_profile }
     let!(:benefit_sponsorship) { bs = employer_profile.add_benefit_sponsorship
                                 bs.save!
@@ -1684,10 +1684,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Change FEIN" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
       end
       let(:employer_organization) do
-        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
@@ -1722,10 +1722,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Submit in Change FEIN window" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
       end
       let(:employer_organization) do
-        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org

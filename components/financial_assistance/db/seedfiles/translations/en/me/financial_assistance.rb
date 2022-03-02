@@ -5,11 +5,11 @@
 # rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
-     on Maine Cover ME. Please call Maine Cover ME at (866) 636-0355 to make updates to that application.
-      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+     on CoverME.gov. Please call CoverME.gov at (866) 636-0355 to make updates to that application.
+      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on CoverME.gov, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid.
-     Please call Maine Cover ME at (866) 636-0355 to make updates to your case.
-     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+     Please call CoverME.gov at (866) 636-0355 to make updates to your case.
+     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on CoverME.gov, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   'en.faa.other_ques.is_student' => 'Is this person a full-time student?*',
@@ -43,7 +43,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
   "en.faa.does_not_qualify" => "Does not qualify",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
-  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through Maine Cover ME:",
+  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through CoverME.gov:",
   "en.faa.private_health_insurance" => "Private Health Insurance",
   "en.faa.qualified_to_enroll" => "These people <span> qualify to enroll </span> in a private health insurance plan:",
   "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. Find out more about the appeal process or get assistance by contacting us directly.",
@@ -83,7 +83,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.self_funded_student_health_coverage" => "Self-funded student health coverage",
   "en.faa.question.foreign_government_health_coverage" => "Foreign government health coverage",
   "en.faa.question.private_health_insurance_plan" => "Private health insurance plan",
-  "en.faa.question.coverage_obtained_through_another_exchange" => "Coverage obtained through a non-#{Settings.site.short_name} marketplace",
+  "en.faa.question.coverage_obtained_through_another_exchange" => "Coverage obtained through a non-%{short_name} marketplace",
   "en.faa.question.coverage_under_the_state_health_benefits_risk_pool" => "Coverage under the state health benefits risk pool",
   "en.faa.question.veterans_administration_health_benefits" => "Veterans Affairs (VA) Health Care Program",
   "en.faa.question.peace_corps_health_benefits" => "Peace Corps Health Benefits",
@@ -104,14 +104,14 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.last_step_1" => "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement.",
   "en.faa.last_step_2" => "Then, enter your name to electronically sign the application. When you're finished, select SUBMIT APPLICATION.",
   "en.faa.i_understand_eligibility" => "I understand that eligibility for private health insurance, with or without financial assistance, or Medicaid, will be reviewed every year.",
-  "en.faa.renewal_process_1" => "This process is called renewal. #{Settings.site.short_name} will review eligibility by checking its records and other electronic data sources",
+  "en.faa.renewal_process_1" => "This process is called renewal. %{short_name} will review eligibility by checking its records and other electronic data sources",
   "en.faa.renewal_process_2" => " including, with my consent, information about my federal tax returns from the IRS.",
   "en.faa.send_notice_1" => "",
   "en.faa.send_notice_2" => "",
   "en.faa.send_notice_3" => "",
   "en.faa.i_agree" => "I agree",
   "en.faa.i_understand_eligibility_changes" => "I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance.",
-  "en.faa.report_changes_1" => "I can report changes by going online and logging into my account, by calling #{Settings.site.short_name} at #{Settings.contact_center.phone_number},",
+  "en.faa.report_changes_1" => "I can report changes by going online and logging into my account, by calling %{short_name} at #{Settings.contact_center.phone_number},",
   "en.faa.report_changes_2" => " or by submitting information via mail.",
   "en.faa.signature_line_below_1" => "I'm the person whose name appears in the signature line below. ",
   "en.faa.signature_line_below_2" => "I understand that I'm submitting an application for health insurance and that information that I provided will be used to decide eligibility for each member of my application group.",
@@ -134,10 +134,10 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
   "en.faa.year_selection_oe_year" => " Open Enrollment",
   "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
-  "en.faa.see_if_you_qualify_2" => " #{Settings.site.short_name} health insurance or free Medicaid coverage.",
+  "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",

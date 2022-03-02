@@ -56,7 +56,7 @@ And(/^the user is on the FAA Household Info page$/) do
     sleep 2
   end
   # should be on checklist page now
-  find('a.interaction-click-control-continue').click
+  #find('a.interaction-click-control-continue').click
 
 end
 

@@ -498,7 +498,7 @@ Then(/^.+ should see a plan year successfully saved message$/) do
 end
 
 When(/^.+ clicks? on employer my account link$/) do
-  click_link "My #{Settings.site.short_name}"
+  click_link "My #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
 end
 
 Then(/^.+ should see employee cost modal for current plan year$/) do
@@ -1089,8 +1089,8 @@ And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn
   end
 end
 
-And(/^employer clicks Create Plan Year$/) do
-  click_button 'Create Plan Year'
+And(/^employer clicks on Create Plan Year$/) do
+  find(EmployerBenefitPackageSetUp.create_plan_year_btn).click
 end
 
 

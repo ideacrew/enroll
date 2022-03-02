@@ -245,7 +245,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the title" do
       expect(rendered).to match(/#{plan_active_year} #{plan_coverage_kind.titleize} Coverage/)
-      expect(rendered).to match(/#{Settings.site.short_name}/)
+      expect(rendered).to match(/#{EnrollRegistry[:enroll_app].setting(:short_name).item}/)
     end
 
     it "should display the Actions Drop down" do

@@ -521,7 +521,7 @@ class PlanYear
         if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
           warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
         elsif employer_profile.employer_attestation.denied?
-          warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+          warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{EnrollRegistry[:enroll_app].setting(:long_name).item}"})
         else
           warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
         end

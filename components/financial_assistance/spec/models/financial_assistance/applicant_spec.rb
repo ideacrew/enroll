@@ -25,6 +25,12 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     applicant.incomes << income
   end
 
+  context "is primary caregiver" do
+    it "should not have a default value" do
+      expect(applicant.is_primary_caregiver).to be(nil)
+    end
+  end
+
   describe 'after_update' do
     context 'callbacks' do
 
@@ -761,6 +767,28 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       applicant.save!
       expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
     end
+
+    context 'application is in draft' do
+      before do
+        application.reload
+        application.applicants.first.save!
+      end
+
+      it 'should trigger operation call as application is in draft state' do
+        expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to have_received(:new)
+      end
+    end
+
+    context 'application is not in draft' do
+      before do
+        application.update_attributes!(aasm_state: 'submitted')
+        application.applicants.first.save!
+      end
+
+      it 'should not trigger operation call as application is in draft state' do
+        expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
+      end
+    end
   end
 
   context 'propagate_destroy' do
@@ -779,6 +807,28 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       applicant.callback_update = true
       applicant.destroy!
       expect(::Operations::Families::DropFamilyMember).to_not have_received(:new)
+    end
+
+    context 'application is in draft' do
+      before do
+        application.reload
+        applicant.destroy!
+      end
+
+      it 'should trigger operation call as application is in draft state' do
+        expect(Operations::Families::DropFamilyMember).to have_received(:new)
+      end
+    end
+
+    context 'application is not in draft' do
+      before do
+        application.update_attributes!(aasm_state: 'submitted')
+        applicant.destroy!
+      end
+
+      it 'should not trigger operation call as application is in draft state' do
+        expect(Operations::Families::DropFamilyMember).to_not have_received(:new)
+      end
     end
   end
 
@@ -907,6 +957,70 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(current_evidence.verification_outstanding).to be_falsey
           expect(current_evidence.is_satisfied).to be_truthy
           expect(current_evidence.due_on).to be_blank
+        end
+      end
+    end
+  end
+
+  describe '#embedded_document_section_entry_complete?' do
+    context 'other_income' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
+      end
+
+      context 'where feature american_indian_alaskan_native_income is enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(true)
+        end
+
+        context 'where applicant is indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false as other_income section is not complete' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'where applicant is not indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: false, has_other_income: false)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
+
+      context 'where feature american_indian_alaskan_native_income is disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(false)
+        end
+
+        context 'where applicant is indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil, has_other_income: false)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
+        end
+
+        context 'where applicant is not indian_tribe_member' do
+          before do
+            applicant.update_attributes!(indian_tribe_member: false, has_other_income: false)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
         end
       end
     end

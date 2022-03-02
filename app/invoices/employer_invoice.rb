@@ -65,7 +65,7 @@ class EmployerInvoice
       message_params = {
         sender_id: "admins",
         parent_message_id: @organization.employer_profile.id,
-        from: Settings.site.short_name,
+        from: EnrollRegistry[:enroll_app].setting(:short_name).item,
         to: "Employer Mailbox",
         subject: subject,
         body: body

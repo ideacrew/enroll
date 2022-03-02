@@ -4,8 +4,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
 
   let(:model_event) { "open_enrollment_end_reminder_and_low_enrollment" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,
@@ -62,7 +62,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
         "employer_profile.notice_date",
         "employer_profile.employer_name",
         "employer_profile.benefit_application.current_py_start_date",
-        "employer_profile.benefit_application.initial_py_publish_due_date", 
+        "employer_profile.benefit_application.initial_py_publish_due_date",
         "employer_profile.broker.primary_fullname",
         "employer_profile.broker.organization",
         "employer_profile.broker.phone",

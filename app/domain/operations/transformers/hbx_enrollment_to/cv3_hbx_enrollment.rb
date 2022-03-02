@@ -41,14 +41,14 @@ module Operations
           payload.merge!(consumer_role_reference: consumer_role_reference(consumer_role)) if consumer_role
           payload.merge!(product_reference: product_reference(product, issuer)) if product && issuer
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
-          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.family.latest_active_sep
+          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.special_enrollment_period
 
           Success(payload)
         end
         # rubocop:enable Metrics/CyclomaticComplexity
 
         def special_enrollment_period_reference(enrollment)
-          sep = enrollment.family.latest_active_sep
+          sep = enrollment.special_enrollment_period
           qle = sep.qualifying_life_event_kind
           {
             qualifying_life_event_kind_reference: construct_qle_reference(sep.qualifying_life_event_kind),

@@ -15,11 +15,11 @@ module Config::SiteModelConcern
 
   class_methods do
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
     def site_key
-      Settings.site.key
+      EnrollRegistry[:enroll_app].setting(:site_key).item
     end
 
     def is_shop_market_enabled?

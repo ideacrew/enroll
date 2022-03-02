@@ -37,7 +37,7 @@
                   <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on), @qle) %>
 
                   <div class='<%= "top-buffer health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></div>
-                  <div class='<%= "top-buffer dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_dental_coverage && !is_dental_coverage.nil? %></div>
+                  <div class='<%= "top-buffer dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
                 <% end %>
 
                 <div class="ivl_errors top-buffer">

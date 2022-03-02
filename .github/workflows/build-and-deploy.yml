@@ -183,11 +183,48 @@ jobs:
       matrix:
         client: ['dc', 'me']
     steps:
+      - run: |
+          MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
+          echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v1.16.0
+        uses: slackapi/slack-github-action@v1.18.0
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
-          slack-message: 'New image pushed: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`'
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*New image available for ${{ env.CLIENT }}*:\n`${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}`"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n`${{ needs.prep.outputs.shortSha }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n`${{ needs.prep.outputs.branchName }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|Direct link to commit>"
+                  }
+                },
+                {
+                  "type": "divider"
+                }
+              ]
+            }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}

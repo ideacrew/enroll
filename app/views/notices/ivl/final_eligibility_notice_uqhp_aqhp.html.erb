@@ -57,7 +57,7 @@
     heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your Payment</strong>', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-    listings: ["Make your premium payment directly to the insurance company - not #{Settings.site.short_name}.","We’ve included information in this letter on how to make your payment.","If you don’t make your payments on time, you could lose your insurance."]} %>
+    listings: ["Make your premium payment directly to the insurance company - not #{EnrollRegistry[:enroll_app].setting(:short_name).item}.","We’ve included information in this letter on how to make your payment.","If you don’t make your payments on time, you could lose your insurance."]} %>
 
 <%= render partial: 'notices/shared/custom_listing', locals: {
     listing: "<strong>If you have auto-pay set up</strong> through your health and/or dental insurance plan(s), you must contact your insurance company to <strong>update your autopay</strong>. The same is true if you set-up auto-pay through another method, such as through your bank. <strong>If you do not make an update, your plan may be terminated.</strong>"} %>
@@ -66,11 +66,11 @@
   <% if notice.aqhp_enrollments.present? %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px' } %>
 
-    <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
+    <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send documents to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
   <% elsif notice.enrollments.present? %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px' } %>
 
-    <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send us documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+    <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send us documents to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
   <% end %>
 <% end %>
 
@@ -132,10 +132,10 @@
     listings: ["You should’ve already received a bill from your insurance company. Your bill tells you how to make your monthly payments.",
                "If you haven’t received your bill yet, call your insurance company right away so you don’t miss your payment deadline.",
                "You must pay your first monthly premium by January 1, #{notice.coverage_year} to start your plan. Your premium payments for the rest of the year are also due by the first of the month.",
-               "Do NOT send your premium payments to #{Settings.site.short_name}."]} %>
+               "Do NOT send your premium payments to #{EnrollRegistry[:enroll_app].setting(:short_name).item}."]} %>
 
 <%= render partial: 'notices/shared/custom_listing', locals: {
-    listing: "Your insurance bill is not like other bills. You won’t get time to catch up if you fall behind on payments. You must make your monthly premium payments to your insurance company on time. <strong>If you don’t, you could lose your insurance, and not be able to activate it again.</strong> If you think you are going to have trouble making your payments on time, call #{Settings.site.short_name}. We can help you find out if there are other options to make your coverage more affordable."} %>
+    listing: "Your insurance bill is not like other bills. You won’t get time to catch up if you fall behind on payments. You must make your monthly premium payments to your insurance company on time. <strong>If you don’t, you could lose your insurance, and not be able to activate it again.</strong> If you think you are going to have trouble making your payments on time, call #{EnrollRegistry[:enroll_app].setting(:short_name).item}. We can help you find out if there are other options to make your coverage more affordable."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: '', heading: 'What You’ll Pay When You Receive Services', sub_heading: ''} %>
 
@@ -154,9 +154,9 @@
                "<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."]} %>
 
 <% if notice.renewal_csr_enrollments.present? %>
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Your plan has extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Your plan has extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use.", top_margin: '5px'} %>
@@ -170,21 +170,21 @@
         listings: ["You move","Your estimated income goes up or down by $150 or more per month ($1,800 annually)","You become eligible for Medicaid, an employer health plan, or other health insurance","The size of your household changes (for example, marriage, divorce, having a baby, adoption)","Your immigration status changes","Your tax filing plans for #{notice.coverage_year} change (for example, you’re married and file jointly but now plan to file separately)","You’re going to jail or prison"]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "Life changes can impact the cost savings you receive or your eligibility to be enrolled in insurance through #{Settings.site.short_name}. If you have any of these life changes, you may be able to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+        content: "Life changes can impact the cost savings you receive or your eligibility to be enrolled in insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. If you have any of these life changes, you may be able to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
 <% else %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
         previous: "",
         listings: ["You move","Your immigration status changes","You’re going to jail or prison"]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "Life changes can impact your eligibility to be enrolled in insurance through #{Settings.site.short_name}. If have any of these life changes, you may be eligible to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+        content: "Life changes can impact your eligibility to be enrolled in insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. If have any of these life changes, you may be eligible to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "To report life changes, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
+    content: "To report life changes, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call #{EnrollRegistry[:enroll_app].setting(:short_name).item}.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-    contents: ["You can end your insurance for any reason. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{Settings.site.short_name} first. We can help you find out if there are other options to make your coverage more affordable."],
+    contents: ["You can end your insurance for any reason. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{EnrollRegistry[:enroll_app].setting(:short_name).item} first. We can help you find out if there are other options to make your coverage more affordable."],
     heading: 'Ending Your Insurance', sub_heading: '', top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
@@ -194,7 +194,7 @@
     content: "If you end your health plan, and don’t replace it, you may have to pay a penalty on your DC taxes for the months you don’t have health insurance.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
+    content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call #{EnrollRegistry[:enroll_app].setting(:short_name).item}.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
     contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
@@ -204,7 +204,7 @@
     listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-    contents: ["Please call #{Settings.site.short_name} at #{notice.hbe.phone} if you have any questions about this letter, or if you think we made a mistake."],
+    contents: ["Please call #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{notice.hbe.phone} if you have any questions about this letter, or if you think we made a mistake."],
     heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
@@ -217,7 +217,7 @@
 <br>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+    content: "If you have questions or concerns, we’re here to help.<br></br>The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team <br></br> _____________________________________________________________________________________________________________"} %>
 <% if notice.documents_needed == false %>
     <%= render partial: 'notices/shared/reference_paragraph', :locals => {
         contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",

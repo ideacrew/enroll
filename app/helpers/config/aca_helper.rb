@@ -300,10 +300,10 @@ module Config::AcaHelper
   end
 
   def payment_pdf_helper
-    if Settings.site.payment_pdf_url.match("http")
-      Settings.site.payment_pdf_url
+    if EnrollRegistry[:enroll_app].setting(:payment_pdf_url).item.match("http")
+      EnrollRegistry[:enroll_app].setting(:payment_pdf_url).item
     else
-      asset_path(Settings.site.payment_pdf_url)
+      asset_path(EnrollRegistry[:enroll_app].setting(:payment_pdf_url).item)
     end
   end
 
@@ -318,7 +318,7 @@ module Config::AcaHelper
   end
 
   def invoice_bill_url_helper
-    Settings.site.invoice_bill_url
+    EnrollRegistry[:enroll_app].setting(:invoice_bill_url).item
   end
 
   def payment_phone_number

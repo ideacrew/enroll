@@ -348,7 +348,7 @@ javascript:
         networkTypes.forEach(function (networkType) {
           dataArray.forEach(function (enrollment) {
             if (networkType.toLowerCase() == 'dc-metro' || networkType.toLowerCase() == 'maine') {
-              if (enrollment.product.in_state_network) {
+              if (enrollment.product.dc_in_network) {
                 resultsData.push(enrollment);
               }
             }
@@ -448,12 +448,12 @@ javascript:
         }
 
         var network = "";
-        if (result.product.in_state_network) {
-          network = result.product.network;
+        if (result.product.dc_in_network) {
+          network = "#{EnrollRegistry[:enroll_app].setting(:statewide_area).item}";
         }
 
         if (result.product.nationwide) {
-          network = result.product.network;
+          network = "#{EnrollRegistry[:enroll_app].setting(:nationwide_area).item}";
         }
 
         var div = document.createElement('div')

@@ -27,7 +27,7 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
-  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{Settings.site.short_name}. Select CONTINUE.")
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
   find('.btn', text: 'CONTINUE').click
   click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
   click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")

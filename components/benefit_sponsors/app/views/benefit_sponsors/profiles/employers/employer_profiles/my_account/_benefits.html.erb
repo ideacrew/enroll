@@ -3,7 +3,7 @@
   <div class="row">
     <% if product_rates_available?(@benefit_sponsorship) %>
     <div class="alert alert-info" role="alert">
-      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= Settings.site.late_rates_message %></strong>
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= EnrollRegistry[:enroll_app].setting(:late_rates_message).item %></strong>
     </div>
     <% end %>
     <div class="col-xs-8">
@@ -272,7 +272,22 @@
         title: "Warning",
         text: "If you choose to continue any previous draft/ineligible plan years will be canceled",
         icon: "warning",
-        buttons: true,
+        buttons: {
+          cancel: {
+            text: "Cancel",
+            value: true,
+            visible: true,
+            className: "data-cuke-swal-cancel-button",
+            closeModal: true,
+          },
+          confirm: {
+            text: "OK",
+            value: true,
+            visible: true,
+            className: "data-cuke-swal-okay-button",
+            closeModal: true,
+          }
+        },
         dangerMode: true
       })
       .then((willDelete) => {

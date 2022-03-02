@@ -1,6 +1,6 @@
 module Config::SiteConcern
   def site_short_name
-    Settings.site.short_name
+    EnrollRegistry[:enroll_app].setting(:short_name).item
   end
 
   def site_uses_default_devise_path?
@@ -8,11 +8,11 @@ module Config::SiteConcern
   end
 
   def site_create_routes
-    Settings.site.create_routes
+    EnrollRegistry[:enroll_app].setting(:create_routes).item
   end
 
   def site_sign_in_routes
-    Settings.site.sign_in_routes
+    EnrollRegistry[:enroll_app].setting(:sign_in_routes).item
   end
 
   def site_redirect_on_timeout_route

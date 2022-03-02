@@ -2,6 +2,7 @@ Feature: User add's new dependent and submit form after filling required fields
 
   Scenario: Add a dependent with missing relationship.
     Given the FAA feature configuration is enabled
+    Given the date is within open enrollment
     When that the user is on FAA Household Info: Family Members page
     Then user clicks the Add New Person Button
     And user enters applicant name, ssn, gender and dob

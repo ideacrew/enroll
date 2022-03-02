@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Forms
+  # Here is a comment to satisfy rubocop
   class ConsumerCandidate
     include Acapi::Notifiers
     include ActiveModel::Model
@@ -32,9 +35,7 @@ module Forms
     def ssn_or_checkbox
       return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
 
-      if ssn.blank? && no_ssn == "0"
-        errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'")
-      end
+      errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'") if ssn.blank? && no_ssn == "0"
     end
 
     def is_applying_coverage?
@@ -42,7 +43,13 @@ module Forms
     end
 
     def dob=(val)
-      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+      @dob = begin
+        Date.strptime(val, "%Y-%m-%d")
+      # rubocop:disable Lint/EmptyRescueClause
+      rescue StandardError
+        nil
+      end
+      # rubocop:enable Lint/EmptyRescueClause
     end
 
     def match_person
@@ -59,7 +66,6 @@ module Forms
         records.first
       end
     end
-
 
     def state_based_policy_satisfied?
       @configuration = EnrollRegistry[:person_match_policy].settings.map(&:to_h).each_with_object({}) do |s,c|
@@ -89,11 +95,13 @@ module Forms
     def uniq_ssn
       return true if ssn.blank?
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
+      # rubocop:disable Style/GuardClause
       if same_ssn.present? && same_ssn.first.try(:user)
         errors.add(:ssn_taken,
-                  #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
-                  "The social security number you entered is affiliated with another account.")
+                  #{}"This Social Security Number has been taken on another account. If this is your correct SSN, and you don't already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
+                   "The social security number you entered is affiliated with another account.")
       end
+      # rubocop:enable Style/GuardClause
     end
 
     # rubocop:disable Style/GuardClause
@@ -102,7 +110,9 @@ module Forms
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob
-        errors.add(:base, l10n("insured.ssn_configuration_warning", site_short_name: Settings.site.short_name, site_phone_number: Settings.contact_center.phone_number, site_tty_number: Settings.contact_center.tty_number))
+        errors.add(:base,
+                   l10n("insured.ssn_configuration_warning", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, site_phone_number: Settings.contact_center.phone_number,
+                                                             site_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item))
         log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end
@@ -110,27 +120,25 @@ module Forms
 
     def does_not_match_a_different_users_person
       matched_person = match_person
-      if matched_person.present?
-        if matched_person.user.present?
-          if matched_person.user.id.to_s != self.user_id.to_s
-            errors.add(
-                :base,
-                "#{first_name} #{last_name} is already affiliated with another account."
-            )
-          end
-        end
+      if matched_person.present? && matched_person.user.present? && (matched_person.user.id.to_s != self.user_id.to_s)
+        errors.add(
+          :base,
+          "#{first_name} #{last_name} is already affiliated with another account."
+        )
       end
       true
     end
 
     def dob_not_in_future
-
+      # rubocop:disable Style/GuardClause
       if self.dob && self.dob > ::TimeKeeper.date_of_record
         errors.add(
-            :dob,
-            "#{dob} can't be in the future.")
-        self.dob=""
+          :dob,
+          "#{dob} can't be in the future."
+        )
+        self.dob = ""
       end
+      # rubocop:enable Style/GuardClause
     end
 
     # Throw Error/Warning if user age is less than 18

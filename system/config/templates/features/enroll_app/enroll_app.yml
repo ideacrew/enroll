@@ -161,6 +161,8 @@ registry:
             item: "https://staging.dchealthlink.com/individuals/tax-documents"
           - key: :statewide_area
             item: "DC-Metro"
+          - key: :nationwide_area
+            item: "Nationwide"
           - key: :standard_plan_label
             item: "STANDARD PLAN"
           - key: :exchange_name
@@ -687,6 +689,9 @@ registry:
         is_enabled: true
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
+        is_enabled: false
+      - key: :existing_coverage_warning
+        item: :existing_coverage_warning
         is_enabled: false
   - namespace:
       - :person_matching_feature
