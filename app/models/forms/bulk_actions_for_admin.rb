@@ -62,7 +62,7 @@ module Forms
         terminate_date = Date.strptime(@params["termination_date_#{hbx_enrollment.id}"], "%m/%d/%Y")
         dropped_enr_members = @params.select{|string| string.include?("terminate_member")}.values
         all_enr_members = hbx_enrollment.hbx_enrollment_members
-        eligible_members = all_enr_members.reject!{ |member| dropped_enr_members.include?(member.id.to_s) }
+        eligible_members = all_enr_members.reject{ |member| dropped_enr_members.include?(member.id.to_s) }
 
         if hbx_enrollment.applied_aptc_amount > 0
           tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
