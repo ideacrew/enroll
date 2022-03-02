@@ -1172,24 +1172,24 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     let(:hbx_enrollment_member1) do
       FactoryBot.build(:hbx_enrollment_member,
-                       is_subscriber:true,
+                       is_subscriber: true,
                        applicant_id: family.family_members.first.id,
-                       coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
-                       eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+                       coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
+                       eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
     end
     let(:hbx_enrollment_member2) do
       FactoryBot.build(:hbx_enrollment_member,
-                       is_subscriber:true,
+                       is_subscriber: true,
                        applicant_id: family.family_members.last.id,
-                       coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
-                       eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+                       coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
+                       eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
     end
     let(:hbx_enrollment_member3) do
       FactoryBot.build(:hbx_enrollment_member,
-                       is_subscriber:true,
+                       is_subscriber: true,
                        applicant_id: family.family_members[1].id,
-                       coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month,
-                       eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+                       coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
+                       eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
     end
 
     let!(:enrollment) do

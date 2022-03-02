@@ -3,12 +3,7 @@ module Forms
     include Acapi::Notifiers
     include Insured::FamiliesHelper
 
-    attr_reader :result
-    attr_reader :row
-    attr_reader :family_id
-    attr_reader :enrollment_id
-    attr_reader :params
-    attr_reader :config
+    attr_reader :result, :row, :family_id, :enrollment_id, :params, :config
 
     def initialize(*arguments)
       @params = arguments.extract_options!
@@ -61,41 +56,34 @@ module Forms
 
     # drop action
     def drop_enrollment_members
-      if @params.keys.to_s[/terminate_member_.*/]
-        hbx_enrollment = HbxEnrollment.find(@enrollment_id)
-        begin
-          terminate_date = Date.strptime(@params["termination_date_#{hbx_enrollment.id}"], "%m/%d/%Y")
-          dropped_enr_members = @params.select{|string| string.include?("terminate_member")}.values
+      return unless @params.keys.to_s[/terminate_member_.*/]
+      hbx_enrollment = HbxEnrollment.find(@enrollment_id)
+      begin
+        terminate_date = Date.strptime(@params["termination_date_#{hbx_enrollment.id}"], "%m/%d/%Y")
+        dropped_enr_members = @params.select{|string| string.include?("terminate_member")}.values
+        all_enr_members = hbx_enrollment.hbx_enrollment_members
+        eligible_members = all_enr_members.reject!{ |member| dropped_enr_members.include?(member.id.to_s) }
 
-          dropped_member_info = []
-          dropped_enr_members.each do |member_id|
-            hem = hbx_enrollment.hbx_enrollment_members.where(id: member_id).first
-            person = hem.family_member.person
-            dropped_member_info << {hbx_id: member_id, full_name: person.full_name, terminated_on: terminate_date}
-          end
-
-          all_enr_members = hbx_enrollment.hbx_enrollment_members
-          eligible_members = all_enr_members.reject!{ |member| dropped_enr_members.include?(member.id.to_s) }
-          effective_date = terminate_date + 1.day
-          if hbx_enrollment.applied_aptc_amount > 0
-            tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
-            applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
-          end
-
-          applied_aptc = applied_aptc.present? ? applied_aptc : 0
-
-          reinstatement = Enrollments::Replicator::Reinstatement.new(hbx_enrollment, effective_date, applied_aptc, eligible_members).build
-          reinstatement.save!
-
-          transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id.to_s}") ? true : false
-          handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
-
-          dropped_member_info.each do |member_info|
-            @result[:success] << member_info
-          end
-        rescue => error
-          @result[:failure] << hbx_enrollment
+        if hbx_enrollment.applied_aptc_amount > 0
+          tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
+          applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
         end
+        applied_aptc = applied_aptc.present? ? applied_aptc : 0
+
+        reinstatement = Enrollments::Replicator::Reinstatement.new(hbx_enrollment, terminate_date, applied_aptc, eligible_members).build
+        reinstatement.save!
+        hbx_enrollment.update_attributes!(terminated_on: terminate_date)
+
+        transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
+        handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
+
+        dropped_enr_members.each do |member_id|
+          @result[:success] << {hbx_id: member_id,
+                                full_name: hbx_enrollment.hbx_enrollment_members.where(id: member_id).first.family_member.person.full_name,
+                                terminated_on: terminate_date}
+        end
+      rescue StandardError
+        @result[:failure] << hbx_enrollment
       end
     end
 
