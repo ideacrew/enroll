@@ -113,7 +113,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
       it "should return (number_of_applicants * (number_of_applicants - 1)) relationships" do
         number_of_applicants = @duplicate_application.applicants.count
-        expect(@duplicate_application.relationships.count).to eq (number_of_applicants * (number_of_applicants - 1))
+        expect(@duplicate_application.relationships.count).to eq(number_of_applicants * (number_of_applicants - 1))
       end
 
       it 'should return created_at timestamps for both relationships' do
