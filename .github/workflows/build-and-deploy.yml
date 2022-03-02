@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - 'trunk'
+      - 'fix_keycloak'
   pull_request:
     branches:
       - 'trunk'
