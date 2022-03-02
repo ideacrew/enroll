@@ -103,7 +103,7 @@ module FinancialAssistance
 
         def build_relationships(source_application, new_app, active_fms_applicant_params)
           primary = new_app.primary_applicant
-          dependent_applicant_params = active_fms_applicant_params.select { |fm_applicant_params| !fm_applicant_params[:is_primary_applicant] }
+          dependent_applicant_params = active_fms_applicant_params.reject { |fm_applicant_params| fm_applicant_params[:is_primary_applicant] }
 
           @relationships_changed = dependent_applicant_params.any? do |fm_applicant_params|
             dependent_applicant = source_application.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
