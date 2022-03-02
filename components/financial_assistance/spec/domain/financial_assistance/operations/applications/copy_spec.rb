@@ -78,6 +78,49 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
     end
 
+    # 3 member application with 6 relationships
+    context 'should create all relationships (number_of_applicants * (number_of_applicants - 1))' do
+      let!(:person3) do
+        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
+        person1.ensure_relationship_with(per, 'child')
+        person1.save!
+        per
+      end
+      let!(:family_member_3) { FactoryBot.create(:family_member, person: person3, family: family)}
+
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: person3.dob,
+                          family_member_id: family_member_3.id,
+                          person_hbx_id: person3.hbx_id)
+      end
+
+      let(:create_relationships) do
+        application.build_relationship(applicant2, 'spouse', applicant)
+        application.build_relationship(applicant, 'spouse', applicant2)
+        application.build_relationship(applicant, 'parent', applicant3)
+        application.build_relationship(applicant3, 'child', applicant)
+        application.build_relationship(applicant2, 'parent', applicant3)
+        application.build_relationship(applicant3, 'child', applicant2)
+        application.save!
+      end
+
+      before do
+        create_relationships
+        @duplicate_application = subject.call(application_id: application.id).success
+      end
+
+      it "should return (number_of_applicants * (number_of_applicants - 1)) relationships" do
+        number_of_applicants = @duplicate_application.applicants.count
+        expect(@duplicate_application.relationships.count).to eq (number_of_applicants * (number_of_applicants - 1))
+      end
+
+      it 'should return created_at timestamps for both relationships' do
+        expect(@duplicate_application.relationships.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
     context 'relationships unchanged with some duplicates' do
       before do
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: 'spouse')
