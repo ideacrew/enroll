@@ -118,6 +118,21 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(@new_application.relationships.count).to eq 6
     end
   end
+
+  context 'copy with failure' do
+    before do
+      sign_in user
+      get :copy, params: { id: BSON::ObjectId.new }
+    end
+
+    it 'redirects to applications_path' do
+      expect(response).to redirect_to(applications_path)
+    end
+
+    it 'should return a flas error' do
+      expect(flash[:error]).to eq(I18n.t('faa.errors.unable_to_find_application_error'))
+    end
+  end
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
