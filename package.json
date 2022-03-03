@@ -16,6 +16,7 @@
     "html-loader": "^0.5.5",
     "jquery": "^3.4.0",
     "jquery-ui": "^1.12.1",
+    "node-sass": "npm:sass",
     "object-assign": "^4.1.0",
     "popper.js": "^1.15.0",
     "postcss-cssnext": "^3.1.0",
