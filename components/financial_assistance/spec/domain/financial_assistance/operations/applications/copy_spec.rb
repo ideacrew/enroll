@@ -97,12 +97,12 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
 
       let(:create_relationships) do
-        application.build_relationship(applicant2, 'spouse', applicant)
-        application.build_relationship(applicant, 'spouse', applicant2)
-        application.build_relationship(applicant, 'parent', applicant3)
-        application.build_relationship(applicant3, 'child', applicant)
-        application.build_relationship(applicant2, 'parent', applicant3)
-        application.build_relationship(applicant3, 'child', applicant2)
+        application.build_new_relationship(applicant2, 'spouse', applicant)
+        application.build_new_relationship(applicant, 'spouse', applicant2)
+        application.build_new_relationship(applicant, 'parent', applicant3)
+        application.build_new_relationship(applicant3, 'child', applicant)
+        application.build_new_relationship(applicant2, 'parent', applicant3)
+        application.build_new_relationship(applicant3, 'child', applicant2)
         application.save!
       end
 
@@ -933,6 +933,34 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
       it 'should return copied spouse applicant as non applicant' do
         expect(@new_application.applicants[0].is_applying_coverage).to eq(application2.applicants[0].is_applying_coverage)
+      end
+    end
+  end
+
+  describe 'person with email, address and phone' do
+    before do
+      @new_application = subject.call(application_id: application.id).success
+      @new_applicant = @new_application.applicants.first
+    end
+
+    context 'for email' do
+      it 'should return emails with created_at' do
+        expect(@new_applicant.emails.count).to eq(person1.emails.count)
+        expect(@new_applicant.emails.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
+    context 'for phone' do
+      it 'should return phones with created_at' do
+        expect(@new_applicant.phones.count).to eq(person1.phones.count)
+        expect(@new_applicant.phones.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
+    context 'for address' do
+      it 'should return addresses with created_at' do
+        expect(@new_applicant.addresses.count).to eq(person1.addresses.count)
+        expect(@new_applicant.addresses.pluck(:created_at)).not_to include(nil)
       end
     end
   end

@@ -1296,10 +1296,14 @@ module FinancialAssistance
       end
     end
 
-    def build_relationship(applicant, rel_kind, relative)
+    def build_new_relationship(applicant, rel_kind, relative)
       rel_params = { applicant_id: applicant&.id, kind: rel_kind, relative_id: relative&.id }
-      return if rel_params.values.include?(nil)
+      return if rel_params.values.include?(nil) || applicant&.id == relative&.id
       relationships.build(rel_params) if relationships.where(rel_params).blank?
+    end
+
+    def build_new_applicant(applicant_params)
+      applicants.build(applicant_params)
     end
 
     private
