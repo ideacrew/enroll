@@ -123,7 +123,7 @@ module FinancialAssistance
             next source_relationship if source_relationship.applicant.nil? || source_relationship.relative.nil?
             new_applicant = fetch_matching_applicant(new_app, source_relationship.applicant)
             new_relative = fetch_matching_applicant(new_app, source_relationship.relative)
-            new_app.build_relationship(new_applicant, source_relationship.kind, new_relative)
+            new_app.build_new_relationship(new_applicant, source_relationship.kind, new_relative)
           end
         end
 
@@ -131,10 +131,10 @@ module FinancialAssistance
           active_fms_applicant_params.each do |fm_applicant_params|
             next fm_applicant_params if fm_applicant_params[:is_primary_applicant]
             new_appl = new_app.applicants.where(family_member_id: fm_applicant_params[:family_member_id]).first
-            new_app.build_relationship(new_appl, fm_applicant_params[:relationship], primary)
+            new_app.build_new_relationship(new_appl, fm_applicant_params[:relationship], primary)
             inverse_rel_kind = ::FinancialAssistance::Relationship::INVERSE_MAP[fm_applicant_params[:relationship]]
             next fm_applicant_params if inverse_rel_kind.blank?
-            new_app.build_relationship(primary, inverse_rel_kind, new_appl)
+            new_app.build_new_relationship(primary, inverse_rel_kind, new_appl)
           end
         end
 
@@ -162,7 +162,7 @@ module FinancialAssistance
           active_fms_applicant_params.each do |fm_params|
             source_applicant = source_application.applicants.where(family_member_id: fm_params[:family_member_id]).first
             new_appli_params = fetch_applicant_params(source_applicant, fm_params)
-            new_applicant = new_app.applicants.build(new_appli_params)
+            new_applicant = new_app.build_new_applicant(new_appli_params)
 
             new_applicant.callback_update = true # avoiding callback to enroll in copy feature
             build_applicant_embeded_documents(source_applicant, new_applicant, active_fms_applicant_params)
@@ -183,19 +183,19 @@ module FinancialAssistance
 
         def build_new_emails(new_applicant, active_fm_applicant_params)
           active_fm_applicant_params[:emails].each do |email_params|
-            new_applicant.emails.build(email_params.slice(:kind, :address))
+            new_applicant.build_new_email(email_params.slice(:kind, :address))
           end
         end
 
         def build_new_phones(new_applicant, active_fm_applicant_params)
           active_fm_applicant_params[:phones].each do |phone_params|
-            new_applicant.phones.build(phone_params.slice(:kind, :country_code, :area_code, :number, :extension, :primary, :full_phone_number))
+            new_applicant.build_new_phone(phone_params.slice(:kind, :country_code, :area_code, :number, :extension, :primary, :full_phone_number))
           end
         end
 
         def build_new_addresses(new_applicant, active_fm_applicant_params)
           active_fm_applicant_params[:addresses].each do |address_params|
-            new_applicant.addresses.build(address_params.slice(:kind, :address_1, :address_2, :address_3, :city, :county, :state, :zip, :country_name, :quadrant))
+            new_applicant.build_new_address(address_params.slice(:kind, :address_1, :address_2, :address_3, :city, :county, :state, :zip, :country_name, :quadrant))
           end
         end
 

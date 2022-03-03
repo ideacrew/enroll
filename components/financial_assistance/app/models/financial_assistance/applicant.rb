@@ -1242,6 +1242,18 @@ module FinancialAssistance
       true
     end
 
+    def build_new_email(email_params)
+      emails.build(email_params)
+    end
+
+    def build_new_phone(phone_params)
+      phones.build(phone_params)
+    end
+
+    def build_new_address(address_params)
+      addresses.build(address_params)
+    end
+
     private
 
     def date_ranges_overlap?(range_a, range_b)
