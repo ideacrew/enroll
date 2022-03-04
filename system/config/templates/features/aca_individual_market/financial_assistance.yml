@@ -86,9 +86,9 @@ registry:
     - :request_determination
     features:
     - key: :haven_determination
-      is_enabled: true
-    - key: :medicaid_gateway_determination
       is_enabled: false
+    - key: :medicaid_gateway_determination
+      is_enabled: true
     - key: :esi_mec_determination
       is_enabled: true
     - key: :non_esi_mec_determination
