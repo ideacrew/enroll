@@ -64,27 +64,35 @@ module Forms
         all_enr_members = hbx_enrollment.hbx_enrollment_members
         eligible_members = all_enr_members.reject{ |member| dropped_enr_members.include?(member.id.to_s) }
 
-        if hbx_enrollment.applied_aptc_amount > 0
-          tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
-          applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
-        end
-        applied_aptc = applied_aptc.present? ? applied_aptc : 0
+        if eligible_members.any? { |member| member.age_on_effective_date > 18 }
+          applied_aptc = get_household_applied_aptc(hbx_enrollment)
 
-        reinstatement = Enrollments::Replicator::Reinstatement.new(hbx_enrollment, terminate_date, applied_aptc, eligible_members).build
-        reinstatement.save!
-        hbx_enrollment.update_attributes!(terminated_on: terminate_date)
+          reinstatement = Enrollments::Replicator::Reinstatement.new(hbx_enrollment, terminate_date, applied_aptc, eligible_members).build(terminate_date)
+          reinstatement.save!
+          hbx_enrollment.update_attributes!(terminated_on: terminate_date)
 
-        transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
-        handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
+          transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
+          handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
 
-        dropped_enr_members.each do |member_id|
-          @result[:success] << {hbx_id: member_id,
-                                full_name: hbx_enrollment.hbx_enrollment_members.where(id: member_id).first.family_member.person.full_name,
-                                terminated_on: terminate_date}
+          dropped_enr_members.each do |member_id|
+            @result[:success] << {hbx_id: member_id,
+                                  full_name: hbx_enrollment.hbx_enrollment_members.where(id: member_id).first.family_member.person.full_name,
+                                  terminated_on: terminate_date}
+          end
+        else
+          @result[:failure] << hbx_enrollment
         end
       rescue StandardError
         @result[:failure] << hbx_enrollment
       end
+    end
+
+    def get_household_applied_aptc(hbx_enrollment)
+      if hbx_enrollment.applied_aptc_amount > 0
+        tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
+        applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
+      end
+      applied_aptc.present? ? applied_aptc : 0
     end
 
     def transition_family_members

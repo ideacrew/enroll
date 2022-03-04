@@ -1247,9 +1247,22 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
         expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 1
       end
+
+      it "should not drop members if there would only be minors left after drop" do
+        enrollment.hbx_enrollment_members.last.person.update_attributes!(dob: TimeKeeper.date_of_record - 15.years)
+
+        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+                                                       "terminate_member_#{enrollment.hbx_enrollment_members.first.id}".to_sym => enrollment.hbx_enrollment_members.first.id.to_s,
+                                                       "terminate_member_#{enrollment.hbx_enrollment_members[1].id}".to_sym => enrollment.hbx_enrollment_members[1].id.to_s,
+                                                       enrollment_id: enrollment.id }, format: :js, xhr: true
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq 'coverage_selected'
+        expect(family.hbx_enrollments.count).to eq 1
+      end
     end
 
-    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
+    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_termination_pending', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
+    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.to_s
     it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.prev_day.to_s
   end
 
