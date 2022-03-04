@@ -587,6 +587,20 @@ context 'Verification process and notices' do
       end
     end
 
+    context "dhs_pending transition" do
+      let(:consumer_role) { person.consumer_role }
+      before do
+        person.consumer_role.aasm_state = "dhs_pending"
+        consumer.lawful_presence_determination.deny! verification_attr
+        consumer.citizen_status = "naturalized_citizen"
+      end
+
+      it "updates citizenship with callback" do
+        consumer.verify_ivl_by_admin([nil])
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+    end
+
     context "fail_dhs" do
       it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :dhs_pending, :verification_outstanding, "fail_dhs!"
       it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, "outstanding", :dhs_pending, :verification_outstanding, "fail_dhs!"
