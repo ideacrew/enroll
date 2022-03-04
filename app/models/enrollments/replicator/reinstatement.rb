@@ -94,9 +94,28 @@ module Enrollments
         true
       end
 
-      def build
+      def build(termination_date = new_effective_date - 1.day)
         reinstated_enrollment = HbxEnrollment.new
         @reinstate_enrollment = reinstated_enrollment
+        assign_all_attributes(reinstated_enrollment)
+
+        reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
+        unless base_enrollment.coverage_expired?
+          if termination_date > TimeKeeper.date_of_record && base_enrollment.may_schedule_coverage_termination?
+            base_enrollment.schedule_coverage_termination!(termination_date)
+          elsif base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
+            base_enrollment.terminate_coverage!
+            base_enrollment.update_attributes!(terminated_on: termination_date)
+          elsif base_enrollment.may_cancel_coverage?
+            base_enrollment.cancel_coverage!
+          end
+        end
+
+        @reinstate_enrollment = reinstated_enrollment
+        reinstated_enrollment
+      end
+
+      def assign_all_attributes(reinstated_enrollment)
         assign_attributes_to_reinstate_enrollment(reinstated_enrollment, common_params)
         if base_enrollment.is_shop?
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
@@ -107,18 +126,6 @@ module Enrollments
             reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
           end
         end
-        reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
-        unless base_enrollment.coverage_expired?
-          if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
-            base_enrollment.terminate_coverage!
-            base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
-          elsif base_enrollment.may_cancel_coverage?
-            base_enrollment.cancel_coverage!
-          end
-        end
-
-        @reinstate_enrollment = reinstated_enrollment
-        reinstated_enrollment
       end
 
       def assign_attributes_to_reinstate_enrollment(enrollment, options = {})
