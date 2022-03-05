@@ -689,13 +689,17 @@ module FinancialAssistance
               lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
               return lcsp_info if lcsp_info.failure?
 
-              slcsp_member_premiums = applicant_hbx_ids.inject([]) do |result, applicant_hbx_id|
-                result << slcsp_info.success[applicant_hbx_id][:health_only_slcsp_premiums]
-              end
+              slcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
+                next applicant_hbx_id unless slcsp_info.success[applicant_hbx_id].present?
 
-              lcsp_member_premiums = applicant_hbx_ids.inject([]) do |result, applicant_hbx_id|
+                result << slcsp_info.success[applicant_hbx_id][:health_only_slcsp_premiums]
+              end.compact
+
+              lcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
+                next applicant_hbx_id unless lcsp_info.success[applicant_hbx_id].present?
+
                 result << lcsp_info.success[applicant_hbx_id][:health_only_lcsp_premiums]
-              end
+              end.compact
 
               Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
             end

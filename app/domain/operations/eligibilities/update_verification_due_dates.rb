@@ -57,8 +57,10 @@ module Operations
 
         type_names = ["Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
         type_names.each do |type_name|
-          verification_type = person.verification_types.active.by_name(type_name).first
-          verification_type.due_date = due_on if verification_type && outstanding_statuses.include?(verification_type.validation_status)
+          verification_types = person.verification_types.active.by_name(type_name)
+          verification_types.each do |verification_type|
+            verification_type.due_date = due_on if verification_type && outstanding_statuses.include?(verification_type.validation_status)
+          end
         end
 
         person.save ? Success(person) : Failure(person.errors)
