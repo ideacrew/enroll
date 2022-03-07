@@ -15,7 +15,7 @@ When(/(.*) selects a current qle date/) do |_person|
   # screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+    find(IvlChooseCoverage.continue_btn).click
   end
 end
 
@@ -30,20 +30,21 @@ When(/^.+ sees the new dependent form$/) do
 end
 
 When(/^.+ enters? the info of his dependent wife$/) do
-  fill_in 'dependent[first_name]', with: 'Cynthia'
-  fill_in 'dependent[last_name]', with: 'Patrick'
-  fill_in 'dependent[ssn]', with: '123445678'
-  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '09/15/1994'
-  find(:xpath, "//label[@for='radio_female']").click
+  fill_in EmployeeFamilyInformation.dependent_first_name, with: 'Cynthia'
+  fill_in EmployeeFamilyInformation.dependent_last_name, with: 'Patrick'
+  fill_in EmployeeFamilyInformation.dependent_ssn, with: '123445678'
+  fill_in EmployeeFamilyInformation.dependent_dob, with: '09/15/1994'
+  find(EmployeeFamilyInformation.female_radiobtn).click
   sleep 1
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[3]/div/div[2]/span').click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[3]/div/div[3]/div/ul/li[2]').click
-  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
-  fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
-  fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
-  fill_in 'dependent[addresses][0][zip]', with: '01001'
+  find(EmployeeFamilyInformation.dependent_relationship_dropdown).click
+  find(EmployeeFamilyInformation.spouse).click
+  find(EmployeeFamilyInformation.lives_with_primary).click
+  fill_in EmployeeFamilyInformation.dependent_address_line_one, with: '123 STREET'
+  fill_in EmployeeFamilyInformation.dependent_city, with: 'WASHINGTON'
+  find(EmployeeFamilyInformation.dependent_select_state_dropdown).click
+  find(EmployeeFamilyInformation.dependent_select_dc_state).click
+  fill_in EmployeeFamilyInformation.dependent_zip, with: '01001'
+  sleep 5
 end
 
 Then(/(.*) should see his active enrollment including his wife$/) do |_person|

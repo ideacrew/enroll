@@ -18,4 +18,12 @@ class IvlConfirmYourPlanSelection
   def self.confirm_btn
     '#btn-continue'
   end
+
+  def self.dup_enrollment_warning_1
+    'The following person currently has coverage on'
+  end
+
+  def self.dup_enrollment_warning_2
+    'Enrolling in a new plan will remove existing coverage for these persons'
+  end
 end

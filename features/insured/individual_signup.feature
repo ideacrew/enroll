@@ -21,8 +21,8 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
     And Individual should not see any plan which premium is 0
-    And Individual select a plan on plan shopping page
-    And Individual click on purchase button on confirmation page
+    And Individual selects a plan on plan shopping page
+    And Individual clicks on purchase button on confirmation page
     Then Individual clicks on the Continue button to go to the Individual home page
     
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
@@ -38,8 +38,8 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
     And Individual should not see any plan which premium is 0
-    And Individual select a plan on plan shopping page
-    And Individual click on purchase button on confirmation page
+    And Individual selects a plan on plan shopping page
+    And Individual clicks on purchase button on confirmation page
     And Individual clicks on the Continue button to go to the Individual home page
     When Individual clicks on Make Changes from Actions tab
     Then Individual should not see any plan which premium is 0
@@ -61,8 +61,8 @@ Feature: Insured Plan Shopping on Individual market
     When Individual does not apply for assistance and clicks continue
     And Individual clicks on the Continue button of the Family Information page
     And Individual clicks on continue button on Choose Coverage page
-    And I select a plan on plan shopping page
+    And Individual selects a plan on plan shopping page
     And Individual checks the Insured portal open enrollment dates
-    And Individual click on purchase button on confirmation page
+    And Individual clicks on purchase button on confirmation page
     And Individual clicks on the Continue button to go to the Individual home page
     Then Individual should see a new renewing enrollment title on home page

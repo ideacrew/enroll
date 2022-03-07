@@ -21,9 +21,9 @@ Then(/Employee (.*) should click Update my security challenge responses/) do |na
 end
 
 Then(/they attempt to submit a new password/) do
-  fill_in 'user[password]', with: 'thisisnotthepassword'
+  fill_in SignIn.password, with: 'thisisnotthepassword'
   fill_in 'user[new_password]', with: 'NewPass!@#$1234'
-  fill_in 'user[password_confirmation]', with: 'NewPass!@#$1234'
+  fill_in CreateAccount.password_confirmation, with: 'NewPass!@#$1234'
   page.find_button('Change my password').click
   sleep 1
 end

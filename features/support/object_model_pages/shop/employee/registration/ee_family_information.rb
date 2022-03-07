@@ -24,11 +24,11 @@ class EmployeeFamilyInformation
   end
 
   def self.male_radiobtn
-    'label[for="person_gender_male"] span'
+    'label[for="radio_male"] span'
   end
 
   def self.female_radiobtn
-    'label[for="person_gender_female"] span'
+    'label[for="radio_female"] span'
   end
 
   def self.continue_btn
@@ -155,6 +155,10 @@ class EmployeeFamilyInformation
     'div.selectric-open li[data-index="10"]'
   end
 
+  def self.dependent_select_ma_state
+    'div.selectric-open li[data-index="24"]'
+  end
+
   def self.dependent_zip
     'dependent[addresses][0][zip]'
   end
@@ -165,5 +169,9 @@ class EmployeeFamilyInformation
 
   def self.confirm_member_btn
     'span[class="btn btn-primary btn-br pull-right mz"]'
+  end
+
+  def self.lives_with_primary
+    'input[id="dependent_same_with_primary'
   end
 end

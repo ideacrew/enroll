@@ -45,12 +45,10 @@ And(/Individual asks how to make an email account$/) do
 end
 
 Then(/Individual creates HBX account$/) do
-  #click_button 'Create account', :wait => 10
-  fill_in "user[oim_id]", :with => (@u.email :email)
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
-  # screenshot("create_account")
-  find('.create-account-btn').click
+  fill_in CreateAccount.email_or_username, :with => (@u.email :email)
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  find(CreateAccount.create_account_btn).click
 end
 And(/^I can see the select effective date$/) do
   expect(page).to have_content "SELECT EFFECTIVE DATE"
@@ -84,11 +82,11 @@ When(/the user registers as an individual$/) do
 end
 
 When(/^\w+ clicks? on the Continue button$/) do
-  find('.interaction-click-control-continue', text: 'CONTINUE', :wait => 10).click
+  find(IvlPersonalInformation.continue_btn, :wait => 10).click
 end
 
 When(/^\w+ clicks? on continue$/) do
-  find('.btn', text: 'CONTINUE').click
+  find(IvlPersonalInformation.continue_btn).click
 end
 
 Then(/^.+ should see heading labeled personal information/) do
@@ -121,7 +119,6 @@ Then(/^.+ sees form to enter personal information$/) do
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
-  # screenshot("personal_form")
 end
 
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
@@ -336,6 +333,7 @@ end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
   find(IvlFamilyInformation.continue_btn).click
+  sleep 10
 end
 
 Then(/^.+ answers the questions of the Identity Verification page and clicks on submit/) do
@@ -420,13 +418,10 @@ Then(/consumer clicked on Go To My Account/) do
 end
 
 Then(/Individual creates a new HBX account$/) do
-  # find('.interaction-click-control-create-account').click
-  sleep 5
-  fill_in "user[oim_id]", :with => "testflow@test.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
-  # screenshot("create_account")
-  click_button "Create Account"
+  fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  find(CreateAccount.create_account_btn).click
 end
 
 When(/I click on none of the situations listed above apply checkbox$/) do
@@ -458,9 +453,9 @@ And(/I signed in$/) do
   sleep 2
   find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
-  fill_in "user[login]", :with => "testflow@test.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => "testflow@test.com"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
+  find(SignIn.sign_in_btn).click
 end
 
 
@@ -478,16 +473,16 @@ And(/Aptc user signed in$/) do
   sleep 2
   find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
-  fill_in "user[login]", :with => "aptc@dclink.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => "aptc@dclink.com"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
+  find(SignIn.sign_in_btn).click
 end
 
 And(/^.+click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end
 
-And(/.+ select a plan on plan shopping page/) do
+And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
   find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
@@ -500,8 +495,8 @@ end
 And(/^I click confirm on the plan selection page for (.*)$/) do |named_person|
   find('.interaction-choice-control-value-terms-check-thank-you').click
   person = people[named_person]
-  fill_in 'first_name_thank_you', :with => (person[:first_name])
-  fill_in 'last_name_thank_you', :with => (person[:last_name])
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => (person[:first_name])
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => (person[:last_name])
   click_link "Confirm"
 end
 
@@ -514,14 +509,11 @@ Then(/the individual should see the modal pop up for eligibility/) do
   expect(page).to have_content IvlChoosePlan.non_silver_plan_modal_text
 end
 
-And(/^.+ click on purchase button on confirmation page/) do
-  find('.interaction-choice-control-value-terms-check-thank-you').click
-  fill_in 'first_name_thank_you', :with => "John"
-  fill_in 'last_name_thank_you', :with => "Smith"
-  #fill_in 'first_name_thank_you', :with => (@u.find :first_name)
-  #fill_in 'last_name_thank_you', :with => (@u.find :last_name)
-  # screenshot("purchase")
-  click_link "Confirm"
+And(/^Individual clicks on purchase button on confirmation page$/) do
+  find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "John"
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Smith"
+  find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
 
 Then(/^.+ should see the extended APTC confirmation message/) do
@@ -548,7 +540,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual clicks on Add New Person$/) do
-  click_link 'Add New Person'
+  find(IvlFamilyInformation.add_new_person).click
 end
 
 Then(/^Individual fills in the form$/) do
@@ -569,6 +561,7 @@ end
 
 Then(/Individual confirms dependent info/) do
   find(IvlFamilyInformation.confirm_member_btn).click
+  sleep 5
 end
 
 Then(/Individual should see three dependents on the page/) do
@@ -655,9 +648,9 @@ When(/^CSR accesses the HBX portal$/) do
   click_link 'HBX Portal'
 
   find('.interaction-click-control-sign-in-existing-account').click
-  fill_in "user[login]", :with => "sherry.buckner@dc.gov"
+  fill_in SignIn.username, :with => "sherry.buckner@dc.gov"
   find('#user_email').set("sherry.buckner@dc.gov")
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
   find('.interaction-click-control-sign-in').click
 end
 
@@ -719,13 +712,13 @@ end
 Then(/^(\w+) creates a new account$/) do |person|
   find('.interaction-click-control-create-account').click
   fill_in 'user[email]', with: "email#{person}"
-  fill_in 'user[password]', with: "aA1!aA1!aA1!"
-  fill_in 'user[password_confirmation]', with: "aA1!aA1!aA1!"
+  fill_in CreateAccount.password, with: "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, with: "aA1!aA1!aA1!"
   click_button 'Create account'
 end
 
 When(/^\w+ clicks continue$/) do
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 When(/^\w+ selects Company match for (\w+)$/) do |company|
@@ -743,9 +736,9 @@ end
 
 When(/^(\w+) signs in$/) do |person|
   click_link 'Sign In'
-  fill_in 'user[login]', with: "email#{person}"
+  fill_in SignIn.username, with: "email#{person}"
   find('#user_email').set "email#{person}"
-  fill_in 'user[password]', with: "aA1!aA1!aA1!"
+  fill_in SignIn.password, with: "aA1!aA1!aA1!"
   click_button 'Sign in'
 end
 
@@ -765,17 +758,17 @@ Then(/^(\w+) enters person search data$/) do |insured|
   fill_in "person[first_name]", with: person[:first_name]
   fill_in "person[last_name]", with: person[:last_name]
   fill_in "jq_datepicker_ignore_person[dob]", with: person[:dob]
-  fill_in "person[ssn]", with: person[:ssn]
+  fill_in IvlPersonalInformation.ssn, with: person[:ssn]
   find(:xpath, '//label[@for="radio_female"]').click
   click_button 'CONTINUE'
 end
 
 Then(/^\w+ continues$/) do
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 Then(/^\w+ continues again$/) do
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 Then(/^\w+ enters demographic information$/) do
@@ -812,8 +805,8 @@ end
 Then(/^Aptc user goes to register as individual/) do
   step "user should see your information page"
   step "user goes to register as an individual"
-  fill_in 'person[first_name]', :with => "Aptc"
-  fill_in 'person[ssn]', :with => (@u.ssn :ssn)
+  fill_in IvlPersonalInformation.first_name, :with => "Aptc"
+  fill_in IvlPersonalInformation.ssn, :with => (@u.ssn :ssn)
   screenshot("aptc_register")
 end
 
@@ -1060,7 +1053,7 @@ When(/Individual clicks on Go To My Account button$/) do
 end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
-  click_button 'CONTINUE', :wait => 10
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 And(/Individual signed in to resume enrollment$/) do
@@ -1069,28 +1062,89 @@ And(/Individual signed in to resume enrollment$/) do
   sleep 2
   find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
-  fill_in "user[login]", :with => "testflow@test.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => "testflow@test.com"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
+  find(SignIn.sign_in_btn).click
 end
 
 Then(/Individual creates a new HBX account via username$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
-  click_button "Create Account"
+  find(CreateAccount.create_account_btn).click
 end
 
 When(/Individual creates an HBX account with username already in use$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
-  click_button "Create Account"
+  find(CreateAccount.create_account_btn).click
 end
 
 When(/Individual creates an HBX account with email already in use$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
-  click_button "Create Account"
+  find(CreateAccount.create_account_btn).click
+end
+
+Then(/Dependent creates a new HBX account$/) do
+  fill_in CreateAccount.email_or_username, :with => "testtest@gmail.com"
+  fill_in CreateAccount.password, :with => "aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!"
+  find(CreateAccount.create_account_btn).click
+end
+
+When(/Dependent registers as an individual$/) do
+  fill_in IvlPersonalInformation.first_name, :with => "Spouse"
+  fill_in IvlPersonalInformation.last_name, :with => "Smith"
+  fill_in IvlPersonalInformation.dob, :with => "11/11/1989"
+  fill_in IvlPersonalInformation.ssn, :with => "212-31-3000"
+  find(IvlPersonalInformation.male_radiobtn).click
+  screenshot("register")
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+Then(/^Individual adds dependent info$/) do
+  fill_in IvlFamilyInformation.dependent_first_name, :with => "Spouse"
+  fill_in IvlFamilyInformation.dependent_last_name, :with => "Smith"
+  fill_in IvlFamilyInformation.dependent_dob, :with => "11/11/1989"
+  click_outside_datepicker(l10n('family_information').to_s)
+  fill_in IvlFamilyInformation.dependent_ssn, :with => "212-31-3000"
+  find(IvlFamilyInformation.dependent_relationship_dropdown).click
+  find(IvlFamilyInformation.spouse).click
+  find(IvlFamilyInformation.female_radiobtn).click
+  find(IvlFamilyInformation.us_citizen_or_national_yes_radiobtn).click
+  find(IvlFamilyInformation.naturalized_citizen_no_radiobtn).click
+  find(IvlFamilyInformation.american_or_alaskan_native_no_radiobtn).click
+  find(IvlFamilyInformation.incarcerated_no_radiobtn).click
+end
+
+And(/^Dependent clicks on purchase button on confirmation page$/) do
+  find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Spouse"
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Smith"
+  click_link "Confirm"
+end
+
+Given(/^the warning duplicate enrollment feature configuration is enabled$/) do
+  EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(true)
+end
+
+And(/Dependent sees Your Information page$/) do
+  expect(page).to have_content YourInformation.your_information_text
+  find(YourInformation.continue_btn).click
+end
+
+And(/Individual should see Duplicate Enrollment warning in the Confirmation page$/) do
+  expect(page).to have_content IvlConfirmYourPlanSelection.dup_enrollment_warning_1
+  expect(page).to have_content IvlConfirmYourPlanSelection.dup_enrollment_warning_2
+  sleep 20
+end
+
+And(/^Primary member logs back in$/) do
+  find(CreateAccount.sign_in_link).click
+  fill_in SignIn.username, :with => "testflow@test.com"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
+  find(SignIn.sign_in_btn).click
 end

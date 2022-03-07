@@ -288,7 +288,7 @@ When(/Employee select a past qle date/) do
   date = [renewal_effective_date - 5.days, TimeKeeper.date_of_record - 5.days].min
   fill_in "qle_date", :with => date.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+    find(EmployeeChooseCoverage.continue_btn).click
   end
 end
 
@@ -305,7 +305,7 @@ When(/Employee select a qle date based on expired plan year/) do
   # screenshot("past_qle_date")
   fill_in "qle_date", :with => (renewal_effective_date - 20.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+    find(EmployeeChooseCoverage.continue_btn).click
   end
 end
 
