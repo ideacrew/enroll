@@ -151,9 +151,9 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(@super_admin.hbx_staff_role.permission.can_send_secure_message).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_send_secure_message).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_send_secure_message).to be false
-        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_send_secure_message).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_send_secure_message).to be false
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_send_secure_message).to be false
-        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_send_secure_message).to be true
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_send_secure_message).to be false
       end
     end
 
@@ -637,10 +637,10 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(@super_admin.hbx_staff_role.permission.can_add_sep).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_add_sep).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
-        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be false
         #verifying that the rake task updated only the correct subroles
         expect(Permission.hbx_csr_tier1.can_add_sep).to be false
-        expect(Permission.hbx_csr_tier2.can_add_sep).to be true
+        expect(Permission.hbx_csr_tier2.can_add_sep).to be false
         expect(Permission.developer.can_add_sep).to be false
       end
     end
