@@ -3046,6 +3046,47 @@ end
 
 
 describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean => :around_each do
+  before do
+    allow(::Operations::Products::ProductOfferedInServiceArea).to receive(:new).and_return(double(call: double(:success? => true)))
+  end
+
+  describe '#reinstate' do
+    let(:family)        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:person)       { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:hbx_profile) do
+      FactoryBot.create(:hbx_profile,
+                        :normal_ivl_open_enrollment,
+                        coverage_year: Date.today.year - 1)
+    end
+
+    let(:enrollment)    do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        coverage_kind: "health",
+                        effective_on: TimeKeeper.date_of_record.last_year.beginning_of_year,
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        aasm_state: "coverage_terminated",
+                        consumer_role_id: person.consumer_role.id,
+                        terminated_on: TimeKeeper.date_of_record.last_year + 6.months)
+    end
+    context 'product not offered in latest service area' do
+      before do
+        allow(::Operations::Products::ProductOfferedInServiceArea).to receive(:new).and_return(double(call: double(:success? => false)))
+      end
+
+      it 'returns false' do
+        expect(enrollment.reinstate).to eq false
+      end
+    end
+
+    context 'product offered in latest service area' do
+
+      it 'returns enrollment' do
+        expect(enrollment.reinstate.class).to eq HbxEnrollment
+      end
+    end
+  end
 
   context "Terminated enrollment re-instatement" do
     let(:current_date) { Date.new(TimeKeeper.date_of_record.year, 6, 1) }
@@ -3369,47 +3410,6 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       it "should have reinstated enrollmentt" do
         allow(hbx_enrollment).to receive(:workflow_state_transitions).and_return([])
         expect(hbx_enrollment.is_reinstated_enrollment?).to be_falsey
-      end
-    end
-  end
-
-  describe '#reinstate' do
-    let(:family)        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-    let!(:person)       { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:hbx_profile) do
-      FactoryBot.create(:hbx_profile,
-                        :normal_ivl_open_enrollment,
-                        coverage_year: Date.today.year - 1)
-    end
-
-    let(:enrollment)    do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        coverage_kind: "health",
-                        effective_on: TimeKeeper.date_of_record.last_year.beginning_of_year,
-                        enrollment_kind: "open_enrollment",
-                        kind: "individual",
-                        aasm_state: "coverage_terminated",
-                        consumer_role_id: person.consumer_role.id,
-                        terminated_on: TimeKeeper.date_of_record.last_year + 6.months)
-    end
-    context 'product not offered in latest service area' do
-      before do
-        allow(::Operations::Products::ProductOfferedInServiceArea).to receive(:new).and_return(double(call: double(:success? => false)))
-      end
-
-      it 'returns false' do
-        expect(enrollment.reinstate).to eq false
-      end
-    end
-
-    context 'product offered in latest service area' do
-      before do
-        allow(::Operations::Products::ProductOfferedInServiceArea).to receive(:new).and_return(double(call: double(:success? => true)))
-      end
-
-      it 'returns false' do
-        expect(enrollment.reinstate.class).to eq HbxEnrollment
       end
     end
   end
