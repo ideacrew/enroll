@@ -42,8 +42,8 @@ module Operations
         dropped_member_info = []
         dropped_enr_members.each do |member_id|
           dropped_member_info << {hbx_id: member_id,
-                                full_name: params[:hbx_enrollment].hbx_enrollment_members.where(id: member_id).first.family_member.person.full_name,
-                                terminated_on: terminate_date}
+                                  full_name: params[:hbx_enrollment].hbx_enrollment_members.where(id: member_id).first.family_member.person.full_name,
+                                  terminated_on: terminate_date}
         end
 
         Success(dropped_member_info)

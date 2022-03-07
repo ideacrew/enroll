@@ -59,7 +59,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       before do
         @dropped_members = subject.call({hbx_enrollment: enrollment,
                                          options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
-                                                   "terminate_member_#{hbx_enrollment_member3.id}" => "#{hbx_enrollment_member3.id}"}}).success
+                                                   "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
       end
 
       it 'should return dropped member info' do

@@ -59,7 +59,6 @@ module Forms
       hbx_enrollment = HbxEnrollment.find(@enrollment_id)
       begin
         result = ::Operations::HbxEnrollments::DropEnrollmentMembers.new.call({hbx_enrollment: hbx_enrollment, options: @params})
-        binding.pry
         return if result.failure == 'No members selected to drop.'
         @result[:failure] << hbx_enrollment if result.failure?
 
