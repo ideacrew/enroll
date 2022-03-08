@@ -66,7 +66,8 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: "child")
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant.id, relative_id: applicant2.id, kind: "parent")
         application.save!
-        @duplicate_application = subject.call(application_id: application.id).success
+        @copy_operation = subject
+        @duplicate_application = @copy_operation.call(application_id: application.id).success
       end
 
       it 'Should return true to match the relative and applicant ids for relationships' do
@@ -75,6 +76,10 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
       it 'should return created_at timestamps for both relationships' do
         expect(@duplicate_application.relationships.pluck(:created_at)).not_to include(nil)
+      end
+
+      it 'should set attribute_reader to true' do
+        expect(@copy_operation.relationships_changed).to eq(true)
       end
     end
 
@@ -962,6 +967,27 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         expect(@new_applicant.addresses.count).to eq(person1.addresses.count)
         expect(@new_applicant.addresses.pluck(:created_at)).not_to include(nil)
       end
+    end
+  end
+
+  describe 'for reader claiming_applicants_missing' do
+    before do
+      applicant.is_claimed_as_tax_dependent = true
+      applicant.claimed_as_tax_dependent_by = applicant2.id
+      applicant.save
+      family_member_12.is_active = false
+      family_member_12.save
+      application.aasm_state
+      @copy_operation = subject
+      @new_application = @copy_operation.call(application_id: application.id).success
+    end
+
+    it 'should set claiming_applicants_missing to true' do
+      expect(@copy_operation.claiming_applicants_missing).to eq(true)
+    end
+
+    it 'should create new application' do
+      expect(@new_application).to be_a(::FinancialAssistance::Application)
     end
   end
 end
