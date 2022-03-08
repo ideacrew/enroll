@@ -18,7 +18,7 @@
       <% if current_broker_agency && display_broker_info_for_consumer %>
         <br/>
         <span class="word-break">
-          <%=  current_broker_agency&.broker_agency_profile&.legal_name&.split(" ")&.map(&:capitalize).join(" ") %>
+          <%= current_broker_agency&.broker_agency_profile&.legal_name&.titleize %>
         </span>
       <% else %>
         <br/>
