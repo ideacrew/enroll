@@ -14,7 +14,7 @@ module FinancialAssistance
 
         VALID_APPLICATION_STATES = ['submitted', 'determination_response_error', 'determined', 'imported'].freeze
         # FamilyMembers, Relationships, claimed_as_tax_dependent_by are the things that might need user interaction to update.
-        attr_reader :family_members_changed
+        attr_reader :family_members_changed, :relationships_changed, :claiming_applicants_missing
 
         # @param [Hash] opts The options to generate draft application
         # @option opts [BSON::ObjectId] :application_id (required)
@@ -83,6 +83,8 @@ module FinancialAssistance
             if new_matching_applicant.present?
               new_appl.claimed_as_tax_dependent_by = new_matching_applicant.id
               new_appl.save!
+            else
+              @claiming_applicants_missing = true
             end
           end
         end
