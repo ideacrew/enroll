@@ -243,6 +243,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
         expect(@renewal_app.reload.haven_magi_medicaid_eligibility_request_errored?).to_not eq("renewal_draft")
       end
 
+      it 'should transition the application to *_magi_medicaid__eligibility_request_errored' do
+        @renewal_app.reload
+        expect(
+          @renewal_app.haven_magi_medicaid_eligibility_request_errored? || @renewal_app.mitc_magi_medicaid_eligibility_request_errored?
+        ).to be_truthy
+      end
+
       it 'should return failure with a message' do
         expect(@result.failure).to include(/The value 'urn:openhbx:terms:v1:financial_assistance_income#test' is not an element of the set {'ur/)
       end

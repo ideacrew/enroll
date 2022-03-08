@@ -587,6 +587,20 @@ context 'Verification process and notices' do
       end
     end
 
+    context "dhs_pending transition" do
+      let(:consumer_role) { person.consumer_role }
+      before do
+        person.consumer_role.aasm_state = "dhs_pending"
+        consumer.lawful_presence_determination.deny! verification_attr
+        consumer.citizen_status = "naturalized_citizen"
+      end
+
+      it "updates citizenship with callback" do
+        consumer.verify_ivl_by_admin([nil])
+        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      end
+    end
+
     context "fail_dhs" do
       it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :dhs_pending, :verification_outstanding, "fail_dhs!"
       it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, "outstanding", :dhs_pending, :verification_outstanding, "fail_dhs!"
@@ -1241,14 +1255,20 @@ describe 'coverage_purchased!' do
 
 
   it 'should trigger call to ssa hub' do
-    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request', {:person => person})
+    unless EnrollRegistry.feature_enabled?(:ssa_h3)
+      expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request',
+                                                                                   {:person => person})
+    end
     person.consumer_role.coverage_purchased!
   end
 
   it 'should trigger call to dhs hub if person is non native and no ssn ' do
     person.update_attributes(ssn: nil)
     person.consumer_role.lawful_presence_determination.update_attributes(citizen_status: nil)
-    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request', {:person => person, :coverage_start_date => start_date})
+    unless EnrollRegistry.feature_enabled?(:vlp_h92)
+      expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request',
+                                                                                   {:person => person, :coverage_start_date => start_date})
+    end
     person.consumer_role.coverage_purchased!
   end
 end
