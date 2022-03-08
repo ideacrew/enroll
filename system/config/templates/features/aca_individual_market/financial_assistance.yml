@@ -247,9 +247,9 @@ registry:
       is_enabled: true
       settings:
         - key: :renewals_creation_month
-          item: 3
+          item: 2
         - key: :renewals_creation_day
-          item: 4
+          item: 24
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation
