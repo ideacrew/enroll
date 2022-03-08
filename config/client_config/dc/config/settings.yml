@@ -123,8 +123,8 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2022,3,7) %>
-      end_on: <%= Date.new(2022,7,5) %>
+      start_on: <%= Date.new(2020,11,1) %>
+      end_on: <%= Date.new(2022,2,4) %>
     dc_resident_application: true
     transition_family_members_link:
       true
