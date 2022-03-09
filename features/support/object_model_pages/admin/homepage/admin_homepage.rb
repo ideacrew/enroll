@@ -87,6 +87,14 @@ class AdminHomepage
     '.interaction-click-control-bulk-notices'
   end
 
+  def self.shop_via_employer
+    '.interaction-click-control-shop-for-employer-sponsored-coverage'
+  end
+
+  def self.failed_validation_text
+    "eligibility failed on residency_status"
+  end
+
   def self.manage_seps_btn
     '.interaction-click-control-manage-seps'
   end

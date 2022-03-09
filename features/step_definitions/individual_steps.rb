@@ -551,6 +551,24 @@ Then(/^Individual clicks on Add New Person$/) do
   click_link 'Add New Person'
 end
 
+And(/^Admin updates the address to Non DC Address$/) do
+  find(IvlHomepage.manage_family_btn).click
+  find(IvlManageFamilyPage.personal_tab).click
+  find('.btn.no-op', text: 'Remove Mailing Address').click
+  find(EmployeeFamilyInformation.save_btn).click
+  find(IvlPersonalInformation.select_state_dropdown).click
+  find(:xpath, "//li[contains(., 'GA')]").click
+  fill_in IvlPersonalInformation.zip, with: '30043'
+  find(EmployeeFamilyInformation.save_btn).click
+  find(EmployeeHomepage.my_dc_health_link).click
+  find(AdminHomepage.shop_via_employer).click
+end
+
+And(/Admin should not see the error text related to non dc address/) do
+  sleep 5
+  expect(page).not_to have_content(AdminHomepage.failed_validation_text)
+end
+
 Then(/^Individual fills in the form$/) do
   fill_in IvlFamilyInformation.dependent_first_name, :with => (@u.first_name :first_name)
   fill_in IvlFamilyInformation.dependent_last_name, :with => (@u.last_name :last_name)
