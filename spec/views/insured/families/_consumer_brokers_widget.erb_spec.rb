@@ -18,6 +18,7 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
     end
     let(:family_member) { family.family_members.last }
     let(:writing_agent) { FactoryBot(:broker_role) }
+    let(:formatted_name) {"Turner Agency, Inc"}
 
     before :each do
       assign(:person, person)
@@ -30,6 +31,10 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
 
     it 'should display broker widget for consumer' do
       expect(rendered).to have_text('h3', "Your Broker")
+    end
+
+    it 'should display correctly formatted broker name' do
+      expect(rendered).to have_text('span', formatted_name)
     end
 
     it 'should display brokers email' do
