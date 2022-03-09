@@ -40,5 +40,6 @@ Feature: Admin plan shopping via SEP
     Then the Admin is navigated to the Families screen
     And I click the name of Patrick Doe from family list
     And Admin updates the address to Non DC Address
+    And Admin clicks on shop for employer sponsored insurance
     Then Admin should not see the error text related to non dc address
 

@@ -554,18 +554,20 @@ end
 And(/^Admin updates the address to Non DC Address$/) do
   find(IvlHomepage.manage_family_btn).click
   find(IvlManageFamilyPage.personal_tab).click
-  find('.btn.no-op', text: 'Remove Mailing Address').click
+  find(AdminHomepage.remove_mailing_address).click
   find(EmployeeFamilyInformation.save_btn).click
   find(IvlPersonalInformation.select_state_dropdown).click
-  find(:xpath, "//li[contains(., 'GA')]").click
+  find(AdminHomepage.non_dc_state).click
   fill_in IvlPersonalInformation.zip, with: '30043'
   find(EmployeeFamilyInformation.save_btn).click
   find(EmployeeHomepage.my_dc_health_link).click
-  find(AdminHomepage.shop_via_employer).click
+end
+
+And(/Admin clicks on shop for employer sponsored insurance/) do
+  find(AdminHomepage.shop_for_employer).click
 end
 
 And(/Admin should not see the error text related to non dc address/) do
-  sleep 5
   expect(page).not_to have_content(AdminHomepage.failed_validation_text)
 end
 
