@@ -92,14 +92,14 @@ class IvlChoosePlan
   end
 
   def self.compare_checkbox
-    'span.checkbox-custom-label'
+    '[data-cuke="compare_plan_checkbox"]'
   end
 
   def self.compare_plans_btn
-    '.ivl-compare-selected-plans-link'
+    '[data-cuke="ivl-compare-selected-plans-link"]'
   end
 
   def self.compare_selected_plans_close_btn
-    'div[id="plan-details-modal-body"] div[class="modal-footer"] button[data-dismiss="modal"]'
+    '[data-cuke="compare_selected_plans_close_btn"]'
   end
 end

@@ -24,7 +24,7 @@ class EmployeeFamilyInformation
   end
 
   def self.male_radiobtn
-    'label[for="radio_male"] span'
+    '[data-cuke="primary_radio_male"]'
   end
 
   def self.female_radiobtn
@@ -116,7 +116,7 @@ class EmployeeFamilyInformation
   end
 
   def self.dependent_male_radiobtn
-    'label[for="radio_male"] span'
+    '[data-cuke="dependent_radio_male"]'
   end
 
   def self.dependent_female_radiobtn
@@ -172,6 +172,6 @@ class EmployeeFamilyInformation
   end
 
   def self.lives_with_primary
-    'input[id="dependent_same_with_primary'
+    '[data-cuke="lives_with_primary_checkbox"]'
   end
 end

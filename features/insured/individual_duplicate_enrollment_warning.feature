@@ -19,7 +19,7 @@ Feature: Individual market with duplicate enrollments
     And Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
     And Individual clicks on Add New Person
-    And Individual adds dependent info
+    And Individual adds spouse dependent info
     Then Individual confirms dependent info
     And Individual clicks on the Continue button of the Family Information page
     And Individual clicks on continue button on Choose Coverage page
@@ -49,7 +49,7 @@ Feature: Individual market with duplicate enrollments
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
     And Individual clicks on Add New Person
-    And Individual adds dependent info
+    And Individual adds spouse dependent info
     Then Individual confirms dependent info
     And the individual logs out
     When Dependent visits the Consumer portal during open enrollment

@@ -20,10 +20,10 @@ class IvlConfirmYourPlanSelection
   end
 
   def self.dup_enrollment_warning_1
-    'The following person currently has coverage on'
+    '[data-cuke="coverage_info_msg"]'
   end
 
   def self.dup_enrollment_warning_2
-    'Enrolling in a new plan will remove existing coverage for these persons'
+    '[data-cuke="coverage_info_msg_2"]'
   end
 end

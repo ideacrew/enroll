@@ -1105,7 +1105,7 @@ When(/Dependent registers as an individual$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 
-Then(/^Individual adds dependent info$/) do
+Then(/^Individual adds spouse dependent info$/) do
   fill_in IvlFamilyInformation.dependent_first_name, :with => "Spouse"
   fill_in IvlFamilyInformation.dependent_last_name, :with => "Smith"
   fill_in IvlFamilyInformation.dependent_dob, :with => "11/11/1989"
@@ -1137,9 +1137,8 @@ And(/Dependent sees Your Information page$/) do
 end
 
 And(/Individual should see Duplicate Enrollment warning in the Confirmation page$/) do
-  expect(page).to have_content IvlConfirmYourPlanSelection.dup_enrollment_warning_1
-  expect(page).to have_content IvlConfirmYourPlanSelection.dup_enrollment_warning_2
-  sleep 20
+  expect(page.has_css?(IvlConfirmYourPlanSelection.dup_enrollment_warning_1)).to eq true
+  expect(page.has_css?(IvlConfirmYourPlanSelection.dup_enrollment_warning_2)).to eq true
 end
 
 And(/^Primary member logs back in$/) do
