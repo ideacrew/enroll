@@ -977,7 +977,6 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       applicant.save
       family_member_12.is_active = false
       family_member_12.save
-      application.aasm_state
       @copy_operation = subject
       @new_application = @copy_operation.call(application_id: application.id).success
     end

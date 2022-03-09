@@ -544,6 +544,8 @@ module FinancialAssistance
         log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
       end
     rescue StandardError => e
+      log(eligibility_response_payload, { severity: 'critical',
+                                          error_message: "send_determination_to_ea ERROR: #{e.message}, backtrace: #{e.backtrace.join('\n')}" })
       Rails.logger.error { "FAA send_determination_to_ea error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
@@ -1299,7 +1301,13 @@ module FinancialAssistance
     def build_new_relationship(applicant, rel_kind, relative)
       rel_params = { applicant_id: applicant&.id, kind: rel_kind, relative_id: relative&.id }
       return if rel_params.values.include?(nil) || applicant&.id == relative&.id
-      relationships.build(rel_params) if relationships.where(rel_params).blank?
+
+      relationship = relationships.where({ applicant_id: applicant&.id, relative_id: relative&.id }).first
+      if relationship.present?
+        relationship.kind = rel_kind
+      elsif relationships.where(rel_params).blank?
+        relationships.build(rel_params)
+      end
     end
 
     def build_new_applicant(applicant_params)
