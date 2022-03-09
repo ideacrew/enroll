@@ -1513,16 +1513,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
 
-    # context "when a family member is deleted" do
-    #   before do
-    #     family.family_members.last.delete
-    #     family.reload
-    #   end
+    context "when a family member is deleted" do
+      let(:slcsp_info) { {} }
+      let(:lcsp_info) { {} }
 
-    #   it "should unsuccessfully submit a cv3 application and get a failure response" do
-    #     expect(result).to_not be_success
-    #   end
-    # end
+      before do
+        family.family_members.last.delete
+        family.reload
+      end
+
+      it "should submit a cv3 application and get a success response" do
+        expect(result).to be_success
+      end
+    end
   end
 
   describe "#applicant is not applying for coverage" do
