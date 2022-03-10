@@ -1914,6 +1914,10 @@ class HbxEnrollment
     return false if has_active_term_or_expired_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
 
+    can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
+
+    return false unless can_renew.success?
+
     if self.is_shop? && !prior_plan_year_coverage?
       census_employee = benefit_group_assignment.census_employee
       census_employee.reinstate_employment if census_employee.can_be_reinstated?

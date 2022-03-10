@@ -121,6 +121,7 @@ module FinancialAssistance
     end
 
     def propagate_applicant
+      return unless application.draft?
       FinancialAssistance::Operations::Application::RelationshipHandler.new.call({relationship: self})
     end
   end
