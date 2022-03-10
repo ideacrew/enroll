@@ -62,7 +62,7 @@ module Forms
         return if result.failure == 'No members selected to drop.'
         @result[:failure] << hbx_enrollment if result.failure?
         if result.success?
-          @result[:success] = gresult.success
+          @result[:success] = result.success
           transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
           handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
         end
