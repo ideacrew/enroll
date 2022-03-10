@@ -1,7 +1,6 @@
 <table class="table table-striped">
   <%if @result[:success].present?%>
-
-    <h4><%= l10n('admin_actions.enrollment_members_dropped_successfully') %></h4>
+    <h4 data-cuke="dropped_members_success"><%= l10n('admin_actions.enrollment_members_dropped_successfully') %></h4>
     <tr>
       <th><%= l10n('hbx_id') %></th>
       <th><%= l10n('name') %></th>
@@ -23,7 +22,7 @@
       <th><%= l10n('hbx_id') %></th>
       <th><%= l10n('exchange.employer_applications.terminated_on') %></th>
     </tr>
-    <h4><%= l10n('admin_actions.enrollment_members_failed_to_drop') %></h4>
+    <h4 data-cuke="failed_to_drop_members"><%= l10n('admin_actions.enrollment_members_failed_to_drop') %></h4>
     <% @result[:failure].each do |hbx| %>
       <tr>
         <td><%= hbx.hbx_id %></td>
@@ -33,7 +32,7 @@
 
   <% else %>
 
-    <h4><%= l10n('admin_actions.no_enrollment_members_selected_for_termination') %></h4>
+    <h4 data-cuke="no_drop_members_selected"><%= l10n('admin_actions.no_enrollment_members_selected_for_termination') %></h4>
 
   <% end %>
 </table>
