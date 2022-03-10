@@ -70,7 +70,7 @@ module Operations
           args[:first_name],
           args[:last_name],
           args[:realm_roles] || [], # realm roles
-          args[:client_roles] || [], # client roles
+          [], # client roles
           args[:attributes],
           after_insert
         )
