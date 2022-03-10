@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/drop_enrollment_members feature is enabled/) do
   EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
 end
