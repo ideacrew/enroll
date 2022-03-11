@@ -111,6 +111,14 @@ module IvlAssistanceWorld
     @enrollment = create_enrollment_for_family(family)
   end
 
+  def create_multiple_member_enrollment_for_family_with_one_minor
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+    family = FactoryBot.create(:family, :with_nuclear_family, person: person)
+    family.family_members.last.person.update_attributes!(dob: TimeKeeper.date_of_record - 10.years)
+    @enrollment = create_enrollment_for_family(family)
+    @enrollment.update_attributes!(consumer_role_id: person.consumer_role.id)
+  end
+
   def enable_change_tax_credit_button
     current_year = TimeKeeper.date_of_record.year
     is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)

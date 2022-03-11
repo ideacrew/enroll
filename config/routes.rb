@@ -173,6 +173,8 @@ Rails.application.routes.draw do
         post :update_cancel_enrollment
         get :terminate_enrollment
         post :update_terminate_enrollment
+        get :drop_enrollment_member
+        post :update_enrollment_member_drop
         post :add_new_sep
         get :update_effective_date
         get :calculate_sep_dates

@@ -1,0 +1,40 @@
+<table class="table table-striped">
+  <%if @result[:success].present?%>
+    <h4 data-cuke="dropped_members_success"><%= l10n('admin_actions.enrollment_members_dropped_successfully') %></h4>
+    <tr>
+      <th><%= l10n('hbx_id') %></th>
+      <th><%= l10n('name') %></th>
+      <th><%= l10n('exchange.employer_applications.terminated_on') %></th>
+      <th><%= l10n('admin_actions.terminated') %>?</th>
+    </tr>
+    <% @result[:success].each do |hbx| %>
+      <tr>
+        <td><%= hbx[:hbx_id] %></td>
+        <td><%= hbx[:full_name] %></td>
+        <td><%= hbx[:terminated_on] %></td>
+        <td><i class="fa fa-check" aria-hidden="true"></i></td>
+      </tr>
+    <% end %>
+
+  <%elsif @result[:failure].present? %>
+
+    <tr>
+      <th><%= l10n('hbx_id') %></th>
+      <th><%= l10n('exchange.employer_applications.terminated_on') %></th>
+    </tr>
+    <h4 data-cuke="failed_to_drop_members"><%= l10n('admin_actions.enrollment_members_failed_to_drop') %></h4>
+    <% @result[:failure].each do |hbx| %>
+      <tr>
+        <td><%= hbx.hbx_id %></td>
+        <td><%= hbx.terminated_on %></td>
+      </tr>
+    <% end %>
+
+  <% else %>
+
+    <h4 data-cuke="no_drop_members_selected"><%= l10n('admin_actions.no_enrollment_members_selected_for_termination') %></h4>
+
+  <% end %>
+</table>
+
+<%= link_to "Close", hide_form_exchanges_hbx_profiles_path(family_id: @family_id, family_actions_id: "family_actions_#{@family_id.to_s}"), class: "btn btn-info", remote: true %>
