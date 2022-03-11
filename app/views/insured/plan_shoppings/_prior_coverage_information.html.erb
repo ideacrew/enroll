@@ -8,14 +8,14 @@
 					<ul>
 					  <% @dependent_members&.each do |member| %>
 					    <li>
-					      <p><b><%= member.person.full_name %> (<%= l10n("age")%>: <%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %> <%= l10n("years")%>)</b> </p>
+					      <p><%= member.person.full_name %> (<%= l10n("age")%>: <%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %> <%= l10n("years")%>) </p>
 					    </li>
 					  <% end %>
 					</ul>
 	      </div>
 	      <div class="container">
 	      <p data-cuke="coverage_info_msg_2"><b><%= l10n("coverage_info_msg_2") %></b></p>
-	      <p><%= l10n('coverage_info_support_message_1') %> at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %> TTY:  <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%> <%= l10n('coverage_info_support_message_2') %></p>
+	      <p><%= l10n('coverage_info_support_message_1') %> <%= l10n("site_name") %> at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %> TTY:  <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%> <%= l10n('coverage_info_support_message_2') %></p>
 	      </div>
     </div>
   </div>
