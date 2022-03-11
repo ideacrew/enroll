@@ -390,8 +390,11 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
 
   :'en.years' => "years",
   :'en.site_name' => "dchealthlink.com",
-  :'en.coverage_info_msg' => "The following person currently has coverage on",
-  :'en.coverage_info_msg_2' => "Enrolling in a new plan will remove existing coverage for these persons",
+  :'en.coverage_on' => "coverage on",
+  :'en.coverage_info_msg' => "The following people are currently enrolled in",
+  :'en.coverage_info_msg_2' => "The plan they have now won't be cancelled automatically when signing up for additional coverage.",
+  :'en.coverage_info_support_message_1' => "You'll need to call",
+  :'en.coverage_info_support_message_2' => "to remove them from their current plan.",
   :'en.age' => "Age",
   :'en.employer_contribution' => "Employer Contribution",
   :'en.you_pay' => "You Pay",
