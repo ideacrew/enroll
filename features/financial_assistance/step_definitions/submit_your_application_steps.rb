@@ -182,8 +182,8 @@ Given(/^all required questions are answered including report change terms field$
 end
 
 Given(/^the user has signed their name$/) do
-  fill_in 'first_name_thank_you', with: application.primary_applicant.first_name
-  fill_in 'last_name_thank_you', with: application.primary_applicant.last_name
+  fill_in IvlConfirmYourPlanSelection.first_name, with: application.primary_applicant.first_name
+  fill_in IvlConfirmYourPlanSelection.last_name, with: application.primary_applicant.last_name
 end
 
 Then(/^the submit button will be enabled$/) do

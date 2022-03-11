@@ -22,19 +22,19 @@ Then(/^Employee should click on Change my Password link$/) do
 end
 
 Then(/they can submit a new password/) do
-  fill_in 'user[password]', with: "aA1!aA1!aA1!"
+  fill_in SignIn.password, with: "aA1!aA1!aA1!"
   sleep 1
   fill_in 'user[new_password]', with: "NewPass!@$1234"
   sleep 1
-  fill_in 'user[password_confirmation]', with: "NewPass!@$1234"
+  fill_in CreateAccount.password_confirmation, with: "NewPass!@$1234"
   sleep 1
   page.find_button('Change my password').click
 end
 
 Then(/^Employee will submit with wrong password$/) do
-  fill_in 'user[password]', with: 'aA1!aA1!'
+  fill_in SignIn.password, with: 'aA1!aA1!'
   fill_in 'user[new_password]', with: 'NewPass!@#$1234'
-  fill_in 'user[password_confirmation]', with: 'NewPass!@#$1234'
+  fill_in CreateAccount.password_confirmation, with: 'NewPass!@#$1234'
   sleep 1
   page.find_button('Change my password').click
 end

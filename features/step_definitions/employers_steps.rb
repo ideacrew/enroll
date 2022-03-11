@@ -384,7 +384,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   fill_in "plan_year[pte_count]", :with => "15"
   fill_in "plan_year[msp_count]", :with => "3"
 
-  find('.interaction-click-control-continue').click
+  find(EmployeeChoosePlan.continue_btn).click
 
   # Benefit Group
   fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
