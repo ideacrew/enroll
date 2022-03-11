@@ -9,9 +9,9 @@ Given(/^that a person exists in EA$/) do
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   # screenshot("individual_start")
   sleep 10
-  fill_in "user[oim_id]", :with => "testflow@test.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
   # screenshot("create_account")
   click_button "Create Account"
   expect(page).to have_content("Your Information")
@@ -32,7 +32,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
   expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{site_short_name} Select CONTINUE.")
-  find('.interaction-click-control-continue', wait: 10).click
+  find(IvlPersonalInformation.continue_btn, wait: 10).click
   find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
   find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
@@ -63,25 +63,26 @@ end
 And(/the person fills in all personal info/) do
   expect(page).to have_content("Personal Information")
   expect(page).to have_content("CONTINUE")
-  fill_in "person_first_name", with: "John"
-  fill_in "person_last_name", with: "Smith"
-  fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
-  fill_in "person_ssn", with: '212-31-3131'
-  find(:xpath, '//label[@for="radio_male"]').click
-  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
-  find('.btn', text: 'CONTINUE').click
-  find('.btn', text: 'CONTINUE').click
-  find(:xpath, '//label[@for="person_us_citizen_true"]').click
-  find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
-  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
-  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  fill_in IvlPersonalInformation.first_name, with: "John"
+  fill_in IvlPersonalInformation.last_name, with: "Smith"
+  fill_in IvlPersonalInformation.dob, with: "11/11/1991"
+  fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.need_coverage_yes).click
+  find(IvlPersonalInformation.continue_btn).click
+  find(IvlPersonalInformation.continue_btn).click
+  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
+  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
+  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
+  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
   find(IvlPersonalInformation.tobacco_user_no_radiobtn).click unless !tobacco_user_field_enabled?
-  fill_in "person_addresses_attributes_0_address_1", with: "123 fake st"
-  fill_in "person_addresses_attributes_0_city", with: "DC"
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  find('#address_info li', :text => 'DC', wait: 5).click
-  fill_in "person[addresses_attributes][0][zip]", with: '20002'
-  find('.btn', text: 'CONTINUE').click
+  fill_in IvlPersonalInformation.address_line_one, with: "123 fake st"
+  fill_in IvlPersonalInformation.city, with: "DC"
+  find(IvlPersonalInformation.select_state_dropdown).click
+  find(IvlPersonalInformation.select_dc_state).click
+  fill_in IvlPersonalInformation.zip, with: '20002'
+  find(IvlPersonalInformation.continue_btn).click
+  sleep 20
 end
 
 And(/^the person has an active resident role$/) do

@@ -130,7 +130,7 @@ And(/Employee should see today date and clicks continue/) do
   expect(find('input#qle_date', style: {'pointer-events': 'none'})).to be_truthy
 
   within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+    find(EmployeeChooseCoverage.continue_btn).click
   end
 end
 

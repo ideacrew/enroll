@@ -31,6 +31,6 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual selects a silver plan on Plan Shopping page
     Then the individual should see the elected APTC amount and click on the Confirm button of the Thank You page
     And the individual should see the APTC amount on the Receipt page
-    And the individual clicks on the Continue button to go to the Individual home page
+    And Individual clicks on the Continue button to go to the Individual home page
     Then the individual should see the elected aptc amount applied to enrollment in the Individual home page
     Then the individual logs out

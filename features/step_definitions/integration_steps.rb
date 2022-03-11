@@ -556,7 +556,7 @@ When(/^.+ go(?:es)? to register as an employee$/) do
   # find("option[id='sec-answer-0-2']").click
   # click_button('Save Responses')
   sleep 1
-  find('.interaction-click-control-continue').click
+  find(EmployeeContactInformation.continue_button).click
 end
 
 Then(/^.+ should see the employee search page$/) do
@@ -577,10 +577,10 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   # screenshot("start")
 
   person = people[named_person]
-  fill_in "user[oim_id]", :with => person[:email]
-  fill_in "user[password]", :with => person[:password]
-  fill_in "user[password_confirmation]", :with => person[:password]
-  find('.create-account-btn').click
+  fill_in CreateAccount.email_or_username, :with => person[:email]
+  fill_in CreateAccount.password, :with => person[:password]
+  fill_in CreateAccount.password_confirmation, :with => person[:password]
+  find(CreateAccount.create_account_btn).click
 end
 
 And(/^Primary Broker select the all security question and give the answer$/) do
@@ -606,11 +606,11 @@ When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   fill_in 'person[first_name]', :with => person[:first_name]
   fill_in 'person[last_name]', :with => person[:last_name]
   fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
-  fill_in 'person[ssn]', :with => person_ssn
+  fill_in IvlPersonalInformation.ssn, :with => person_ssn
   find(:xpath, '//label[@for="radio_male"]').click
 
   # screenshot("information_entered")
-  find('.interaction-click-control-continue').click
+  find(EmployeeContactInformation.continue_button).click
 end
 
 And(/^(.*?) sees the option to enroll for all employers$/) do |named_person|
@@ -702,7 +702,7 @@ And(/^.+ completes and submits the matched employee form for (.*)$/) do |named_p
   fill_in "person[first_name]", with: person[:first_name]
   fill_in "person[last_name]", with: person[:last_name]
   fill_in 'jq_datepicker_ignore_person_dob', with: person[:dob]
-  fill_in 'person[ssn]', with: person[:ssn]
+  fill_in IvlPersonalInformation.ssn, with: person[:ssn]
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 
 end
@@ -781,7 +781,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   find_all(EmployeeFamilyInformation.dependent_relationship_dropdown)[0].click
   find(EmployeeFamilyInformation.spouse).click
   find(:xpath, "//label[@for='radio_female']").click
-  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
+  find(EmployeeFamilyInformation.lives_with_primary).click
   fill_in EmployeeFamilyInformation.dependent_address_line_one, with: '123 STREET'
   fill_in EmployeeFamilyInformation.dependent_city, with: 'WASHINGTON'
   find(EmployeeFamilyInformation.dependent_select_state_dropdown).click
@@ -929,7 +929,7 @@ Then(/^.+ should see the receipt page$/) do
   find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
   # screenshot("receipt_page")
-  find('.interaction-click-control-continue').click
+  find(EmployeeEnrollmentSubmitted.continue_btn).click
 end
 
 Then(/^.+ should see the "my account" page$/) do
@@ -1130,17 +1130,16 @@ end
 
 And(/.+ select three plans to compare/) do
   wait_for_ajax
-  expect(page).to have_content("Select Plan")
-  if page.all("span.checkbox-custom-label").count > 3
+  expect(page).to have_content(IvlChoosePlan.choose_plan_text)
+  if page.all(IvlChoosePlan.compare_checkbox).count > 3
     #modal plan data for IVL not really seeded in.
-    page.all("span.checkbox-custom-label")[0].click
-    page.all("span.checkbox-custom-label")[1].click
-    page.all("span.checkbox-custom-label")[2].click
-    find('.ivl-compare-selected-plans-link').click
-
+    page.all(IvlChoosePlan.compare_checkbox)[0].click
+    page.all(IvlChoosePlan.compare_checkbox)[1].click
+    page.all(IvlChoosePlan.compare_checkbox)[2].click
+    find(IvlChoosePlan.compare_plans_btn).click
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
-    find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').click
+    find(IvlChoosePlan.compare_selected_plans_close_btn).click
   end
 end
 

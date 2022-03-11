@@ -101,10 +101,10 @@ When(/^Employer login$/) do
   click_link "Employer Portal"
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[login]", :with => 'employer@dc.gov'
+  fill_in SignIn.username, :with => 'employer@dc.gov'
   find('#user_login').set('employer@dc.gov')
-  fill_in "user[password]", :with => '1qaz@WSX'
-  fill_in "user[login]", :with => 'employer@dc.gov' unless find(:xpath, '//*[@id="user_login"]').value == 'employer@dc.gov'
+  fill_in SignIn.password, :with => '1qaz@WSX'
+  fill_in SignIn.username, :with => 'employer@dc.gov' unless find(:xpath, '//*[@id="user_login"]').value == 'employer@dc.gov'
   find('.interaction-click-control-sign-in').click
 end
 
@@ -118,10 +118,10 @@ When(/^Consumer login$/) do
   wait_for_ajax
   find('.interaction-click-control-sign-in-existing-account').click
 
-  fill_in "user[login]", :with => 'consumer@dc.gov'
+  fill_in SignIn.username, :with => 'consumer@dc.gov'
   find('#user_login').set('consumer@dc.gov')
-  fill_in "user[password]", :with => '1qaz@WSX'
-  fill_in "user[login]", :with => 'consumer@dc.gov' unless find(:xpath, '//*[@id="user_login"]').value == 'consumer@dc.gov'
+  fill_in SignIn.password, :with => '1qaz@WSX'
+  fill_in SignIn.username, :with => 'consumer@dc.gov' unless find(:xpath, '//*[@id="user_login"]').value == 'consumer@dc.gov'
   find('.interaction-click-control-sign-in').click
 end
 

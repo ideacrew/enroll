@@ -138,7 +138,7 @@ def enter_plan_year_info
   fill_in 'benefit_application[fte_count]', with: '3'
   fill_in 'benefit_application[pte_count]', with: '3'
   fill_in 'benefit_application[msp_count]', with: '3'
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
   sleep(3)
   #Benefit Package
   wait_for_ajax

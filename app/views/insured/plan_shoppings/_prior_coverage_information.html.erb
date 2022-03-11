@@ -3,7 +3,7 @@
   <div class="row">
     <div class="col-md-11 col-sm-12 col-xs-12">
         <div class="container">
-        	<h4><%= l10n("coverage_info_msg") %> <%= l10n("site_name") %></h4>
+        	<h4 data-cuke="coverage_info_msg"><%= l10n("coverage_info_msg") %> <%= l10n("site_name") %></h4>
 					<ul>
 					  <% @dependent_members&.each do |member| %>
 					    <li>
@@ -13,7 +13,7 @@
 					</ul>
 	      </div>
 	      <div class="container">
-	      <h4><%= l10n("coverage_info_msg_2") %></h4>
+	      <h4 data-cuke="coverage_info_msg_2"><%= l10n("coverage_info_msg_2") %></h4>
 	      </div>
     </div>
   </div>

@@ -90,4 +90,16 @@ class IvlChoosePlan
   def self.non_silver_plan_modal_text
     'You are Eligible for Lower Costs'
   end
+
+  def self.compare_checkbox
+    '[data-cuke="compare_plan_checkbox"]'
+  end
+
+  def self.compare_plans_btn
+    '[data-cuke="ivl-compare-selected-plans-link"]'
+  end
+
+  def self.compare_selected_plans_close_btn
+    '[data-cuke="compare_selected_plans_close_btn"]'
+  end
 end

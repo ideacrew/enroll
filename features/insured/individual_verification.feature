@@ -19,8 +19,8 @@ Scenario: Outstanding verification
     When Individual does not apply for assistance and clicks continue
     And Individual clicks on continue
     And Individual clicks on continue button on Choose Coverage page
-    When Individual select a plan on plan shopping page
-    And Individual click on purchase button on confirmation page
+    When Individual selects a plan on plan shopping page
+    And Individual clicks on purchase button on confirmation page
     And Individual clicks on Go To My Account button
     And Individual clicks on Documents link
     * I should see page for documents verification
