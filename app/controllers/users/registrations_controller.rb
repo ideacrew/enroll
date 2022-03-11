@@ -33,7 +33,28 @@ class Users::RegistrationsController < Devise::RegistrationsController
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
     resource.handle_headless_records
 
-    resource_saved = resource.save
+    if EnrollRegistry[:identity_management_config].settings(:identity_manager).item == :keycloak
+      # TODO: - Handle headless in keycloak
+      # TODO - Update keycloak with person details later stage (If required)
+      result = Operations::Users::Create.new.call(account: {
+                                                    email: sign_up_params['oim_id'],
+                                                    password: sign_up_params['password'],
+                                                    first_name: nil,
+                                                    last_name: nil,
+                                                    realm_roles: []
+                                                  })
+
+      if result.success?
+        resource_saved = true
+        resource = result.success[:user]
+      else
+        flash[:alert] = "Error while registration. Contact administrator."
+        render :new and return
+      end
+    else
+      resource_saved = resource.save
+    end
+
     yield resource if block_given?
     if resource_saved
       # FIXME: DON'T EVER DO THIS!

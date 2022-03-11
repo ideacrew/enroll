@@ -80,6 +80,7 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
 
       before do
         allow(Operations::Users::Create).to receive(:new).and_return(operation)
+        allow(EnrollRegistry).to receive(:[]).and_call_original
         allow(EnrollRegistry).to receive(:[]).with(:identity_management_config).and_return(double(settings: double(item: :keycloak)))
       end
 

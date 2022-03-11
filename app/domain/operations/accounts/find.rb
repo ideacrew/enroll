@@ -43,7 +43,7 @@ module Operations
           # rubocop:enable Layout/MultilineOperationIndentation
         else
           Failure(
-            "params must include :scope_name key and valid scope: #{valid_scopes}"
+            "params must include :scope_name key and valid scope: #{VALID_SCOPES}"
           )
         end
       end
