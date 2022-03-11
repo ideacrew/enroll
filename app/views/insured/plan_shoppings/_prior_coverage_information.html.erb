@@ -1,9 +1,10 @@
-<div class="alert alert-notice">
+<div class="alert alert-message">
   <a href="#" data-dismiss="alert" ></a>
   <div class="row">
     <div class="col-md-11 col-sm-12 col-xs-12">
         <div class="container">
-        	<h4 data-cuke="coverage_info_msg"><%= l10n("coverage_info_msg") %> <%= l10n("site_name") %></h4>
+        	<p data-cuke="coverage_info_msg"><i class="fa fa-exclamation-triangle" style="font-size:20px;color:#ffb11a"></i> 
+        		<%= l10n("coverage_info_msg") %> <%= @enrollment.coverage_kind %> <%= l10n("coverage_on") %> <%= l10n("site_name") %>:</p>
 					<ul>
 					  <% @dependent_members&.each do |member| %>
 					    <li>
@@ -13,7 +14,8 @@
 					</ul>
 	      </div>
 	      <div class="container">
-	      <h4 data-cuke="coverage_info_msg_2"><%= l10n("coverage_info_msg_2") %></h4>
+	      <p data-cuke="coverage_info_msg_2"><b><%= l10n("coverage_info_msg_2") %></b></p>
+	      <p><%= l10n('coverage_info_support_message_1') %> at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %> TTY:  <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%> <%= l10n('coverage_info_support_message_2') %></p>
 	      </div>
     </div>
   </div>
