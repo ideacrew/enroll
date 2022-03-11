@@ -16,7 +16,7 @@ class IvlIapIncomeAdjustmentsPage
   end
 
   def self.continue_btn
-    'a[class="btn btn-lg btn-primary btn-block interaction-click-control-continue"]'
+    '.interaction-click-control-continue'
   end
 
   def self.save_and_exit_link
@@ -147,12 +147,24 @@ class IvlIapIncomeAdjustmentsPage
     'input[class="deduction-checkbox-moving_expenses interaction-choice-control-value-deduction-kind"]'
   end
 
+  def self.moving_expenses_how_often_dropdown
+    '.new-deduction-form.moving_expenses span.label'
+  end
+
   def self.moving_expenses_select_bi_weekly
     'li[class="interaction-choice-control-deduction-frequency-kind-65 interaction-choice-control-deduction-frequency-kind-1"]'
   end
 
   def self.moving_expenses_select_monthly
     'li[class="interaction-choice-control-deduction-frequency-kind-68 interaction-choice-control-deduction-frequency-kind-4"]'
+  end
+
+  def self.moving_expenses_select_yearly
+    '.new-deduction-form.moving_expenses li.interaction-choice-control-deduction-frequency-kind-7'
+  end
+
+  def self.income_adjustments_save_btn
+    '[data-cuke="income-adjustments-save-button"]'
   end
 
   def self.health_savings_account_checkbox

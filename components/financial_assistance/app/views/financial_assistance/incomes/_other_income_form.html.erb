@@ -37,7 +37,7 @@
       <% else %>
         <% onclick_save_event = "" %>
       <% end %>
-      <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", onclick: onclick_save_event %>
+      <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", :data => { :cuke => "other-income-save-button" }, onclick: onclick_save_event %>
     </div>
   </div>
 </div>

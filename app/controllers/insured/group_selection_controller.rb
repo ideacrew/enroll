@@ -224,7 +224,9 @@ class Insured::GroupSelectionController < ApplicationController
            end
     family_member_ids = @family.family_members.active.map(&:id)
 
-    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: get_ivl_market_kind(@person), shopping_family_members_ids: family_member_ids})
+    market_kind = @market_kind == "shop" ? "shop" : get_ivl_market_kind(@person)
+
+    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: market_kind, shopping_family_members_ids: family_member_ids})
 
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person

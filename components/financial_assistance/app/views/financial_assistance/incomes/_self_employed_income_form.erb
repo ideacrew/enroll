@@ -17,7 +17,7 @@
       </div>
       <div class="col-md-3 fa-select select-box">
         <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
-        <div class="fa-frequency-kind">
+        <div class="fa-frequency-kind" data-cuke="self-employed-income-how-often-dropdown">
           <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {prompt: 'Choose' }, {:required => true} %>
         </div>
       </div>
@@ -40,7 +40,7 @@
         <% else %>
           <% onclick_save_event = "" %>
         <% end %>
-        <%= f.submit 'Save', class: 'btn btn-danger', onclick: onclick_save_event %>
+        <%= f.submit 'Save', class: 'btn btn-danger', :data => { :cuke => "self-employed-income-save-button" }, onclick: onclick_save_event %>
       </div>
     </div>
 <% end %>
