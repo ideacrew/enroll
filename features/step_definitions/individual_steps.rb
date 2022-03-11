@@ -1167,3 +1167,17 @@ And(/^Primary member logs back in$/) do
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
   find(SignIn.sign_in_btn).click
 end
+When(/Individual creates an HBX account with SSN already in use$/) do
+  fill_in CreateAccount.email_or_username, :with => "testflow123"
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  click_button "Create Account"
+  find(YourInformation.continue_btn).click
+  fill_in IvlPersonalInformation.first_name, with: "Jack"
+  fill_in IvlPersonalInformation.last_name, with: "Smith"
+  fill_in IvlPersonalInformation.dob, with: "11/11/1992"
+  fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.need_coverage_yes).click
+  find(IvlPersonalInformation.continue_btn).click
+end
