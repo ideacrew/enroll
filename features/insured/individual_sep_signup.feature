@@ -24,8 +24,8 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
     Then Individual should not see any plan which premium is 0
-    When Individual select a plan on plan shopping page
-    And Individual click on purchase button on confirmation page
+    When Individual selects a plan on plan shopping page
+    And Individual clicks on purchase button on confirmation page
     And Individual clicks on continue
     Then Individual should land on Home page
     

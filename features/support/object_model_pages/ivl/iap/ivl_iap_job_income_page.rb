@@ -63,8 +63,12 @@ class IvlIapJobIncomeInformationPage
     'div[class="selectric-wrapper selectric-interaction-choice-control-income-employer-address-state"]'
   end
 
+  def self.select_dc
+    'li[class="interaction-choice-control-income-employer-address-state-9 interaction-choice-control-income-frequency-kind-9"]'
+  end
+
   def self.select_va_state
-    'li[class="interaction-choice-control-income-employer-address-state-46 interaction-choice-control-income-frequency-kind-46"]'
+    'li[class="interaction-choice-control-income-employer-address-state-47 interaction-choice-control-income-frequency-kind-47"]'
   end
 
   def self.income_employer_zip
@@ -76,7 +80,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.income_save_btn
-    '.interaction-click-control-save'
+    '[data-cuke="job-income-save-button"]'
   end
 
   def self.add_another_job_income
@@ -108,7 +112,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.self_employee_how_often_dropdown
-    'div[class="selectric interaction-choice-control-income-frequency-kind interaction-choice-control-income-employer-address-state"]'
+    '[data-cuke="self-employed-income-how-often-dropdown"]'
   end
 
   def self.self_employed_yearly
@@ -135,7 +139,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.self_self_employee_save_btn
-    '.interaction-click-control-save'
+    '[data-cuke="self-employed-income-save-button"]'
   end
 
   def self.self_add_another_self_employment
@@ -159,6 +163,6 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.continue_btn
-    'a[id="btn-continue"]'
+    '.interaction-click-control-continue'
   end
 end

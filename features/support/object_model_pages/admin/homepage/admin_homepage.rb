@@ -118,4 +118,21 @@ class AdminHomepage
   def self.bot_button
     '[data-cuke="bot-button"]'
   end
+
+  def self.failed_validation_text
+    "eligibility failed"
+  end
+
+  def self.remove_mailing_address
+    '[data-cuke="remove_mailing_address"]'
+  end
+
+  # any non-dc state
+  def self.non_dc_state
+    'div.selectric-open li[data-index="12"]'
+  end
+
+  def self.shop_for_employer
+    '[data-cuke="shop_for_employer"]'
+  end
 end

@@ -20,6 +20,7 @@ FactoryBot.define do
     can_cancel_enrollment {false}
     can_terminate_enrollment {false}
     change_enrollment_end_date {false}
+    can_drop_enrollment_members {false}
 
     trait :hbx_staff do
       name { 'hbx_staff' }
@@ -36,6 +37,7 @@ FactoryBot.define do
       can_cancel_enrollment {true}
       can_terminate_enrollment {true}
       change_enrollment_end_date {true}
+      can_drop_enrollment_members {true}
     end
 
     trait :hbx_update_ssn do
@@ -79,6 +81,7 @@ FactoryBot.define do
         can_cancel_enrollment {true}
         can_terminate_enrollment {true}
         change_enrollment_end_date {true}
+        can_drop_enrollment_members {true}
       end
     end
 
@@ -102,6 +105,7 @@ FactoryBot.define do
         can_cancel_enrollment {true}
         can_terminate_enrollment {true}
         change_enrollment_end_date {true}
+        can_drop_enrollment_members {true}
       end
     end
 
@@ -158,6 +162,7 @@ FactoryBot.define do
       can_cancel_enrollment {true}
       can_terminate_enrollment {true}
       change_enrollment_end_date {true}
+      can_drop_enrollment_members {true}
     end
 
     trait :super_admin do
@@ -178,6 +183,7 @@ FactoryBot.define do
       can_cancel_enrollment {true}
       can_terminate_enrollment {true}
       change_enrollment_end_date {true}
+      can_drop_enrollment_members {true}
     end
   end
 end

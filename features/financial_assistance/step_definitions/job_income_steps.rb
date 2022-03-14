@@ -121,7 +121,7 @@ end
 
 And(/^the user fills out the required self employment information$/) do
   fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
-  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.self_employee_how_often_dropdown).click
   find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
   fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2016"
   fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2017"
@@ -130,7 +130,7 @@ end
 
 And(/^the user fills out the required self employment information with incorrect dates$/) do
   fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
-  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.self_employee_how_often_dropdown).click
   find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
   fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2017"
   fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2016"
@@ -141,7 +141,7 @@ Given(/^the user has entered at least one self employment information$/) do
   choose(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn)
   sleep 1
   fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
-  find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+  find(IvlIapJobIncomeInformationPage.self_employee_how_often_dropdown).click
   find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
   fill_in IvlIapJobIncomeInformationPage.income_from, with: "11/11/2016"
   fill_in IvlIapJobIncomeInformationPage.income_to, with: "11/11/2017"
@@ -164,7 +164,7 @@ And(/^the user adds another self employment income$/) do
 end
 
 When(/^the user saves the self employment information$/) do
-  find(IvlIapJobIncomeInformationPage.income_save_btn).click
+  find(IvlIapJobIncomeInformationPage.self_self_employee_save_btn).click
 end
 
 Given(/^the user is on the Job Income page$/) do

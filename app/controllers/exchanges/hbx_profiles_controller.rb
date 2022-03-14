@@ -483,6 +483,26 @@ def employer_poc
     end
   end
 
+  # drop action
+  def drop_enrollment_member
+    @hbxs = Family.find(params[:family]).all_enrollments.individual_market.can_terminate
+    @row = params[:family_actions_id]
+    respond_to do |format|
+      format.js { render "datatables/drop_enrollment_member" }
+    end
+  end
+
+  def update_enrollment_member_drop
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_enrollment_member_drop_params).to_h)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.drop_enrollment_members
+    respond_to do |format|
+      format.js { render :file => "datatables/drop_enrollment_member_result.js.erb"}
+    end
+  end
+
   def view_enrollment_to_update_end_date
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
@@ -882,6 +902,10 @@ def employer_poc
 
   def uniq_terminate_params
     params.keys.map { |key| key.match(/terminate_hbx_.*/) || key.match(/termination_date_.*/) || key.match(/transmit_hbx_.*/) || key.match(/family_.*/) }.compact.map(&:to_s)
+  end
+
+  def uniq_enrollment_member_drop_params
+    params.keys.map { |key| key.match(/terminate_member_.*/) || key.match(/termination_date_.*/) || key.match(/family_.*/) || key.match(/enrollment_id/) || key.match(/transmit_hbx_.*/) }.compact.map(&:to_s)
   end
 
   def uniq_cancel_params

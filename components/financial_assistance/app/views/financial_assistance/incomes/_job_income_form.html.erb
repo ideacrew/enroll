@@ -79,7 +79,7 @@
         <% else %>
           <% onclick_save_event = "checkDate('#{income_id}')" %>
         <% end %>
-        <%= f.submit 'Save', class: 'btn btn-danger', onclick: onclick_save_event %>
+        <%= f.submit 'Save', class: 'btn btn-danger', :data => { :cuke => "job-income-save-button" }, onclick: onclick_save_event %>
       </div>
     </div>
 <% end %>

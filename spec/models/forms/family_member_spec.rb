@@ -305,7 +305,7 @@ describe Forms::FamilyMember, 'with no ssn' do
     it 'should throw an error if ssn or no ssn values are blank' do
       subject.validate
       expect(subject).not_to be_valid
-      expect(subject.errors[:base].first).to eq "ssn is required"
+      expect(subject.errors[:base].first).to eq "SSN is required"
     end
   end
 

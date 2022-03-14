@@ -4,7 +4,7 @@
 class IvlIapOtherIncomePage
 
   def self.has_unemployment_income_yes_radiobtn
-    '#has_unemployment_income_true'
+    'has_unemployment_income_true'
   end
 
   def self.has_unemployment_income_no_radiobtn
@@ -20,7 +20,7 @@ class IvlIapOtherIncomePage
   end
 
   def self.how_often_dropdown
-    'div[class="selectric interaction-choice-control-income-frequency-kind"] span'
+    '[data-cuke="unemployment-income-how-often-dropdown"]'
   end
 
   def self.select_bi_weekly
@@ -33,6 +33,10 @@ class IvlIapOtherIncomePage
 
   def self.select_monthly
     'li[class="interaction-choice-control-income-frequency-kind-4"]'
+  end
+
+  def self.select_yearly
+    '.new-unemployment-income-form li.interaction-choice-control-income-frequency-kind-7'
   end
 
   def self.income_from
@@ -48,7 +52,7 @@ class IvlIapOtherIncomePage
   end
 
   def self.unemployment_save_btn
-    'input[class="btn btn-danger  interaction-click-control-save"]'
+    '[data-cuke="unemployment-income-save-button"]'
   end
 
   def self.unemployment_edit_btn
@@ -71,8 +75,12 @@ class IvlIapOtherIncomePage
     'a[href="#has_other_income"]'
   end
 
+  def self.has_other_income_save_btn
+    '[data-cuke="other-income-save-button"]'
+  end
+
   def self.continue_btn
-    'a[class="btn btn-lg btn-primary btn-block interaction-click-control-continue"]'
+    '.interaction-click-control-continue'
   end
 
   def self.alimony_received_checkbox
@@ -151,6 +159,10 @@ class IvlIapOtherIncomePage
     'input[class="other-income-checkbox-interest interaction-choice-control-value-other-income-kind"]'
   end
 
+  def self.interest_how_often_dropdown
+    '.new-other-income-form.interest span.label'
+  end
+
   def self.interest_select_bi_weekly
     'li[class="interaction-choice-control-income-frequency-kind-33 interaction-choice-control-income-frequency-kind-1"]'
   end
@@ -160,7 +172,7 @@ class IvlIapOtherIncomePage
   end
 
   def self.interest_select_yearly
-    'li[class="interaction-choice-control-income-frequency-kind-39 last interaction-choice-control-income-frequency-kind-7"]'
+    '.new-other-income-form.interest li.interaction-choice-control-income-frequency-kind-7'
   end
 
   def self.pension_or_retirement_checkbox

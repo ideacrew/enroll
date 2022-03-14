@@ -41,9 +41,9 @@ end
 When(/^(.*) create a new account for employer$/) do |named_person|
   find('.interaction-click-control-create-account').click
   person = people_for_cobra[named_person]
-  fill_in "user[oim_id]", :with => person[:email]
-  fill_in "user[password]", :with => person[:password]
-  fill_in "user[password_confirmation]", :with => person[:password]
+  fill_in CreateAccount.email_or_username, :with => person[:email]
+  fill_in SignIn.password, :with => person[:password]
+  fill_in CreateAccount.password_confirmation, :with => person[:password]
   # screenshot("create_account")
   find(".interaction-click-control-create-account").click
 end
@@ -51,9 +51,9 @@ end
 Then(/^I fill employer signup form for (.*?)$/) do |named_person|
   find('.interaction-click-control-create-account').click
   person = people_for_cobra[named_person]
-  fill_in "user[oim_id]", :with => person[:username]
-  fill_in "user[password]", :with => person[:password]
-  fill_in "user[password_confirmation]", :with => person[:password]
+  fill_in CreateAccount.email_or_username, :with => person[:username]
+  fill_in SignIn.password, :with => person[:password]
+  fill_in CreateAccount.password_confirmation, :with => person[:password]
   sleep 1
 end
 
@@ -212,7 +212,7 @@ Then(/^Jack Cobra should see the receipt page and verify employer contribution f
   expect(page).to have_content('Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.')
   expect(page).to have_content('$0.00')
   # screenshot("receipt_page_for_cobra_employee")
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 Then(/^Jack Employee should see the receipt page and verify employer contribution for normal employee$/) do
@@ -220,7 +220,7 @@ Then(/^Jack Employee should see the receipt page and verify employer contributio
   expect(page).to have_content('Market: Employer Sponsored')
   expect(page).not_to have_content('Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.')
   # screenshot("receipt_page_for_normal_employee")
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 Then(/^.+ should see my account page$/) do
@@ -238,10 +238,10 @@ When(/^(.*) login in for (.*)$/) do |named_person, role|
   end
   expect(page).to have_content('Sign In')
 
-  fill_in "user[login]", with: email_address
+  fill_in SignIn.username, with: email_address
   find('#user_login').set(email_address)
-  fill_in "user[password]", with: password
-  fill_in "user[login]", :with => email_address unless find(:xpath, '//*[@id="user_login"]').value == email_address
+  fill_in SignIn.password, with: password
+  fill_in SignIn.username, :with => email_address unless find(:xpath, '//*[@id="user_login"]').value == email_address
   find('.interaction-click-control-sign-in').click
 end
 
@@ -361,7 +361,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   fill_in "plan_year[pte_count]", :with => "15"
   fill_in "plan_year[msp_count]", :with => "3"
 
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
 
   # Benefit Group
   fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
@@ -396,7 +396,7 @@ def enter_plan_year_info
   fill_in 'benefit_application[fte_count]', with: '3'
   fill_in 'benefit_application[pte_count]', with: '3'
   fill_in 'benefit_application[msp_count]', with: '3'
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
   sleep(3)
   #Benefit Package
   wait_for_ajax

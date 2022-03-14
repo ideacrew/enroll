@@ -131,7 +131,7 @@ Then(/^the relationship is saved$/) do
 end
 
 And(/^all the relationships have been entered$/) do
-  find('.interaction-click-control-continue').click
+  find(IvlChooseCoverage.continue_btn).click
   expect(page).to have_no_css('.missing_relation')
   sleep 3
 end

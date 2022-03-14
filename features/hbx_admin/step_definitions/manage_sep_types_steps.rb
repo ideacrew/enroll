@@ -241,9 +241,9 @@ end
 And("Employee signed in") do
   find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
-  fill_in "user[login]", :with => "patrick.doe@dc.gov"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => "patrick.doe@dc.gov"
+  fill_in SignIn.password, :with => "aA1!aA1!aA1!"
+  find(SignIn.sign_in_btn).click
 end
 
 Then("Employee should land on home page") do
@@ -809,7 +809,7 @@ end
 And(/^\w+ should see QLE date filled and clicks continue$/) do
   expect(find('#qle_date').value.present?).to eq true
   within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+    find(IvlChooseCoverage.continue_btn).click
   end
 end
 
@@ -951,7 +951,7 @@ When("Patrick Doe clicked on Shop For Plans button") do
   sfp = page.all('div').detect { |div| div.text == 'Shop For Plans'}
   sfp.click
   find('.interaction-click-control-shop-now').click
-  find(".interaction-click-control-continue").click
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 When("I click on Shop For Plans banner button") do
