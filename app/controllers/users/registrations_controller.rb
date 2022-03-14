@@ -39,42 +39,40 @@ class Users::RegistrationsController < Devise::RegistrationsController
       result = Operations::Users::Create.new.call(account: {
                                                     email: sign_up_params['oim_id'],
                                                     password: sign_up_params['password'],
-                                                    first_name: nil,
-                                                    last_name: nil,
-                                                    realm_roles: []
                                                   })
 
       if result.success?
         resource_saved = true
-        resource = result.success[:user]
+        user = result.success[:user]
       else
         flash[:alert] = "Error while registration. Contact administrator."
         render :new and return
       end
     else
       resource_saved = resource.save
+      user = resource
     end
 
-    yield resource if block_given?
+    yield user if block_given?
     if resource_saved
       # FIXME: DON'T EVER DO THIS!
       # HACK: DON'T EVER DO THIS!
       # NONONONOBAD: We are only doing this because the enterprise service
       #              can't accept a password with a standard hash.
       session["stashed_password"] = sign_up_params["password"]
-      if resource.active_for_authentication?
+      if user.active_for_authentication?
         set_flash_message :notice, :signed_up, site_name: EnrollRegistry[:enroll_app].setting(:short_name).item if is_flashing_format?
-        sign_up(resource_name, resource)
-        location = after_sign_in_path_for(resource)
+        sign_up(resource_name, user)
+        location = after_sign_in_path_for(user)
         flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
-        respond_with resource, location: location
+        respond_with user, location: location
       else
-        set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
+        set_flash_message :notice, :"signed_up_but_#{user.inactive_message}" if is_flashing_format?
         expire_data_after_sign_in!
-        respond_with resource, location: after_inactive_sign_up_path_for(resource)
+        respond_with user, location: after_inactive_sign_up_path_for(user)
       end
     else
-      clean_up_passwords resource
+      clean_up_passwords user
       @validatable = devise_mapping.validatable?
       if @validatable
         @minimum_password_length = resource_class.password_length.min

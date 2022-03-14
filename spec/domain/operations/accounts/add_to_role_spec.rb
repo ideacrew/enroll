@@ -39,7 +39,8 @@ RSpec.describe Operations::Accounts::AddToRole, type: :request do
         end
       end
 
-      it 'should create the new user' do
+      # We're not adding roles to keycloak for now
+      xit 'should create the new user' do
         VCR.use_cassette('account.add_to_role.add_account_to_role') do
           staff_accounts =
             Operations::Accounts::Find.new.call(

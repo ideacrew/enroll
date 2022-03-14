@@ -124,7 +124,7 @@ RSpec.describe Users::RegistrationsController, dbclean: :after_each do
       context "with a broker invitation" do
         let(:user) { FactoryBot.create(:user, email: email, oim_id: email) }
         let(:operation) { double(Operations::Users::Create, call: Success(user: user)) }
-        let(:invitation) { FactoryBot.create(:invitation, :broker_role) }
+        let(:invitation) { FactoryBot.create(:invitation, :broker_role, invitation_email: email) }
 
         before do
           allow(Operations::Users::Create).to receive(:new).and_return(operation)
