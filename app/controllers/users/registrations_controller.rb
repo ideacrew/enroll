@@ -11,6 +11,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
+  # rubocop:todo Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
   def create
     build_resource(sign_up_params)
 #   Check for curam user email, if present then restrict the user.
@@ -38,7 +39,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       # TODO - Update keycloak with person details later stage (If required)
       result = Operations::Users::Create.new.call(account: {
                                                     email: sign_up_params['oim_id'],
-                                                    password: sign_up_params['password'],
+                                                    password: sign_up_params['password']
                                                   })
 
       if result.success?
@@ -80,6 +81,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       render :new
     end
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
 
   # GET /resource/edit
   # def edit
