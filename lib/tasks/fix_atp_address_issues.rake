@@ -95,9 +95,10 @@ namespace :migrations do
 
             counters[:faa_apps] = { fixed: 0, homeless_fix: 0, address_fix: 0, same_as_primary_fix: 0, no_fix_needed: 0 }
 
-            @target_app.no_timeout.select{|application| application.applicants.no_timeout.detect{|a| a.person_hbx_id == person.hbx_id}}&.each do |application|
-              primary = application.primary_applicant
-              application.applicants&.select{|a| a.person_hbx_id == person.hbx_id}.each do |applicant|
+            @target_app.no_timeout.select{|application| application.no_timeout.applicants.no_timeout.detect{|a| a.person_hbx_id == person.hbx_id}}&.each do |application|
+              next if application.nil?
+              primary = application.primary_applicant              
+              application.no_timeout.applicants.no_timeout.select{|a| a.person_hbx_id == person.hbx_id}.each do |applicant|
                 next if applicant.nil?
                 a_isnt_homeless = applicant.is_homeless? == true && applicant.addresses.any?
                 counters[:faa_apps][:homeless_fix] += 1 if a_isnt_homeless
