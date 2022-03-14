@@ -67,7 +67,7 @@ namespace :migrations do
       FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
       file_name = "#{Rails.root}/update_address_fixes.csv"
       total_count = @people.count
-      users_per_iteration = 10_000.0
+      users_per_iteration = 5_000.0
       counter = 0
       number_of_iterations = (total_count / users_per_iteration).ceil
       CSV.open(file_name, 'w+', headers: true) do |csv|
