@@ -60,13 +60,18 @@ module Forms
       begin
         result = ::Operations::HbxEnrollments::DropEnrollmentMembers.new.call({hbx_enrollment: hbx_enrollment, options: @params})
         return if result.failure == 'No members selected to drop.'
-        @result[:failure] << hbx_enrollment if result.failure?
+        if result.failure?
+          @result[:failure] << hbx_enrollment
+          Rails.logger.error("Unable to drop enrollment members, error: #{result.failure}")
+        end
+
         if result.success?
           @result[:success] = result.success
           transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
           handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
         end
-      rescue StandardError
+      rescue StandardError => e
+        Rails.logger.error("Unable to drop enrollment members, error: #{e}")
         @result[:failure] << hbx_enrollment
       end
     end
