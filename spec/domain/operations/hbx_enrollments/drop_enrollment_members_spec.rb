@@ -56,19 +56,36 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
     end
 
     context 'when members are selected for drop', dbclean: :around_each do
-      before do
-        @dropped_members = subject.call({hbx_enrollment: enrollment,
-                                         options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
-                                                   "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
+      context 'when previous enrollment has 0 applied aptc' do
+        before do
+          @dropped_members = subject.call({hbx_enrollment: enrollment,
+                                           options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
+                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
+        end
+
+        it 'should return dropped member info' do
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+        end
+
+        it 'should terminate previously existing enrollment' do
+          expect(enrollment.aasm_state).to eq 'coverage_terminated'
+        end
       end
 
-      it 'should return dropped member info' do
-        expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
-        expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
-      end
+      context 'when previous enrollment has applied aptc' do
+        before do
+          enrollment.update_attributes!(applied_aptc_amount: 100)
+          FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment.effective_on)
+          @dropped_members = subject.call({hbx_enrollment: enrollment,
+                                           options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
+                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
+        end
 
-      it 'should terminate previously existing enrollment' do
-        expect(enrollment.aasm_state).to eq 'coverage_terminated'
+        it 'should return dropped member info' do
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+        end
       end
     end
 
