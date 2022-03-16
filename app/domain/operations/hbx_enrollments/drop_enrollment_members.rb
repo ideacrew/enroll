@@ -37,6 +37,10 @@ module Operations
 
         reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, applied_aptc, eligible_members).build(terminate_date)
         reinstatement.save!
+
+        reinstatement.force_select_coverage! if reinstatement.may_reinstate_coverage?
+        reinstatement.begin_coverage! if reinstatement.may_begin_coverage? && reinstatement.effective_on <= TimeKeeper.date_of_record
+
         params[:hbx_enrollment].update_attributes!(terminated_on: terminate_date)
 
         dropped_member_info = []

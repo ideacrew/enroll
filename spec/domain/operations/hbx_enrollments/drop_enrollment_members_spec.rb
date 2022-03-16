@@ -71,6 +71,10 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         it 'should terminate previously existing enrollment' do
           expect(enrollment.aasm_state).to eq 'coverage_terminated'
         end
+
+        it 'should select coverage for the reinstatement' do
+          expect(family.hbx_enrollments.last.aasm_state).to eq 'coverage_selected'
+        end
       end
 
       context 'when previous enrollment has applied aptc' do
@@ -85,6 +89,24 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         it 'should return dropped member info' do
           expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+        end
+      end
+
+      context 'when termination date is in the past' do
+        before do
+          FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment.effective_on)
+          @dropped_members = subject.call({hbx_enrollment: enrollment,
+                                           options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
+                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
+        end
+
+        it 'should return dropped member info' do
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
+        end
+
+        it 'should begin coverage for the reinstatement' do
+          expect(family.hbx_enrollments.last.aasm_state).to eq 'coverage_enrolled'
         end
       end
     end
