@@ -155,7 +155,6 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
   end
 
   describe 'latest enrollment' do
-    let(:params) { group_selection_params }
 
     context 'no enrollment' do
 
