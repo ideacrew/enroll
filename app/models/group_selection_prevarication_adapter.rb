@@ -35,7 +35,7 @@ class GroupSelectionPrevaricationAdapter
       record.previous_hbx_enrollment = enrollment if enrollment.coverage_kind == coverage_kind
     end
     record.check_shopping_roles(params)
-    record.latest_enrollment = family.active_household.hbx_enrollments.order_by(:'created_at'.desc).first
+    record.latest_enrollment = family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
     record
   end
 

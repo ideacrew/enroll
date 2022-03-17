@@ -154,6 +154,75 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
     end
   end
 
+  describe 'latest enrollment' do
+    let(:params) { group_selection_params }
+
+    context 'no enrollment' do
+
+      it 'returns nil for latest enrollment' do
+        expect(adapter.latest_enrollment).to eq nil
+      end
+    end
+
+    context 'with shopping enrollment' do
+      let!(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          family: family,
+          aasm_state: 'shopping',
+          created_at: Date.today
+        )
+      end
+
+      it 'returns nil for latest enrollment' do
+        expect(adapter.latest_enrollment).to eq nil
+      end
+    end
+
+    context 'with latest shopping enrollment and old non-shopping enrollment' do
+      let!(:shopping_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          family: family,
+          aasm_state: 'shopping',
+          created_at: Date.today
+        )
+      end
+
+      let!(:non_shopping_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          family: family,
+          aasm_state: 'coverage_selected',
+          created_at: Date.today - 5.days
+        )
+      end
+
+      it 'returns non_shopping_enrollment for latest enrollment' do
+        expect(adapter.latest_enrollment).to eq non_shopping_enrollment
+      end
+    end
+
+    context 'with active enrollment' do
+      let!(:active_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          family: family,
+          aasm_state: 'coverage_selected',
+          created_at: Date.today - 5.days
+        )
+      end
+
+      it 'returns active_enrollment for latest enrollment' do
+        expect(adapter.latest_enrollment).to eq active_enrollment
+      end
+    end
+  end
+
   context 'set_mc_variables for coverall' do
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
     let!(:hbx_enrollment) do
