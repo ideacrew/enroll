@@ -63,74 +63,77 @@ end
 Given(/^all applicants are in Info Completed state with all types of income$/) do
   until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
     find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
-    find('#is_required_to_file_taxes_no', wait: 5).click
-    find('#is_claimed_as_tax_dependent_no').click
-    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
-
-    find('#has_job_income_true').click
+    choose(IvlIapTaxInformationPage.file_taxes_no_radiobtn, wait: 5)
+    choose(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn)
+    find(IvlIapTaxInformationPage.continue_btn).click
+    choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
     sleep 1
-    fill_in 'income[employer_name]', with: 'GloboGym'
-    fill_in 'income[amount]', with: '100'
-    fill_in 'income[start_on]', with: '1/1/2018'
-    find_all("#job_income .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
-    find_all("#job_income li.interaction-choice-control-income-frequency-kind-7").first.click
-    fill_in 'income[employer_address][address_1]', with: '1 K Street'
-    fill_in 'income[employer_address][city]', with: 'Washington'
-    fill_in 'income[employer_address][zip]', with: '20000'
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[3]/div/ul/li[10]').click
-    fill_in 'income[employer_phone][full_phone_number]', with: '7898765676'
-    click_button('Save')
-    find('#has_self_employment_income_true').click
-    fill_in 'income[amount]', with: '100.00'
-    find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
-    find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
-    fill_in 'income[start_on]', with: '01/01/2018'
-    click_button('Save')
-    find(:xpath, '//*[@id="btn-continue"]').click
+    fill_in IvlIapJobIncomeInformationPage.employer_name, with: 'GloboGym'
+    fill_in IvlIapJobIncomeInformationPage.income_amount, with: '100'
+    fill_in IvlIapJobIncomeInformationPage.income_from, with: '1/1/2018'
+    find(IvlIapJobIncomeInformationPage.income_how_often_dropdown).click
+    find(IvlIapJobIncomeInformationPage.select_yearly).click
+    sleep 5
+    fill_in IvlIapJobIncomeInformationPage.income_employer_address_1, with: '1 K Street'
+    fill_in IvlIapJobIncomeInformationPage.income_employer_city, with: 'Washington'
+    fill_in IvlIapJobIncomeInformationPage.income_employer_zip, with: '20000'
+    find(IvlIapJobIncomeInformationPage.income_employer_state_dropdown).click
+    find(IvlIapJobIncomeInformationPage.select_dc).click
+    fill_in IvlIapJobIncomeInformationPage.income_employer_phone_number, with: '7898765676'
+    find(IvlIapJobIncomeInformationPage.income_save_btn).click
+    choose(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn)
+    fill_in IvlIapJobIncomeInformationPage.self_employee_income_amount, with: '100.00'
+    find(IvlIapJobIncomeInformationPage.self_employee_how_often_dropdown).click
+    find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
+    fill_in IvlIapJobIncomeInformationPage.self_employee_income_from, with: '01/01/2018'
+    find(IvlIapJobIncomeInformationPage.self_self_employee_save_btn).click
+    find(IvlIapJobIncomeInformationPage.continue_btn).click
 
     if FinancialAssistanceRegistry[:unemployment_income].enabled?
-      find('#has_unemployment_income_true').click
+      choose(IvlIapOtherIncomePage.has_unemployment_income_yes_radiobtn)
       sleep 1
-      fill_in 'income[amount]', with: '100'
-      fill_in 'income[start_on]', with: '1/1/2018'
-      find(".new-unemployment-income-form .interaction-choice-control-income-frequency-kind").click
-      find(".new-unemployment-income-form li.interaction-choice-control-income-frequency-kind-7").click
-      click_button('Save')
+      fill_in IvlIapOtherIncomePage.income_amount, with: '100'
+      fill_in IvlIapOtherIncomePage.income_from, with: '1/1/2018'
+      find(IvlIapOtherIncomePage.how_often_dropdown).click
+      find(IvlIapOtherIncomePage.select_yearly).click
+      find(IvlIapOtherIncomePage.unemployment_save_btn).click
     end
+    choose(IvlIapOtherIncomePage.has_other_income_yes_radiobtn)
 
-    find('#has_other_income_true').click
     sleep 1
     find(:css, "#other_income_kind[value='interest']").set(true)
-    fill_in 'income[amount]', with: '100'
-    fill_in 'income[start_on]', with: '1/1/2018'
-    find(".new-other-income-form.interest span.label").click
-    find(".new-other-income-form.interest li.interaction-choice-control-income-frequency-kind-7").click
-    click_button('Save')
-    find(:xpath, '//*[@id="btn-continue"]').click
+    fill_in IvlIapOtherIncomePage.income_amount, with: '100'
+    fill_in IvlIapOtherIncomePage.income_from, with: '1/1/2018'
+    find(IvlIapOtherIncomePage.interest_how_often_dropdown).click
+    find(IvlIapOtherIncomePage.interest_select_yearly).click
 
-    find('#has_deductions_true').click
+    within('.new-other-income-form.interest') do
+      find(IvlIapOtherIncomePage.has_other_income_save_btn).click
+    end
+
+    find(IvlIapOtherIncomePage.continue_btn).click
+    choose(IvlIapIncomeAdjustmentsPage.income_adjustments_yes_radiobtn)
     find(:css, "#deduction_kind[value='moving_expenses']").set(true)
-    fill_in 'deduction[amount]', with: '50'
-    fill_in 'deduction[start_on]', with: '1/1/2018'
-    find(".new-deduction-form.moving_expenses span.label").click
-    find(".new-deduction-form.moving_expenses li.interaction-choice-control-deduction-frequency-kind-7").click
-    click_button('Save')
-    find(:xpath, '//*[@id="btn-continue"]').click
+    fill_in IvlIapIncomeAdjustmentsPage.amount, with: '50'
+    fill_in IvlIapIncomeAdjustmentsPage.from, with: '1/1/2018'
+    find(IvlIapIncomeAdjustmentsPage.moving_expenses_how_often_dropdown).click
+    find(IvlIapIncomeAdjustmentsPage.moving_expenses_select_yearly).click
 
-    find('#has_enrolled_health_coverage_false').click
-    find('#has_eligible_health_coverage_false').click
+    within('.new-deduction-form.moving_expenses') do
+      find(IvlIapIncomeAdjustmentsPage.income_adjustments_save_btn).click
+    end
 
-
-    find(:xpath, '//*[@id="btn-continue"]').click
-
-    find('#is_pregnant_no').click
-    find('#is_post_partum_period_no').click
-    find('#is_self_attested_blind_no').click
-    find('#has_daily_living_no').click
-    find('#need_help_paying_bills_no').click
-    find('#radio_physically_disabled_no').click
-    find('[name=commit]').click
+    find(IvlIapIncomeAdjustmentsPage.continue_btn).click
+    choose(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn)
+    choose(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn)
+    find(IvlIapHealthCoveragePage.continue).click
+    choose(IvlIapOtherQuestions.is_pregnant_no_radiobtn)
+    choose(IvlIapOtherQuestions.is_post_partum_period_no_radiobtn)
+    choose(IvlIapOtherQuestions.person_blind_no_radiobtn)
+    choose(IvlIapOtherQuestions.has_daily_living_help_no_radiobtn)
+    choose(IvlIapOtherQuestions.need_help_paying_bills_no_radiobtn)
+    choose(IvlIapOtherQuestions.physically_disabled_no_radiobtn)
+    find(IvlIapOtherQuestions.continue_btn).click
   end
 end
 
@@ -179,8 +182,8 @@ Given(/^all required questions are answered including report change terms field$
 end
 
 Given(/^the user has signed their name$/) do
-  fill_in 'first_name_thank_you', with: application.primary_applicant.first_name
-  fill_in 'last_name_thank_you', with: application.primary_applicant.last_name
+  fill_in IvlConfirmYourPlanSelection.first_name, with: application.primary_applicant.first_name
+  fill_in IvlConfirmYourPlanSelection.last_name, with: application.primary_applicant.last_name
 end
 
 Then(/^the submit button will be enabled$/) do

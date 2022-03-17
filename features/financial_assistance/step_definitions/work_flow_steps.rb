@@ -69,7 +69,7 @@ end
 # end
 
 When(/^the user clicks CONTINUE$/) do
-  find('.interaction-click-control-continue', wait: 5).click
+  find(IvlChooseCoverage.continue_btn, wait: 5).click
 end
 
 # When(/^the answer to Do you want to apply for Medicaid… is NIL$/) do

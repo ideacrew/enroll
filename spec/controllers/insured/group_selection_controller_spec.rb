@@ -810,10 +810,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       post :edit_aptc, params: params
     end
 
+    # as per self_service_factory #update_aptc, we create reinstatement with effective_date two months in the future when the current date is greater than the 15th of the month
+    # ie. today is 3/16, then reinstatement effective_date will be 5/1
+    # ie. if today is 3/15, then reinstatement effective_date will be 4/1
     it 'should update current enrollment(cancel/terminate)' do
       hbx_enrollment_14.reload
       if TimeKeeper.date_of_record.day > HbxProfile::IndividualEnrollmentDueDayOfMonth
-        expect(hbx_enrollment_14.aasm_state).to eq 'coverage_terminated'
+        expect(hbx_enrollment_14.aasm_state).to eq 'coverage_termination_pending'
         new_enrollment = family_14.hbx_enrollments.coverage_selected.first
         expect(hbx_enrollment_14.terminated_on.to_date).to eq new_enrollment.effective_on.prev_day.to_date
       else

@@ -3,17 +3,14 @@ module Forms
     include Acapi::Notifiers
     include Insured::FamiliesHelper
 
-    attr_reader :result
-    attr_reader :row
-    attr_reader :family_id
-    attr_reader :params
-    attr_reader :config
+    attr_reader :result, :row, :family_id, :enrollment_id, :params, :config
 
     def initialize(*arguments)
       @params = arguments.extract_options!
       @result = {success: [], failure: []}
       @row = @params[:family_actions_id]
       @family_id = @params[:family_id]
+      @enrollment_id = @params[:enrollment_id]
       @config = Rails.application.config.acapi
     end
 
@@ -55,6 +52,28 @@ module Forms
         end
       end
       terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
+    end
+
+    # drop action
+    def drop_enrollment_members
+      hbx_enrollment = HbxEnrollment.find(@enrollment_id)
+      begin
+        result = ::Operations::HbxEnrollments::DropEnrollmentMembers.new.call({hbx_enrollment: hbx_enrollment, options: @params})
+        return if result.failure == 'No members selected to drop.'
+        if result.failure?
+          @result[:failure] << hbx_enrollment
+          Rails.logger.error("Unable to drop enrollment members, error: #{result.failure}")
+        end
+
+        if result.success?
+          @result[:success] = result.success
+          transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
+          handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
+        end
+      rescue StandardError => e
+        Rails.logger.error("Unable to drop enrollment members, error: #{e}")
+        @result[:failure] << hbx_enrollment
+      end
     end
 
     def transition_family_members

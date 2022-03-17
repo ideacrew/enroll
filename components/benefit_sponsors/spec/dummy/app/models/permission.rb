@@ -33,6 +33,7 @@ class Permission
   field :can_terminate_enrollment, type: Boolean, default: false
   field :change_enrollment_end_date, type: Boolean, default: false
   field :can_change_username_and_email, type: Boolean, default: false
+  field :can_drop_enrollment_members, type: Boolean, default: false
 
   class << self
     def hbx_staff

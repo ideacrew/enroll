@@ -67,7 +67,7 @@ namespace :migrations do
       FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
       file_name = "#{Rails.root}/update_address_fixes.csv"
       total_count = @people.count
-      users_per_iteration = 10_000.0
+      users_per_iteration = 5_000.0
       counter = 0
       number_of_iterations = (total_count / users_per_iteration).ceil
       CSV.open(file_name, 'w+', headers: true) do |csv|
@@ -96,8 +96,9 @@ namespace :migrations do
             counters[:faa_apps] = { fixed: 0, homeless_fix: 0, address_fix: 0, same_as_primary_fix: 0, no_fix_needed: 0 }
 
             @target_app.no_timeout.select{|application| application.applicants.no_timeout.detect{|a| a.person_hbx_id == person.hbx_id}}&.each do |application|
-              primary = application.primary_applicant
-              application.applicants&.select{|a| a.person_hbx_id == person.hbx_id}.each do |applicant|
+              next if application.nil?
+              primary = application.primary_applicant              
+              application.applicants.no_timeout.select{|a| a.person_hbx_id == person.hbx_id}.each do |applicant|
                 next if applicant.nil?
                 a_isnt_homeless = applicant.is_homeless? == true && applicant.addresses.any?
                 counters[:faa_apps][:homeless_fix] += 1 if a_isnt_homeless

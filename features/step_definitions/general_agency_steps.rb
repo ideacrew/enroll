@@ -137,7 +137,7 @@ end
 When(/^.+ registers? with valid information for staff$/) do
   fill_in "user[oim_id]", with: "jack.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, with: "aA1!aA1!aA1!"
   click_button 'Create account'
 end
 
@@ -172,7 +172,7 @@ end
 When(/^.+ registers with valid information for ga flow$/) do
   fill_in "user[oim_id]", with: "broker.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, with: "aA1!aA1!aA1!"
   create_account_input = page.all('input').detect { |input| input[:value] == 'Create Account' }
   create_account_input.click
 end

@@ -43,5 +43,6 @@ permission.update_attributes!({
   can_reinstate_enrollment: true,
   can_cancel_enrollment: true,
   can_terminate_enrollment: true,
-  change_enrollment_end_date: true
+  change_enrollment_end_date: true,
+  can_drop_enrollment_members: true
 })

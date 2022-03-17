@@ -95,6 +95,13 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
         expect(reinstated_enrollment.hbx_enrollment_members.first.tobacco_use).to eq 'Y'
       end
     end
+
+    context 'future termination date for base enrollment provided', dbclean: :around_each do
+      it 'Enrollment member has tobacco attestation' do
+        Enrollments::Replicator::Reinstatement.new(enrollment, enrollment.terminated_on.next_day).build(TimeKeeper.date_of_record + 5.days)
+        expect(enrollment.aasm_state).to eq 'coverage_termination_pending'
+      end
+    end
   end
 
   describe "renewing employer",  dbclean: :around_each do

@@ -18,4 +18,12 @@ class IvlConfirmYourPlanSelection
   def self.confirm_btn
     '#btn-continue'
   end
+
+  def self.dup_enrollment_warning_1
+    '[data-cuke="coverage_info_msg"]'
+  end
+
+  def self.dup_enrollment_warning_2
+    '[data-cuke="coverage_info_msg_2"]'
+  end
 end
