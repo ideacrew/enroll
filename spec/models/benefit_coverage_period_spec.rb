@@ -482,6 +482,51 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
     end
 
+    context "When hbx enrollment members are AI/AN and apply for dental coverage" do
+
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return more than one dental plan" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'dental')
+        expect(benefit_packages.count).to be > 1
+      end
+    end
+
+    context "When hbx enrollment members are AI/AN and apply for health coverage" do
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return one health plan" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'health')
+        expect(benefit_packages.count).to eql(1)
+      end
+    end
+
+    context "When hbx enrollment members are not AI/AN and apply for health coverage" do
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return more than one health plan" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'health')
+        expect(benefit_packages.count).to be > 1
+      end
+    end
+
+    context "When hbx enrollment members are not AI/AN and apply for dental coverage" do
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return more than one dental plan" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'dental')
+        expect(benefit_packages.count).to be > 1
+      end
+    end
+
     context 'when native american csr feature is enabled' do
 
       before do
