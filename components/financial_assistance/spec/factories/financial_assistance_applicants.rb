@@ -28,6 +28,7 @@ FactoryBot.define do
     is_self_attested_blind { false }
     has_daily_living_help { false }
     need_help_paying_bills { false }
+    gender { 'male' }
 
     trait :with_ssn do
       sequence(:ssn) { |n| 222_222_220 + n }

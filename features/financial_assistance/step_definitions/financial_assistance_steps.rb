@@ -561,6 +561,10 @@ Then(/^a family with financial application in (.*) state exists$/) do |state|
   create_family_faa_application(state)
 end
 
+Then(/^a family with financial application and applicants in (.*) state exists$/) do |state|
+  create_family_faa_application_with_applicants(state)
+end
+
 Then(/^the user with (.*) role is logged in$/) do |role|
   @user.roles << role
   login_as @user

@@ -132,7 +132,27 @@ module IvlAssistanceWorld
     @user.save
     @person = FactoryBot.create(:person, :with_consumer_role, user: user)
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
-    FactoryBot.create(:financial_assistance_application, aasm_state: state, family_id: family.id, effective_date: TimeKeeper.date_of_record)
+    @application = FactoryBot.create(:financial_assistance_application, aasm_state: state, family_id: family.id, effective_date: TimeKeeper.date_of_record)
+  end
+
+  def create_family_faa_application_with_applicants(state)
+    create_family_faa_application(state)
+    eligibility_determination1 = FactoryBot.create(:financial_assistance_eligibility_determination, application: @application)
+    _applicant = FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, application: @application, family_member_id: BSON::ObjectId.new)
+    @application.applicants.each do |appl|
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: '')]
+      appl.save!
+    end
+    @application.save!
   end
 
   def create_enrollment_for_family(family, carrier_name = nil)
