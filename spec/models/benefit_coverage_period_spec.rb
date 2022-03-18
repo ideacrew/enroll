@@ -482,6 +482,14 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
     end
 
+    context "When hbx enrollment members are AI/AN and apply for dental coverage" do
+
+      it "should return more than one dental plan" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'dental')
+        expect(benefit_packages.count).to be > 1
+      end
+    end
+
     context 'when native american csr feature is enabled' do
 
       before do
