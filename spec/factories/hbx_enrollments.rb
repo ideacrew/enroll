@@ -29,6 +29,14 @@ FactoryBot.define do
       hbx_enrollment_members { enrollment_members.map{|member| FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
     end
 
+    trait :with_tobacco_use_enrollment_members do
+      hbx_enrollment_members do
+        enrollment_members.map do |member|
+          FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on, tobacco_use: 'Y')
+        end
+      end
+    end
+
     trait :with_dental_coverage_kind do
       association :plan, factory: [:plan, :with_dental_coverage]
       coverage_kind { "dental" }
