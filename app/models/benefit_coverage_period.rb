@@ -171,7 +171,7 @@ class BenefitCoveragePeriod
   end
 
   def get_benefit_packages(**attrs)
-    fetch_benefit_packages(attrs[:american_indian_members], attrs[:csr_kind]).inject([]) do |result, bg|
+    fetch_benefit_packages(attrs[:american_indian_members], attrs[:csr_kind], attrs[:coverage_kind]).inject([]) do |result, bg|
       satisfied = true
       attrs[:family_members].each do |family_member|
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
@@ -203,8 +203,8 @@ class BenefitCoveragePeriod
     end
   end
 
-  def fetch_benefit_packages(american_indian_members, csr_kind)
-    return benefit_packages unless american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+  def fetch_benefit_packages(american_indian_members, csr_kind, coverage_kind = 'health')
+    return benefit_packages unless american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr) && coverage_kind == "health"
 
     benefit_packages.select{|bg| bg.cost_sharing == csr_kind}
   end
