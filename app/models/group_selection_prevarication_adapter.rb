@@ -4,7 +4,7 @@ class GroupSelectionPrevaricationAdapter
   include Config::SiteModelConcern
 
   attr_accessor :optional_effective_on, :shop_under_current, :shop_under_future, :person, :family,
-                :coverage_household, :previous_hbx_enrollment, :change_plan, :coverage_kind, :enrollment_kind, :shop_for_plans
+                :coverage_household, :previous_hbx_enrollment, :change_plan, :coverage_kind, :enrollment_kind, :shop_for_plans, :latest_enrollment
 
   def self.initialize_for_common_vars(params)
     person_id = params[:person_id]
@@ -35,6 +35,7 @@ class GroupSelectionPrevaricationAdapter
       record.previous_hbx_enrollment = enrollment if enrollment.coverage_kind == coverage_kind
     end
     record.check_shopping_roles(params)
+    record.latest_enrollment = family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
     record
   end
 
@@ -470,12 +471,6 @@ class GroupSelectionPrevaricationAdapter
     assignment = employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
     assignment.update(hbx_enrollment_id: enrollment.id)
     enrollment.update(benefit_group_assignment_id: assignment.id)
-  end
-
-  def update_member(id, permitted_param)
-    member_person = @family.family_members.where(id: id).first&.person
-    return unless member_person.present?
-    member_person.update(is_tobacco_user: permitted_param["is_tobacco_user_#{id}"])
   end
 
   protected
