@@ -561,12 +561,16 @@ Then(/^a family with financial application in (.*) state exists$/) do |state|
   create_family_faa_application(state)
 end
 
+Then(/^a family with financial application and applicants in (.*) state exists$/) do |state|
+  create_family_faa_application_with_applicants(state)
+end
+
 Then(/^the user with (.*) role is logged in$/) do |role|
   @user.roles << role
   login_as @user
 end
 
-And(/^the .+ clicks on Cost Savings link$/) do
+And(/^.+ clicks on Cost Savings link$/) do
   find_link('Cost Savings').click
 end
 
@@ -574,16 +578,20 @@ And(/^.+ should see 'Start New Application' button$/) do
   expect(page).to have_css('.interaction-click-control-start-new-application')
 end
 
-When(/^the user clicks on Action dropdown$/) do
+When(/^.+ clicks on Action dropdown$/) do
   find('.interaction-click-control-actions').click
 end
 
-Then(/^the user should see text Full Application$/) do
+Then(/^the .+ should see text Full Application$/) do
   expect(page).to have_content('Full Application')
 end
 
-Then(/^user clicks on Full application action$/) do
+Then(/^.+ clicks on Full application action$/) do
   click_link 'Full Application'
+end
+
+Then(/^.+ should see county under Mailing and Home address$/) do
+  expect(page).to have_content('COUNTY')
 end
 
 Then(/^user should land on full application page and should see 2 view my applications buttons$/) do
