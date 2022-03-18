@@ -1181,3 +1181,38 @@ When(/Individual creates an HBX account with SSN already in use$/) do
   find(IvlPersonalInformation.need_coverage_yes).click
   find(IvlPersonalInformation.continue_btn).click
 end
+
+Then(/Benefit package updated with incarceration status$/) do
+  bcp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.first
+  benefit_package = bcp.benefit_packages.select{|bp| bp[:title] == "individual_health_benefits_#{TimeKeeper.date_of_record.year}"}.first
+  benefit_package.benefit_eligibility_element_group.update_attributes!(incarceration_status: ["unincarcerated"])
+end
+
+Then(/^.+ enters personal information with incarceration details$/) do
+  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
+  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
+  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
+  find(IvlPersonalInformation.incarcerated_yes_radiobtn).click
+  find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
+  fill_in IvlPersonalInformation.address_line_two, :with => "212"
+  fill_in IvlPersonalInformation.city, :with => "Washington"
+  find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+  fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
+  sleep 2
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/Individual navigates to Choose Coverage for your Household page$/) do
+  step "Individual agrees to the privacy agreeement"
+  step "Individual answers the questions of the Identity Verification page and clicks on submit"
+  step "Individual is on the Help Paying for Coverage page"
+  step "Individual does not apply for assistance and clicks continue"
+  step "Individual clicks on the Continue button of the Family Information page"
+end
+
+And(/Individual should see incarceration message blocking individual from plan shopping$/) do
+  expect(page).to have_content(/is not eligible to purchase a plan/)
+end
