@@ -77,22 +77,13 @@ module Operations
         end
 
         def process_notice_request(family, document_reminder_key, values)
-          result =
-            CreateReminderRequest.new.call(
-              document_reminder_key: document_reminder_key,
-              family: family,
-              date_of_record: values[:date_of_record]
-            )
-
-          if result.failure?
-            Rails
-              .logger.info "Error #{result.failure} generating #{document_reminder_key} notice for family #{family.hbx_assigned_id}"
-          end
-
-          result
-        rescue StandardError => e
-          Rails
-            .logger.info "Error #{e.backtrace} generating #{document_reminder_key} notice for family #{family.hbx_assigned_id}"
+          payload = {
+            document_reminder_key: document_reminder_key,
+            family_id: family.id,
+            date_of_record: values[:date_of_record]
+          }
+          event = event('events.individual.notices.request_batch_verification_reminders', attributes: payload)
+          Success(event.success.publish)
         end
 
         def offset_prior_to_due_date(document_reminder_key)
