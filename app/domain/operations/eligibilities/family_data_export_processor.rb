@@ -49,7 +49,10 @@ module Operations
               assistance_year: values[:assistance_year] || TimeKeeper.date_of_record.year
             ).success
 
-            family_data.each { |member_row| csv << member_row }
+            ed_status = family.eligibility_determination&.outstanding_verification_status
+            ed_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
+
+            family_data.each { |member_row| csv << (member_row + [ed_status.to_s, ed_due_date]) }
           end
         end
 
@@ -119,7 +122,9 @@ module Operations
           'Local Mec Due Date',
           'Local Mec Response',
           'Esi Updated?',
-          'Local Mec Updated?'
+          'Local Mec Updated?',
+          'Eligibility Determination Status',
+          'Eligibility Determination Due Date'
         ]
       end
       # rubocop:enable Metrics/MethodLength

@@ -172,7 +172,7 @@ module Operations
           determination&.csr_percent_as_integer
         ]
 
-        return (data + append_nil(18)) unless applicant
+        return (data + append_nil(19)) unless applicant
 
         evidences = %w[
           income_evidence
