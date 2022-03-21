@@ -149,7 +149,7 @@ module IvlAssistanceWorld
                                          :kind => 'home',
                                          :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
                                          :zip => '20001',
-                                         county: '')]
+                                         county: 'Cumberland')]
       appl.save!
     end
     @application.save!

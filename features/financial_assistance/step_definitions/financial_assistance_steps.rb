@@ -592,6 +592,7 @@ end
 
 Then(/^.+ should see county under Mailing and Home address$/) do
   expect(page).to have_content('COUNTY')
+  expect(page).to have_content('Cumberland')
 end
 
 Then(/^user should land on full application page and should see 2 view my applications buttons$/) do
