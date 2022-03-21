@@ -1261,7 +1261,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
-    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_termination_pending', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
+    it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
     it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.to_s
     it_behaves_like 'POST update_enrollment_member_drop', 'coverage_terminated', ::TimeKeeper.date_of_record.prev_day.to_s
   end
