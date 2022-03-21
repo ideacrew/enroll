@@ -94,7 +94,7 @@ module Enrollments
         true
       end
 
-      def build(termination_date = new_effective_date - 1.day)
+      def build
         reinstated_enrollment = HbxEnrollment.new
         @reinstate_enrollment = reinstated_enrollment
         assign_all_attributes(reinstated_enrollment)
@@ -103,7 +103,7 @@ module Enrollments
         unless base_enrollment.coverage_expired?
           if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
             base_enrollment.terminate_coverage!
-            base_enrollment.update_attributes!(terminated_on: termination_date)
+            base_enrollment.update_attributes!(terminated_on: new_effective_date - 1.day)
           elsif base_enrollment.may_cancel_coverage?
             base_enrollment.cancel_coverage!
           end

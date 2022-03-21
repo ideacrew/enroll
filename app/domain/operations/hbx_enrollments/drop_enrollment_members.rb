@@ -33,7 +33,7 @@ module Operations
 
         return Failure("Enrollment cannot exist without at least one member that is 18 years or older.") unless eligible_members.any? { |member| member.age_on_effective_date > 18 }
 
-        reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, 0, eligible_members).build(terminate_date)
+        reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, 0, eligible_members).build
         reinstatement.save!
 
         get_household_applied_aptc(reinstatement, terminate_date + 1.day)
