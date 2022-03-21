@@ -33,10 +33,10 @@ module Operations
 
         return Failure("Enrollment cannot exist without at least one member that is 18 years or older.") unless eligible_members.any? { |member| member.age_on_effective_date > 18 }
 
-        applied_aptc = get_household_applied_aptc(params[:hbx_enrollment], terminate_date + 1.day)
-
-        reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, applied_aptc, eligible_members).build(terminate_date)
+        reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, 0, eligible_members).build
         reinstatement.save!
+
+        get_household_applied_aptc(reinstatement, terminate_date + 1.day)
 
         reinstatement.force_select_coverage! if reinstatement.may_reinstate_coverage?
         reinstatement.begin_coverage! if reinstatement.may_begin_coverage? && reinstatement.effective_on <= TimeKeeper.date_of_record
@@ -54,11 +54,10 @@ module Operations
       end
 
       def get_household_applied_aptc(hbx_enrollment, effective_date)
-        if hbx_enrollment.applied_aptc_amount > 0
-          tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
-          applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) if tax_household
-        end
-        applied_aptc.present? ? applied_aptc : 0
+        tax_household = hbx_enrollment.family.active_household.latest_tax_household_with_year(hbx_enrollment.effective_on.year)
+        return unless tax_household
+        applied_aptc = tax_household.monthly_max_aptc(hbx_enrollment, effective_date) #if tax_household
+        ::Insured::Factories::SelfServiceFactory.update_enrollment_for_apcts(hbx_enrollment, applied_aptc)
       end
     end
   end
