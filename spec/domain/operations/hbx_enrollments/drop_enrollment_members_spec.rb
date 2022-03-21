@@ -64,7 +64,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
         end
 
@@ -110,7 +110,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
         end
 
@@ -131,7 +131,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
         end
 
