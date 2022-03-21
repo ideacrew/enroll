@@ -12,7 +12,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
     let(:benefit_package)  { initial_application.benefit_packages.first }
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
 
-    let!(:person) { FactoryBot.create(:person)}
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person)}
     let!(:household) { FactoryBot.create(:household, family: family) }
 
@@ -45,7 +45,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                          household: family.active_household,
                                          hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
                                          aasm_state: "coverage_selected",
-                                         effective_on: initial_application.start_on,
+                                         effective_on: TimeKeeper.date_of_record,
                                          rating_area_id: initial_application.recorded_rating_area_id,
                                          sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                                          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
@@ -64,7 +64,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
         end
 
@@ -77,18 +77,48 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
       end
 
-      context 'when previous enrollment has applied aptc' do
+      context 'when previous enrollment has applied aptc', dbclean: :around_each do
         before do
-          enrollment.update_attributes!(applied_aptc_amount: 100)
-          FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment.effective_on)
-          @dropped_members = subject.call({hbx_enrollment: enrollment,
-                                           options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
+          enrollment_2 = FactoryBot.create(:hbx_enrollment,
+                                           :with_product,
+                                           :individual_assisted,
+                                           family: family,
+                                           household: family.active_household,
+                                           hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
+                                           aasm_state: "coverage_selected",
+                                           effective_on: TimeKeeper.date_of_record,
+                                           rating_area_id: initial_application.recorded_rating_area_id,
+                                           sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                                           sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                           benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
+          enrollment_2.benefit_sponsorship = benefit_sponsorship
+          enrollment_2.save!
+
+          @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
+          @product.premium_tables.first.update_attributes!(rating_area: ::BenefitMarkets::Locations::RatingArea.where('active_year' => TimeKeeper.date_of_record.year).first)
+          BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+
+          enrollment_2.update_attributes!(product: @product, consumer_role: person.consumer_role)
+          tax_household = FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment_2.effective_on, effective_ending_on: nil)
+          family.family_members.each do |member|
+            FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: member.id)
+          end
+          FactoryBot.create(:eligibility_determination, tax_household: tax_household)
+          @dropped_members = subject.call({hbx_enrollment: enrollment_2,
+                                           options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
         end
 
         it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+        end
+
+        it 'should recalculate aptc for reinstated enrollment' do
+          reinstatement = family.hbx_enrollments.last
+          expect(reinstatement.elected_aptc_pct).to eq 1.0
+          expect(reinstatement.applied_aptc_amount).to_not eq 0
+          expect(reinstatement.aggregate_aptc_amount).to_not eq 0
         end
       end
 
@@ -101,7 +131,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.id.to_s
+          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
         end
 
