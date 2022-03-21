@@ -58,8 +58,22 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
-    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+    notice.ivl_open_enrollment_start_on = bc_period&.open_enrollment_start_on || default_open_enrollment_begin_for(TimeKeeper.date_of_record.next_year.year)
+    notice.ivl_open_enrollment_end_on = bc_period&.open_enrollment_end_on || default_open_enrollment_end_for(TimeKeeper.date_of_record.next_year.year)
+  end
+
+  def default_open_enrollment_begin_for(calendar_year)
+    month = EnrollRegistry[:default_open_enrollment_begin].setting(:month).item
+    day = EnrollRegistry[:default_open_enrollment_begin].setting(:day).item
+    year_offset = EnrollRegistry[:default_open_enrollment_begin].setting(:year_offset).item
+    Date.new(calendar_year + year_offset, month, day)
+  end
+
+  def default_open_enrollment_end_for(calendar_year)
+    month = EnrollRegistry[:default_open_enrollment_end].setting(:month).item
+    day = EnrollRegistry[:default_open_enrollment_end].setting(:day).item
+    year_offset = EnrollRegistry[:default_open_enrollment_end].setting(:year_offset).item
+    Date.new(calendar_year + year_offset, month, day)
   end
 
   def append_member_information(people)
