@@ -98,7 +98,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
     context 'future termination date for base enrollment provided', dbclean: :around_each do
       it 'Enrollment member has tobacco attestation' do
-        Enrollments::Replicator::Reinstatement.new(enrollment, enrollment.terminated_on.next_day).build(TimeKeeper.date_of_record + 5.days)
+        Enrollments::Replicator::Reinstatement.new(enrollment, enrollment.terminated_on.next_day).build
         expect(enrollment.aasm_state).to eq 'coverage_terminated'
       end
     end
