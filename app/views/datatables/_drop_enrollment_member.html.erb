@@ -34,7 +34,7 @@
               <td><%= person.full_name %></td>
               <td><%= number_to_obscured_ssn(person.ssn) %></td>
               <td><%= person.dob %></td>
-              <td><%= hbx.hbx_id %></td>
+              <td><%= member.hbx_id %></td>
               <td><%= hbx.effective_on %></td>
               <td><%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %></td>
             </tr>
