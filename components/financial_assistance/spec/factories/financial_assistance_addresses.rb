@@ -9,5 +9,13 @@ FactoryBot.define do
     state { Settings.aca.state_abbreviation }
     zip { '01001' }
     county { 'Hampden' }
+
+    trait :mailing_address do
+      kind { 'mailing' }
+    end
+
+    trait :work_address do
+      kind { 'work' }
+    end
   end
 end
