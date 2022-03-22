@@ -1025,4 +1025,98 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  describe '#has_valid_address?' do
+    let(:applicant) do
+      FactoryBot.create(
+        :financial_assistance_applicant,
+        :with_home_address,
+        application: application,
+        dob: Date.today - 40.years,
+        is_primary_applicant: true,
+        family_member_id: BSON::ObjectId.new
+      )
+    end
+    let(:mailing_address) { FactoryBot.build(:financial_assistance_address, :mailing_address)}
+    let(:work_address) { FactoryBot.build(:financial_assistance_address, :work_address)}
+
+    context 'invalid addresses' do
+      it 'should consider no address at all invalid' do
+        applicant.addresses = []
+        applicant.save
+        expect(applicant.has_valid_address?).to eq false
+      end
+
+      it 'should consider work address invalid' do
+        applicant.addresses = [work_address]
+        applicant.save
+        expect(applicant.has_valid_address?).to eq false
+      end
+    end
+
+    context 'living_outside_state feature enabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(true)
+      end
+
+      context 'valid addresses' do
+        context 'applicant lives in-state' do
+          it 'should consider in-state home address valid' do
+            expect(applicant.has_valid_address?).to eq true
+          end
+
+          it 'should consider in-state mailing address valid' do
+            applicant.addresses = [mailing_address]
+            applicant.save
+            expect(applicant.has_valid_address?).to eq true
+          end
+        end
+
+        context 'applicant lives out-of-state but plans to return' do
+          before do
+            applicant.update(is_temporarily_out_of_state: true)
+          end
+
+          it 'should consider out-of-state home address valid' do
+            applicant.addresses.first.state = "OS"
+            applicant.save
+            expect(applicant.has_valid_address?).to eq true
+          end
+
+          it 'should consider out-of-state mailing address valid' do
+            applicant.addresses = [mailing_address]
+            applicant.addresses.first.state = "OS"
+            applicant.save
+            expect(applicant.has_valid_address?).to eq true
+          end
+        end
+      end
+    end
+
+    context 'living_outside_state feature disabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+      end
+
+      context 'valid addresses' do
+        it 'should consider in-state home address valid' do
+          expect(applicant.has_valid_address?).to eq true
+        end
+
+        it 'should consider in-state mailing address valid' do
+          applicant.addresses = [mailing_address]
+          applicant.save
+          expect(applicant.has_valid_address?).to eq true
+        end
+      end
+
+      context 'invalid addresses' do
+        it 'should consider out-of-state address invalid' do
+          applicant.addresses.first.state = "OS"
+          applicant.save
+          expect(applicant.has_valid_address?).to eq false
+        end
+      end
+    end
+  end
 end

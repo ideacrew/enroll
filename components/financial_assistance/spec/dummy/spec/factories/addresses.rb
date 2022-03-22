@@ -6,7 +6,7 @@ FactoryBot.define do
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street NE" }
     sequence(:address_2, 111) { |n| "##{n}" }
     city { 'Washington' }
-    state { Settings.aca.state_abbreviation }
+    state { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
     zip { '01001' }
     county { 'Hampden' }
 

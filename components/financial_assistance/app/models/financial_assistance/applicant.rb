@@ -1224,13 +1224,19 @@ module FinancialAssistance
     end
 
     # Case1: Missing address - No address objects at all
-    # Case2: Invalid Address - No addresses matching the state
+    # Case2: Invalid Address - No addresses matching the state (skip if living_outside_state feature is enabled and applicant plans to return)
     # Case3: Unable to get rating area(home_address || mailing_address)
     def has_valid_address?
-      addresses.where(
-        state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
-        :kind.in => ['home', 'mailing']
-      ).present?
+      if EnrollRegistry.feature_enabled?(:living_outside_state) && is_temporarily_out_of_state
+        addresses.where(
+          :kind.in => ['home', 'mailing']
+        ).present?
+      else
+        addresses.where(
+          state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+          :kind.in => ['home', 'mailing']
+        ).present?
+      end
     end
 
     #use this method to check what evidences needs to be included on notices
