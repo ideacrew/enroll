@@ -381,7 +381,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def update_tobacco_field(members)
-    params[:family_member_ids].each_value do |id|
+    params[:family_member_ids].each_pair do |_key, id|
       member = members.where(applicant_id: id).first
       member.update_attributes(tobacco_use: params["is_tobacco_user_#{id}"])
     end
