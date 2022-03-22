@@ -88,6 +88,9 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
+
+    update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+
     if @market_kind == 'shop' || @market_kind == 'fehb'
 
       raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
@@ -375,5 +378,12 @@ class Insured::GroupSelectionController < ApplicationController
 
     flash[:error] = l10n("insured.out_of_state_error_message")
     redirect_to family_account_path
+  end
+
+  def update_tobacco_field(members)
+    params[:family_member_ids].each_value do |id|
+      member = members.where(applicant_id: id).first
+      member.update_attributes(tobacco_use: params["is_tobacco_user_#{id}"])
+    end
   end
 end
