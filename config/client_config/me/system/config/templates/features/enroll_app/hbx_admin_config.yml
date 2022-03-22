@@ -6,22 +6,22 @@ registry:
       - key: :hbx_admin_config
         is_enabled: true
   - namespace:
-    - :enroll_app
-    - :hbx_admin_config
+      - :enroll_app
+      - :hbx_admin_config
     features:
-        - key: :issuers_tab
-          is_enabled: true
-        - key: :inbox_tab
-          is_enabled: true
-        - key: :notices_tab
-          is_enabled: false
-        - key: :calendar_tab
-          is_enabled: false
-        - key: :staff_tab
-          is_enabled: false
-        - key: :orphan_accounts_tab
-          is_enabled: false
-        - key: :no_transition_families
-          is_enabled: false
-        - key: :drop_enrollment_members
-          is_enabled: true
+      - key: :issuers_tab
+        is_enabled: true
+      - key: :inbox_tab
+        is_enabled: true
+      - key: :notices_tab
+        is_enabled: false
+      - key: :calendar_tab
+        is_enabled: false
+      - key: :staff_tab
+        is_enabled: false
+      - key: :orphan_accounts_tab
+        is_enabled: false
+      - key: :no_transition_families
+        is_enabled: false
+      - key: :drop_enrollment_members
+        is_enabled: false
