@@ -33,5 +33,12 @@ RSpec.describe "insured/families/_consumer_broker.html.erb" do
       render partial: 'insured/families/consumer_broker.html.erb', locals: { title: nil}
       expect(rendered).to match /Assignment Date/
     end
+
+    it "the partial should display Assignment Date in EST timezone" do
+      render partial: 'insured/families/consumer_broker.html.erb', locals: { title: nil}
+      date = broker_agency_account.start_on.in_time_zone('Eastern Time (US & Canada)')
+      expect(rendered).to have_content(date.strftime("%m/%d/%Y"))
+      expect(rendered).to have_content(date.strftime("%-I:%M%p"))
+    end
   end
 end
