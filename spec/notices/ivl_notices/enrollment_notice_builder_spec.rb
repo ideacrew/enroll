@@ -104,7 +104,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
     let(:calendar_year) { TimeKeeper.date_of_record.next_year.year }
-    
+
     before :each do
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
       hbx_profile.benefit_sponsorship.benefit_coverage_periods = nil
@@ -116,7 +116,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       let(:day) {EnrollRegistry[:default_open_enrollment_begin].setting(:day).item}
       let(:year_offset) { EnrollRegistry[:default_open_enrollment_begin].setting(:year_offset).item }
       let(:benefit_coverage_period) { nil }
-      let(:open_enrollment_start_on) {Date.new(calendar_year + year_offset, month, day )}
+      let(:open_enrollment_start_on) {Date.new(calendar_year + year_offset, month, day)}
 
       it "should return next year's open enrollment start on if there is no benefit coverage period present" do
         hbx_profile.reload
@@ -129,7 +129,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       let(:day) {EnrollRegistry[:default_open_enrollment_end].setting(:day).item}
       let(:year_offset) { EnrollRegistry[:default_open_enrollment_end].setting(:year_offset).item }
       let(:benefit_coverage_period) { nil }
-      let(:open_enrollment_end_on) {Date.new(calendar_year + year_offset, month, day )}
+      let(:open_enrollment_end_on) {Date.new(calendar_year + year_offset, month, day)}
 
       it "should return next year's open enrollment end on if there is no benefit coverage period present" do
         hbx_profile.reload
