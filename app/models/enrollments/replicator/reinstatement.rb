@@ -191,9 +191,10 @@ module Enrollments
                       else
                         base_enrollment.hbx_enrollment_members
                       end
+        latest_enrollment = base_enrollment.family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
         enr_members.inject([]) do |members, hbx_enrollment_member|
-          is_tobacco_user = hbx_enrollment_member&.family_member&.person&.is_tobacco_user
-          tobacco_use = is_tobacco_user == 'unknown' ? 'NA' : is_tobacco_user
+          member = latest_enrollment.hbx_enrollment_members.where(applicant_id: hbx_enrollment_member.applicant_id).first
+          tobacco_use = member&.tobacco_use || 'N'
           members << HbxEnrollmentMember.new({
                                                  applicant_id: hbx_enrollment_member.applicant_id,
                                                  eligibility_date: new_effective_date,
