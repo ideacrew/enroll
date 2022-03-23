@@ -1136,5 +1136,46 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(flash[:error]).to eq l10n("insured.out_of_state_error_message")
       end
     end
+
+    context 'create enrollment' do
+      let(:family_member) { family.family_members.first }
+      let(:params) do
+        {
+          "person_id" => person.id,
+          "family_member_ids" => {"0" => family_member.id },
+          "is_tobacco_user_#{family_member.id}" => "Y",
+          "market_kind" => "individual",
+          "coverage_kind" => "health",
+          "change_plan" => "change_by_qle",
+          "commit" => "Shop for new plan"
+        }
+      end
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:tobacco_cost).and_return(true)
+        sign_in user
+      end
+
+      it 'creates enrollment & set tobacco_use on hbx_enrollment member' do
+        expect(family.active_household.hbx_enrollments.size).to eq 0
+        post :create, params: {
+          "person_id" => person.id,
+          "family_member_ids" => {"0" => family_member.id },
+          "is_tobacco_user_#{family_member.id}" => "Y",
+          "market_kind" => "individual",
+          "coverage_kind" => "health",
+          "change_plan" => "change_by_qle",
+          "effective_on_option_selected" => TimeKeeper.date_of_record.to_s,
+          "commit" => "Shop for new plan"
+        }
+
+        expect(response).to have_http_status(:redirect)
+        ivl_enrollments = HbxEnrollment.where(kind: 'individual')
+        expect(ivl_enrollments.size).to eq 1
+        expect(ivl_enrollments.first.hbx_enrollment_members.first.tobacco_use).to eq 'Y'
+      end
+    end
   end
 end

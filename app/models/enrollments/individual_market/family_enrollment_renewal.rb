@@ -205,9 +205,10 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     old_enrollment_members = eligible_enrollment_members
     raise "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
 
+    latest_enrollment = @enrollment.family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
     old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
-      member_tobacco_use = hbx_enrollment_member&.person&.is_tobacco_user
-      tobacco_use = (member_tobacco_use == 'unknown') ? 'NA' : member_tobacco_use
+      member = latest_enrollment.hbx_enrollment_members.where(applicant_id: hbx_enrollment_member.applicant_id).first
+      tobacco_use = member&.tobacco_use || 'N'
       members << HbxEnrollmentMember.new({ applicant_id: hbx_enrollment_member.applicant_id,
                                            eligibility_date: renewal_coverage_start,
                                            coverage_start_on: renewal_coverage_start,
