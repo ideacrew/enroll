@@ -9,7 +9,7 @@ module TimeHelper
     enrollment.effective_on + 1.day
   end
 
-  def set_date_min_to_beginning_of_year (enrollment, offset = 0)
+  def set_date_min_to_beginning_of_year(enrollment, offset = 0)
     enrollment.effective_on.beginning_of_year + offset.days
   end
 
