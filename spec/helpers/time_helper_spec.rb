@@ -43,6 +43,14 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
     end
   end
 
+  describe "set earliest date to beginning of year" do
+    it "returns beginning of the year plus the given offset" do
+      enrollment.effective_on = (TimeKeeper.date_of_record)
+      expect(helper.set_date_min_to_beginning_of_year(enrollment)).to eq(TimeKeeper.date_of_record.beginning_of_year)
+      expect(helper.set_date_min_to_beginning_of_year(enrollment, 7)).to eq(TimeKeeper.date_of_record.beginning_of_year + 7.days)
+    end
+  end
+
   describe "set latest date for terminating enrollment" do
     context "for enrollment in shop market"do
       it "sets the latest date able to terminate an enrollment to be 1 year less 1 day from the enrollment start date" do
