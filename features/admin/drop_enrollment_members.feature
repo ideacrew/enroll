@@ -31,4 +31,4 @@ Feature: Drop Enrollment Members
       When Admin sets termination date for dropped members
       And Admin selects all members except a minor to be dropped from enrollment
       And Admin submits drop enrollment member form
-      Then Admin should see that the enrollment failed to terminate
+      Then Admin should see the dropped members
