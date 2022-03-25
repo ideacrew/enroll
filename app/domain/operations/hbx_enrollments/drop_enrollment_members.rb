@@ -34,7 +34,7 @@ module Operations
         reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, 0, eligible_members).build
         reinstatement.save!
 
-        get_household_applied_aptc(reinstatement, terminate_date + 1.day)
+        get_household_applied_aptc(reinstatement, terminate_date + 1.day) if params[:hbx_enrollment].applied_aptc_amount > 0
 
         reinstatement.force_select_coverage! if reinstatement.may_reinstate_coverage?
         reinstatement.begin_coverage! if reinstatement.may_begin_coverage? && reinstatement.effective_on <= TimeKeeper.date_of_record
