@@ -714,3 +714,8 @@ registry:
         is_enabled: false
       - key: :staff_list_back
         is_enabled: true
+  - namespace:
+      - :enrollments
+    features:
+      - key: :display_enr_summary
+        is_enabled: true
