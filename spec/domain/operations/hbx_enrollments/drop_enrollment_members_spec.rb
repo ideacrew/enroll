@@ -87,6 +87,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                            hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
                                            aasm_state: "coverage_selected",
                                            effective_on: TimeKeeper.date_of_record,
+                                           applied_aptc_amount: 200,
                                            rating_area_id: initial_application.recorded_rating_area_id,
                                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                                            sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
