@@ -491,7 +491,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return more than one dental plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'dental', family_members)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', family_members, 'dental')
         expect(benefit_packages.count).to be > 1
       end
     end
@@ -503,7 +503,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return one health plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'health', family_members)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', family_members, 'health')
         expect(benefit_packages.count).to eql(1)
       end
     end
@@ -515,7 +515,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return more than one health plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'health', family_members)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members, 'health')
         expect(benefit_packages.count).to be > 1
       end
     end
@@ -527,11 +527,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return more than one dental plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'dental', family_members)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members, 'dental')
         expect(benefit_packages.count).to be > 1
       end
     end
- 
+
     context "When hbx enrollment members are AI/AN, over 30, and apply for health coverage" do
       let(:family_members) {family.family_members}
       before :each do
@@ -539,7 +539,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return one benefit package" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', 'health', family_members)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, 'health')
         expect(benefit_packages.count).to eql(1)
       end
     end
@@ -553,7 +553,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return health plans with csr_limited and csr_0" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', 'health', family_members_under_thirty)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members_under_thirty, 'health')
         expect(benefit_packages).to include(benefit_package2, benefit_package1, benefit_package3)
       end
     end
@@ -568,7 +568,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it "should return more than one health plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'health', family_members_under_thirty)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members_under_thirty, 'health')
         expect(benefit_packages.count).to eql(4)
       end
     end
