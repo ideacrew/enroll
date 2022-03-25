@@ -960,6 +960,69 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
       end
     end
+
+    context 'set evidence to outstanding' do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context 'for income evidence' do
+        before do
+          applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
+        end
+
+        let(:current_evidence) { applicant.income_evidence }
+
+        it 'should set evidence verified' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_outstanding(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied and verification_outstanding' do
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).not_to be_present
+          applicant.set_evidence_outstanding(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+        end
+      end
+
+      context 'for esi mec evidence' do
+
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
+        end
+
+        let(:current_evidence) { applicant.esi_evidence }
+
+        it 'should set evidence verified' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_outstanding(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied and verification_outstanding' do
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).not_to be_present
+          applicant.set_evidence_outstanding(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+        end
+      end
+    end
   end
 
   describe '#embedded_document_section_entry_complete?' do
