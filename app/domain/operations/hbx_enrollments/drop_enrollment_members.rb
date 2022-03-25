@@ -31,8 +31,6 @@ module Operations
         all_enr_members = params[:hbx_enrollment].hbx_enrollment_members
         eligible_members = all_enr_members.reject{ |member| dropped_enr_members.include?(member.id.to_s) }
 
-        return Failure("Enrollment cannot exist without at least one member that is 18 years or older.") unless eligible_members.any? { |member| member.age_on_effective_date > 18 }
-
         reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, 0, eligible_members).build
         reinstatement.save!
 
