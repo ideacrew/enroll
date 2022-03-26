@@ -190,6 +190,11 @@ module Insured::FamiliesHelper
     }
   end
 
+  def display_termination_reason?(enrollment)
+    return false if enrollment.is_shop?
+    enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason)
+  end
+
   def enrollment_coverage_end(hbx_enrollment)
     if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on

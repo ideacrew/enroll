@@ -22,6 +22,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_for_non_payment?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
@@ -45,6 +46,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
@@ -70,6 +72,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_for_non_payment?).and_return(true)
     end
@@ -89,6 +92,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
       allow(existing_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
@@ -110,6 +114,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
       allow(existing_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
@@ -227,6 +232,7 @@ describe "given cancel event to cancel terminated coverage" do
     hbx_enrollment.reload
     expect(hbx_enrollment.terminated_on).to eq nil
     expect(hbx_enrollment.coverage_canceled?).to eq true
+    expect(hbx_enrollment.terminate_reason).to eq "non_payment"
   end
 end
 
@@ -254,5 +260,6 @@ describe "given term event to cancel terminated coverage" do
     hbx_enrollment.reload
     expect(hbx_enrollment.terminated_on).to eq nil
     expect(hbx_enrollment.coverage_canceled?).to eq true
+    expect(hbx_enrollment.terminate_reason).to eq "non_payment"
   end
 end
