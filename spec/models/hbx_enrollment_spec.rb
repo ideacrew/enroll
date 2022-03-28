@@ -4732,6 +4732,10 @@ describe ".parent enrollments", dbclean: :around_each do
       it 'should create the workflow_state_transition object' do
         expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
       end
+
+      it 'should return latest_transition_at' do
+        expect(hbx_enrollment12.latest_transition_at).not_to be_nil
+      end
     end
   end
 

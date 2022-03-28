@@ -2651,6 +2651,10 @@ class HbxEnrollment
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 
+  def latest_transition_at
+    workflow_state_transitions.order(created_at: :desc).first&.created_at
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding

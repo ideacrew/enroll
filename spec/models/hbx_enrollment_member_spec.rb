@@ -74,7 +74,7 @@ describe HbxEnrollmentMember, dbclean: :around_each do
   end
 
   context "given a family member", dbclean: :around_each do
-    let(:person) { double }
+    let(:person) { double(full_name: 'John Smith10') }
     let(:family_member) { instance_double(FamilyMember, :person => person ) }
     subject { HbxEnrollmentMember.new }
 
@@ -89,6 +89,10 @@ describe HbxEnrollmentMember, dbclean: :around_each do
     it "delegates #ivl_coverage_selected to the family member" do
       expect(family_member).to receive(:ivl_coverage_selected)
       subject.ivl_coverage_selected
+    end
+
+    it "should return person's full_name" do
+      expect(subject.full_name).to eq person.full_name
     end
   end
 end
