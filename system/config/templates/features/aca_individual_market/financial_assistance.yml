@@ -204,7 +204,7 @@ registry:
     - key: :native_american_csr
       is_enabled: true
     - key: :filing_as_head_of_household
-      is_enabled: false
+      is_enabled: true
     - key: :no_coverage_tribe_details
       is_enabled: false
     - key: :display_medicaid_question
