@@ -97,7 +97,7 @@
         .col-xs-6
           span.ttu.lg.twelve.font-weight-bold
             = l10n('enrollment.latest_transition_at')
-          = @hbx_enrollment.workflow_state_transitions.order(created_at: :desc).first&.created_at
+          = @hbx_enrollment.latest_transition_at
           br/
           br/
           span.ttu.lg.twelve.font-weight-bold
@@ -116,7 +116,7 @@
                 table.table-responsive
                   tr
                     td.font-weight-bold.h4
-                      = member.person.full_name.titleize
+                      = member.full_name.titleize
                   tr
                     br/
                     td class='pt_20px'
@@ -124,7 +124,7 @@
                         = l10n('enrollment.tobbaco_user')
                       br/
                       span.ttu.dg.fourteen
-                        = member.tobacco_use
+                        = member.tobacco_use_value
                     td class='pt_20px'
                       span.ttu.lg.twelve.h5 data-cuke="enrollment_coverage_state_date"
                         = l10n('enrollment_member.coverage_state_date')

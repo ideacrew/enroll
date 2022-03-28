@@ -718,4 +718,4 @@ registry:
       - :enrollments
     features:
       - key: :display_enr_summary
-        is_enabled: true
+        is_enabled: false

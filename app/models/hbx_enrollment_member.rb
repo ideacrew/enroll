@@ -141,6 +141,10 @@ class HbxEnrollmentMember
     tobacco_use.blank? ? "NA" : tobacco_use
   end
 
+  def full_name
+    person.full_name
+  end
+
   private
 
   def end_date_gt_start_date
