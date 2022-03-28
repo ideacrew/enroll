@@ -87,6 +87,8 @@ registry:
         is_enabled: true
       - key: :total_minimum_responsibility
         is_enabled: true
+      - key: :display_ivl_termination_reason
+        is_enabled: true
   - namespace:
     - :enroll_app
     - :aca_individual_market
@@ -112,4 +114,4 @@ registry:
             item: 15
           - key: :year_offset
             item: 0
-          
+
