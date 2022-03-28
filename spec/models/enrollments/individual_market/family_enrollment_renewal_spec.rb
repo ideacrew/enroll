@@ -219,6 +219,20 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       context "when dependent age off feature is turned on" do
+        let(:enrollment_with_tobacco_users) do
+          FactoryBot.create(:hbx_enrollment,
+                            :with_tobacco_use_enrollment_members,
+                            family: family,
+                            enrollment_members: enrollment_members,
+                            household: family.active_household,
+                            coverage_kind: coverage_kind,
+                            effective_on: current_benefit_coverage_period.start_on,
+                            kind: "individual",
+                            product_id: current_product.id,
+                            rating_area_id: rating_area.id,
+                            consumer_role_id: family.primary_person.consumer_role.id,
+                            aasm_state: 'coverage_selected')
+        end
         before do
           allow(child1).to receive(:relationship).and_return('child')
           allow(child3).to receive(:relationship).and_return('child')
@@ -238,15 +252,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(renewal.effective_on).to eq renewal_benefit_coverage_period.start_on
           end
 
-          it 'Renewal enrollment members should have the tobacco_use populated from person record.' do
+          it 'Renewal enrollment members should have the tobacco_use populated from previous enrollment' do
+            subject.enrollment = enrollment_with_tobacco_users
             renewal_members = subject.clone_enrollment_members
-            expect(renewal_members.pluck(:tobacco_use)).to include('y')
+            expect(renewal_members.pluck(:tobacco_use)).to include('Y')
           end
 
-          it 'Renewal enrollment members should have the tobacco_use populated NA for unknown.' do
-            spouse_rec.update_attributes(is_tobacco_user: 'unknown')
+          it 'Renewal enrollment members should have the tobacco_use populated N for unknown.' do
             renewal_members = subject.clone_enrollment_members
-            expect(renewal_members.pluck(:tobacco_use)).not_to include('unknown')
+            expect(renewal_members.pluck(:tobacco_use).uniq).to eq(['N'])
           end
         end
       end

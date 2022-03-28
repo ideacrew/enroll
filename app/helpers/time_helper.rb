@@ -9,6 +9,10 @@ module TimeHelper
     enrollment.effective_on + 1.day
   end
 
+  def set_date_min_to_beginning_of_year(enrollment, offset = 0)
+    enrollment.effective_on.beginning_of_year + offset.days
+  end
+
   def set_date_max_to_plan_end_of_year (enrollment)
     year = enrollment.effective_on.year
     if (enrollment.kind == "employer_sponsored") || (enrollment.kind == "employer_sponsored_cobra")
@@ -48,4 +52,3 @@ module TimeHelper
     has_only_employee_role || (has_dual_roles && %w[shop fehb].include?(market_kind))
   end
 end
-

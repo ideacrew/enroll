@@ -481,6 +481,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.sort_by' => "Sort By",
   :'en.plan_name' => "Plan Name",
   :'en.loading' => "Loading...",
+  :'en.termination_reason' => "Termination Reason",
   :'en.plan_compare_alert' => "Plan Compare Alert",
   :'en.insured.plan_shoppings.show.can_not_select_more_than_n_plans_to_compare' => "Can not select more than %{number} plans to compare.",
   :'en.insured.plan_shoppings.thankyou.confirm_your_plan_selection.content' => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",

@@ -141,7 +141,6 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
         evidence_names.each do |evidence_name|
           evidence = applicant.send(evidence_name)
           expect(evidence.outstanding?).to be_truthy
-          expect(evidence.due_on).to be_blank
         end
       end
 

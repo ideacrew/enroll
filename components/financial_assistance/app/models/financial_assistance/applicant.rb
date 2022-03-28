@@ -1181,7 +1181,7 @@ module FinancialAssistance
 
     def enrolled_with(_enrollment)
       return unless income_evidence&.pending?
-      income_evidence.due_on = schedule_verification_due_on if income_evidence.due_on.blank?
+
       set_evidence_outstanding(income_evidence)
     end
 
@@ -1209,6 +1209,7 @@ module FinancialAssistance
 
       evidence.verification_outstanding = true
       evidence.is_satisfied = false
+      evidence.due_on = schedule_verification_due_on if evidence.due_on.blank?
       evidence.move_to_outstanding
       save!
     end

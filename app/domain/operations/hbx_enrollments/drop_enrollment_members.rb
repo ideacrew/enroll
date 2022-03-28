@@ -31,12 +31,10 @@ module Operations
         all_enr_members = params[:hbx_enrollment].hbx_enrollment_members
         eligible_members = all_enr_members.reject{ |member| dropped_enr_members.include?(member.id.to_s) }
 
-        return Failure("Enrollment cannot exist without at least one member that is 18 years or older.") unless eligible_members.any? { |member| member.age_on_effective_date > 18 }
-
         reinstatement = Enrollments::Replicator::Reinstatement.new(params[:hbx_enrollment], terminate_date + 1.day, 0, eligible_members).build
         reinstatement.save!
 
-        get_household_applied_aptc(reinstatement, terminate_date + 1.day)
+        get_household_applied_aptc(reinstatement, terminate_date + 1.day) if params[:hbx_enrollment].applied_aptc_amount > 0
 
         reinstatement.force_select_coverage! if reinstatement.may_reinstate_coverage?
         reinstatement.begin_coverage! if reinstatement.may_begin_coverage? && reinstatement.effective_on <= TimeKeeper.date_of_record

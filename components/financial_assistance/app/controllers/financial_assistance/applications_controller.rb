@@ -357,7 +357,8 @@ module FinancialAssistance
           "ADDRESS LINE 2" => address&.address_2,
           "CITY" => address&.city,
           "ZIP" => address&.zip,
-          "STATE" => address&.state
+          "STATE" => address&.state,
+          "COUNTY" => address&.county
         }
       end
       addresses_hash

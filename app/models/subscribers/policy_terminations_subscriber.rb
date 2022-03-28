@@ -27,6 +27,7 @@ module Subscribers
           end.compact
           Rails.logger.error("PolicyTerminationsSubscriber") { "Found #{enrollments.count} enrollments" }
           enrollments.each do |en|
+            en.update_attributes(terminate_reason: qr_uri.to_s)
             if is_cancel
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as cancel" }
               next if en.coverage_canceled?
@@ -37,7 +38,7 @@ module Subscribers
               else
                 # cancel termed coverage
                 prevs_state = en.aasm_state
-                en.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
+                en.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil)
                 en.workflow_state_transitions << WorkflowStateTransition.new(
                   from_state: prevs_state,
                   to_state: "coverage_canceled",
@@ -67,7 +68,7 @@ module Subscribers
                     else
                       # cancel terminated coverage
                       prevs_state = en.aasm_state
-                      en.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
+                      en.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil)
                       en.workflow_state_transitions << WorkflowStateTransition.new(
                         from_state: prevs_state,
                         to_state: "coverage_canceled"
