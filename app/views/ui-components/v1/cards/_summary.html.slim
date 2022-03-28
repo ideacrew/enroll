@@ -94,7 +94,7 @@
   - if EnrollRegistry.feature_enabled?(:display_enr_summary)
     .row.plan
       .col-xs-12
-        .col-xs-4
+        .col-xs-6
           span.ttu.lg.twelve.font-weight-bold
             = l10n('enrollment.latest_transition_at')
           = @hbx_enrollment.workflow_state_transitions.order(created_at: :desc).first&.created_at
