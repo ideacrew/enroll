@@ -46,4 +46,12 @@ class EmployeeHomepage
   def self.qle_continue_btn
     '#qle_submit'
   end
+
+  def self.enrollment_tobacco_use
+    '[data-cuke="tobbaco_use"]'
+  end
+
+  def self.enrollment_coverage_state_date
+    '[data-cuke="enrollment_coverage_state_date"]'
+  end
 end

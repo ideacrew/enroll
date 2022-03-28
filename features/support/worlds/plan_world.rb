@@ -34,9 +34,9 @@ module PlanWorld
     ids = [newest_enr.product.hios_id]
     id = ids.map { |str| str[0..13] }.first
     qhp = FactoryBot.build(:products_qhp,
-                            state_postal_code: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-                            active_year: newest_enr.effective_on.year,
-                            standard_component_id: id)
+                           state_postal_code: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+                           active_year: newest_enr.effective_on.year,
+                           standard_component_id: id)
     FactoryBot.build(:products_qhp_cost_share_variance, qhp: qhp, hios_plan_and_variant_id: ids.first)
     qhp.save!
   end

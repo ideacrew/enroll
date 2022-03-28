@@ -8,8 +8,8 @@ end
 
 Then(/^additional Enrollment Summary exists$/) do
   sleep(3)
-  expect(page).to have_content(l10n('enrollment.tobbaco_user'))
-  expect(page).to have_content(l10n('enrollment_member.coverage_state_date'))
+  expect(page.has_css?(IvlHomepage.enrollment_tobacco_use)).to eq true
+  expect(page.has_css?(IvlHomepage.enrollment_coverage_state_date)).to eq true
 end
 
 Given(/^the display enrollment summary configuration is enabled$/) do
