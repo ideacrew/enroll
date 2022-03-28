@@ -508,6 +508,54 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     end
   end
 
+  describe "#display_termination_reason?" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_terminated',
+        terminate_reason: 'non_payment'
+      )
+    end
+
+    context "when termination reason config is enabled and enrollment is IVL" do
+      before :each do
+        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return true" do
+        expect(helper.display_termination_reason?(hbx_enrollment)).to eq true
+      end
+    end
+
+    context "when termination reason config is disabled and enrollment is IVL" do
+      before :each do
+        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should return false" do
+        expect(helper.display_termination_reason?(hbx_enrollment)).to eq false
+      end
+    end
+
+    context "when termination reason config is enabled and enrollment is shop" do
+      before :each do
+        hbx_enrollment.update_attributes(kind: "shop")
+        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should return false" do
+        expect(helper.display_termination_reason?(hbx_enrollment)).to eq false
+      end
+    end
+  end
+
   describe "#Enrollment coverage", dbclean: :after_each do
     let!(:person) { FactoryBot.build_stubbed(:person)}
     let!(:family) { FactoryBot.build_stubbed(:family, :with_primary_family_member, person: person) }
