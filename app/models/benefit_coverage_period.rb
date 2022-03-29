@@ -171,7 +171,7 @@ class BenefitCoveragePeriod
   end
 
   def get_benefit_packages(**attrs)
-    fetch_benefit_packages(attrs[:american_indian_members], attrs[:csr_kind], attrs[:family_members], attrs[:coverage_kind]).inject([]) do |result, bg|
+    fetch_benefit_packages(attrs[:american_indian_members], attrs[:csr_kind], attrs[:family_members], attrs[:effective_on], attrs[:coverage_kind]).inject([]) do |result, bg|
       satisfied = true
       attrs[:family_members].each do |family_member|
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
@@ -203,12 +203,12 @@ class BenefitCoveragePeriod
     end
   end
 
-  def fetch_benefit_packages(american_indian_members, csr_kind, family_members, coverage_kind = 'health')
+  def fetch_benefit_packages(american_indian_members, csr_kind, family_members, effective_on, coverage_kind = 'health')
     american_indian_status = american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
 
     return benefit_packages unless american_indian_status && coverage_kind == "health"
 
-    return benefit_packages.select{|bg| bg.cost_sharing == csr_kind || bg.cost_sharing == 'csr_0' } unless american_indian_status && over_thirty?(family_members)
+    return benefit_packages.select{|bg| bg.cost_sharing == csr_kind || bg.cost_sharing == 'csr_0' } unless american_indian_status && over_thirty?(family_members, effective_on)
 
     benefit_packages.select{|bg| bg.cost_sharing == csr_kind}
   end
@@ -263,8 +263,8 @@ class BenefitCoveragePeriod
 
   private
 
-  def over_thirty?(family_members)
-    family_members.detect{|family_member| DateTime.now - 30.years >= family_member.person.dob}.present?
+  def over_thirty?(family_members, effective_on)
+    family_members.detect{|family_member| family_member.person.age_on(effective_on) >= 30}.present?
   end
 
   def extract_csr_kind(tax_household, shopping_family_member_ids)
