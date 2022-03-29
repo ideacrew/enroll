@@ -81,7 +81,7 @@ FactoryBot.define do
         can_cancel_enrollment {true}
         can_terminate_enrollment {true}
         change_enrollment_end_date {true}
-        can_drop_enrollment_members {true}
+        can_drop_enrollment_members {false}
       end
     end
 
@@ -105,7 +105,7 @@ FactoryBot.define do
         can_cancel_enrollment {true}
         can_terminate_enrollment {true}
         change_enrollment_end_date {true}
-        can_drop_enrollment_members {true}
+        can_drop_enrollment_members {false}
       end
     end
 
@@ -162,7 +162,7 @@ FactoryBot.define do
       can_cancel_enrollment {true}
       can_terminate_enrollment {true}
       change_enrollment_end_date {true}
-      can_drop_enrollment_members {true}
+      can_drop_enrollment_members {false}
     end
 
     trait :super_admin do
