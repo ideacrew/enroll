@@ -86,6 +86,8 @@ registry:
       - key: :total_minimum_responsibility
         is_enabled: false
       - key: :display_ivl_termination_reason
+        is_enabled: true
+      - key: :reinstate_nonpayment_ivl_enrollment
         is_enabled: false
   - namespace:
     - :enroll_app

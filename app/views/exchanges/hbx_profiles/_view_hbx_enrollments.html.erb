@@ -28,6 +28,7 @@
                     <td><%= enrollment.kind.camelcase %></td>
                     <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
                     <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
+                    <td id="term_reason_eligible_for_reinstate" class="hidden"><%= enrollment.term_reason_eligible_for_reinstate? %></td>
                     <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
                     <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
                     <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
@@ -148,25 +149,30 @@
             var employee_status = $(this).closest('tr').find("td#employee_status").text();
             var effective_date = $(this).closest('tr').find("td#reinstate").text();
             var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
+            var term_reason_eligible_for_reinstate = $(this).closest('tr').find("td#term_reason_eligible_for_reinstate").text();
             var enrollment_market = $(this).closest('tr').find("td#enrollment_market").text();
             var cobra_employee = $(this).closest('tr').find("td#cobra_employee").text();
             var cobra_enrollment = $(this).closest('tr').find("td#cobra_enrollment").text();
             var active_enroll_exists_with_reinstate_date = $(this).closest('tr').find("td#active_enroll_exists_with_reinstate_date").text();
             if(enrollment_can_be_reinstated == "false") {
-                if (enrollment_market == "Employer Sponsored"){
-                    if (cobra_employee == "true" && cobra_enrollment == "false"){
-                        $('.modal-dialog .bg-warning').html("Unable to reinstate employer sponsored enrollment for cobra employee ");
-                        return;
-                    }
-                    if(cobra_employee == "false" && cobra_enrollment == "true"){
-                        $('.modal-dialog .bg-warning').html("Unable to reinstate cobra enrollment for active employee");
-                        return;
-                    }
-                    $('.modal-dialog .bg-warning').html("Unable to reinstate Employer Sponsored enrollment, Employer not offering coverage for the effective date " + effective_date);
-                }else{
-                    $('.modal-dialog .bg-warning').html("Unable to reinstate Individual Market enrollment for effective date " + effective_date + " : Previous year terminated enrollment can't be reinstated, Please reinstate for current year terminated enrollment.");
-                }
+              if (term_reason_eligible_for_reinstate == "false"){
+                $('.modal-dialog .bg-warning').html("Unable to reinstate, Termination Reason Not Eligible for Reinstate");
                 return;
+              }
+              if (enrollment_market == "Employer Sponsored"){
+                  if (cobra_employee == "true" && cobra_enrollment == "false"){
+                      $('.modal-dialog .bg-warning').html("Unable to reinstate employer sponsored enrollment for cobra employee ");
+                      return;
+                  }
+                  if(cobra_employee == "false" && cobra_enrollment == "true"){
+                      $('.modal-dialog .bg-warning').html("Unable to reinstate cobra enrollment for active employee");
+                      return;
+                  }
+                  $('.modal-dialog .bg-warning').html("Unable to reinstate Employer Sponsored enrollment, Employer not offering coverage for the effective date " + effective_date);
+              }else{
+                  $('.modal-dialog .bg-warning').html("Unable to reinstate Individual Market enrollment for effective date " + effective_date + " : Previous year terminated enrollment can't be reinstated, Please reinstate for current year terminated enrollment.");
+              }
+              return;
             }
             if (active_enroll_exists_with_reinstate_date == "true") {
                 $('.modal-dialog .bg-warning').html("Unable to reinstate, Active Coverage/Enrollment exists with Effective date " + effective_date);
