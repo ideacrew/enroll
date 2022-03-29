@@ -31,7 +31,7 @@ class MeDefinePermissions < MigrationTask
                           can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false, can_reset_password: false, can_change_username_and_email: false,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false, can_view_sep_history: true,
-                          can_reinstate_enrollment: false, can_cancel_enrollment: false, can_terminate_enrollment: false, change_enrollment_end_date: false, can_drop_enrollment_members: true)
+                          can_reinstate_enrollment: false, can_cancel_enrollment: false, can_terminate_enrollment: false, change_enrollment_end_date: false, can_drop_enrollment_members: false)
     Permission
       .find_or_initialize_by(name: 'hbx_csr_supervisor')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_access_pay_now: false,
@@ -41,7 +41,7 @@ class MeDefinePermissions < MigrationTask
                           can_transition_family_members: true, can_access_user_account_tab: true, view_login_history: false, can_reset_password: false,
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false,
-                          can_view_sep_history: true, can_reinstate_enrollment: false, can_cancel_enrollment: false, can_terminate_enrollment: false, change_enrollment_end_date: false, can_drop_enrollment_members: true)
+                          can_view_sep_history: true, can_reinstate_enrollment: false, can_cancel_enrollment: false, can_terminate_enrollment: false, change_enrollment_end_date: false, can_drop_enrollment_members: false)
   end
 
   def initial_hbx
@@ -79,7 +79,7 @@ class MeDefinePermissions < MigrationTask
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true,
                           manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true,
                           view_login_history: false, can_reset_password: false, can_edit_aptc: true, can_view_sep_history: true, can_reinstate_enrollment: true,
-                          can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true, can_access_user_account_tab: true, can_drop_enrollment_members: true)
+                          can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true, can_access_user_account_tab: true, can_drop_enrollment_members: false)
     Permission
       .find_or_initialize_by(name: 'developer')
       .update_attributes!(modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true, can_access_user_account_tab: true,
