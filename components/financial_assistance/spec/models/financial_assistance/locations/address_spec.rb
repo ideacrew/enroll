@@ -160,18 +160,18 @@ module FinancialAssistance
           context 'when county is blank' do
             let(:county) { nil }
 
+            context 'when in state' do
+
+              it 'returns false' do
+                expect(address.valid?).to eq false
+              end
+            end
+
             context 'when out of state' do
               let(:state) { 'DC' }
 
               it 'returns true' do
                 expect(address.valid?).to eq true
-              end
-            end
-
-            context 'when in state' do
-
-              it 'returns false' do
-                expect(address.valid?).to eq false
               end
             end
           end
