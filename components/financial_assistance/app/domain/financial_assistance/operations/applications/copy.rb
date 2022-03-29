@@ -221,9 +221,9 @@ module FinancialAssistance
         end
 
         def fetch_app_params(source_application)
-          source_app_params = source_application.attributes.slice(:family_id, :is_renewal_authorized, :years_to_renew, :is_requesting_voter_registration_application_in_mail,
-                                                                  :benchmark_product_id, :medicaid_terms, :medicaid_insurance_collection_terms, :report_change_terms,
-                                                                  :parent_living_out_of_home_terms, :attestation_terms, :submission_terms, :request_full_determination)
+          source_app_params = source_application.attributes.deep_symbolize_keys.slice(:family_id, :is_renewal_authorized, :years_to_renew, :is_requesting_voter_registration_application_in_mail,
+                                                                                      :benchmark_product_id, :medicaid_terms, :medicaid_insurance_collection_terms, :report_change_terms,
+                                                                                      :parent_living_out_of_home_terms, :attestation_terms, :submission_terms, :request_full_determination)
 
           source_app_params.merge({ aasm_state: 'draft',
                                     hbx_id: FinancialAssistance::HbxIdGenerator.generate_application_id })
@@ -235,28 +235,28 @@ module FinancialAssistance
           is_living_in_state = has_in_state_home_addresses?(source_applicant.addresses.map(&:attributes).each_with_index.to_h.invert)
           applicant_mergable_params.merge!(is_living_in_state: is_living_in_state)
 
-          source_appli_params = source_applicant.attributes.slice(:name_pfx, :first_name, :middle_name, :last_name, :name_sfx, :encrypted_ssn, :gender, :dob, :is_primary_applicant,
-                                                                  :is_incarcerated, :is_disabled, :ethnicity, :race, :indian_tribe_member, :tribal_id, :language_code, :no_dc_address,
-                                                                  :is_homeless, :is_temporarily_out_of_state, :immigration_doc_statuses, :no_ssn, :citizen_status, :is_consumer_role,
-                                                                  :is_resident_role, :same_with_primary, :is_applying_coverage, :is_tobacco_user, :vlp_document_id, :vlp_subject,
-                                                                  :alien_number, :i94_number, :visa_number, :passport_number, :sevis_id, :naturalization_number, :receipt_number,
-                                                                  :citizenship_number, :card_number, :country_of_citizenship, :vlp_description, :expiration_date, :issuing_country,
-                                                                  :is_consent_applicant, :is_tobacco_user, :assisted_income_validation, :assisted_mec_validation, :assisted_income_reason,
-                                                                  :assisted_mec_reason, :aasm_state, :person_hbx_id, :ext_app_id, :family_member_id, :has_fixed_address, :is_living_in_state,
-                                                                  :is_required_to_file_taxes, :is_filing_as_head_of_household, :tax_filer_kind, :is_joint_tax_filing, :is_claimed_as_tax_dependent,
-                                                                  :is_physically_disabled, :has_income_verification_response, :has_mec_verification_response, :is_medicare_eligible, :is_student,
-                                                                  :student_kind, :student_school_kind, :student_status_end_on, :is_self_attested_blind, :is_self_attested_disabled,
-                                                                  :is_self_attested_long_term_care, :is_veteran, :is_refugee, :is_trafficking_victim, :is_former_foster_care, :age_left_foster_care,
-                                                                  :foster_care_us_state, :had_medicaid_during_foster_care, :is_pregnant, :is_enrolled_on_medicaid, :is_post_partum_period,
-                                                                  :children_expected_count, :pregnancy_due_on, :pregnancy_end_on, :is_primary_caregiver, :is_subject_to_five_year_bar,
-                                                                  :is_five_year_bar_met, :is_forty_quarters, :is_ssn_applied, :non_ssn_apply_reason, :moved_on_or_after_welfare_reformed_law,
-                                                                  :is_veteran_or_active_military, :is_spouse_or_dep_child_of_veteran_or_active_military, :is_currently_enrolled_in_health_plan,
-                                                                  :has_daily_living_help, :need_help_paying_bills, :is_resident_post_092296, :is_vets_spouse_or_child, :has_job_income,
-                                                                  :has_self_employment_income, :has_other_income, :has_unemployment_income, :has_deductions, :has_enrolled_health_coverage,
-                                                                  :has_eligible_health_coverage, :has_american_indian_alaskan_native_income, :medicaid_chip_ineligible, :immigration_status_changed,
-                                                                  :health_service_through_referral, :health_service_eligible, :tribal_state, :tribal_name, :is_medicaid_cubcare_eligible,
-                                                                  :has_eligible_medicaid_cubcare, :medicaid_cubcare_due_on, :has_eligibility_changed, :has_household_income_changed,
-                                                                  :person_coverage_end_on, :has_dependent_with_coverage, :dependent_job_end_on, :transfer_referral_reason)
+          source_appli_params = source_applicant.attributes.deep_symbolize_keys.slice(:name_pfx, :first_name, :middle_name, :last_name, :name_sfx, :encrypted_ssn, :gender, :dob, :is_primary_applicant,
+                                                                                      :is_incarcerated, :is_disabled, :ethnicity, :race, :indian_tribe_member, :tribal_id, :language_code, :no_dc_address,
+                                                                                      :is_homeless, :is_temporarily_out_of_state, :immigration_doc_statuses, :no_ssn, :citizen_status, :is_consumer_role,
+                                                                                      :is_resident_role, :same_with_primary, :is_applying_coverage, :is_tobacco_user, :vlp_document_id, :vlp_subject,
+                                                                                      :alien_number, :i94_number, :visa_number, :passport_number, :sevis_id, :naturalization_number, :receipt_number,
+                                                                                      :citizenship_number, :card_number, :country_of_citizenship, :vlp_description, :expiration_date, :issuing_country,
+                                                                                      :is_consent_applicant, :is_tobacco_user, :assisted_income_validation, :assisted_mec_validation, :assisted_income_reason,
+                                                                                      :assisted_mec_reason, :aasm_state, :person_hbx_id, :ext_app_id, :family_member_id, :has_fixed_address, :is_living_in_state,
+                                                                                      :is_required_to_file_taxes, :is_filing_as_head_of_household, :tax_filer_kind, :is_joint_tax_filing, :is_claimed_as_tax_dependent,
+                                                                                      :is_physically_disabled, :has_income_verification_response, :has_mec_verification_response, :is_medicare_eligible, :is_student,
+                                                                                      :student_kind, :student_school_kind, :student_status_end_on, :is_self_attested_blind, :is_self_attested_disabled,
+                                                                                      :is_self_attested_long_term_care, :is_veteran, :is_refugee, :is_trafficking_victim, :is_former_foster_care, :age_left_foster_care,
+                                                                                      :foster_care_us_state, :had_medicaid_during_foster_care, :is_pregnant, :is_enrolled_on_medicaid, :is_post_partum_period,
+                                                                                      :children_expected_count, :pregnancy_due_on, :pregnancy_end_on, :is_primary_caregiver, :is_subject_to_five_year_bar,
+                                                                                      :is_five_year_bar_met, :is_forty_quarters, :is_ssn_applied, :non_ssn_apply_reason, :moved_on_or_after_welfare_reformed_law,
+                                                                                      :is_veteran_or_active_military, :is_spouse_or_dep_child_of_veteran_or_active_military, :is_currently_enrolled_in_health_plan,
+                                                                                      :has_daily_living_help, :need_help_paying_bills, :is_resident_post_092296, :is_vets_spouse_or_child, :has_job_income,
+                                                                                      :has_self_employment_income, :has_other_income, :has_unemployment_income, :has_deductions, :has_enrolled_health_coverage,
+                                                                                      :has_eligible_health_coverage, :has_american_indian_alaskan_native_income, :medicaid_chip_ineligible, :immigration_status_changed,
+                                                                                      :health_service_through_referral, :health_service_eligible, :tribal_state, :tribal_name, :is_medicaid_cubcare_eligible,
+                                                                                      :has_eligible_medicaid_cubcare, :medicaid_cubcare_due_on, :has_eligibility_changed, :has_household_income_changed,
+                                                                                      :person_coverage_end_on, :has_dependent_with_coverage, :dependent_job_end_on, :transfer_referral_reason)
           source_appli_params.deep_symbolize_keys!
           source_appli_params.merge(applicant_mergable_params)
         end

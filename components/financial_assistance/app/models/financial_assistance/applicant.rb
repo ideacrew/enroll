@@ -1265,11 +1265,12 @@ module FinancialAssistance
     private
 
     def fetch_evidence_params(evidence)
-      evidence.attributes.slice(:key, :title, :description, :received_at, :is_satisfied, :verification_outstanding, :aasm_state, :update_reason, :due_on, :external_service, :updated_by)
+      evidence.attributes.deep_symbolize_keys.slice(:key, :title, :description, :received_at, :is_satisfied, :verification_outstanding, :aasm_state, :update_reason, :due_on, :external_service, :updated_by)
     end
 
     def clone_income_evidence(new_applicant)
-      new_income_evi = new_applicant.build_income_evidence(fetch_evidence_params(income_evidence))
+      params = fetch_evidence_params(income_evidence)
+      new_income_evi = new_applicant.build_income_evidence(params)
       income_evidence.clone_embedded_documents(new_income_evi)
     end
 
