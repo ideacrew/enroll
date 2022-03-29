@@ -63,7 +63,7 @@ class HbxEnrollment
 
   module TermReason
     NON_PAYMENT = 'non_payment'.freeze
-    Voluntary_WITHDRAWL = 'voluntary_withdrawl'.freeze
+    VOLUNTARY_WITHDRAWL = 'voluntary_withdrawl'.freeze
     RETROACTIVE_CANCELED = 'retroactive_canceled'.freeze
   end
 
@@ -1957,14 +1957,13 @@ class HbxEnrollment
       if allow_reinstate_non_payment_term?
         enrollments = HbxEnrollment.where(
           {:family_id => family_id,
-          :effective_on => effective_on.beginning_of_year..reinstate_enrollment.effective_on - 1.day,
-          :coverage_kind => coverage_kind,
-          :consumer_role_id => consumer_role_id,
-          :product_id  => product_id,
-          :terminate_reason => HbxEnrollment::TermReason::NON_PAYMENT,
-          :"hbx_enrollment_members.applicant_id" => subscriber&.applicant_id,
-          :"hbx_enrollment_members.is_subscriber" => true
-          }
+           :effective_on => effective_on.beginning_of_year..reinstate_enrollment.effective_on - 1.day,
+           :coverage_kind => coverage_kind,
+           :consumer_role_id => consumer_role_id,
+           :product_id => product_id,
+           :terminate_reason => HbxEnrollment::TermReason::NON_PAYMENT,
+           :"hbx_enrollment_members.applicant_id" => subscriber&.applicant_id,
+           :"hbx_enrollment_members.is_subscriber" => true}
         )
         enrollments.update_all(terminate_reason: nil) if enrollments.any?
       end

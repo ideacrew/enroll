@@ -3130,12 +3130,16 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       it "when feature enabled reinstate_nonpayment_ivl_enrollment, reset termination reason on reinstate" do
-        members = FactoryBot.build(:hbx_enrollment_member, applicant_id: ivl_family.primary_family_member.id, hbx_enrollment: ivl_enrollment, is_subscriber: true, coverage_start_on: ivl_enrollment.effective_on, eligibility_date: ivl_enrollment.effective_on, tobacco_use: 'Y')
-        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT, hbx_enrollment_members: [members] )
+        members = FactoryBot.build(:hbx_enrollment_member,
+                                   applicant_id: ivl_family.primary_family_member.id,
+                                   hbx_enrollment: ivl_enrollment, is_subscriber: true,
+                                   coverage_start_on: ivl_enrollment.effective_on,
+                                   eligibility_date: ivl_enrollment.effective_on, tobacco_use: 'Y')
+        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT, hbx_enrollment_members: [members])
         EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(true)
 
         ivl_enrollment.reinstate
-        reinstated_enrollment = HbxEnrollment.where(family_id:ivl_family.id).detect{|e| e.coverage_selected?}
+        reinstated_enrollment = HbxEnrollment.where(family_id: ivl_family.id).map(&:coverage_enrolled?).last
         ivl_enrollment.reload
         expect(ivl_enrollment.terminate_reason).to be_nil
         expect(reinstated_enrollment.present?).to be_truthy
@@ -3212,14 +3216,18 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       it "when feature reinstate_nonpayment_ivl_enrollment enabled should not reset termination reason on reinstate for shop" do
-        members = FactoryBot.build(:hbx_enrollment_member, applicant_id: shop_family.primary_family_member.id, hbx_enrollment: shop_enrollment, is_subscriber: true, coverage_start_on: shop_enrollment.effective_on, eligibility_date: shop_enrollment.effective_on, tobacco_use: 'Y')
-        shop_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT, hbx_enrollment_members: [members] )
+        members = FactoryBot.build(:hbx_enrollment_member,
+                                   applicant_id: shop_family.primary_family_member.id,
+                                   hbx_enrollment: shop_enrollment, is_subscriber: true,
+                                   coverage_start_on: shop_enrollment.effective_on,
+                                   eligibility_date: shop_enrollment.effective_on, tobacco_use: 'Y')
+        shop_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT, hbx_enrollment_members: [members])
         EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(true)
 
         shop_enrollment.reinstate
         shop_enrollment.reload
         expect(shop_enrollment.terminate_reason).to eq HbxEnrollment::TermReason::NON_PAYMENT
-        reinstated_enrollment = HbxEnrollment.where(family_id:shop_family.id).detect{|e| e.coverage_enrolled?}
+        reinstated_enrollment = HbxEnrollment.where(family_id: shop_family.id).map(&:coverage_enrolled?).last
         expect(reinstated_enrollment.present?).to be_truthy
         expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
         expect(reinstated_enrollment.effective_on).to eq shop_enrollment.terminated_on.next_day
@@ -3499,14 +3507,14 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
       it "enrollment terminated with non payment reason, when feature disabled" do
         EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(false)
-        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT )
+        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT)
         ivl_enrollment.reload
         expect(ivl_enrollment.can_be_reinstated?).to be_falsey
       end
 
       it "enrollment terminated with non payment reason, when feature enabled" do
         EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(true)
-        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT )
+        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT)
         ivl_enrollment.reload
         expect(ivl_enrollment.can_be_reinstated?).to be_truthy
       end
