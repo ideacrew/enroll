@@ -178,6 +178,7 @@ module FinancialAssistance
           build_new_emails(new_applicant, active_fm_applicant_params)
           return if source_applicant.blank?
 
+          source_applicant.clone_evidences(new_applicant)
           build_new_incomes(source_applicant, new_applicant)
           build_new_deductions(source_applicant, new_applicant)
           build_new_benefits(source_applicant, new_applicant)

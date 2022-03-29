@@ -328,18 +328,6 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         end
       end
 
-      context 'for applicant esi evidence' do
-        before do
-          applicant.build_esi_evidence(key: :esi, title: "ESI MEC")
-          applicant.save!
-          @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
-        end
-
-        it 'should not have esi evidence' do
-          expect(@duplicate_applicant.esi_evidence).to eq nil
-        end
-      end
-
       context 'for claimed_as_tax_dependent_by' do
         let(:mocked_params) { { claimed_as_tax_dependent_by: BSON::ObjectId.new } }
 
@@ -650,41 +638,6 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
     end
   end
 
-  describe 'applicant with income, esi, non esi and mec evidences' do
-    before do
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
-      application.send(:create_evidences)
-      @new_application = subject.call(application_id: application.id).success
-      @new_applicant = @new_application.applicants.first
-    end
-
-    it 'should not create evidences for new application' do
-      expect(@new_applicant.income_evidence).to be_nil
-      expect(@new_applicant.esi_evidence).to be_nil
-      expect(@new_applicant.non_esi_evidence).to be_nil
-      expect(@new_applicant.local_mec_evidence).to be_nil
-    end
-
-    it 'should create evidences when application is determined' do
-      @new_application.applicants.each do |applicant|
-        applicant.update_attributes(is_applying_coverage: true)
-      end
-
-      allow(@new_application).to receive(:is_application_valid?).and_return(true)
-      @new_application.submit!
-      @new_application.determine!
-      applicant = @new_application.applicants.first
-      expect(applicant.income_evidence).not_to be_nil
-      expect(applicant.esi_evidence).not_to be_nil
-      expect(applicant.non_esi_evidence).not_to be_nil
-      expect(applicant.local_mec_evidence).not_to be_nil
-    end
-  end
-
   describe 'applicant with incomes, benefits and deductions' do
     let!(:create_job_income12) do
       inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
@@ -987,6 +940,258 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
     it 'should create new application' do
       expect(@new_application).to be_a(::FinancialAssistance::Application)
+    end
+  end
+
+  describe 'with income_evidence' do
+    let!(:income_evidence) do
+      application.applicants.first.create_income_evidence(key: :income,
+                                                          title: 'Income',
+                                                          aasm_state: 'pending',
+                                                          due_on: Date.today,
+                                                          verification_outstanding: true,
+                                                          is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      income_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      income_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      income_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
+                                                        user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      income_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_income_evi = new_applicant.income_evidence
+      @new_verification_history = @new_income_evi.verification_histories.first
+      @new_request_result = @new_income_evi.request_results.first
+      @new_wfst = @new_income_evi.workflow_state_transitions.first
+      @new_document = @new_income_evi.documents.first
+    end
+
+    it 'should clone income_evidence' do
+      expect(@new_income_evi).not_to be_nil
+      expect(@new_income_evi.created_at).not_to be_nil
+      expect(@new_income_evi.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_income_evi.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_income_evi.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_income_evi.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_income_evi.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
+    end
+  end
+
+  describe 'with esi_evidence' do
+    let!(:esi_evidence) do
+      application.applicants.first.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      esi_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      esi_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      esi_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      esi_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_esi_evi = new_applicant.esi_evidence
+      @new_verification_history = @new_esi_evi.verification_histories.first
+      @new_request_result = @new_esi_evi.request_results.first
+      @new_wfst = @new_esi_evi.workflow_state_transitions.first
+      @new_document = @new_esi_evi.documents.first
+    end
+
+    it 'should clone esi_evidence' do
+      expect(@new_esi_evi).not_to be_nil
+      expect(@new_esi_evi.created_at).not_to be_nil
+      expect(@new_esi_evi.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_esi_evi.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_esi_evi.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_esi_evi.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_esi_evi.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
+    end
+  end
+
+  describe 'with non_esi_evidence' do
+    let!(:non_esi_evidence) do
+      application.applicants.first.create_non_esi_evidence(key: :non_esi_mec, title: "Non Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      non_esi_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      non_esi_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      non_esi_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
+                                                         user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      non_esi_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_non_esi_evi = new_applicant.non_esi_evidence
+      @new_verification_history = @new_non_esi_evi.verification_histories.first
+      @new_request_result = @new_non_esi_evi.request_results.first
+      @new_wfst = @new_non_esi_evi.workflow_state_transitions.first
+      @new_document = @new_non_esi_evi.documents.first
+    end
+
+    it 'should clone non_esi_evidence' do
+      expect(@new_non_esi_evi).not_to be_nil
+      expect(@new_non_esi_evi.created_at).not_to be_nil
+      expect(@new_non_esi_evi.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_non_esi_evi.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_non_esi_evi.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_non_esi_evi.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_non_esi_evi.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
+    end
+  end
+
+  describe 'with local_mec_evidence' do
+    let!(:local_mec_evidence) do
+      application.applicants.first.create_local_mec_evidence(key: :local_mec, title: "Local Mec", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      local_mec_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      local_mec_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      local_mec_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
+                                                           user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      local_mec_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_local_mec = new_applicant.local_mec_evidence
+      @new_verification_history = @new_local_mec.verification_histories.first
+      @new_request_result = @new_local_mec.request_results.first
+      @new_wfst = @new_local_mec.workflow_state_transitions.first
+      @new_document = @new_local_mec.documents.first
+    end
+
+    it 'should clone local_mec_evidence' do
+      expect(@new_local_mec).not_to be_nil
+      expect(@new_local_mec.created_at).not_to be_nil
+      expect(@new_local_mec.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_local_mec.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_local_mec.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_local_mec.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_local_mec.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
     end
   end
 end

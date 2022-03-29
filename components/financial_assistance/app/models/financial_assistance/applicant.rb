@@ -1255,7 +1255,38 @@ module FinancialAssistance
       addresses.build(address_params)
     end
 
+    def clone_evidences(new_applicant)
+      clone_income_evidence(new_applicant) if income_evidence.present?
+      clone_esi_evidence(new_applicant) if esi_evidence.present?
+      clone_non_esi_evidence(new_applicant) if non_esi_evidence.present?
+      clone_local_mec_evidence(new_applicant) if local_mec_evidence.present?
+    end
+
     private
+
+    def fetch_evidence_params(evidence)
+      evidence.attributes.slice(:key, :title, :description, :received_at, :is_satisfied, :verification_outstanding, :aasm_state, :update_reason, :due_on, :external_service, :updated_by)
+    end
+
+    def clone_income_evidence(new_applicant)
+      new_income_evi = new_applicant.build_income_evidence(fetch_evidence_params(income_evidence))
+      income_evidence.clone_embedded_documents(new_income_evi)
+    end
+
+    def clone_esi_evidence(new_applicant)
+      new_esi_evi = new_applicant.build_esi_evidence(fetch_evidence_params(esi_evidence))
+      esi_evidence.clone_embedded_documents(new_esi_evi)
+    end
+
+    def clone_non_esi_evidence(new_applicant)
+      new_non_esi_evi = new_applicant.build_non_esi_evidence(fetch_evidence_params(non_esi_evidence))
+      non_esi_evidence.clone_embedded_documents(new_non_esi_evi)
+    end
+
+    def clone_local_mec_evidence(new_applicant)
+      new_local_mec_evi = new_applicant.build_local_mec_evidence(fetch_evidence_params(local_mec_evidence))
+      local_mec_evidence.clone_embedded_documents(new_local_mec_evi)
+    end
 
     def date_ranges_overlap?(range_a, range_b)
       range_b.begin <= range_a.end && range_a.begin <= range_b.end
