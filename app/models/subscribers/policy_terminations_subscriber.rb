@@ -27,7 +27,8 @@ module Subscribers
           end.compact
           Rails.logger.error("PolicyTerminationsSubscriber") { "Found #{enrollments.count} enrollments" }
           enrollments.each do |en|
-            en.update_attributes(terminate_reason: qr_uri.to_s)
+            # persist reason when feature enabled
+            en.update_attributes(terminate_reason: qr_uri.to_s) if EnrollRegistry.feature_enabled?(:display_ivl_termination_reason)
             if is_cancel
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as cancel" }
               next if en.coverage_canceled?
