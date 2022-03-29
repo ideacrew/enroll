@@ -111,6 +111,72 @@ module FinancialAssistance
         end
       end
 
+      context '#county_check' do
+        let(:address) { FactoryBot.build(:address, county: county, zip: zip, state: state) }
+        let(:county) { 'county' }
+        let(:zip) { '04660' }
+        let(:state) { 'ME' }
+        let(:setting) { double }
+
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(false)
+          allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+          allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'ME'))
+        end
+
+        context 'when county disabled' do
+          before do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+          end
+
+          context 'when county exists' do
+
+            it 'returns true when county is nil' do
+              expect(address.valid?).to eq true
+            end
+          end
+
+          context 'when county is nil' do
+            let(:county) { nil }
+
+            it 'returns true' do
+              expect(address.valid?).to eq true
+            end
+          end
+        end
+
+        context 'when county enabled' do
+          before do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+          end
+
+          context 'when county present' do
+
+            it 'returns true' do
+              expect(address.valid?).to eq true
+            end
+          end
+
+          context 'when county is blank' do
+            let(:county) { nil }
+
+            context 'when out of state' do
+              let(:state) { 'DC' }
+
+              it 'returns true' do
+                expect(address.valid?).to eq true
+              end
+            end
+
+            context 'when in state' do
+
+              it 'returns false' do
+                expect(address.valid?).to eq false
+              end
+            end
+          end
+        end
+      end
     end
 
     describe 'view helpers/presenters' do
