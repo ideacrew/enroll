@@ -494,7 +494,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return more than one dental plan" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, effective_on, 'dental')
         expect(benefit_packages.count).to be > 1
-        expect(benefit_packages.map {|benefit_package| benefit_package.cost_sharing}.count).to eql(4)
+        expect(benefit_packages.map(&:cost_sharing).count).to eql(4)
       end
     end
 
@@ -508,7 +508,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return one health plan" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, effective_on, 'health')
         expect(benefit_packages.count).to eql(1)
-        expect(benefit_packages.map {|benefit_package| benefit_package.cost_sharing}).to eql(["csr_limited"])
+        expect(benefit_packages.map(&:cost_sharing)).to eql(["csr_limited"])
       end
     end
 
@@ -522,7 +522,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return more than one health plan" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members, effective_on, 'health')
         expect(benefit_packages.count).to be > 1
-        expect(benefit_packages.map {|benefit_package| benefit_package.cost_sharing}.count).to eql(4)
+        expect(benefit_packages.map(&:cost_sharing).count).to eql(4)
       end
     end
 
@@ -536,7 +536,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return more than one dental plan" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members, effective_on, 'dental')
         expect(benefit_packages.count).to be > 1
-        expect(benefit_packages.map {|benefit_package| benefit_package.cost_sharing}.count).to eql(4)
+        expect(benefit_packages.map(&:cost_sharing).count).to eql(4)
       end
     end
 
@@ -550,7 +550,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return one benefit package" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, effective_on, 'health')
         expect(benefit_packages.count).to eql(1)
-        expect(benefit_packages.map {|benefit_package| benefit_package.cost_sharing}).to eql(["csr_limited"])
+        expect(benefit_packages.map(&:cost_sharing)).to eql(["csr_limited"])
       end
     end
 
@@ -566,7 +566,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return health plans with csr_limited and csr_0" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members_under_thirty, effective_on, 'health')
         expect(benefit_packages).to include(benefit_package2, benefit_package1, benefit_package3)
-        expect(benefit_packages.map {|benefit_package| benefit_package.cost_sharing}).to eql(["csr_0", "csr_0", "csr_limited"])
+        expect(benefit_packages.map(&:cost_sharing)).to eql(["csr_0", "csr_0", "csr_limited"])
       end
     end
 
