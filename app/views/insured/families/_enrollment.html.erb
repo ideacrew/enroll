@@ -151,16 +151,6 @@
         <% end %>
       </div>
     </div>
-    <% if display_termination_reason?(hbx_enrollment) %>
-      <div class="col-xs-12 vertically-aligned-row">
-        <div class="termination-display-reason info vertical-align-top">
-          <p>
-            <strong><%= l10n("termination_reason") %>: </strong>
-            <%= hbx_enrollment.terminate_reason.titleize %>
-          </p>
-        </div>
-      </div>
-    <% end %>
     <div class="col-xs-12 vertically-aligned-row">
       <% names = hbx_enrollment.covered_members_first_names %>
       <% if names.present? %>

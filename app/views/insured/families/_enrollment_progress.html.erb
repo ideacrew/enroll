@@ -6,9 +6,9 @@ percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0
 
  <% if display_aasm_state? hbx_enrollment %>
     <div class="text-right">
-      <% if formatted_enrollment_states[hbx_enrollment.aasm_state].present? %>
+      <% if formatted_enrollment_states(hbx_enrollment).present? %>
         <span class="label label-success canceled">
-          <%= formatted_enrollment_states[hbx_enrollment.aasm_state] %>
+          <%= formatted_enrollment_states(hbx_enrollment) %>
         <span>
       <% else %>
         <span class="label label-success">
