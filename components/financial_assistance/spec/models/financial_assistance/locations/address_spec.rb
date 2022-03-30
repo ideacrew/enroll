@@ -112,7 +112,7 @@ module FinancialAssistance
       end
 
       context '#county_check' do
-        let(:address) { FactoryBot.build(:address, county: county, zip: zip, state: state) }
+        let(:address) { FactoryBot.build(:financial_assistance_address, county: county, zip: zip, state: state) }
         let(:county) { 'county' }
         let(:zip) { '04660' }
         let(:state) { 'ME' }
