@@ -56,10 +56,31 @@ RSpec.describe "insured/families/home.html.erb" do
     expect(rendered).to have_selector('div#qle-details-for-existing-sep')
   end
 
+  it "should not display 'existing SEP - Eligible to enroll' partial if there is an active admin SEP" do
+    sep.qualifying_life_event_kind.update_attributes!(is_active: false)
+    render file: "insured/families/home.html.erb"
+    assign(:active_sep, sep)
+    render file: "insured/families/home.html.erb"
+    expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
+  end
+
   it "should not display 'existing SEP - Eligible to enroll' partial if there is no active admin SEP" do
     assign(:active_sep, [])
     render file: "insured/families/home.html.erb"
     expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
+  end
+
+  it "should not display 'sep message' partial if there is no active qle kind" do
+    sep.qualifying_life_event_kind.update_attributes!(is_active: false)
+    assign(:active_sep, sep)
+    render file: "insured/families/home.html.erb"
+    expect(rendered).to_not have_selector('div#sep_message')
+  end
+
+  it "should display 'sep message' partial if there is an active qle kind" do
+    assign(:active_sep, sep)
+    render file: "insured/families/home.html.erb"
+    expect(rendered).to have_selector('div#sep_message')
   end
 
   context "Entire Enrollment History for Family" do
