@@ -183,16 +183,26 @@ module Insured::FamiliesHelper
     end
   end
 
-  def formatted_enrollment_states
-    {
-      'coverage_terminated' => 'Terminated',
-      'coverage_expired' => 'Coverage Period Ended'
-    }
+  def formatted_enrollment_states(enrollment)
+    enrollment_states_hash = if display_termination_reason?(enrollment)
+                               {
+                                 'coverage_terminated' => 'Terminated by health insurer',
+                                 'coverage_canceled' => 'Canceled by health insurer',
+                                 'coverage_expired' => 'Coverage Period Ended'
+                               }
+                             else
+                               {
+                                 'coverage_terminated' => 'Terminated',
+                                 'coverage_expired' => 'Coverage Period Ended'
+                               }
+                             end
+    enrollment_states_hash.stringify_keys[enrollment.aasm_state.to_s]
   end
 
   def display_termination_reason?(enrollment)
     return false if enrollment.is_shop?
-    enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason)
+    enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason) &&
+      enrollment.terminate_reason == HbxEnrollment::TermReason::NON_PAYMENT
   end
 
   def enrollment_coverage_end(hbx_enrollment)
