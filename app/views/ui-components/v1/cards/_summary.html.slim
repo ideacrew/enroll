@@ -104,10 +104,7 @@
         br/
         span.ttu.lg.twelve.font-weight-bold
           = l10n('enrollment.latest_transition')
-        = @hbx_enrollment.latest_wfst.present? ? l10n('enrollment.latest_transition_data',
-                                                      from_state: @hbx_enrollment.latest_wfst.from_state,
-                                                      to_state: @hbx_enrollment.latest_wfst.to_state,
-                                                      created_at: @hbx_enrollment.latest_wfst.created_at) : l10n('not_available')
+        = latest_transition(@hbx_enrollment)
         br/
         span.ttu.lg.twelve.font-weight-bold
           = l10n('product_hios_id')
