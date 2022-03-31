@@ -46,6 +46,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     application.save!
   end
 
+  before do
+    allow_any_instance_of(::FinancialAssistance::Locations::Address).to receive(:county_check).and_return true
+  end
+
   describe '.modelFeilds' do
     it { is_expected.to have_field(:hbx_id).of_type(String) }
     it { is_expected.to have_field(:external_id).of_type(String) }

@@ -70,6 +70,7 @@ class Address
 
   before_validation :detect_quadrant
   validate :quadrant_check
+  validate :county_check
 
   def detect_quadrant
     self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if EnrollRegistry.feature_enabled?(:validate_quadrant)
@@ -81,6 +82,13 @@ class Address
     return unless EnrollRegistry[:validate_quadrant].settings(:exclusions).item.exclude?(self.zip)
     return unless self.quadrant.blank?
     errors.add(:quadrant, "not present")
+  end
+
+  def county_check
+    return unless EnrollRegistry.feature_enabled?(:display_county)
+    return if self.county.present?
+    return if self.state&.downcase != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
+    errors.add(:county, 'not present')
   end
 
   # @note Add support for GIS location

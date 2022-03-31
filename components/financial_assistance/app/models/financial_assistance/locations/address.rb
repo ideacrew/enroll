@@ -51,6 +51,14 @@ module FinancialAssistance
                   :with => /\A\d{5}(-\d{4})?\z/,
                   :message => 'should be in the form: 12345 or 12345-1234'
                 }
+      validate :county_check
+
+      def county_check
+        return unless EnrollRegistry.feature_enabled?(:display_county)
+        return if self.county.present?
+        return if self.state&.downcase != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
+        errors.add(:county, 'not present')
+      end
 
       def office_is_primary_location?
         kind == 'primary'
