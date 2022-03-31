@@ -36,6 +36,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   let(:plan3) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
   let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
   let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+  let(:plan6) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile, metal_level: "catastrophic")}
   let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
   let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
   let(:benefit_package3) {double(benefit_ids: [plan5.id])}
@@ -483,51 +484,111 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     end
 
     context "When hbx enrollment members are AI/AN and apply for dental coverage" do
+      let(:family_members) {family.family_members}
+      let(:effective_on) { hbx_enrollment.effective_on }
 
       before :each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should return more than one dental plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'dental')
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, effective_on, 'dental')
         expect(benefit_packages.count).to be > 1
+        expect(benefit_packages.map(&:cost_sharing).count).to eql(4)
       end
     end
 
     context "When hbx enrollment members are AI/AN and apply for health coverage" do
+      let(:family_members) {family.family_members}
+      let(:effective_on) { hbx_enrollment.effective_on }
       before :each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should return one health plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'health')
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, effective_on, 'health')
         expect(benefit_packages.count).to eql(1)
+        expect(benefit_packages.map(&:cost_sharing)).to eql(["csr_limited"])
       end
     end
 
     context "When hbx enrollment members are not AI/AN and apply for health coverage" do
+      let(:family_members) {family.family_members}
+      let(:effective_on) { hbx_enrollment.effective_on }
       before :each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should return more than one health plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'health')
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members, effective_on, 'health')
         expect(benefit_packages.count).to be > 1
+        expect(benefit_packages.map(&:cost_sharing).count).to eql(4)
       end
     end
 
     context "When hbx enrollment members are not AI/AN and apply for dental coverage" do
+      let(:family_members) {family.family_members}
+      let(:effective_on) { hbx_enrollment.effective_on }
       before :each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should return more than one dental plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'dental')
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members, effective_on, 'dental')
         expect(benefit_packages.count).to be > 1
+        expect(benefit_packages.map(&:cost_sharing).count).to eql(4)
+      end
+    end
+
+    context "When hbx enrollment members are AI/AN, over 30, and apply for health coverage" do
+      let(:family_members) {family.family_members}
+      let(:effective_on) { hbx_enrollment.effective_on }
+      before :each do
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return one benefit package" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members, effective_on, 'health')
+        expect(benefit_packages.count).to eql(1)
+        expect(benefit_packages.map(&:cost_sharing)).to eql(["csr_limited"])
+      end
+    end
+
+    context "When hbx enrollment members are under 30, have AI/AN status, and apply for health coverage" do
+      let(:family_members_under_thirty) {[]}
+      let(:effective_on) { hbx_enrollment.effective_on }
+      before :each do
+        family.family_members.first.person.update_attributes!(dob: effective_on - 20.years)
+        family_members_under_thirty << family.family_members.first
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return health plans with csr_limited and csr_0" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_limited', family_members_under_thirty, effective_on, 'health')
+        expect(benefit_packages).to include(benefit_package2, benefit_package1, benefit_package3)
+        expect(benefit_packages.map(&:cost_sharing)).to eql(["csr_0", "csr_0", "csr_limited"])
+      end
+    end
+
+    context "When hbx enrollment members are under 30, do not have AI/AN status, and apply for health coverage" do
+      let(:family_members_under_thirty) {[]}
+      let(:effective_on) { hbx_enrollment.effective_on }
+
+      before :each do
+        family.family_members.first.person.update_attributes!(dob: effective_on - 25.years)
+        family_members_under_thirty << family.family_members.first
+        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return more than one health plan" do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', family_members_under_thirty, effective_on, 'health')
+        expect(benefit_packages.count).to eql(4)
       end
     end
 
     context 'when native american csr feature is enabled' do
+      let(:family_members) {family.family_members}
+      let(:effective_on) { hbx_enrollment.effective_on }
 
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:native_american_csr).and_return(true)
@@ -547,7 +608,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it 'should return csr limited plans' do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true, 'csr_limited')
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true, 'csr_limited', family_members, effective_on)
 
         expect(benefit_packages).to eq [benefit_package3]
       end
