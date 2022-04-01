@@ -206,7 +206,7 @@ class BenefitCoveragePeriod
   def fetch_benefit_packages(american_indian_members, csr_kind, coverage_kind = "health")
     american_indian_status = american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
 
-    return benefit_packages unless american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr) && coverage_kind == "health"
+    return benefit_packages unless american_indian_status && coverage_kind == "health"
 
     benefit_packages.select{|bg| bg.cost_sharing == csr_kind}
   end
