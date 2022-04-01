@@ -506,8 +506,6 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
     end
 
-    end
-
     context "When hbx enrollment members are not AI/AN and apply for health coverage" do
       before :each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
