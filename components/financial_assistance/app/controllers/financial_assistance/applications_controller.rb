@@ -97,6 +97,9 @@ module FinancialAssistance
       service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
       @application = service.copy!
       redirect_to edit_application_path(@application)
+    rescue StandardError => e
+      flash[:error] = "Failed with error - #{e}"
+      redirect_to applications_path(tab: 'cost_savings')
     end
 
     def help_paying_coverage; end
