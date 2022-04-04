@@ -491,7 +491,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       it "should return more than one dental plan" do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'dental')
         expect(benefit_packages.count).to eql(4)
-       
+
       end
     end
 
