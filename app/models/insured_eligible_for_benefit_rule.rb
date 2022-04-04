@@ -19,6 +19,7 @@ class InsuredEligibleForBenefitRule
     @new_effective_on = options[:new_effective_on]
     @market_kind = options[:market_kind]
     @shopping_family_member_ids = options[:shopping_family_members_ids]
+    @version_date = options[:version_date]
   end
 
   def setup
@@ -105,6 +106,8 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
+    return true
+
     tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
     return true if tax_household.blank?
 
@@ -172,7 +175,14 @@ class InsuredEligibleForBenefitRule
 
       #TODO person can have more than one families
       @family.family_members.active.each do |family_member|
-        if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
+        next if (family_member.person_id == person.id)
+        relative_found = person.person_relationships.any? do |pm|
+          pm.relative_id == family_member.person_id
+        end
+        next unless relative_found
+        fm_person = family_member.person_version_for(@version_date)
+        next unless fm_person
+        if age_on_next_effective_date(fm_person.dob) >= 19 && fm_person.is_dc_resident?
           return true
         end
       end
@@ -194,12 +204,12 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_lawful_presence_status_satisfied?
-    is_verification_satisfied? || is_person_vlp_verified?
+    true
   end
 
   def is_active_individual_role_satisfied?
-    return (@role.person.is_resident_role_active? || @role.person.is_consumer_role_active?) if @market_kind == "coverall"
-    return @role.person.is_consumer_role_active? if @market_kind == "individual"
+    return (resident_role_active? || consumer_role_active?) if @market_kind == "coverall"
+    return consumer_role_active? if @market_kind == "individual"
   end
 
   def determination_results
@@ -220,9 +230,30 @@ class InsuredEligibleForBenefitRule
   end
 
   def age_on_next_effective_date(dob)
-    today = TimeKeeper.date_of_record
+    today = @new_effective_on
     today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
     age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
+  end
+
+  def resident_role_active?
+    r_role = @role.person.resident_role
+    return false unless r_role
+    # Apparently resident roles can have an empty created_at.
+    # If they do, use the timestamp for comparison.
+    r_role_created_at = resident_role_created_at(r_role)
+    r_role_created_at <= @version_date
+  end
+
+  def resident_role_created_at(r_role)
+    return r_role.created_at if r_role.created_at.present?
+    r_role.id.to_time
+  end
+
+  def consumer_role_active?
+    c_role = @role
+    return false unless c_role
+    return false if resident_role_active?
+    true
   end
 
   private
@@ -241,8 +272,9 @@ class InsuredEligibleForBenefitRule
   end
 
   def relation_ship_with_primary_applicant
-    primary_applicant.person.person_relationships.select {|r|r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
-  # @role.person.person_relationships.select {|r| r.person.id.to_s == primary_applicant.person_id.to_s }.first.try(:kind) || nil
+    fm_person = @family.primary_applicant.person_version_for(@version_date)
+    return nil unless fm_person
+    fm_person.person_relationships.select { |r| r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
   end
 
 end
