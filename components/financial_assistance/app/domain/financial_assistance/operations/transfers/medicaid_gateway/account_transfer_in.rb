@@ -40,32 +40,47 @@ module FinancialAssistance
           end
 
           def load_missing_county_names(payload)
-            zips_with_missing_counties = []
-            zips_with_multiple_counties = []
+            @zips_with_missing_counties = []
+            @zips_with_multiple_counties = []
+
             payload.dig("family", "family_members").each do |person|
-              addresses = person.dig("person", "addresses")
-              addresses.each do |address|
-                zip = address["zip"]
-                county = county_finder(zip)
-                address["county"] = county.first.county_name if county&.count == 1
-                zips_with_missing_counties << zip if county.blank?
+              person_addresses = person.dig("person", "addresses")
+              populate_counties_for(person_addresses)
+            end
 
-                next unless county.count > 1
-                town_name = address['city'].titleize
-                county_name = find_specific_county(town_name)
-
-                if county_name.present?
-                  address['county'] = county_name
-                else
-                  zips_with_multiple_counties << zip
-                end
+            payload.dig("family", "magi_medicaid_applications")&.each do |application|
+              application["applicants"]&.each do |applicant|
+                applicant_addresses = applicant["addresses"]
+                populate_counties_for(applicant_addresses)
               end
             end
-            return Failure("Unable to find county objects for zips #{zips_with_missing_counties.uniq}") if zips_with_missing_counties.present?
-            return Failure("Unable to match county for #{zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if zips_with_multiple_counties.present?
+
+            return Failure("Unable to find county objects for zips #{@zips_with_missing_counties.uniq}") if @zips_with_missing_counties.present?
+            return Failure("Unable to match county for #{@zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if @zips_with_multiple_counties.present?
             Success(payload)
           rescue StandardError => e
             Failure("load_missing_county_names #{e}")
+          end
+
+          def populate_counties_for(addresses)
+            addresses.each do |address|
+              next unless address["county"].blank?
+
+              zip = address["zip"]
+              county = county_finder(zip)
+              address["county"] = county.first.county_name if county&.count == 1
+              @zips_with_missing_counties << zip if county.blank?
+
+              next unless county.count > 1
+              town_name = address['city'].titleize
+              county_name = find_specific_county(town_name)
+
+              if county_name.present?
+                address['county'] = county_name
+              else
+                @zips_with_multiple_counties << zip
+              end
+            end
           end
 
           def load_data(payload = {})
