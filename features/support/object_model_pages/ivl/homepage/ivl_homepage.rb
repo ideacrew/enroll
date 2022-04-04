@@ -94,4 +94,12 @@ class IvlHomepage
   def self.enrollment_coverage_state_date
     '[data-cuke="enrollment_coverage_state_date"]'
   end
+
+  def self.enrollment_detail
+    '[data-cuke="enrollment_detail"]'
+  end
+
+  def self.enrollment_member_detail
+    '[data-cuke="enrollment_member_detail"]'
+  end
 end

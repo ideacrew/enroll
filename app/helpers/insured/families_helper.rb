@@ -334,4 +334,15 @@ module Insured::FamiliesHelper
 
     BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
   end
+
+  def latest_transition(enrollment)
+    if enrollment.latest_wfst.present?
+      l10n('enrollment.latest_transition_data',
+           from_state: enrollment.latest_wfst.from_state,
+           to_state: enrollment.latest_wfst.to_state,
+           created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+    else
+      l10n('not_available')
+    end
+  end
 end
