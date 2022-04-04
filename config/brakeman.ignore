@@ -137,6 +137,22 @@
       "note": ""
     },
     {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 122,
+      "fingerprint": "21ab0fe00fdd5899ffc405cff75aadb91b805ee996a614f7e27b08a287e9062d",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 5.2.4.4 ends on 2022-06-01",
+      "file": "Gemfile.lock",
+      "line": 770,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "Weak",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "22d65d891690c434f7fb0e1b2a23f969f41a4e466fce79e60e75f6d6ccc0dce6",
@@ -290,7 +306,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 190,
+          "line": 191,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -482,7 +498,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 190,
+          "line": 191,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -553,7 +569,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 489,
+          "line": 509,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -784,7 +800,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "components/financial_assistance/app/controllers/financial_assistance/verification_documents_controller.rb",
-      "line": 113,
+      "line": 115,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "@docs_owner.send(params[:evidence_kind])",
       "render_path": null,
@@ -904,7 +920,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "components/financial_assistance/app/controllers/financial_assistance/evidences_controller.rb",
-      "line": 83,
+      "line": 77,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "@docs_owner.send(params[:evidence_kind])",
       "render_path": null,
@@ -918,6 +934,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-12-27 17:20:42 -0500",
-  "brakeman_version": "5.1.1"
+  "updated": "2022-04-04 12:28:35 -0400",
+  "brakeman_version": "5.2.1"
 }
