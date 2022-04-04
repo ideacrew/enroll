@@ -66,5 +66,12 @@ module Caches
       end
     end
 
+    def self.drop_cache_to_free_ram!
+      $plan_age_bounds = nil
+      $plan_age_lookup = nil
+      $plan_age_lookup_with_rating_area = nil
+      GC.start
+    end
+
   end
 end

@@ -17,6 +17,7 @@ class Person
   include ::BenefitSponsors::Concerns::Observable
   include SponsoredBenefits::Concerns::Dob
   include LegacyVersioningRecords
+  include HistoryTrackerToRecord
 
   # verification history tracking
   include Mongoid::History::Trackable
@@ -63,6 +64,20 @@ class Person
   VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   NON_SHOP_ROLES = ['Individual','Coverall']
+
+  IVL_ELIGIBILITY_EXCLUDED_CHAINS = [
+    "verification_types",
+    "employee_roles",
+    "employer_staff_roles",
+    "individual_market_transitions",
+    "broker_role",
+    "phones",
+    "emails",
+    "inbox",
+    "messages",
+    "workflow_state_transitions",
+    "raw_event_responses"
+  ]
 
   field :hbx_id, type: String
   field :ext_app_id, type: String
@@ -266,6 +281,9 @@ class Person
     {"broker_agency_staff_roles._id" => 1},
     {name: "person_broker_agency_staff_role_id_search"}
   )
+
+  index({"created_at" => 1, "updated_at" => 1})
+  index({"created_at" => 1, "updated_at" => 1, "consumer_role._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }

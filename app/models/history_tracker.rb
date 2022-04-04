@@ -3,6 +3,8 @@ class HistoryTracker
 
   after_create :check_history_trackers
 
+  index({"association_chain.0.id" => 1, "association_chain.0.name" => 1, "scope" => 1})
+
   TRACK_HISTORY_ON = %w- consumer_role -
 
 
