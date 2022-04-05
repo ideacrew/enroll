@@ -9,7 +9,7 @@ PASSIVE_RENEWAL_DATE = Time.mktime(2020,11,1,0,0,0)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
 
-PROC_COUNT = 6
+PROC_COUNT = 14
 
 STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
@@ -36,13 +36,7 @@ families_of_interest = Family.where(
 STDOUT.puts "Counted #{families_of_interest.count} families."
 STDOUT.flush
 
-family_cache_pb = ProgressBar.create(
-  :title => "Generating Family Cache",
-  :format => "%t %a %E %c/%C %P%%",
-  :throttle_rate => 2.0
-)
-
-family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_person_ids, family_cache_pb)
+family_map = {}
 
 # So what we need here is: family_membership * person_record * version_numbers_for_person
 person_id_count = ivl_person_ids.length
@@ -177,10 +171,11 @@ def fork_kids(ivl_ids, f_map, hb_packages, exclusions,passive_r_date)
 end
 
 def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_family_map, health_benefit_packages, exclusions, passive_r_date)
-  keys_to_delete = person_family_map.keys - ivl_people_ids
-  keys_to_delete.each do |k|
-    person_family_map.delete(k)
-  end
+#  keys_to_delete = person_family_map.keys - ivl_people_ids
+#  keys_to_delete.each do |k|
+#    person_family_map.delete(k)
+#  end
+  person_family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_people_ids)
   GC.start
   MallocTrim.trim
   f = File.open("audit_log_#{current_proc_index}.log", 'w')
