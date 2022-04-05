@@ -131,7 +131,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it 'redirects when ApplicationService raises an error' do
-        expect(flash[:error]).to match(/Failed with error/)
+        expect(flash[:error]).to match(/error/)
         expect(response).to redirect_to(applications_path(tab: 'cost_savings'))
       end
     end
