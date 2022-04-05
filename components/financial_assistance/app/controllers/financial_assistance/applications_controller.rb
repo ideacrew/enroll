@@ -98,7 +98,7 @@ module FinancialAssistance
       @application = service.copy!
       redirect_to edit_application_path(@application)
     rescue StandardError => e
-      flash[:error] = "Failed with error - #{e}"
+      flash[:error] = "#{l10n('exchange.error')} - #{e}"
       redirect_to applications_path(tab: 'cost_savings')
     end
 
