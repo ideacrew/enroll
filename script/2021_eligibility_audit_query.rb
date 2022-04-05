@@ -9,7 +9,7 @@ PASSIVE_RENEWAL_DATE = Time.mktime(2020,11,1,0,0,0)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
 
-PROC_COUNT = 8
+PROC_COUNT = 6
 
 STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
@@ -36,7 +36,13 @@ families_of_interest = Family.where(
 STDOUT.puts "Counted #{families_of_interest.count} families."
 STDOUT.flush
 
-family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_person_ids)
+family_cache_pb = ProgressBar.create(
+  :title => "Generating Family Cache",
+  :format => "%t %a %E %c/%C %P%%",
+  :throttle_rate => 2.0
+)
+
+family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_person_ids, family_cache_pb)
 
 # So what we need here is: family_membership * person_record * version_numbers_for_person
 person_id_count = ivl_person_ids.length
@@ -339,7 +345,7 @@ pb = ProgressBar.create(
   :title => "Running records",
   :total => ivl_person_ids.length,
   :format => "%t %a %E %c/%C %P%%",
-  :throttle_rate => 5.0
+  :throttle_rate => 2.0
 )
 
 while !reader_map.empty?

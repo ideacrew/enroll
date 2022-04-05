@@ -35,16 +35,19 @@ module IvlEligibilityAudits
       end
     end
 
-    def self.generate_family_map_for(ivl_person_ids)
+    def self.generate_family_map_for(ivl_person_ids, pb)
       families_of_interest = Family.where(
         {"family_members.person_id" => {"$in" => ivl_person_ids}}
       )
+      pb.total = families_of_interest.count
       person_family_map = Hash.new { |h,k| h[k] = Array.new }
       families_of_interest.each do |fam|
         fam.family_members.each do |fm|
           person_family_map[fm.person_id] = person_family_map[fm.person_id] + [fam]
         end
+        pb.increment
       end
+      pb.finish
       person_family_map
     end
   end
