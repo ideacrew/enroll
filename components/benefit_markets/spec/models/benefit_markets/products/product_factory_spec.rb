@@ -67,7 +67,7 @@ module BenefitMarkets
 
       let!(:product15) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '06')}
       let!(:product16) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '06')}
-      let(:all_products) { [product1,product2,product3,product4, product5, product6, product7, product8, product9, product10, product11, product12, product13, product14, product15, product16 ]}
+      let(:all_products) { [product1,product2,product3,product4, product5, product6, product7, product8, product9, product10, product11, product12, product13, product14, product15, product16]}
       before do
         @products = product_factory.new({market_kind: "individual"})
       end
