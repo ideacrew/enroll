@@ -160,8 +160,12 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
     end
 
-    it 'should include transition at text' do
-      expect(rendered).to have_content(l10n('enrollment.latest_transition_at'))
+    it 'should include enrollment effective_on text' do
+      expect(rendered).to have_content(l10n('enrollment.effective_on'))
+    end
+
+    it 'should include latest transition text' do
+      expect(rendered).to have_content(l10n('enrollment.latest_transition'))
     end
 
     it 'should include Product HIOS ID text' do

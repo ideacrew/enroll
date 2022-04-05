@@ -653,4 +653,23 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
     end
   end
+
+  describe '#fetch_counties_by_zip', dbclean: :after_each do
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:hbx_enr) { FactoryBot.create(:hbx_enrollment, aasm_state: 'shopping', kind: 'individual', family: family) }
+
+    context 'with workflow_state_transition' do
+      before { hbx_enr.renew_enrollment! }
+
+      it 'should return latest_transition_data' do
+        expect(helper.latest_transition(hbx_enr)).to match(/From shopping to auto_renewing at/)
+      end
+    end
+
+    context 'without workflow_state_transition' do
+      it 'should return latest_transition_data' do
+        expect(helper.latest_transition(hbx_enr)).to eq(l10n('not_available'))
+      end
+    end
+  end
 end
