@@ -15,6 +15,9 @@
     font-weight: inherit;
   }
 }
+.csr-result .glossary  {
+  font-weight: normal;
+}
 .er-medicaid-prsn p, .er-summary p {
   color: #333;
 }
@@ -99,4 +102,7 @@
 }
 .mb {
   margin-bottom: 10px;
+}
+.lowercase {
+  text-transform: lowercase;
 }

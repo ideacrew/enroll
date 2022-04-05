@@ -82,6 +82,8 @@ registry:
         is_enabled: false
       - key: :non_applicant_citizen_status
         is_enabled: true
+      - key: :display_eligibility_results_by_thh
+        is_enabled: false
   - namespace:
     - :request_determination
     features:

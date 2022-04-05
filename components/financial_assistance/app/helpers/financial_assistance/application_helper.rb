@@ -11,12 +11,20 @@ module FinancialAssistance
       eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
       eds.map(&:max_aptc).flat_map(&:to_f).inject(:+)
     end
+
     def eligible_applicants(application_id, eligibility_flag)
       application = FinancialAssistance::Application.find(application_id)
       full_names = application.active_applicants.where(eligibility_flag => true).map(&:full_name)
       # capitalize each name of full name individually, as titleize will cause spacing issues if multiple capital letters already in applicant name
       full_names.map{ |full_name| capitalize_full_name(full_name) }
     end
+
+    def household_eligible_applicants(application_id, eligibility_flag, determination_id)
+      application = FinancialAssistance::Application.find(application_id)
+      applicants = application.active_applicants.where(eligibility_flag => true, eligibility_determination_id: determination_id)
+      applicants.map { |applicant| [capitalize_full_name(applicant.full_name), applicant.csr_percent_as_integer] }.to_h
+    end
+
     def any_csr_ineligible_applicants?(application_id)
       application = FinancialAssistance::Application.find(application_id)
       application.eligibility_determinations.inject([]) do |csr_eligible, ed_obj|
