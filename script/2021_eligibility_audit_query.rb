@@ -3,7 +3,7 @@ require 'delegate'
 Caches::PlanDetails.drop_cache_to_free_ram!
 MallocTrim.trim
 
-AUDIT_START_DATE = Date.new(2012,10,1)
+AUDIT_START_DATE = Date.new(2020,10,1)
 AUDIT_END_DATE = Date.new(2021,10,1)
 PASSIVE_RENEWAL_DATE = Time.mktime(2020,11,1,0,0,0)
 STDOUT.puts "Standard caching complete."
