@@ -1056,6 +1056,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
           EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
 
         end
@@ -1087,6 +1088,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
         end
 
         it "should cancel the enrollment" do
@@ -3128,6 +3130,24 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
         expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
         expect(reinstated_enrollment.effective_on).to eq terminated_on_date.next_day
       end
+
+      it "when feature enabled reinstate_nonpayment_ivl_enrollment, reset termination reason on reinstate" do
+        members = FactoryBot.build(:hbx_enrollment_member,
+                                   applicant_id: ivl_family.primary_family_member.id,
+                                   hbx_enrollment: ivl_enrollment, is_subscriber: true,
+                                   coverage_start_on: ivl_enrollment.effective_on,
+                                   eligibility_date: ivl_enrollment.effective_on, tobacco_use: 'Y')
+        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT, hbx_enrollment_members: [members])
+        EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(true)
+
+        ivl_enrollment.reinstate
+        reinstated_enrollment = HbxEnrollment.where(family_id: ivl_family.id).detect(&:coverage_selected?)
+        ivl_enrollment.reload
+        expect(ivl_enrollment.terminate_reason).to be_nil
+        expect(reinstated_enrollment.present?).to be_truthy
+        expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
+        expect(reinstated_enrollment.effective_on).to eq terminated_on_date.next_day
+      end
     end
 
     context "for SHOP market" do
@@ -3195,6 +3215,24 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
           census_employee.reload
           expect(census_employee.employee_role_linked?).to be_truthy
         end
+      end
+
+      it "when feature reinstate_nonpayment_ivl_enrollment enabled should not reset termination reason on reinstate for shop" do
+        members = FactoryBot.build(:hbx_enrollment_member,
+                                   applicant_id: shop_family.primary_family_member.id,
+                                   hbx_enrollment: shop_enrollment, is_subscriber: true,
+                                   coverage_start_on: shop_enrollment.effective_on,
+                                   eligibility_date: shop_enrollment.effective_on, tobacco_use: 'Y')
+        shop_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT, hbx_enrollment_members: [members])
+        EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(true)
+
+        shop_enrollment.reinstate
+        shop_enrollment.reload
+        expect(shop_enrollment.terminate_reason).to eq HbxEnrollment::TermReason::NON_PAYMENT
+        reinstated_enrollment = HbxEnrollment.where(family_id: shop_family.id).detect(&:coverage_enrolled?)
+        expect(reinstated_enrollment.present?).to be_truthy
+        expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
+        expect(reinstated_enrollment.effective_on).to eq shop_enrollment.terminated_on.next_day
       end
     end
   end
@@ -3469,6 +3507,19 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
         expect(ivl_enrollment.can_be_reinstated?).to be_truthy
       end
 
+      it "enrollment terminated with non payment reason, when feature disabled" do
+        EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(false)
+        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT)
+        ivl_enrollment.reload
+        expect(ivl_enrollment.can_be_reinstated?).to be_falsey
+      end
+
+      it "enrollment terminated with non payment reason, when feature enabled" do
+        EnrollRegistry[:reinstate_nonpayment_ivl_enrollment].feature.stub(:is_enabled).and_return(true)
+        ivl_enrollment.update_attributes(terminate_reason: HbxEnrollment::TermReason::NON_PAYMENT)
+        ivl_enrollment.reload
+        expect(ivl_enrollment.can_be_reinstated?).to be_truthy
+      end
     end
 
     context "for SHOP market", dbclean: :after_each do
@@ -4461,6 +4512,7 @@ describe "#select_coverage event for shop", dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
       census_employee.benefit_group_assignments << expired_bga
       census_employee.benefit_group_assignments << active_bga
       census_employee.save
@@ -4731,6 +4783,10 @@ describe ".parent enrollments", dbclean: :around_each do
 
       it 'should create the workflow_state_transition object' do
         expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
+      end
+
+      it 'should return latest_wfst' do
+        expect(hbx_enrollment12.latest_wfst).to be_a(::WorkflowStateTransition)
       end
     end
   end

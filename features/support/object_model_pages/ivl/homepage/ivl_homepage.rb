@@ -86,4 +86,20 @@ class IvlHomepage
   def self.first_payment_glossary
     '.interaction-click-control-make-a-first-payment-for-my-new-plan .hover-glossary'
   end
+
+  def self.enrollment_tobacco_use
+    '[data-cuke="tobbaco_use"]'
+  end
+
+  def self.enrollment_coverage_state_date
+    '[data-cuke="enrollment_coverage_state_date"]'
+  end
+
+  def self.enrollment_detail
+    '[data-cuke="enrollment_detail"]'
+  end
+
+  def self.enrollment_member_detail
+    '[data-cuke="enrollment_member_detail"]'
+  end
 end

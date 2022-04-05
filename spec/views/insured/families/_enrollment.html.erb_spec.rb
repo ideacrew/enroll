@@ -340,7 +340,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
-  context "Termination reason display" do
+  context "Termination Indicator display for terminated enrollments" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
     let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
@@ -364,17 +364,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "should display reason if enrollment has termination reason present" do
+      it "should display Terminated by health insure indicator on enrollment tile" do
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).to have_text("Termination Reason")
-        expect(rendered).to have_text("Non Payment")
+        expect(rendered).to have_text("Terminated by health insurer")
       end
 
-      it "should not display reason if enrollment has no termination reason present" do
+      it "should not display Terminated by health insure indicator on enrollment tile" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Termination Reason")
-        expect(rendered).not_to have_text("Non Payment")
+        expect(rendered).not_to have_text("Terminated by health insurer")
+        expect(rendered).to have_text("Terminated")
       end
     end
 
@@ -383,17 +382,17 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
       end
 
-      it "should not display reason if enrollment has termination reason present" do
+      it "should not display Terminated by health insure indicator on enrollment tile" do
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Termination Reason")
-        expect(rendered).not_to have_text("Non Payment")
+        expect(rendered).not_to have_text("Terminated by health insurer")
+        expect(rendered).to have_text("Terminated")
       end
 
-      it "should not display reason if enrollment has no termination reason present" do
+      it "should not display Terminated by health insure indicator on enrollment tile if no reason present" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Termination Reason")
-        expect(rendered).not_to have_text("Non Payment")
+        expect(rendered).not_to have_text("Terminated by health insurer")
+        expect(rendered).to have_text("Terminated")
       end
     end
 
@@ -403,17 +402,53 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
       end
 
-      it "should not display reason if enrollment has termination reason present" do
+      it "should not display Terminated by health insure indicator if enrollment has termination reason present" do
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Termination Reason")
-        expect(rendered).not_to have_text("Non Payment")
+        expect(rendered).not_to have_text("Terminated by health insurer")\
       end
 
-      it "should not display reason if enrollment does not have termination reason present" do
+      it "should not display Terminated by health insure indicator if enrollment does not have termination reason present" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Termination Reason")
-        expect(rendered).not_to have_text("Non Payment")
+        expect(rendered).not_to have_text("Terminated by health insurer")
+      end
+    end
+  end
+
+  context "Termination Indicator display for terminated enrollments" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_canceled',
+        terminate_reason: 'non_payment',
+        product: product
+      )
+    end
+
+    context "when termination reason config is enabled and enrollment is IVL" do
+      before :each do
+        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should display Canceled by health insure indicator on enrollment tile" do
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        expect(rendered).to have_text("Canceled by health insurer")
+      end
+
+      it "should not display Canceled by health insure indicator on enrollment tile" do
+        hbx_enrollment.update_attributes(terminate_reason: nil)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        expect(rendered).not_to have_text("Canceled by health insurer")
+        expect(rendered).to have_text("Coverage Canceled")
       end
     end
   end

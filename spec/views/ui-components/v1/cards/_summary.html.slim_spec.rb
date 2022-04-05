@@ -1,12 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
+  before do
+    DatabaseCleaner.clean
+  end
+
   let(:aws_env) { ENV['AWS_ENV'] || "qa" }
   let(:person) {FactoryBot.create(:person)}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:active_household) {family.active_household}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record, eligibility_date: TimeKeeper.date_of_record) }
-  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, family: family, hbx_enrollment_members: [hbx_enrollment_member])}
+  let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, family: family, hbx_enrollment_members: [hbx_enrollment_member], rating_area_id: rating_area.id)}
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member.id, product_price: BigDecimal(100),sponsor_contribution: BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: mock_product, member_enrollments: [member_enrollment])}
   let(:member_group) {double(group_enrollment: group_enrollment)}
@@ -146,6 +151,33 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       allow(mock_product).to receive(:nationwide).and_return(false)
       render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to match(/#{mock_product.provider_directory_url}/)
+    end
+  end
+
+  context 'for display of enrollment additional summary' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
+      render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
+    end
+
+    it 'should include enrollment effective_on text' do
+      expect(rendered).to have_content(l10n('enrollment.effective_on'))
+    end
+
+    it 'should include latest transition text' do
+      expect(rendered).to have_content(l10n('enrollment.latest_transition'))
+    end
+
+    it 'should include Product HIOS ID text' do
+      expect(rendered).to have_content(l10n('product_hios_id'))
+    end
+
+    it 'should include RatingArea text' do
+      expect(rendered).to have_content(l10n('rating_area.exchange_provided_code'))
+    end
+
+    it 'should include full name of person' do
+      expect(rendered).to have_content(hbx_enrollment_member.person.full_name.titleize)
     end
   end
 end

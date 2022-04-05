@@ -91,6 +91,54 @@
                   = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
               - else
                 = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
+  - if EnrollRegistry.feature_enabled?(:display_enr_summary)
+    .row.plan
+      .col-xs-12
+        span.h3 data-cuke='enrollment_detail'
+          = l10n('enrollment.details.header')
+        br/
+        br/
+        span.ttu.lg.twelve.font-weight-bold
+          = l10n('enrollment.effective_on')
+        = @hbx_enrollment&.effective_on
+        br/
+        span.ttu.lg.twelve.font-weight-bold
+          = l10n('enrollment.latest_transition')
+        = latest_transition(@hbx_enrollment)
+        br/
+        span.ttu.lg.twelve.font-weight-bold
+          = l10n('product_hios_id')
+        = @hbx_enrollment&.product&.hios_id || l10n('not_available')
+        br/
+        span.ttu.lg.twelve.font-weight-bold
+          = l10n('rating_area.exchange_provided_code')
+        = @hbx_enrollment&.rating_area&.exchange_provided_code || l10n('not_available')
+        br/
+        br/
+        span.h3 data-cuke='enrollment_member_detail'
+          = l10n('enrollment.members.header')
+        br/
+        - @hbx_enrollment.hbx_enrollment_members.each do |member|
+          .row
+            .col-md-9.col-sm-9.col-xs-12
+              table.table-responsive
+                tr
+                  td.font-weight-bold.h4
+                    = member.full_name.titleize
+                tr
+                  br/
+                  td class='pt_10px'
+                    span.ttu.lg.twelve.h5 data-cuke="tobbaco_use"
+                      = l10n('enrollment.tobbaco_user')
+                    br/
+                    span.ttu.dg.fourteen
+                      = member.tobacco_use_value
+                  td class='pt_10px'
+                    span.ttu.lg.twelve.h5 data-cuke="enrollment_coverage_state_date"
+                      = l10n('enrollment_member.coverage_state_date')
+                    br/
+                    span.ttu.dg.fourteen
+                      = member.coverage_start_on
   .col-md-6.col-sm-6.col-xs-12 style=("display: none;")
     .row
       - if @market_kind == "employer_sponsored" && @coverage_kind == 'health'

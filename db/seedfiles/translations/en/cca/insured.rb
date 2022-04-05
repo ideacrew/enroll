@@ -412,5 +412,15 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.plan_shoppings.thankyou.confirm_your_plan_selection.content' => "Please review your current plan selection. If you want to change your plan, select 'Previous' to go back. If you’ve decided on a plan and are ready to complete your enrollment, select 'Confirm'. </br></br>Note: This is not an invoice. We will send a bill to your employer each month. If you have questions about paying your monthly premium, please check with your employer",
   :'en.important' => "Important",
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
-  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
+  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
+  :'en.enrollment.details.header' => 'Enrollment Detail',
+  :'en.enrollment.members.header' => 'Enrollment Member Detail',
+  :'en.enrollment.effective_on' => 'Effective Date: ',
+  :'en.enrollment.latest_transition' => 'Latest Transition: ',
+  :'en.enrollment.latest_transition_data' => "From %{from_state} to %{to_state} at %{created_at}",
+  :'en.product_hios_id' => 'Product HIOS ID: ',
+  :'en.rating_area.exchange_provided_code' => 'Rating Area: ',
+  :'en.enrollment.tobbaco_user' => 'Tobacco User',
+  :'en.enrollment_member.coverage_state_date' => 'Coverage Start Date',
+  :'en.not_available' => 'NA',
 }.freeze

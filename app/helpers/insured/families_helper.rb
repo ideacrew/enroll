@@ -183,16 +183,26 @@ module Insured::FamiliesHelper
     end
   end
 
-  def formatted_enrollment_states
-    {
-      'coverage_terminated' => 'Terminated',
-      'coverage_expired' => 'Coverage Period Ended'
-    }
+  def formatted_enrollment_states(enrollment)
+    enrollment_states_hash = if display_termination_reason?(enrollment)
+                               {
+                                 'coverage_terminated' => 'Terminated by health insurer',
+                                 'coverage_canceled' => 'Canceled by health insurer',
+                                 'coverage_expired' => 'Coverage Period Ended'
+                               }
+                             else
+                               {
+                                 'coverage_terminated' => 'Terminated',
+                                 'coverage_expired' => 'Coverage Period Ended'
+                               }
+                             end
+    enrollment_states_hash.stringify_keys[enrollment.aasm_state.to_s]
   end
 
   def display_termination_reason?(enrollment)
     return false if enrollment.is_shop?
-    enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason)
+    enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason) &&
+      enrollment.terminate_reason == HbxEnrollment::TermReason::NON_PAYMENT
   end
 
   def enrollment_coverage_end(hbx_enrollment)
@@ -323,5 +333,16 @@ module Insured::FamiliesHelper
     return [] unless address&.zip
 
     BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
+  end
+
+  def latest_transition(enrollment)
+    if enrollment.latest_wfst.present?
+      l10n('enrollment.latest_transition_data',
+           from_state: enrollment.latest_wfst.from_state,
+           to_state: enrollment.latest_wfst.to_state,
+           created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+    else
+      l10n('not_available')
+    end
   end
 end

@@ -228,6 +228,7 @@ describe "given cancel event to cancel terminated coverage" do
   end
 
   it "should cancel terminated enrollment" do
+    EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
     Subscribers::PolicyTerminationsSubscriber.new.call(cancelation_event_name, nil, nil, nil, cancelation_payload)
     hbx_enrollment.reload
     expect(hbx_enrollment.terminated_on).to eq nil
@@ -256,6 +257,7 @@ describe "given term event to cancel terminated coverage" do
   end
 
   it "should cancel terminated enrollment" do
+    EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
     Subscribers::PolicyTerminationsSubscriber.new.call(term_event_name, nil, nil, nil, term_payload)
     hbx_enrollment.reload
     expect(hbx_enrollment.terminated_on).to eq nil
