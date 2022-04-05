@@ -61,7 +61,7 @@ module IvlEligibilityAudits
     end
   
     def each
-      @query_ids.each_slice(5) do |chunk|
+      @query_ids.each_slice(1) do |chunk|
         Person.where("_id" => {"$in" => chunk}).no_timeout.each do |pers|
           yield pers
         end
