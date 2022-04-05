@@ -128,8 +128,8 @@ namespace :import do
         )
     )
 
-    individual_catastrophic_ai_health_benefit_package = BenefitPackage.new(
-        title: "catastrophic_ai_health_benefits_2022",
+    individual_catastrophic_ai_health_benefit_package_for_csr_limited = BenefitPackage.new(
+        title: "catastrophic_ai_health_benefits_csr_limited_2022",
         elected_premium_credit_strategy: "unassisted",
         benefit_ids:          ivl_and_cat_ai_health_plans_2022,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -138,6 +138,24 @@ namespace :import do
             family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
             benefit_categories:   ["health"],
             cost_sharing: "csr_limited",
+            incarceration_status: ["unincarcerated"],
+            age_range:            0..30,
+            citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
+            residency_status:     ["state_resident"],
+            ethnicity:            ["indian_tribe_member"]
+        )
+    )
+
+    individual_catastrophic_ai_health_benefit_package_for_csr_100 = BenefitPackage.new(
+        title: "catastrophic_ai_health_benefits_csr_100_2022",
+        elected_premium_credit_strategy: "unassisted",
+        benefit_ids:          ivl_and_cat_ai_health_plans_2022,
+        benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
+            market_places:        ["individual"],
+            enrollment_periods:   ["open_enrollment", "special_enrollment"],
+            family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
+            benefit_categories:   ["health"],
+            cost_sharing: "csr_100",
             incarceration_status: ["unincarcerated"],
             age_range:            0..30,
             citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
@@ -337,8 +355,9 @@ namespace :import do
         individual_health_benefit_package_for_csr_87,
       individual_health_benefit_package_for_csr_73,
       individual_health_benefit_package_for_csr_0,
-      individual_catastrophic_ai_health_benefit_package,
-      individual_health_benefit_package_for_csr_limited
+      individual_catastrophic_ai_health_benefit_package_for_csr_limited,
+      individual_health_benefit_package_for_csr_limited,
+      individual_catastrophic_ai_health_benefit_package_for_csr_100
     ]
 
     bc_period_2022.save!
