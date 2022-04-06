@@ -800,6 +800,8 @@ module FinancialAssistance
     end
 
     def tax_info_complete?
+      # is_joint_tax_filing can't be nil for primary or spouse of primary if married and filing taxes
+      return false if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
       filing_as_head = (FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && !is_claimed_as_tax_dependent.nil?) ? !is_filing_as_head_of_household.nil? : true
       !is_required_to_file_taxes.nil? &&
         !is_claimed_as_tax_dependent.nil? &&
@@ -1387,7 +1389,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_step_1
-      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && is_spouse_of_primary
+      errors.add(:is_joint_tax_filing, "#{full_name} must answer 'Will this person be filing jointly?'") if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
 
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 
