@@ -54,9 +54,9 @@ registry:
       - key: :indian_alaskan_tribe_details
         is_enabled: false
       - key: :prior_plan_year_ivl_sep
-        is_enabled: :true
+        is_enabled: :false
       - key: :admin_ivl_end_date_changes
-        is_enabled: :true
+        is_enabled: :false
       - key: :display_external_id_in_family_datatable
         is_enabled: :false
       - key: :contact_method_via_dropdown
