@@ -140,7 +140,7 @@ end
 
 def fork_kids(ivl_ids, f_map, hb_packages, exclusions,passive_r_date)
   child_list = Array.new
-  id_chunks = ivl_ids.in_groups(PROC_COUNT, false)
+  id_chunks = ivl_ids.shuffle.in_groups(PROC_COUNT, false)
   (1..PROC_COUNT).to_a.each do |proc_index|
     child_ivl_ids = id_chunks[proc_index - 1]
     reader, writer = IO.pipe
