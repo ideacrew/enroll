@@ -405,6 +405,26 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant.tax_info_complete?).to eq true
       end
     end
+
+    context 'primary is married and filing taxes' do
+      let(:application) { FactoryBot.create(:financial_assistance_application, :with_applicants) }
+      let(:primary) { application.primary_applicant }
+      let(:spouse) { application.applicants.at(1) }
+
+      before do
+        spouse.relationship = ('spouse')
+      end
+
+      context 'when is_joint_tax_filing is missing for primary and spouse' do
+        it 'should return false for primary' do
+          expect(primary.tax_info_complete?).to eq false
+        end
+
+        it 'should return false for spouse' do
+          expect(spouse.tax_info_complete?).to eq false
+        end
+      end
+    end
   end
 
   context 'is filing application with parents in household' do
