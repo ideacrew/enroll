@@ -1120,6 +1120,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     context 'living_outside_state feature enabled' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       end
 
       context 'valid addresses' do
@@ -1159,6 +1160,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     context 'living_outside_state feature disabled' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       end
 
       context 'valid addresses' do
