@@ -256,7 +256,6 @@ class DocumentsController < ApplicationController
     case value
     when 'true' then true
     when 'false' then false
-    else nil
     end
   end
 
