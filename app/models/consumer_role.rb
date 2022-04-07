@@ -1157,12 +1157,12 @@ class ConsumerRole
     end
   end
 
-  def admin_verification_action(admin_action, v_type, update_reason)
+  def admin_verification_action(admin_action, v_type, update_reason, admin_rejected)
     case admin_action
       when "verify"
         update_verification_type(v_type, update_reason)
       when "return_for_deficiency"
-        return_doc_for_deficiency(v_type, update_reason)
+        return_doc_for_deficiency(v_type, update_reason, admin_rejected)
     end
   end
 
@@ -1177,9 +1177,15 @@ class ConsumerRole
     end
   end
 
-  def return_doc_for_deficiency(v_type, update_reason, *authority)
+  def return_doc_for_deficiency(v_type, update_reason, admin_rejected, *authority)
     message = "#{v_type.type_name} was rejected."
-    v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
+
+    if admin_rejected
+      v_type.reject_type(update_reason)
+    else
+      v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
+    end
+
     if  v_type.type_name == LOCATION_RESIDENCY
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name

@@ -70,7 +70,8 @@ class DocumentsController < ApplicationController
     family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
-      verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
+      admin_rejected = format_string_to_bool(params[:admin_rejected])
+      verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason, admin_rejected)
       @person.save
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
@@ -171,7 +172,7 @@ class DocumentsController < ApplicationController
     if @document.destroyed?
       @person.save!
       if (@verification_type.vlp_documents - [@document]).empty?
-        @person.consumer_role.return_doc_for_deficiency(@verification_type, "all documents needed")
+        @person.consumer_role.return_doc_for_deficiency(@verification_type, "all documents needed", nil)
         flash[:danger] = "All documents were deleted. Action needed"
       else
         flash[:success] = "Document deleted."
@@ -250,6 +251,14 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  def format_string_to_bool(value)
+    case value
+    when 'true' then true
+    when 'false' then false
+    else nil
+    end
+  end
 
   def updateable?
     authorize Family, :updateable?
