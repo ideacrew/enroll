@@ -37,6 +37,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                        coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
                        eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
     end
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
 
     let!(:enrollment) do
       hbx_enrollment = FactoryBot.create(:hbx_enrollment,
@@ -45,11 +46,13 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                          household: family.active_household,
                                          hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
                                          aasm_state: "coverage_selected",
+                                         kind: "individual",
                                          effective_on: TimeKeeper.date_of_record,
                                          rating_area_id: initial_application.recorded_rating_area_id,
                                          sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                                          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
-                                         benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
+                                         benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                                         consumer_role_id: consumer_role.id)
       hbx_enrollment.benefit_sponsorship = benefit_sponsorship
       hbx_enrollment.save!
       hbx_enrollment
@@ -73,7 +76,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should select coverage for the reinstatement' do
-          expect(family.hbx_enrollments.last.aasm_state).to eq 'coverage_selected'
+          expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
         end
       end
 
@@ -91,7 +94,9 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                            rating_area_id: initial_application.recorded_rating_area_id,
                                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                                            sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
-                                           benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
+                                           benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                                           kind: "individual",
+                                           consumer_role_id: consumer_role.id)
           enrollment_2.benefit_sponsorship = benefit_sponsorship
           enrollment_2.save!
 
@@ -104,6 +109,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           family.family_members.each do |member|
             FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: member.id)
           end
+          enrollment.update_attributes(product_id: enrollment_2.product.id)
           FactoryBot.create(:eligibility_determination, tax_household: tax_household)
           @dropped_members = subject.call({hbx_enrollment: enrollment_2,
                                            options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
@@ -116,7 +122,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should recalculate aptc for reinstated enrollment' do
-          reinstatement = family.hbx_enrollments.last
+          reinstatement = family.hbx_enrollments.where(:id.ne => enrollment.id).last
           expect(reinstatement.elected_aptc_pct).to eq 1.0
           expect(reinstatement.applied_aptc_amount).to_not eq 0
           expect(reinstatement.aggregate_aptc_amount).to_not eq 0
@@ -137,7 +143,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should begin coverage for the reinstatement' do
-          expect(family.hbx_enrollments.last.aasm_state).to eq 'coverage_enrolled'
+          expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
         end
       end
     end
