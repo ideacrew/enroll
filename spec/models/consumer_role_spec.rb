@@ -1008,7 +1008,7 @@ describe "Indian tribe member" do
       consumer_role.pass_residency!
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
       american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
-      consumer_role.return_doc_for_deficiency(american_indian_status, "Invalid Document")
+      consumer_role.return_doc_for_deficiency(american_indian_status, 'Invalid Document', nil)
       expect(consumer_role.aasm_state).to eq 'verification_outstanding'
       expect(american_indian_status.validation_status).to eq 'outstanding'
       expect(consumer_role.lawful_presence_determination.vlp_authority).to eq 'ssa'
