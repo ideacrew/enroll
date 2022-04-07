@@ -208,6 +208,41 @@ RSpec.describe DocumentsController, :type => :controller do
         it_behaves_like "update verification type", "citizenship_type", reason, "verify", "lawful_presence_update_reason", reason
       end
     end
+
+    context 'admin_rejected a verification_type' do
+      let!(:person10) { FactoryBot.create(:person, :with_family, :with_consumer_role) }
+      let!(:user10) { FactoryBot.create(:user, person: person10) }
+      let!(:ver_type10) do
+        person10.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+        person10.verification_types.where(type_name: 'Citizenship').last
+      end
+
+      let(:input_params) do
+        { person_id: person10.id,
+          verification_type: ver_type10.id,
+          admin_action: 'return_for_deficiency',
+          family_member_id: person10.primary_family.primary_applicant.id,
+          admin_rejected: 'true',
+          verification_reason: 'Illegible' }
+      end
+
+      before do
+        post :update_verification_type, params: input_params
+        ver_type10.reload
+      end
+
+      it "should update verification_type's validation_status to rejected" do
+        expect(ver_type10.validation_status).to eq('rejected')
+      end
+
+      it "should update verification_type's update_reason" do
+        expect(ver_type10.update_reason).to eq(input_params[:verification_reason])
+      end
+
+      it "should update verification_type's rejected" do
+        expect(ver_type10.rejected).to eq(true)
+      end
+    end
   end
   describe "PUT update_ridp_verification_type" do
     before :each do

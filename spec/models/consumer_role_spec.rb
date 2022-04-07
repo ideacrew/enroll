@@ -1803,6 +1803,54 @@ describe 'vlp documents' do
       expect(@consumer_role.workflow_state_transitions.last.reason).to eq("Self Attest #{VerificationType::LOCATION_RESIDENCY}")
     end
   end
+
+  describe 'admin_verification_action' do
+    let!(:person10) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:ver_type10) do
+      person10.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+      person10.verification_types.where(type_name: 'Citizenship').last
+    end
+
+    before do
+      person10.consumer_role.admin_verification_action('return_for_deficiency', ver_type10, 'Illegible', true)
+    end
+
+    it "should update verification_type's validation_status to rejected" do
+      expect(ver_type10.validation_status).to eq('rejected')
+    end
+
+    it "should update verification_type's update_reason" do
+      expect(ver_type10.update_reason).to eq('Illegible')
+    end
+
+    it "should update verification_type's rejected" do
+      expect(ver_type10.rejected).to eq(true)
+    end
+  end
+
+  describe 'return_doc_for_deficiency' do
+    let!(:person10) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:ver_type10) do
+      person10.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+      person10.verification_types.where(type_name: 'Citizenship').last
+    end
+
+    before do
+      person10.consumer_role.return_doc_for_deficiency(ver_type10, 'Illegible', true)
+    end
+
+    it "should update verification_type's validation_status to rejected" do
+      expect(ver_type10.validation_status).to eq('rejected')
+    end
+
+    it "should update verification_type's update_reason" do
+      expect(ver_type10.update_reason).to eq('Illegible')
+    end
+
+    it "should update verification_type's rejected" do
+      expect(ver_type10.rejected).to eq(true)
+    end
+  end
 end
 
 # rubocop:enable Metrics/ParameterLists
