@@ -111,7 +111,7 @@ registry:
       - key: :consumer_validations
         is_enabled: false
       - key: :non_magi_referral_display
-        is_enabled: true
+        is_enabled: false
   - namespace:
     - :questions
     features:
