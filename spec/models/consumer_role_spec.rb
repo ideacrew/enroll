@@ -1805,50 +1805,36 @@ describe 'vlp documents' do
   end
 
   describe 'admin_verification_action' do
-    let!(:person10) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:ver_type10) do
-      person10.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
-      person10.verification_types.where(type_name: 'Citizenship').last
+    let!(:consumer) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:verification_type) do
+      consumer.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
     end
 
     before do
-      person10.consumer_role.admin_verification_action('return_for_deficiency', ver_type10, 'Illegible')
+      consumer.consumer_role.admin_verification_action('return_for_deficiency', verification_type, 'Illegible')
     end
 
-    it "should update verification_type's validation_status to rejected" do
-      expect(ver_type10.validation_status).to eq('rejected')
-    end
-
-    it "should update verification_type's update_reason" do
-      expect(ver_type10.update_reason).to eq('Illegible')
-    end
-
-    it "should update verification_type's rejected" do
-      expect(ver_type10.rejected).to eq(true)
+    it "should update verification_type" do
+      expect(verification_type.validation_status).to eq('rejected')
+      expect(verification_type.update_reason).to eq('Illegible')
+      expect(verification_type.rejected).to eq(true)
     end
   end
 
   describe 'return_doc_for_deficiency' do
-    let!(:person10) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:ver_type10) do
-      person10.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
-      person10.verification_types.where(type_name: 'Citizenship').last
+    let!(:consumer) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:verification_type) do
+      consumer.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
     end
 
     before do
-      person10.consumer_role.return_doc_for_deficiency(ver_type10, 'Illegible')
+      consumer.consumer_role.return_doc_for_deficiency(verification_type, 'Illegible')
     end
 
-    it "should update verification_type's validation_status to rejected" do
-      expect(ver_type10.validation_status).to eq('rejected')
-    end
-
-    it "should update verification_type's update_reason" do
-      expect(ver_type10.update_reason).to eq('Illegible')
-    end
-
-    it "should update verification_type's rejected" do
-      expect(ver_type10.rejected).to eq(true)
+    it "should update verification_type" do
+      expect(verification_type.validation_status).to eq('rejected')
+      expect(verification_type.update_reason).to eq('Illegible')
+      expect(verification_type.rejected).to eq(true)
     end
   end
 end
