@@ -36,13 +36,13 @@ module Operations
         clone_enrollment = Operations::HbxEnrollments::Clone.new.call({hbx_enrollment: params[:hbx_enrollment], effective_on: new_effective_date, options: optionals_params})
         return clone_enrollment if clone_enrollment.failure?
 
-        reinstatement = clone_enrollment.value!
-        remove_dropped_enr_members(reinstatement, non_eligible_members)
-        reinstatement.save!
-        terminate_base_enrollment(params[:hbx_enrollment], reinstatement, terminate_date)
-        get_household_applied_aptc(reinstatement, new_effective_date) if params[:hbx_enrollment].applied_aptc_amount > 0
-        reinstatement.force_select_coverage! if reinstatement.may_reinstate_coverage?
-        # reinstatement.begin_coverage! if reinstatement.may_begin_coverage? && reinstatement.effective_on <= TimeKeeper.date_of_record #Note: not needed for ivl enrollments
+        new_enrollment = clone_enrollment.value!
+        remove_dropped_enr_members(new_enrollment, non_eligible_members)
+        new_enrollment.save!
+        terminate_base_enrollment(params[:hbx_enrollment], new_enrollment, terminate_date)
+        get_household_applied_aptc(new_enrollment, new_effective_date) if params[:hbx_enrollment].applied_aptc_amount > 0
+        new_enrollment.force_select_coverage! if new_enrollment.may_reinstate_coverage?
+        # new_enrollment.begin_coverage! if new_enrollment.may_begin_coverage? && new_enrollment.effective_on <= TimeKeeper.date_of_record #Note: not needed for ivl enrollments
 
         dropped_member_info = []
         dropped_enr_members.each do |member_id|
@@ -55,15 +55,15 @@ module Operations
         Success(dropped_member_info)
       end
 
-      def remove_dropped_enr_members(reinstatement, non_eligible_members)
+      def remove_dropped_enr_members(new_enrollment, non_eligible_members)
         ineligible_applicant_ids = non_eligible_members.pluck(:applicant_id)
-        reinstatement.hbx_enrollment_members.where(:applicant_id.in => ineligible_applicant_ids).delete
+        new_enrollment.hbx_enrollment_members.where(:applicant_id.in => ineligible_applicant_ids).delete
       end
 
-      def terminate_base_enrollment(base_enrollment, reinstate_enrollment, terminate_date)
+      def terminate_base_enrollment(base_enrollment, new_enrollment, terminate_date)
         return if  base_enrollment.coverage_expired?
 
-        if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
+        if base_enrollment.may_terminate_coverage? && (new_enrollment.effective_on > base_enrollment.effective_on)
           base_enrollment.terminate_coverage!
           base_enrollment.update_attributes!(terminated_on: terminate_date)
         elsif base_enrollment.may_cancel_coverage?
