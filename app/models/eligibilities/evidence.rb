@@ -149,15 +149,25 @@ module Eligibilities
       state :denied
       state :errored
       state :closed
-
       state :corrected
+      state :rejected
 
       event :attest, :after => [:record_transition] do
         transitions from: :pending, to: :attested
         transitions from: :attested, to: :attested
         transitions from: :review, to: :attested
         transitions from: :outstanding, to: :attested
+        transitions from: :rejected, to: :attested
         transitions from: :attested, to: :attested
+      end
+
+      event :move_to_rejected, :after => [:record_transition] do
+        transitions from: :pending, to: :rejected
+        transitions from: :review, to: :rejected
+        transitions from: :attested, to: :rejected
+        transitions from: :verified, to: :rejected
+        transitions from: :outstanding, to: :rejected
+        transitions from: :rejected, to: :rejected
       end
 
       event :move_to_outstanding, :after => [:record_transition] do
@@ -166,6 +176,7 @@ module Eligibilities
         transitions from: :review, to: :outstanding
         transitions from: :attested, to: :outstanding
         transitions from: :verified, to: :outstanding
+        transitions from: :rejected, to: :outstanding
       end
 
       event :move_to_verified, :after => [:record_transition] do
@@ -174,6 +185,7 @@ module Eligibilities
         transitions from: :review, to: :verified
         transitions from: :attested, to: :verified
         transitions from: :outstanding, to: :verified
+        transitions from: :rejected, to: :verified
       end
 
       event :move_to_review, :after => [:record_transition] do
@@ -182,6 +194,7 @@ module Eligibilities
         transitions from: :outstanding, to: :review
         transitions from: :attested, to: :review
         transitions from: :verified, to: :review
+        transitions from: :rejected, to: :review
       end
 
       event :move_to_pending, :after => [:record_transition] do
@@ -190,6 +203,7 @@ module Eligibilities
         transitions from: :review, to: :pending
         transitions from: :outstanding, to: :pending
         transitions from: :verified, to: :pending
+        transitions from: :rejected, to: :pending
       end
 
       event :determined, :after => [:record_transition] do
