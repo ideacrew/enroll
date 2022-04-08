@@ -165,7 +165,7 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
       it "should set eligibility dates to to previous enrollment's effective date if it is earlier" do
         coverage_start_on = previous_coverage.hbx_enrollment_members.first.coverage_start_on
         previous_coverage.hbx_enrollment_members.first.update_attributes!(coverage_start_on: coverage_start_on + 1.month)
-        subject.set_enrollment_member_coverage_start_dates(hbx_enrollment) 
+        subject.set_enrollment_member_coverage_start_dates(hbx_enrollment)
         expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq(previous_coverage.effective_on)
       end
     end
