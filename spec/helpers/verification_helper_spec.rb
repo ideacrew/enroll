@@ -210,11 +210,25 @@ RSpec.describe VerificationHelper, :type => :helper do
       let(:applicants) { [FactoryBot.create(:financial_assistance_applicant, is_applying_coverage: is_applying_coverage, income_evidence: income_evidence, incomes: incomes)] }
       let(:incomes) { [FactoryBot.build(:financial_assistance_income)] }
       let(:income_evidence) { FactoryBot.build(:evidence, key: :income, title: 'Income', aasm_state: income_evidence_status, is_satisfied: false) }
-      let(:income_evidence_status) { 'outstanding' }
       let(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_selected')}
       let(:is_applying_coverage) { true }
 
+      context 'when income evidence is in rejected state' do
+        let(:income_evidence_status) { 'rejected' }
+
+        before do
+          allow(helper).to receive(:is_unverified_verification_type?).with(person).and_return false
+          enrollment
+        end
+
+        it 'returns true' do
+          expect(helper.enrollment_group_unverified?(person)).to eq true
+        end
+      end
+
       context 'when outstanding income evidence' do
+        let(:income_evidence_status) { 'outstanding' }
+
         before do
           allow(helper).to receive(:is_unverified_verification_type?).with(person).and_return false
         end
