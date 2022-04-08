@@ -217,6 +217,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
         "Mailing City",
         "Mailing State",
         "Mailing Zip",
+        "No DC Address",
         "Residency Exemption Reason",
         "Is applying for coverage",
         "Resident Role",
@@ -261,6 +262,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
                         address_fields +
                         mailing_address_fields +
                         [
+                          !no_dc_address_reason_for(pers).blank?,
                           no_dc_address_reason_for(pers),
                           cr.is_applying_coverage,
                           pers.resident_role.present?,
