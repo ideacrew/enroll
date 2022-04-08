@@ -37,7 +37,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
     let!(:employee_role){census_employee.employee_role}
 
     let(:enrollment_kind) { "open_enrollment" }
-    let(:special_enrollment_period_id) { nil }
+    let(:special_enrollment_period_id) { "some id" }
 
     let(:covered_individuals) { family.family_members }
     let(:person) { family.primary_applicant.person }
@@ -52,10 +52,12 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
                         enrollment_kind: enrollment_kind,
                         kind: "employer_sponsored",
                         benefit_sponsorship_id: benefit_sponsorship.id,
+                        special_enrollment_period_id: special_enrollment_period_id,
                         sponsored_benefit_package_id: current_benefit_package.id,
                         sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
                         employee_role_id: employee_role.id,
                         product: sponsored_benefit.reference_product,
+
                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
     end
 
@@ -86,6 +88,10 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
         expect(enrollment_member.coverage_start_on).to eq enrollment.effective_on
         expect(enrollment_member.eligibility_date).to eq reinstated_enrollment.effective_on
         expect(reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
+      end
+
+      it 'reinstated enrollment should have special_enrollment_period_id' do
+        expect(reinstated_enrollment.special_enrollment_period_id).to eq special_enrollment_period_id
       end
     end
 
@@ -172,7 +178,8 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
       let!(:employee_role){census_employee.employee_role}
 
       let(:enrollment_kind) { "open_enrollment" }
-      let(:special_enrollment_period_id) { nil }
+      let(:special_enrollment_period_id) { "some id" }
+
 
       let(:covered_individuals) { family.family_members }
       let(:person) { family.primary_applicant.person }
@@ -187,6 +194,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
                           enrollment_kind: enrollment_kind,
                           kind: "employer_sponsored",
                           benefit_sponsorship_id: benefit_sponsorship.id,
+                          special_enrollment_period_id: special_enrollment_period_id,
                           sponsored_benefit_package_id: current_benefit_package.id,
                           sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
                           employee_role_id: employee_role.id,
@@ -234,6 +242,10 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
           expect(enrollment.present?).to be_truthy
 
           expect(enrollment.sponsored_benefit_package.benefit_application).to eq benefit_sponsorship.renewal_benefit_application
+        end
+
+        it 'reinstated enrollment should have special_enrollment_period_id' do
+          expect(reinstated_enrollment.special_enrollment_period_id).to eq special_enrollment_period_id
         end
       end
 
