@@ -38,24 +38,16 @@ module VerificationHelper
 
   def verification_type_class(status)
     case status
-      when "verified"
-        "success"
-      when "review"
-        "warning"
-      when "outstanding"
-        "danger"
-      when "curam"
-        "default"
-      when "attested"
-        "default"
-      when "valid"
-        "success"
-      when "pending"
-        "info"
-      when "expired"
-        "default"
-      when "unverified"
-        "default"
+    when 'verified', 'valid'
+      'success'
+    when 'review'
+      'warning'
+    when 'outstanding', 'rejected'
+      'danger'
+    when 'curam', 'attested', 'expired', 'unverified'
+      'default'
+    when 'pending'
+      'info'
     end
   end
 

@@ -434,6 +434,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "verification type css_class method", "valid", "success"
     it_behaves_like "verification type css_class method", "pending", "info"
     it_behaves_like "verification type css_class method", "expired", "default"
+    it_behaves_like 'verification type css_class method', 'rejected', 'danger'
   end
 
   describe "#build_admin_actions_list" do
