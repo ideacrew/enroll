@@ -67,7 +67,7 @@ module BenefitMarkets
 
       let!(:product15) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '06')}
       let!(:product16) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '06')}
-
+      let(:all_products) { [product1,product2,product3,product4, product5, product6, product7, product8, product9, product10, product11, product12, product13, product14, product15, product16]}
       before do
         @products = product_factory.new({market_kind: "individual"})
       end
@@ -85,12 +85,12 @@ module BenefitMarkets
           expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_94")).to eq [product1,product2,product3,product15]
         end
 
-        it 'should return all product along with product having csr 100' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100")).to eq [product5,product6,product7,product8]
+        it 'should return all products if the csr_kind is csr_100' do
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100")).to eq all_products
         end
 
-        it 'should return all product along with product having csr limited' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited")).to eq [product9,product10,product11,product12]
+        it 'should return all products if the csr_kind is csr_limited'  do
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited")).to eq all_products
         end
       end
 

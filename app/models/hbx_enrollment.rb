@@ -61,6 +61,11 @@ class HbxEnrollment
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
   TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
 
+  module TermReason
+    NON_PAYMENT = 'non_payment'.freeze
+    VOLUNTARY_WITHDRAWL = 'voluntary_withdrawl'.freeze
+    RETROACTIVE_CANCELED = 'retroactive_canceled'.freeze
+  end
 
   WAIVER_REASONS = [
       "I have coverage through spouse’s employer health plan",
@@ -1824,6 +1829,7 @@ class HbxEnrollment
   end
 
   def can_be_reinstated?
+    return false unless term_reason_eligible_for_reinstate?
     return false if is_shop? && benefit_sponsorship.blank?
     return false unless is_eligible_for_reinstatement?
     return false if is_shop? && employee_role.is_cobra_status? && self.kind == "employer_sponsored"
@@ -1836,6 +1842,19 @@ class HbxEnrollment
     eligible_states = %w[coverage_terminated coverage_termination_pending]
     eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:admin_ivl_end_date_changes) || ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes)
     eligible_states.include?(aasm_state)
+  end
+
+  def term_reason_eligible_for_reinstate?
+    return true unless terminate_reason
+    return true if is_shop?
+    allow_reinstate_non_payment_term?
+  end
+
+  def allow_reinstate_non_payment_term?
+    # Currently checking for IVL(ME)
+    is_ivl_by_kind? &&
+      TermReason::NON_PAYMENT == terminate_reason &&
+      EnrollRegistry.feature_enabled?(:reinstate_nonpayment_ivl_enrollment)
   end
 
   def has_active_term_or_expired_exists_for_reinstated_date?
@@ -1935,6 +1954,19 @@ class HbxEnrollment
       # Move reinstated enrollment to "coverage enrolled" status if coverage begins
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
       reinstate_enrollment.notify_of_coverage_start(edi)
+      if allow_reinstate_non_payment_term?
+        enrollments = HbxEnrollment.where(
+          {:family_id => family_id,
+           :effective_on => effective_on.beginning_of_year..reinstate_enrollment.effective_on - 1.day,
+           :coverage_kind => coverage_kind,
+           :consumer_role_id => consumer_role_id,
+           :product_id => product_id,
+           :terminate_reason => HbxEnrollment::TermReason::NON_PAYMENT,
+           :"hbx_enrollment_members.applicant_id" => subscriber&.applicant_id,
+           :"hbx_enrollment_members.is_subscriber" => true}
+        )
+        enrollments.update_all(terminate_reason: nil) if enrollments.any?
+      end
     end
     reinstate_enrollment
   end
@@ -2651,8 +2683,8 @@ class HbxEnrollment
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 
-  def latest_transition_at
-    workflow_state_transitions.order(created_at: :desc).first&.created_at
+  def latest_wfst
+    workflow_state_transitions.order(created_at: :desc).first
   end
 
   private

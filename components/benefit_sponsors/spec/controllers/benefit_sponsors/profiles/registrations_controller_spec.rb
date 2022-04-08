@@ -125,6 +125,7 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false)

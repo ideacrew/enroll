@@ -8,7 +8,7 @@
   <% @person.active_employee_roles.each do |employee_role|%>
     <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
-  <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
+  <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? && @active_sep.qualifying_life_event_kind.active? %>
   <div class="my-account-page">
     <h1 class="heading-text mt-0"><%= l10n("my_site_short_name", site_short_name: site_short_name) %></h1>
   </div>
@@ -17,7 +17,7 @@
     <div class="col-md-8">
       <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
       <%= render partial: 'qle_detail' %>
-      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
+      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? && @active_sep.qualifying_life_event_kind.active? %>
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
         <% enrollments = @all_hbx_enrollments_for_admin %>
       <% else %>

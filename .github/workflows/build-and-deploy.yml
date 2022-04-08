@@ -151,8 +151,6 @@ jobs:
           build-args: |
             HOSTNAME=172.17.0.1
             CLIENT=${{ matrix.client }}
-      - name: Check encryption
-        run: docker run --network="host" ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }} /bin/bash .docker/check-encryption.sh
 
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
