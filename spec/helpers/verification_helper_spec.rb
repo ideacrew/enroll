@@ -174,6 +174,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       allow(person).to receive_message_chain("primary_family").and_return(family)
       allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
     end
+
     it "returns true if any family members have verification types state as outstanding" do
       family.family_members.each do |member|
         member.person = FactoryBot.create(:person, :with_consumer_role)
@@ -200,6 +201,65 @@ RSpec.describe VerificationHelper, :type => :helper do
         member.save
       end
       expect(helper.enrollment_group_unverified?(person)).to eq false
+    end
+
+    context 'when no outstanding verification types' do
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:person) { FactoryBot.create(:person)}
+      let!(:application) { FactoryBot.create(:financial_assistance_application, applicants: applicants, family_id: family.id) }
+      let(:applicants) { [FactoryBot.create(:financial_assistance_applicant, is_applying_coverage: is_applying_coverage, income_evidence: income_evidence, incomes: incomes)] }
+      let(:incomes) { [FactoryBot.build(:financial_assistance_income)] }
+      let(:income_evidence) { FactoryBot.build(:evidence, key: :income, title: 'Income', aasm_state: income_evidence_status, is_satisfied: false) }
+      let(:income_evidence_status) { 'outstanding' }
+      let(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_selected')}
+      let(:is_applying_coverage) { true }
+
+      context 'when outstanding income evidence' do
+        before do
+          allow(helper).to receive(:is_unverified_verification_type?).with(person).and_return false
+        end
+
+        context 'when enrolled, applying for coverage, having incomes' do
+          before do
+            enrollment
+          end
+
+          it 'returns true' do
+            expect(helper.enrollment_group_unverified?(person)).to eq true
+          end
+        end
+
+        context 'when family not enrolled' do
+
+          it 'returns false' do
+            expect(helper.enrollment_group_unverified?(person)).to eq false
+          end
+        end
+
+        context 'when applicant is not applying coverage' do
+          let(:is_applying_coverage) { false }
+
+          before do
+            enrollment
+          end
+
+          it 'returns false' do
+            expect(helper.enrollment_group_unverified?(person)).to eq false
+          end
+        end
+
+        context 'when no incomes' do
+          let(:incomes) { [] }
+
+          before do
+            enrollment
+          end
+
+          it 'returns false' do
+            expect(helper.enrollment_group_unverified?(person)).to eq false
+          end
+        end
+      end
     end
   end
 
