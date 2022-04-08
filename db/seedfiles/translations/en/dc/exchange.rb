@@ -56,5 +56,6 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.new_question" => "New Question",
   "en.exchange.employer_applications.security_questions" => "Security Questions",
   "en.documents.controller.missing_document_message" => "Unable to find document with specified ID. Please contact customer service at %{contact_center_phone_number}.",
-  "en.exchange.seeds.page_title" => "Data Seeds"
+  "en.exchange.seeds.page_title" => "Data Seeds",
+  "en.exchange.error" => "Error",
 }.freeze
