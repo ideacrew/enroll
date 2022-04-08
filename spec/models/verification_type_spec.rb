@@ -120,26 +120,19 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
   end
 
   describe 'reject_type' do
-    let!(:person10) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:ver_type10) do
-      person10.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
-      person10.verification_types.where(type_name: 'Citizenship').last
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:verification_type) do
+      person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
     end
 
     before do
-      ver_type10.reject_type('Illegible')
+      verification_type.reject_type('Illegible')
     end
 
-    it "should update verification_type's validation_status to rejected" do
-      expect(ver_type10.validation_status).to eq('rejected')
-    end
-
-    it "should update verification_type's update_reason" do
-      expect(ver_type10.update_reason).to eq('Illegible')
-    end
-
-    it "should update verification_type's rejected" do
-      expect(ver_type10.rejected).to eq(true)
+    it "should update verification_type" do
+      expect(verification_type.validation_status).to eq('rejected')
+      expect(verification_type.update_reason).to eq('Illegible')
+      expect(verification_type.rejected).to eq(true)
     end
   end
 end
