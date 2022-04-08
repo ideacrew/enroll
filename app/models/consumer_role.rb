@@ -1179,7 +1179,7 @@ class ConsumerRole
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     message = "#{v_type.type_name} was rejected."
-    v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
+    v_type.reject_type(update_reason)
     if  v_type.type_name == LOCATION_RESIDENCY
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
