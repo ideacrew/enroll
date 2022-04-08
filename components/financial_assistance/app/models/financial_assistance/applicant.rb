@@ -1213,6 +1213,15 @@ module FinancialAssistance
       evidence.move_to_outstanding
       save!
     end
+
+    def set_evidence_rejected(evidence)
+      return unless evidence.may_move_to_rejected?
+
+      evidence.verification_outstanding = true
+      evidence.is_satisfied = false
+      evidence.move_to_rejected
+      save!
+    end
     # rubocop:enable Metrics/Naming/AccessorMethodName
 
     class << self
