@@ -138,6 +138,12 @@ def auditable?(person_record, person_version, person_updated_at, family)
   not_authorized_by_curam?(person_version)
 end
 
+def no_dc_address_reason_for(pers)
+  return "homeless" if pers.is_homeless
+  return "I am temporarily living outside of DC" if pers.is_temporarily_out_of_state
+  nil
+end
+
 def fork_kids(ivl_ids, f_map, hb_packages, exclusions,passive_r_date)
   child_list = Array.new
   id_chunks = ivl_ids.shuffle.in_groups(PROC_COUNT, false)
@@ -211,7 +217,6 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
         "Mailing City",
         "Mailing State",
         "Mailing Zip",
-        "No DC Address",
         "Residency Exemption Reason",
         "Is applying for coverage",
         "Resident Role",
@@ -256,8 +261,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
                         address_fields +
                         mailing_address_fields +
                         [
-                          pers.no_dc_address,
-                          pers.no_dc_address ? pers.no_dc_address_reason : "",
+                          no_dc_address_reason_for(pers),
                           cr.is_applying_coverage,
                           pers.resident_role.present?,
                           eligible,
