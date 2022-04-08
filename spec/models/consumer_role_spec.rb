@@ -1008,9 +1008,9 @@ describe "Indian tribe member" do
       consumer_role.pass_residency!
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
       american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
-      consumer_role.return_doc_for_deficiency(american_indian_status, 'Invalid Document', nil)
+      consumer_role.return_doc_for_deficiency(american_indian_status, 'Invalid Document')
       expect(consumer_role.aasm_state).to eq 'verification_outstanding'
-      expect(american_indian_status.validation_status).to eq 'outstanding'
+      expect(american_indian_status.validation_status).to eq 'rejected'
       expect(consumer_role.lawful_presence_determination.vlp_authority).to eq 'ssa'
     end
   end
@@ -1812,7 +1812,7 @@ describe 'vlp documents' do
     end
 
     before do
-      person10.consumer_role.admin_verification_action('return_for_deficiency', ver_type10, 'Illegible', true)
+      person10.consumer_role.admin_verification_action('return_for_deficiency', ver_type10, 'Illegible')
     end
 
     it "should update verification_type's validation_status to rejected" do
@@ -1836,7 +1836,7 @@ describe 'vlp documents' do
     end
 
     before do
-      person10.consumer_role.return_doc_for_deficiency(ver_type10, 'Illegible', true)
+      person10.consumer_role.return_doc_for_deficiency(ver_type10, 'Illegible')
     end
 
     it "should update verification_type's validation_status to rejected" do

@@ -222,7 +222,6 @@ RSpec.describe DocumentsController, :type => :controller do
           verification_type: ver_type10.id,
           admin_action: 'return_for_deficiency',
           family_member_id: person10.primary_family.primary_applicant.id,
-          admin_rejected: 'true',
           verification_reason: 'Illegible' }
       end
 
