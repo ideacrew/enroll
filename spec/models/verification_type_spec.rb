@@ -135,4 +135,33 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       expect(verification_type.rejected).to eq(true)
     end
   end
+
+  describe 'is_type_outstanding?' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:ver_type) { person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified') }
+
+    context 'for outstanding' do
+      before { ver_type.fail_type }
+
+      it 'should return true' do
+        expect(ver_type.is_type_outstanding?).to eq(true)
+      end
+    end
+
+    context 'for rejected' do
+      before { ver_type.reject_type('Illegible') }
+
+      it 'should return true' do
+        expect(ver_type.is_type_outstanding?).to eq(true)
+      end
+    end
+
+    context 'for pass_type' do
+      before { ver_type.pass_type }
+
+      it 'should return false' do
+        expect(ver_type.is_type_outstanding?).to eq(false)
+      end
+    end
+  end
 end
