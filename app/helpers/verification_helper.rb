@@ -87,7 +87,7 @@ module VerificationHelper
       end
     end
 
-    aasm_states.include?('outstanding')
+    aasm_states.any? { |state| Eligibilities::Evidence::OUTSTANDING_STATES.include?(state) }
   end
 
   def verification_needed?(person)
