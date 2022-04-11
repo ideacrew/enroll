@@ -32,7 +32,7 @@ module Operations
         @new_effective_date = (termination_date > base_enrollment.effective_on) ? termination_date + 1.day : base_enrollment.effective_on
         return Failure('Select termination date that would result member drop in present calender year.') unless new_effective_date.year == termination_date.year
         return Failure('Termination date cannot be outside of the current calender year.') unless termination_date.year == TimeKeeper.date_of_record.year
-
+        return Failure('Termination date not within the allowed range') unless valid_termination_date?(params)
         Success(params)
       end
 
@@ -143,6 +143,19 @@ module Operations
 
         applied_aptc = tax_household.monthly_max_aptc(new_enrollment, new_effective_date)
         ::Insured::Factories::SelfServiceFactory.update_enrollment_for_apcts(new_enrollment, applied_aptc)
+      end
+
+      def valid_termination_date?(params)
+        hbx_enrollment = params[:hbx_enrollment]
+        term_date = params[:options]["termination_date_#{hbx_enrollment.id}"]
+
+        min = (hbx_enrollment.effective_on.beginning_of_year + 1)
+        max = if (hbx_enrollment.kind == "employer_sponsored") || (hbx_enrollment.kind == "employer_sponsored_cobra")
+                hbx_enrollment.sponsored_benefit_package.end_on
+              else
+                Date.new(hbx_enrollment.effective_on.year, 12, 31)
+              end
+        (min..max).include?(term_date.to_date)
       end
     end
   end

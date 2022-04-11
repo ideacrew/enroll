@@ -18,6 +18,12 @@ When(/Admin sets termination date for dropped members/) do
   find(DropEnrollmentMembers.drop_enrollment_members_title).click
 end
 
+When(/Admin sets invalid termination date for dropped members/) do
+  # format: MM/DD/YYYY
+  find(DropEnrollmentMembers.drop_enrollment_members_termination_date).click.set((TimeKeeper.date_of_record - 2.years).to_s)
+  find(DropEnrollmentMembers.drop_enrollment_members_title).click
+end
+
 When(/Admin selects member to be dropped from enrollment/) do
   find_all(DropEnrollmentMembers.drop_member_select_checkbox).first.click
 end

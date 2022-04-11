@@ -32,3 +32,9 @@ Feature: Drop Enrollment Members
       And Admin selects all members except a minor to be dropped from enrollment
       And Admin submits drop enrollment member form
       Then Admin should see the dropped members
+
+    Scenario: Admin manually enters a termination date outside the allowed range
+      When Admin sets invalid termination date for dropped members
+      And Admin selects members to be dropped from enrollment
+      And Admin submits drop enrollment member form
+      Then Admin should see that the enrollment failed to terminate
