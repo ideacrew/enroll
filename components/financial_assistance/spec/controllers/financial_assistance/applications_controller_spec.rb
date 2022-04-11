@@ -86,36 +86,54 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       application.add_or_update_relationships(applicants[2], applicants[3], 'sibling')
       application.relationships << ::FinancialAssistance::Relationship.new(kind: 'spouse', applicant_id: applicants[0].id, relative_id: applicants[1].id)
       application.relationships << ::FinancialAssistance::Relationship.new(kind: 'spouse', applicant_id: applicants[0].id, relative_id: applicants[1].id)
-
-      get :copy, params: { :id => application.id }
-      @new_application = FinancialAssistance::Application.where(family_id: application.family_id, :id.ne => application.id).first
     end
 
-    it "redirects to the new application copy" do
-      expect(response).to redirect_to(edit_application_path(assigns(:application).reload))
+    context 'when application service raises an error' do
+
+      before do
+        get :copy, params: { :id => application.id }
+        @new_application = FinancialAssistance::Application.where(family_id: application.family_id, :id.ne => application.id).first
+      end
+
+      it "redirects to the new application copy" do
+        expect(response).to redirect_to(edit_application_path(assigns(:application).reload))
+      end
+
+      it 'create duplicate application' do
+        expect(@new_application.family_id).to eq application.family_id
+      end
+
+      it 'create duplicate application with assistance year' do
+        expect(@new_application.assistance_year).not_to eq nil
+      end
+
+      it 'copies all the applicants' do
+        expect(@new_application.applicants.count).to eq application.applicants.count
+      end
+
+      it 'does not copy duplicate relationships' do
+        applicants = @new_application.applicants
+        expect(@new_application.relationships.where(applicant_id: applicants[0].id, relative_id: applicants[1].id).count).to eq 1
+      end
+
+      it 'only copies relationships to the primary applicant' do
+        applicants = @new_application.applicants
+        expect(@new_application.relationships.where(applicant_id: applicants[2].id, relative_id: applicants[3].id).count).to eq 0
+        expect(@new_application.relationships.count).to eq 6
+      end
     end
 
-    it 'create duplicate application' do
-      expect(@new_application.family_id).to eq application.family_id
-    end
+    context 'when application service not raises an error' do
 
-    it 'create duplicate application with assistance year' do
-      expect(@new_application.assistance_year).not_to eq nil
-    end
+      before do
+        allow_any_instance_of(::FinancialAssistance::Services::ApplicationService).to receive(:copy!).and_raise 'error'
+        get :copy, params: { :id => application.id }
+      end
 
-    it 'copies all the applicants' do
-      expect(@new_application.applicants.count).to eq application.applicants.count
-    end
-
-    it 'does not copy duplicate relationships' do
-      applicants = @new_application.applicants
-      expect(@new_application.relationships.where(applicant_id: applicants[0].id, relative_id: applicants[1].id).count).to eq 1
-    end
-
-    it 'only copies relationships to the primary applicant' do
-      applicants = @new_application.applicants
-      expect(@new_application.relationships.where(applicant_id: applicants[2].id, relative_id: applicants[3].id).count).to eq 0
-      expect(@new_application.relationships.count).to eq 6
+      it 'redirects when ApplicationService raises an error' do
+        expect(flash[:error]).to match(/error/)
+        expect(response).to redirect_to(applications_path(tab: 'cost_savings'))
+      end
     end
   end
 end

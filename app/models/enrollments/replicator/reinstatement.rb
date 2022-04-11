@@ -172,6 +172,7 @@ module Enrollments
           coverage_kind: base_enrollment.coverage_kind,
           enrollment_kind: base_enrollment.enrollment_kind,
           kind: base_enrollment.kind,
+          special_enrollment_period_id: base_enrollment.special_enrollment_period_id,
           predecessor_enrollment_id: base_enrollment.id,
           hbx_enrollment_members: clone_hbx_enrollment_members
         }
