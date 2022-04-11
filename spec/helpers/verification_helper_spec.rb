@@ -221,7 +221,7 @@ RSpec.describe VerificationHelper, :type => :helper do
           enrollment
         end
 
-        it 'returns true' do
+        it 'should return true for rejected status' do
           expect(helper.enrollment_group_unverified?(person)).to eq true
         end
       end

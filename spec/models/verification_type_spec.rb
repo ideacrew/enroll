@@ -138,10 +138,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
 
   describe 'is_type_outstanding?' do
     let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:ver_type) do
-      person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
-      person.verification_types.where(type_name: 'Citizenship').last
-    end
+    let!(:ver_type) { person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified') }
 
     context 'for outstanding' do
       before { ver_type.fail_type }
