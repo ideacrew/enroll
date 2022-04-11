@@ -9,15 +9,17 @@ module Versioning
     end
 
     def resolve_to_model
-      record.reload
       case kind
       when :history_track
-        record.history_tracker_to_record(timestamp)
+        found_record = record.class.find(record.id)
+        found_record.history_tracker_to_record(timestamp)
       when :version
+        record.reload
         record.versions.detect do |v|
           v.updated_at == timestamp
         end
       else
+        record.reload
         record
       end
     end
