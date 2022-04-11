@@ -11,7 +11,7 @@ class VerificationType
   ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam rejected].freeze
-  OUTSTANDING_STATES = %w[outstanding].freeze
+  OUTSTANDING_STATES = %w[outstanding rejected].freeze
   DUE_DATE_STATES = %w[review outstanding].freeze
   SATISFIED_STATES = %w[verified attested valid curam].freeze
 
@@ -63,7 +63,7 @@ class VerificationType
   end
 
   def is_type_outstanding?
-    validation_status == "outstanding"
+    OUTSTANDING_STATES.include?(validation_status)
   end
 
   def is_type_expired?

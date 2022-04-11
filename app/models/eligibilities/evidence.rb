@@ -19,6 +19,8 @@ module Eligibilities
     VERIFY_REASONS = EnrollRegistry[:verification_reasons].item
     REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person", "Expired", "Too old"].freeze
 
+    OUTSTANDING_STATES = ['outstanding', 'rejected'].freeze
+
     FDSH_EVENTS = {
       :esi_mec => 'events.fdsh.evidences.esi_determination_requested',
       :non_esi_mec => 'events.fdsh.evidences.non_esi_determination_requested',
