@@ -189,7 +189,7 @@ module FinancialAssistance
     def eligibility_results
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
+      render layout: ((params.keys.include?('cur') || FinancialAssistanceRegistry.feature_enabled?(:display_eligibility_results_by_thh)) ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error

@@ -21,8 +21,7 @@ module FinancialAssistance
 
     def household_eligible_applicants(application_id, eligibility_flag, determination_id)
       application = FinancialAssistance::Application.find(application_id)
-      applicants = application.active_applicants.where(eligibility_flag => true, eligibility_determination_id: determination_id)
-      applicants.map { |applicant| [capitalize_full_name(applicant.full_name), applicant.csr_percent_as_integer] }.to_h
+      application.active_applicants.where(eligibility_flag => true, eligibility_determination_id: determination_id)
     end
 
     def any_csr_ineligible_applicants?(application_id)

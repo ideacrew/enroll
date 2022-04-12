@@ -6,7 +6,7 @@
   margin: 10px 15px 12px;
   font-weight: 600;
 }
-.er-medicaid-prsn, .er-summary {
+.er-medicaid-prsn, .er-summary, .mh-results {
   padding: 20px 30px 15px;
 }
 .er-medicaid-prsn span {
@@ -75,6 +75,15 @@
 }
 .er-downhist i {
   font-size: 1.5em;
+}
+.mh-results {
+  color: #333;
+  padding-top: 0;
+  margin-top: 0;
+  h1, h2, h4 {margin-top: 0;}
+  h4 {font-weight: bold;}
+  li {font-size: 1.25em;}
+  .text-warning {display: flex}
 }
 .fa, .knowmore h4 {
   color: #007BC4;

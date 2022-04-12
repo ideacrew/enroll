@@ -7,8 +7,9 @@
         <% else %>
           <h1 class="darkblue"><%= l10n("faa.eligibility_results") %></h1>
           <p><b><%= l10n("faa.we_have_your_results") %>!</b></p>
+          
           <!-- This appears if at least some (not necessarily all) applicants are medicaid eligible -->
-          <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present? %>
+          <%if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present?%>
             <div class="er-medicaid mt-20">
               <div class="er-title">
                 <h3><%= l10n("faa.medicaid") %></h3>
@@ -53,57 +54,26 @@
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <% if FinancialAssistanceRegistry.feature_enabled?(:display_eligibility_results_by_thh) %>
-                <% @application.eligibility_determinations.each_with_index do |ed, i| %>
-                  <% if household_eligible_applicants(params[:id], :is_ia_eligible, ed.id).any? && @application.eligibility_determinations.length > 1 %>
-                    <h4><%= l10n("faa.results_hh_label") %> <%= i +1 %></h4>
-                  <% end %>
-                  <% csr_73_87_or_94_applicants = csr_73_87_or_94_eligible_applicants?(params[:id]) %>
-                  <% csr_100_applicants = csr_100_eligible_applicants?(params[:id]) %>
-                  <% csr_limited_applicants = csr_limited_eligible_applicants?(params[:id]) %>
-                  <% total_aptc_amount = number_to_currency(ed.max_aptc&.to_f) %>
-                  <p><%= l10n("faa.premium_reductions_1", reduction_amount: total_aptc_amount.present? ? total_aptc_amount.to_s : "0") %></p>
-                  <% if csr_73_87_or_94_applicants.present? || csr_100_applicants.present? || csr_limited_applicants.present? %>
-                    <p class="csr-result"><%= l10n("faa.csr_73_87_or_94_results") %></p>
-                    <% if csr_100_applicants.present? %>
-                      <p class="mt-10 mb-0">
-                        <%= l10n("faa.qualify_for_lower_costs_1") %>
-                        <%= l10n("faa.qualify_for_csr_100") %>
-                      </p>
-                    <% end %>
-                    <% if csr_100_applicants.present? %>
-                      <p class="mt-10 mb-0">
-                        <%= l10n("faa.qualify_for_csr_limited") %>
-                      </p>
-                    <% end %>
-                  <% end %>
+              <% total_aptc_amount =  number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %>
+              <p><%= l10n("faa.premium_reductions_1", reduction_amount: total_aptc_amount.present? ? total_aptc_amount.to_s : "0") %></p>
 
-                  <% household_eligible_applicants(params[:id], :is_ia_eligible, ed.id).each do |applicant, csr| %>
-                    <ul class="er-prsn mt-15">
-                      <!-- make the csr labels look like CSR-73, CSR-87, CSR-94, CSR-NA0 (100), CSR-NAL (Limited) (ignore (), just reference) !-->
-                      <li><strong><%= applicant %> <% if csr > 0 %>&mdash; <%= csr %>%<% end %></strong></li>
-                    </ul>
-                  <%end%>
-                <% end %>
-                <br />
-              <% else %>
-                <% total_aptc_amount = number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %>
-                <p><%= l10n("faa.premium_reductions_1", reduction_amount: total_aptc_amount.present? ? total_aptc_amount.to_s : "0") %></p>
+              <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
+                <div class="er-prsn mt-15">
+                  <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                  <h4><%=applicant_name%></h4>
+                </div>
+              <%end%>
 
-                <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
-                  <div class="er-prsn mt-15">
-                    <i class="fa fa-user fa-2x" aria-hidden="true"></i>
-                    <h4><%=applicant_name%></h4>
-                  </div>
-                <%end%>
-
-                </br>
-              
+              </br>
 
               <%# For all eligible for 73, 87 or 94 %>
               <% csr_73_87_or_94_applicants = csr_73_87_or_94_eligible_applicants?(params[:id]) %>
               <% if csr_73_87_or_94_applicants.present? %>
-                <p class="csr-result"><%= l10n("faa.csr_73_87_or_94_results") %></p>
+                <p>
+                  These people <strong>qualify for lower <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: "out-of-pocket costs" } %></strong> including lower <%= render partial:"shared/glossary", locals: {key: "deductible", title: "annual deductibles", term: "annual deductibles"} %> and lower <%= render partial:"shared/glossary", locals: {key: "copayment", title: "Copayments", term: "copayments", punctuation: "." } %> <strong>This benefit is only available for a silver plan.</strong> To select a <%= render partial:"shared/glossary", locals: {key: "Silver_Health_Plan", title: "silver health plan", term: "silver health plan", punctuation: "," } %> look for a checkmark
+                  <i class="fa fa-check-square-o col-green" aria-hidden="true"></i>
+                  next to the plan name.
+                </p>
 
                 <% csr_73_87_or_94_applicants.each do |applicant_name| %>
                   <div class="er-prsn mt-15">
@@ -143,10 +113,10 @@
                   </div>
                 <% end %>
               <% end %>
-            <% end %>
-            <% end %>
+
             </div>
           </div>
+        <% end %>
         <!-- End ia eligible stuff -->
         <!-- Totally ineligible -->
         <%if eligible_applicants(params[:id], :is_totally_ineligible).present?%>
@@ -232,89 +202,90 @@
             </div>
           </div>
         <%end%>
-        <% end %>
-        
 
-      <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
-        @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
-        @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? &&
-        !@application.is_transferrable? %>
-        <div class="er-medicaid mt-20">
-          <div class="er-title">
-            <h3>
-              <%= l10n("other_actions") %>
-              <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
-            </h3>
-            <div class="border-bottom-2px"></div>
-          </div>
-          <div id="fa_other_actions" class="panel-collapse collapse">
-            <div class="panel-body">
-              <!-- Sub panels -->
-              <div class="panel-group" id="accordion">
-                <%= l10n(
-                  "faa.full_long_name_determination",
-                  program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
-                  program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
-                  ) %><br/>
-                <br/>
-                <div>
-                  <%# <%= link_to l10n("faa.send_to_external_verification"), applications_path, class: "btn btn-small btn-primary" %>
-                  <%= link_to l10n("faa.send_to_external_verification"), update_transfer_requested_application_url, method: :put, class: "btn btn-small btn-primary", id: "btn-request-transfer", remote: true %>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
+          @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
+          @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? &&
+          !@application.is_transferrable? %>
+          <div class="er-medicaid mt-20">
+            <div class="er-title">
+              <h3>
+                <%= l10n("other_actions") %>
+                <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
+              </h3>
+              <div class="border-bottom-2px"></div>
+            </div>
+            <div id="fa_other_actions" class="panel-collapse collapse">
+              <div class="panel-body">
+                <!-- Sub panels -->
+                <div class="panel-group" id="accordion">
+                  <%= l10n(
+                    "faa.full_long_name_determination",
+                    program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+                    program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+                    ) %><br/>
+                  <br/>
+                  <div>
+                    <%# <%= link_to l10n("faa.send_to_external_verification"), applications_path, class: "btn btn-small btn-primary" %>
+                    <%= link_to l10n("faa.send_to_external_verification"), update_transfer_requested_application_url, method: :put, class: "btn btn-small btn-primary", id: "btn-request-transfer", remote: true %>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
 
-      <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible or ineligible. It will appear for any other combination of applicant determinations. %>
-      <% all_medicaid_applicants = eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length %>
-      <% all_ineligible_applicants = eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
-      <% unless all_medicaid_applicants == true || all_ineligible_applicants == true %>
-        <div class="border-bottom-1px"></div>
-        <div class="er-medicaid mt-20">
-          <div class="er-medicaid-prsn">
-            <p>
-              <%= l10n("faa.eligibility_go_to_my_account_message") %>  
-            </p>  
-            <div class='row'>
-              <div class="col-md-8">
-              </div>
-              <div class='col-md-4'>
-                <%= link_to 'GO TO MY ACCOUNT', main_app.family_account_path, class: 'btn btn-small btn-primary', id: 'btn-continue', style: 'width: 100%;' %>
-              </div>
-            </div>
-          </div>
-        </div>
-      <% end %>
-
-      <!-- Green next step box -->
-      <% unless ((action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur")) || all_ineligible_applicants %>
-        <div class="er-medicaid mt-20">
+        <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible or ineligible. It will appear for any other combination of applicant determinations. %>
+        <% all_medicaid_applicants = eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length %>
+        <% all_ineligible_applicants = eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
+        <% unless all_medicaid_applicants == true || all_ineligible_applicants == true %>
           <div class="border-bottom-1px"></div>
-          <div class="er-success bg-success">
-            <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
-            <div class="text-success">
-              <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
-                  determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
-              <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
-                <span>
-                  <%= l10n("faa.next_step_medicaid_eligible") %>
-                </span>
-              <% else %>
-                  <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
-              <% end %>
+          <div class="er-medicaid mt-20">
+            <div class="er-medicaid-prsn">
+              <p>
+                <%= l10n("faa.eligibility_go_to_my_account_message") %>  
+              </p>  
+              <div class='row'>
+                <div class="col-md-8">
+                </div>
+                <div class='col-md-4'>
+                  <%= link_to 'GO TO MY ACCOUNT', main_app.family_account_path, class: 'btn btn-small btn-primary', id: 'btn-continue', style: 'width: 100%;' %>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
-      <!-- End Green next step box -->
+        <% end %>
 
-      <div class="er-summary mt-20">
-        <p class="mt-10"><%= l10n("faa.do_not_agree", appeal_link: EnrollRegistry[:enroll_app].setting(:appeal_link).item, find_expert_link:  EnrollRegistry[:enroll_app].setting(:find_expert_link).item) %></p>
-        <p class="mb-0"><%= l10n("faa.your_application_reference") %><b><%= @application.hbx_id %></b>.</p>
-        <br />
-        <div><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></div>
+        <!-- Green next step box -->
+        <% unless ((action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur")) || all_ineligible_applicants %>
+          <div class="er-medicaid mt-20">
+            <div class="border-bottom-1px"></div>
+            <div class="er-success bg-success">
+              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+              <div class="text-success">
+                <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
+                    determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
+                <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
+                  <span>
+                    <%= l10n("faa.next_step_medicaid_eligible") %>
+                  </span>
+                <% else %>
+                    <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <!-- End Green next step box -->
+
+        <div class="er-summary mt-20">
+          <p class="mt-10"><%= l10n("faa.do_not_agree", appeal_link: EnrollRegistry[:enroll_app].setting(:appeal_link).item, find_expert_link:  EnrollRegistry[:enroll_app].setting(:find_expert_link).item) %></p>
+          <p class="mb-0"><%= l10n("faa.your_application_reference") %><b><%= @application.hbx_id %></b>.</p>
+          <br />
+          <div><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></div>
+        </div>
+
+        <% end %>
       </div>
     </div>
 
@@ -327,5 +298,6 @@
           next_url: @person.consumer_role.present? && is_under_open_enrollment? ? group_selection_url : find_sep_url
         } %>
     </div>
+
   </div>
 </div>

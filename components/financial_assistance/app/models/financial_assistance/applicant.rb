@@ -55,6 +55,14 @@ module FinancialAssistance
     INCOME_VALIDATION_STATES = %w[na valid outstanding pending].freeze
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
     CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
+    CSR_LABELS = {
+      csr_100: "CSR-NA0",
+      csr_94: "CSR-94",
+      csr_87: "CSR-87",
+      csr_73: "CSR-73",
+      csr_0: "",
+      csr_limited: "CSR-NAL"
+    }.freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
@@ -773,6 +781,11 @@ module FinancialAssistance
       else
         CITIZEN_KINDS[citizen_status.to_sym]
       end
+    end
+
+    def format_csr
+      return "" unless csr_eligibility_kind.present?
+      CSR_LABELS[csr_eligibility_kind.to_sym]
     end
 
     def student_age_satisfied?
