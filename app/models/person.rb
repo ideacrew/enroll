@@ -267,6 +267,8 @@ class Person
     {name: "person_broker_agency_staff_role_id_search"}
   )
 
+  index({ "verification_types.validation_status" => 1 })
+
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
@@ -317,6 +319,9 @@ class Person
   scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
   scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
+
+  # People with at least one verification_type in rejected status
+  scope :rejected_verification_type, -> { where(:'verification_types.validation_status' => 'rejected') }
 
 #  ViewFunctions::Person.install_queries
 
