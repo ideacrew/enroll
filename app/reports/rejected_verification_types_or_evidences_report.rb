@@ -125,7 +125,7 @@ class RejectedVerificationTypesOrEvidencesReport < MongoidMigrationTask
   end
 
   def migrate
-    file_name = "#{Rails.root}/app/reports/rejected_verification_types_or_evidences_report.csv"
+    file_name = "#{Rails.root}/rejected_verification_types_or_evidences_report.csv"
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
       total_count = families.count

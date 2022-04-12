@@ -23,10 +23,10 @@ describe RejectedVerificationTypesOrEvidencesReport do
                                   due_on: nil, verification_outstanding: false, is_satisfied: true)
   end
 
-  let(:output_csv) { "#{Rails.root}/app/reports/rejected_verification_types_or_evidences_report.csv" }
+  let(:output_csv) { "#{Rails.root}/rejected_verification_types_or_evidences_report.csv" }
 
   after :all do
-    output_csv = "#{Rails.root}/app/reports/rejected_verification_types_or_evidences_report.csv"
+    output_csv = "#{Rails.root}/rejected_verification_types_or_evidences_report.csv"
     File.delete(output_csv) if File.exist?(output_csv)
     DatabaseCleaner.clean
   end
