@@ -2,6 +2,7 @@
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require 'csv'
+require "#{Rails.root}/app/helpers/l10n_helper.rb"
 
 # List of people with any verification_type or evidence in rejected status
 class RejectedVerificationTypesOrEvidencesReport < MongoidMigrationTask

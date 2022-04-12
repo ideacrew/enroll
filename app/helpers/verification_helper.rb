@@ -87,7 +87,7 @@ module VerificationHelper
       end
     end
 
-    aasm_states.any? { |state| Eligibilities::Evidence::OUTSTANDING_STATES.include?(state) }
+    (Eligibilities::Evidence::OUTSTANDING_STATES & aasm_states).any?
   end
 
   def verification_needed?(person)
@@ -183,6 +183,7 @@ module VerificationHelper
       admin ? "External Source".center(12) : "verified".capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     elsif status
       status = "verified" if status == "valid"
+      l10n('verification_type.validation_status') if status == 'rejected'
       status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     end
   end
