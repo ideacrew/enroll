@@ -317,7 +317,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).failure
         end
 
-        it 'should fail to drop members' dog
+        it 'should fail to drop members' do
           expect(@dropped_members).to eq 'Termination date not within the allowed range'
         end
       end
