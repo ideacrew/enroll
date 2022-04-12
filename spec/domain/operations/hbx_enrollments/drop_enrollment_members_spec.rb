@@ -308,6 +308,19 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
         end
       end
+
+      context 'when termination date is invalid' do
+        before do
+          FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment.effective_on)
+          @dropped_members = subject.call({hbx_enrollment: enrollment,
+                                           options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 2.years).to_s,
+                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).failure
+        end
+
+        it 'should fail to drop members' dog
+          expect(@dropped_members).to eq 'Termination date not within the allowed range'
+        end
+      end
     end
 
     context 'when subscriber is being dropped' do
