@@ -147,15 +147,15 @@ module Operations
 
       def valid_termination_date?(params)
         hbx_enrollment = params[:hbx_enrollment]
-        term_date = params[:options]["termination_date_#{hbx_enrollment.id}"]
+        term_date = Date.strptime(params[:options]["termination_date_#{hbx_enrollment.id}"], '%m/%d/%Y')
 
         min = (hbx_enrollment.effective_on.beginning_of_year + 1)
         max = if (hbx_enrollment.kind == "employer_sponsored") || (hbx_enrollment.kind == "employer_sponsored_cobra")
-                hbx_enrollment.sponsored_benefit_package.end_on
+                hbx_enrollment.sponsored_benefit_package.end_on.to_date
               else
                 Date.new(hbx_enrollment.effective_on.year, 12, 31)
               end
-        (min..max).include?(term_date.to_date)
+        (min..max).include?(term_date)
       end
     end
   end
