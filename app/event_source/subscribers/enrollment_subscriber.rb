@@ -38,25 +38,20 @@ module Subscribers
       enrollment = GlobalID::Locator.locate(payload[:gid])
       return if enrollment.shopping?
 
+      family = enrollment.family
+      assistance_year = enrollment.effective_on.year
+
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
-        family = enrollment.family
-        application = family.active_financial_assistance_application(enrollment.effective_on.year)
+        application = family.active_financial_assistance_application(assistance_year)
         application&.enrolled_with(enrollment)
       end
-      update_due_date_on_vlp_documents(family)
 
-      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
-        family: enrollment.family,
-        effective_date: TimeKeeper.date_of_record
-      )
+      family.update_due_dates_on_vlp_docs_and_evidences(assistance_year)
+
+      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
     end
 
     private
-
-    def update_due_date_on_vlp_documents(family)
-      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-      ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: family, due_date: TimeKeeper.date_of_record + verification_document_due.days)
-    end
 
     def pre_process_message(subscriber_logger, payload)
     #   logger.info '-' * 100 unless Rails.env.test?
