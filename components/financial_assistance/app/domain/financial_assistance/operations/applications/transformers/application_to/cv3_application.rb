@@ -213,7 +213,8 @@ module FinancialAssistance
                            non_esi_evidence: applicant&.non_esi_evidence&.serializable_hash&.deep_symbolize_keys,
                            local_mec_evidence: applicant&.local_mec_evidence&.serializable_hash&.deep_symbolize_keys,
                            mitc_relationships: mitc_relationships(applicant),
-                           mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes)}
+                           mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes),
+                           mitc_state_resident: mitc_state_resident(applicant, application.us_state)}
                 result
               end
             end
@@ -858,6 +859,15 @@ module FinancialAssistance
 
             def mitc_eligible_unearned_incomes(eligible_incomes)
               eligible_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
+            end
+
+            def mitc_state_resident(applicant, us_state)
+              home_address = applicant.home_address
+              is_homeless = applicant.is_homeless
+              return false if home_address.blank? && !is_homeless
+
+              in_state_address = home_address&.state == us_state
+              in_state_address || is_homeless || applicant.is_temporarily_out_of_state
             end
           end
         end
