@@ -58,6 +58,10 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       hbx_enrollment
     end
 
+    before :each do
+      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+    end
+
     context 'when members are selected for drop', dbclean: :around_each do
       context 'when previous enrollment has 0 applied aptc' do
         before do

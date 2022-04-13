@@ -1213,6 +1213,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     before :each do
+      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in user
     end
