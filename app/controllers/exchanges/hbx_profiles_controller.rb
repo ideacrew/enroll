@@ -481,7 +481,7 @@ def employer_poc
 
   # drop action
   def drop_enrollment_member
-    @hbxs = Family.find(params[:family]).all_enrollments.individual_market.can_terminate
+    @hbxs = Family.find(params[:family]).all_enrollments.individual_market.can_terminate.select{ |enr| enr.hbx_enrollment_members.count > 1 }
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/drop_enrollment_member" }

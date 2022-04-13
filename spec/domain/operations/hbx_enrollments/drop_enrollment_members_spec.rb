@@ -62,13 +62,13 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       context 'when previous enrollment has 0 applied aptc' do
         before do
           @dropped_members = subject.call({hbx_enrollment: enrollment,
-                                           options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
+                                           options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
         end
 
         it 'should return dropped member info' do
           expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
-          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record + 1.day
         end
 
         it 'should terminate previously existing enrollment' do
@@ -77,6 +77,24 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
         it 'should select coverage for the reinstatement' do
           expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
+        end
+      end
+
+      context 'when termination date is equal to base enrollment effective date' do
+        before do
+          @dropped_members = subject.call({hbx_enrollment: enrollment,
+                                           options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
+                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
+        end
+
+        it 'should cancel previously existing enrollment' do
+          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+          expect(enrollment.aasm_state).to eq 'coverage_canceled'
+        end
+
+        it 'member should have coverage start on as new enrollment effective on' do
+          new_enrollment = family.hbx_enrollments.where(:id.ne => enrollment.id).last
+          expect(new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [new_enrollment.effective_on]
         end
       end
 
@@ -91,6 +109,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                            aasm_state: "coverage_selected",
                                            effective_on: TimeKeeper.date_of_record,
                                            applied_aptc_amount: 200,
+                                           elected_aptc_pct: 1.0,
                                            rating_area_id: initial_application.recorded_rating_area_id,
                                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                                            sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
@@ -123,7 +142,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
         it 'should recalculate aptc for reinstated enrollment' do
           reinstatement = family.hbx_enrollments.where(:id.ne => enrollment.id).last
-          expect(reinstatement.elected_aptc_pct).to eq 1.0
+          expect(reinstatement.elected_aptc_pct).to_not eq 0.0 #Since there will be a change to coverage_start on member level to new effective date.
           expect(reinstatement.applied_aptc_amount).to_not eq 0
           expect(reinstatement.aggregate_aptc_amount).to_not eq 0
         end
