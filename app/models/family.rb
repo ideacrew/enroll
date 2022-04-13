@@ -933,6 +933,12 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def update_due_dates_on_vlp_docs_and_evidences(assistance_year)
+    verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    new_due_date = TimeKeeper.date_of_record + verification_document_due.days
+    update_verification_due_dates(assistance_year, new_due_date)
+    update_due_date_on_vlp_documents(new_due_date)
+  end
 
   class << self
 
@@ -1391,5 +1397,13 @@ private
     if e_case_id.blank?
       unset("e_case_id")
     end
+  end
+
+  def update_verification_due_dates(assistance_year, new_due_date)
+    ::Operations::Eligibilities::UpdateVerificationDueDates.new.call(family: self, assistance_year: assistance_year, due_on: new_due_date)
+  end
+
+  def update_due_date_on_vlp_documents(new_due_date)
+    ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: self, due_date: new_due_date)
   end
 end
