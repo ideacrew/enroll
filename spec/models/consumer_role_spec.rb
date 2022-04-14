@@ -1823,18 +1823,57 @@ describe 'vlp documents' do
 
   describe 'return_doc_for_deficiency' do
     let!(:consumer) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:verification_type) do
-      consumer.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
-    end
 
     before do
       consumer.consumer_role.return_doc_for_deficiency(verification_type, 'Illegible')
     end
 
-    it "should update verification_type" do
-      expect(verification_type.validation_status).to eq('rejected')
-      expect(verification_type.update_reason).to eq('Illegible')
-      expect(verification_type.rejected).to eq(true)
+    context 'for Citizenship' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
+    end
+
+    context 'for Immigration status' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: 'Immigration status', validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
+    end
+
+    context 'for Social Security Number' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: 'Social Security Number', validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
+    end
+
+    context 'for Residency' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: VerificationType::LOCATION_RESIDENCY, validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
     end
   end
 end
