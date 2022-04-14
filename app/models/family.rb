@@ -422,7 +422,7 @@ class Family
   #
   # @return [ Array<FamilyMember> ] the active members of this family
   def active_family_members
-    family_members.find_all { |family_member| family_member.is_active? }
+    family_members.where(is_active: true)
   end
 
   # Get the {FamilyMember} associated with this {Person}
