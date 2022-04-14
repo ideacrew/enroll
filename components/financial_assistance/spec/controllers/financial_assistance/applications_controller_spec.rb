@@ -122,19 +122,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(@new_application.relationships.count).to eq 6
       end
     end
-
-    context 'when application service not raises an error' do
-
-      before do
-        allow_any_instance_of(::FinancialAssistance::Services::ApplicationService).to receive(:copy!).and_raise 'error'
-        get :copy, params: { :id => application.id }
-      end
-
-      it 'redirects when ApplicationService raises an error' do
-        expect(flash[:error]).to match(/error/)
-        expect(response).to redirect_to(applications_path(tab: 'cost_savings'))
-      end
-    end
   end
 
   context 'copy with failure' do
