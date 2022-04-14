@@ -39,9 +39,10 @@ describe RejectedVerificationTypesOrEvidencesReport do
     end
 
     it 'should include details of person and verification_type in the report' do
-      expect(@csv.last[5]).to eq(person.hbx_id)
-      expect(@csv.last[6]).to eq(ver_type.type_name)
-      expect(@csv.last[7]).to eq(l10n('verification_type.validation_status'))
+      expect(@csv.last[1]).to eq(person.first_name)
+      expect(@csv.last[7]).to eq(person.hbx_id)
+      expect(@csv.last[8]).to eq(ver_type.type_name)
+      expect(@csv.last[9]).to eq(l10n('verification_type.validation_status'))
     end
   end
 
@@ -53,9 +54,9 @@ describe RejectedVerificationTypesOrEvidencesReport do
     end
 
     it 'should include details of person and evidence in the report' do
-      expect(@csv.last[5]).to eq(person.hbx_id)
-      expect(@csv.last[6]).to eq(l10n('faa.evidence_type_esi'))
-      expect(@csv.last[7]).to eq(esi_evidence.aasm_state.capitalize)
+      expect(@csv.last[7]).to eq(person.hbx_id)
+      expect(@csv.last[8]).to eq(l10n('faa.evidence_type_esi'))
+      expect(@csv.last[9]).to eq(esi_evidence.aasm_state.capitalize)
     end
   end
 
@@ -68,15 +69,15 @@ describe RejectedVerificationTypesOrEvidencesReport do
     end
 
     it 'should include details of person with both verification_type and evidence in the report' do
-      v_type_row = @csv.detect { |row| row[5] == person.hbx_id && row[6] == ver_type.type_name }
-      expect(v_type_row[5]).to eq(person.hbx_id)
-      expect(v_type_row[6]).to eq(ver_type.type_name)
-      expect(v_type_row[7]).to eq(l10n('verification_type.validation_status'))
+      v_type_row = @csv.detect { |row| row[7] == person.hbx_id && row[8] == ver_type.type_name }
+      expect(v_type_row[7]).to eq(person.hbx_id)
+      expect(v_type_row[8]).to eq(ver_type.type_name)
+      expect(v_type_row[9]).to eq(l10n('verification_type.validation_status'))
 
-      evidence_row = @csv.detect { |row| row[5] == person.hbx_id && row[6] == l10n('faa.evidence_type_esi') }
-      expect(evidence_row[5]).to eq(person.hbx_id)
-      expect(evidence_row[6]).to eq(l10n('faa.evidence_type_esi'))
-      expect(evidence_row[7]).to eq(esi_evidence.aasm_state.capitalize)
+      evidence_row = @csv.detect { |row| row[7] == person.hbx_id && row[8] == l10n('faa.evidence_type_esi') }
+      expect(evidence_row[7]).to eq(person.hbx_id)
+      expect(evidence_row[8]).to eq(l10n('faa.evidence_type_esi'))
+      expect(evidence_row[9]).to eq(esi_evidence.aasm_state.capitalize)
     end
   end
 end

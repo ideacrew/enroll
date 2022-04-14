@@ -41,7 +41,7 @@ class RejectedVerificationTypesOrEvidencesReport < MongoidMigrationTask
       "External Source"
     elsif status
       status = "verified" if status == "valid"
-      l10n('verification_type.validation_status') if status == 'rejected'
+      return l10n('verification_type.validation_status') if status == 'rejected'
       status.capitalize
     end
   end
@@ -61,8 +61,10 @@ class RejectedVerificationTypesOrEvidencesReport < MongoidMigrationTask
   def data_for_rejected_evidence(evidence, primary, application, active_enr, person)
     latest_wfst = evidence.workflow_state_transitions.order(created_at: :desc).first
     [primary.hbx_id,
+     primary.first_name,
      primary.last_name,
      primary.consumer_role&.contact_method,
+     primary.home_phone&.full_phone_number,
      primary.work_email_or_best,
      application&.hbx_id,
      person.hbx_id,
@@ -75,8 +77,10 @@ class RejectedVerificationTypesOrEvidencesReport < MongoidMigrationTask
   def data_for_rejected_v_type(v_type, primary, application, active_enr, person)
     latest_history = v_type.type_history_elements.order(created_at: :desc).first
     [primary.hbx_id,
+     primary.first_name,
      primary.last_name,
      primary.consumer_role&.contact_method,
+     primary.home_phone&.full_phone_number,
      primary.work_email_or_best,
      application&.hbx_id,
      person.hbx_id,
@@ -87,9 +91,9 @@ class RejectedVerificationTypesOrEvidencesReport < MongoidMigrationTask
   end
 
   def field_names
-    %w[PrimaryHBXID LastName CommunicationPreference PrimaryEmailAddress
-       ApplicationID MemberHBXID MemberVerificationType CurrentVerificationStatus
-       LastStatusTransition ActiveEnrollment]
+    %w[PrimaryHBXID FirstName LastName CommunicationPreference HomePhoneNumber
+       PrimaryEmailAddress ApplicationID MemberHBXID MemberVerificationType
+       CurrentVerificationStatus LastStatusTransition ActiveEnrollment]
   end
 
   def process_family_members(family, csv, primary, application, active_enr)

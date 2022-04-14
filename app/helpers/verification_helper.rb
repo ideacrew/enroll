@@ -183,7 +183,7 @@ module VerificationHelper
       admin ? "External Source".center(12) : "verified".capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     elsif status
       status = "verified" if status == "valid"
-      l10n('verification_type.validation_status') if status == 'rejected'
+      status = l10n('verification_type.validation_status') if status == 'rejected'
       status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     end
   end
