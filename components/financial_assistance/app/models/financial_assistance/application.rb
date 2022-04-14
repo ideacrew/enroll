@@ -344,6 +344,12 @@ module FinancialAssistance
 
     index({"applicants.evidences.eligibility_status" => 1})
 
+    # Applicant evidences
+    index({ "applicants.income_evidence.aasm_state" => 1 })
+    index({ "applicants.esi_evidence.aasm_state" => 1 })
+    index({ "applicants.non_esi_evidence.aasm_state" => 1 })
+    index({ "applicants.local_mec_evidence.aasm_state" => 1 })
+
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
     scope :closed, ->{ any_in(aasm_state: CLOSED_STATUSES) }
@@ -352,8 +358,19 @@ module FinancialAssistance
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
+
     # Applications that are in submitted and after submission states. Non work in progress applications.
-    scope :submitted_and_after, -> { where(:aasm_state.in => ['submitted', 'determination_response_error', 'determined']) }
+    scope :submitted_and_after, lambda {
+      where(
+        :aasm_state.in => ['submitted',
+                           'mitc_magi_medicaid_eligibility_request_errored',
+                           'haven_magi_medicaid_eligibility_request_errored',
+                           'determination_response_error',
+                           'determined',
+                           'imported']
+      )
+    }
+
     scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
