@@ -984,15 +984,13 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(current_evidence.verification_outstanding).to be_truthy
         end
 
-        it 'should set due_on, is_satisfied and verification_outstanding' do
+        it 'should set is_satisfied and verification_outstanding' do
           expect(current_evidence.verification_outstanding).to be_falsey
           expect(current_evidence.is_satisfied).to be_truthy
-          expect(current_evidence.due_on).not_to be_present
           applicant.set_evidence_outstanding(current_evidence)
           current_evidence.reload
           expect(current_evidence.verification_outstanding).to be_truthy
           expect(current_evidence.is_satisfied).to be_falsey
-          expect(current_evidence.due_on).to be_present
         end
       end
 
@@ -1011,15 +1009,13 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(current_evidence.verification_outstanding).to be_truthy
         end
 
-        it 'should set due_on, is_satisfied and verification_outstanding' do
+        it 'should set is_satisfied and verification_outstanding' do
           expect(current_evidence.verification_outstanding).to be_falsey
           expect(current_evidence.is_satisfied).to be_truthy
-          expect(current_evidence.due_on).not_to be_present
           applicant.set_evidence_outstanding(current_evidence)
           current_evidence.reload
           expect(current_evidence.verification_outstanding).to be_truthy
           expect(current_evidence.is_satisfied).to be_falsey
-          expect(current_evidence.due_on).to be_present
         end
       end
     end

@@ -372,6 +372,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should not return nil for is_vets_spouse_or_child' do
         expect(@applicant[:demographic][:is_vets_spouse_or_child]).not_to be_nil
       end
+
+      it 'should not return nil for mitc_state_resident' do
+        expect(@applicant[:mitc_state_resident]).not_to be_nil
+      end
     end
 
     context 'mitc_income' do
@@ -1742,6 +1746,62 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'should check FinancialAssistanceRegistry for indian_alaskan_tribe_details feature' do
       expect(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
       result
+    end
+  end
+
+  describe '#mitc_state_resident' do
+    let(:in_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
+    let(:out_of_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Metropolis', state: 'OS', zip: '12345' } }
+
+    context 'applicant home address state matches the application state' do
+      before do
+        applicant.addresses.create!(in_state_address_params)
+        applicant.save!
+        result = subject.call(application)
+        @applicant = result.success[:applicants].first
+      end
+
+      it 'should return true' do
+        expect(@applicant[:mitc_state_resident]).to eq true
+      end
+    end
+
+    context 'applicant is homeless' do
+      before do
+        applicant.update!(is_homeless: true)
+        result = subject.call(application)
+        @applicant = result.success[:applicants].first
+      end
+
+      it 'should return true' do
+        expect(@applicant[:mitc_state_resident]).to eq true
+      end
+    end
+
+    context 'applicant is living out of state temporarily' do
+      before do
+        applicant.addresses.create!(out_of_state_address_params)
+        applicant.update!(is_temporarily_out_of_state: true)
+        result = subject.call(application)
+        @applicant = result.success[:applicants].first
+      end
+
+      it 'should return true' do
+        expect(@applicant[:mitc_state_resident]).to eq true
+      end
+    end
+
+    context 'applicant lives outside of state permanently' do
+      before do
+        applicant.addresses.create!(out_of_state_address_params)
+        applicant.save!
+        result = subject.call(application)
+        @applicant = result.success[:applicants].first
+      end
+
+      it 'should return false' do
+        expect(@applicant[:mitc_state_resident]).to eq false
+      end
     end
   end
 end

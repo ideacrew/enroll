@@ -1056,6 +1056,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
           EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
 
         end
@@ -1087,6 +1088,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
         end
 
         it "should cancel the enrollment" do
@@ -4510,6 +4512,7 @@ describe "#select_coverage event for shop", dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
       census_employee.benefit_group_assignments << expired_bga
       census_employee.benefit_group_assignments << active_bga
       census_employee.save
@@ -4782,8 +4785,8 @@ describe ".parent enrollments", dbclean: :around_each do
         expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
       end
 
-      it 'should return latest_transition_at' do
-        expect(hbx_enrollment12.latest_transition_at).not_to be_nil
+      it 'should return latest_wfst' do
+        expect(hbx_enrollment12.latest_wfst).to be_a(::WorkflowStateTransition)
       end
     end
   end

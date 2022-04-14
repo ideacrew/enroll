@@ -83,10 +83,13 @@ module VerificationHelper
   end
 
   def is_unverified_evidences?(person)
+    return false if person.primary_family.enrollments.enrolled_and_renewal.blank?
     application = FinancialAssistance::Application.where(family_id: person.primary_family.id).determined.order_by(:created_at => 'desc').first
     aasm_states = []
     application&.active_applicants&.each do |applicant|
+      next unless applicant.is_applying_coverage
       FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+        next if evidence_type == :income_evidence && applicant.incomes.blank?
         evidence = applicant.send(evidence_type)
         aasm_states << evidence.aasm_state if evidence.present?
       end

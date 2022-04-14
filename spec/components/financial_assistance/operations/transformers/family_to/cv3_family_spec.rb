@@ -461,7 +461,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
               :applicants => [
                 {
                   :addresses => [],
-                  :age_of_applicant => 49,
+                  :age_of_applicant => primary_applicant.age_on(DateTime.now),
                   :attestation => {
                     :is_incarcerated => false,
                     :is_self_attested_blind => false,
@@ -585,6 +585,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   },
                   :mitc_is_required_to_file_taxes => false,
                   :mitc_relationships => [],
+                  mitc_state_resident: false,
                   :moved_on_or_after_welfare_reformed_law => false,
                   :name => {:first_name => nil, :last_name => nil, :middle_name => nil, :name_pfx => nil, :name_sfx => nil},
                   :native_american_information => {:indian_tribe_member => nil, :tribal_id => nil},
@@ -613,7 +614,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 },
                 {
                   :addresses => [],
-                  :age_of_applicant => 49,
+                  :age_of_applicant => primary_applicant.age_on(DateTime.now),
                   :attestation => {
                     :is_incarcerated => false,
                     :is_self_attested_blind => false,
@@ -734,6 +735,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   },
                   :mitc_is_required_to_file_taxes => false,
                   :mitc_relationships => [],
+                  mitc_state_resident: false,
                   :moved_on_or_after_welfare_reformed_law => false,
                   :name => {:first_name => nil, :last_name => nil, :middle_name => nil, :name_pfx => nil, :name_sfx => nil},
                   :native_american_information => {:indian_tribe_member => nil, :tribal_id => nil},
@@ -758,7 +760,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                 },
                 {
                   :addresses => [],
-                  :age_of_applicant => 49,
+                  :age_of_applicant => primary_applicant.age_on(DateTime.now),
                   :attestation => {
                     :is_incarcerated => false,
                     :is_self_attested_blind => false,
@@ -879,6 +881,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   },
                   :mitc_is_required_to_file_taxes => false,
                   :mitc_relationships => [],
+                  mitc_state_resident: false,
                   :moved_on_or_after_welfare_reformed_law => false,
                   :name => {
                     :first_name => nil,

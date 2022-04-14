@@ -76,31 +76,19 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   end
 
   context 'failure' do
-    context 'with counties not matching those present in database' do
-      before do
-        record = serializer.parse(xml)
-        transformed = transformer.transform(record.to_hash(identifier: true))
-        @result = subject.call(transformed)
-      end
+    context 'with no counties loaded in database' do
+      context 'with all addressess missing counties' do
+        before do
+          missing_counties_xml = Nokogiri::XML(xml)
+          missing_counties_xml.xpath("//ns3:LocationCountyName", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).remove
+          record = serializer.parse(missing_counties_xml)
+          transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
+          @result = subject.call(transformed)
+        end
 
-      it 'should return failure if no zips are present' do
-        expect(@result).to eq(Failure("Unable to find county objects for zips [\"04330\"]"))
-      end
-    end
-
-    context 'with zip code matching multiple counties' do
-      before do
-        ::BenefitMarkets::Locations::CountyZip.create(zip: "04930", state: "ME", county_name: "Somerset")
-        ::BenefitMarkets::Locations::CountyZip.create(zip: "04930", state: "ME", county_name: "Somerset")
-        duplicate_zip_counties_xml = Nokogiri::XML(xml)
-        duplicate_zip_counties_xml.xpath("//ns3:LocationPostalCode", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).each {|node| node.content = "04930"}
-        record = serializer.parse(duplicate_zip_counties_xml)
-        transformed = transformer.transform(record.to_hash(identifier: true))
-        @result = subject.call(transformed)
-      end
-
-      it 'should return success' do
-        expect(@result.success?).to eq true
+        it 'should return failure' do
+          expect(@result).to eq(Failure("Unable to find county objects for zips [\"04330\"]"))
+        end
       end
     end
   end
@@ -114,26 +102,43 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       @transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
     end
 
-    it 'should load missing county name if zip matches exactly one county in database' do
-      county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
-      expect(county_name).to eq(nil)
+    context 'zip matches exactly one county in database' do
+      before do
+        person_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
+        applicant_county_name = @transformed["family"]["magi_medicaid_applications"].first["applicants"].first["addresses"].first["county"]
+        expect(person_county_name).to eq(nil)
+        expect(applicant_county_name).to eq(nil)
+        subject.load_missing_county_names(@transformed)
+      end
 
-      subject.load_missing_county_names(@transformed)
-      loaded_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
-      expect(loaded_county_name).to eq("Kennebec")
+      it 'should load missing county name for person addresses' do
+        loaded_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
+        expect(loaded_county_name).to eq("Kennebec")
+      end
+
+      it 'should load missing county name for applicant addresses' do
+        loaded_county_name = @transformed["family"]["magi_medicaid_applications"].first["applicants"].first["addresses"].first["county"]
+        expect(loaded_county_name).to eq("Kennebec")
+      end
     end
 
     context 'when matches more than one county' do
       before do
         ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
+        person_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
+        applicant_county_name = @transformed["family"]["magi_medicaid_applications"].first["applicants"].first["addresses"].first["county"]
+        expect(person_county_name).to eq(nil)
+        expect(applicant_county_name).to eq(nil)
+        subject.load_missing_county_names(@transformed)
       end
 
-      it 'should load missing county name' do
-        county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
-        expect(county_name).to eq(nil)
-
-        subject.load_missing_county_names(@transformed)
+      it 'should load missing county name for person addresses' do
         loaded_county_name = @transformed["family"]["family_members"].first["person"]["addresses"].first["county"]
+        expect(loaded_county_name).to eq("Kennebec")
+      end
+
+      it 'should load missing county name for applicant addresses' do
+        loaded_county_name = @transformed["family"]["magi_medicaid_applications"].first["applicants"].first["addresses"].first["county"]
         expect(loaded_county_name).to eq("Kennebec")
       end
     end

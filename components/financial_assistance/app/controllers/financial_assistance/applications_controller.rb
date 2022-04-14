@@ -103,6 +103,9 @@ module FinancialAssistance
         flash[:error] = copy_result.failure
         redirect_to applications_path
       end
+    rescue StandardError => e
+      flash[:error] = "#{l10n('exchange.error')} - #{e}"
+      redirect_to applications_path(tab: 'cost_savings')
     end
 
     def help_paying_coverage; end
