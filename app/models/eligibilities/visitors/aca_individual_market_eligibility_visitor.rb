@@ -20,7 +20,7 @@ module Eligibilities
           evidence_gid: verification_type.to_global_id.uri
         }
 
-        outstanding_statuses = %w[unverified outstanding review]
+        outstanding_statuses = %w[unverified outstanding review rejected]
 
         if outstanding_statuses.include?(verification_type.validation_status)
           evidence_state_attributes[:is_satisfied] = false
