@@ -106,22 +106,21 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
     end
   end
 
-  context 'when verification type is in unverified' do
-
+  shared_examples_for 'outstanding verification type' do |status|
     let(:evidence_item) { eligibility_item.evidence_items.detect{|evidence_item| evidence_item.key == 'citizenship'} }
     let(:due_on) { TimeKeeper.date_of_record }
 
     before do
       person1.verification_types.each do |verification_type|
         if verification_type.type_name == "Citizenship"
-          verification_type.validation_status = 'unverified'
+          verification_type.validation_status = status
           verification_type.due_date = due_on
         end
         verification_type.save!
       end
     end
 
-    it 'should set verification outstanding false' do
+    it "should set verification outstanding true when verification status is #{status}" do
       subject.call
       expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
       evidence = subject.evidence[evidence_item.key.to_sym]
@@ -131,4 +130,8 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
       expect(evidence[:due_on]).to eq due_on
     end
   end
+
+  it_behaves_like 'outstanding verification type', 'unverified'
+  it_behaves_like 'outstanding verification type', 'outstanding'
+  it_behaves_like 'outstanding verification type', 'rejected'
 end
