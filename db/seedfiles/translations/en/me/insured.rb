@@ -106,6 +106,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.document_due_date' => "Document Due Date",
   :'en.past_due' => "Past Due",
   :'en.verification_type' => "Verification Type",
+  :'en.verification_type.validation_status' => 'Rejected',
   :'en.status' => "Status",
   :'en.documents' => "Documents",
   :'en.insured.families.verification.complete_verification_for_enrollment' => "Complete Verification for Enrollment",
