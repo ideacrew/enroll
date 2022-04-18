@@ -71,11 +71,6 @@ module Operations
         end
       end
 
-      def remove_dropped_enr_members(new_enrollment, non_eligible_members)
-        ineligible_applicant_ids = non_eligible_members.pluck(:applicant_id)
-        new_enrollment.hbx_enrollment_members.where(:applicant_id.in => ineligible_applicant_ids).delete
-      end
-
       def terminate_base_enrollment(base_enrollment, new_enrollment, termination_date)
         if base_enrollment.may_terminate_coverage? && (new_enrollment.effective_on > base_enrollment.effective_on)
           base_enrollment.terminate_coverage!
