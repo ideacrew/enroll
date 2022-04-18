@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 8d0597b98503b557aeef5074d01e95bf1c20c064
+  revision: 21b07fb9642d40d14dc3b1acd189240c6e4de162
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -169,7 +169,7 @@ GEM
     coderay (1.1.3)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
-    concurrent-ruby (1.1.9)
+    concurrent-ruby (1.1.10)
     config (2.2.1)
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
