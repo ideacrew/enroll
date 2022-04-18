@@ -107,7 +107,7 @@ class PlanSelection
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
 
         if matched
-          member.coverage_start_on = [matched.coverage_start_on, existing_coverage.effective_on, hbx_enrollment.effective_on].min
+          member.coverage_start_on = matched.coverage_start_on || existing_coverage.effective_on
         end
       end
     end
