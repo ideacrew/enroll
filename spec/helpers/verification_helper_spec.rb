@@ -24,14 +24,15 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:types) { ['Identity', 'Application'] }
     shared_examples_for 'ridp type status' do |current_state, ridp_type, uploaded_doc, status|
       before do
-        uploaded_doc ? person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => ridp_type) : person.consumer_role.ridp_documents = []
-        if current_state == "valid"
-          person.consumer_role.identity_validation = "valid"
-          person.consumer_role.application_validation = "valid"
-        else
-          person.consumer_role.identity_validation = "outstanding"
-          person.consumer_role.application_validation = "outstanding"
-        end
+        consumer_role = person.consumer_role
+        uploaded_doc ? consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => ridp_type) : consumer_role.ridp_documents = []
+        is_rejected = current_state == 'rejected'
+        consumer_role.assign_attributes(
+          identity_validation: current_state,
+          application_validation: current_state,
+          identity_rejected: is_rejected,
+          application_rejected: is_rejected
+        )
       end
       it "returns #{status} status for #{ridp_type} #{uploaded_doc ? 'with uploaded doc' : 'without uploaded docs'}" do
         expect(helper.ridp_type_status(ridp_type, person)).to eq status
@@ -41,9 +42,13 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like 'ridp type status', 'outstanding', 'Identity', false, 'outstanding'
       it_behaves_like 'ridp type status', 'valid', 'Identity', false, 'valid'
       it_behaves_like 'ridp type status', 'outstanding', 'Identity', true, 'in review'
+      it_behaves_like 'ridp type status', 'rejected', 'Identity', true, 'rejected'
+      it_behaves_like 'ridp type status', 'rejected', 'Identity', false, 'rejected'
       it_behaves_like 'ridp type status', 'outstanding', 'Application', false, 'outstanding'
       it_behaves_like 'ridp type status', 'valid', 'Application', false, 'valid'
       it_behaves_like 'ridp type status', 'outstanding', 'Application', true, 'in review'
+      it_behaves_like 'ridp type status', 'rejected', 'Application', true, 'rejected'
+      it_behaves_like 'ridp type status', 'rejected', 'Application', false, 'rejected'
     end
   end
 
