@@ -540,6 +540,26 @@ describe Person, :dbclean => :after_each do
           expect(person.has_multiple_roles?).to eq false
         end
       end
+
+      context '.outstanding_identity_validation' do
+        ::ConsumerRole::IDENTITY_VALIDATION_STATES.each do |status|
+          let!("role_with_#{status}_identity") { FactoryBot.create(:consumer_role, identity_validation: status, person: FactoryBot.build(:person)) }
+        end
+
+        it 'should return rejected & pending records' do
+          expect(Person.outstanding_identity_validation.map(&:id).sort).to eq([role_with_rejected_identity.person.id, role_with_pending_identity.person.id].sort)
+        end
+      end
+
+      context '.outstanding_application_validation' do
+        ::ConsumerRole::IDENTITY_VALIDATION_STATES.each do |status|
+          let!("role_with_#{status}_application") { FactoryBot.create(:consumer_role, application_validation: status, person: FactoryBot.build(:person)) }
+        end
+
+        it 'should return rejected & pending records' do
+          expect(Person.outstanding_application_validation.map(&:id).sort).to eq([role_with_rejected_application.person.id, role_with_pending_application.person.id].sort)
+        end
+      end
     end
   end
 
