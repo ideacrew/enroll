@@ -43,14 +43,18 @@ module ClientReporting
             fields["Indian Tribe Member"] = applicant.indian_tribe_member
             fields["Applying for Coverage"] = applicant.is_applying_coverage
             fields["Temporarily Out of State"] = applicant.is_temporarily_out_of_state
-            fields = fields.merge(extract_home_address(applicant))
-            fields = fields.merge(extract_mailing_address(applicant))
             fields["Relationship"] = resolve_relationship(primary_applicant, applicant)
+            fields = extract_address_information(fields)
             result_fields << fields
           end
           result_fields
         end
         # rubocop:enable Style/EmptyLiteral
+
+        def extract_address_information(fields, applicant)
+          include_home_address = fields.merge(extract_home_address(applicant))
+          include_home_address.merge(extract_mailing_address(applicant))
+        end
 
         def extract_home_address(applicant)
           fields = {}
