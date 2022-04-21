@@ -4,7 +4,6 @@ module FinancialAssistance
   module Validators
     class AddressContract < Dry::Validation::Contract
 
-
       params do
         required(:kind).filled(:string)
         required(:address_1).filled(:string)
@@ -15,6 +14,7 @@ module FinancialAssistance
         required(:state).filled(:string)
         required(:zip).filled(:string)
         optional(:country_name).maybe(:string)
+        optional(:quadrant).maybe(:string)
       end
     end
   end

@@ -1861,4 +1861,54 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
   end
+
+  describe 'build_new_relationship' do
+    context 'no relationship' do
+      before do
+        application.relationships.where({ applicant_id: applicant1&.id, relative_id: applicant2&.id }).count
+        application.build_new_relationship(applicant1, 'spouse', applicant2)
+        application.save!
+      end
+
+      it 'should create new relationship' do
+        expect(
+          application.relationships.where({ applicant_id: applicant1&.id, relative_id: applicant2&.id }).first.kind
+        ).to eq('spouse')
+      end
+    end
+
+    context 'with matching relationship' do
+      before do
+        application.relationships.create!({ applicant_id: applicant1&.id, kind: 'spouse', relative_id: applicant2&.id })
+        application.build_new_relationship(applicant1, 'spouse', applicant2)
+        application.save!
+      end
+
+      it 'should not create new relationship' do
+        expect(
+          application.relationships.where({ applicant_id: applicant1&.id, kind: 'spouse', relative_id: applicant2&.id }).count
+        ).to eq(1)
+      end
+    end
+
+    context 'relationship with different relationship kind' do
+      before do
+        application.relationships.create!({ applicant_id: applicant1&.id, kind: 'parent', relative_id: applicant2&.id })
+        application.build_new_relationship(applicant1, 'spouse', applicant2)
+        application.save!
+      end
+
+      it 'should not create new relationships' do
+        expect(
+          application.relationships.where({ applicant_id: applicant1&.id, relative_id: applicant2&.id }).count
+        ).to eq(1)
+      end
+
+      it 'should update existing relationship' do
+        expect(
+          application.relationships.where({ applicant_id: applicant1&.id, relative_id: applicant2&.id }).first.kind
+        ).to eq('spouse')
+      end
+    end
+  end
 end

@@ -113,9 +113,9 @@ module FinancialAssistance
 
     field :has_mec_check_response, type: Boolean, default: false
 
-    embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
-    embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
-    embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
+    embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination', cascade_callbacks: true, validate: true
+    embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship', cascade_callbacks: true, validate: true
+    embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant', cascade_callbacks: true, validate: true
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
@@ -394,6 +394,7 @@ module FinancialAssistance
 
     def update_or_build_relationship(applicant, relative, relation_kind)
       return if applicant.blank? || relative.blank? || relation_kind.blank?
+      return if applicant == relative
 
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?
@@ -543,6 +544,8 @@ module FinancialAssistance
         log(eligibility_response_payload, {:severity => 'critical', :error_message => "send_determination_to_ea ERROR: #{result.failure}"})
       end
     rescue StandardError => e
+      log(eligibility_response_payload, { severity: 'critical',
+                                          error_message: "send_determination_to_ea ERROR: #{e.message}, backtrace: #{e.backtrace.join('\n')}" })
       Rails.logger.error { "FAA send_determination_to_ea error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
@@ -860,24 +863,6 @@ module FinancialAssistance
         transitions from: :draft, to: :imported
       end
     end
-
-    # def applicant
-    #   return nil unless tax_household_member
-    #   tax_household_member.family_member
-    # end
-
-    # The following methods will need to be refactored as there are multiple eligibility determinations - per THH
-    # def eligibility_determination=(ed_instance)
-    #   return unless ed_instance.is_a? EligibilityDetermination
-    #   self.eligibility_determination_id = ed_instance._id
-    #   @eligibility_determination = ed_instance
-    # end
-
-    # def eligibility_determination
-    #   return nil unless tax_household_member
-    #   return @eligibility_determination if defined? @eligibility_determination
-    #   @eligibility_determination = tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
-    # end
 
     # Evaluate if receiving Alternative Benefits this year
     def is_receiving_benefit?
@@ -1311,6 +1296,22 @@ module FinancialAssistance
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
         applicant.save!
       end
+    end
+
+    def build_new_relationship(applicant, rel_kind, relative)
+      rel_params = { applicant_id: applicant&.id, kind: rel_kind, relative_id: relative&.id }
+      return if rel_params.values.include?(nil) || applicant&.id == relative&.id
+
+      relationship = relationships.where({ applicant_id: applicant&.id, relative_id: relative&.id }).first
+      if relationship.present?
+        relationship.kind = rel_kind
+      elsif relationships.where(rel_params).blank?
+        relationships.build(rel_params)
+      end
+    end
+
+    def build_new_applicant(applicant_params)
+      applicants.build(applicant_params)
     end
 
     private
