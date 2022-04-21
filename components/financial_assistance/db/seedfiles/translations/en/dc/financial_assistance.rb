@@ -155,6 +155,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
   "en.faa.errors.missing_relationships" => "You must have a complete set of relationships defined among every member.",
   "en.faa.errors.extra_relationship" => "Extra relationship exist without an applicant.",
+  "en.faa.errors.invalid_application" => "Unable to create new application because of some validation errors.",
+  "en.faa.errors.copy_application_error" => "Unable to copy given application.",
+  "en.faa.errors.key_application_id_missing_error" => 'Missing application_id key.',
+  "en.faa.errors.unable_to_find_application_error" => 'Unable to find application with given application_id.',
+  "en.faa.errors.given_application_is_not_submitted_error" => 'Unable to find application with given application_id.',
   "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members."
 }.freeze
 # rubocop:enable Layout/LineLength

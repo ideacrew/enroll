@@ -124,4 +124,25 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
       end
     end
   end
+
+  describe 'applicant/relative/propagate_applicant' do
+    before do
+      @second_application = FactoryBot.build(:application, family_id: bson_id)
+      second_applicant1 = FactoryBot.build(:applicant, application: @second_application, family_member_id: bson_id, is_primary_applicant: true)
+      second_applicant2 = FactoryBot.build(:applicant, application: @second_application, family_member_id: bson_id)
+      @second_application.relationships.build({ applicant_id: second_applicant1.id, kind: 'spouse', relative_id: second_applicant2.id })
+    end
+
+    it 'should not raise NoMethodError' do
+      expect{ @second_application.save! }.not_to raise_error(NoMethodError)
+    end
+
+    it 'should return applicant' do
+      expect(@second_application.relationships.first.applicant).to be_a(::FinancialAssistance::Applicant)
+    end
+
+    it 'should return relative' do
+      expect(@second_application.relationships.first.relative).to be_a(::FinancialAssistance::Applicant)
+    end
+  end
 end
