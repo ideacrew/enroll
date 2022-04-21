@@ -77,9 +77,9 @@ module FinancialAssistance
           # In our context we want to create new application from the existing application
           # that is sent from this Operation.
           Try() do
-            ::FinancialAssistance::Factories::ApplicationFactory.new(application)
+            ::FinancialAssistance::Operations::Applications::Copy.new
           end.bind do |renewal_application_factory|
-            renewal_application = renewal_application_factory.create_application
+            renewal_application = renewal_application_factory.call(application_id: application.id).success
             family_members_changed = renewal_application_factory.family_members_changed
             calculated_renewal_base_year = calculate_renewal_base_year(application)
 
@@ -89,6 +89,7 @@ module FinancialAssistance
               years_to_renew: application.years_to_renew || 0,
               renewal_base_year: calculated_renewal_base_year,
               predecessor_id: application.id,
+              full_medicaid_determination: application.full_medicaid_determination,
               effective_date: Date.new(validated_params[:renewal_year])
             )
 

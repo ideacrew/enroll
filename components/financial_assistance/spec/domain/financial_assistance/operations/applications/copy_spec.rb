@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model, dbclean: :after_each do
+RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model, dbclean: :after_each do
 
   before :all do
     DatabaseCleaner.clean
@@ -43,15 +43,21 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
   end
 
   context 'duplicate' do
-
     context 'Should create relationships if there are no relationship for application and relationships present to primary person' do
       before do
-        factory = described_class.new(application)
-        @duplicate_application = factory.create_application
+        @relationships = subject.call(application_id: application.id).success.relationships
       end
 
       it 'Should return true to match the relative and applicant ids for relationships' do
-        expect(@duplicate_application.relationships.count).to eq 2
+        expect(@relationships.count).to eq 2
+      end
+
+      it 'should return created_at timestamps for both relationships' do
+        expect(@relationships.pluck(:created_at)).not_to include(nil)
+      end
+
+      it 'should return updated_at timestamps for both relationships' do
+        expect(@relationships.pluck(:updated_at)).not_to include(nil)
       end
     end
 
@@ -60,12 +66,87 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: "child")
         application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant.id, relative_id: applicant2.id, kind: "parent")
         application.save!
-        factory = described_class.new(application)
-        @duplicate_application = factory.create_application
+        @copy_operation = subject
+        @duplicate_application = @copy_operation.call(application_id: application.id).success
       end
 
       it 'Should return true to match the relative and applicant ids for relationships' do
         expect(@duplicate_application.relationships.pluck(:relative_id)).to eq @duplicate_application.applicants.pluck(:id)
+      end
+
+      it 'should return created_at timestamps for both relationships' do
+        expect(@duplicate_application.relationships.pluck(:created_at)).not_to include(nil)
+      end
+
+      it 'should set attribute_reader to true' do
+        expect(@copy_operation.relationships_changed).to eq(true)
+      end
+    end
+
+    # 3 member application with 6 relationships
+    context 'should create all relationships (number_of_applicants * (number_of_applicants - 1))' do
+      let!(:person3) do
+        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
+        person1.ensure_relationship_with(per, 'child')
+        person1.save!
+        per
+      end
+      let!(:family_member_3) { FactoryBot.create(:family_member, person: person3, family: family)}
+
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: person3.dob,
+                          family_member_id: family_member_3.id,
+                          person_hbx_id: person3.hbx_id)
+      end
+
+      let(:create_relationships) do
+        application.build_new_relationship(applicant2, 'spouse', applicant)
+        application.build_new_relationship(applicant, 'spouse', applicant2)
+        application.build_new_relationship(applicant, 'parent', applicant3)
+        application.build_new_relationship(applicant3, 'child', applicant)
+        application.build_new_relationship(applicant2, 'parent', applicant3)
+        application.build_new_relationship(applicant3, 'child', applicant2)
+        application.save!
+      end
+
+      before do
+        create_relationships
+        @duplicate_application = subject.call(application_id: application.id).success
+      end
+
+      it "should return (number_of_applicants * (number_of_applicants - 1)) relationships" do
+        number_of_applicants = @duplicate_application.applicants.count
+        expect(@duplicate_application.relationships.count).to eq(number_of_applicants * (number_of_applicants - 1))
+      end
+
+      it 'should return created_at timestamps for both relationships' do
+        expect(@duplicate_application.relationships.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
+    context 'relationships unchanged with some duplicates' do
+      before do
+        application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: 'spouse')
+        application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant2.id, relative_id: applicant.id, kind: 'spouse')
+        application.relationships << FinancialAssistance::Relationship.new(applicant_id: applicant.id, relative_id: applicant2.id, kind: 'spouse')
+        application.save!
+        @copied_application = subject.call(application_id: application.id).success
+      end
+
+      it 'should only return 2 relationships' do
+        expect(@copied_application.relationships.count).to eq 2
+      end
+
+      it 'should return valid relationships only' do
+        expect(
+          @copied_application.relationships.reject{ |rel| rel.applicant_id == rel.relative_id }.count
+        ).to eq(2)
+      end
+
+      it 'should return created_at timestamps for both relationships' do
+        expect(@copied_application.relationships.pluck(:created_at)).not_to include(nil)
       end
     end
 
@@ -83,8 +164,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
         before do
           application.update_attributes!(mocked_params)
-          factory = described_class.new(application)
-          @duplicate_application = factory.create_application
+          @duplicate_application = subject.call(application_id: application.id).success
         end
 
         it 'should not copy determination_http_status_code' do
@@ -138,8 +218,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
         before do
           application.update_attributes!(mocked_params)
-          factory = described_class.new(application)
-          @duplicate_application = factory.create_application
+          @duplicate_application = subject.call(application_id: application.id).success
         end
 
         it 'should not copy predecessor_id' do
@@ -172,9 +251,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
         before do
           applicant.update_attributes!(mocked_params)
-          factory = described_class.new(application)
-          duplicate_application = factory.create_application
-          @duplicate_applicant = duplicate_application.applicants.first
+          @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
         it 'should not copy medicaid_household_size' do
@@ -228,6 +305,10 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         it 'should not copy csr_eligibility_kind' do
           expect(@duplicate_applicant.csr_eligibility_kind).not_to eq(mocked_params[:csr_eligibility_kind])
         end
+
+        it 'should return created_at timestamp for applicant' do
+          expect(@duplicate_applicant.created_at).not_to be_nil
+        end
       end
 
       context 'for net_annual_income' do
@@ -235,27 +316,15 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
         before do
           applicant.update_attributes!(mocked_params)
-          factory = described_class.new(application)
-          duplicate_application = factory.create_application
-          @duplicate_applicant = duplicate_application.applicants.first
+          @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
         it 'should not copy net_annual_income' do
           expect(@duplicate_applicant.net_annual_income).to be_nil
         end
-      end
 
-      context 'for applicant esi evidence' do
-        before do
-          applicant.build_esi_evidence(key: :esi, title: "ESI MEC")
-          applicant.save!
-          factory = described_class.new(application)
-          duplicate_application = factory.create_application
-          @duplicate_applicant = duplicate_application.applicants.first
-        end
-
-        it 'should not have esi evidence' do
-          expect(@duplicate_applicant.esi_evidence).to eq nil
+        it 'should return created_at timestamp for applicant' do
+          expect(@duplicate_applicant.created_at).not_to be_nil
         end
       end
 
@@ -264,9 +333,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
         before do
           applicant.update_attributes!(mocked_params)
-          factory = described_class.new(application)
-          duplicate_application = factory.create_application
-          @duplicate_applicant = duplicate_application.applicants.first
+          @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
         it 'should not copy claimed_as_tax_dependent_by' do
@@ -288,11 +355,15 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
     before do
       application.update_attributes!(family_id: family11.id)
       applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
-      @new_application = described_class.new(application).create_application
+      @new_application = subject.call(application_id: application.id).success
     end
 
     it 'should return application with one applicant' do
       expect(@new_application.applicants.count).to eq(1)
+    end
+
+    it 'should return created_at for newly created applicant' do
+      expect(@new_application.applicants.first.created_at).not_to be_nil
     end
   end
 
@@ -309,7 +380,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
       application.update_attributes!(family_id: family11.id)
       applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
       applicant2.update_attributes!(is_active: false)
-      @new_application = described_class.new(application).create_application
+      @new_application = subject.call(application_id: application.id).success
     end
 
     it 'should return application with one applicant' do
@@ -349,7 +420,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
       before do
         applicant.update_attributes!(person_hbx_id: '10001', first_name: 'Test', last_name: 'Last', dob: TimeKeeper.date_of_record - 40.years)
-        @applicant_result = described_class.new(application).send(:fetch_matching_applicant, new_application, applicant)
+        @applicant_result = subject.send(:fetch_matching_applicant, new_application, applicant)
       end
 
       it 'should return applicant that matches with the person_hbx_id' do
@@ -381,7 +452,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         application.update_attributes!(family_id: family11.id)
         applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
         applicant2.destroy!
-        @new_application = described_class.new(application).create_application
+        @new_application = subject.call(application_id: application.id).success
       end
 
       it 'should return relationships' do
@@ -433,12 +504,11 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         let!(:family_member_13) { FactoryBot.create(:family_member, person: person_13, family: family_11)}
 
         before do
-          @new_application_factory = described_class.new(application_11)
+          @new_application_factory = subject
+          @new_application_factory.call(application_id: application_11.id)
         end
 
         it 'should set family_members_changed to true on factory' do
-          expect(@new_application_factory.family_members_changed).to eq false
-          @new_application_factory.create_application
           expect(@new_application_factory.family_members_changed).to eq true
         end
       end
@@ -447,12 +517,11 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
         before do
           family_11.remove_family_member(family_member_12.person)
           family_11.save!
-          @new_application_factory = described_class.new(application_11)
+          @new_application_factory = subject
+          @new_application_factory.call(application_id: application_11.id)
         end
 
         it 'should set family_members_changed to true on factory' do
-          expect(@new_application_factory.family_members_changed).to eq false
-          @new_application_factory.create_application
           expect(@new_application_factory.family_members_changed).to eq true
         end
       end
@@ -465,19 +534,18 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
           expect(application_11.applicants.where(person_hbx_id: person_12.hbx_id).first.relation_with_primary).to eq "spouse"
           expect(person_11.find_relationship_with(person_12)).to eq "child"
 
-          @new_application_factory = described_class.new(application_11)
-          new_application = @new_application_factory.create_application
+          new_application = subject.call(application_id: application_11.id).success
+
           expect(new_application.applicants.where(person_hbx_id: person_11.hbx_id).first.dob).to eq person_11.dob
           expect(new_application.applicants.where(person_hbx_id: person_12.hbx_id).first.relation_with_primary).to eq "child"
         end
       end
-
     end
 
     context 'claimed_as_tax_dependent_by' do
       context 'it should populate data for claimed_as_tax_dependent_by' do
         before do
-          @new_application = described_class.new(application_11).create_application
+          @new_application = subject.call(application_id: application_11.id).success
           @claimed_applicant = @new_application.applicants.where(is_claimed_as_tax_dependent: true).first
           @claiming_applicant = @new_application.applicants.find(@claimed_applicant.claimed_as_tax_dependent_by)
         end
@@ -535,7 +603,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
       context 'for in state addresses' do
         before do
-          @new_application = described_class.new(application_11).create_application
+          @new_application = subject.call(application_id: application_11.id).success
         end
 
         it 'should set as true' do
@@ -547,7 +615,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
       context 'for out of state addresses for one of the dependents' do
         before do
           application_11.applicants.first.addresses.update_all(state: 'CA')
-          @new_application = described_class.new(application_11).create_application
+          @new_application = subject.call(application_id: application_11.id).success
         end
 
         it 'should set as true' do
@@ -559,7 +627,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
       context 'for no addresses for one of the dependents' do
         before do
           application_11.applicants.first.addresses.delete_all
-          @new_application = described_class.new(application_11).create_application
+          @new_application = subject.call(application_id: application_11.id).success
         end
 
         it 'should set as true' do
@@ -567,41 +635,6 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
           expect(applicants.map(&:is_living_in_state)).to eq [false,true]
         end
       end
-    end
-  end
-
-  describe 'applicant with income, esi, non esi and mec evidences' do
-    before do
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
-      application.send(:create_evidences)
-      @new_application = described_class.new(application).create_application
-      @new_applicant = @new_application.applicants.first
-    end
-
-    it 'should not create evidences for new application' do
-      expect(@new_applicant.income_evidence).to be_nil
-      expect(@new_applicant.esi_evidence).to be_nil
-      expect(@new_applicant.non_esi_evidence).to be_nil
-      expect(@new_applicant.local_mec_evidence).to be_nil
-    end
-
-    it 'should create evidences when application is determined' do
-      @new_application.applicants.each do |applicant|
-        applicant.update_attributes(is_applying_coverage: true)
-      end
-
-      allow(@new_application).to receive(:is_application_valid?).and_return(true)
-      @new_application.submit!
-      @new_application.determine!
-      applicant = @new_application.applicants.first
-      expect(applicant.income_evidence).not_to be_nil
-      expect(applicant.esi_evidence).not_to be_nil
-      expect(applicant.non_esi_evidence).not_to be_nil
-      expect(applicant.local_mec_evidence).not_to be_nil
     end
   end
 
@@ -614,15 +647,23 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
                                                 end_on: TimeKeeper.date_of_record.prev_month,
                                                 employer_name: 'Testing employer' })
       applicant.incomes << inc
+      income = applicant.incomes.first
+      income.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
+      income.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
+      income.save!
       applicant.save!
     end
 
     let!(:create_esi_benefit) do
       benefit = ::FinancialAssistance::Benefit.new({ kind: 'is_enrolled',
-                                                     insurance_kind: 'peace_corps_health_benefits',
+                                                     insurance_kind: 'employer_sponsored_insurance',
                                                      start_on: Date.today.prev_year,
-                                                     end_on: TimeKeeper.date_of_record.prev_month })
+                                                     end_on: TimeKeeper.date_of_record.prev_month,
+                                                     employer_name: 'Testing employer' })
       applicant.benefits = [benefit]
+      benefit = applicant.benefits.first
+      benefit.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
+      benefit.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
       applicant.save!
     end
 
@@ -636,23 +677,74 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
     end
 
     before do
-      @new_application = described_class.new(application).create_application
+      @new_application = subject.call(application_id: application.id).success
       @new_applicant = @new_application.applicants.first
     end
 
-    it 'should create income for applicant' do
-      expect(@new_applicant.incomes.first).not_to be_nil
-      expect(@new_applicant.incomes.first.kind).to eq(applicant.incomes.first.kind)
+    context 'for income' do
+      it 'should create income for applicant' do
+        expect(@new_applicant.incomes.first).not_to be_nil
+      end
+
+      it 'should populate kind for income' do
+        expect(@new_applicant.incomes.first.kind).to eq(applicant.incomes.first.kind)
+      end
+
+      it 'should populate created_at' do
+        expect(@new_applicant.incomes.first.created_at).not_to be_nil
+      end
+
+      it 'should create employer_address' do
+        expect(@new_applicant.incomes.first.employer_address).not_to be_nil
+      end
+
+      it 'should create employer_address with created_at' do
+        expect(@new_applicant.incomes.first.employer_address.created_at).not_to be_nil
+      end
+
+      it 'should create employer_phone' do
+        expect(@new_applicant.incomes.first.employer_phone).not_to be_nil
+      end
+
+      it 'should create employer_phone with created_at' do
+        expect(@new_applicant.incomes.first.employer_phone.created_at).not_to be_nil
+      end
     end
 
-    it 'should create benefit for applicant' do
-      expect(@new_applicant.benefits.first).not_to be_nil
-      expect(@new_applicant.benefits.first.kind).to eq(applicant.benefits.first.kind)
+    context 'for benefit' do
+      it 'should create benefit for applicant' do
+        expect(@new_applicant.benefits.first).not_to be_nil
+      end
+
+      it 'should populate kind for benefit' do
+        expect(@new_applicant.benefits.first.kind).to eq(applicant.benefits.first.kind)
+      end
+
+      it 'should populate created_at' do
+        expect(@new_applicant.benefits.first.created_at).not_to be_nil
+      end
+
+      it 'should create employer_address' do
+        expect(@new_applicant.benefits.first.employer_address).not_to be_nil
+      end
+
+      it 'should create employer_address with created_at' do
+        expect(@new_applicant.benefits.first.employer_address.created_at).not_to be_nil
+      end
+
+      it 'should create employer_phone' do
+        expect(@new_applicant.benefits.first.employer_phone).not_to be_nil
+      end
+
+      it 'should create employer_phone with created_at' do
+        expect(@new_applicant.benefits.first.employer_phone.created_at).not_to be_nil
+      end
     end
 
     it 'should create deduction for applicant' do
       expect(@new_applicant.deductions.first).not_to be_nil
       expect(@new_applicant.deductions.first.kind).to eq(applicant.deductions.first.kind)
+      expect(@new_applicant.deductions.first.created_at).not_to be_nil
     end
   end
 
@@ -663,7 +755,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
     end
 
     before do
-      @new_application = described_class.new(application).create_application
+      @new_application = subject.call(application_id: application.id).success
     end
 
     it 'should not create eligibility determination objects for newly created application' do
@@ -764,7 +856,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
 
     context "when main app data is same as previous application data" do
       before do
-        @new_application = described_class.new(application2).create_application
+        @new_application = subject.call(application_id: application2.id).success
       end
 
       it 'should return application without any changes in data' do
@@ -775,7 +867,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
     context "when primary_member is non applicant" do
       it 'should return copied primary applicant as non applicant' do
         person.consumer_role.update_attributes(is_applying_coverage: false)
-        @new_application = described_class.new(application2).create_application
+        @new_application = subject.call(application_id: application2.id).success
         expect(@new_application.applicants[0].is_applying_coverage).not_to eq(application2.applicants[0].is_applying_coverage)
       end
     end
@@ -783,7 +875,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
     context "when spouse_member is non applicant" do
       before do
         person2.consumer_role.update_attributes(is_applying_coverage: false)
-        @new_application = described_class.new(application2).create_application
+        @new_application = subject.call(application_id: application2.id).success
       end
 
       it 'should return copied spouse applicant as non applicant' do
@@ -794,12 +886,312 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model,
     context "when spouse_applicant is non applicant" do
       before do
         application2.applicants[1].update_attributes(is_applying_coverage: false)
-        @new_application = described_class.new(application2).create_application
+        @new_application = subject.call(application_id: application2.id).success
       end
 
       it 'should return copied spouse applicant as non applicant' do
         expect(@new_application.applicants[0].is_applying_coverage).to eq(application2.applicants[0].is_applying_coverage)
       end
+    end
+  end
+
+  describe 'person with email, address and phone' do
+    before do
+      @new_application = subject.call(application_id: application.id).success
+      @new_applicant = @new_application.applicants.first
+    end
+
+    context 'for email' do
+      it 'should return emails with created_at' do
+        expect(@new_applicant.emails.count).to eq(person1.emails.count)
+        expect(@new_applicant.emails.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
+    context 'for phone' do
+      it 'should return phones with created_at' do
+        expect(@new_applicant.phones.count).to eq(person1.phones.count)
+        expect(@new_applicant.phones.pluck(:created_at)).not_to include(nil)
+      end
+    end
+
+    context 'for address' do
+      it 'should return addresses with created_at' do
+        expect(@new_applicant.addresses.count).to eq(person1.addresses.count)
+        expect(@new_applicant.addresses.pluck(:created_at)).not_to include(nil)
+      end
+    end
+  end
+
+  describe 'for reader claiming_applicants_missing' do
+    before do
+      applicant.is_claimed_as_tax_dependent = true
+      applicant.claimed_as_tax_dependent_by = applicant2.id
+      applicant.save
+      family_member_12.is_active = false
+      family_member_12.save
+      @copy_operation = subject
+      @new_application = @copy_operation.call(application_id: application.id).success
+    end
+
+    it 'should set claiming_applicants_missing to true' do
+      expect(@copy_operation.claiming_applicants_missing).to eq(true)
+    end
+
+    it 'should create new application' do
+      expect(@new_application).to be_a(::FinancialAssistance::Application)
+    end
+  end
+
+  describe 'with income_evidence' do
+    let!(:income_evidence) do
+      application.applicants.first.create_income_evidence(key: :income,
+                                                          title: 'Income',
+                                                          aasm_state: 'pending',
+                                                          due_on: Date.today,
+                                                          verification_outstanding: true,
+                                                          is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      income_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      income_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      income_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
+                                                        user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      income_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_income_evi = new_applicant.income_evidence
+      @new_verification_history = @new_income_evi.verification_histories.first
+      @new_request_result = @new_income_evi.request_results.first
+      @new_wfst = @new_income_evi.workflow_state_transitions.first
+      @new_document = @new_income_evi.documents.first
+    end
+
+    it 'should clone income_evidence' do
+      expect(@new_income_evi).not_to be_nil
+      expect(@new_income_evi.created_at).not_to be_nil
+      expect(@new_income_evi.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_income_evi.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_income_evi.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_income_evi.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_income_evi.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
+    end
+  end
+
+  describe 'with esi_evidence' do
+    let!(:esi_evidence) do
+      application.applicants.first.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      esi_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      esi_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      esi_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      esi_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_esi_evi = new_applicant.esi_evidence
+      @new_verification_history = @new_esi_evi.verification_histories.first
+      @new_request_result = @new_esi_evi.request_results.first
+      @new_wfst = @new_esi_evi.workflow_state_transitions.first
+      @new_document = @new_esi_evi.documents.first
+    end
+
+    it 'should clone esi_evidence' do
+      expect(@new_esi_evi).not_to be_nil
+      expect(@new_esi_evi.created_at).not_to be_nil
+      expect(@new_esi_evi.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_esi_evi.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_esi_evi.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_esi_evi.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_esi_evi.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
+    end
+  end
+
+  describe 'with non_esi_evidence' do
+    let!(:non_esi_evidence) do
+      application.applicants.first.create_non_esi_evidence(key: :non_esi_mec, title: "Non Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      non_esi_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      non_esi_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      non_esi_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
+                                                         user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      non_esi_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_non_esi_evi = new_applicant.non_esi_evidence
+      @new_verification_history = @new_non_esi_evi.verification_histories.first
+      @new_request_result = @new_non_esi_evi.request_results.first
+      @new_wfst = @new_non_esi_evi.workflow_state_transitions.first
+      @new_document = @new_non_esi_evi.documents.first
+    end
+
+    it 'should clone non_esi_evidence' do
+      expect(@new_non_esi_evi).not_to be_nil
+      expect(@new_non_esi_evi.created_at).not_to be_nil
+      expect(@new_non_esi_evi.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_non_esi_evi.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_non_esi_evi.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_non_esi_evi.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_non_esi_evi.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
+    end
+  end
+
+  describe 'with local_mec_evidence' do
+    let!(:local_mec_evidence) do
+      application.applicants.first.create_local_mec_evidence(key: :local_mec, title: "Local Mec", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      local_mec_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      local_mec_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      local_mec_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
+                                                           user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      local_mec_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    before do
+      new_applicant = subject.call(application_id: application.id).success.applicants.first
+      @new_local_mec = new_applicant.local_mec_evidence
+      @new_verification_history = @new_local_mec.verification_histories.first
+      @new_request_result = @new_local_mec.request_results.first
+      @new_wfst = @new_local_mec.workflow_state_transitions.first
+      @new_document = @new_local_mec.documents.first
+    end
+
+    it 'should clone local_mec_evidence' do
+      expect(@new_local_mec).not_to be_nil
+      expect(@new_local_mec.created_at).not_to be_nil
+      expect(@new_local_mec.updated_at).not_to be_nil
+    end
+
+    it 'should clone verification_history' do
+      expect(@new_local_mec.verification_histories).not_to be_empty
+      expect(@new_verification_history.created_at).not_to be_nil
+      expect(@new_verification_history.updated_at).not_to be_nil
+    end
+
+    it 'should clone request_result' do
+      expect(@new_local_mec.request_results).not_to be_empty
+      expect(@new_request_result.created_at).not_to be_nil
+      expect(@new_request_result.updated_at).not_to be_nil
+    end
+
+    it 'should clone workflow_state_transition' do
+      expect(@new_local_mec.workflow_state_transitions).not_to be_empty
+      expect(@new_wfst.created_at).not_to be_nil
+      expect(@new_wfst.updated_at).not_to be_nil
+    end
+
+    it 'should clone documents' do
+      expect(@new_local_mec.documents).not_to be_empty
+      expect(@new_document.created_at).not_to be_nil
+      expect(@new_document.updated_at).not_to be_nil
     end
   end
 end

@@ -82,15 +82,11 @@ module FinancialAssistance
         applicants = applications.first.applicants.where("deductions._id" => bson_id)
         applicants.size == 1 ? applicants.first.deductions.find(bson_id) : nil
       end
+    end
 
-      def dup_instance(source_instance)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        new_deduction_params = source_instance.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-        new(new_deduction_params)
-      end
+    def duplicate_instance(new_applicant)
+      deduction_params = self.attributes.slice(:title, :kind, :amount, :start_on, :end_on, :frequency_kind)
+      new_applicant.deductions.build(deduction_params)
     end
 
     private

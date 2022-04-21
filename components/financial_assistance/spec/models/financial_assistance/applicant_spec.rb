@@ -1084,4 +1084,235 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  describe 'clone_evidences' do
+    let!(:application2) do
+      FactoryBot.create(:application,
+                        family_id: application.family_id,
+                        aasm_state: 'draft',
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        effective_date: Date.today)
+    end
+
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application2,
+                        dob: Date.today - 40.years,
+                        is_primary_applicant: true,
+                        family_member_id: applicant.family_member_id)
+    end
+
+    let!(:income_evidence) do
+      applicant.create_income_evidence(key: :income,
+                                       title: 'Income',
+                                       aasm_state: 'pending',
+                                       due_on: Date.today,
+                                       verification_outstanding: true,
+                                       is_satisfied: false)
+    end
+
+    let!(:esi_evidence) do
+      applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:non_esi_evidence) do
+      applicant.create_non_esi_evidence(key: :non_esi_mec, title: "Non Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:local_mec_evidence) do
+      applicant.create_local_mec_evidence(key: :local_mec, title: "Local Mec", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    before do
+      create_embedded_docs_for_evidences(applicant)
+      applicant.clone_evidences(applicant2)
+      applicant2.save!
+    end
+
+    context 'income_evidence' do
+      before do
+        @new_income_evi = applicant2.income_evidence
+        @new_verification_history = @new_income_evi.verification_histories.first
+        @new_request_result = @new_income_evi.request_results.first
+        @new_wfst = @new_income_evi.workflow_state_transitions.first
+        @new_document = @new_income_evi.documents.first
+      end
+
+      it 'should clone income_evidence' do
+        expect(@new_income_evi).not_to be_nil
+        expect(@new_income_evi.created_at).not_to be_nil
+        expect(@new_income_evi.updated_at).not_to be_nil
+      end
+
+      it 'should clone verification_history' do
+        expect(@new_income_evi.verification_histories).not_to be_empty
+        expect(@new_verification_history.created_at).not_to be_nil
+        expect(@new_verification_history.updated_at).not_to be_nil
+      end
+
+      it 'should clone request_result' do
+        expect(@new_income_evi.request_results).not_to be_empty
+        expect(@new_request_result.created_at).not_to be_nil
+        expect(@new_request_result.updated_at).not_to be_nil
+      end
+
+      it 'should clone workflow_state_transition' do
+        expect(@new_income_evi.workflow_state_transitions).not_to be_empty
+        expect(@new_wfst.created_at).not_to be_nil
+        expect(@new_wfst.updated_at).not_to be_nil
+      end
+
+      it 'should clone documents' do
+        expect(@new_income_evi.documents).not_to be_empty
+        expect(@new_document.created_at).not_to be_nil
+        expect(@new_document.updated_at).not_to be_nil
+      end
+    end
+
+    context 'esi_evidence' do
+      before do
+        @new_esi_evi = applicant2.esi_evidence
+        @new_verification_history = @new_esi_evi.verification_histories.first
+        @new_request_result = @new_esi_evi.request_results.first
+        @new_wfst = @new_esi_evi.workflow_state_transitions.first
+        @new_document = @new_esi_evi.documents.first
+      end
+
+      it 'should clone esi_evidence' do
+        expect(@new_esi_evi).not_to be_nil
+        expect(@new_esi_evi.created_at).not_to be_nil
+        expect(@new_esi_evi.updated_at).not_to be_nil
+      end
+
+      it 'should clone verification_history' do
+        expect(@new_esi_evi.verification_histories).not_to be_empty
+        expect(@new_verification_history.created_at).not_to be_nil
+        expect(@new_verification_history.updated_at).not_to be_nil
+      end
+
+      it 'should clone request_result' do
+        expect(@new_esi_evi.request_results).not_to be_empty
+        expect(@new_request_result.created_at).not_to be_nil
+        expect(@new_request_result.updated_at).not_to be_nil
+      end
+
+      it 'should clone workflow_state_transition' do
+        expect(@new_esi_evi.workflow_state_transitions).not_to be_empty
+        expect(@new_wfst.created_at).not_to be_nil
+        expect(@new_wfst.updated_at).not_to be_nil
+      end
+
+      it 'should clone documents' do
+        expect(@new_esi_evi.documents).not_to be_empty
+        expect(@new_document.created_at).not_to be_nil
+        expect(@new_document.updated_at).not_to be_nil
+      end
+    end
+
+    context 'non_esi_evidence' do
+      before do
+        @new_non_esi_evi = applicant2.non_esi_evidence
+        @new_verification_history = @new_non_esi_evi.verification_histories.first
+        @new_request_result = @new_non_esi_evi.request_results.first
+        @new_wfst = @new_non_esi_evi.workflow_state_transitions.first
+        @new_document = @new_non_esi_evi.documents.first
+      end
+
+      it 'should clone non_esi_evidence' do
+        expect(@new_non_esi_evi).not_to be_nil
+        expect(@new_non_esi_evi.created_at).not_to be_nil
+        expect(@new_non_esi_evi.updated_at).not_to be_nil
+      end
+
+      it 'should clone verification_history' do
+        expect(@new_non_esi_evi.verification_histories).not_to be_empty
+        expect(@new_verification_history.created_at).not_to be_nil
+        expect(@new_verification_history.updated_at).not_to be_nil
+      end
+
+      it 'should clone request_result' do
+        expect(@new_non_esi_evi.request_results).not_to be_empty
+        expect(@new_request_result.created_at).not_to be_nil
+        expect(@new_request_result.updated_at).not_to be_nil
+      end
+
+      it 'should clone workflow_state_transition' do
+        expect(@new_non_esi_evi.workflow_state_transitions).not_to be_empty
+        expect(@new_wfst.created_at).not_to be_nil
+        expect(@new_wfst.updated_at).not_to be_nil
+      end
+
+      it 'should clone documents' do
+        expect(@new_non_esi_evi.documents).not_to be_empty
+        expect(@new_document.created_at).not_to be_nil
+        expect(@new_document.updated_at).not_to be_nil
+      end
+    end
+
+    context 'local_mec_evidence' do
+      before do
+        @new_local_mec_evi = applicant2.local_mec_evidence
+        @new_verification_history = @new_local_mec_evi.verification_histories.first
+        @new_request_result = @new_local_mec_evi.request_results.first
+        @new_wfst = @new_local_mec_evi.workflow_state_transitions.first
+        @new_document = @new_local_mec_evi.documents.first
+      end
+
+      it 'should clone local_mec_evidence' do
+        expect(@new_local_mec_evi).not_to be_nil
+        expect(@new_local_mec_evi.created_at).not_to be_nil
+        expect(@new_local_mec_evi.updated_at).not_to be_nil
+      end
+
+      it 'should clone verification_history' do
+        expect(@new_local_mec_evi.verification_histories).not_to be_empty
+        expect(@new_verification_history.created_at).not_to be_nil
+        expect(@new_verification_history.updated_at).not_to be_nil
+      end
+
+      it 'should clone request_result' do
+        expect(@new_local_mec_evi.request_results).not_to be_empty
+        expect(@new_request_result.created_at).not_to be_nil
+        expect(@new_request_result.updated_at).not_to be_nil
+      end
+
+      it 'should clone workflow_state_transition' do
+        expect(@new_local_mec_evi.workflow_state_transitions).not_to be_empty
+        expect(@new_wfst.created_at).not_to be_nil
+        expect(@new_wfst.updated_at).not_to be_nil
+      end
+
+      it 'should clone documents' do
+        expect(@new_local_mec_evi.documents).not_to be_empty
+        expect(@new_document.created_at).not_to be_nil
+        expect(@new_document.updated_at).not_to be_nil
+      end
+    end
+  end
+end
+
+def create_embedded_docs_for_evidences(appli)
+  [appli.income_evidence, appli.esi_evidence, appli.non_esi_evidence, appli.local_mec_evidence].each do |evidence|
+    create_verification_history(evidence)
+    create_request_result(evidence)
+    create_workflow_state_transition(evidence)
+    create_document(evidence)
+  end
+end
+
+def create_verification_history(evidence)
+  evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+end
+
+def create_request_result(evidence)
+  evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+end
+
+def create_workflow_state_transition(evidence)
+  evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria",
+                                             comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
+end
+
+def create_document(evidence)
+  evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
 end
