@@ -136,6 +136,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with due date nill", dbclean: :after_each do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:primary_caregiver_other_question).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(true)
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_without_due_date }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'other_questions'

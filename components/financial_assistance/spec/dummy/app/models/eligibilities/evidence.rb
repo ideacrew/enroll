@@ -44,16 +44,15 @@ module Eligibilities
 
     embeds_many :verification_histories, class_name: "::Eligibilities::VerificationHistory", cascade_callbacks: true
     embeds_many :request_results, class_name: "::Eligibilities::RequestResult", cascade_callbacks: true
+    embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional, cascade_callbacks: true
 
-    embeds_many :documents, class_name: "::Document", as: :documentable do
+    embeds_many :documents, class_name: "::Document", cascade_callbacks: true, as: :documentable do
       def uploaded
         @target.select(&:identifier)
       end
     end
 
     accepts_nested_attributes_for :verification_histories, :request_results
-
-    embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     validates_presence_of :key, :is_satisfied, :aasm_state
 
@@ -97,6 +96,42 @@ module Eligibilities
     def verif_due_date
       due_on || evidenceable.schedule_verification_due_on
     end
+
+    # bypasses regular guards for changing the date
+    def change_due_on!(new_date)
+      self.due_on = new_date
+    end
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def has_determination_response?
+      return false if pending?
+      return true  if outstanding? || verified? || non_verified?
+
+      if review?
+        transitions = workflow_state_transitions.where(:to_state => 'review').order("transition_at DESC")
+
+        from_pending = transitions.detect{|transition| transition.from_state == 'pending'}
+        if from_pending
+          return true if request_results.where(:created_at.gte => from_pending.transition_at).present?
+          return false
+        end
+
+        from_outstanding = transitions.detect{|transition| transition.from_state == 'outstanding'}
+        return true if from_outstanding
+      end
+
+      if attested?
+        request_history = verification_histories.where(:action.in => ['application_determined', 'call_hub']).last
+
+        if request_history
+          return true if request_results.where(:created_at.gte => request_history.created_at).present?
+          return false
+        end
+      end
+
+      request_results.present? ? true : false
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     PENDING = [:pending, :attested].freeze
     OUTSTANDING = [:outstanding, :review, :errored].freeze
@@ -209,6 +244,44 @@ module Eligibilities
 
     def is_type_outstanding?
       aasm_state == "outstanding"
+    end
+
+    def clone_embedded_documents(new_evidence)
+      clone_verification_histories(new_evidence)
+      clone_request_results(new_evidence)
+      clone_workflow_state_transitions(new_evidence)
+      clone_documents(new_evidence)
+    end
+
+    private
+
+    def clone_verification_histories(new_evidence)
+      verification_histories.each do |verification|
+        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state)
+        new_evidence.verification_histories.build(verification_attrs)
+      end
+    end
+
+    def clone_request_results(new_evidence)
+      request_results.each do |request_result|
+        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload)
+        new_evidence.request_results.build(request_result_attrs)
+      end
+    end
+
+    def clone_workflow_state_transitions(new_evidence)
+      workflow_state_transitions.each do |wfst|
+        wfst_attrs = wfst.attributes.deep_symbolize_keys.slice(:event, :from_state, :to_state, :transition_at, :reason, :comment, :user_id)
+        new_evidence.workflow_state_transitions.build(wfst_attrs)
+      end
+    end
+
+    def clone_documents(new_evidence)
+      documents.each do |document|
+        document_attrs = document.attributes.deep_symbolize_keys.slice(:title, :creator, :subject, :description, :publisher, :contributor, :date, :type, :format,
+                                                                       :identifier, :source, :language, :relation, :coverage, :rights, :tags, :size, :doc_identifier)
+        new_evidence.documents.build(document_attrs)
+      end
     end
   end
 end

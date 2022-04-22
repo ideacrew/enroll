@@ -261,6 +261,70 @@ RSpec.describe VerificationHelper, :type => :helper do
         end
       end
     end
+
+    context 'checking is_family_has_unverified_verifications?' do
+      let(:person) { FactoryBot.create(:person)}
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_selected')}
+      let(:due_date) { TimeKeeper.date_of_record + 96.days }
+
+      before do
+        allow(helper).to receive(:is_unverified_verification_type?).with(person).and_return false
+        allow(helper).to receive(:is_unverified_evidences?).with(person).and_return false
+      end
+
+      context "when include_faa_outstanding_verifications is disabled" do
+        it 'returns false' do
+          expect(helper.enrollment_group_unverified?(person)).to eq false
+        end
+      end
+
+      context "when include_faa_outstanding_verifications is enabled" do
+        before do
+          EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it 'returns false when family has no eligibility determination' do
+          expect(helper.enrollment_group_unverified?(person)).to eq false
+        end
+
+        it 'returns false when family eligibility determination status is not outstanding' do
+          family.build_eligibility_determination(outstanding_verification_status: 'verified')
+          family.save!
+          expect(helper.enrollment_group_unverified?(person)).to eq false
+        end
+
+        it 'returns false when family eligibility determination due date is nil' do
+          family.build_eligibility_determination(outstanding_verification_status: 'outstanding')
+          family.save!
+          expect(helper.enrollment_group_unverified?(person)).to eq false
+        end
+
+        it 'returns false when family eligibility determination due date is present and doc status is fully uploaded' do
+          family.build_eligibility_determination(outstanding_verification_status: 'outstanding',
+                                                 outstanding_verification_earliest_due_date: due_date,
+                                                 outstanding_verification_document_status: 'Fully Uploaded')
+          family.save!
+          expect(helper.enrollment_group_unverified?(person)).to eq false
+        end
+
+        it 'returns true when family eligibility determination due date is present and doc status is none uploaded' do
+          family.build_eligibility_determination(outstanding_verification_status: 'outstanding',
+                                                 outstanding_verification_earliest_due_date: due_date,
+                                                 outstanding_verification_document_status: 'None')
+          family.save!
+          expect(helper.enrollment_group_unverified?(person)).to eq true
+        end
+
+        it 'returns true when family eligibility determination due date is present and doc status is partially uploaded' do
+          family.build_eligibility_determination(outstanding_verification_status: 'outstanding',
+                                                 outstanding_verification_earliest_due_date: due_date,
+                                                 outstanding_verification_document_status: 'Partially Uploaded')
+          family.save!
+          expect(helper.enrollment_group_unverified?(person)).to eq true
+        end
+      end
+    end
   end
 
   describe "#can_show_due_date?" do

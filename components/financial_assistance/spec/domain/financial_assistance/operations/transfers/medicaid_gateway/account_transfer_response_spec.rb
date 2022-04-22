@@ -65,6 +65,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       context 'when no applicants are initiated' do
         before do
           @applicant.transfer_referral_reason = "Rejected"
+          @applicant.save!
         end
 
         it 'should not trigger account transfer notice' do
