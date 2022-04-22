@@ -138,64 +138,64 @@ describe 'daily_faa_submission_report' do
 
   context 'spouse applicant in a separate tax household' do
     it 'should match with the primary hbx id' do
-        expect(@file_content[2][0]).to eq(application.primary_applicant.person_hbx_id.to_s)
-      end
-  
-      it 'should match with the application hbx id' do
-        expect(@file_content[2][1]).to eq(application.hbx_id.to_s)
-      end
-  
-      it 'should match with the applicant age' do
-        expect(@file_content[2][2]).to eq(spouse_applicant.age_of_the_applicant.to_s)
-      end
-  
-      it 'should match with the applicant uqhp determination' do
-        expect(@file_content[2][3]).to eq(spouse_applicant.is_without_assistance.to_s)
-      end
-  
-      it 'should match with the applicant aptc/csr determination' do
-        expect(@file_content[2][4]).to eq(spouse_applicant.is_ia_eligible.to_s)
-      end
-  
-      it 'should match with the max aptc' do
-        expect(@file_content[2][5]).to eq format('%.2f', eligibilty_determination.max_aptc.to_f)
-      end
-  
-      it 'should match with the csr percent as integer' do
-        expect(@file_content[2][6]).to eq(eligibilty_determination.csr_percent_as_integer.to_s)
-      end
-  
-      it 'should match with the applicant medicaid determination' do
-        expect(@file_content[2][7]).to eq(spouse_applicant.is_medicaid_chip_eligible.to_s)
-      end
-  
-      it 'should match with the applicant non magi medicaid determination' do
-        expect(@file_content[2][8]).to eq(spouse_applicant.is_non_magi_medicaid_eligible.to_s)
-      end
-  
-      it 'should match with the applicant totally ineligible determination' do
-        expect(@file_content[2][9]).to eq(spouse_applicant.is_totally_ineligible.to_s)
-      end
-  
-      it 'should match with the application submission date' do
-        expect(@file_content[2][10]).to eq(application.submitted_at.to_s)
-      end
-  
-      it 'should match with the application full medicaid determination' do
-        expect(@file_content[2][11]).to eq(application.full_medicaid_determination.to_s)
-      end
-  
-      it 'should match with the applicant is blind indicator' do
-        expect(@file_content[2][12]).to eq(spouse_applicant.is_self_attested_blind.to_s)
-      end
-  
-      it 'should match with the applicant is disabled indicator' do
-        expect(@file_content[2][13]).to eq(spouse_applicant.is_physically_disabled.to_s)
-      end
-  
-      it 'should match with the applicant needs help with daily living indicator' do
-        expect(@file_content[2][14]).to eq(spouse_applicant.has_daily_living_help.to_s)
-      end
+      expect(@file_content[2][0]).to eq(application.primary_applicant.person_hbx_id.to_s)
+    end
+
+    it 'should match with the application hbx id' do
+      expect(@file_content[2][1]).to eq(application.hbx_id.to_s)
+    end
+
+    it 'should match with the applicant age' do
+      expect(@file_content[2][2]).to eq(spouse_applicant.age_of_the_applicant.to_s)
+    end
+
+    it 'should match with the applicant uqhp determination' do
+      expect(@file_content[2][3]).to eq(spouse_applicant.is_without_assistance.to_s)
+    end
+
+    it 'should match with the applicant aptc/csr determination' do
+      expect(@file_content[2][4]).to eq(spouse_applicant.is_ia_eligible.to_s)
+    end
+
+    it 'should match with the max aptc' do
+      expect(@file_content[2][5]).to eq format('%.2f', eligibilty_determination.max_aptc.to_f)
+    end
+
+    it 'should match with the csr percent as integer' do
+      expect(@file_content[2][6]).to eq(eligibilty_determination.csr_percent_as_integer.to_s)
+    end
+
+    it 'should match with the applicant medicaid determination' do
+      expect(@file_content[2][7]).to eq(spouse_applicant.is_medicaid_chip_eligible.to_s)
+    end
+
+    it 'should match with the applicant non magi medicaid determination' do
+      expect(@file_content[2][8]).to eq(spouse_applicant.is_non_magi_medicaid_eligible.to_s)
+    end
+
+    it 'should match with the applicant totally ineligible determination' do
+      expect(@file_content[2][9]).to eq(spouse_applicant.is_totally_ineligible.to_s)
+    end
+
+    it 'should match with the application submission date' do
+      expect(@file_content[2][10]).to eq(application.submitted_at.to_s)
+    end
+
+    it 'should match with the application full medicaid determination' do
+      expect(@file_content[2][11]).to eq(application.full_medicaid_determination.to_s)
+    end
+
+    it 'should match with the applicant is blind indicator' do
+      expect(@file_content[2][12]).to eq(spouse_applicant.is_self_attested_blind.to_s)
+    end
+
+    it 'should match with the applicant is disabled indicator' do
+      expect(@file_content[2][13]).to eq(spouse_applicant.is_physically_disabled.to_s)
+    end
+
+    it 'should match with the applicant needs help with daily living indicator' do
+      expect(@file_content[2][14]).to eq(spouse_applicant.has_daily_living_help.to_s)
+    end
   end
 
   after :each do
