@@ -179,34 +179,6 @@ module FinancialAssistance
 
 
     class << self
-      def duplicate_employer_address(source_employer_address)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        source_employer_address.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-      end
-
-      def duplicate_employer_phone(source_employer_phone)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        source_employer_phone.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-      end
-
-      def dup_instance(source_instance)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        new_instance_params = source_instance.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-        new_instance = new(new_instance_params)
-        new_instance.employer_address = ::FinancialAssistance::Locations::Address.new(duplicate_employer_address(source_instance.employer_address)) if source_instance.employer_address.present?
-        new_instance.employer_phone = ::FinancialAssistance::Locations::Phone.new(duplicate_employer_phone(source_instance.employer_phone)) if source_instance.employer_phone.present?
-        new_instance
-      end
-
       def find(id)
         bson_id = BSON::ObjectId.from_string(id.to_s)
         applications = ::FinancialAssistance::Application.where('applicants.incomes._id' => bson_id)
@@ -237,7 +209,25 @@ module FinancialAssistance
     end
     # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
+    def duplicate_instance(new_applicant)
+      income_params = self.attributes.slice(:title, :kind, :wage_type, :hours_per_week, :amount, :amount_tax_exempt, :frequency_kind, :start_on,
+                                            :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights)
+      new_income = new_applicant.incomes.build(income_params)
+      build_new_employer_address(new_income) if employer_address.present?
+      build_new_employer_phone(new_income) if employer_phone.present?
+    end
+
     private
+
+    def build_new_employer_address(new_income)
+      empl_address_params = employer_address.attributes.slice(:kind, :address_1, :address_2, :address_3, :city, :county, :state, :zip, :country_name, :quadrant)
+      new_income.build_employer_address(empl_address_params)
+    end
+
+    def build_new_employer_phone(new_income)
+      empl_phone_params = employer_phone.attributes.slice(:kind, :country_code, :area_code, :number, :extension, :primary, :full_phone_number)
+      new_income.build_employer_phone(empl_phone_params)
+    end
 
     def set_submission_timestamp
       write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?

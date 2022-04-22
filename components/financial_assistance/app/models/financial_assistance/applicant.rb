@@ -89,8 +89,6 @@ module FinancialAssistance
       'None of these'
     ].freeze
 
-    EVIDENCE_EXCLUDED_PARAMS = %w[_id created_at updated_at employer_address employer_phone].freeze
-
     EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
 
     field :name_pfx, type: String
@@ -285,9 +283,9 @@ module FinancialAssistance
     field :transfer_referral_reason, type: String
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
-    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+    embeds_many :incomes,     class_name: "::FinancialAssistance::Income", cascade_callbacks: true, validate: true
+    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction", cascade_callbacks: true, validate: true
+    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit", cascade_callbacks: true, validate: true
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :addresses, cascade_callbacks: true, validate: true, class_name: "::FinancialAssistance::Locations::Address"
     embeds_many :phones, class_name: "::FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true
@@ -1253,7 +1251,51 @@ module FinancialAssistance
       true
     end
 
+    def build_new_email(email_params)
+      emails.build(email_params)
+    end
+
+    def build_new_phone(phone_params)
+      phones.build(phone_params)
+    end
+
+    def build_new_address(address_params)
+      addresses.build(address_params)
+    end
+
+    def clone_evidences(new_applicant)
+      clone_income_evidence(new_applicant) if income_evidence.present?
+      clone_esi_evidence(new_applicant) if esi_evidence.present?
+      clone_non_esi_evidence(new_applicant) if non_esi_evidence.present?
+      clone_local_mec_evidence(new_applicant) if local_mec_evidence.present?
+    end
+
     private
+
+    def fetch_evidence_params(evidence)
+      evidence.attributes.deep_symbolize_keys.slice(:key, :title, :description, :received_at, :is_satisfied, :verification_outstanding, :aasm_state, :update_reason, :due_on, :external_service, :updated_by)
+    end
+
+    def clone_income_evidence(new_applicant)
+      params = fetch_evidence_params(income_evidence)
+      new_income_evi = new_applicant.build_income_evidence(params)
+      income_evidence.clone_embedded_documents(new_income_evi)
+    end
+
+    def clone_esi_evidence(new_applicant)
+      new_esi_evi = new_applicant.build_esi_evidence(fetch_evidence_params(esi_evidence))
+      esi_evidence.clone_embedded_documents(new_esi_evi)
+    end
+
+    def clone_non_esi_evidence(new_applicant)
+      new_non_esi_evi = new_applicant.build_non_esi_evidence(fetch_evidence_params(non_esi_evidence))
+      non_esi_evidence.clone_embedded_documents(new_non_esi_evi)
+    end
+
+    def clone_local_mec_evidence(new_applicant)
+      new_local_mec_evi = new_applicant.build_local_mec_evidence(fetch_evidence_params(local_mec_evidence))
+      local_mec_evidence.clone_embedded_documents(new_local_mec_evi)
+    end
 
     def date_ranges_overlap?(range_a, range_b)
       range_b.begin <= range_a.end && range_a.begin <= range_b.end

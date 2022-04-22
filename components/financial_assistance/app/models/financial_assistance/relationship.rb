@@ -112,12 +112,12 @@ module FinancialAssistance
 
     def applicant
       return @applicant if defined? @applicant
-      @applicant = FinancialAssistance::Applicant.find(applicant_id)
+      @applicant = application.applicants.where(id: applicant_id).first || FinancialAssistance::Applicant.find(applicant_id)
     end
 
     def relative
       return @relative if defined? @relative
-      @relative = FinancialAssistance::Applicant.find(relative_id)
+      @relative = application.applicants.where(id: relative_id).first || FinancialAssistance::Applicant.find(relative_id)
     end
 
     def propagate_applicant

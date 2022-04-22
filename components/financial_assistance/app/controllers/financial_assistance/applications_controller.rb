@@ -94,9 +94,15 @@ module FinancialAssistance
     # rubocop:enable Metrics/AbcSize
 
     def copy
-      service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
-      @application = service.copy!
-      redirect_to edit_application_path(@application)
+      copy_result = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: params[:id])
+      if copy_result.success?
+        @application = copy_result.success
+        @application.set_assistance_year
+        redirect_to edit_application_path(@application)
+      else
+        flash[:error] = copy_result.failure
+        redirect_to applications_path
+      end
     rescue StandardError => e
       flash[:error] = "#{l10n('exchange.error')} - #{e}"
       redirect_to applications_path(tab: 'cost_savings')
