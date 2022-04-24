@@ -65,11 +65,7 @@ module Forms
           Rails.logger.error("Unable to drop enrollment members, error: #{result.failure}")
         end
 
-        if result.success?
-          @result[:success] = result.success
-          transmit_drop = params.key?("transmit_hbx_#{hbx_enrollment.id}") ? true : false
-          handle_edi_transmissions(hbx_enrollment.id, transmit_drop)
-        end
+        @result[:success] = result.success
       rescue StandardError => e
         Rails.logger.error("Unable to drop enrollment members, error: #{e}")
         @result[:failure] << hbx_enrollment
