@@ -149,34 +149,6 @@ module FinancialAssistance
     end
 
     class << self
-      def duplicate_employer_address(source_employer_address)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        source_employer_address.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-      end
-
-      def duplicate_employer_phone(source_employer_phone)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        source_employer_phone.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-      end
-
-      def dup_instance(source_instance)
-        rejected_attrs = ::FinancialAssistance::Applicant::EVIDENCE_EXCLUDED_PARAMS
-        new_instance_params = source_instance.attributes.reduce({}) do |new_attrs, attr|
-          new_attrs.merge!({ attr.first => attr.second }) unless rejected_attrs.include?(attr.first)
-          new_attrs
-        end
-        new_instance = new(new_instance_params)
-        new_instance.employer_address = ::FinancialAssistance::Locations::Address.new(duplicate_employer_address(source_instance.employer_address)) if source_instance.employer_address.present?
-        new_instance.employer_phone = ::FinancialAssistance::Locations::Phone.new(duplicate_employer_phone(source_instance.employer_phone)) if source_instance.employer_phone.present?
-        new_instance
-      end
-
       def find(id)
         bson_id = BSON::ObjectId.from_string(id.to_s)
         applications = ::FinancialAssistance::Application.where('applicants.benefits._id' => bson_id)
@@ -225,7 +197,25 @@ module FinancialAssistance
       # rubocop:enable Metrics/AbcSize
     end
 
+    def duplicate_instance(new_applicant)
+      benefit_params = self.attributes.slice(:title, :esi_covered, :kind, :insurance_kind, :hra_type, :is_employer_sponsored, :is_esi_waiting_period,
+                                             :is_esi_mec_met, :employee_cost, :employee_cost_frequency, :start_on, :end_on, :employer_name, :employer_id)
+      new_benefit = new_applicant.benefits.build(benefit_params)
+      build_new_employer_address(new_benefit) if employer_address.present?
+      build_new_employer_phone(new_benefit) if employer_phone.present?
+    end
+
     private
+
+    def build_new_employer_address(new_benefit)
+      empl_address_params = employer_address.attributes.slice(:kind, :address_1, :address_2, :address_3, :city, :county, :state, :zip, :country_name, :quadrant)
+      new_benefit.build_employer_address(empl_address_params)
+    end
+
+    def build_new_employer_phone(new_benefit)
+      empl_phone_params = employer_phone.attributes.slice(:kind, :country_code, :area_code, :number, :extension, :primary, :full_phone_number)
+      new_benefit.build_employer_phone(empl_phone_params)
+    end
 
     def clean_params(params)
       model_params = params[:benefit]

@@ -74,6 +74,30 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
     it 'should not return full_text' do
       expect(@address.keys).not_to include(:full_text)
     end
+
+    it 'should include :kind with value' do
+      expect(@address[:kind]).not_to be_blank
+    end
+
+    it 'should include :address_1 with value' do
+      expect(@address[:address_1]).not_to be_blank
+    end
+
+    it 'should include :city with value' do
+      expect(@address[:city]).not_to be_blank
+    end
+
+    it 'should include :county with value' do
+      expect(@address[:county]).not_to be_blank
+    end
+
+    it 'should include :state with value' do
+      expect(@address[:state]).not_to be_blank
+    end
+
+    it 'should include :zip with value' do
+      expect(@address[:zip]).not_to be_blank
+    end
   end
 
   describe 'with inactive family members' do

@@ -67,7 +67,16 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    is_unverified_verification_type?(person) || is_unverified_evidences?(person)
+    is_unverified_verification_type?(person) || is_unverified_evidences?(person) || is_family_has_unverified_verifications?(person)
+  end
+
+  def is_family_has_unverified_verifications?(person)
+    return false unless EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+    return false if person.primary_family.enrollments.enrolled_and_renewal.blank?
+    ed = person.primary_family.eligibility_determination
+    return false unless ed.present?
+    return false unless ed.outstanding_verification_status == 'outstanding'
+    !ed.outstanding_verification_earliest_due_date.nil? && ed.outstanding_verification_document_status != 'Fully Uploaded'
   end
 
   def is_unverified_verification_type?(person)

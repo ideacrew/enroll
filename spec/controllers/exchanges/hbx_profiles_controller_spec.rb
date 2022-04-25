@@ -1191,6 +1191,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                        coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
                        eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
     end
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
 
     let!(:enrollment) do
       hbx_enrollment = FactoryBot.create(:hbx_enrollment,
@@ -1199,20 +1200,20 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                                          household: family.active_household,
                                          hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
                                          aasm_state: "coverage_selected",
+                                         kind: "individual",
                                          effective_on: initial_application.start_on,
                                          rating_area_id: initial_application.recorded_rating_area_id,
                                          sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                                          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
                                          benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
-                                         employee_role_id: employee_role.id)
+                                         consumer_role_id: consumer_role.id)
       hbx_enrollment.benefit_sponsorship = benefit_sponsorship
       hbx_enrollment.save!
       hbx_enrollment
     end
 
-
-
     before :each do
+      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in user
     end

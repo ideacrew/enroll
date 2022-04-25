@@ -18,7 +18,7 @@ RSpec.describe ::AddressValidator, :type => :helper, dbclean: :after_each do
           "quadrant" => "",
           "kind" => "home",
           "city" => "Augusta",
-          "state" => "DC",
+          "state" => EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
           "zip" => "04332-6626"
         }}
       end
