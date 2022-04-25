@@ -15,7 +15,7 @@
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
       <div class="col-md-10 benefits-check">
         <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
-        <%= render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n("faa.question.#{insurance_kind}") } %>
+        <%= render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n("faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) } %>
       </div>
     </div>
 
