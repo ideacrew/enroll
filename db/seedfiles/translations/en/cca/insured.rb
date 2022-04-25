@@ -424,4 +424,5 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.enrollment.tobbaco_user' => 'Tobacco User',
   :'en.enrollment_member.coverage_state_date' => 'Coverage Start Date',
   :'en.not_available' => 'NA',
+  :'en.insured.rejected' => "%{ridp_type} successfully rejected."
 }.freeze

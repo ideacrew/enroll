@@ -13,6 +13,7 @@ class ConsumerRole
   include Config::AcaIndividualMarketHelper
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
+  include L10nHelper
 
   embedded_in :person
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
@@ -1174,7 +1175,7 @@ class ConsumerRole
       when 'return_for_deficiency'
         return_ridp_doc_for_deficiency(ridp_type, update_reason)
         UserMailer.identity_verification_denial(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
-        "#{ridp_type} successfully rejected."
+        l10n('insured.rejected', ridp_type: ridp_type)
     end
   end
 

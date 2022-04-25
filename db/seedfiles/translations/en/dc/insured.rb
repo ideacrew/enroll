@@ -516,4 +516,5 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollment.tobbaco_user' => 'Tobacco User',
   :'en.enrollment_member.coverage_state_date' => 'Coverage Start Date',
   :'en.not_available' => 'NA',
+  :'en.insured.rejected' => "%{ridp_type} successfully rejected."
 }.freeze
