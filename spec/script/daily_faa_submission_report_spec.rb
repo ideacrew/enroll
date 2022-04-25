@@ -26,7 +26,7 @@ describe 'daily_faa_submission_report' do
        :with_home_address,
        application: application,
        family_member_id: family_member2.id,
-       citizen_status: 'us_citizen'
+       citizen_status: 'alien_lawfully_present'
      )]
   end
   let(:primary_applicant) { application.applicants.first }
@@ -48,6 +48,7 @@ describe 'daily_faa_submission_report' do
         Blind
         Disabled
         Help_With_Daily_Living
+        Immigration_Status
     ]
   end
 
@@ -134,6 +135,11 @@ describe 'daily_faa_submission_report' do
     it 'should match with the applicant needs help with daily living indicator' do
       expect(@file_content[1][14]).to eq(primary_applicant.has_daily_living_help.to_s)
     end
+
+    it 'should match with the applicant immigration status' do
+      immigration_status = primary_applicant.citizen_status&.humanize&.downcase&.gsub("us", "US")
+      expect(@file_content[1][15]).to eq(immigration_status)
+    end
   end
 
   context 'spouse applicant in a separate tax household' do
@@ -195,6 +201,11 @@ describe 'daily_faa_submission_report' do
 
     it 'should match with the applicant needs help with daily living indicator' do
       expect(@file_content[2][14]).to eq(spouse_applicant.has_daily_living_help.to_s)
+    end
+
+    it 'should match with the applicant immigration status' do
+      immigration_status = spouse_applicant.citizen_status&.humanize&.downcase&.gsub("us", "US")
+      expect(@file_content[2][15]).to eq(immigration_status)
     end
   end
 
