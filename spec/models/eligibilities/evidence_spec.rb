@@ -124,6 +124,40 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         expect(history.updated_by).to eq updated_by
       end
     end
+
+    context 'reject' do
+      let(:evidence) do
+        evidence = applicant.create_income_evidence(
+          key: :income,
+          title: 'Income',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
+
+        evidence
+      end
+
+      before do
+        evidence.move_to_rejected!
+        evidence.reload
+      end
+
+      shared_examples_for 'transition to rejected' do |initial_state|
+        let(:aasm_state) { initial_state }
+
+        it 'should transition to rejected' do
+          expect(evidence.aasm_state).to eq 'rejected'
+        end
+      end
+
+      it_behaves_like "transition to rejected", 'pending'
+      it_behaves_like "transition to rejected", 'review'
+      it_behaves_like "transition to rejected", 'attested'
+      it_behaves_like "transition to rejected", 'verified'
+      it_behaves_like "transition to rejected", 'outstanding'
+    end
   end
 
   describe 'clone_embedded_documents' do

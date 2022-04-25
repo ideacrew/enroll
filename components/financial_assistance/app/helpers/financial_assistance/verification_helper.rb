@@ -24,7 +24,8 @@ module FinancialAssistance
         applicant.set_evidence_verified(evidence)
         "#{evidence.title} successfully verified."
       when "return_for_deficiency"
-        applicant.set_evidence_outstanding(evidence)
+        # applicant.set_evidence_outstanding(evidence)
+        applicant.set_evidence_rejected(evidence)
         "#{evidence.title} rejected."
       end
     end
@@ -84,6 +85,8 @@ module FinancialAssistance
         "default"
       when "unverified"
         "default"
+      when "rejected"
+        "danger"
       end
     end
   end

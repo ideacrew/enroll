@@ -10,8 +10,8 @@ class VerificationType
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
   ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
-  VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
-  OUTSTANDING_STATES = %w[outstanding].freeze
+  VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam rejected].freeze
+  OUTSTANDING_STATES = %w[outstanding rejected].freeze
   DUE_DATE_STATES = %w[review outstanding].freeze
   SATISFIED_STATES = %w[verified attested valid curam].freeze
 
@@ -63,7 +63,7 @@ class VerificationType
   end
 
   def is_type_outstanding?
-    validation_status == "outstanding"
+    OUTSTANDING_STATES.include?(validation_status)
   end
 
   def is_type_expired?
@@ -98,6 +98,10 @@ class VerificationType
 
   def pass_type
     update_attributes(:validation_status => "verified")
+  end
+
+  def reject_type(reason_for_update)
+    update_attributes!(validation_status: 'rejected', update_reason: reason_for_update, rejected: true)
   end
 
   def fail_type

@@ -82,6 +82,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.document_due_date' => "Document Due Date",
   :'en.past_due' => "Past Due",
   :'en.verification_type' => "Verification Type",
+  :'en.verification_type.validation_status' => 'Rejected',
   :'en.status' => "Status",
   :'en.documents' => "Documents",
   :'en.insured.families.verification.complete_verification_for_enrollment' => "Complete Verification for Enrollment",

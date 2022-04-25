@@ -18,7 +18,7 @@ module VerificationHelper
     consumer = person.consumer_role
     case type
     when 'Identity'
-      if consumer.identity_verified?
+      if consumer.identity_verified? || consumer.identity_rejected
         consumer.identity_validation
       elsif consumer.has_ridp_docs_for_type?(type) && !consumer.identity_rejected
         'in review'
@@ -26,7 +26,7 @@ module VerificationHelper
         'outstanding'
       end
     when 'Application'
-      if consumer.application_verified?
+      if consumer.application_verified? || consumer.application_rejected
         consumer.application_validation
       elsif consumer.has_ridp_docs_for_type?(type) && !consumer.application_rejected
         'in review'
@@ -38,35 +38,27 @@ module VerificationHelper
 
   def verification_type_class(status)
     case status
-      when "verified"
-        "success"
-      when "review"
-        "warning"
-      when "outstanding"
-        "danger"
-      when "curam"
-        "default"
-      when "attested"
-        "default"
-      when "valid"
-        "success"
-      when "pending"
-        "info"
-      when "expired"
-        "default"
-      when "unverified"
-        "default"
+    when 'verified', 'valid'
+      'success'
+    when 'review'
+      'warning'
+    when 'outstanding', 'rejected'
+      'danger'
+    when 'curam', 'attested', 'expired', 'unverified'
+      'default'
+    when 'pending'
+      'info'
     end
   end
 
   def ridp_type_class(type, person)
     case ridp_type_status(type, person)
-      when 'valid'
-        'success'
-      when 'in review'
-        'warning'
-      when 'outstanding'
-        'danger'
+    when 'valid'
+      'success'
+    when 'in review'
+      'warning'
+    when 'outstanding', 'rejected'
+      'danger'
     end
   end
 
@@ -104,7 +96,7 @@ module VerificationHelper
       end
     end
 
-    aasm_states.include?('outstanding')
+    (Eligibilities::Evidence::OUTSTANDING_STATES & aasm_states).any?
   end
 
   def verification_needed?(person)
@@ -200,6 +192,7 @@ module VerificationHelper
       admin ? "External Source".center(12) : "verified".capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     elsif status
       status = "verified" if status == "valid"
+      status = l10n('verification_type.validation_status') if status == 'rejected'
       status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     end
   end
@@ -210,6 +203,8 @@ module VerificationHelper
       "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
     when 'valid'
       "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+    when 'rejected'
+      l10n('verification_type.validation_status')
     else
       "&nbsp;&nbsp;Outstanding&nbsp;&nbsp;".html_safe
     end

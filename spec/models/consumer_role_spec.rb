@@ -1008,9 +1008,9 @@ describe "Indian tribe member" do
       consumer_role.pass_residency!
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
       american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
-      consumer_role.return_doc_for_deficiency(american_indian_status, "Invalid Document")
+      consumer_role.return_doc_for_deficiency(american_indian_status, 'Invalid Document')
       expect(consumer_role.aasm_state).to eq 'verification_outstanding'
-      expect(american_indian_status.validation_status).to eq 'outstanding'
+      expect(american_indian_status.validation_status).to eq 'rejected'
       expect(consumer_role.lawful_presence_determination.vlp_authority).to eq 'ssa'
     end
   end
@@ -1801,6 +1801,79 @@ describe 'vlp documents' do
 
     it 'should add reason to newly created workflow_state_transition' do
       expect(@consumer_role.workflow_state_transitions.last.reason).to eq("Self Attest #{VerificationType::LOCATION_RESIDENCY}")
+    end
+  end
+
+  describe 'admin_verification_action' do
+    let!(:consumer) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:verification_type) do
+      consumer.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+    end
+
+    before do
+      consumer.consumer_role.admin_verification_action('return_for_deficiency', verification_type, 'Illegible')
+    end
+
+    it "should update verification_type" do
+      expect(verification_type.validation_status).to eq('rejected')
+      expect(verification_type.update_reason).to eq('Illegible')
+      expect(verification_type.rejected).to eq(true)
+    end
+  end
+
+  describe 'return_doc_for_deficiency' do
+    let!(:consumer) { FactoryBot.create(:person, :with_consumer_role) }
+
+    before do
+      consumer.consumer_role.return_doc_for_deficiency(verification_type, 'Illegible')
+    end
+
+    context 'for Citizenship' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
+    end
+
+    context 'for Immigration status' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: 'Immigration status', validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
+    end
+
+    context 'for Social Security Number' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: 'Social Security Number', validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
+    end
+
+    context 'for Residency' do
+      let(:verification_type) do
+        consumer.verification_types.create!(type_name: VerificationType::LOCATION_RESIDENCY, validation_status: 'unverified')
+      end
+
+      it "should update verification_type" do
+        expect(verification_type.validation_status).to eq('rejected')
+        expect(verification_type.update_reason).to eq('Illegible')
+        expect(verification_type.rejected).to eq(true)
+      end
     end
   end
 end
