@@ -29,8 +29,8 @@ class ConsumerRole
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending expired) #attested state is used for people with active enrollments before locale residency verification was turned on
 
   #ridp
-  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
-  APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
+  IDENTITY_VALIDATION_STATES = %w[na valid outstanding pending rejected].freeze
+  APPLICATION_VALIDATION_STATES = %w[na valid outstanding pending rejected].freeze
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -139,7 +139,7 @@ class ConsumerRole
 
   # Application
   field :application_validation, type: String, default: "na"
-  validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
+  validates_inclusion_of :application_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
 
   #ridp update reason fields
   field :identity_update_reason, type: String
@@ -1179,7 +1179,7 @@ class ConsumerRole
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     message = "#{v_type.type_name} was rejected."
-    v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
+    v_type.reject_type(update_reason)
     if  v_type.type_name == LOCATION_RESIDENCY
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
@@ -1196,9 +1196,9 @@ class ConsumerRole
 
   def return_ridp_doc_for_deficiency(ridp_type, update_reason)
     if ridp_type == 'Identity'
-      update_attributes(:identity_validation => 'outstanding', :identity_update_reason => update_reason, :identity_rejected => true)
+      update_attributes(:identity_validation => 'rejected', :identity_update_reason => update_reason, :identity_rejected => true)
     elsif  ridp_type == 'Application'
-      update_attributes(:application_validation => 'outstanding', :application_update_reason => update_reason, :application_rejected => true)
+      update_attributes(:application_validation => 'rejected', :application_update_reason => update_reason, :application_rejected => true)
     end
     "#{ridp_type} was rejected."
   end
