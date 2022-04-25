@@ -125,6 +125,7 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
+    authorize HbxProfile, :can_call_hub?
     request_hash = {person_id: @person.id, verification_type: @verification_type.type_name}
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success
