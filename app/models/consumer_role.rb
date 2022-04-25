@@ -1174,6 +1174,7 @@ class ConsumerRole
       when 'return_for_deficiency'
         return_ridp_doc_for_deficiency(ridp_type, update_reason)
         UserMailer.identity_verification_denial(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
+        "#{ridp_type} successfully rejected."
     end
   end
 
