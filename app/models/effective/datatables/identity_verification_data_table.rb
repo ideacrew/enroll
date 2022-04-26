@@ -37,12 +37,13 @@ module Effective
 
       def document_type(row)
         role = row.consumer_role
-        identity_validation = role.identity_validation
-        application_validation = role.application_validation
 
-        return 'Identity' if ['pending', 'rejected'].include? identity_validation
-        return 'Application' if ['pending', 'rejected'].include? application_validation
-        'Identity/Application'
+        is_identity = ['pending', 'rejected'].include? role.identity_validation
+        is_application = ['pending', 'rejected'].include? role.application_validation
+
+        return 'Identity/Application' if is_identity && is_application
+        return 'Identity' if is_identity
+        return 'Application' if is_application
       end
       
       def document_uploaded_date(row)
