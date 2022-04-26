@@ -4,6 +4,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   let(:family_member) { FamilyMember.new }
   let(:coverage_household_member) { CoverageHouseholdMember.new(:family_member_id => family_member.id) }
   let(:coverage_household) { CoverageHousehold.new(:coverage_household_members => [coverage_household_member]) }
+  let(:family) {FactoryBot.create(:family, family_member: family_member)}
 
   subject { Household.new(:coverage_households => [coverage_household]) }
 
@@ -18,6 +19,18 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   it "ImmediateFamily should have domestic partner" do
     expect(Household::ImmediateFamily.include?('domestic_partner')).to eq true
+  end
+
+  context "new household member matching existing person record" do
+    let(:person) { FactoryBot.create(:person, dob: DateTime.now - 10.years, ssn: '111111111') }
+    let(:family_member1) { FactoryBot.create(:family_member, person: person)}
+    let(:family_member2) { FactoryBot.create(:family_member, person: person)}
+    
+    it "should create new coverage household member" do
+      subject.add_household_coverage_member(family_member1)
+      binding.irb
+      expect(coverage_household.size).to eql(2)
+    end
   end
 
   context "new_hbx_enrollment_from" do
