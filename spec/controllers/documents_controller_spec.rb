@@ -78,6 +78,13 @@ RSpec.describe DocumentsController, :type => :controller do
 
   describe 'POST Fed_Hub_Request' do
     let(:consumer_role) { person.consumer_role }
+    let(:permission) { FactoryBot.create(:permission, :super_admin) }
+    let(:user) do
+      person = FactoryBot.create(:person, :with_hbx_staff_role)
+      user = FactoryBot.create(:user, person: person)
+      user.person.hbx_staff_role.update_attributes(permission_id: permission.id)
+      user
+    end
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
       allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
@@ -124,6 +131,15 @@ RSpec.describe DocumentsController, :type => :controller do
           post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: bad_document.id }
           expect(flash[:danger]).to eq('Please fill in your information for Document Description.')
         end
+      end
+    end
+
+    context 'when admin does not have permissions' do
+      let(:permission) { FactoryBot.create(:permission, :hbx_csr_tier1) }
+
+      it 'should redirect with pundit error' do
+        post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: person.id, id: document.id }
+        expect(flash[:error]).to eq('Access not allowed for hbx_profile_policy.can_call_hub?, (Pundit policy)')
       end
     end
   end
@@ -255,11 +271,13 @@ RSpec.describe DocumentsController, :type => :controller do
     context "Identity verification type" do
       it_behaves_like "update ridp verification type", "Identity", "Document in EnrollApp", "verify", "identity_validation", "valid"
       it_behaves_like "update ridp verification type", "Identity", "E-Verified in Curam", "verify", "identity_update_reason", "E-Verified in Curam"
+      it_behaves_like "update ridp verification type", "Identity", "Additional Document Required", "return_for_deficiency", "identity_validation", "rejected"
     end
 
     context "Application verification type" do
       it_behaves_like "update ridp verification type", "Application", "Document in EnrollApp", "verify", "application_validation", "valid"
       it_behaves_like "update ridp verification type", "Application", "Document in EnrollApp", "verify", "application_update_reason", "Document in EnrollApp"
+      it_behaves_like "update ridp verification type", "Application", "Additional Document Required", "return_for_deficiency", "application_validation", "rejected"
     end
 
     context "redirection" do

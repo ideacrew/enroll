@@ -36,21 +36,26 @@ module Effective
       end
 
       def document_type(row)
-        if row.consumer_role.application_validation == "outstanding" && row.consumer_role.identity_validation == "pending" || row.consumer_role.application_validation == "valid" && row.consumer_role.identity_validation == "pending"
-          return "Identity"
-        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "outstanding" || row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "valid"
-          return "Application"
-        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "pending"
-          return "Identity/Application"
-        end
+        role = row.consumer_role
+
+        is_identity = ['pending', 'rejected'].include? role.identity_validation
+        is_application = ['pending', 'rejected'].include? role.application_validation
+
+        return 'Identity/Application' if is_identity && is_application
+        return 'Identity' if is_identity
+        return 'Application' if is_application
       end
       
       def document_uploaded_date(row)
-        if row.consumer_role.identity_validation == "pending"
-          ridp_document = row.consumer_role.ridp_documents.where(ridp_verification_type:"Identity").last
+        role = row.consumer_role
+        identity_validation = role.identity_validation
+        application_validation = role.application_validation
+
+        if ['pending', 'rejected'].include? identity_validation
+          ridp_document = role.ridp_documents.where(ridp_verification_type: "Identity").last
           ridp_document.present? && ridp_document.uploaded_at.present? ? ridp_document.uploaded_at : ""
-        elsif row.consumer_role.application_validation == "pending"
-          ridp_document = row.consumer_role.ridp_documents.where(ridp_verification_type:"Application").last
+        elsif ['pending', 'rejected'].include? application_validation
+          ridp_document = role.ridp_documents.where(ridp_verification_type: "Application").last
           ridp_document.present? && ridp_document.uploaded_at.present? ? ridp_document.uploaded_at : ""
         end
       end
