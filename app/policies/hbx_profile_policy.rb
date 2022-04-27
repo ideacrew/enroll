@@ -192,6 +192,12 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_pdc
   end
 
+  def can_call_hub?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_call_hub
+  end
+
 
   private
 
