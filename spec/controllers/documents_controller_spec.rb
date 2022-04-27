@@ -271,11 +271,13 @@ RSpec.describe DocumentsController, :type => :controller do
     context "Identity verification type" do
       it_behaves_like "update ridp verification type", "Identity", "Document in EnrollApp", "verify", "identity_validation", "valid"
       it_behaves_like "update ridp verification type", "Identity", "E-Verified in Curam", "verify", "identity_update_reason", "E-Verified in Curam"
+      it_behaves_like "update ridp verification type", "Identity", "Additional Document Required", "return_for_deficiency", "identity_validation", "rejected"
     end
 
     context "Application verification type" do
       it_behaves_like "update ridp verification type", "Application", "Document in EnrollApp", "verify", "application_validation", "valid"
       it_behaves_like "update ridp verification type", "Application", "Document in EnrollApp", "verify", "application_update_reason", "Document in EnrollApp"
+      it_behaves_like "update ridp verification type", "Application", "Additional Document Required", "return_for_deficiency", "application_validation", "rejected"
     end
 
     context "redirection" do

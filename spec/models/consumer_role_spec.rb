@@ -1821,6 +1821,25 @@ describe 'vlp documents' do
     end
   end
 
+  describe '#admin_ridp_verification_action' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:consumer_role) { person.consumer_role }
+
+    context 'when admin verifies' do
+
+      it 'returns verified message' do
+        expect(consumer_role.admin_ridp_verification_action('verify', 'Identity', 'Document in EnrollApp', person)).to eq 'Identity successfully verified.'
+      end
+    end
+
+    context 'when admin rejects' do
+
+      it 'returns rejected message' do
+        expect(consumer_role.admin_ridp_verification_action('return_for_deficiency', 'Identity', 'Other', person)).to eq 'Identity successfully rejected.'
+      end
+    end
+  end
+
   describe 'return_doc_for_deficiency' do
     let!(:consumer) { FactoryBot.create(:person, :with_consumer_role) }
 
