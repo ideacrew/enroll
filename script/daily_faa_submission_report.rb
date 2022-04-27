@@ -18,8 +18,7 @@ field_names = %w[Primary_HBX_ID
                  Blind
                  Disabled
                  Help_With_Daily_Living
-                 Immigration_Status
-                ]
+                 Immigration_Status]
 
 logger_field_names = %w[id Backtrace]
 
@@ -37,17 +36,18 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
     report_csv << field_names
     applications = FinancialAssistance::Application.where(:submitted_at => {:"$gte" => start_time, :"$lte" => end_time})
     applications.each do |application|
-      application.applicants.each do |applicant|        
+      application.applicants.each do |applicant|
         age = applicant.age_on(end_time)
         uqhp_eligble = applicant.is_without_assistance
         aptc = applicant.is_ia_eligible
         family = Family.find(application.family_id)
         tax_households = family.active_household.tax_households
-        applicant_thh = tax_households.detect {|th| th.tax_household_members.map(&:applicant_id).include?(applicant.family_member_id)}
-        current_ed = applicant_thh&.latest_eligibility_determination
-        max_aptc = current_ed&.max_aptc&.to_f.present? ? format('%.2f', current_ed.max_aptc.to_f) : 'N/A'
-        csr_percent = current_ed&.csr_percent_as_integer.present? ? current_ed.csr_percent_as_integer.to_s : 'N/A'
-        medicaid_eligible = applicant.is_medicaid_chip_eligible
+        applicant_thh = tax_households.detect {|th| th.applicant_ids.include?(applicant.family_member_id)}
+        applicant_thm = applicant_thh.tax_household_members.detect {|thm| thm.applicant_id == applicant.family_member_id}
+        max_aptc_str = format('%.2f', applicant_thh.current_max_aptc.to_f) if applicant_thh&.current_max_aptc.present?
+        max_aptc = applicant.is_magi_medicaid ? 'N/A' : max_aptc_str
+        csr_percent = applicant&.csr_percent_as_integer.present? ? applicant.csr_percent_as_integer.to_s : 'N/A'
+        medicaid_eligible = applicant.is_magi_medicaid
         non_magi_medicaid_eligible = applicant.is_non_magi_medicaid_eligible
         is_totally_ineligible = applicant.is_totally_ineligible
         is_blind = applicant.is_self_attested_blind
