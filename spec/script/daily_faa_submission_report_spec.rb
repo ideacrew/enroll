@@ -1,34 +1,77 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 describe 'daily_faa_submission_report' do
   before do
     DatabaseCleaner.clean
   end
-  include_context 'setup two tax households with one ia member each'
+
+  let(:person_dob_year) { Date.today.year - 48 }
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.new(person_dob_year, 4, 4)) }
+  let!(:person2) do
+    member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (person.dob - 10.years))
+    person.ensure_relationship_with(member, 'spouse')
+    member.save!
+    member
+  end
+
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:family_member) { family.primary_applicant }
+  let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+
+  let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
+  let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household) }
+  let!(:tax_household2) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
+  let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household2) }
+
+  let!(:eligibility_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73') }
+  let!(:eligibility_determination2) { FactoryBot.create(:eligibility_determination, max_aptc: 250.00, tax_household: tax_household2, csr_eligibility_kind: 'csr_87') }
+  let(:eligibility_determinations) { [eligibility_determination, eligibility_determination2] }
 
   let(:yesterday) { Time.now.getlocal.prev_day }
-  let(:application) { FactoryBot.create(:financial_assistance_application, submitted_at: yesterday, family_id: family.id) }
-  let(:applicants) do
-    [FactoryBot.build(
+  let!(:application) do
+    FactoryBot.create(
+      :financial_assistance_application,
+      submitted_at: yesterday,
+      family_id: family.id,
+      eligibility_determinations: eligibility_determinations
+    )
+  end
+  let!(:applicant) do
+    FactoryBot.create(
       :financial_assistance_applicant,
       :with_home_address,
       application: application,
       family_member_id: family_member.id,
       is_primary_applicant: true,
-      citizen_status: 'us_citizen'
-    ),
-     FactoryBot.build(
-       :financial_assistance_applicant,
-       :spouse,
-       :with_home_address,
-       application: application,
-       family_member_id: family_member2.id,
-       citizen_status: 'alien_lawfully_present'
-     )]
+      citizen_status: 'us_citizen',
+      csr_percent_as_integer: 73,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      gender: person.gender,
+      dob: person.dob,
+      encrypted_ssn: person.encrypted_ssn
+    )
   end
+  let!(:applicant2) do
+    FactoryBot.create(
+      :financial_assistance_applicant,
+      :spouse,
+      :with_home_address,
+      application: application,
+      family_member_id: family_member2.id,
+      citizen_status: 'alien_lawfully_present',
+      csr_percent_as_integer: 87,
+      first_name: person2.first_name,
+      last_name: person2.last_name,
+      gender: person2.gender,
+      dob: person2.dob,
+      encrypted_ssn: person.encrypted_ssn
+    )
+  end
+  let!(:applicants) { [applicant, applicant2] }
+
   let(:primary_applicant) { application.applicants.first }
   let(:spouse_applicant) { application.applicants.last }
   let(:field_names) do
@@ -53,16 +96,7 @@ describe 'daily_faa_submission_report' do
   end
 
   before :each do
-    tax_household.update_attributes!(created_at: yesterday)
-    tax_household2.update_attributes!(created_at: yesterday)
-    application.applicants = applicants
     application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
-    application.save
-    person_params = person.attributes.slice("first_name", "last_name", "gender", "dob", "encrypted_ssn")
-    person2_params = person2.attributes.slice("first_name", "last_name", "gender", "dob", "encrypted_ssn")
-    application.applicants.first.update(person_params)
-    application.applicants.last.update(person2_params)
-    application.reload
     invoke_daily_faa_submission_report
     @file_content = CSV.read("#{Rails.root}/daily_faa_submission_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
   end
@@ -97,15 +131,15 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the max aptc' do
-      expect(@file_content[1][5]).to eq format('%.2f', eligibilty_determination2.max_aptc.to_f)
+      expect(@file_content[1][5]).to eq format('%.2f', eligibility_determination.max_aptc.to_f)
     end
 
     it 'should match with the csr percent as integer' do
-      expect(@file_content[1][6]).to eq(eligibilty_determination2.csr_percent_as_integer.to_s)
+      expect(@file_content[1][6]).to eq(primary_applicant.csr_percent_as_integer.to_s)
     end
 
     it 'should match with the applicant medicaid determination' do
-      expect(@file_content[1][7]).to eq(primary_applicant.is_medicaid_chip_eligible.to_s)
+      expect(@file_content[1][7]).to eq(primary_applicant.is_magi_medicaid.to_s)
     end
 
     it 'should match with the applicant non magi medicaid determination' do
@@ -164,15 +198,15 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the max aptc' do
-      expect(@file_content[2][5]).to eq format('%.2f', eligibilty_determination.max_aptc.to_f)
+      expect(@file_content[2][5]).to eq format('%.2f', eligibility_determination2.max_aptc.to_f)
     end
 
     it 'should match with the csr percent as integer' do
-      expect(@file_content[2][6]).to eq(eligibilty_determination.csr_percent_as_integer.to_s)
+      expect(@file_content[2][6]).to eq(spouse_applicant.csr_percent_as_integer.to_s)
     end
 
     it 'should match with the applicant medicaid determination' do
-      expect(@file_content[2][7]).to eq(spouse_applicant.is_medicaid_chip_eligible.to_s)
+      expect(@file_content[2][7]).to eq(spouse_applicant.is_magi_medicaid.to_s)
     end
 
     it 'should match with the applicant non magi medicaid determination' do
