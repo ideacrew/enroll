@@ -1429,6 +1429,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
         expect(permission.can_drop_enrollment_members).to eq true
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'hbx_read_only' as permission" do
@@ -1441,6 +1442,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
         expect(permission.can_drop_enrollment_members).to eq false
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'hbx_csr_supervisor' as permission" do
@@ -1448,6 +1450,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.name).to eq 'hbx_csr_supervisor'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_call_hub).to eq true
         if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
           expect(permission.can_reinstate_enrollment).to eq true
           expect(permission.can_cancel_enrollment).to eq true
@@ -1462,6 +1465,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.name).to eq 'hbx_csr_tier2'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_call_hub).to eq true
         if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
           expect(permission.can_reinstate_enrollment).to eq true
           expect(permission.can_cancel_enrollment).to eq true
@@ -1481,6 +1485,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
         expect(permission.can_drop_enrollment_members).to eq false
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'developer' as permission" do
@@ -1493,6 +1498,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
         expect(permission.can_drop_enrollment_members).to eq false
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'hbx_tier3' as permission" do
@@ -1505,6 +1511,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
         expect(permission.can_drop_enrollment_members).to eq false
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'super_admin' as permission" do
@@ -1517,6 +1524,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
         expect(permission.can_drop_enrollment_members).to eq true
+        expect(permission.can_call_hub).to eq true
       end
     end
   end
