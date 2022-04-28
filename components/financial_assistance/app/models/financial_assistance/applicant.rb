@@ -189,7 +189,6 @@ module FinancialAssistance
     field :magi_medicaid_category, type: String
     field :medicaid_household_size, type: Integer
 
-    # We may not need the following two fields
     field :is_magi_medicaid, type: Boolean, default: false
     field :is_medicare_eligible, type: Boolean, default: false
 

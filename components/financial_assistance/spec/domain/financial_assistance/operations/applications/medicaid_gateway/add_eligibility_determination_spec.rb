@@ -108,6 +108,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
           expect(@applicant.is_medicaid_chip_eligible).to eq(false)
         end
 
+        it 'should update is_magi_medicaid' do
+          expect(@applicant.is_magi_medicaid).to eq(false)
+        end
+
         it 'should update is_non_magi_medicaid_eligible' do
           expect(@applicant.is_non_magi_medicaid_eligible).to eq(false)
         end
