@@ -2,9 +2,10 @@ require 'rails_helper'
 
 describe Household, "given a coverage household with a dependent", :dbclean => :after_each do
   let(:family_member) { FamilyMember.new }
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let(:person) { FactoryBot.create(:person, :with_family, dob: DateTime.now - 10.years, ssn: '111111111') }
   let(:coverage_household_member) { CoverageHouseholdMember.new(:family_member_id => family_member.id) }
   let(:coverage_household) { CoverageHousehold.new(:coverage_household_members => [coverage_household_member]) }
-  let(:family) {FactoryBot.create(:family, family_member: family_member)}
 
   subject { Household.new(:coverage_households => [coverage_household]) }
 
@@ -22,14 +23,12 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   end
 
   context "new household member matching existing person record" do
-    let(:person) { FactoryBot.create(:person, dob: DateTime.now - 10.years, ssn: '111111111') }
-    let(:family_member1) { FactoryBot.create(:family_member, person: person)}
-    let(:family_member2) { FactoryBot.create(:family_member, person: person)}
-    
+    let(:new_family_member) {FactoryBot.create(:family_member, family: family, person: person)}
+
     it "should create new coverage household member" do
-      subject.add_household_coverage_member(family_member1)
-      binding.irb
-      expect(coverage_household.size).to eql(2)
+      allow(new_family_member).to receive(:primary_relationship).and_return("child")
+      family.active_household.add_household_coverage_member(new_family_member)
+      expect(family.active_household.coverage_households.first.coverage_household_members.size).to eql(family.family_members.size)
     end
   end
 
