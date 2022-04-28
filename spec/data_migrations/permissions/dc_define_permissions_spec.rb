@@ -1427,6 +1427,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq true
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'hbx_read_only' as permission" do
@@ -1438,6 +1439,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
+        expect(permission.can_call_hub).to eq false
       end
 
       it "user with 'hbx_csr_supervisor' as permission" do
@@ -1449,6 +1451,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
+        expect(permission.can_call_hub).to eq false
       end
 
       it "user with 'hbx_csr_tier2' as permission" do
@@ -1460,6 +1463,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
+        expect(permission.can_call_hub).to eq false
       end
 
       it "user with 'hbx_csr_tier1' as permission" do
@@ -1471,6 +1475,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
+        expect(permission.can_call_hub).to eq false
       end
 
       it "user with 'developer' as permission" do
@@ -1482,6 +1487,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq false
         expect(permission.can_terminate_enrollment).to eq false
         expect(permission.change_enrollment_end_date).to eq false
+        expect(permission.can_call_hub).to eq false
       end
 
       it "user with 'hbx_tier3' as permission" do
@@ -1493,6 +1499,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq true
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
+        expect(permission.can_call_hub).to eq true
       end
 
       it "user with 'super_admin' as permission" do
@@ -1504,6 +1511,7 @@ describe DcDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq true
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
+        expect(permission.can_call_hub).to eq true
       end
     end
   end
