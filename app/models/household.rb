@@ -56,7 +56,7 @@ class Household
 
   def add_household_coverage_member(family_member)
     if Family::IMMEDIATE_FAMILY.include?(family_member.primary_relationship)
-     immediate_family_coverage_household.add_coverage_household_member(family_member)
+      immediate_family_coverage_household.add_coverage_household_member(family_member)
       extended_family_coverage_household.remove_family_member(family_member)
     else
       immediate_family_coverage_household.remove_family_member(family_member)
