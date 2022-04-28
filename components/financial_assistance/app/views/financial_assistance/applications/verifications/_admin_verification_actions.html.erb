@@ -99,46 +99,41 @@
         </tr>
         </thead>
         <tbody>
-          <% evidence.verification_histories.each_with_index do |record, index| %>
+          <% records = (evidence.verification_histories + evidence.request_results).flatten.sort_by(&:created_at).reverse! %>
+          <% records.each_with_index do |record, index| %>
             <tr>
               <th scope="row"><%= index + 1 %></th>
               <td><%= record.created_at.in_time_zone('Eastern Time (US & Canada)') %></td>
-              <td><%= record.action.capitalize %></td>
-              <td><%= record.updated_by %></td>
-              <td><%= record.update_reason %></td>
-            </tr>
-          <% end %>
-          <% evidence.request_results.each_with_index do |record, index| %>
-            <tr>
-              <th scope="row"><%= index + 1 %></th>
-              <td><%= record.created_at.in_time_zone('Eastern Time (US & Canada)') %></td>
-              <td><%= "Hub Call" %></td>
-              <td><%= record.source_transaction_id %></td>
-              <td><%= "Fdsh HUb Call" %></td>
-              <td>
-                <% if record.raw_payload.present? %>
+              <td><%= record.is_a?(Eligibilities::RequestResult) ? 'Hub Call' : record.action.capitalize %></td>
+              <td><%= record.is_a?(Eligibilities::RequestResult) ? record.source_transaction_id : record.updated_by %></td>
+              <td><%= record.is_a?(Eligibilities::RequestResult) ? 'Fdsh Hub Call' : record.update_reason %></td>
+              <% if record.is_a?(Eligibilities::RequestResult) %>
+                <td>
+                  <% if record.raw_payload.present? %>
                     <button type="button" data-toggle="modal" data-target=<%="#record_details_#{record.id}" %>>Payload</button>
-                <% end %>
-              </td>
-            </tr>
-            <div class="modal fade" id=<%="record_details_#{record.id}" %>  tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h4 class="modal-title"><%= "#{evidence.title.capitalize} payload" %></h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <%= JSON.parse(record.raw_payload) if record.raw_payload.present? %>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <% end %>
+                </td>
+
+                <div class="modal fade" id=<%="record_details_#{record.id}" %>  tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title"><%= "#{evidence.title.capitalize} payload" %></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <%= JSON.parse(record.raw_payload) if record.raw_payload.present? %>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              <% end %>
+            </tr>
           <% end %>
         </tbody>
       </table>
