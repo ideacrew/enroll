@@ -45,8 +45,8 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         applicant_thh = tax_households.detect {|th| th.applicant_ids.include?(applicant.family_member_id)}
         applicant_thm = applicant_thh.tax_household_members.detect {|thm| thm.applicant_id == applicant.family_member_id}
         max_aptc_str = format('%.2f', applicant_thh.current_max_aptc.to_f) if applicant_thh&.current_max_aptc.present?
-        max_aptc = applicant.is_magi_medicaid ? 'N/A' : max_aptc_str
-        csr_percent = applicant&.csr_percent_as_integer.present? ? applicant.csr_percent_as_integer.to_s : 'N/A'
+        max_aptc = max_aptc_str if applicant.is_ia_eligible
+        csr_percent = applicant.csr_percent_as_integer.to_s
         medicaid_eligible = applicant.is_magi_medicaid
         non_magi_medicaid_eligible = applicant.is_non_magi_medicaid_eligible
         is_totally_ineligible = applicant.is_totally_ineligible
