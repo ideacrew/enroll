@@ -11,6 +11,14 @@ module Operations
     class FamilyDataExportProcessor
       include Dry::Monads[:result, :do]
 
+      DR_NOTICES = {
+          :DR0 => "Action Needed - Submit Documents",
+          :DR1 => "Reminder - You Must Submit Documents",
+          :DR2 => "Don't Forget - You Must Submit Documents",
+          :DR3 => "Don't Miss the Deadline - You Must Submit Documents",
+          :DR4 => "Final Notice - You Must Submit Documents"
+        }
+        
       # @param [Hash] opts Options to update evidence due on dates
       # @option opts [Integer] :offset required
       # @option opts [Integer] :limit required
@@ -51,14 +59,22 @@ module Operations
 
             ed_status = family.eligibility_determination&.outstanding_verification_status
             ed_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
-
-            family_data.each { |member_row| csv << (member_row + [ed_status.to_s, ed_due_date]) }
+            primary_person = family.primary_person
+            dr_notice_creation_dates = get_dr_notice_creation_dates(primary_person)
+            family_data.each { |member_row| csv << (member_row + [ed_status.to_s, ed_due_date] + dr_notice_creation_dates + [primary_person.consumer_role&.contact_method]) }
           end
         end
 
         Success(file_name)
       rescue StandardError => e
         logger.info(e.message) unless Rails.env.test?
+      end
+
+      def get_dr_notice_creation_dates(person)
+        DR_NOTICES.inject([]) do |data, (type,title)|
+          data << person.documents.where(title: title).last&.created_at&.strftime('%Y_%m_%d %H:%M')
+          data
+        end
       end
 
       def init_logger
@@ -124,7 +140,13 @@ module Operations
           'Esi Updated?',
           'Local Mec Updated?',
           'Eligibility Determination Status',
-          'Eligibility Determination Due Date'
+          'Eligibility Determination Due Date',
+          'DR0 Created On',
+          'DR1 Created On',
+          'DR2 Created On',
+          'DR3 Created On',
+          'DR4 Created On',
+          'Communication Preference'
         ]
       end
       # rubocop:enable Metrics/MethodLength
