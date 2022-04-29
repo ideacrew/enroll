@@ -41,10 +41,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         uqhp_eligble = applicant.is_without_assistance
         aptc = applicant.is_ia_eligible
         family = Family.find(application.family_id)
-        tax_households = family.active_household.tax_households
-        applicant_thh = tax_households.detect {|th| th.applicant_ids.include?(applicant.family_member_id)}
-        applicant_thm = applicant_thh.tax_household_members.detect {|thm| thm.applicant_id == applicant.family_member_id}
-        max_aptc_str = format('%.2f', applicant_thh.current_max_aptc.to_f) if applicant_thh&.current_max_aptc.present?
+        max_aptc_str = format('%.2f', applicant.eligibility_determination.max_aptc.to_f) if applicant.eligibility_determination&.max_aptc.present?
         max_aptc = max_aptc_str if applicant.is_ia_eligible
         csr_percent = applicant.csr_percent_as_integer.to_s
         medicaid_eligible = applicant.is_magi_medicaid

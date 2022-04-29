@@ -52,7 +52,8 @@ describe 'daily_faa_submission_report' do
       last_name: person.last_name,
       gender: person.gender,
       dob: person.dob,
-      encrypted_ssn: person.encrypted_ssn
+      encrypted_ssn: person.encrypted_ssn,
+      eligibility_determination_id: eligibility_determination.id
     )
   end
   let!(:applicant2) do
@@ -69,7 +70,8 @@ describe 'daily_faa_submission_report' do
       last_name: person2.last_name,
       gender: person2.gender,
       dob: person2.dob,
-      encrypted_ssn: person.encrypted_ssn
+      encrypted_ssn: person.encrypted_ssn,
+      eligibility_determination_id: eligibility_determination2.id
     )
   end
   let!(:applicants) { [applicant, applicant2] }
