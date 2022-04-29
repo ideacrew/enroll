@@ -12,13 +12,13 @@ module Operations
       include Dry::Monads[:result, :do]
 
       DR_NOTICES = {
-          :DR0 => "Action Needed - Submit Documents",
-          :DR1 => "Reminder - You Must Submit Documents",
-          :DR2 => "Don't Forget - You Must Submit Documents",
-          :DR3 => "Don't Miss the Deadline - You Must Submit Documents",
-          :DR4 => "Final Notice - You Must Submit Documents"
-        }
-        
+        :DR0 => "Action Needed - Submit Documents",
+        :DR1 => "Reminder - You Must Submit Documents",
+        :DR2 => "Don't Forget - You Must Submit Documents",
+        :DR3 => "Don't Miss the Deadline - You Must Submit Documents",
+        :DR4 => "Final Notice - You Must Submit Documents"
+      }.freeze
+
       # @param [Hash] opts Options to update evidence due on dates
       # @option opts [Integer] :offset required
       # @option opts [Integer] :limit required
@@ -71,7 +71,7 @@ module Operations
       end
 
       def get_dr_notice_creation_dates(person)
-        DR_NOTICES.inject([]) do |data, (type,title)|
+        DR_NOTICES.inject([]) do |data, (_type,title)|
           data << person.documents.where(title: title).last&.created_at&.strftime('%Y_%m_%d %H:%M')
           data
         end
