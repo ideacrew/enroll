@@ -46,6 +46,7 @@ describe 'daily_faa_submission_report' do
       family_member_id: family_member.id,
       is_primary_applicant: true,
       citizen_status: 'us_citizen',
+      is_ia_eligible: true,
       csr_percent_as_integer: 73,
       first_name: person.first_name,
       last_name: person.last_name,
@@ -62,6 +63,7 @@ describe 'daily_faa_submission_report' do
       application: application,
       family_member_id: family_member2.id,
       citizen_status: 'alien_lawfully_present',
+      is_ia_eligible: false,
       csr_percent_as_integer: 87,
       first_name: person2.first_name,
       last_name: person2.last_name,
@@ -131,7 +133,8 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the max aptc' do
-      expect(@file_content[1][5]).to eq format('%.2f', eligibility_determination.max_aptc.to_f)
+      max_aptc = format('%.2f', eligibility_determination.max_aptc.to_f) if primary_applicant.is_ia_eligible
+      expect(@file_content[1][5]).to eq max_aptc.to_s
     end
 
     it 'should match with the csr percent as integer' do
@@ -198,7 +201,8 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the max aptc' do
-      expect(@file_content[2][5]).to eq format('%.2f', eligibility_determination2.max_aptc.to_f)
+      max_aptc = format('%.2f', eligibility_determination2.max_aptc.to_f) if spouse_applicant.is_ia_eligible
+      expect(@file_content[2][5]).to eq max_aptc.to_s
     end
 
     it 'should match with the csr percent as integer' do
