@@ -127,7 +127,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant uqhp determination' do
-      expect(@file_content[1][3]).to eq(primary_applicant.is_without_assistance.to_s)
+      expect(@file_content[1][3]).to eq(primary_applicant.is_without_assistance.present?.to_s)
     end
 
     it 'should match with the applicant aptc/csr determination' do
@@ -152,7 +152,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant totally ineligible determination' do
-      expect(@file_content[1][9]).to eq(primary_applicant.is_totally_ineligible.to_s)
+      expect(@file_content[1][9]).to eq(primary_applicant.is_totally_ineligible.present?.to_s)
     end
 
     it 'should match with the application submission date' do
@@ -195,7 +195,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant uqhp determination' do
-      expect(@file_content[2][3]).to eq(spouse_applicant.is_without_assistance.to_s)
+      expect(@file_content[2][3]).to eq(spouse_applicant.is_without_assistance.present?.to_s)
     end
 
     it 'should match with the applicant aptc/csr determination' do
@@ -220,7 +220,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant totally ineligible determination' do
-      expect(@file_content[2][9]).to eq(spouse_applicant.is_totally_ineligible.to_s)
+      expect(@file_content[2][9]).to eq(spouse_applicant.is_totally_ineligible.present?.to_s)
     end
 
     it 'should match with the application submission date' do
