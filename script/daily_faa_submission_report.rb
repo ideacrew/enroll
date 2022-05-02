@@ -38,7 +38,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
     applications.each do |application|
       application.applicants.each do |applicant|
         age = applicant.age_on(end_time)
-        uqhp_eligble = applicant.is_without_assistance
+        uqhp_eligble = applicant.is_without_assistance.present?
         aptc = applicant.is_ia_eligible
         family = Family.find(application.family_id)
         max_aptc_str = format('%.2f', applicant.eligibility_determination.max_aptc.to_f) if applicant.eligibility_determination&.max_aptc.present?
@@ -46,7 +46,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         csr_percent = applicant.csr_percent_as_integer.to_s
         medicaid_eligible = applicant.is_magi_medicaid
         non_magi_medicaid_eligible = applicant.is_non_magi_medicaid_eligible
-        is_totally_ineligible = applicant.is_totally_ineligible
+        is_totally_ineligible = applicant.is_totally_ineligible.present?
         is_blind = applicant.is_self_attested_blind
         is_disabled = applicant.is_physically_disabled
         need_help_with_daily_living = applicant.has_daily_living_help
