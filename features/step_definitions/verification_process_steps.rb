@@ -101,3 +101,36 @@ end
 Then(/^consumer should see Documents We Accept link$/) do
   expect(page).to have_content('Documents We Accept')
 end
+
+Then(/^Individual should see cost saving documents for evidences$/) do
+  expect(page).to have_content('Coverage from a job')
+  expect(page).to have_content('Coverage from another program')
+  expect(page).to have_content('Coverage from MaineCare and Cub Care')
+end
+
+And(/^Individual clicks on Actions dropdown$/) do
+  find_all('.v-type-actions')[-1].click
+end
+
+Then(/^Individual should see view history option/) do
+  expect(page).to have_content('View History')
+end
+
+And(/^Individual clicks on view history$/) do
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div[5]/div/div/div/div[2]/div[15]/div/div[5]/div/div[3]/div/ul/li[4]').click
+
+end
+
+Then(/^Individual should see request histories and verification types$/) do
+  expect(page).to have_content('Verification History')
+  expect(page).to have_content('Fdsh Hub Call')
+  expect(page).to have_content('Requested Hub for verification')
+end
+
+And(/^Individual clicks on cancel button$/) do
+  find('.btn', text: 'Cancel').click
+end
+
+Then(/^Individual should not see view history table$/) do
+  expect(page).not_to have_content('Verification History')
+end
