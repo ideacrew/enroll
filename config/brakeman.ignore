@@ -539,7 +539,7 @@
       "warning_code": 24,
       "fingerprint": "65fcfed30f4a5e04a15736f27beec09010b3ffedd31ea672a34ef1eb1721b917",
       "check_name": "UnsafeReflection",
-      "message": "Unsafe reflection method `safe_constantize` called with parameter value",
+      "message": "Unsafe reflection method `safe_constantize` called on parameter value",
       "file": "app/controllers/documents_controller.rb",
       "line": 37,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
@@ -734,6 +734,22 @@
         "method": "download_employer_document"
       },
       "user_input": "BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 122,
+      "fingerprint": "98b26f60d776fd41ee6f088c833725145be9aac2d7c5b33780241c273622db42",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 5.2.4.4 ends on 2022-06-01",
+      "file": "Gemfile.lock",
+      "line": 770,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
       "confidence": "Medium",
       "note": ""
     },
@@ -934,6 +950,6 @@
       "note": ""
     }
   ],
-  "updated": "2022-04-04 12:28:35 -0400",
-  "brakeman_version": "5.2.1"
+  "updated": "2022-05-02 10:25:34 -0400",
+  "brakeman_version": "5.2.3"
 }
