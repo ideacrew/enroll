@@ -62,6 +62,7 @@ class Household
       immediate_family_coverage_household.remove_family_member(family_member)
       extended_family_coverage_household.add_coverage_household_member(family_member)
     end
+    self.save
   end
 
   def immediate_family_coverage_household
