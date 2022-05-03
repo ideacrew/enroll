@@ -155,6 +155,18 @@ module IvlAssistanceWorld
     @application.save!
   end
 
+  def create_family_faa_application_with_applicants_and_evidences(state)
+    create_family_faa_application_with_applicants(state)
+
+    @application.applicants.each do |applicant|
+      applicant.income_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :income, title: 'Income', aasm_state: 'pending', is_satisfied: false)
+      applicant.esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :esi_mec, title: 'ESI MEC')
+      applicant.non_esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :non_esi_mec, title: 'Non ESI MEC')
+      applicant.local_mec_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :local_mec, title: 'Local MEC')
+      applicant.save
+    end
+  end
+
   def create_enrollment_for_family(family, carrier_name = nil)
     if carrier_name == 'Kaiser'
       enrollment_product = create_kaiser_product

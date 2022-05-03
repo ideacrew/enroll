@@ -11,5 +11,16 @@ FactoryBot.define do
     aasm_state { :attested }
     due_on { nil }
 
+    trait :with_request_results do
+      after :build do |evidence, _evaluator|
+        evidence.request_results << FactoryBot.build(:request_result)
+      end
+    end
+
+    trait :with_verification_histories do
+      after :build do |evidence, _evaluator|
+        evidence.verification_histories << FactoryBot.build(:verification_history)
+      end
+    end
   end
 end
