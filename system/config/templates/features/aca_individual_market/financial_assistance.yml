@@ -75,7 +75,7 @@ registry:
         item: :primary_caregiver_other_question
         is_enabled: false
       - key: :mec_check
-        is_enabled: true
+        is_enabled: false
       - key: :include_faa_outstanding_verifications
         is_enabled: false
       - key: :skip_aptc_families_from_document_reminder_notices
