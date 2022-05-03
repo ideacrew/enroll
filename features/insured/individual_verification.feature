@@ -60,3 +60,18 @@ Scenario: Outstanding verification
     When an HBX admin exists
     And clicks on the person in families tab
     Then verification types should display as external source
+
+  Scenario: Consumer has determined Financial Assistance application
+    Given the FAA feature configuration is enabled
+    And FAA display_medicaid_question feature is enabled
+    And a family with financial application and applicants in determined state exists with evidences
+    And the user with hbx_staff role is logged in
+    When admin visits home page
+    And Individual clicks on Documents link
+    Then Individual should see cost saving documents for evidences
+    And Individual clicks on Actions dropdown
+    Then Individual should see view history option
+    And Individual clicks on view history
+    Then Individual should see request histories and verification types
+    And Individual clicks on cancel button
+    Then Individual should not see view history table
