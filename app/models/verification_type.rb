@@ -106,11 +106,12 @@ class VerificationType
 
   def fail_type
     verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+    status = self.reload.validation_status == 'rejected' ? 'rejected' : 'outstanding'
     attrs =
       if EnrollRegistry.feature_enabled?(:set_due_date_upon_response_from_hub)
-        {:validation_status => "outstanding", :due_date => (TimeKeeper.date_of_record + verification_document_due.days), :due_date_type => 'response_from_hub'}
+        {:validation_status => status, :due_date => (TimeKeeper.date_of_record + verification_document_due.days), :due_date_type => 'response_from_hub'}
       else
-        {:validation_status => "outstanding"}
+        {:validation_status => status}
       end
 
     update_attributes(attrs)
