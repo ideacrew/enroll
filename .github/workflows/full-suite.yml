@@ -13,11 +13,23 @@ env:
   CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/cucumber-split-config.json'
 
 jobs:
+  codesweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run AppScan CodeSweep
+        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@v1
+        with:
+          asoc_key: ${{secrets.ASOC_KEY}}
+          asoc_secret: ${{secrets.ASOC_SECRET}}
+    env:
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   rubocop:
     if: contains(github.ref, 'release') == false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - name: Cache Gems
         uses: actions/cache@v2
@@ -39,7 +51,7 @@ jobs:
   view_linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/cache@v2
         with:
@@ -59,7 +71,7 @@ jobs:
   brakeman:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore
@@ -85,7 +97,7 @@ jobs:
             'financial_assistance',
           ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -149,7 +161,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -236,7 +248,7 @@ jobs:
             25,
           ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -340,7 +352,7 @@ jobs:
             51,
           ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -382,7 +394,7 @@ jobs:
       - name: Run tests
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   quality-workbench:
-    needs: [engines, benefit-sponsors, rspec, cucumber]
+    needs: [engines, benefit-sponsors, rspec, cucumber, codesweep]
     if: always()
     runs-on: ubuntu-latest
     strategy:
