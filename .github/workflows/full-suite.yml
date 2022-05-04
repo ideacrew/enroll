@@ -395,7 +395,7 @@ jobs:
       - name: Run tests
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   quality-workbench:
-    needs: [engines, benefit-sponsors, rspec, cucumber, codesweep]
+    needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
     runs-on: ubuntu-latest
     strategy:
