@@ -1233,10 +1233,10 @@ module FinancialAssistance
     end
 
     # Case1: Missing address - No address objects at all
-    # Case2: Invalid Address - No addresses matching the state (skip if living_outside_state feature is enabled and applicant plans to return)
+    # Case2: Invalid Address - No addresses matching the state (unless out_of_state_primary feature is enabled)
     # Case3: Unable to get rating area(home_address || mailing_address)
     def has_valid_address?
-      if EnrollRegistry.feature_enabled?(:living_outside_state) && is_temporarily_out_of_state
+      if FinancialAssistanceRegistry[:out_of_state_primary].enabled?
         addresses.where(
           :kind.in => ['home', 'mailing']
         ).present?
