@@ -20,7 +20,7 @@ class HbxEnrollment
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
-  # TODO need to understand these two fields
+  # TODO: need to understand these two fields
   field :elected_aptc_pct, type: Float, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
   field :aggregate_aptc_amount, type: Money, default: 0.0
