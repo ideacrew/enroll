@@ -52,7 +52,7 @@ module FinancialAssistance
 
             if applicant_local_mec_evidence.present?
               if response_evidence.aasm_state == 'outstanding'
-                applicant.set_evidence_outstanding(applicant_local_mec_evidence)
+                applicant.set_evidence_to_negative_response(applicant_local_mec_evidence)
               else
                 applicant.set_evidence_verified(applicant_local_mec_evidence)
               end

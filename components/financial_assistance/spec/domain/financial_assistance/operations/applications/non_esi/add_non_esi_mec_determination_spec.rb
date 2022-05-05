@@ -43,7 +43,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Add
 
       it 'should update applicant verification' do
         @applicant.reload
-        expect(@applicant.non_esi_evidence.aasm_state).to eq "outstanding"
+        expect(@applicant.non_esi_evidence.aasm_state).not_to eq "outstanding"
+        expect(@applicant.non_esi_evidence.aasm_state).to eq "negative_response_received"
         expect(@applicant.non_esi_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end

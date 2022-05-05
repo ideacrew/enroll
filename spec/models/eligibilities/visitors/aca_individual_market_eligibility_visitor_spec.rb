@@ -131,7 +131,6 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
     end
   end
 
-  it_behaves_like 'outstanding verification type', 'unverified'
   it_behaves_like 'outstanding verification type', 'outstanding'
   it_behaves_like 'outstanding verification type', 'rejected'
 end
