@@ -1135,7 +1135,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'out_of_state_primary feature enabled' do
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       end
 
@@ -1171,7 +1171,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'out_of_state_primary feature disabled' do
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       end
 
