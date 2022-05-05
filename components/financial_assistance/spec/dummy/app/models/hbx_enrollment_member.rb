@@ -5,10 +5,6 @@
 class HbxEnrollmentMember
   include Mongoid::Document
   include Mongoid::Timestamps
-  include BelongsToFamilyMember
-  include Insured::GroupSelectionHelper
-  include Insured::EmployeeRolesHelper
-  include ApplicationHelper
 
   embedded_in :hbx_enrollment
 

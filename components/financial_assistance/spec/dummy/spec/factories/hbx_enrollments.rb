@@ -30,6 +30,13 @@ FactoryBot.define do
       hbx_enrollment_members { enrollment_members.map{|member| FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
     end
 
+    trait :individual_assisted do
+      kind { "individual" }
+      elected_premium_credit { 150 }
+      applied_premium_credit { 110 }
+      aasm_state { "coverage_selected" }
+    end
+
     trait :shop do
       kind { "employer_sponsored" }
       aasm_state { "coverage_selected" }

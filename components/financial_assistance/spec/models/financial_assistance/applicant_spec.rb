@@ -1088,15 +1088,12 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   describe 'enrolled_with' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:issuer) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let!(:enrollment) do
       FactoryBot.create(
         :hbx_enrollment,
         :with_enrollment_members,
         :individual_assisted,
         family: family,
-        product_id: product.id,
         applied_aptc_amount: Money.new(44_500),
         consumer_role_id: person.consumer_role.id,
         enrollment_members: family.family_members

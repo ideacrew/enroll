@@ -115,7 +115,7 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
     %w[income_evidence esi_evidence non_esi_evidence local_mec_evidence]
   end
 
-  let(:outstanding_types) { %w[unverified outstanding review] }
+  let(:outstanding_types) { %w[outstanding review rejected] }
   let(:people) { [person1, person2] }
   let(:verification_type_names) do
     [
@@ -124,6 +124,12 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
       'Citizenship',
       'Immigration status'
     ]
+  end
+
+  before do
+    people.each do |person|
+      person.verification_types.each{ |vt| vt.update!(validation_status: 'outstanding') }
+    end
   end
 
   context 'when valid attributes passed' do
