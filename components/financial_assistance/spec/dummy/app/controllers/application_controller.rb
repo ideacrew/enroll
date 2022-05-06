@@ -22,6 +22,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, private"
+    response.headers["Pragma"] = "no-cache"
+  end
+
   def set_current_person(required: true) # rubocop:disable Naming/AccessorMethodName
     @person = if current_user.try(:person).try(:agent?) && session[:person_id].present?
                 Person.find(session[:person_id])
