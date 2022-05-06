@@ -47,6 +47,7 @@ describe 'daily_faa_submission_report' do
       is_primary_applicant: true,
       citizen_status: 'us_citizen',
       is_ia_eligible: true,
+      is_medicaid_chip_eligible: false,
       csr_percent_as_integer: 73,
       first_name: person.first_name,
       last_name: person.last_name,
@@ -65,6 +66,7 @@ describe 'daily_faa_submission_report' do
       family_member_id: family_member2.id,
       citizen_status: 'alien_lawfully_present',
       is_ia_eligible: false,
+      is_medicaid_chip_eligible: true,
       csr_percent_as_integer: 87,
       first_name: person2.first_name,
       last_name: person2.last_name,
@@ -144,7 +146,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant medicaid determination' do
-      expect(@file_content[1][7]).to eq(primary_applicant.is_magi_medicaid.to_s)
+      expect(@file_content[1][7]).to eq(primary_applicant.is_medicaid_chip_eligible.to_s)
     end
 
     it 'should match with the applicant non magi medicaid determination' do
@@ -212,7 +214,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant medicaid determination' do
-      expect(@file_content[2][7]).to eq(spouse_applicant.is_magi_medicaid.to_s)
+      expect(@file_content[2][7]).to eq(spouse_applicant.is_medicaid_chip_eligible.to_s)
     end
 
     it 'should match with the applicant non magi medicaid determination' do
