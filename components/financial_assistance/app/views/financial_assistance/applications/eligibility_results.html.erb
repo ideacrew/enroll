@@ -6,7 +6,7 @@
         <p><b><%= l10n("faa.we_have_your_results") %>!</b></p>
         
         <!-- This appears if at least some (not necessarily all) applicants are medicaid eligible -->
-        <%if eligible_applicants(params[:id], [:is_magi_medicaid, :is_medicaid_chip_eligible]).present?%>
+        <%if eligible_applicants(params[:id], :is_magi_medicaid).present? || eligible_applicants(params[:id], :is_medicaid_chip_eligible).present?%>
           <div class="er-medicaid mt-20">
             <div class="er-title">
               <h3><%= l10n("faa.medicaid") %></h3>
@@ -23,7 +23,10 @@
                 <% end %>
               </p>
 
-              <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
+              <%medicaid_applicants = eligible_applicants(params[:id], :is_magi_medicaid)%>
+              <%chip_applicants = eligible_applicants(params[:id], :is_medicaid_chip_eligible)%>
+              <%medicaid_and_chip_applicants = medicaid_applicants.concat(chip_applicants)%>
+              <%medicaid_and_chip_applicants.each do |applicant_name|%>
               <div class='er-prsn'>
                 <i class="fa fa-user fa-2x" aria-hidden="true"></i>
                 <h4><%=applicant_name%></h4>
@@ -233,7 +236,7 @@
       <% end %>
 
       <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible or ineligible. It will appear for any other combination of applicant determinations. %>
-      <% all_medicaid_applicants = eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length %>
+      <% all_medicaid_applicants = medicaid_and_chip_applicants&.length == @application.active_applicants.length %>
       <% all_ineligible_applicants = eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
       <% unless all_medicaid_applicants == true || all_ineligible_applicants == true %>
         <div class="border-bottom-1px"></div>
@@ -262,7 +265,7 @@
             <div class="text-success">
               <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
                   determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
-              <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
+              <% if medicaid_and_chip_applicants&.length == @application.active_applicants.length  %>
                 <span>
                   <%= l10n("faa.next_step_medicaid_eligible") %>
                 </span>
