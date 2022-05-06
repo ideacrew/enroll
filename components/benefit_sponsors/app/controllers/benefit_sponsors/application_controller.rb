@@ -17,7 +17,7 @@ module BenefitSponsors
     end
 
     def set_cache_headers
-      response.headers["Cache-Control"] = "private, no-store, no-cache"
+      response.headers["Cache-Control"] = "no-cache, no-store, private"
       response.headers["Pragma"] = "no-cache"
     end
 

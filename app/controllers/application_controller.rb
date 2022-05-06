@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
   def set_cache_headers
-    response.headers["Cache-Control"] = "private, no-store, no-cache"
+    response.headers["Cache-Control"] = "no-cache, no-store, private"
     response.headers["Pragma"] = "no-cache"
   end
 
