@@ -12,7 +12,7 @@ module Eligibilities
     include GlobalID::Identification
     include Eligibilities::Eventable
 
-    DUE_DATE_STATES = %w[review outstanding].freeze
+    DUE_DATE_STATES = %w[review outstanding rejected].freeze
 
     ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject", "View History", "Call HUB", "Extend"].freeze
 
