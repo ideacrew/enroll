@@ -44,7 +44,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         max_aptc_str = format('%.2f', applicant.eligibility_determination.max_aptc.to_f) if applicant.eligibility_determination&.max_aptc.present?
         max_aptc = max_aptc_str if applicant.is_ia_eligible
         csr_percent = applicant.csr_percent_as_integer.to_s
-        medicaid_eligible = applicant.is_magi_medicaid
+        medicaid_eligible = applicant.is_medicaid_chip_eligible # is_medicaid_chip_eligible stores both magi medicaid and CHIP eligibility determinations
         non_magi_medicaid_eligible = applicant.is_non_magi_medicaid_eligible
         is_totally_ineligible = applicant.is_totally_ineligible.present?
         is_blind = applicant.is_self_attested_blind
