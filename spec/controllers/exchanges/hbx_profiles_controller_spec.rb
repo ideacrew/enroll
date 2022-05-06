@@ -329,6 +329,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to render_template("exchanges/hbx_profiles/show")
     end
 
+    it "has the correct headers" do
+      get :show
+      expect(response.headers['Cache-Control']).to eql("no-cache, no-store")
+      expect(response.headers['Pragma']).to eql("no-cache")
+    end
+
     it "should clear session for dismiss_announcements" do
       get :show
       expect(session[:dismiss_announcements]).to eq nil
