@@ -72,6 +72,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::RequestMa
     allow(obj2.class).to receive(:new).and_return(obj2)
     allow(obj2).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary)
   end
 
   context 'success' do
