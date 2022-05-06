@@ -10,7 +10,7 @@ module BenefitSponsors
       # TODO: Let's just doo this for now
       before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
       before_action :set_cache_headers, only: [:edit]
-      
+
       layout 'two_column', :only => :edit
 
       def new
