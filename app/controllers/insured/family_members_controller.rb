@@ -8,6 +8,7 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
   before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
+  before_action :set_cache_headers, only: [:edit]
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
