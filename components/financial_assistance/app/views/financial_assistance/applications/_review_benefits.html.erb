@@ -10,7 +10,7 @@
 
   <% benefits.each do |benefit| %>
     <div class="row ptb no-buffer row-height row-benefit-form-wrapper verti-line">
-      <div class="col-md-6 form-heading"><%= l10n("faa.question.#{insurance_kind}") %></div>
+      <div class="col-md-6 form-heading"><%= l10n("faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></div>
       <div class="col-md-6 form-content"><%= start_to_end_dates(benefit) %></div>
     </div>
 
