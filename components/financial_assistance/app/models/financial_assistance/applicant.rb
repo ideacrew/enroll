@@ -1236,7 +1236,7 @@ module FinancialAssistance
     # Case2: Invalid Address - No addresses matching the state (unless out_of_state_primary feature is enabled)
     # Case3: Unable to get rating area(home_address || mailing_address)
     def has_valid_address?
-      if FinancialAssistanceRegistry[:out_of_state_primary].enabled?
+      if FinancialAssistanceRegistry.feature_enabled?(:out_of_state_primary)
         addresses.where(
           :kind.in => ['home', 'mailing']
         ).present?
