@@ -53,6 +53,11 @@ class ApplicationController < ActionController::Base
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, private"
+    response.headers["Pragma"] = "no-cache"
+  end
+
   def access_denied
     render file: 'public/403.html', status: 403
   end

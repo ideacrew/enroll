@@ -6,6 +6,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]
+  before_action :set_cache_headers, only: [:index, :edit]
 
   def index
     @people = Person.broker_role_having_agency

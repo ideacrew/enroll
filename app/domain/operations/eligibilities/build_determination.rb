@@ -23,8 +23,7 @@ module Operations
       def call(params)
         values = yield validate(params)
         eligibility_items = yield get_eligibility_items(values)
-        determination_hash =
-          yield build_determination(eligibility_items, values)
+        determination_hash = yield build_determination(eligibility_items, values)
         determination_entity = yield create_determination(determination_hash)
 
         Success(determination_entity)

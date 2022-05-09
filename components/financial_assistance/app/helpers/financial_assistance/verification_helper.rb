@@ -11,7 +11,7 @@ module FinancialAssistance
 
     def show_verification_status(status, admin = nil)
       status = "verified" if status == "valid"
-      (status || '').capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+      (status || '').titleize.center(12).gsub(' ', '&nbsp;').html_safe
     end
 
     def admin_verification_action(admin_action, evidence, update_reason)
@@ -87,6 +87,10 @@ module FinancialAssistance
         "default"
       when "rejected"
         "danger"
+      when "negative_response_received"
+        "warning"
+      else
+        "default"
       end
     end
   end

@@ -53,7 +53,7 @@ module Operations
       end
 
       def update_person_eligibilities(person, due_on)
-        outstanding_statuses = %w[unverified outstanding review]
+        outstanding_statuses = %w[outstanding review rejected]
 
         type_names = ["Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
         type_names.each do |type_name|

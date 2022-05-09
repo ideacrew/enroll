@@ -146,6 +146,10 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       it 'should return true' do
         expect(ver_type.is_type_outstanding?).to eq(true)
       end
+
+      it 'returns state as outstanding' do
+        expect(ver_type.validation_status).to eq('outstanding')
+      end
     end
 
     context 'for rejected' do
@@ -154,6 +158,10 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       it 'should return true' do
         expect(ver_type.is_type_outstanding?).to eq(true)
       end
+
+      it 'return state as rejected' do
+        expect(ver_type.validation_status).to eq('rejected')
+      end
     end
 
     context 'for pass_type' do
@@ -161,6 +169,10 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
 
       it 'should return false' do
         expect(ver_type.is_type_outstanding?).to eq(false)
+      end
+
+      it 'return state as verified' do
+        expect(ver_type.validation_status).to eq('verified')
       end
     end
   end

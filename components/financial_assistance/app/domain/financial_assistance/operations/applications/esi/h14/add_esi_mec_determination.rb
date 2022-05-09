@@ -56,7 +56,7 @@ module FinancialAssistance
 
               if applicant_esi_evidence.present?
                 if response_esi_evidence.aasm_state == 'outstanding'
-                  applicant.set_evidence_outstanding(applicant_esi_evidence)
+                  applicant.set_evidence_to_negative_response(applicant_esi_evidence)
                 else
                   applicant.set_evidence_verified(applicant_esi_evidence)
                 end

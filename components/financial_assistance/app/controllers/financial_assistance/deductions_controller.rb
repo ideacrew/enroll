@@ -7,6 +7,7 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :load_support_texts, only: [:index]
+    before_action :set_cache_headers, only: [:index]
 
     def index
       save_faa_bookmark(request.original_url)

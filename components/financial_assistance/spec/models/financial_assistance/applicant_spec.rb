@@ -916,6 +916,32 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
+    context "create_evidences" do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      end
+
+      it "should create esi, non_esi and mec_check evidences and keep them in pending state" do
+        applicant.create_evidences
+        applicant.reload
+        expect(applicant.esi_evidence).to be_present
+        expect(applicant.esi_evidence.aasm_state).to eq 'pending'
+        expect(applicant.non_esi_evidence).to be_present
+        expect(applicant.non_esi_evidence.aasm_state).to eq 'pending'
+        expect(applicant.local_mec_evidence).to be_present
+        expect(applicant.local_mec_evidence.aasm_state).to eq 'pending'
+      end
+    end
 
     context 'set evidence to verified' do
       let!(:applicant) do
@@ -1036,6 +1062,145 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           current_evidence.reload
           expect(current_evidence.verification_outstanding).to be_truthy
           expect(current_evidence.is_satisfied).to be_falsey
+        end
+      end
+    end
+
+    context 'set evidence to negative_response_received' do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context 'for income evidence' do
+        before do
+          applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
+        end
+
+        let(:current_evidence) { applicant.income_evidence }
+
+        it 'should set evidence negative_response_received' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_to_negative_response(current_evidence)
+          expect(current_evidence.reload.aasm_state).to eq 'negative_response_received'
+        end
+      end
+
+      context 'for esi mec evidence' do
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
+        end
+
+        let(:current_evidence) { applicant.esi_evidence }
+
+        it 'should set evidence negative_response_received' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_to_negative_response(current_evidence)
+          expect(current_evidence.reload.aasm_state).to eq 'negative_response_received'
+        end
+      end
+    end
+  end
+
+  describe 'enrolled_with' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :individual_assisted,
+        family: family,
+        applied_aptc_amount: Money.new(44_500),
+        consumer_role_id: person.consumer_role.id,
+        enrollment_members: family.family_members
+      )
+    end
+
+    let!(:applicant) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: family.family_members.first.id)
+    end
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      applicant.create_evidences
+      applicant.create_eligibility_income_evidence
+      applicant.income_evidence.move_to_pending!
+    end
+
+    context "when aptc is applied on enrolment member" do
+      before do
+        enrollment.hbx_enrollment_members.each {|hem| hem.applied_aptc_amount = 150 }
+        enrollment.save!
+      end
+
+      context "when evidence is in pending state" do
+        it "move to outstanding state" do
+          applicant.enrolled_with(enrollment)
+          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+            evidence = applicant.send(evidence_type)
+            expect(evidence.outstanding?).to eq true
+            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+          end
+        end
+      end
+
+      context "when evidence is in negative_response_received state" do
+        it "move to outstanding state" do
+          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+            evidence = applicant.send(evidence_type)
+            evidence.negative_response_received!
+          end
+
+          applicant.enrolled_with(enrollment)
+
+          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+            evidence = applicant.send(evidence_type)
+            expect(evidence.outstanding?).to eq true
+            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+          end
+        end
+      end
+    end
+
+    context "when aptc is not applied on enrolment member" do
+      context "when evidence is in pending state" do
+        it "move to unverified state" do
+          applicant.enrolled_with(enrollment)
+          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+            evidence = applicant.send(evidence_type)
+            expect(evidence.outstanding?).to eq false
+            expect(evidence.unverified?).to eq true
+            expect(evidence.due_on).to eq nil
+          end
+        end
+      end
+
+      context "when evidence is in negative_response_received state" do
+        it "will stay in negative_response_received state" do
+          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+            evidence = applicant.send(evidence_type)
+            evidence.negative_response_received!
+          end
+
+          applicant.enrolled_with(enrollment)
+
+          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+            evidence = applicant.send(evidence_type)
+            expect(evidence.outstanding?).to eq false
+            expect(evidence.negative_response_received?).to eq true
+            expect(evidence.due_on).to eq nil
+          end
         end
       end
     end
