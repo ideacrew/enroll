@@ -1,6 +1,7 @@
 class Exchanges::AnnouncementsController < ApplicationController
   before_action :check_hbx_staff_role, except: [:dismiss]
   before_action :updateable?, :only => [:create, :destroy]
+  before_action :set_cache_headers, only: [:index]
   def dismiss
     if params[:content].present?
       dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []

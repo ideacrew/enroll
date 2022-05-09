@@ -14,6 +14,7 @@ module BenefitSponsors
 
         before_action :set_current_person, only: [:staff_index]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
+        before_action :set_cache_headers, only: [:show]
 
         skip_before_action :verify_authenticity_token, only: :create
 

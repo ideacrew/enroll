@@ -6,6 +6,7 @@ module Exchanges
     include ::Pundit
     include ::L10nHelper
 
+    before_action :set_cache_headers, only: [:sep_types_dt, :sorting_sep_types, :clone, :new, :edit]
     before_action :updateable?
     layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]

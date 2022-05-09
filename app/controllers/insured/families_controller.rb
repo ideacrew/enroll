@@ -13,6 +13,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :can_view_entire_family_enrollment_history?, only: [:display_all_hbx_enrollments]
   before_action :transition_family_members_update_params, only: [:transition_family_members_update]
   before_action :upload_notice_form_enabled?, only: [:upload_notice_form]
+  before_action :set_cache_headers, only: [:home, :inbox]
 
   def home
     Caches::CurrentHbx.with_cache do

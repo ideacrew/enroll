@@ -4,6 +4,7 @@ module Insured
   # controller for fdsh ridp H139 feature
   class FdshRidpVerificationsController < ApplicationController
     before_action :set_current_person
+    before_action :set_cache_headers, only: [:failed_validation]
 
     def new
       result = Operations::Fdsh::Ridp::RequestPrimaryDetermination.new.call(@person.primary_family)

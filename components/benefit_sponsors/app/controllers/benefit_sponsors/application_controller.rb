@@ -16,6 +16,11 @@ module BenefitSponsors
       BenefitSponsors::Site.by_site_key(site_key).first
     end
 
+    def set_cache_headers
+      response.headers["Cache-Control"] = "no-cache, no-store, private"
+      response.headers["Pragma"] = "no-cache"
+    end
+
     protected
 
     def set_current_person(required: true)
