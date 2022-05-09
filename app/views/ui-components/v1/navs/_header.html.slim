@@ -25,7 +25,7 @@
             li
               span.my-portal-links
                 = render partial: "shared/my_portal_links"
-                span = link_to l10n(".help"), EnrollRegistry[:enroll_app].setting(:help_url).item, target: '_blank', class: 'header-text'
+                span = link_to l10n(".help"), EnrollRegistry[:enroll_app].setting(:help_url).item, target: '_blank', rel: "noopener noreferrer", class: 'header-text'
                 span  |&nbsp;
                 span = link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text"
                 br

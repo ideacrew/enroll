@@ -2,7 +2,7 @@
 ### Base image ###
 ############################################
 
-ARG RUBY_VERSION=2.5.1
+ARG RUBY_VERSION=2.5.9
 FROM ruby:$RUBY_VERSION-slim-stretch as base
 LABEL author="IdeaCrew"
 
