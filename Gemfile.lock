@@ -1209,7 +1209,7 @@ DEPENDENCIES
   yard-mongoid (~> 0.1)
 
 RUBY VERSION
-   ruby 2.5.1p57
+   ruby 2.5.9p229
 
 BUNDLED WITH
    2.2.27
