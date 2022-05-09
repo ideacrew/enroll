@@ -8,6 +8,7 @@ module Exchanges
     before_action :unread_messages
     before_action :set_current_user
     before_action :perform_authorization
+    before_action :set_cache_headers, only: [:index, :new]
 
     def index
       @bulk_notices = Admin::BulkNotice.all.order([:updated_at, :desc])

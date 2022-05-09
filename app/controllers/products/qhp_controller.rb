@@ -5,6 +5,7 @@ class Products::QhpController < ApplicationController
   extend Acapi::Notifiers
   before_action :set_current_person, only: [:comparison, :summary]
   before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
+  before_action :set_cache_headers, only: [:summary]
 
   def comparison
     params.permit("standard_component_ids", :hbx_enrollment_id)

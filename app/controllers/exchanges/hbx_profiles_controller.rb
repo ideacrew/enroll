@@ -19,6 +19,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
   before_action :redirect_if_staff_tab_is_disabled, only: [:staff_index]
+  before_action :set_cache_headers, only: [:show, :family_index_dt, :user_account_index, :identity_verification, :broker_agency_index, :outstanding_verification_dt, :configuration, :inbox]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'

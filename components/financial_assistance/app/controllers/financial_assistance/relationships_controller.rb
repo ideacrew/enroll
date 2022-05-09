@@ -3,6 +3,7 @@
 module FinancialAssistance
   class RelationshipsController < FinancialAssistance::ApplicationController
     before_action :find_application
+    before_action :set_cache_headers, only: [:index]
 
     layout 'financial_assistance_nav'
 
