@@ -1608,6 +1608,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(haven_determination)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(medicaid_gateway_determination)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary)
       create_instate_addresses
       create_relationships
       application.update_attributes!(aasm_state: app_state)
