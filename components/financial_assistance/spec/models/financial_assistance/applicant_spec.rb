@@ -1133,9 +1133,9 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
-    context 'living_outside_state feature enabled' do
+    context 'out_of_state_primary feature enabled' do
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       end
 
@@ -1152,11 +1152,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
         end
 
-        context 'applicant lives out-of-state but plans to return' do
-          before do
-            applicant.update(is_temporarily_out_of_state: true)
-          end
-
+        context 'applicant lives out-of-state' do
           it 'should consider out-of-state home address valid' do
             applicant.addresses.first.state = "OS"
             applicant.save
@@ -1173,9 +1169,9 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
-    context 'living_outside_state feature disabled' do
+    context 'out_of_state_primary feature disabled' do
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       end
 
