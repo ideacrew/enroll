@@ -50,7 +50,11 @@
     "start:angular": "ANGULAR_ADMIN_APPLICATION_URL=http://localhost:4200 bundle exec rails s",
     "hugo:dev": "cd hugo && hugo server --disableFastRender",
     "build:hugo": "cd hugo && hugo --minify",
-    "build:hugo:local": "rm -rf hugo/public && npm run build:hugo"
+    "build:hugo:local": "rm -rf hugo/public && npm run build:hugo",
+    "services:start": "docker-compose -f .docker/docker-compose.build.yml up -d",
+    "services:stop": "docker-compose -f .docker/docker-compose.build.yml down",
+    "translations": "bundle exec rake seed:translations['db/seedfiles/english_translations_seed.rb']",
+    "swap:me": "bundle exec rake configuration:client_configuration_toggler client=me"
   },
   "jest": {
     "testURL": "http://localhost",
