@@ -13,7 +13,7 @@ module FinancialAssistance
     field :max_aptc, type: Money, default: 0.00
 
     # DEPRECATED - csr_percent_as_integer is deprecated.
-    # CSR determination is a member level determination and exists on model '::FinancialAssistance::TaxHouseholdMember'
+    # CSR determination is a member level determination and exists on model '::FinancialAssistance::Applicant'
     field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
 
     field :source, type: String

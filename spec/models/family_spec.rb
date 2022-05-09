@@ -1609,7 +1609,7 @@ describe "update_due_dates_on_vlp_docs_and_evidences" do
     %w[income_evidence esi_evidence non_esi_evidence local_mec_evidence]
   end
 
-  let(:outstanding_types) { %w[unverified outstanding review] }
+  let(:outstanding_types) { %w[rejected outstanding review] }
   let(:people) { [person1, person2] }
   let(:verification_type_names) do
     ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
@@ -1646,6 +1646,7 @@ describe "update_due_dates_on_vlp_docs_and_evidences" do
 
     it 'should set due dates on individual verification types' do
       people.each do |person|
+        person.verification_types.each{ |vt| vt.update!(validation_status: 'outstanding') }
         person.reload
         expect(person.verification_types.active.where(:validation_status.in => outstanding_types).present?).to be_truthy
         person.verification_types.active.each do |verification_type|

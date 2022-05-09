@@ -1159,6 +1159,7 @@ module FinancialAssistance
       return unless is_ia_eligible? || is_applying_coverage
       association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
       self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
+      self.send("#{association_name}_evidence").move_to_pending!
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
@@ -1177,11 +1178,20 @@ module FinancialAssistance
       TimeKeeper.date_of_record + verification_document_due.days
     end
 
-    def enrolled_with(_enrollment)
-      return unless income_evidence&.pending?
+    def enrolled_with(enrollment)
+      EVIDENCES.each do |evidence_type|
+        evidence = self.send(evidence_type)
+        next unless evidence.present?
+        enrollment_member = enrollment.hbx_enrollment_members.where(:applicant_id => family_member_id).first
+        aptc_or_csr_used = enrollment_member.applied_aptc_amount > 0 || ['csr_73', 'csr_87', 'csr_94', 'csr_limited'].include?(csr_eligibility_kind)
 
-      income_evidence.due_on = schedule_verification_due_on if income_evidence.due_on.blank?
-      set_evidence_outstanding(income_evidence)
+        if aptc_or_csr_used && ['pending', 'negative_response_received'].include?(evidence.aasm_state)
+          evidence.due_on = schedule_verification_due_on if evidence.due_on.blank?
+          set_evidence_outstanding(evidence)
+        elsif evidence.pending?
+          set_evidence_unverified(evidence)
+        end
+      end
     end
 
     def set_income_evidence_verified
@@ -1209,6 +1219,19 @@ module FinancialAssistance
       evidence.verification_outstanding = true
       evidence.is_satisfied = false
       evidence.move_to_outstanding
+      save!
+    end
+
+    def set_evidence_to_negative_response(evidence)
+      evidence.negative_response_received! if evidence.may_negative_response_received?
+      save!
+    end
+
+    def set_evidence_unverified(evidence)
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.move_to_unverified
       save!
     end
 

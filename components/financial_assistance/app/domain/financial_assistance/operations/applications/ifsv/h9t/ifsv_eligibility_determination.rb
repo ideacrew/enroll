@@ -65,7 +65,7 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                applicant.set_evidence_outstanding(income_evidence)
+                applicant.set_evidence_to_negative_response(income_evidence)
               end
 
               response_income_evidence.request_results&.each do |request_result|
