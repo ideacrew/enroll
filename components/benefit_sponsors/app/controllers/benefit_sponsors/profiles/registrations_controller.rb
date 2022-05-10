@@ -88,6 +88,10 @@ module BenefitSponsors
         render json: @counties
       end
 
+      def reroute
+        redirect_to main_app.root_path
+      end
+
       private
 
       def redirect_if_general_agency_disabled

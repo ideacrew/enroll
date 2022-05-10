@@ -16,10 +16,6 @@ module BenefitSponsors
       BenefitSponsors::Site.by_site_key(site_key).first
     end
 
-    def reroute
-      redirect_to main_app.root_path
-    end
-
     def set_cache_headers
       response.headers["Cache-Control"] = "no-cache, no-store, private"
       response.headers["Pragma"] = "no-cache"
