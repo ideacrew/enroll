@@ -1,5 +1,7 @@
 BenefitSponsors::Engine.routes.draw do
 
+  get '*path.:inc', to: 'application#reroute'
+
   namespace :profiles do
     resources :registrations, except: [:index, :show] do
       post :counties_for_zip_code, on: :collection
