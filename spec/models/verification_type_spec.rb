@@ -47,7 +47,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     let(:due_date) { TimeKeeper.date_of_record + 96.days }
 
     it "fail verification type" do
-      person.verification_types.each{|type| type.fail_type}
+      person.verification_types.each(&:fail_type)
       expect(person.verification_types.all?{|type| type.is_type_outstanding?}).to be true
     end
 
