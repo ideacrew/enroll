@@ -46,17 +46,15 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
   describe "type can be updated" do
     let(:due_date) { TimeKeeper.date_of_record + 96.days }
 
-    before do
-      person.verification_types.each{|type| type.fail_type}
-    end
     it "fail verification type" do
+      person.verification_types.each{|type| type.fail_type}
       expect(person.verification_types.all?{|type| type.is_type_outstanding?}).to be true
     end
 
     context 'when setting verification_document_due_in_days is enabled' do
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(true)
+        EnrollRegistry[:set_due_date_upon_response_from_hub].feature.stub(:is_enabled).and_return(true)
         person.verification_types.each(&:fail_type)
       end
 
@@ -72,7 +70,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     context 'when setting verification_document_due_in_days is disabled' do
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(false)
+        EnrollRegistry[:set_due_date_upon_response_from_hub].feature.stub(:is_enabled).and_return(false)
         person.verification_types.each(&:fail_type)
       end
 
