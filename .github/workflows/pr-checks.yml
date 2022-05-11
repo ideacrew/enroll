@@ -1,4 +1,4 @@
-name: full check suite
+name: pull request checks
 on:
   pull_request:
     branches:
