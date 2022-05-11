@@ -11,6 +11,7 @@ module Subscribers
       pre_process_message(subscriber_logger, payload)
       # Add subscriber operations below this line
       redetermine_family_eligibility(payload)
+      check_for_critical_changes(payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -18,6 +19,23 @@ module Subscribers
     #   logger.info "PeopleSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       subscriber_logger.info "PeopleSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
+    end
+
+    def check_for_critical_changes(payload)
+      person = GlobalID::Locator.locate(payload[:gid])
+
+      return unless (history_track = person.history_tracks.last)
+      return unless (consumer_role = person.consumer_role)
+
+      person.families.each do |family|
+        consumer_role.check_for_critical_changes(
+          family,
+          info_changed: consumer_role.sensitive_information_changed?(history_track.modified),
+          is_homeless: person.is_homeless,
+          is_temporarily_out_of_state: person.is_temporarily_out_of_state,
+          dc_status: (person.is_homeless || person.is_temporarily_out_of_state)
+        )
+      end
     end
 
     def redetermine_family_eligibility(payload)
