@@ -58,8 +58,8 @@ class ApplicationController < ActionController::Base
     response.headers["Pragma"] = "no-cache"
   end
 
-  def reroute
-    redirect_to root_path
+  def resource_not_found
+    render file: 'public/404.html', status: 404
   end
 
   def access_denied

@@ -88,8 +88,8 @@ module BenefitSponsors
         render json: @counties
       end
 
-      def reroute
-        redirect_to main_app.root_path
+      def resource_not_found
+        render file: 'public/404.html', status: 404
       end
 
       private
