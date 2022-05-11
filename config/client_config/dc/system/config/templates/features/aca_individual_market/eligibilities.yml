@@ -6,7 +6,7 @@ registry:
       - :eligibilities
     features:
       - key: :'gid://enroll_app/Family'
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :eligibility_items
             item:
@@ -18,7 +18,7 @@ registry:
         item: 96
         is_enabled: true
       - key: :ivl_eligibility_notices
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :document_reminders
             item:
@@ -34,7 +34,7 @@ registry:
       - :eligibility_items
     features:
       - key: :aptc_csr_credit
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :evidence_items
             item:
@@ -43,7 +43,7 @@ registry:
               - :non_esi_evidence
               - :local_mec_evidence
       - key: :aca_individual_market_eligibility
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :evidence_items
             item:
@@ -52,13 +52,13 @@ registry:
               - :american_indian_status
               - :social_security_number
       - key: :health_product_enrollment_status
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :evidence_items
             item:
               - :health_product_enrollment_evidence
       - key: :dental_product_enrollment_status
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :evidence_items
             item:
@@ -92,7 +92,7 @@ registry:
           - key: :evidence_ref
             item: 'gid://enroll_app/FinancialAssitance::Application'
       - key: :local_mec_evidence
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :subject_ref
             item: 'gid://enroll_app/Family::FamilyMember'
@@ -147,7 +147,7 @@ registry:
       - :notices
     features:
       - key: :document_reminder_0
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
             item: 95
@@ -156,7 +156,7 @@ registry:
           - key: :event_name
             item: :verifications_reminder
       - key: :document_reminder_1
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
             item: 85
@@ -165,7 +165,7 @@ registry:
           - key: :event_name
             item: :first_verifications_reminder
       - key: :document_reminder_2
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
             item: 70
@@ -174,7 +174,7 @@ registry:
           - key: :event_name
             item: :second_verifications_reminder
       - key: :document_reminder_3
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
             item: 45
@@ -183,7 +183,7 @@ registry:
           - key: :event_name
             item: :third_verifications_reminder
       - key: :document_reminder_4
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
             item: 30
@@ -198,4 +198,4 @@ registry:
       - :responses
     features:
       - key: :set_due_date_upon_response_from_hub
-        is_enabled: false
+        is_enabled: true
