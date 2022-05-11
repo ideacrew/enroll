@@ -77,7 +77,7 @@ registry:
       - key: :mec_check
         is_enabled: false
       - key: :include_faa_outstanding_verifications
-        is_enabled: false
+        is_enabled: true
       - key: :skip_aptc_families_from_document_reminder_notices
         is_enabled: true
       - key: :non_applicant_citizen_status
