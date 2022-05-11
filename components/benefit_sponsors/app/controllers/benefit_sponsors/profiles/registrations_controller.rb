@@ -88,6 +88,10 @@ module BenefitSponsors
         render json: @counties
       end
 
+      def resource_not_found
+        render file: 'public/404.html', status: 404
+      end
+
       private
 
       def redirect_if_general_agency_disabled

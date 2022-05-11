@@ -42,7 +42,7 @@ Rails.application.routes.draw do
     end
   end
 
-
+  get 'insured/consumer_role/help_paying_coverage.:inc', to: 'application#resource_not_found'
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
   get 'unsupported_browser' => 'users#unsupported_browser'
