@@ -1,0 +1,36 @@
+name: pull request checks
+on:
+  pull_request:
+    branches:
+      - trunk
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: |
+          git config diff.renameLimit 800
+          git fetch --no-tags --depth=1 origin trunk
+          bundle exec rubocop-git origin/trunk | grep "no offenses detected"
+  codesweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Run AppScan CodeSweep
+        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@v1
+        with:
+          asoc_key: ${{secrets.ASOC_KEY}}
+          asoc_secret: ${{secrets.ASOC_SECRET}}
+          status: failure
+    env:
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
