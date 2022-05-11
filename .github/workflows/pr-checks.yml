@@ -12,20 +12,20 @@ jobs:
   rubocop:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - name: Run rubocop
-        run: |
+      - run: |
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin trunk
           bundle exec rubocop-git origin/trunk | grep "no offenses detected"
   codesweep:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Run AppScan CodeSweep
         uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@v1
         with:
