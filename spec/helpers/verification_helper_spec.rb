@@ -719,6 +719,26 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "reject reason dropdown list", "Social Security Number", "Wrong Type", "Too old"
     it_behaves_like "reject reason dropdown list", "American Indian Status", "Wrong Person", "Expired"
   end
+
+  describe '#show_ssa_dhs_response' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:consumer_role) { person.consumer_role }
+    let(:record) { double(event_response_record_id: event_response.id)}
+    let(:event_response) do
+      event_response = EventResponse.new({received_at: Time.now, body: 'lsjdfioennnklsjdfe'})
+      consumer_role.lawful_presence_determination.ssa_responses << event_response
+      consumer_role.save
+      event_response
+    end
+
+    before do
+      EnrollRegistry[:ssa_h3].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it 'parses payload' do
+      expect { helper.show_ssa_dhs_response(person, record) }.not_to raise_error
+    end
+  end
 end
 
 describe "#build_ridp_admin_actions_list" do

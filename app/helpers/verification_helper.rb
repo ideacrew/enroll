@@ -302,6 +302,12 @@ module VerificationHelper
     return "no response record" unless raw_response.any?
 
     EnrollRegistry.feature_enabled?(:ssa_h3) ? JSON.parse(raw_response.first.body) : Nokogiri::XML(raw_response.first.body)
+  rescue JSON::ParserError => e
+    Rails.logger.info("JSON parse failed with error #{e}. Trying Nokogiri XML parse") unless Rails.env.test?
+    Nokogiri::XML(raw_response.first.body)
+  rescue Nokogiri::XML::SyntaxError => e
+    Rails.logger.info("Nokogiri XML parse failed with error #{e}. Trying JSON parse") unless Rails.env.test?
+    JSON.parse(raw_response.first.body)
   end
 
   def display_documents_tab?(family_members, person)
