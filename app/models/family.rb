@@ -66,7 +66,9 @@ class Family
   embeds_one :eligibility_determination, class_name: "::Eligibilities::Determination", as: :determinable, cascade_callbacks: true
 
   after_initialize :build_household
-  before_save :clear_blank_fields
+
+  # removed it as it is not setting e_case_id on some cases randomly
+  # before_save :clear_blank_fields
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
