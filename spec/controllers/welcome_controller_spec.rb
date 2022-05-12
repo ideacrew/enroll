@@ -10,6 +10,10 @@ RSpec.describe WelcomeController, :type => :controller do
       it "renders welcome index" do
         expect(response).to render_template("index")
       end
+
+      it "has strict same site Cookie attributes" do
+        expect(response.headers["Set-Cookie"]).to eql("SameSite=Strict")
+      end
     end
 
     context "when not signed in" do
