@@ -1,7 +1,7 @@
 module Config::AcaIndividualMarketHelper
 
+  # TODO: this method will be refactored/removed.
   def verification_sensitive_attributes
-    ::EnrollRegistry[:verification_sensitive_attributes].setting(:demographic_attributes).item
+    []
   end
-
 end
