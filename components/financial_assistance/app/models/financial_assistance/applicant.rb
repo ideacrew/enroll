@@ -1340,6 +1340,7 @@ module FinancialAssistance
           array
         end
       else
+        update_attributes!(is_post_partum_period: false) if is_pregnant
         [:is_pregnant, :is_post_partum_period].collect{|question| send(question)}
       end
     end
