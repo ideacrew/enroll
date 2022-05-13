@@ -7,6 +7,10 @@ on:
         default: 'me'
         description: 'Client to build for'
         required: true
+        type: choice
+        options:
+          - me
+          - dc
       branch:
         default: 'trunk'
         description: 'Branch to build'
