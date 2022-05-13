@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 9e9a1916a86631773696b0b7c5d3ef1618b5e24e
+  revision: b12d77270e00d0acb333dd3937c37d1a156ca405
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -554,4 +554,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.2.28
+   2.3.13
