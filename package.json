@@ -54,7 +54,8 @@
     "services:start": "docker-compose -f .docker/docker-compose.build.yml up -d",
     "services:stop": "docker-compose -f .docker/docker-compose.build.yml down",
     "translations": "bundle exec rake seed:translations['db/seedfiles/english_translations_seed.rb']",
-    "swap:me": "bundle exec rake configuration:client_configuration_toggler client=me"
+    "swap:me": "bundle exec rake configuration:client_configuration_toggler client=me",
+    "image:build": "docker build -f .docker/production/Dockerfile.gha --network=host --build-arg CLIENT=me --target=deploy -t enroll-local ."
   },
   "jest": {
     "testURL": "http://localhost",

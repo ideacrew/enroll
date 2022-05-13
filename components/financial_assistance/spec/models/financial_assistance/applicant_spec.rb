@@ -451,6 +451,17 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   end
 
   context '#other_questions_complete?' do
+
+    context "not applying for coverage and is_pregnant" do
+      before do
+        applicant.update_attributes!(is_pregnant: true, is_applying_coverage: false)
+      end
+      it "should should return false for post_partum period" do
+        applicant.other_questions_complete?
+        expect(applicant.is_post_partum_period).to eql(false)
+      end
+    end
+
     context 'pregnancy_due_on' do
       before do
         applicant.update_attributes!({
