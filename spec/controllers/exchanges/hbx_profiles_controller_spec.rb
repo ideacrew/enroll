@@ -845,24 +845,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to render_template('update_enrollment')
     end
 
-    it "should set instance variable info changed if consumer role exists" do
-      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
-      sign_in(user)
-      expect(response).to have_http_status(:success)
-      @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
-      expect(assigns(:info_changed)). to eq true
-    end
-
-    it "should set instance variable dc_status if consumer role exists" do
-      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
-      sign_in(user)
-      expect(response).to have_http_status(:success)
-      @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
-      expect(assigns(:dc_status)). to eq false
-    end
-
     it "should render update enrollment if the save is successful" do
       person1.consumer_role.update_attributes!(active_vlp_document_id: person1.consumer_role.vlp_documents.first.id)
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
