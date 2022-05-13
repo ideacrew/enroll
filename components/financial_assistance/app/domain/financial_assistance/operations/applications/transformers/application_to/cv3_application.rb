@@ -869,7 +869,7 @@ module FinancialAssistance
               in_state_address = home_address&.state == us_state
               is_temporarily_out_of_state = applicant.is_temporarily_out_of_state
 
-              # Should be considered Mitc state resident if 'temporarily out of state' box is not checked and one of the following:
+              # Should be considered Mitc state resident if 'temporarily out of state' box is NOT checked and either:
               # Case 1 - applicant has in state address
               # Case 2 - applicant does not have in state address but 'is homeless resident' box is checked
               (in_state_address && !is_temporarily_out_of_state) || (!in_state_address && !is_temporarily_out_of_state && is_homeless)
