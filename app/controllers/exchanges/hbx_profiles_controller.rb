@@ -1,6 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include Exchanges::HbxProfilesHelper
-  include VlpDoc
   include ::DataTablesAdapter
   include ::DataTablesSearch
   include ::Pundit
@@ -659,12 +658,12 @@ def employer_poc
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
     @ssn_fields = @person.employee_roles.map{|e| e.census_employee.is_no_ssn_allowed?} if @person.active_employee_roles.present?
-    @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
+
     @ssn_require = @ssn_fields.present? && @ssn_fields.include?(false)
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
     else
-      result = ::Operations::UpdateDobSsn.new.call(person_id: @person.id, params: params, info_changed: @info_changed, dc_status: @dc_status, current_user: current_user, ssn_require: @ssn_require)
+      result = ::Operations::UpdateDobSsn.new.call(person_id: @person.id, params: params, current_user: current_user, ssn_require: @ssn_require)
       @error_on_save, @dont_update_ssn = result.failure? ? result.failure : result.success
     end
     respond_to do |format|
