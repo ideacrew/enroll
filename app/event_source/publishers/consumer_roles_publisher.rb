@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Publishers
-  # Publisher will send request payload to medicaid gateway for determinations
+  # Publisher will send request payload to enroll
   class ConsumerRolesPublisher
-    include ::EventSource::Publisher[amqp: 'enroll.consumer_roles']
+    include ::EventSource::Publisher[amqp: 'enroll.individual.consumer_roles']
 
-    register_event 'consumer_role_create'
+    register_event 'created'
   end
 end

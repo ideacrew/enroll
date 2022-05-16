@@ -14,6 +14,7 @@ class ConsumerRole
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
   include L10nHelper
+  include EventSource::Command
 
   embedded_in :person
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
@@ -683,11 +684,8 @@ class ConsumerRole
 
   def invoke_verification!(*args)
     return if skip_residency_verification == true
-    if person.ssn.present? || is_native?
-      invoke_ssa
-    else
-      invoke_dhs
-    end
+    invoke_ssa if person.ssn.present? || is_native?
+    invoke_dhs
   end
 
   def verify_ivl_by_admin(*args)
@@ -1288,7 +1286,7 @@ class ConsumerRole
   end
 
   def determine_verifications_event
-    event = event('events.consumer_role_create', attributes: { gid: self.to_global_id.uri })
+    event = event('events.individual.consumer_roles.created', attributes: { gid: self.to_global_id.uri })
     event.success.publish if event.success?
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }

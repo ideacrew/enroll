@@ -3,12 +3,12 @@
 module Subscribers
   # Subscriber for consumer roles
   class ConsumerRolesSubscriber
-    include ::EventSource::Subscriber[amqp: 'enroll.consumer_roles']
+    include ::EventSource::Subscriber[amqp: 'enroll.individual.consumer_roles']
 
-    subscribe(:on_consumer_role_create) do |delivery_info, _metadata, response|
-      subscriber_logger = subscriber_logger_for(:on_consumer_role_create)
+    subscribe(:on_enroll_individual_consumer_roles) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles)
       payload = JSON.parse(response, symbolize_names: true)
-      pre_process_message(subscriber_logger, payload)
+      subscriber_logger.info "ConsumerRolesSubscriber, response: #{payload}"
       determine_verifications(payload, subscriber_logger)
 
       ack(delivery_info.delivery_tag)
@@ -26,9 +26,6 @@ module Subscribers
 
     private
 
-    def pre_process_message(subscriber_logger, payload)
-      subscriber_logger.info "ConsumerRolesSubscriber, response: #{payload}"
-    end
 
     def subscriber_logger_for(event)
       Logger.new(
