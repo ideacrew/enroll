@@ -10,12 +10,14 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,6,6)..Date.new(2021,7,24) %>
-      - key: :verification_sensitive_attributes
+      - key: :consumer_role_hub_call
         item: :consumer_role_hub_call
         is_enabled: true
         settings:
-          - key: :demographic_attributes
-            item: ['first_name', 'last_name', 'ssn', 'us_citizen', 'naturalized_citizen', 'eligible_immigration_status', 'dob']
+          - key: :identifying_information_attributes
+            item: ['first_name', 'last_name', 'encrypted_ssn', 'dob']
+          - key: :citizen_statuses
+            item: ['us_citizen', 'naturalized_citizen', 'indian_tribe_member', 'alien_lawfully_present']
       - key: :special_enrollment_period
         is_enabled: true
         settings:
