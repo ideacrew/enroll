@@ -1597,10 +1597,11 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
   def create_workflow_state_transition(evidence)
     evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria",
-                                              comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
+                                               comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
   end
 
   def create_document(evidence)
-    evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier',
+                              source: 'enroll_system', language: 'en')
   end
 end
