@@ -1783,9 +1783,11 @@ class HbxEnrollment
         if qle && enrollment.family.is_under_special_enrollment_period?
           enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
           enrollment.enrollment_kind = "special_enrollment"
+          enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(resident_role.rating_address, during: enrollment.effective_on)&.id
         elsif enrollment.family.is_under_ivl_open_enrollment?
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
+          enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(resident_role.rating_address, during: enrollment.effective_on)&.id
         else
           enrollment.errors.add(
             :base,

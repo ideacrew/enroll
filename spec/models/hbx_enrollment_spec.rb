@@ -602,6 +602,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp)}
       let(:bcp) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months)}
       let(:renewal_bcp) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months)}
+      let!(:rating_area) { create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.year) }
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -648,6 +649,20 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       it_behaves_like "new enrollment from", false, true, "open_enrollment", false
       it_behaves_like "new enrollment from", true, true, "special_enrollment", false
       it_behaves_like "new enrollment from", false, false, "not_open_enrollment", "raise_an_error"
+
+      context 'when person has resident role' do
+        subject { HbxEnrollment.new_from(resident_role: resident_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: true) }
+
+        let(:resident_role) { create(:resident_role) }
+
+        before do
+          allow(resident_role).to receive(:person).and_return(person)
+        end
+
+        it "assigns default rating area" do
+          expect(subject.rating_area).to be_present
+        end
+      end
     end
 
 
