@@ -141,6 +141,10 @@ class ResidentRole
     end
   end
 
+  def rating_address
+    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
+  end
+
   private
   def mark_residency_denied(*args)
     self.residency_determined_at = Time.now
@@ -174,9 +178,5 @@ class ResidentRole
 
   def residency_verified?
     is_state_resident?
-  end
-
-  def rating_address
-    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
   end
 end
