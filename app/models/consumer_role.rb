@@ -227,7 +227,7 @@ class ConsumerRole
   embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
-  after_create :create_initial_market_transition, :determine_verifications_event
+  after_create :create_initial_market_transition, :publish_created_event
   before_validation :ensure_verification_types
 
   before_validation :ensure_validation_states, on: [:create, :update]
@@ -1285,7 +1285,7 @@ class ConsumerRole
                    })
   end
 
-  def determine_verifications_event
+  def publish_created_event
     event = event('events.individual.consumer_roles.created', attributes: { gid: self.to_global_id.uri })
     event.success.publish if event.success?
   rescue StandardError => e
