@@ -25,9 +25,8 @@ module BrokerAgencies::ProfilesHelper
     # Destroy button cannot be shown for final broker staff role
     return false if total_broker_staff_count == 1
     # Destroy button will always be shown to broker staff member if no broker role is present OR
-    # Destroy button cannot be shown for broker staff member with primary broker role equal to broker agency profile primary broker 
+    # Destroy button cannot be shown for broker staff member with primary broker role equal to broker agency profile primary broker
     return false if broker_agency_profile.primary_broker_role == broker_staff_member.broker_role
-    
     broker_staff_member.broker_role.blank? || broker_staff_member.broker_role != broker_agency_profile.primary_broker_role
     #show the delete button if the broker_staff_member has a broker role but they are the primary broker on a different agency
   end

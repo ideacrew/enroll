@@ -12,7 +12,7 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
   let(:person3) { FactoryBot.create(:person) }
   let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person) }
   let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: '123', person: person3) }
-  
+
   describe 'disable_edit_broker_agency?' do
     it 'should return false if current user has broker role' do
       allow(person).to receive(:broker_role).and_return true
@@ -43,7 +43,7 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
       end
 
       it 'should return false if staff has primary broker role' do
-        expect(helper.can_show_destroy_for_brokers?(person, 2, broker_agency_profile1)). to be_falsey
+        expect(helper.can_show_destroy_for_brokers?(person, 2, broker_agency_profile1)).to be_falsey
       end
 
       it 'should return true if staff DOES NOT HAVE broker role' do
