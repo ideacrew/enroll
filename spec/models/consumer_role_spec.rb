@@ -1258,6 +1258,8 @@ describe 'coverage_purchased!' do
     unless EnrollRegistry.feature_enabled?(:ssa_h3)
       expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request',
                                                                                    {:person => person})
+      expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request',
+                                                                                   {:coverage_start_date => TimeKeeper.date_of_record, :person => person})
     end
     person.consumer_role.coverage_purchased!
   end
