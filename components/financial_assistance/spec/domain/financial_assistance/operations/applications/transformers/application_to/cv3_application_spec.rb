@@ -1766,7 +1766,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
 
-    context 'applicant is homeless' do
+    context 'applicant is homeless (and not temporarily out of state)' do
       before do
         applicant.update!(is_homeless: true)
         result = subject.call(application)
@@ -1786,8 +1786,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         @applicant = result.success[:applicants].first
       end
 
-      it 'should return true' do
-        expect(@applicant[:mitc_state_resident]).to eq true
+      it 'should return false' do
+        expect(@applicant[:mitc_state_resident]).to eq false
       end
     end
 

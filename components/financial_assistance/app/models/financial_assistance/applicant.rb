@@ -189,7 +189,6 @@ module FinancialAssistance
     field :magi_medicaid_category, type: String
     field :medicaid_household_size, type: Integer
 
-    # We may not need the following two fields
     field :is_magi_medicaid, type: Boolean, default: false
     field :is_medicare_eligible, type: Boolean, default: false
 
@@ -800,6 +799,8 @@ module FinancialAssistance
     end
 
     def tax_info_complete?
+      # is_joint_tax_filing can't be nil for primary or spouse of primary if married and filing taxes
+      return false if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
       filing_as_head = (FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && !is_claimed_as_tax_dependent.nil?) ? !is_filing_as_head_of_household.nil? : true
       !is_required_to_file_taxes.nil? &&
         !is_claimed_as_tax_dependent.nil? &&
@@ -1255,13 +1256,19 @@ module FinancialAssistance
     end
 
     # Case1: Missing address - No address objects at all
-    # Case2: Invalid Address - No addresses matching the state
+    # Case2: Invalid Address - No addresses matching the state (unless out_of_state_primary feature is enabled)
     # Case3: Unable to get rating area(home_address || mailing_address)
     def has_valid_address?
-      addresses.where(
-        state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
-        :kind.in => ['home', 'mailing']
-      ).present?
+      if FinancialAssistanceRegistry.feature_enabled?(:out_of_state_primary)
+        addresses.where(
+          :kind.in => ['home', 'mailing']
+        ).present?
+      else
+        addresses.where(
+          state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+          :kind.in => ['home', 'mailing']
+        ).present?
+      end
     end
 
     #use this method to check what evidences needs to be included on notices
@@ -1381,7 +1388,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_step_1
-      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && is_spouse_of_primary
+      errors.add(:is_joint_tax_filing, "#{full_name} must answer 'Will this person be filing jointly?'") if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
 
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 

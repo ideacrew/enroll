@@ -82,6 +82,8 @@ registry:
         is_enabled: false
       - key: :non_applicant_citizen_status
         is_enabled: true
+      - key: :out_of_state_primary
+        is_enabled: false
   - namespace:
     - :request_determination
     features:

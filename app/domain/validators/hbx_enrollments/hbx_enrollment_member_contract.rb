@@ -9,13 +9,14 @@ module Validators
 
       params do
         required(:applicant_id).filled(Types::Bson)
-        optional(:carrier_member_id).maybe(Types::Bson)
+        optional(:carrier_member_id).maybe(:string)
         required(:is_subscriber).filled(:bool)
         optional(:premium_amount).maybe(:float)
         optional(:applied_aptc_amount).maybe(:float)
         required(:eligibility_date).filled(:date)
         required(:coverage_start_on).filled(:date)
         optional(:coverage_end_on).maybe(:date)
+        optional(:tobacco_use).maybe(:string)
       end
 
       rule(:coverage_end_on, :coverage_start_on) do

@@ -405,6 +405,26 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant.tax_info_complete?).to eq true
       end
     end
+
+    context 'primary is married and filing taxes' do
+      let(:application) { FactoryBot.create(:financial_assistance_application, :with_applicants) }
+      let(:primary) { application.primary_applicant }
+      let(:spouse) { application.applicants.at(1) }
+
+      before do
+        spouse.relationship = ('spouse')
+      end
+
+      context 'when is_joint_tax_filing is missing for primary and spouse' do
+        it 'should return false for primary' do
+          expect(primary.tax_info_complete?).to eq false
+        end
+
+        it 'should return false for spouse' do
+          expect(spouse.tax_info_complete?).to eq false
+        end
+      end
+    end
   end
 
   context 'is filing application with parents in household' do
@@ -1261,6 +1281,98 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  describe '#has_valid_address?' do
+    let(:applicant) do
+      FactoryBot.create(
+        :financial_assistance_applicant,
+        :with_home_address,
+        application: application,
+        dob: Date.today - 40.years,
+        is_primary_applicant: true,
+        family_member_id: BSON::ObjectId.new
+      )
+    end
+    let(:mailing_address) { FactoryBot.build(:financial_assistance_address, :mailing_address)}
+    let(:work_address) { FactoryBot.build(:financial_assistance_address, :work_address)}
+
+    context 'invalid addresses' do
+      it 'should consider no address at all invalid' do
+        applicant.addresses = []
+        applicant.save
+        expect(applicant.has_valid_address?).to eq false
+      end
+
+      it 'should consider work address invalid' do
+        applicant.addresses = [work_address]
+        applicant.save
+        expect(applicant.has_valid_address?).to eq false
+      end
+    end
+
+    context 'out_of_state_primary feature enabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+      end
+
+      context 'valid addresses' do
+        context 'applicant lives in-state' do
+          it 'should consider in-state home address valid' do
+            expect(applicant.has_valid_address?).to eq true
+          end
+
+          it 'should consider in-state mailing address valid' do
+            applicant.addresses = [mailing_address]
+            applicant.save
+            expect(applicant.has_valid_address?).to eq true
+          end
+        end
+
+        context 'applicant lives out-of-state' do
+          it 'should consider out-of-state home address valid' do
+            applicant.addresses.first.state = "OS"
+            applicant.save
+            expect(applicant.has_valid_address?).to eq true
+          end
+
+          it 'should consider out-of-state mailing address valid' do
+            applicant.addresses = [mailing_address]
+            applicant.addresses.first.state = "OS"
+            applicant.save
+            expect(applicant.has_valid_address?).to eq true
+          end
+        end
+      end
+    end
+
+    context 'out_of_state_primary feature disabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+      end
+
+      context 'valid addresses' do
+        it 'should consider in-state home address valid' do
+          expect(applicant.has_valid_address?).to eq true
+        end
+
+        it 'should consider in-state mailing address valid' do
+          applicant.addresses = [mailing_address]
+          applicant.save
+          expect(applicant.has_valid_address?).to eq true
+        end
+      end
+
+      context 'invalid addresses' do
+        it 'should consider out-of-state address invalid' do
+          applicant.addresses.first.state = "OS"
+          applicant.save
+          expect(applicant.has_valid_address?).to eq false
+        end
+      end
+    end
+  end
+
   describe 'clone_evidences' do
     let!(:application2) do
       FactoryBot.create(:application,
@@ -1465,30 +1577,31 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
-end
 
-def create_embedded_docs_for_evidences(appli)
-  [appli.income_evidence, appli.esi_evidence, appli.non_esi_evidence, appli.local_mec_evidence].each do |evidence|
-    create_verification_history(evidence)
-    create_request_result(evidence)
-    create_workflow_state_transition(evidence)
-    create_document(evidence)
+  def create_embedded_docs_for_evidences(appli)
+    [appli.income_evidence, appli.esi_evidence, appli.non_esi_evidence, appli.local_mec_evidence].each do |evidence|
+      create_verification_history(evidence)
+      create_request_result(evidence)
+      create_workflow_state_transition(evidence)
+      create_document(evidence)
+    end
   end
-end
 
-def create_verification_history(evidence)
-  evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
-end
+  def create_verification_history(evidence)
+    evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+  end
 
-def create_request_result(evidence)
-  evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
-end
+  def create_request_result(evidence)
+    evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+  end
 
-def create_workflow_state_transition(evidence)
-  evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria",
-                                             comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
-end
+  def create_workflow_state_transition(evidence)
+    evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria",
+                                               comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
+  end
 
-def create_document(evidence)
-  evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+  def create_document(evidence)
+    evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier',
+                              source: 'enroll_system', language: 'en')
+  end
 end
