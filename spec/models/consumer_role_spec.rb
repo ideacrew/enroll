@@ -1256,6 +1256,7 @@ describe 'coverage_purchased!' do
 
   it 'should trigger call to ssa hub' do
     expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request', {:person => person})
+    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request', {:coverage_start_date => TimeKeeper.date_of_record, :person => person})
     person.consumer_role.coverage_purchased!
   end
 
