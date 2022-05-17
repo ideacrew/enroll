@@ -1,6 +1,11 @@
 name: full check suite
 on:
-  # push:
+  push:
+    branches:
+      - trunk
+  pull_request:
+    branches:
+      - trunk
   schedule:
     - cron: '0 6 * * *'
 
@@ -13,10 +18,26 @@ env:
   CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/cucumber-split-config.json'
 
 jobs:
+  CodeQL-Build:
+    # CodeQL runs on ubuntu-latest, windows-latest, and macos-latest
+    runs-on: ubuntu-latest
+    permissions:
+      # required for all workflows
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
   view_linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/cache@v2
         with:
@@ -36,7 +57,7 @@ jobs:
   brakeman:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore
@@ -62,7 +83,7 @@ jobs:
             'financial_assistance',
           ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -126,7 +147,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -213,7 +234,7 @@ jobs:
             25,
           ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -317,7 +338,7 @@ jobs:
             51,
           ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
