@@ -62,12 +62,15 @@ module Operations
             primary_person = family.primary_person
             dr_notice_creation_dates = get_dr_notice_creation_dates(primary_person)
             family_data.each { |member_row| csv << (member_row + [ed_status.to_s, ed_due_date] + dr_notice_creation_dates + [primary_person.consumer_role&.contact_method]) }
+          rescue StandardError => e
+            logger.info(e.message) unless Rails.env.test?
           end
         end
 
         Success(file_name)
       rescue StandardError => e
         logger.info(e.message) unless Rails.env.test?
+        Success(file_name)
       end
 
       def get_dr_notice_creation_dates(person)

@@ -64,6 +64,7 @@ Scenario: Outstanding verification
   Scenario: Consumer has determined Financial Assistance application
     Given the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
+    And FAA mec_check feature is enabled
     And a family with financial application and applicants in determined state exists with evidences
     And the user with hbx_staff role is logged in
     When admin visits home page

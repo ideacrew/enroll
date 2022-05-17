@@ -1666,6 +1666,8 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#trustee"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#other_relationship"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#other_relative"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#parents_domestic_partner"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:individual_relationship#domestic_partners_child"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="QualifyingLifeEventNameType">

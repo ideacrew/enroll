@@ -13,6 +13,7 @@
             </div>
             <div class="verification-types col-md-12">
               <% FinancialAssistance::Applicant::EVIDENCES.each do |evidence_kind| %>
+                <% next if evidence_kind == :local_mec_evidence && !FinancialAssistanceRegistry.feature_enabled?(:mec_check) %>
                 <% evidence = applicant.send(evidence_kind) %>
                 <% if evidence.present? %>
                   <% next if evidence.key == :income && applicant.incomes.blank? %>
