@@ -16,7 +16,6 @@
                 <% next if evidence_kind == :local_mec_evidence && !FinancialAssistanceRegistry.feature_enabled?(:mec_check) %>
                 <% evidence = applicant.send(evidence_kind) %>
                 <% if evidence.present? %>
-                  <% next if evidence.key == :income && applicant.incomes.blank? %>
                   <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: evidence, evidence_kind: evidence_kind } %>
                 <% end %>
               <% end %>
