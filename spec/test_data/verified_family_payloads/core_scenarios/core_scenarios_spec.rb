@@ -41,7 +41,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         context "simulating consumer role controller create action" do
           let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
-          let(:person) { consumer_role.person }
           let(:ua_params) do
             {
               person: {
@@ -61,75 +60,80 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             }
           end
 
-          let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
-
+          let!(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
+          let(:person) { consumer_role.person }
           let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
-          let(:tax_household_db) { family_db.active_household.tax_households.first }
           let(:person_db) { family_db.primary_applicant.person }
           let(:consumer_role_db) { person_db.consumer_role }
 
-          it "should not log any errors initially" do
-            person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
-            expect(subject).not_to receive(:log)
-            subject.call(nil, nil, nil, nil, message)
-          end
+          let(:tax_household_db) { family_db.active_household.tax_households.first }
 
-          it "updates the tax household with aptc from the payload on the primary persons family" do
-            if tax_household_db
-              expect(tax_household_db).to be_truthy
-              expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
-              expect(tax_household_db.primary_applicant.family_member.person).to eq person
-              expect(tax_household_db.allocated_aptc.to_f).to eq 0
-              expect(tax_household_db.is_eligibility_determined).to be_truthy
-              expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
+          context "with e case id updated", dbclean: :after_each do
+            before do
+              person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
+              subject.call(nil, nil, nil, nil, message)
+            end
+
+            it "updates the tax household with aptc from the payload on the primary persons family" do
+              if tax_household_db
+                person.reload
+                person.primary_family.reload
+                expect(tax_household_db).to be_truthy
+                expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+                expect(tax_household_db.primary_applicant.family_member.person).to eq person
+                expect(tax_household_db.allocated_aptc.to_f).to eq 0
+                expect(tax_household_db.is_eligibility_determined).to be_truthy
+                expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
+              end
+            end
+
+            it "updates all consumer role verifications" do
+              expect(consumer_role_db.fully_verified?).to be_truthy
+              expect(consumer_role_db.vlp_authority).to eq "curam"
+              expect(consumer_role_db.residency_determined_at).to eq primary.created_at
+              expect(consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
+              expect(consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
+              expect(consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+            end
+
+            it "updates the address for the primary applicant's person" do
+              expect(person_db.addresses).to be_truthy
             end
           end
 
-          it "updates all consumer role verifications" do
-            expect(consumer_role_db.fully_verified?).to be_truthy
-            expect(consumer_role_db.vlp_authority).to eq "curam"
-            expect(consumer_role_db.residency_determined_at).to eq primary.created_at
-            expect(consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
-            expect(consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
-            expect(consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
-          end
-
-          it "updates the address for the primary applicant's person" do
-            expect(person_db.addresses).to be_truthy
-          end
-
-          it "can recieve duplicate payloads without logging errors" do
-            expect(subject).not_to receive(:log)
-            subject.call(nil, nil, nil, nil, message)
-          end
-
-          it "does should contain both tax households with one of them having an end on date" do
-            if tax_household_db
-              expect(family_db.active_household.tax_households.length).to eq 2
-              expect(family_db.active_household.tax_households.select{|th| th.effective_ending_on.present? }).to be_truthy
+          context "without ease id", dbclean: :after_each do
+            before do
+              2.times { subject.call(nil, nil, nil, nil, message) }
             end
-          end
 
-          it "maintain the old tax household" do
-            if tax_household_db
-              expect(tax_household_db).to be_truthy
-              expect(tax_household_db.primary_applicant.family_member.person).to eq person
-              expect(tax_household_db.allocated_aptc.to_f).to eq 0
-              expect(tax_household_db.is_eligibility_determined).to be_truthy
-              expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
-              expect(tax_household_db.effective_ending_on).to be_truthy
+            it "does should contain both tax households with one of them having an end on date" do
+              if tax_household_db
+                expect(family_db.active_household.tax_households.length).to eq 2
+                expect(family_db.active_household.tax_households.select{|th| th.effective_ending_on.present? }).to be_truthy
+              end
             end
-          end
 
-          it "should have a new tax household with the same aptc data" do
-            if tax_household_db
-              updated_tax_household = tax_household_db.household.latest_active_tax_household
-              expect(updated_tax_household).to be_truthy
-              expect(updated_tax_household.primary_applicant.family_member.person).to eq person
-              expect(updated_tax_household.allocated_aptc.to_f).to eq 0
-              expect(updated_tax_household.is_eligibility_determined).to be_truthy
-              expect(updated_tax_household.current_max_aptc.to_f).to eq max_aptc
-              expect(updated_tax_household.effective_ending_on).not_to be_truthy
+            it "maintain the old tax household" do
+              if tax_household_db
+                expect(tax_household_db).to be_truthy
+                expect(tax_household_db.primary_applicant.family_member.person).to eq person
+                expect(tax_household_db.allocated_aptc.to_f).to eq 0
+                expect(tax_household_db.is_eligibility_determined).to be_truthy
+                expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
+                expect(tax_household_db.effective_ending_on).to be_truthy
+              end
+            end
+
+            it "should have a new tax household with the same aptc data" do
+              if tax_household_db
+                updated_tax_household = tax_household_db.household.latest_active_tax_household
+                expect(updated_tax_household).to be_truthy
+                expect(updated_tax_household.primary_applicant.family_member.person).to eq person
+                expect(updated_tax_household.allocated_aptc.to_f).to eq 0
+                expect(updated_tax_household.is_eligibility_determined).to be_truthy
+                expect(updated_tax_household.current_max_aptc.to_f).to eq max_aptc
+                expect(updated_tax_household.effective_ending_on).not_to be_truthy
+              end
             end
           end
         end

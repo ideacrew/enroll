@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - 'trunk'
+      - '180873465_dc_determination_configs'
   pull_request:
     branches:
       - 'trunk'

@@ -1255,14 +1255,20 @@ describe 'coverage_purchased!' do
 
 
   it 'should trigger call to ssa hub' do
-    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request', {:person => person})
+    unless EnrollRegistry.feature_enabled?(:ssa_h3)
+      expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request',
+                                                                                   {:person => person})
+    end
     person.consumer_role.coverage_purchased!
   end
 
   it 'should trigger call to dhs hub if person is non native and no ssn ' do
     person.update_attributes(ssn: nil)
     person.consumer_role.lawful_presence_determination.update_attributes(citizen_status: nil)
-    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request', {:person => person, :coverage_start_date => start_date})
+    unless EnrollRegistry.feature_enabled?(:vlp_h92)
+      expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request',
+                                                                                   {:person => person, :coverage_start_date => start_date})
+    end
     person.consumer_role.coverage_purchased!
   end
 end
