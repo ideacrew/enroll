@@ -98,6 +98,10 @@ class ConsumerRole
     AMERICAN INDIAN BORN IN CANADA EMPLOYMENT AUTHORIZED
   ].freeze
 
+  # Used to store FiveYearBar data that we receive from FDSH Gateway in VLP Response Payload.
+  field :five_year_bar_applies, type: Boolean
+  field :five_year_bar_met, type: Boolean
+
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record

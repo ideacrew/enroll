@@ -6,7 +6,6 @@ module Subscribers
     include EventSource::Logging
     include ::EventSource::Subscriber[amqp: 'magi_medicaid.mitc.eligibilities']
 
-    # event_source branch: release_0.5.2
     subscribe(
       :on_magi_medicaid_mitc_eligibilities
     ) do |delivery_info, _metadata, response|
