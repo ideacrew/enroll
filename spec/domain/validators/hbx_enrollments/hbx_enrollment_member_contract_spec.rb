@@ -31,6 +31,34 @@ RSpec.describe Validators::HbxEnrollments::HbxEnrollmentMemberContract, type: :m
     it 'should not have any errors' do
       expect(@result.errors.empty?).to be_truthy
     end
+
+    context 'carrier_member_id is passed.' do
+      it 'should return success' do
+        enrollment_member_params.merge!(carrier_member_id: '010')
+        result = subject.call(enrollment_member_params)
+        expect(result.success?).to be_truthy
+      end
+
+      it 'should not return success' do
+        enrollment_member_params.merge!(carrier_member_id: BSON::ObjectId.new)
+        result = subject.call(enrollment_member_params)
+        expect(result.success?).to be_falsey
+      end
+    end
+
+    context 'tobacco_use is passed.' do
+      it 'should return success' do
+        enrollment_member_params.merge!(tobacco_use: 'N')
+        result = subject.call(enrollment_member_params)
+        expect(result.success?).to be_truthy
+      end
+
+      it 'should not return success' do
+        enrollment_member_params.merge!(tobacco_use: BSON::ObjectId.new)
+        result = subject.call(enrollment_member_params)
+        expect(result.success?).to be_falsey
+      end
+    end
   end
 
   context 'failure case' do
