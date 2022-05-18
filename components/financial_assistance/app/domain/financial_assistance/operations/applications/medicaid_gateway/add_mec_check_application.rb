@@ -54,7 +54,7 @@ module FinancialAssistance
               if response_evidence.aasm_state == 'outstanding'
                 applicant.set_evidence_to_negative_response(applicant_local_mec_evidence)
               else
-                applicant.set_evidence_verified(applicant_local_mec_evidence)
+                applicant.set_evidence_attested(applicant_local_mec_evidence)
               end
 
               response_evidence.request_results&.each do |eligibility_result|

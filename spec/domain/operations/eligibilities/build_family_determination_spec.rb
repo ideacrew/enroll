@@ -181,4 +181,48 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
       end
     end
   end
+
+  context "when person is not applying for coverage" do
+    before do
+      person1.consumer_role.update(:is_applying_coverage => false)
+      person2.consumer_role.update(:is_applying_coverage => false)
+    end
+
+    it 'should not build and perist determination' do
+      result = subject.call(required_params)
+      expect(result.success?).to be_falsey
+      expect(result.success).not_to be_a(Eligibilities::Determination)
+    end
+  end
+
+  context "when person without consumer_role is enrolling" do
+    let!(:person1) do
+      FactoryBot.create(
+        :person,
+        :with_employee_role,
+        first_name: 'test40',
+        last_name: 'test50',
+        gender: 'male'
+      )
+    end
+
+    let!(:person2) do
+      person =
+        FactoryBot.create(
+          :person,
+          :with_employee_role,
+          first_name: 'test70',
+          last_name: 'test60',
+          gender: 'male'
+        )
+      person1.ensure_relationship_with(person, 'child')
+      person
+    end
+
+    it 'should not build and perist determination' do
+      result = subject.call(required_params)
+      expect(result.success?).to be_falsey
+      expect(result.success).not_to be_a(Eligibilities::Determination)
+    end
+  end
 end
