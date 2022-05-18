@@ -40,10 +40,14 @@ module Operations
       def build_determination(values)
         subjects = values[:family].family_members.map(&:to_global_id)
 
-        BuildDetermination.new.call(
-          subjects: subjects,
-          effective_date: values[:effective_date]
-        )
+        family = values[:family]
+        primary_person = family&.primary_applicant&.person
+        is_any_member_applying_for_coverage = family.family_members.any?(&:is_applying_coverage)
+        if is_any_member_applying_for_coverage && primary_person.consumer_role.present?
+          BuildDetermination.new.call(subjects: subjects, effective_date: values[:effective_date])
+        else
+          Failure("Person don't have consumer role or is not applying for coverage")
+        end
       end
 
       def persist(values, determination_entity)
