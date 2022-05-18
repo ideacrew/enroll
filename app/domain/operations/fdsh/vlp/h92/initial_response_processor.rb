@@ -60,7 +60,8 @@ module Operations
 
           def store_response_and_get_consumer_role(person, initial_response)
             consumer_role = person.consumer_role
-            return Failure("No Consumer role found for person with hbx_id: #{person_hbx_id}") unless consumer_role
+            return Failure("No Consumer role found for person with hbx_id: #{person.hbx_id}") unless consumer_role
+            store_five_year_bar_information(consumer_role, initial_response)
 
             event_response_record = EventResponse.new({received_at: Time.now, body: initial_response.to_h.to_json})
             consumer_role.lawful_presence_determination.vlp_responses << event_response_record
@@ -77,6 +78,22 @@ module Operations
 
             consumer_role.save
             Success(consumer_role)
+          end
+
+          def store_five_year_bar_information(consumer_role, response)
+            individual_response = response.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first[:InitialVerificationIndividualResponseSet]
+            consumer_role.five_year_bar_applies = vlp_response_code_to_boolean(individual_response[:FiveYearBarApplyCode]) if individual_response.key?(:FiveYearBarApplyCode)
+            consumer_role.five_year_bar_met = vlp_response_code_to_boolean(individual_response[:FiveYearBarMetCode]) if individual_response.key?(:FiveYearBarMetCode)
+            consumer_role.save! if individual_response[:FiveYearBarApplyCode].present? || individual_response[:FiveYearBarMetCode].present?
+          rescue StandardError => e
+            Rails.logger.error "Failed to update Consumer Role with Five Year Bar information, message: #{e.message}"
+          end
+
+          def vlp_response_code_to_boolean(code_value)
+            case code_value
+            when 'P', nil, 'Y' then true
+            when 'X', 'N' then false
+            end
           end
         end
       end
