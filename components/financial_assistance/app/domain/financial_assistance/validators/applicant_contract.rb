@@ -58,6 +58,9 @@ module FinancialAssistance
         optional(:same_with_primary).maybe(:bool)
         required(:is_applying_coverage).filled(:bool)
 
+        optional(:five_year_bar_applies).maybe(:bool)
+        optional(:five_year_bar_met).maybe(:bool)
+
         optional(:addresses).maybe(:array)
         optional(:phones).maybe(:array)
         optional(:emails).maybe(:array)
