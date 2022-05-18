@@ -103,6 +103,7 @@ Then(/^consumer should see Documents We Accept link$/) do
 end
 
 Then(/^Individual should see cost saving documents for evidences$/) do
+  expect(page).to have_css(IvlDocumentsPage.income_evidence)
   expect(page).to have_content('Coverage from a job')
   expect(page).to have_content('Coverage from another program')
   expect(page).to have_content('Coverage from MaineCare and Cub Care')
@@ -117,8 +118,7 @@ Then(/^Individual should see view history option/) do
 end
 
 And(/^Individual clicks on view history$/) do
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div[5]/div/div/div/div[2]/div[15]/div/div[5]/div/div[3]/div/ul/li[4]').click
-
+  find(:xpath, IvlDocumentsPage.view_history_option).click
 end
 
 Then(/^Individual should see request histories and verification types$/) do
