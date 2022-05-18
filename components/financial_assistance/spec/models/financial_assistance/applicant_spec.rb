@@ -1018,6 +1018,68 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
+    context 'set evidence to attested' do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context 'for non esi evidence' do
+        let(:current_evidence) { applicant.non_esi_evidence }
+
+        before do
+          applicant.create_non_esi_evidence(key: :income, title: "Non Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        it 'should set evidence attested' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_attested(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.attested?).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied' do
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_attested(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).to be_blank
+        end
+      end
+
+      context 'for esi mec evidence' do
+        let(:current_evidence) { applicant.esi_evidence }
+
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        it 'should set evidence attested' do
+          expect(current_evidence.pending?).to be_truthy
+          applicant.set_evidence_attested(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.attested?).to be_truthy
+        end
+
+        it 'should set due_on, is_satisfied' do
+          expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_attested(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.due_on).to be_blank
+        end
+      end
+    end
+
     context 'set evidence to outstanding' do
       let!(:applicant) do
         FactoryBot.create(:financial_assistance_applicant,

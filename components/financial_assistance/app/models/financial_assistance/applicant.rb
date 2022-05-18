@@ -1214,6 +1214,14 @@ module FinancialAssistance
       save!
     end
 
+    def set_evidence_attested(evidence)
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.attest
+      save!
+    end
+
     def set_evidence_outstanding(evidence)
       return unless evidence.may_move_to_outstanding?
 
