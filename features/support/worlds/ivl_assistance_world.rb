@@ -138,7 +138,7 @@ module IvlAssistanceWorld
   def create_family_faa_application_with_applicants(state)
     create_family_faa_application(state)
     eligibility_determination1 = FactoryBot.create(:financial_assistance_eligibility_determination, application: @application)
-    FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, gender: "male", application: @application, family_member_id: BSON::ObjectId.new)
+    @applicant = FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, gender: "male", application: @application, family_member_id: BSON::ObjectId.new)
     @application.applicants.each do |appl|
       appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                          :address_1 => '1111 Awesome Street NE',
