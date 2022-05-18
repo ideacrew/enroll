@@ -46,7 +46,7 @@ module Operations
         @new_enrollment = clone_enrollment.value!
         dropped_enr_members = params[:options].select{|string| string.include?("terminate_member")}.values
         drop_selected_members(dropped_enr_members)
-        set_product_result = set_product_id if base_enrollment.is_health_enrollment?
+        set_product_result = set_product_id
         return set_product_result if set_product_result.failure?
 
         new_enrollment.check_for_subscriber

@@ -143,7 +143,6 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
     context 'when members are selected for drop', dbclean: :around_each do
       context 'when previous enrollment has 0 applied aptc' do
-        allow(enrollment).to receive(:is_health_enrollment?).and_return(true)
         before do
           @dropped_members = subject.call({hbx_enrollment: enrollment,
                                            options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
