@@ -1,7 +1,7 @@
 <% evidence_type = evidence.title %>
 <div class="row">
   <div class="v-type col-md-12">
-    <div class="v-type-name col-md-2">
+    <div class="v-type-name col-md-2" id="evidence_kind_<%= evidence_kind %>">
       <%= l10n(display_evidence_type(evidence_type)) %>
     </div>
     <div class="v-type-status col-md-2 text-center">
