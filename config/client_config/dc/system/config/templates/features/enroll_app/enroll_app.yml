@@ -610,7 +610,7 @@ registry:
       - key: :mainecare_cubcare_glossary
         is_enabled: false
       - key: :legacy_enrollment_trigger
-        is_enabled: true
+        is_enabled: false
       - key: :document_reminder_notice_trigger
         is_enabled: false
       - key: :account_transfer_notice_trigger
@@ -686,7 +686,7 @@ registry:
         is_enabled: false
       - key: :send_secure_purchase_confirmation_email
         item: :send_secure_purchase_confirmation_email
-        is_enabled: true
+        is_enabled: false
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: false
