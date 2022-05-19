@@ -84,7 +84,7 @@ module Operations
             individual_response = response.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first[:InitialVerificationIndividualResponseSet]
             consumer_role.five_year_bar_applies = vlp_response_code_to_boolean(individual_response[:FiveYearBarApplyCode]) if individual_response.key?(:FiveYearBarApplyCode)
             consumer_role.five_year_bar_met = vlp_response_code_to_boolean(individual_response[:FiveYearBarMetCode]) if individual_response.key?(:FiveYearBarMetCode)
-            consumer_role.save! if individual_response[:FiveYearBarApplyCode].present? || individual_response[:FiveYearBarMetCode].present?
+            consumer_role.person.save! if individual_response[:FiveYearBarApplyCode].present? || individual_response[:FiveYearBarMetCode].present?
           rescue StandardError => e
             Rails.logger.error "Failed to update Consumer Role with Five Year Bar information, message: #{e.message}"
           end
