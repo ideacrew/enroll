@@ -140,6 +140,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     context "#send_receipt_emails" do
+      before :each do
+        EnrollRegistry[:send_secure_purchase_confirmation_email].feature.stub(:is_enabled).and_return(true)
+      end
+
       it "should send send secure message to IVL person inbox" do
         allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
         sign_in(user)
