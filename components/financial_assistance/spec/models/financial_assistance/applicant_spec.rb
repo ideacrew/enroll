@@ -1640,6 +1640,44 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  describe '#attributes_for_export' do
+    let(:test_applicant) do
+      applicant.five_year_bar_applies = five_year_bar
+      applicant.five_year_bar_met = five_year_bar
+      applicant.save!
+      applicant
+    end
+
+    before { @result = test_applicant.attributes_for_export }
+
+    context 'for five_year_bar is set to true' do
+      let(:five_year_bar) { true }
+
+      it 'should include the keys and assign correct values' do
+        expect(@result[:five_year_bar_applies]).to eq(true)
+        expect(@result[:five_year_bar_met]).to eq(true)
+      end
+    end
+
+    context 'for five_year_bar is set to false' do
+      let(:five_year_bar) { false }
+
+      it 'should include the keys and assign correct values' do
+        expect(@result[:five_year_bar_applies]).to eq(false)
+        expect(@result[:five_year_bar_met]).to eq(false)
+      end
+    end
+
+    context 'for five_year_bar is set to nil' do
+      let(:five_year_bar) { nil }
+
+      it 'should include the keys and assign correct values' do
+        expect(@result[:five_year_bar_applies]).to eq(nil)
+        expect(@result[:five_year_bar_met]).to eq(nil)
+      end
+    end
+  end
+
   def create_embedded_docs_for_evidences(appli)
     [appli.income_evidence, appli.esi_evidence, appli.non_esi_evidence, appli.local_mec_evidence].each do |evidence|
       create_verification_history(evidence)
