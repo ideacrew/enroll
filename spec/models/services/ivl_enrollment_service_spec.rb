@@ -28,6 +28,10 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
   context "send_reminder_notices_for_ivl" do
 
     context 'when include_faa_outstanding_verifications feature is turned off' do
+      before :each do
+        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(true)
+      end
+
       it 'should trigger first reminder notice for unassisted families after 10 days of ENR notice' do
         person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
         family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
