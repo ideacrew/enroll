@@ -282,6 +282,14 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
               expect(reinstatement.product.id).to eq product_1.id
             end
 
+            it 'enrollment with should have older product for dental' do
+              allow(enrollment_2).to receive(:is_health_enrollment?).and_return(false)
+              subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
+                                                                    "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
+              reinstatement = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
+              expect(reinstatement.product.id).not_to eq product_1.id
+            end
+
             it 'when product is not in service area' do
               product_1.unset(:service_area_id)
               result = subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
