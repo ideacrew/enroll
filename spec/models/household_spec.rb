@@ -32,6 +32,21 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
+  context "new household member not matching existing person record" do
+    let(:new_family_member) {FactoryBot.create(:family_member, family: family, person: person)}
+    let(:primary) {family.family_members.first.person}
+
+    context "primary family member has employee role" do
+      it "should not persist the new coverage household member" do
+        allow(new_family_member).to receive(:primary_relationship).and_return("child")
+        allow(primary).to receive(:employee_roles).and_return(double)
+        active_household = family.active_household
+        active_household.add_household_coverage_member(new_family_member)
+        expect(active_household.coverage_households.first.coverage_household_members.last.persisted?).to eq false
+      end
+    end
+  end
+
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryBot.create(:consumer_role)}
     let(:address) { FactoryBot.build(:address) }
