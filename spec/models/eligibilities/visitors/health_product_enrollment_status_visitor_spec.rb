@@ -106,4 +106,15 @@ RSpec.describe ::Eligibilities::Visitors::HealthProductEnrollmentStatusVisitor,
       expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
     end
   end
+
+  context "when there is no individual enrollment" do
+    before do
+      hbx_enrollment1.update(kind: 'employer_sponsored')
+    end
+
+    it 'should not build evidence state for the given eligibility item' do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_falsey
+    end
+  end
 end
