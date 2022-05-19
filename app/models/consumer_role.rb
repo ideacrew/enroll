@@ -238,6 +238,8 @@ class ConsumerRole
 
   track_history :modifier_field_optional => true,
                 :on => [:five_year_bar,
+                        :five_year_bar_applies,
+                        :five_year_bar_met,
                         :aasm_state,
                         :marital_status,
                         :ssn_validation,

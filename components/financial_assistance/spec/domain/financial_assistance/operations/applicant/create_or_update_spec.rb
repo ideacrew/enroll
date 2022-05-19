@@ -28,6 +28,8 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          last_name: "childlast",
          gender: "male",
          :is_applying_coverage => true,
+         five_year_bar_applies: true,
+         five_year_bar_met: true,
          :citizen_status => "us_citizen",
          :is_consumer_role => true,
          :same_with_primary => false,
@@ -71,6 +73,9 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
 
       it 'should create a applicant object' do
         expect(application.reload.applicants.count).to eq(2)
+        expect(
+          application.applicants.where(:id.ne => applicant.id).pluck(:five_year_bar_applies, :five_year_bar_met)
+        ).to eq([[true, true]])
       end
     end
 
@@ -81,6 +86,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                           :with_work_phone,
                           :with_work_email,
                           :with_home_address,
+                          :with_five_year_bar,
                           application: application,
                           ssn: '889984400',
                           dob: (Date.today - 10.years),
@@ -123,6 +129,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
       let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
       let!(:applicant) do
         appl = FactoryBot.create(:financial_assistance_applicant,
+                                 :with_five_year_bar,
                                  application: application,
                                  ssn: '889984400',
                                  dob: (Date.today - 10.years),
@@ -175,6 +182,8 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :is_primary_applicant => true,
          :is_ssn_applied => nil,
          :is_tobacco_user => "unknown",
+         five_year_bar_applies: true,
+         five_year_bar_met: true,
          :issuing_country => nil,
          :last_name => "bond",
          :middle_name => nil,
@@ -222,6 +231,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                           :with_work_phone,
                           :with_work_email,
                           :with_home_address,
+                          :with_five_year_bar,
                           application: application,
                           ssn: '889984400',
                           dob: (Date.today - 10.years),
