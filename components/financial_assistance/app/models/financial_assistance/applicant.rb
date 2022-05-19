@@ -282,6 +282,10 @@ module FinancialAssistance
 
     field :transfer_referral_reason, type: String
 
+    # Used to store FiveYearBar data that we receive from FDSH Gateway in VLP Response Payload.
+    field :five_year_bar_applies, type: Boolean
+    field :five_year_bar_met, type: Boolean
+
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income", cascade_callbacks: true, validate: true
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction", cascade_callbacks: true, validate: true
@@ -1100,6 +1104,7 @@ module FinancialAssistance
                                                                    :i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                                                    :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,
                                                                    :issuing_country,:status,:indian_tribe_member,
+                                                                   :five_year_bar_applies, :five_year_bar_met,
                                                                    :same_with_primary,:vlp_description,:tribal_state,:tribal_name)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})
       applicant_params.merge!(expiration_date: expiration_date.strftime('%d/%m/%Y')) if expiration_date.present?
