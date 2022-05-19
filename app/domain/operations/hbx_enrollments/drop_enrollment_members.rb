@@ -119,7 +119,6 @@ module Operations
 
       def set_product_id
         return Success() unless base_enrollment.is_health_enrollment?
-        
         tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(new_enrollment.effective_on.year)
         return Success() unless tax_household.present?
 
