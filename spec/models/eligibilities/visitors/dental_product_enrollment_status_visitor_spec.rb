@@ -38,20 +38,7 @@ RSpec.describe ::Eligibilities::Visitors::DentalProductEnrollmentStatusVisitor,
   end
 
   let(:household) { FactoryBot.create(:household, family: family) }
-#   let!(:organization) do
-#     FactoryBot.create(:organization, legal_name: 'CareFirst', dba: 'care')
-#   end
-#   let!(:carrier_profile1) do
-#     FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
-#   end
-#   let!(:product1) do
-#     FactoryBot.create(
-#       :benefit_markets_products_health_products_health_product,
-#       benefit_market_kind: :aca_individual,
-#       kind: :dental,
-#       csr_variant_id: '01'
-#     )
-#   end
+
   let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile) }
 
   let!(:hbx_enrollment1) do
@@ -106,6 +93,17 @@ RSpec.describe ::Eligibilities::Visitors::DentalProductEnrollmentStatusVisitor,
     it 'should build evidence state for the given eligibility item' do
       subject.call
       expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
+    end
+  end
+
+  context "when there is no individual enrollment" do
+    before do
+      hbx_enrollment1.update(kind: 'employer_sponsored')
+    end
+
+    it 'should not build evidence state for the given eligibility item' do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_falsey
     end
   end
 end

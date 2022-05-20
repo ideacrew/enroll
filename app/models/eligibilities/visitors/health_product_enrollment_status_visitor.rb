@@ -30,6 +30,7 @@ module Eligibilities
             :effective_on.gte => effective_date.beginning_of_year,
             :effective_on.lte => effective_date.end_of_year
           )
+          .individual_market
           .by_health
           .enrolled_and_renewing
           .last
