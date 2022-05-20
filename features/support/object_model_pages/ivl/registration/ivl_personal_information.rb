@@ -65,7 +65,7 @@ class IvlPersonalInformation
   end
 
   def self.select_continue_message
-    'Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.'
+    'Next, we need to verify if you or you and your family are eligible to enroll in coverage through OPM Health Link. Select CONTINUE.'
   end
 
   def self.previous_link

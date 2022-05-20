@@ -10,7 +10,7 @@ module PortalHeaderHelper
     if current_user.nil?
       "<a class='portal'>#{l10n('welcome.index.welcome_to_site_header')}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
-      link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
+      link_to "#{image_tag 'icons/icon-exchange-admin-black.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role) && controller_path.exclude?('general_agencies')
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)

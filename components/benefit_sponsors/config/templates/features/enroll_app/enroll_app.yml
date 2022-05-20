@@ -20,9 +20,9 @@ registry:
           - key: :policies_url
             item: "https://dchealthlink.com/"
           - key: :faqs_url
-            item: "https://dchealthlink.com/help"
+            item: "https://opm.gov/faqs/"
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: "https://www.opm.gov/faqs/"
           - key: :business_resource_center_url
             item: "https://dchealthxlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
@@ -44,7 +44,7 @@ registry:
           - key: :home_business_url
             item: "https://www.dchealthlink.com/smallbusiness/overview"
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: "https://www.opm.gov/faqs/"
           - key: :main_web_address_url
             item: "https://www.dchealthlink.com/"
           - key: :invoice_bill_url
@@ -62,13 +62,13 @@ registry:
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-            item: "DC Health Link"
+            item: "OPM Health Link"
           - key: :byline
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :long_name
             item: "District of Columbia Health Link"
           - key: :header_message
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :logo_file_name
             item: "logo.png"
           - key: :make_their_premium_payments_online
@@ -130,7 +130,7 @@ registry:
           - key: :no_reply_email
             item: "noreply@dchealthlink.com"
           - key: :mail_address
-            item: "info@dchealthlink.com"
+            item: "info@opm.org"
           - key: :producer_email_address
             item: 'dchl.producer@dc.gov'
           - key: :privacy_policy
@@ -170,7 +170,7 @@ registry:
           - key: :health_benefit_exchange_authority_phone_number
             item: '(202) 715-7576'
           - key: :contact_center_name
-            item: "DC Health Link's Customer Care Center"
+            item: "OPM Health Link's Customer Care Center"
           - key: :contact_center_po_box
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
@@ -182,9 +182,9 @@ registry:
           - key: :contact_center_zip_code
             item: "20024" # For DC loading rating areas, the zip uses this zip code 20024
           - key: :contact_center_email_address
-            item: "info@dchealthlink.com"
+            item: "info@opm.org"
           - key: :contact_center_short_number
-            item: "1-855-532-5465"
+            item: "1-888-813-9220"
           - key: :producer_advisory_committee_url
             item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
           - key: :mailer_logo_file_name

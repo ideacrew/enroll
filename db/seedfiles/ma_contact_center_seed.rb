@@ -5,7 +5,7 @@ def create_contact_center_for(benefit_market)
     contact_center.name = "MA Customer Care Center"
     contact_center.alt_name = "MA CCC"
 
-    contact_center.phones.build(:area_code => 855, :number => "5325465", :full_phone_number => "1-855-532-5465", :kind => "main")
+    contact_center.phones.build(:area_code => 855, :number => "5325465", :full_phone_number => "1-888-813-9220", :kind => "main")
     contact_center.phones.build(:area_code => 617, :number => "7224033", :full_phone_number => "1-617-722-4033", :kind => "fax")
 
     contact_center.addresses.build(

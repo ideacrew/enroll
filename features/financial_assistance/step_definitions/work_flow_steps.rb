@@ -21,7 +21,7 @@
 #   find(:xpath, '//label[@for="radio_male"]').click
 #   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
 #   find('.btn', text: 'CONTINUE').click
-#   expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+#   expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through OPM Health Link. Please select CONTINUE.')
 #   find('.btn', text: 'CONTINUE').click
 #   find(:xpath, '//label[@for="person_us_citizen_true"]').click
 #   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
