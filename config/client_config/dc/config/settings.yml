@@ -17,8 +17,8 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
 
 contact_center:
-  alt_name: 'DC Health Link Customer Service'
-  phone_number: '1-855-532-5465'
+  alt_name: 'OPM Health Link Customer Service'
+  phone_number: '1-888-813-9220'
   fax: '1-617-933-3099'
   alt_fax: '617-722-4033'
   tty: '771'
@@ -26,11 +26,11 @@ contact_center:
   payment_phone_number: '855-532-LINK'
   ivl_number: '1-877-623-6765'
   ivl_phone_number: '1-877-623-6765'
-  email_address: 'info@dchealthlink.com'
+  email_address: 'info@opm.org'
   state: 'DC'
-  non_discrimination_email: 'info@dchealthlink.com'
+  non_discrimination_email: 'info@opm.org'
 
-  appeals: 'info@dchealthlink.com'
+  appeals: 'info@opm.org'
 
   board_of_elections_entity: 'DC Board of Elections'
   board_of_elections_address: '1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>'
@@ -38,7 +38,7 @@ contact_center:
   board_of_elections_phone_number: '(202) 727-2525'
 
   mailing_address:
-    name: 'DC Health Link'
+    name: 'OPM Health Link'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
@@ -46,7 +46,7 @@ contact_center:
     zip_code: '20090'
 
   appeal_center:
-    name: 'DC Health Link'
+    name: 'OPM Health Link'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
@@ -54,10 +54,10 @@ contact_center:
     zip_code: '20090'
 
   non_discrimination:
-    email: 'info@dchealthlink.com'
-    phone_1: '1-855-532-5465'
-    phone_2: '1-855-532-5465'
-    phone_3: '1-855-532-5465'
+    email: 'info@opm.org'
+    phone_1: '1-888-813-9220'
+    phone_2: '1-888-813-9220'
+    phone_3: '1-888-813-9220'
     complaint_url: 'https://www.hhs.gov/civil-rights/filing-a-complaint'
 
 plan_option_titles:

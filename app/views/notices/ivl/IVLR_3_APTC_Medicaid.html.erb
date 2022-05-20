@@ -44,7 +44,7 @@ content: "Information we have for you or other members of your household:"} %>
 <%end%>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{EnrollRegistry[:enroll_app].setting(:short_name).item} Customer Service at (855) 532-5465."} %>
+content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{EnrollRegistry[:enroll_app].setting(:short_name).item} Customer Service at (888) 813-9220."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Based on the information we have for you (detailed above), your household will NOT be eligible for the advanced premium tax credit or cost-sharing reductions in 2017. This is because the people listed below are eligible for Medicaid, based on your household income:"],
@@ -62,5 +62,5 @@ content: "Medicaid offers free, comprehensive health coverage.  You are still el
 content: "In order to receive a final eligibility notice for Medicaid, make sure your information is correct and respond to all requests for additional documentation.   Even if you do not respond to the requests for documentation, and are ultimately determined ineligible for Medicaid based on a failure to respond, you would still be ineligible for financial help through the advanced premium tax credit and cost-sharing reductions.  If you are eligible for Medicaid, enrollment information will be sent to you in a separate notice."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Important information is stored in your account on the #{EnrollRegistry[:enroll_app].setting(:short_name).item} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>. You can get help with logging in or creating an account by calling #{EnrollRegistry[:enroll_app].setting(:short_name).item} Customer Service toll-free at (855) 532-5465."],
+ contents: ["Important information is stored in your account on the #{EnrollRegistry[:enroll_app].setting(:short_name).item} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>. You can get help with logging in or creating an account by calling #{EnrollRegistry[:enroll_app].setting(:short_name).item} Customer Service toll-free at (888) 813-9220."],
    heading: 'Your Secure User Account', sub_heading: ''} %>

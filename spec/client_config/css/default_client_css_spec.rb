@@ -9,7 +9,7 @@ RSpec.describe "Default Client Specific CSS with Resource Registry" do
     context "application colors" do
       if EnrollRegistry[:enroll_app].setting(:site_key).item == :me
         it "should have dark blue text" do
-          expect(EnrollRegistry[:application_text_color].settings(:color).item).to eq("#487ba2")
+          expect(EnrollRegistry[:application_text_color].settings(:color).item).to eq("#2E2E2E")
         end
       end
       if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc

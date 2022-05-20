@@ -5,11 +5,11 @@
 # rubocop:disable Layout/LineLength
 
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
-  "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings on DC Health Link.
-     Please call DC Health Link at (855) 532-5465 to make updates to that application.
-      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
-  "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid. Please call DC Health Link at (855) 532-5465 to make updates to your case.
-     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+  "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings on OPM Health Link.
+     Please call OPM Health Link at (888) 813-9220 to make updates to that application.
+      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on OPM Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+  "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid. Please call OPM Health Link at (888) 813-9220 to make updates to your case.
+     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on OPM Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   'en.faa.other_ques.is_student' => 'Is this person a student? *',
@@ -29,7 +29,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligible_for_medicaid" => "These people <span>likely qualify</span> for ",
   "en.faa.eligible_for_medicaid2" => "",
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
-  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
+  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling OPM Health Link at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
   "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums. The monthly premium reduction is %{reduction_amount} per month </strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
@@ -40,13 +40,13 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
   "en.faa.does_not_qualify" => "Does not qualify",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
-  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through DC Health Link:",
+  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through OPM Health Link:",
   "en.faa.private_health_insurance" => "Private Health Insurance",
   "en.faa.qualified_to_enroll" => "These people are not eligible for lower monthly premiums. They <span> qualify to enroll </span> in a private health insurance plan.",
   "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. <a href= %{appeal_link} target='_blank'>Find out more about the appeal process</a> or <a href= %{find_expert_link}  target='_blank'>get help</a> by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
-  "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
+  "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in OPM Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
   "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
   "en.faa.next_step_medicaid_eligible" => "<b>Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:</b><ul><li>pick a plan, or</li><li>add or remove someone from your plan.</li>",
   "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
@@ -132,9 +132,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2021-coverage?utm_source=2021EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2021'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2021-coverage?utm_source=2021EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2021'>submit a webform</a> or call %{short_name} at (888) 813-9220 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
-  "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
+  "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in OPM Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",

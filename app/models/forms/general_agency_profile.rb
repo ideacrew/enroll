@@ -202,7 +202,7 @@ module Forms
 
     def validate_duplicate_npn
       if Person.where("general_agency_staff_roles.npn" => npn).any?
-        errors.add(:base, "NPN has already been claimed by another general agency staff. Please contact HBX-Customer Service - Call (855) 532-5465.")
+        errors.add(:base, "NPN has already been claimed by another general agency staff. Please contact HBX-Customer Service - Call (888) 813-9220.")
       end
     end
 

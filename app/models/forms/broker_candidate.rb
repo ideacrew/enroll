@@ -37,7 +37,7 @@ module Forms
         person.save!
   
       rescue TooManyMatchingPeople
-        errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX-Customer Service - Call (855) 532-5465.")
+        errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX-Customer Service - Call (888) 813-9220.")
         return false      
       end
 

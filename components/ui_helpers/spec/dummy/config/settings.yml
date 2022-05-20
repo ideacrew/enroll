@@ -57,10 +57,10 @@ contact_center:
     zip_code: '20090'
 
   non_discrimination:
-    email: 'info@dchealthlink.com'
-    phone_1: '1-855-532-5465'
-    phone_2: '1-855-532-5465'
-    phone_3: '1-855-532-5465'
+    email: 'info@opm.org'
+    phone_1: '1-888-813-9220'
+    phone_2: '1-888-813-9220'
+    phone_3: '1-888-813-9220'
     complaint_url: 'https://www.hhs.gov/civil-rights/filing-a-complaint'
 
 plan_option_titles:
@@ -297,18 +297,18 @@ aptc_errors:
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 style:
-  primary_orange: '#487ba2'
-  brand_primary: '#487ba2'
-  primary_color: '#487ba2'
-  primary_notification: '#487ba2'
-  primary_panel: '#487ba2'
+  primary_orange: '#2E2E2E'
+  brand_primary: '#2E2E2E'
+  primary_color: '#2E2E2E'
+  primary_notification: '#2E2E2E'
+  primary_panel: '#2E2E2E'
   primary_button: '#F7B319'
   primary_button_color: '#F7B319'
-  primary_button_disabled: '#487ba2'
-  primary_button_border_disabled: '#487ba2'
-  alternate_header_color: '#487ba2'
-  primary_icon_color: '#487ba2'
-  qle_header_color: '#487ba2'
+  primary_button_disabled: '#2E2E2E'
+  primary_button_border_disabled: '#2E2E2E'
+  alternate_header_color: '#2E2E2E'
+  primary_icon_color: '#2E2E2E'
+  qle_header_color: '#2E2E2E'
   primary_header_font: "'Open Sans', serif"
 
 external_applications:
