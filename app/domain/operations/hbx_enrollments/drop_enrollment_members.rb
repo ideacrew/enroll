@@ -24,6 +24,7 @@ module Operations
         return Failure('Missing HbxEnrollment Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         @base_enrollment = params[:hbx_enrollment]
+        family_members = base_enrollment.family.family_members
         return Failure('Enrollment need be in an active state to drop dependent') unless base_enrollment.is_admin_terminate_eligible?
         return Failure('Not an ivl enrollment.') unless base_enrollment.is_ivl_by_kind? # Added per the request, also need further development if to be used for shop
         return Failure('No members selected to drop.') if params[:options].select{|string| string.include?("terminate_member")}.empty?
@@ -32,6 +33,7 @@ module Operations
         @new_effective_date = (termination_date > base_enrollment.effective_on) ? termination_date + 1.day : base_enrollment.effective_on
         return Failure('Select termination date that would result member drop in present calender year.') unless new_effective_date.year == termination_date.year
         return Failure('Termination date cannot be outside of the current calender year.') unless termination_date.year == TimeKeeper.date_of_record.year
+        return Failure("Missing mailing address for a family member") if family_members.flat_map(&:person).map(&:mailing_address).any?(&:nil?)
 
         Success(params)
       end

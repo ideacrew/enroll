@@ -138,6 +138,14 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           expect(result.failure).to eq "Termination date cannot be outside of the current calender year."
         end
 
+        it 'should return a failure when mailing address is not present for any of the members' do
+          enrollment.family.family_members[2].person.addresses.delete_all
+          result = subject.call({hbx_enrollment: enrollment,
+                                 options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
+                                           "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
+
+          expect(result.failure).to eq "Missing mailing address for a family member"
+        end
       end
     end
 
