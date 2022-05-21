@@ -99,11 +99,9 @@ module Services
     end
 
     def trigger_enrollment_notice(enrollment)
-      begin
-        ::Operations::Notices::IvlEnrNoticeTrigger.new.call(enrollment: enrollment) unless Rails.env.test?
-      rescue Exception => e
-        Rails.logger.error { "Unable to trigger enrollment notice for person with enrollment hbx_id #{enrollment.hbx_id} due to #{e.inspect}" }
-      end
+      ::Operations::Notices::IvlEnrNoticeTrigger.new.call(enrollment: enrollment) unless Rails.env.test?
+    rescue StandardError => e
+      Rails.logger.error { "Unable to trigger enrollment notice for person with enrollment hbx_id #{enrollment.hbx_id} due to #{e.inspect}" }
     end
 
     def trigger_reminder_notices(family, event_name)

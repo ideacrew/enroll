@@ -5506,7 +5506,8 @@ describe ".propogate_cancel" do
 
 
       let(:shop_enrollment) do
-        FactoryBot.build(:hbx_enrollment,
+        FactoryBot.build(
+          :hbx_enrollment,
           :shop,
           :with_enrollment_members,
           :with_product,
@@ -5519,7 +5520,7 @@ describe ".propogate_cancel" do
           sponsored_benefit_package_id: current_benefit_package.id,
           sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
           employee_role_id: employee_role.id,
-          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
         )
       end
 
@@ -5531,7 +5532,8 @@ describe ".propogate_cancel" do
 
     context 'when ivl market' do
       let(:ivl_enrollment) do
-        FactoryBot.build(:hbx_enrollment,
+        FactoryBot.build(
+          :hbx_enrollment,
           :individual_shopping,
           :with_enrollment_members,
           :with_product,
