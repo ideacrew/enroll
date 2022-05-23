@@ -66,7 +66,7 @@ registry:
           - key: :byline
             item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :long_name
-            item: "District of Columbia Health Link"
+            item: "Office of Personnel Management"
           - key: :header_message
             item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :logo_file_name
