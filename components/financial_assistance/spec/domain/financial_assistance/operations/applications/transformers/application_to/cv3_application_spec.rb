@@ -1806,4 +1806,24 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe 'five_year_bar_applies, five_year_bar_met' do
+    context 'for five_year_bar information' do
+      let!(:update_applicant) do
+        applicant.five_year_bar_applies = true
+        applicant.five_year_bar_met = true
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application.reload).success
+        @applicant_hash = result[:applicants].first
+      end
+
+      it 'should include five_year_bar info in the result payload' do
+        expect(@applicant_hash[:five_year_bar_applies]).to eq(true)
+        expect(@applicant_hash[:five_year_bar_met]).to eq(true)
+      end
+    end
+  end
 end
