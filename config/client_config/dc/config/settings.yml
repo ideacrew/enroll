@@ -308,7 +308,7 @@ aptc_errors:
 
 style:
   primary_orange: '#333333'
-  brand_primary: '#007bc4'
+  brand_primary: '#2e2e2e'
   primary_color: '#007bc4'
   primary_notification: '#333333'
   primary_panel: '#69A30D'
