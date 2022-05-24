@@ -126,9 +126,9 @@ class HbxProfile
 
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
-  CallCenterName = "OPM Health Link's Customer Care Center"
+  CallCenterName = "OPM.gov's Customer Care Center"
   CallCenterPhoneNumber = "1-888-813-9220"
-  ShortName = "OPM Health Link"
+  ShortName = "OPM.gov"
 
   IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
 

@@ -38,7 +38,7 @@ Set up multiple benefit packages. Employers are allowed to set up multiple benef
 - Establish the new hire coverage effective date (options – 1st of the month following or coinciding with date of hire, 1st of the month following 30 days, 1st of the month following 60 days)
 - Choose what dependent groups (if any) to offer coverage.
 - Set the premium contributions for employees (must be at least 50% except during annual open enrollment period) and set the premium contribution for covered dependent groups (employer premium contribution can differ between dependent groups)
-- Set employee choice offerings. On OPM Health Link groups can offer all plans from a single carrier, all plan from a single metal level from all participating carriers, or a single plan.
+- Set employee choice offerings. On OPM.gov groups can offer all plans from a single carrier, all plan from a single metal level from all participating carriers, or a single plan.
 - Select a reference plan. This plan set the employer contribution at a fixed dollar amount for all employees and covered dependents.
 
 # Add dental coverage.
@@ -76,7 +76,7 @@ Minimum contribution requirements can be applied to individual contribution opti
 - Premium Invoice and Online Payment
 
 # Renewal
-Renewal employers can change any of the offerings above EXCEPT for the coverage start date. In order for a group to be considered a renewal they must complete a 12 month plan year on OPM Health Link and remain in continuous coverage.
+Renewal employers can change any of the offerings above EXCEPT for the coverage start date. In order for a group to be considered a renewal they must complete a 12 month plan year on OPM.gov and remain in continuous coverage.
 
 When employer renewal becomes available to the employer (currently 90 days in advance of the end of the current plan year), the system generates a draft renewal plan year in the employer’s account that is prepopulated with the same options the employer offered in the previous plan year, including:
 
