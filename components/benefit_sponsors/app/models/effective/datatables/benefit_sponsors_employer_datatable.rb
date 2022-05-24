@@ -153,7 +153,7 @@ module Effective
       def collection
         return @employer_collection if defined? @employer_collection
 
-        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.unscoped
+        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.unscoped.order(created_at: :desc)
 
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
