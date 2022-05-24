@@ -12,7 +12,7 @@ site:
   support_for_ie_browser: true
 contact_center:
   alt_fax: '617-722-4033'
-  alt_name: 'OPM Health Link Customer Service'
+  alt_name: 'OPM.gov Customer Service'
   alt_phone_number: '1-855-532-LINK'
   appeals: 'info@opm.org'
   board_of_elections_address: '1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>'
@@ -29,14 +29,14 @@ contact_center:
   state: 'DC'
   tty: '771'
   mailing_address:
-    name: 'OPM Health Link'
+    name: 'OPM.gov'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
     state: 'DC'
     zip_code: '20090'
   appeal_center:
-    name: 'OPM Health Link'
+    name: 'OPM.gov'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'

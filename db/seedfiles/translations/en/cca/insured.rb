@@ -170,7 +170,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.make_your_first_payment' => "Make a first Payment for a new plan",
   :'en.make_payments_for_my_plan' => "Make Payments for My Plan",
   :'en.go_back' => "GO BACK",
-  :'en.leave_dc_health_link' => "Leave OPM Health Link",
+  :'en.leave_dc_health_link' => "Leave OPM.gov",
   :'en.insured.primary_applicant' => "Primary Applicant",
   :'en.benefits' => "Benefits",
   :'en.benefit' => "Benefit",

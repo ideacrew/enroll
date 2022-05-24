@@ -71,8 +71,8 @@ Feature: User should be able to pay for plan
     And I click on purchase confirm button for matched person
     Then I should click on pay now button
     And I should see model pop up
-    Then I should see Leave OPM Health Link buttton
-    And I should be able to click  Leave OPM Health Link buttton
+    Then I should see Leave OPM.gov buttton
+    And I should be able to click  Leave OPM.gov buttton
     And I should see an alert with error message
 
     Examples:
@@ -91,7 +91,7 @@ Feature: User should be able to pay for plan
     And tries to purchase with a break in coverage
     Then I click on purchase confirm button for matched person
     And I should click on pay now button
-    Then I should be able to view OPM Health Link text
+    Then I should be able to view OPM.gov text
 
     Examples:
       | role          |

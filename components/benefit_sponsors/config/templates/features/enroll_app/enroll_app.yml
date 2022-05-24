@@ -62,7 +62,7 @@ registry:
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-            item: "OPM Health Link"
+            item: "OPM.gov"
           - key: :byline
             item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :long_name
@@ -70,7 +70,7 @@ registry:
           - key: :header_message
             item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :logo_file_name
-            item: "logo.png"
+            item: "opm-logo.png"
           - key: :make_their_premium_payments_online
             item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
           - key: :tab_icon
@@ -170,7 +170,7 @@ registry:
           - key: :health_benefit_exchange_authority_phone_number
             item: '(202) 715-7576'
           - key: :contact_center_name
-            item: "OPM Health Link's Customer Care Center"
+            item: "OPM.gov's Customer Care Center"
           - key: :contact_center_po_box
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
@@ -206,7 +206,7 @@ registry:
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :header_logo
-            item: "logo.png"
+            item: "opm-logo.png"
           - key: :eligibile_immigration_statuses_url
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :assistance_estimate_url

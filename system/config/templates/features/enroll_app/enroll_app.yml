@@ -64,7 +64,7 @@ registry:
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-            item: "OPM Health Link"
+            item: "OPM.gov"
           - key: :byline
             item: "Welcome to OPM's Health Insurance Marketplace"
           - key: :long_name
@@ -178,7 +178,7 @@ registry:
           - key: :health_benefit_exchange_authority_phone_number
             item: '(888) 813-9220 TTY: 711'
           - key: :contact_center_name
-            item: "OPM Health Link's Customer Care Center"
+            item: "OPM.gov's Customer Care Center"
           - key: :contact_center_po_box
             item: "PO Box 97022"
           - key: :contact_center_state_and_city

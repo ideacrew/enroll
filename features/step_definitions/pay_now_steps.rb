@@ -208,17 +208,17 @@ And(/^I should see model pop up$/) do
   expect(page).to have_css('.modal-open')
 end
 
-And(/^I should see Leave OPM Health Link buttton$/) do
-  expect(page).to have_content('LEAVE OPM Health Link')
+And(/^I should see Leave OPM.gov buttton$/) do
+  expect(page).to have_content('LEAVE OPM.gov')
 end
 
-And(/^I should be able to click  Leave OPM Health Link buttton$/) do
+And(/^I should be able to click  Leave OPM.gov buttton$/) do
   find('.interaction-click-control-leave-dc-health-link').click
   sleep 5
 end
 
-Then(/^I should be able to view OPM Health Link text$/) do
-  expect(page).to have_content("You are leaving the OPM Health Link website and entering a privately-owned website created, operated and maintained by Kaiser Permanente.")
+Then(/^I should be able to view OPM.gov text$/) do
+  expect(page).to have_content("You are leaving the OPM.gov website and entering a privately-owned website created, operated and maintained by Kaiser Permanente.")
 end
 
 And(/^I should see an alert with error message$/) do
