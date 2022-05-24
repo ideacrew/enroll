@@ -101,6 +101,18 @@ describe LawfulPresenceDetermination do
 end
 
 describe LawfulPresenceDetermination do
+  context 'publish_updated_event' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:determination) { person.consumer_role.lawful_presence_determination }
+
+    before { determination.citizen_status = 'naturalized_citizen' }
+
+    it 'should trigger publish_updated_event' do
+      expect_any_instance_of(Events::Individual::ConsumerRoles::LawfulPresenceDeterminations::Updated).to receive(:publish)
+      determination.save!
+    end
+  end
+
   context "state machine" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     subject { person.consumer_role.lawful_presence_determination }
