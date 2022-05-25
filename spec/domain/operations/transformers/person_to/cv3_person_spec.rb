@@ -37,7 +37,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     subject { ::Operations::Transformers::PersonTo::Cv3Person.new.transform_addresses(person.addresses) }
 
     context 'ME geocodes enabled' do
-      before do 
+      before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:me_geocodes).and_return(true)
       end
 
@@ -48,7 +48,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     end
 
     context 'ME geocodes disabled' do
-      before do 
+      before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:me_geocodes).and_return(false)
       end
 
