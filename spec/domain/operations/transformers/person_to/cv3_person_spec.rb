@@ -31,4 +31,31 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       expect(subject[:contact_method]).to eq('Paper and Electronic communications')
     end
   end
+
+  describe '#transform_addresses' do
+
+    subject { ::Operations::Transformers::PersonTo::Cv3Person.new.transform_addresses(person.addresses) }
+
+    context 'ME geocodes enabled' do
+      before do 
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:me_geocodes).and_return(true)
+      end
+
+      it 'should include geocode in addresses' do
+        result = subject.all? {|address| address.keys.include?(:geocode) && address[:geocode].present? }
+        expect(result).to eq(true)
+      end
+    end
+
+    context 'ME geocodes disabled' do
+      before do 
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:me_geocodes).and_return(false)
+      end
+
+      it 'should not include geocode in addresses' do
+        result = subject.all? {|address| address.keys.include?(:geocode) && address[:geocode].present? }
+        expect(result).to eq(false)
+      end
+    end
+  end
 end
