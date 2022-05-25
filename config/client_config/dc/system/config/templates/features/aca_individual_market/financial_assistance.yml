@@ -107,12 +107,6 @@ registry:
     - key: :transfer_service
       is_enabled: false
       item: "curam"
-    - key: :ios_integration
-      is_enabled: false
-  - namespace:
-    - :account_transfer
-    - :ios_integration
-    features:
     - key: me_geocodes
       is_enabled: false
   - namespace:

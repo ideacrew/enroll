@@ -107,12 +107,6 @@ registry:
     - key: :transfer_service
       is_enabled: true
       item: "aces"
-    - key: :ios_integration
-      is_enabled: false
-  - namespace:
-    - :account_transfer
-    - :ios_integration
-    features:
     - key: me_geocodes
       is_enabled: true
   - namespace:
