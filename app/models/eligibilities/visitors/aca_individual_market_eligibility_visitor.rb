@@ -12,7 +12,8 @@ module Eligibilities
       end
 
       def visit(verification_type)
-        return unless verification_type.type_name.downcase == evidence_item.key.titleize.downcase
+        evidence_key = evidence_item.key.downcase == "residency" ? "#{site_key}_residency" : evidence_item.key
+        return unless verification_type.type_name.downcase == evidence_key.titleize.downcase
 
         status_for = status_for(verification_type)
         evidence_state_attributes = {

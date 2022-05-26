@@ -156,11 +156,11 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
 
   context "enable residency verification" do
     before do
-      EnrollRegistry[:dc_residency].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:residency].feature.stub(:is_enabled).and_return(true)
     end
 
     let(:eligibility_items_requested) do
-      { aca_individual_market_eligibility: { evidence_items: [:dc_residency] } }
+      { aca_individual_market_eligibility: { evidence_items: [:residency] } }
     end
 
     let(:required_params) do
@@ -175,7 +175,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
       result.value!.subjects.each do |subject|
-        expect(subject.last.dig(:eligibility_states, :aca_individual_market_eligibility, :evidence_states, :dc_residency)).to be_present
+        expect(subject.last.dig(:eligibility_states, :aca_individual_market_eligibility, :evidence_states, :residency)).to be_present
       end
     end
   end
