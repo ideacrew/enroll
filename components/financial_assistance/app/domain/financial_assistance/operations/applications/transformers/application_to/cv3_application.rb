@@ -15,7 +15,7 @@ module FinancialAssistance
 
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
-            include FinancialAssistance::MeCountyHelper
+            include ::FinancialAssistance::CountyHelper
 
             FAA_MITC_RELATIONSHIP_MAP = {
               'spouse' => :husband_or_wife,
@@ -562,12 +562,9 @@ module FinancialAssistance
                            county_fips: address.fetch_county_fips_code,
                            state: address.state,
                            zip: address.zip,
-                           country_name: address.country_name}
+                           country_name: address.country_name,
+                          geocode: zipcode_to_geocode(address.zip)}
 
-                if FinancialAssistanceRegistry.feature_enabled?(:me_geocodes)
-                  city = address.city
-                  result.merge!(me_geocode_hash(city))
-                end
                 result
               end
             end

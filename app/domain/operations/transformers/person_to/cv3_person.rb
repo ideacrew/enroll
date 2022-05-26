@@ -13,7 +13,7 @@ module Operations
         include Dry::Monads[:result, :do]
         include Acapi::Notifiers
         include Rails.application.routes.url_helpers
-        include MeCountyHelper
+        include ::FinancialAssistance::CountyHelper
         require 'securerandom'
 
         def call(person)
@@ -79,13 +79,9 @@ module Operations
               state: address.state,
               zip: address.zip,
               country_name: "United States of America",
-              has_fixed_address: address.person.is_homeless ? false : true
+              has_fixed_address: address.person.is_homeless ? false : true,
+              geocode: zipcode_to_geocode(address.zip)
             }
-
-            if FinancialAssistanceRegistry.feature_enabled?(:me_geocodes)
-              city = address.city
-              address_hash.merge!(me_geocode_hash(city))
-            end
 
             address_hash
           end
@@ -382,13 +378,6 @@ module Operations
           return nil unless value
 
           AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
-        end
-
-        def me_geocode_hash(city)
-          # how to handle missing city or geocode??
-          return if city.empty?
-          county_and_geocode = maine_towns_county_and_geocode[city]
-          county_and_geocode.present? ? county_and_geocode.slice(:geocode) : {}
         end
       end
     end
