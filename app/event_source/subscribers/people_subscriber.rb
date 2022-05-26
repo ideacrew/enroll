@@ -14,9 +14,23 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "PeopleSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
     #   logger.info "PeopleSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "PeopleSubscriber, ack: #{payload}"
+      subscriber_logger.info "PeopleSubscriber::Save, ack: #{payload}"
+      ack(delivery_info.delivery_tag)
+    end
+
+    subscribe(:on_person_updated) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_person_updated)
+      payload = JSON.parse(response, symbolize_names: true)
+      pre_process_message(subscriber_logger, payload)
+
+      determine_verifications(payload, subscriber_logger)
+
+      ack(delivery_info.delivery_tag)
+    rescue StandardError, SystemStackError => e
+      subscriber_logger.info "PeopleSubscriber::Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "PeopleSubscriber::Update,  ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -29,6 +43,15 @@ module Subscribers
           effective_date: TimeKeeper.date_of_record
         )
       end
+    end
+
+    def determine_verifications(payload, subscriber_logger)
+      person = GlobalID::Locator.locate(payload[:gid])
+      consumer_role = person.consumer_role
+
+      ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id}) if consumer_role.present? && ([:first_name, :last_name, :dob, :encrypted_ssn] & payload.keys).present?
+    rescue StandardError => e
+      subscriber_logger.info "Error: PeopleSubscriber::Update, response: #{e}"
     end
 
     private
