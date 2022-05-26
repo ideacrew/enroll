@@ -130,7 +130,7 @@ class LawfulPresenceDetermination
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
     event.success.publish if event.success?
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }
+    Rails.logger.error { "Couldn't generate lawful presence determination update event due to #{e.backtrace}" }
   end
 
   def record_transition(*args)
