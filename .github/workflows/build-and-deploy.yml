@@ -179,6 +179,10 @@ jobs:
     needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     steps:
+      - id: get-msg
+        run: |
+          commit_message=$(echo ${{ github.event.commits[0].message }} | cut -d "(" -f1)
+          echo "::set-output name=commit_message::$commit_message"
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
@@ -191,14 +195,14 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "New image built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.repositoryName }}> on `${{ needs.prep.outputs.branchName }}`"
+                    "text": "New image built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`"
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Commit message:*\n```${{ github.event.commits[0].message }}```"
+                    "text": "*Commit message:*\n```${{ steps.get-msg.outputs.commit_message }}```"
                   }
                 }
               ]
