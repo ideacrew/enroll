@@ -1,4 +1,5 @@
 # Migration for fixing nil maine counties
+require File.join(Rails.root, "components", "financial_assistance", "app", "helpers", "financial_assistance", "zipcode_helper")
 include ::FinancialAssistance::ZipcodeHelper
 
 # Run this with RAILS_ENV=production bundle exec rake migrations:fix_maine_nil_counties
