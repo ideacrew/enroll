@@ -59,6 +59,9 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
+      - key: :ssi_income_types
+        item: :ssi_income_types
+        is_enabled: false
       - key: :medicaid_tax_credits_link
         item: :medicaid_tax_credits_link
         is_enabled: true
