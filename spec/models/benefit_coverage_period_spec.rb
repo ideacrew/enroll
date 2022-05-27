@@ -531,7 +531,6 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     context 'when native american csr feature is enabled' do
 
       before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:me_geocodes).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:native_american_csr).and_return(true)
       end
 
