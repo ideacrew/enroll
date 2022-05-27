@@ -13,8 +13,8 @@ RSpec.describe ::FinancialAssistance::ZipcodeHelper, :type => :helper, dbclean: 
 
     it 'should only have city, county and geocode keys in each value hash' do
       value_keys = zipcode_mappings.values.map(&:keys)
-      bad_keys = value_keys.select {|keys| keys != [:city, :county, :geocode]}
-      expect(bad_keys.empty?).to be_truthy
+      bad_keys = value_keys.detect {|keys| keys != [:city, :county, :geocode]}
+      expect(bad_keys.nil?).to be_truthy
     end
   end
 
