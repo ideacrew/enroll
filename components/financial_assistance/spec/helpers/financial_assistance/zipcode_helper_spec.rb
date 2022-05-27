@@ -2,13 +2,19 @@
 
 require 'rails_helper'
 
-RSpec.describe ::FinancialAssistance::CountyHelper, :type => :helper, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::ZipcodeHelper, :type => :helper, dbclean: :after_each do
 
-  let(:zipcode_mappings) { ::FinancialAssistance::CountyHelper::ZIPCODE_MAPPINGS }
+  let(:zipcode_mappings) { ::FinancialAssistance::ZipcodeHelper::ZIPCODE_MAPPINGS }
 
   context 'zipcode mappings hash' do
     it 'should exist and not be empty' do
       expect(zipcode_mappings.present?).to be_truthy
+    end
+
+    it 'should only have city, county and geocode keys in each value hash' do
+      value_keys = zipcode_mappings.values.map(&:keys)
+      bad_keys = value_keys.select {|keys| keys != [:city, :county, :geocode]}
+      expect(bad_keys.empty?).to be_truthy
     end
   end
 

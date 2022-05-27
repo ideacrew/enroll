@@ -13,7 +13,7 @@ module Operations
         include Dry::Monads[:result, :do]
         include Acapi::Notifiers
         include Rails.application.routes.url_helpers
-        include ::FinancialAssistance::CountyHelper
+        include ::FinancialAssistance::ZipcodeHelper
         require 'securerandom'
 
         def call(person)

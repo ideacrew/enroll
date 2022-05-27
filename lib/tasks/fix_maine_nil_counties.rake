@@ -1,5 +1,5 @@
 # Migration for fixing nil maine counties
-include ::FinancialAssistance::CountyHelper
+include ::FinancialAssistance::ZipcodeHelper
 
 # Run this with RAILS_ENV=production bundle exec rake migrations:fix_maine_nil_counties
 namespace :migrations do

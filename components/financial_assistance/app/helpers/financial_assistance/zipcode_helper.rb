@@ -3,7 +3,7 @@
 # rubocop:disable Metrics/ModuleLength
 module FinancialAssistance
     # Helper to load and map zipcodes to city, county and geocode
-  module CountyHelper
+  module ZipcodeHelper
     ZIPCODE_MAPPINGS = {
       '03901' => {:city => "Berwick", :county => "York", :geocode => "16003"},
       '03902' => {:city => "Cape Neddick", :county => "York", :geocode => "16028"},

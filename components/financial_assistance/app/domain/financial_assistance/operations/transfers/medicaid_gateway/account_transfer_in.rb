@@ -11,7 +11,7 @@ module FinancialAssistance
         # This Operation creates a new family and application draft
         # Operation receives ATP payload from medicaid gateway
         class AccountTransferIn
-          include ::FinancialAssistance::CountyHelper
+          include ::FinancialAssistance::ZipcodeHelper
           include Dry::Monads[:result, :do]
 
           PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)

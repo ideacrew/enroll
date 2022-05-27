@@ -15,7 +15,7 @@ module FinancialAssistance
 
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
-            include ::FinancialAssistance::CountyHelper
+            include ::FinancialAssistance::ZipcodeHelper
 
             FAA_MITC_RELATIONSHIP_MAP = {
               'spouse' => :husband_or_wife,
