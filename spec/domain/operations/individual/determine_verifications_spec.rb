@@ -26,6 +26,19 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
     end
   end
 
+  context 'when person is not applying for coverage' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:consumer_role) do
+      role = person.consumer_role
+      role.update_attributes(is_applying_coverage: false)
+      role
+    end
+
+    it 'returns failure' do
+      expect(subject.failure?).to eq true
+    end
+  end
+
   context 'when person and consumer role exists' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
