@@ -5,6 +5,14 @@ Rake.application.rake_require "tasks/fix_maine_nil_counties"
 Rake::Task.define_task(:environment)
 
 RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :after_each do
+
+  after :all do
+    list_file = "#{Rails.root}/list_county.csv"
+    update_file = "#{Rails.root}/update_county.csv"
+    File.delete(list_file)
+    File.delete(update_file)
+  end
+
   # Main app stuff
   # HBX ID from the CSV
   let(:maine_zip) { '04401' }

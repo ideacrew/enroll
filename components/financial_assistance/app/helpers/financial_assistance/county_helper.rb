@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/ModuleLength
 module FinancialAssistance
     # Helper to load and map zipcodes to city, county and geocode
   module CountyHelper
@@ -508,3 +511,4 @@ module FinancialAssistance
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength

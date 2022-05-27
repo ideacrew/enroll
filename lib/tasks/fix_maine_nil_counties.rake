@@ -1,6 +1,5 @@
-# Migration for fixin gnil maine counties
-require File.join(Rails.root, "app", "helpers", "me_county_helper")
-include MeCountyHelper
+# Migration for fixing nil maine counties
+include ::FinancialAssistance::CountyHelper
 
 # Run this with RAILS_ENV=production bundle exec rake migrations:fix_maine_nil_counties
 namespace :migrations do
@@ -49,8 +48,8 @@ namespace :migrations do
     def address_fixer(address)
       zip = address.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
       # Must be titleized like "Presque Isle" or "Bangor"
-      town_name = address.city.titleize
-      county_name = find_specific_county(town_name)
+      town_name = address.city.titleize      
+      county_name = city_to_county(town_name)
       counties = county_finder(zip)
       if counties.count == 1
         address.county = counties.first.county_name
@@ -82,12 +81,6 @@ namespace :migrations do
 
     def county_finder(zip)
       ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
-    end
-    
-    
-    # Will return a county name otherwise nil
-    def find_specific_county(town_name)
-      maine_counties_and_towns.detect { |key, value| maine_counties_and_towns[key].include?(town_name) }&.first
     end
 
     #2 update people with nil county

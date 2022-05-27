@@ -563,7 +563,7 @@ module FinancialAssistance
                            state: address.state,
                            zip: address.zip,
                            country_name: address.country_name,
-                          geocode: zipcode_to_geocode(address.zip)}
+                           geocode: zipcode_to_geocode(address.zip)}
 
                 result
               end
