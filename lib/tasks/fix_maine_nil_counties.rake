@@ -49,7 +49,7 @@ namespace :migrations do
     def address_fixer(address)
       zip = address.zip.match(/^(\d+)/).captures.first # incase of 20640-2342 (9 digit zip)
       # Must be titleized like "Presque Isle" or "Bangor"
-      town_name = address.city.titleize      
+      town_name = address.city.titleize
       county_name = city_to_county(town_name)
       counties = county_finder(zip)
       if counties.count == 1

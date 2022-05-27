@@ -69,7 +69,7 @@ module Operations
 
         def transform_addresses(addresses)
           addresses.collect do |address|
-            address_hash = {
+            {
               kind: address.kind,
               address_1: address.address_1,
               address_2: address.address_2,
@@ -82,8 +82,6 @@ module Operations
               has_fixed_address: address.person.is_homeless ? false : true,
               geocode: zipcode_to_geocode(address.zip)
             }
-
-            address_hash
           end
         end
 

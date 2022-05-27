@@ -107,8 +107,6 @@ registry:
     - key: :transfer_service
       is_enabled: false
       item: "curam"
-    - key: me_geocodes
-      is_enabled: false
   - namespace:
     - :documents
     features:

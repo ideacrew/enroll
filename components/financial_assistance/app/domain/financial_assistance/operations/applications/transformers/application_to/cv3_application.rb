@@ -569,13 +569,6 @@ module FinancialAssistance
               end
             end
 
-            def me_geocode_hash(city)
-              # how to handle missing city or geocode??
-              return if city.empty?
-              county_and_geocode = maine_towns_county_and_geocode[city]
-              county_and_geocode.present? ? county_and_geocode.slice(:geocode) : {}
-            end
-
             def emails(applicant)
               applicant.emails.inject([]) do |result, email|
                 result << {kind: email.kind,

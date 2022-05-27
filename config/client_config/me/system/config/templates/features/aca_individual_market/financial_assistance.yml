@@ -107,8 +107,6 @@ registry:
     - key: :transfer_service
       is_enabled: true
       item: "aces"
-    - key: me_geocodes
-      is_enabled: true
   - namespace:
     - :documents
     features:
