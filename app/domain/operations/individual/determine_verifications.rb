@@ -26,6 +26,7 @@ module Operations
         person = consumer_role.person
 
         return Failure('person not found') if person.blank?
+        return Failure('person not applying for coverage') unless person.is_applying_coverage
 
         attrs = OpenStruct.new({
                                  :determined_at => Time.now,
