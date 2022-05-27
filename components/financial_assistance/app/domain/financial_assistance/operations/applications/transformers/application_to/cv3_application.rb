@@ -614,6 +614,7 @@ module FinancialAssistance
                             tax_form: income.tax_form,
                             employer: employer(income),
                             has_property_usage_rights: income.has_property_usage_rights,
+                            ssi_type: income.ssi_type,
                             submitted_at: income.submitted_at }
                 result
               end
