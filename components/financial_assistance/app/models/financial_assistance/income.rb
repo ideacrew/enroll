@@ -133,7 +133,7 @@ module FinancialAssistance
     validates :start_on, presence: true, on: [:step_1, :submission]
     validate :start_on_must_precede_end_on
     validate :check_if_valid_amount
-    validate :check_if_ssi_type
+    validate :check_if_ssi_type, on: [:step_1, :submission]
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record

@@ -113,26 +113,29 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ssi_income_types).and_return(true)
+      income.update_attributes!(kind: "social_security_benefit")
     end
 
     context 'with no ssi type set' do
       it 'should not save with the correct error message' do
-        income.update_attributes(kind: "social_security_benefit")
-        expect(income.errors.full_messages).to include("Ssi type You must provide a valid type for social security income.")
+        expect(income.valid?(:step_1)).to be_falsey
+        expect(income.valid?(:submission)).to be_falsey
       end
     end
 
     context 'with valid ssi type set' do
       it 'should be a valid income' do
-        income.update_attributes(kind: "social_security_benefit", ssi_type: 'Survivor')
-        expect(income.valid?).to be_truthy
+        income.update_attributes!(kind: "social_security_benefit", ssi_type: 'Survivor')
+        expect(income.valid?(:step_1)).to be_truthy
+        expect(income.valid?(:submission)).to be_truthy
       end
     end
 
     context 'with invalid ssi type set' do
       it 'should be an invalid income step_1 and submit' do
-        income.update_attributes(kind: "social_security_benefit", ssi_type: 'InvalidType')
-        expect(income.errors.full_messages).to include("Ssi type You must provide a valid type for social security income.")
+        income.update_attributes(ssi_type: 'InvalidType')
+        expect(income.valid?(:step_1)).to be_falsey
+        expect(income.valid?(:submission)).to be_falsey
       end
     end
 
