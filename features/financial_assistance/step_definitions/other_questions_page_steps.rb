@@ -100,6 +100,14 @@ Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg
   end
 end
 
+Given(/^the user has an age greater than (\d+) years old$/) do |_arg1|
+  dob = TimeKeeper.date_of_record - (_arg1 + rand(1..20)).year
+  consumer.person.update_attributes(dob: dob)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(dob: dob)
+  end
+end
+
 Then(/^the have you applied for an SSN question should display$/) do
   expect(page).to have_content('Has this person applied for an SSN *')
 end
@@ -134,6 +142,26 @@ And(/^the user answers two for how many children$/) do
   find(".selectric-interaction-choice-control-children-expected-count").click
   sleep 1
   find('.interaction-choice-control-children-expected-count-2', match: :first).click
+end
+
+Given(/^the user answers yes to being a primary caregiver$/) do
+  choose('is_primary_caregiver_yes')
+end
+
+Given(/^the user answers no to being a primary caregiver$/) do
+  choose('is_primary_caregiver_no')
+end
+
+Then(/^the caregiver relationships should display$/) do
+  expect(page).to have_content(l10n('faa.other_ques.is_student'))
+end
+
+And(/^the user select one or more applicants they are primary caregivers for$/) do
+  expect(all(:css, "$('input#is_primary_caregiver_for')").count).to be > 0
+end
+
+And(/^the user does not select applicants they are primary caregivers for$/) do
+  expect(all(:css, "$('input#is_primary_caregiver_for')").count).to be eq(0)
 end
 
 And(/^the user fills out the rest of the other questions form and submits it$/) do
