@@ -7,13 +7,13 @@
 
     <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
       <div class="col-md-12  no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel"><%= l10n("TYPE")&.upcase %> *</label>
+        <label class="static_label label-floatlabel"><%= l10n("TYPE")&.upcase %> *</label>
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= other_income.ssi_type %></span>
       </div>
       <% end %>
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
         <% if show_net_amount_for(other_income) %>
-          <label class="static_label label-floatlabel"><%= l10n("NET AMOUNT")&.upcase %> *</label>
+          <label class="static_label label-floatlabel"><%= l10n("NET")&.upcase %> <%= l10n("AMOUNT")&.upcase %> *</label>
         <% else %>
           <label class="static_label label-floatlabel"><%= l10n("AMOUNT")&.upcase %> *</label>
         <% end %>

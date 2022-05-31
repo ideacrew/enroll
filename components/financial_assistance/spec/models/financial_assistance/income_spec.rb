@@ -117,7 +117,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
     end
 
     context 'with no ssi type set' do
-      it 'should not save with the correct error message' do
+      it 'should be an invalid income on step_1 and submit' do
         expect(income.valid?(:step_1)).to be_falsey
         expect(income.valid?(:submission)).to be_falsey
       end
@@ -132,7 +132,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
     end
 
     context 'with invalid ssi type set' do
-      it 'should be an invalid income step_1 and submit' do
+      it 'should be an invalid income on step_1 and submit' do
         income.update_attributes(ssi_type: 'InvalidType')
         expect(income.valid?(:step_1)).to be_falsey
         expect(income.valid?(:submission)).to be_falsey
