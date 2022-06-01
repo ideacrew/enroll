@@ -795,9 +795,8 @@ module FinancialAssistance
         questions_array << pregnancy_end_on
         questions_array << is_enrolled_on_medicaid if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
       end
-      
-      (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
 
+      (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
 
     def tax_info_complete?
