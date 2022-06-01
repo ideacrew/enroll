@@ -87,14 +87,6 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And the user saves the other income information
     Then the negative other income information should be saved on the page
 
-  Scenario: User enters negative Income amount for valid income type
-    Given the user answers yes to having other income
-    And the user checks capital gains checkbox
-    And the user fills out the other income information with negative income
-    Then the save button should be enabled
-    And the user saves the other income information
-    Then the negative other income information should be saved on the page
-
   Scenario: User enters Social Security income type
     Given the user answers yes to having other income
     And the user checks social security checkbox
