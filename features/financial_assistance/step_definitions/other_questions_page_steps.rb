@@ -14,11 +14,13 @@ Given(/^all applicants fill all pages except other questions$/) do
     fill_in 'income[start_on]', with: '1/1/2018'
     find_all("#job_income .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
     find_all("#job_income li.interaction-choice-control-income-frequency-kind-7").first.click
-    fill_in 'income[employer_address][address_1]', with: '1 K Street'
-    fill_in 'income[employer_address][city]', with: 'Washington'
-    fill_in 'income[employer_address][zip]', with: '20000'
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[3]/div/ul/li[10]').click
+    unless (FinancialAssistanceRegistry[:disable_employer_address_fields].enabled?)
+      fill_in 'income[employer_address][address_1]', with: '1 K Street'
+      fill_in 'income[employer_address][city]', with: 'Washington'
+      fill_in 'income[employer_address][zip]', with: '20000'
+      find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[2]/b').click
+      find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[3]/div/ul/li[10]').click
+    end
     fill_in 'income[employer_phone][full_phone_number]', with: '7898765676'
     click_button('Save')
     find('#has_self_employment_income_true').click
@@ -100,12 +102,13 @@ Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg
   end
 end
 
-Given(/^the user has an age greater than (\d+) years old$/) do |_arg1|
+Given(/^the user has an age greater than (\d+) years old, with a young child$/) do |_arg1|
   dob = TimeKeeper.date_of_record - (_arg1 + rand(1..20)).year
   consumer.person.update_attributes(dob: dob)
   application.applicants.each do |applicant|
     applicant.update_attributes(dob: dob)
   end
+  application.applicants.last.update_attributes(dob: (TimeKeeper.date_of_record - 3.years))
 end
 
 Then(/^the have you applied for an SSN question should display$/) do
@@ -153,15 +156,19 @@ Given(/^the user answers no to being a primary caregiver$/) do
 end
 
 Then(/^the caregiver relationships should display$/) do
-  expect(page).to have_content(l10n('faa.other_ques.is_student'))
+  expect(page).to have_content(l10n('faa.primary_caretaker_for_text'))
 end
 
-And(/^the user select one or more applicants they are primary caregivers for$/) do
-  expect(all(:css, "$('input#is_primary_caregiver_for')").count).to be > 0
+Then(/^the caregiver relationships should not display$/) do
+  expect(page).to_not have_content(l10n('faa.primary_caretaker_for_text'))
 end
 
-And(/^the user does not select applicants they are primary caregivers for$/) do
-  expect(all(:css, "$('input#is_primary_caregiver_for')").count).to be eq(0)
+And(/^the user selects an applicant they are the primary caregiver for$/) do
+  find(:css, "#is_primary_caregiver_for").set(true)
+end
+
+Then(/^an applicant is selected as a caregivee$/) do
+  expect(all(:css, "#is_primary_caregiver_for:checked").count).to be > 0
 end
 
 And(/^the user fills out the rest of the other questions form and submits it$/) do
