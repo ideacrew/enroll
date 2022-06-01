@@ -49,7 +49,12 @@ module FinancialAssistance
     NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
-    SSI_TYPES = %w[Disability Retirement Survivor].freeze
+    SSI_TYPES = %w[disability retirement survivors].freeze
+    SS_BENEFITS = {
+      disability: 'Disability Benefits',
+      retirement: 'Retirement Benefits',
+      survivors: 'Survivors Benefits'
+    }.freeze
 
     NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = EnrollRegistry[:negative_amount_income_types].setting(:income_types).item || %w[net_self_employment capital_gains farming_and_fishing].freeze
 

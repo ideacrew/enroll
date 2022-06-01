@@ -125,7 +125,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
 
     context 'with valid ssi type set' do
       it 'should be a valid income' do
-        income.update_attributes(ssi_type: 'Survivor')
+        income.update_attributes(ssi_type: 'survivors')
         expect(income.valid?(:step_1)).to be_truthy
         expect(income.valid?(:submission)).to be_truthy
       end
