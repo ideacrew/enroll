@@ -14,7 +14,7 @@ Given(/^all applicants fill all pages except other questions$/) do
     fill_in 'income[start_on]', with: '1/1/2018'
     find_all("#job_income .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
     find_all("#job_income li.interaction-choice-control-income-frequency-kind-7").first.click
-    unless (FinancialAssistanceRegistry[:disable_employer_address_fields].enabled?)
+    unless FinancialAssistanceRegistry[:disable_employer_address_fields].enabled?
       fill_in 'income[employer_address][address_1]', with: '1 K Street'
       fill_in 'income[employer_address][city]', with: 'Washington'
       fill_in 'income[employer_address][zip]', with: '20000'
@@ -102,8 +102,8 @@ Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg
   end
 end
 
-Given(/^the user has an age greater than (\d+) years old, with a young child$/) do |_arg1|
-  dob = TimeKeeper.date_of_record - (_arg1 + rand(1..20)).year
+Given(/^the user has an age greater than (\d+) years old, with a young child$/) do |arg1|
+  dob = TimeKeeper.date_of_record - (arg1 + rand(1..20)).year
   consumer.person.update_attributes(dob: dob)
   application.applicants.each do |applicant|
     applicant.update_attributes(dob: dob)

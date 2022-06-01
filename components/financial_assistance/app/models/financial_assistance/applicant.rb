@@ -795,9 +795,8 @@ module FinancialAssistance
         questions_array << pregnancy_end_on
         questions_array << is_enrolled_on_medicaid if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
       end
-      
-      (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
 
+      (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
 
     def tax_info_complete?
@@ -1421,8 +1420,8 @@ module FinancialAssistance
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
-      if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && age_of_applicant >= 19 && is_applying_coverage == true
-        errors.add(:is_primary_caregiver, "'#{l10n('faa.primary_caretaker_question_text')}' should be answered" ) if is_primary_caregiver.nil?
+      if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && age_of_applicant >= 19 && is_applying_coverage == true && is_primary_caregiver.nil?
+        errors.add(:is_primary_caregiver, "'#{l10n('faa.primary_caretaker_question_text')}' should be answered")
       end
 
       return unless is_applying_coverage
