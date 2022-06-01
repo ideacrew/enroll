@@ -9,7 +9,6 @@
 <div class="focus_effect_module">
   <div class="row row-form-wrapper no-buffer row-height row-edit-border">
     <%= f.hidden_field :kind, value: kind %>
-    feature enabled: <%= FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
     <% if (other_income.kind == "social_security_benefit" || kind == :social_security_benefit) && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
       <div class="row row-form-wrapper no-buffer check_box_collection" id="ssi_type">
         <div class="col-xs-12 form-group form-group-lg ss_benefit_type">
