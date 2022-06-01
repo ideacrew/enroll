@@ -179,7 +179,11 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       end
 
       context 'when termination date is equal to base enrollment effective date' do
+        # set the date to a day other than the first of the month to ensure it is not the same as the coverage start on
+        let(:non_first_date) {Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2)}
         before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(non_first_date)
+          enrollment.update_attributes(effective_on: non_first_date)
           @dropped_members = subject.call({hbx_enrollment: enrollment,
                                            options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
