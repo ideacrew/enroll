@@ -47,11 +47,6 @@ module BenefitSponsors
 
         def update_representative(attributes)
           handler.update_representative(attributes)
-
-          if is_broker_profile?
-            person = Person.find(attributes[:person_id])
-            person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
-          end
         end
 
         def self.persist!(factory_obj, attributes)
@@ -442,7 +437,19 @@ module BenefitSponsors
 
           def update_representative(attributes)
             person = Person.find(attributes[:person_id])
-            person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
+            attrs = attributes.slice(:first_name, :last_name, :dob)
+
+            is_allow_edit_broker_npn = EnrollRegistry.feature_enabled?(:allow_edit_broker_npn)
+            is_allow_edit_broker_email = EnrollRegistry.feature_enabled?(:allow_edit_broker_email)
+
+            attrs.merge!({ npn: attributes[:npn] }) if is_allow_edit_broker_npn
+            attrs.merge!({ email: attributes[:email] }) if is_allow_edit_broker_email
+
+            person.update_attributes!(attrs)
+            broker_role = person.broker_role
+            return unless broker_role
+            broker_role.update_attributes!(npn: attributes[:npn]) if is_allow_edit_broker_npn
+            broker_role.email&.update_attributes!(address: attributes[:email]) if is_allow_edit_broker_email
           end
 
           def add_person_contact_info
