@@ -316,6 +316,10 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
         end
+
+        it 'should begin coverage for the reinstatement' do
+          expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
+        end
       end
     end
 
