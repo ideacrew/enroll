@@ -122,7 +122,18 @@ function applyFaaListenersFor(target) {
     } else {
       $('#tribal_container').hide();
       $('.tribal_container').hide();
+      $('.tribal_name_other_container').hide();
       $('#tribal_id').val("");
+      
+    }
+  });
+
+  $('input#applicant_tribal_name_other').change(function() {
+    if(this.checked){
+      $('.tribal_name_other_container').show();
+    }
+    else{
+      $('.tribal_name_other_container').hide();
     }
   });
 
@@ -195,15 +206,18 @@ function validationForIndianTribeMember(e) {
   if ($('#indian_tribe_area').length == 0) {
     return false;
   };
+
   $('.close').click(function() {
     $('#tribal_id_alert').hide()
     $('#tribal-state-alert').hide();
     $('#tribal-name-alert').hide();
   });
+
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
     if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
+    
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       e.preventDefault && e.preventDefault();
