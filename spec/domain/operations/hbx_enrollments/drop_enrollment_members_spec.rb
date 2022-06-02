@@ -316,10 +316,6 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
           expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
         end
-
-        it 'should begin coverage for the reinstatement' do
-          expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
-        end
       end
     end
 
@@ -366,6 +362,15 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
       it 'should not terminate previously existing enrollment' do
         expect(enrollment.aasm_state).to eq 'coverage_selected'
+      end
+    end
+
+    context 'when passing nil for terminated member with key present' do
+      it 'should return failure.' do
+        dropped_members = subject.call({hbx_enrollment: enrollment,
+                                        options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
+                                                  "terminate_member_#{hbx_enrollment_member3.id}" => nil}}).failure
+        expect(dropped_members).to eq 'No members were being dropped.'
       end
     end
   end
