@@ -306,7 +306,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 191,
+          "line": 192,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -450,7 +450,7 @@
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/application_controller.rb",
-      "line": 105,
+      "line": 114,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.permit!",
       "render_path": null,
@@ -498,7 +498,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 191,
+          "line": 192,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -569,7 +569,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 509,
+          "line": 510,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -758,7 +758,7 @@
       "warning_code": 121,
       "fingerprint": "9a3951031616a07c8e02c86652f537e92c08685da97f5ec2b12d5d3602b55bb8",
       "check_name": "EOLRuby",
-      "message": "Support for Ruby 2.5.1 ended on 2021-03-31",
+      "message": "Support for Ruby 2.5.9 ended on 2021-03-31",
       "file": "Gemfile.lock",
       "line": 770,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
@@ -890,6 +890,22 @@
       "note": ""
     },
     {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 120,
+      "fingerprint": "d84924377155b41e094acae7404ec2e521629d86f97b0ff628e3d1b263f8101c",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 5.2.4.4 ended on 2022-06-01",
+      "file": "Gemfile.lock",
+      "line": 770,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "d8b1f403fa74add1a58d263a2714750ac7e3da05fadc319c83af5b94078a8f33",
@@ -950,6 +966,6 @@
       "note": ""
     }
   ],
-  "updated": "2022-05-02 10:25:34 -0400",
+  "updated": "2022-06-02 12:03:31 -0400",
   "brakeman_version": "5.2.3"
 }
