@@ -37,6 +37,15 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
+      context 'no ssn' do
+        it 'should populate applicant no ssn field using transformed cv3 person demographics' do
+          person_demographics = @transformed["family"]["family_members"].first["person"]["person_demographics"]
+          no_ssn_string = subject.transform_no_ssn(person_demographics["no_ssn"])
+          applicant = FinancialAssistance::Application.first.applicants.first
+          expect(applicant.no_ssn).to eq no_ssn_string
+        end
+      end
+
       context 'relationships' do
         before do
           @family_member_rels = Family.first.family_members.map(&:relationship)
