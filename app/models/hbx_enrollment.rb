@@ -1065,6 +1065,8 @@ class HbxEnrollment
   end
 
   def trigger_enrollment_notice
+    return if is_shop?
+
     Services::IvlEnrollmentService.new.trigger_enrollment_notice(self) unless EnrollRegistry[:legacy_enrollment_trigger].enabled?
   end
 

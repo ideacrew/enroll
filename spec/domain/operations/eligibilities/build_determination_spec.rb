@@ -154,6 +154,32 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     end
   end
 
+  context "enable residency verification" do
+    before do
+      EnrollRegistry[:residency].feature.stub(:is_enabled).and_return(true)
+    end
+
+    let(:eligibility_items_requested) do
+      { aca_individual_market_eligibility: { evidence_items: [:residency] } }
+    end
+
+    let(:required_params) do
+      {
+        subjects: subjects,
+        effective_date: effective_date,
+        eligibility_items_requested: eligibility_items_requested
+      }
+    end
+
+    it 'should build evidences for residency' do
+      result = subject.call(required_params)
+      expect(result.success?).to be_truthy
+      result.value!.subjects.each do |subject|
+        expect(subject.last.dig(:eligibility_states, :aca_individual_market_eligibility, :evidence_states, :residency)).to be_present
+      end
+    end
+  end
+
   context '.outstanding_verification_document_status_for_determination' do
 
     context 'eligibility states' do

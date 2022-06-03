@@ -112,8 +112,9 @@ module Operations
         return 'not_enrolled' unless enrolled
 
         return 'eligible' if eligibility_states.all? { |eligibility_state| eligibility_state[:is_eligible] }
+        return 'outstanding' if eligibility_states.any? { |eligibility_state| eligibility_state[:evidence_states].present? && !eligibility_state[:is_eligible]}
         return 'pending' if eligibility_states.all? { |eligibility_state| eligibility_state[:is_eligible] || eligibility_state[:evidence_states].blank? }
-        return 'outstanding' if eligibility_states.any? { |eligibility_state| !eligibility_state[:is_eligible] }
+        return 'outstanding' if eligibility_states.any? { |eligibility_state| !eligibility_state[:is_eligible]}
 
         'pending'
       end

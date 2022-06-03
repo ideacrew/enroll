@@ -156,27 +156,59 @@ jobs:
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
         id: scan
-        uses: anchore/scan-action@main
+        uses: anchore/scan-action@v3
         with:
           image: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
 
-      #- name: upload Anchore scan SARIF report
-      #  if: github.event_name != 'pull_request'
-      #  uses: github/codeql-action/upload-sarif@v1
-      #  with:
-      #    sarif_file: ${{ steps.scan.outputs.sarif }}
+      - name: upload Anchore scan SARIF report
+        if: github.event_name != 'pull_request'
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
 
       - name: Move cache
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-  notify-slack:
+  new-image-notification:
     if: github.event_name != 'pull_request'
     needs: [prep, build-and-upload-image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "New image built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Commit message:*\n```${{ github.event.commits[0].message }}```"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+
+  notify-slack:
+    if: github.event_name != 'pull_request'
+    needs: [new-image-notification, prep, build-and-upload-image]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -197,27 +229,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*New image available for ${{ env.CLIENT }}*:\n`${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}`"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Commit:*\n`${{ needs.prep.outputs.shortSha }}`"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch:*\n`${{ needs.prep.outputs.branchName }}`"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "<https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|Direct link to commit>"
+                    "text": "*${{ env.CLIENT }} image*:\n`${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}`"
                   }
                 },
                 {

@@ -5491,4 +5491,63 @@ describe ".propogate_cancel" do
       end
     end
   end
+
+  describe 'trigger_enrollment_notice' do
+    let(:person) { create(:person, :with_consumer_role) }
+    let(:family) { create(:family, :with_primary_family_member, person: person)}
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+    context 'when shop market' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
+      let(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
+
+
+      let(:shop_enrollment) do
+        FactoryBot.build(
+          :hbx_enrollment,
+          :shop,
+          :with_enrollment_members,
+          :with_product,
+          coverage_kind: "health",
+          family: family,
+          employee_role: employee_role,
+          effective_on: effective_on,
+          aasm_state: 'shopping',
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          sponsored_benefit_package_id: current_benefit_package.id,
+          sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
+        )
+      end
+
+      it 'should not trigger enr notice' do
+        expect(Services::IvlEnrollmentService).not_to receive(:new)
+        shop_enrollment.select_coverage!
+      end
+    end
+
+    context 'when ivl market' do
+      let(:ivl_enrollment) do
+        FactoryBot.build(
+          :hbx_enrollment,
+          :individual_shopping,
+          :with_enrollment_members,
+          :with_product,
+          family: family,
+          consumer_role: person.consumer_role,
+          coverage_kind: "health",
+          effective_on: effective_on
+        )
+      end
+
+      it 'should trigger enr notice' do
+        expect(Services::IvlEnrollmentService).to receive_message_chain('new.trigger_enrollment_notice').with(ivl_enrollment)
+        ivl_enrollment.select_coverage!
+      end
+    end
+  end
 end

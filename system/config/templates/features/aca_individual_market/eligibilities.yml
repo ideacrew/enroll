@@ -51,6 +51,7 @@ registry:
               - :citizenship
               - :american_indian_status
               - :social_security_number
+              - :residency
       - key: :health_product_enrollment_status
         is_enabled: true
         settings:
@@ -120,6 +121,13 @@ registry:
           - key: :evidence_ref
             item: 'gid://enroll_app/Person'
       - key: :social_security_number
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :residency
         is_enabled: true
         settings:
           - key: :subject_ref
