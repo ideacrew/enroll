@@ -472,8 +472,13 @@ module BenefitSponsors
         let(:is_edit_email_allowed)   { false }
 
         before do
-          EnrollRegistry[:allow_edit_broker_npn].feature.stub(:is_enabled).and_return(is_edit_npn_allowed)
-          EnrollRegistry[:allow_edit_broker_email].feature.stub(:is_enabled).and_return(is_edit_email_allowed)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_npn).and_return is_edit_npn_allowed
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_email).and_return is_edit_email_allowed
           profile_factory
 
           broker_organization.reload
