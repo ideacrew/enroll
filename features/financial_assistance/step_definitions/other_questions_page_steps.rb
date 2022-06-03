@@ -112,7 +112,7 @@ Given(/^the user has an age greater than (\d+) years old, with a young child$/) 
 end
 
 Then(/^the have you applied for an SSN question should display$/) do
-  expect(page).to have_content('Has this person applied for an SSN *')
+  expect(page).to have_content('Has this person applied for an SSN?*')
 end
 
 And(/^the user answers no to the have you applied for an SSN question$/) do
@@ -267,7 +267,7 @@ Then(/^type of school question should display$/) do
 end
 
 Then(/^the has this person ever been in foster care question should display$/) do
-  expect(page).to have_content('Was this person in foster care at age 18 or older? *')
+  expect(page).to have_content('Was this person in foster care at age 18 or older?*')
 end
 
 Given(/^the user answered yes to the has this person ever been in foster care question$/) do
