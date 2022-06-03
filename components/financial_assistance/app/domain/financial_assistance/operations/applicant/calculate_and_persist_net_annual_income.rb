@@ -73,7 +73,8 @@ module FinancialAssistance
 
           start_day_of_year = income_start_date.yday
           year_difference = end_date_year - start_date_year
-          end_day_of_year = income_end_date.yday + (year_difference * 365)
+          days_in_start_year = Date.gregorian_leap?(income.start_on.year) ? 366 : 365
+          end_day_of_year = income_end_date.yday + (year_difference * days_in_start_year)
 
           ((end_day_of_year - start_day_of_year + 1) * income_per_day).round(2)
         end
