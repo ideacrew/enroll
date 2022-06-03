@@ -340,6 +340,20 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
           expect(@duplicate_applicant.claimed_as_tax_dependent_by).to be_nil
         end
       end
+
+      context 'for five year bar information' do
+        let(:mocked_params) { { five_year_bar_applies: true, five_year_bar_met: true } }
+
+        before do
+          person1.consumer_role.update_attributes!(mocked_params)
+          @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
+        end
+
+        it 'should copy five_year_bar_applies & five_year_bar_met' do
+          expect(@duplicate_applicant.five_year_bar_applies).to eq(true)
+          expect(@duplicate_applicant.five_year_bar_met).to eq(true)
+        end
+      end
     end
   end
 
