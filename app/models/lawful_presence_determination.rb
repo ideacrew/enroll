@@ -6,7 +6,6 @@ class LawfulPresenceDetermination
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
-  include Mongoid::Attributes::Dynamic
   include Mongoid::History::Trackable
   include EventSource::Command
 

@@ -7,7 +7,6 @@ class Person
   include Mongoid::Timestamps
   # include Mongoid::Versioning
   include Ssn
-  include Mongoid::Attributes::Dynamic
   # include SponsoredBenefits::Concerns::Ssn
   # include SponsoredBenefits::Concerns::Dob
 

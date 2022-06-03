@@ -10,7 +10,6 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   include Ssn
-  include Mongoid::Attributes::Dynamic
   include BenefitSponsors::Concerns::UnsetableSparseFields
   include CrmGateway::PersonConcern
   GENDER_KINDS = %w[male female].freeze

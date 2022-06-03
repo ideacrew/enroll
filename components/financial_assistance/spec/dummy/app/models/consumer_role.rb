@@ -6,7 +6,6 @@ class ConsumerRole
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AASM
-  include Mongoid::Attributes::Dynamic
 
   embedded_in :person
   # Just added here to simplify engine

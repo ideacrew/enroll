@@ -3,7 +3,6 @@ module BenefitSponsors
 
     include Mongoid::Document
     include Mongoid::Timestamps
-    include Mongoid::Attributes::Dynamic
 
     embedded_in :sponsored_benefit,
       class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
