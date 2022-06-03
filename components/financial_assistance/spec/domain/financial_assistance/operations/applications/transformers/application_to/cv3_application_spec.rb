@@ -26,6 +26,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_required_to_file_taxes: true,
                                   is_filing_as_head_of_household: true,
                                   is_pregnant: false,
+                                  is_primary_caregiver: true,
+                                  is_primary_caregiver_for: [],
                                   has_job_income: false,
                                   has_self_employment_income: false,
                                   has_unemployment_income: false,

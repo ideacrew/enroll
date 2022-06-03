@@ -405,10 +405,27 @@ $(document).ready(function(){
 
   if($('#is_student_yes').is(':checked')) {
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').removeClass('hide');
-  } else {
+  } else {  
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
   }
 
+  $("body").on("change", "#is_primary_caregiver_no", function(){
+    if ($('#is_primary_caregiver_no').is(':checked')) {
+      $('#is_primary_caregiver_for').parents('.row-form-wrapper').addClass('hide');
+    };
+  });
+
+  $("body").on("change", "#is_primary_caregiver_yes", function(){
+    if ($('#is_primary_caregiver_yes').is(':checked')) {
+      $('#is_primary_caregiver_for').parents('.row-form-wrapper').removeClass('hide');
+    };
+  });
+
+  if($('#is_primary_caregiver_yes').is(':checked')) {
+    $('#is_primary_caregiver_for').parents('.row-form-wrapper').removeClass('hide');
+  } else {
+    $('#is_primary_caregiver_for').parents('.row-form-wrapper').addClass('hide');
+  }
 
   if($('#is_veteran_or_active_military_yes').is(':checked')) {
     $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
