@@ -308,8 +308,8 @@ module FinancialAssistance
                 name_pfx: applicant_hash['name']['name_pfx'],
                 alternate_name: applicant_hash['name']['alternate_name'],
                 ssn: family_member.person.ssn,
+                no_ssn: family_member.person.no_ssn,
                 # "encrypted_ssn": applicant_hash['identifying_information']['encrypted_ssn'],
-                has_ssn: applicant_hash['identifying_information']['has_ssn'],
                 gender: applicant_hash['demographic']['gender'],
                 dob: applicant_hash['demographic']['dob'],
                 ethnicity: applicant_hash['demographic']['ethnicity'],
@@ -420,7 +420,7 @@ module FinancialAssistance
               last_name: person_hash['person_name']['last_name'],
               full_name: person_hash['person_name']['full_name'],
               ssn: person_hash['person_demographics']['ssn'],
-              no_ssn: transform_no_ssn(person_hash['person_demographics']['no_ssn']), # update in aca entities contracts to receive as string
+              no_ssn: transform_no_ssn(person_hash['person_demographics']['ssn']), # update in aca entities contracts to receive as string
               gender: person_hash['person_demographics']['gender'],
               dob: person_hash['person_demographics']['dob'],
               date_of_death: person_hash['person_demographics']['date_of_death'],
@@ -450,8 +450,8 @@ module FinancialAssistance
             Failure("build person hash #{e}")
           end
 
-          def transform_no_ssn(no_ssn_value)
-            no_ssn_value ? '1' : '0'
+          def transform_no_ssn(ssn)
+            ssn.present? ? '0' : '1'
           end
 
           def find_application(id)
