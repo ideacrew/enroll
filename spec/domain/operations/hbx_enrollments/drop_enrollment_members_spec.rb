@@ -368,5 +368,14 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         expect(enrollment.aasm_state).to eq 'coverage_selected'
       end
     end
+
+    context 'when passing nil for terminated member with key present' do
+      it 'should return failure.' do
+        dropped_members = subject.call({hbx_enrollment: enrollment,
+                                        options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
+                                                  "terminate_member_#{hbx_enrollment_member3.id}" => nil}}).failure
+        expect(dropped_members).to eq 'No members were being dropped.'
+      end
+    end
   end
 end
