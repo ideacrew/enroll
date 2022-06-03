@@ -345,7 +345,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         let(:mocked_params) { { five_year_bar_applies: true, five_year_bar_met: true } }
 
         before do
-          applicant.update_attributes!(mocked_params)
+          person1.consumer_role.update_attributes!(mocked_params)
           @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
