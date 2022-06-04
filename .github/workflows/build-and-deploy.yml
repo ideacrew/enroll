@@ -192,7 +192,7 @@ jobs:
         run: echo '${{ toJSON(matrix) }}'
 
   new-image-notification:
-    # if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request'
     needs: [
         prep,
         # build-and-upload-image,
