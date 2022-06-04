@@ -214,36 +214,36 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
 
-  notify-slack:
-    if: github.event_name != 'pull_request'
-    needs: [new-image-notification, prep, build-and-upload-image]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        client: ['dc', 'me']
-    steps:
-      - run: |
-          MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
-          echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.18.0
-        with:
-          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*${{ env.CLIENT }} image*:\n`${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}`"
-                  }
-                },
-                {
-                  "type": "divider"
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+  # notify-slack:
+  #   if: github.event_name != 'pull_request'
+  #   needs: [new-image-notification, prep, build-and-upload-image]
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       client: ['dc', 'me']
+  #   steps:
+  #     - run: |
+  #         MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
+  #         echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
+  #     - name: Post to a Slack channel
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v1.18.0
+  #       with:
+  #         channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
+  #         payload: |
+  #           {
+  #             "blocks": [
+  #               {
+  #                 "type": "section",
+  #                 "text": {
+  #                   "type": "mrkdwn",
+  #                   "text": "*${{ env.CLIENT }} image*:\n`${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}`"
+  #                 }
+  #               },
+  #               {
+  #                 "type": "divider"
+  #               }
+  #             ]
+  #           }
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
