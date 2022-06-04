@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - 'trunk'
-      - '180873465_dc_determination_configs'
   pull_request:
     branches:
       - 'trunk'
@@ -176,9 +175,14 @@ jobs:
 
   new-image-notification:
     if: github.event_name != 'pull_request'
-    needs: [prep, build-and-upload-image]
+    needs: [
+        prep,
+        build-and-upload-image,
+      ]
     runs-on: ubuntu-latest
     steps:
+      - name: Git Commit Data w/ Message
+        uses: jcputney/git-commit-data-action@1.0.2
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
@@ -192,13 +196,6 @@ jobs:
                   "text": {
                     "type": "mrkdwn",
                     "text": "New image built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Commit message:*\n```${{ github.event.commits[0].message }}```"
                   }
                 }
               ]
