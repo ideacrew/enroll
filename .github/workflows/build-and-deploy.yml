@@ -182,11 +182,8 @@ jobs:
       ]
     runs-on: ubuntu-latest
     steps:
-      - id: get-msg
-        run: |
-          raw_commit=${{ github.event.commits[0].message }}
-          commit_message=$(echo ${ raw_commit:0:50 })
-          echo "::set-output name=commit_message::$commit_message"
+      - name: Git Commit Data w/ Message
+        uses: jcputney/git-commit-data-action@1.0.2
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
@@ -206,7 +203,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Commit message:*\n```${{ steps.get-msg.outputs.commit_message }}```"
+                    "text": "*Commit message:*\n```${{ env.GIT_COMMIT_MESSAGE }}```"
                   }
                 }
               ]
