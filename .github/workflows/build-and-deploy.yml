@@ -220,7 +220,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Commit message:*\n```${{ env.GIT_COMMIT_MESSAGE }}```"
+                    "text": "*Commit message:*\n${{ env.GIT_COMMIT_MESSAGE }}"
                   }
                 }
               ]
