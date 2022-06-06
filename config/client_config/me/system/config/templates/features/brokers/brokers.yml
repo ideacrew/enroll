@@ -24,3 +24,7 @@ registry:
       - key: :broker_training_link
         is_enabled: true
         item: "https://coverme.inquisiqlms.com/"
+      - key: :allow_edit_broker_email
+        is_enabled: true
+      - key: :allow_edit_broker_npn
+        is_enabled: true
