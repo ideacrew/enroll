@@ -529,9 +529,21 @@ RSpec.describe TaxHousehold, type: :model do
             expect(family.active_household.hbx_enrollments.count).to eq(2)
           end
 
-          it 'should return available APTC amount' do
+          it 'Should return max APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1, shopping_hbx_enrollment1.effective_on)
-            expect(result.round(2)).to eq(500.00)
+            expect(result.round(2)).to eq(1000.00)
+          end
+
+          context 'When enrollments has different subscribers' do
+            before do
+              aptc_enrollment1.hbx_enrollment_members.first.update_attributes(is_subscriber: false)
+              aptc_enrollment1.hbx_enrollment_members.second.update_attributes(is_subscriber: false)
+            end
+
+            it 'Should return remaining aptc' do
+              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1, shopping_hbx_enrollment1.effective_on)
+              expect(result.round(2)).to eq(500.00)
+            end
           end
         end
 
