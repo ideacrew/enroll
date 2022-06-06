@@ -92,7 +92,7 @@ module Operations
 
       # rubocop:disable Metrics/MethodLength
       def columns
-        [
+        headings = [
           'Family Hbx ID',
           'Primary Hbx ID',
           'Is Subscriber?',
@@ -151,6 +151,9 @@ module Operations
           'DR4 Created On',
           'Communication Preference'
         ]
+
+        headings.insert(headings.find_index('Aptc Amt'), "Residency Evi Status", "Residency Evi Due Date") if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
+        headings
       end
       # rubocop:enable Metrics/MethodLength
     end
