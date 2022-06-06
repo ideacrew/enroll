@@ -411,6 +411,10 @@ Given(/^the primary caretaker question configuration is diasbled$/) do
   disable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
 end
 
+Given(/^the primary caretaker relationship question configuration is enabled$/) do
+  enable_feature :primary_caregiver_relationship_other_question, {registry_name: FinancialAssistanceRegistry}
+end
+
 Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
 end

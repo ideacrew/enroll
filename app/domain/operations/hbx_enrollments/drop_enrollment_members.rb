@@ -46,6 +46,8 @@ module Operations
         @new_enrollment = clone_enrollment.value!
         dropped_enr_members = params[:options].select{|string| string.include?("terminate_member")}.values
         drop_selected_members(dropped_enr_members)
+        return Failure('No members were being dropped.') if base_enrollment.hbx_enrollment_members.map(&:applicant_id) == new_enrollment.hbx_enrollment_members.map(&:applicant_id)
+
         set_product_result = set_product_id
         return set_product_result if set_product_result.failure?
 

@@ -14,11 +14,13 @@ Given(/^all applicants fill all pages except other questions$/) do
     fill_in 'income[start_on]', with: '1/1/2018'
     find_all("#job_income .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
     find_all("#job_income li.interaction-choice-control-income-frequency-kind-7").first.click
-    fill_in 'income[employer_address][address_1]', with: '1 K Street'
-    fill_in 'income[employer_address][city]', with: 'Washington'
-    fill_in 'income[employer_address][zip]', with: '20000'
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[3]/div/ul/li[10]').click
+    unless FinancialAssistanceRegistry[:disable_employer_address_fields].enabled?
+      fill_in 'income[employer_address][address_1]', with: '1 K Street'
+      fill_in 'income[employer_address][city]', with: 'Washington'
+      fill_in 'income[employer_address][zip]', with: '20000'
+      find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[2]/b').click
+      find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[3]/div/ul/li[10]').click
+    end
     fill_in 'income[employer_phone][full_phone_number]', with: '7898765676'
     click_button('Save')
     find('#has_self_employment_income_true').click
@@ -100,8 +102,17 @@ Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg
   end
 end
 
+Given(/^the user has an age greater than (\d+) years old, with a young child$/) do |arg1|
+  dob = TimeKeeper.date_of_record - (arg1 + rand(1..20)).year
+  consumer.person.update_attributes(dob: dob)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(dob: dob)
+  end
+  application.applicants.last.update_attributes(dob: (TimeKeeper.date_of_record - 3.years))
+end
+
 Then(/^the have you applied for an SSN question should display$/) do
-  expect(page).to have_content('Has this person applied for an SSN *')
+  expect(page).to have_content('Has this person applied for an SSN?*')
 end
 
 And(/^the user answers no to the have you applied for an SSN question$/) do
@@ -134,6 +145,30 @@ And(/^the user answers two for how many children$/) do
   find(".selectric-interaction-choice-control-children-expected-count").click
   sleep 1
   find('.interaction-choice-control-children-expected-count-2', match: :first).click
+end
+
+Given(/^the user answers yes to being a primary caregiver$/) do
+  choose('is_primary_caregiver_yes')
+end
+
+Given(/^the user answers no to being a primary caregiver$/) do
+  choose('is_primary_caregiver_no')
+end
+
+Then(/^the caregiver relationships should display$/) do
+  expect(page).to have_content(l10n('faa.primary_caretaker_for_text'))
+end
+
+Then(/^the caregiver relationships should not display$/) do
+  expect(page).to_not have_content(l10n('faa.primary_caretaker_for_text'))
+end
+
+And(/^the user selects an applicant they are the primary caregiver for$/) do
+  find(:css, "#is_primary_caregiver_for").set(true)
+end
+
+Then(/^an applicant is selected as a caregivee$/) do
+  expect(all(:css, "#is_primary_caregiver_for:checked").count).to be > 0
 end
 
 And(/^the user fills out the rest of the other questions form and submits it$/) do
@@ -232,7 +267,7 @@ Then(/^type of school question should display$/) do
 end
 
 Then(/^the has this person ever been in foster care question should display$/) do
-  expect(page).to have_content('Was this person in foster care at age 18 or older? *')
+  expect(page).to have_content('Was this person in foster care at age 18 or older?*')
 end
 
 Given(/^the user answered yes to the has this person ever been in foster care question$/) do

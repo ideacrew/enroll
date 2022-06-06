@@ -21,7 +21,10 @@
 	"extensions": [
 		"rebornix.Ruby",
 		"ms-azuretools.vscode-docker",
-		"mongodb.mongodb-vscode"
+		"mongodb.mongodb-vscode",
+		"streetsidesoftware.code-spell-checker",
+		"alexkrechik.cucumberautocomplete",
+		"EditorConfig.EditorConfig"
 	],
 
 	// "postCreateCommand": "chmod +x ./.devcontainer/postCreateCommand.sh",
