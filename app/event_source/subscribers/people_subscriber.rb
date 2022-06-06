@@ -15,7 +15,6 @@ module Subscribers
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       subscriber_logger.info "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-    #   logger.info "PeopleSubscriber: errored & acked. Backtrace: #{e.backtrace}"
       subscriber_logger.info "PeopleSubscriber::Save, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
@@ -25,7 +24,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
       pre_process_message(subscriber_logger, payload)
 
-      determine_verifications(payload, subscriber_logger)
+      determine_verifications(payload, subscriber_logger) if EnrollRegistry.feature_enabled?(:consumer_role_hub_call)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -45,11 +44,16 @@ module Subscribers
       end
     end
 
-    def determine_verifications(payload, subscriber_logger)
-      person = GlobalID::Locator.locate(payload[:gid])
+    def determine_verifications(params, subscriber_logger)
+      person = GlobalID::Locator.locate(params[:gid])
       consumer_role = person.consumer_role
 
-      ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id}) if consumer_role.present? && ([:first_name, :last_name, :dob, :encrypted_ssn] & payload.keys).present?
+      identifying_information_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:identifying_information_attributes).item.map(&:to_sym)
+      if consumer_role.present? && (identifying_information_attributes & params[:payload].keys).present?
+        result = ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id})
+        result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
+        subscriber_logger.info "PeopleSubscriber::Update, determine_verifications result: #{result_str}"
+      end
     rescue StandardError => e
       subscriber_logger.info "Error: PeopleSubscriber::Update, response: #{e}"
     end
@@ -57,9 +61,7 @@ module Subscribers
     private
 
     def pre_process_message(subscriber_logger, payload)
-    #   logger.info '-' * 100 unless Rails.env.test?
       subscriber_logger.info "PeopleSubscriber, response: #{payload}"
-    #   logger.info "PeopleSubscriber payload: #{payload}" unless Rails.env.test?
     end
 
     def subscriber_logger_for(event)
