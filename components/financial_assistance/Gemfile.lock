@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 97b30cc8756e3def29697d7e6a3df68dfbbf57a2
+  revision: 586a83cafc54f577e9e14d97842deaa01d8f440e
   branch: relocate_hub_calls_182132895
   specs:
     aca_entities (0.10.0)
