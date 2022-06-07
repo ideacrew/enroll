@@ -9,7 +9,7 @@ module Subscribers
       subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles_lawful_presence_determinations)
       payload = JSON.parse(response, symbolize_names: true)
       subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, response: #{payload}"
-      determine_verifications(payload, subscriber_logger)
+      determine_verifications(payload, subscriber_logger) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:consumer_role_hub_call)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -19,8 +19,11 @@ module Subscribers
     end
 
     def determine_verifications(payload, subscriber_logger)
-      ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]}) if ['us_citizen', 'naturalized_citizen', 'indian_tribe_member',
-                                                                                                      'alien_lawfully_present'].include?(payload[:citizen_status]) || payload[:can_trigger_hub_call]
+      citizen_statuses = EnrollRegistry[:consumer_role_hub_call].setting(:citizen_statuses).item.map(&:to_sym)
+      prev_citizen_status = payload['citizen_status'][1]
+      current_citizen_status = payload['citizen_status'][0]
+      can_trigger_hub_call = payload.key?('citizen_status') && (prev_citizen_status.nil? || citizen_statuses.include?(current_citizen_status))
+      ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]}) if can_trigger_hub_call
     rescue StandardError => e
       subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber, response: #{e}"
     end
