@@ -25,3 +25,5 @@ registry:
           is_enabled: true
         - key: :drop_enrollment_members
           is_enabled: false
+        - key: :drop_retro_scenario
+          is_enabled: false
