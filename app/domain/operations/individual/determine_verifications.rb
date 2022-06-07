@@ -37,7 +37,7 @@ module Operations
         consumer_role.coverage_purchased_no_residency!(attrs)
         consumer_role.trigger_residency! if can_trigger_residency?(person)
 
-        Success()
+        Success("Successfully triggered Hub Calls for ConsumerRole with person_hbx_id: #{person.hbx_id}")
       rescue StandardError => e
         Failure("Error - #{e}")
       end
