@@ -17,19 +17,20 @@
     </div>
   </div>
 
-  <% if FinancialAssistanceRegistry.feature_enabled?(:me_tribe_picker) %>
+  <% if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>
 
     <div class="no-buffer row row-form-wrapper tribal_container <%= 'hidden_field' unless show_tribal_container(f.object) %>" id="me_tribe_container">
       <div class="col-md-12">
         <label><%= l10n("insured.tribal_name") %> *</label>
       </div>
       <div class="col-md-12 form-group form-group-lg ethnicity_options check_box_collection">
-        <%= f.collection_check_boxes(:tribal_name, me_tribe_collection, :name, :name, {}, :class => 'tribal_name')  do |tribe| %>
+        <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
           <div> <%= tribe.label(:"data-value" => tribe.value) { tribe.check_box + tribe.text } %> </div>
         <% end %>
       </div>
     </div>
-    <div class="row no-buffer tribal_name_other_container">
+
+    <div class="row no-buffer tribal_name_other_container <%= 'hidden_field' unless show_tribal_container(f.object) %>">
       <div class="form-group form-group-lg no-pd row row-form-wrapper no-buffer">
         <%= f.text_field :tribal_name, class: "floatlabel form-control required", id: "tribal_name", placeholder: "TRIBE NAME" %>
       </div>

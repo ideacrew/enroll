@@ -264,6 +264,7 @@ module FinancialAssistance
     field :health_service_eligible, type: Boolean
     field :tribal_state, type: String
     field :tribal_name, type: String
+    field :tribe_codes, type: Array
 
     field :is_medicaid_cubcare_eligible, type: Boolean
 

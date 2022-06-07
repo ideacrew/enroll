@@ -9,7 +9,7 @@ module FinancialAssistance
       include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
-                    :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
+                    :tribe_codes, :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
 
       attr_writer :family
 
@@ -55,11 +55,17 @@ module FinancialAssistance
 
         validate_citizen_status
         self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
+
         if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
-          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
-          self.errors.add(:tribal_name, "cannot contain numbers") if !(tribal_name =~ /\d/).nil? && @indian_tribe_member
-        elsif !tribal_id.present? && @indian_tribe_member
+          puts "???????????????????????"
+          unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+            puts "!!!!!!!!!!!!!!!!!!!!!!!"
+            self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
+            self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
+            self.errors.add(:tribal_name, "cannot contain numbers") if !(tribal_name =~ /\d/).nil? && @indian_tribe_member
+          end
+        elsif !tribal_id.present? && @indian_tribe_member && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+          puts "!!!!!!!!!!!!!!!!!!!!!!!"
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
@@ -95,10 +101,10 @@ module FinancialAssistance
         return false unless valid?
         is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
+        
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
-
           if applicant.present? && applicant.persisted?
             applicant.update(values)
           else
@@ -106,6 +112,7 @@ module FinancialAssistance
             applicant.save!
           end
 
+          binding.irb
           # reloading the application to fetch the latest data updated through applicant callbacks to avoid duplicate relationships
           application.reload
           application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?
@@ -146,6 +153,7 @@ module FinancialAssistance
           tribal_id: tribal_id,
           tribal_state: tribal_state,
           tribal_name: tribal_name,
+          tribe_codes: tribe_codes.to_a.reject(&:blank?),
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state,
           immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)

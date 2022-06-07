@@ -217,6 +217,7 @@ module FinancialAssistance
         :alien_number, :passport_number, :sevis_id, :visa_number,
         :receipt_number, :expiration_date, :card_number, :description,
         :i94_number, :country_of_citizenship,
+        { :tribe_codes => [] },
         { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],

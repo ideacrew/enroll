@@ -43,8 +43,14 @@ module ConsumerRolesHelper
     obj.try(:indian_tribe_member)
   end
 
-  def me_tribe_collection
-      ["Maliseet", "Passamaquoddy", "Penobscot", "Micmac", "Other"].map{|e| OpenStruct.new({name: e, value: e})}
+  def featured_tribes_collection
+    [
+        ["Maliseet", "HM"], 
+        ["Passamaquoddy", "PD"], 
+        ["Penobscot", "PE"], 
+        ["Micmac", "AM"], 
+        ["Other", "OT"]
+    ].map{|a| OpenStruct.new({name: a.first, value: a.last})}
   end
 
   def show_naturalization_doc_type(obj)

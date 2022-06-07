@@ -128,7 +128,7 @@ function applyFaaListenersFor(target) {
     }
   });
 
-  $('input#applicant_tribal_name_other').change(function() {
+  $('input#applicant_tribe_codes_ot').change(function() {
     if(this.checked){
       $('.tribal_name_other_container').show();
     }
