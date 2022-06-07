@@ -45,6 +45,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
 
     it 'returns success' do
       expect(subject.success?).to eq true
+      expect(subject.success).to eq "Successfully triggered Hub Calls for ConsumerRole with person_hbx_id: #{person.hbx_id}"
     end
 
     it 'updates consumer_role state to verification_outstanding' do
