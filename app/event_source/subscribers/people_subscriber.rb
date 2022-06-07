@@ -24,7 +24,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
       pre_process_message(subscriber_logger, payload)
 
-      determine_verifications(payload, subscriber_logger) if EnrollRegistry.feature_enabled?(:consumer_role_hub_call)
+      determine_verifications(payload, subscriber_logger) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:consumer_role_hub_call)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
