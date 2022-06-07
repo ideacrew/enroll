@@ -5,42 +5,23 @@ module Subscribers
   class LawfulPresenceDeterminationsSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.individual.consumer_roles.lawful_presence_determinations']
 
-    subscribe(:on_enroll_individual_consumer_roles_lawful_presence_determinations_created) do |delivery_info, _metadata, response|
-      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles_lawful_presence_determinations_created)
+    subscribe(:on_enroll_individual_consumer_roles_lawful_presence_determinations) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles_lawful_presence_determinations)
       payload = JSON.parse(response, symbolize_names: true)
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber Create, response: #{payload}"
-      determine_verifications_on_create(payload, subscriber_logger)
+      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, response: #{payload}"
+      determine_verifications(payload, subscriber_logger)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber Create, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber Create, ack: #{payload}"
+      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
-    subscribe(:on_enroll_individual_consumer_roles_lawful_presence_determinations_updated) do |delivery_info, _metadata, response|
-      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles_lawful_presence_determinations_updated)
-      payload = JSON.parse(response, symbolize_names: true)
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber Update, response: #{payload}"
-      determine_verifications_on_update(payload, subscriber_logger)
-
-      ack(delivery_info.delivery_tag)
-    rescue StandardError, SystemStackError => e
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber Update, ack: #{payload}"
-      ack(delivery_info.delivery_tag)
-    end
-
-    def determine_verifications_on_create(payload, subscriber_logger)
-      ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]})
-    rescue StandardError => e
-      subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber Create, response: #{e}"
-    end
-
-    def determine_verifications_on_update(payload, subscriber_logger)
+    def determine_verifications(payload, subscriber_logger)
       ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]}) if ['us_citizen', 'naturalized_citizen', 'indian_tribe_member', 'alien_lawfully_present'].include?(payload[:citizen_status])
     rescue StandardError => e
-      subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber Update, response: #{e}"
+      subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber, response: #{e}"
     end
 
     private
