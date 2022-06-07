@@ -19,10 +19,10 @@ module Subscribers
     end
 
     def determine_verifications(payload, subscriber_logger)
-      citizen_statuses = EnrollRegistry[:consumer_role_hub_call].setting(:citizen_statuses).item.map(&:to_sym)
-      prev_citizen_status = payload['citizen_status'][0]
-      current_citizen_status = payload['citizen_status'][1]
-      can_trigger_hub_call = payload.key?('citizen_status') && (prev_citizen_status.nil? || citizen_statuses.include?(current_citizen_status))
+      citizen_statuses = EnrollRegistry[:consumer_role_hub_call].setting(:citizen_statuses).item
+      prev_citizen_status = payload[:citizen_status][0]
+      current_citizen_status = payload[:citizen_status][1]
+      can_trigger_hub_call = payload.key?(:citizen_status) && (prev_citizen_status.nil? || citizen_statuses.include?(current_citizen_status))
       ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]}) if can_trigger_hub_call
     rescue StandardError => e
       subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber, response: #{e}"
