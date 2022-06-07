@@ -5,6 +5,7 @@ module Publishers
   class LawfulPresenceDeterminationsPublisher
     include ::EventSource::Publisher[amqp: 'enroll.individual.consumer_roles.lawful_presence_determinations']
 
+    register_event 'created'
     register_event 'updated'
   end
 end
