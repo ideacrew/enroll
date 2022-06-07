@@ -76,6 +76,18 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
       end
 
+      context 'when retro active feature is turned off && termination date is past date' do
+        before do
+          @result = subject.call({hbx_enrollment: enrollment,
+                                  options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 1.day).to_s,
+                                            "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
+        end
+
+        it 'should return a failure' do
+          expect(@result.failure).to eq "Cannot Drop a retroactive dependents."
+        end
+      end
+
       context 'when sending invalid params' do
         it 'should return a failure when hbx_enrollment key is not present' do
           result = subject.call({options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
@@ -304,23 +316,24 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
       end
 
-      context 'when termination date is in the past' do
-        before do
-          FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment.effective_on)
-          @dropped_members = subject.call({hbx_enrollment: enrollment,
-                                           options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
-                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
-        end
+      # TODO: Fix this when we allow retro scenarios
+      # context 'when termination date is in the past' do
+      #   before do
+      #     FactoryBot.create(:tax_household, household: family.active_household, effective_starting_on: enrollment.effective_on)
+      #     @dropped_members = subject.call({hbx_enrollment: enrollment,
+      #                                      options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
+      #                                                "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}}).success
+      #   end
 
-        it 'should return dropped member info' do
-          expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
-          expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
-        end
+      #   it 'should return dropped member info' do
+      #     expect(@dropped_members.first[:hbx_id]).to eq hbx_enrollment_member3.hbx_id.to_s
+      #     expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record - 30.days
+      #   end
 
-        it 'should begin coverage for the reinstatement' do
-          expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
-        end
-      end
+      #   it 'should begin coverage for the reinstatement' do
+      #     expect(family.hbx_enrollments.where(:id.ne => enrollment.id).last.aasm_state).to eq 'coverage_selected'
+      #   end
+      # end
     end
 
     context 'when subscriber is being dropped' do
@@ -374,7 +387,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         dropped_members = subject.call({hbx_enrollment: enrollment,
                                         options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
                                                   "terminate_member_#{hbx_enrollment_member3.id}" => nil}}).failure
-        expect(dropped_members).to eq 'No members were being dropped.'
+        expect(dropped_members).to eq 'Cannot Drop a retroactive dependents.'
       end
     end
   end
