@@ -126,7 +126,7 @@ class LawfulPresenceDetermination
   end
 
   def publish_updated_event
-    attrs = { consumer_role_id: ivl_role.id }.merge!(self.changed_attributes)
+    attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
     event.success.publish if event.success?
   rescue StandardError => e
