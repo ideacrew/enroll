@@ -126,7 +126,8 @@ class LawfulPresenceDetermination
   end
 
   def publish_updated_event
-    attrs = { consumer_role_id: ivl_role.id }.merge!(self.changed_attributes)
+    can_trigger_hub_call = self.changed_attributes.key?('citizen_status') && self.changed_attributes['citizen_status'].nil?
+    attrs = { consumer_role_id: ivl_role.id, citizen_status: self.citizen_status, can_trigger_hub_call: can_trigger_hub_call }
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
     event.success.publish if event.success?
   rescue StandardError => e

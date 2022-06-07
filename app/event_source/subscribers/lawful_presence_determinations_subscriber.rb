@@ -19,7 +19,8 @@ module Subscribers
     end
 
     def determine_verifications(payload, subscriber_logger)
-      ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]}) if ['us_citizen', 'naturalized_citizen', 'indian_tribe_member', 'alien_lawfully_present'].include?(payload[:citizen_status])
+      ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]}) if ['us_citizen', 'naturalized_citizen', 'indian_tribe_member',
+                                                                                                      'alien_lawfully_present'].include?(payload[:citizen_status]) || payload[:can_trigger_hub_call]
     rescue StandardError => e
       subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber, response: #{e}"
     end
