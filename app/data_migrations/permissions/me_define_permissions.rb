@@ -183,7 +183,7 @@ class MeDefinePermissions < MigrationTask
 
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes!(can_update_ssn: true)
-    Permission.super_admin.update_attributes!(can_update_ssn: ssn)
+    Permission.super_admin.update_attributes!(can_update_ssn: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_update_ssn: can_update_ssn)
     Permission.hbx_csr_tier2.update_attributes!(can_update_ssn: can_update_ssn)
     Permission.hbx_csr_tier1.update_attributes!(can_update_ssn: can_update_ssn)
