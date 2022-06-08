@@ -8,7 +8,7 @@ class MeDefinePermissions < MigrationTask
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
 
-  
+
   def can_add_sep
     ENV['CAN_ADD_SEP'] || false
   end
