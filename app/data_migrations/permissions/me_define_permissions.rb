@@ -24,7 +24,7 @@ class MeDefinePermissions < MigrationTask
                           can_terminate_enrollment: false, change_enrollment_end_date: false, can_change_username_and_email: false, can_drop_enrollment_members: true, can_call_hub: true)
     Permission
       .find_or_initialize_by(name: 'hbx_csr_tier2')
-      .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_send_secure_message: false, can_add_sep: false,
+      .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_send_secure_message: false, can_add_sep: true,
                           send_broker_agency_message: true, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true, can_access_pay_now: false,
                           can_update_ssn: false, can_lock_unlock: false, can_complete_resident_application: true, can_add_pdc: false, can_view_username_and_email: true,
