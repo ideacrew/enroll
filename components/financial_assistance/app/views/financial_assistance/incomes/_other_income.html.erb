@@ -4,7 +4,7 @@
   <% end %>
   <div class="focus_effect_module other-income-show">
     <div class="row row-form-wrapper no-buffer row-height">
-      <% if other_income.kind == "social_security_benefit" %>
+      <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
       <div class="col-md-12  no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel"><%= l10n("Social")&.upcase %> <%= l10n("Security")&.upcase %> <%= l10n("TYPE")&.upcase %> *</label>
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= FinancialAssistance::Income::SS_BENEFITS[other_income.ssi_type&.to_sym] %></span>
