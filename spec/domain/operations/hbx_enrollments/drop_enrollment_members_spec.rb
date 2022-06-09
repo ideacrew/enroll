@@ -185,7 +185,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
             result = subject.call({hbx_enrollment: enrollment,
                                    options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                              "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
-            expect(result.failure).to eq 'Rating area could be found.'
+            expect(result.failure).to eq 'Rating area could not be found.'
           end
         end
       end

@@ -22,13 +22,11 @@
       <th><%= l10n('hbx_id') %></th>
       <th><%= l10n('exchange.employer_applications.terminated_on') %></th>
     </tr>
-    <h4 data-cuke="failed_to_drop_members"><%= l10n('admin_actions.enrollment_members_failed_to_drop') %></h4>
-    <% @result[:failure].each do |hbx| %>
-      <tr>
-        <td><%= hbx.hbx_id %></td>
-        <td><%= hbx.terminated_on %></td>
-      </tr>
-    <% end %>
+    <h4 data-cuke="failed_to_drop_members"><%= @result[:failure].first[:message] || l10n('admin_actions.no_enrollment_members_selected_for_termination')%></h4>
+    <tr>
+      <td><%= @result[:failure].first[:hbx].hbx_id %></td>
+      <td><%= @result[:failure].first[:hbx].terminated_on %></td>
+    </tr>
 
   <% else %>
 
