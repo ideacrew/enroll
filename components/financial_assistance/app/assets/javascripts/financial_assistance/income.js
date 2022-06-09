@@ -599,7 +599,7 @@ $(document).on('turbolinks:load', function () {
   //   return 'You have an unsaved income, are you sure you want to proceed?';
   // });
 
-  $('input[type="checkbox"]').click(function(e){
+  $('input[name="other_income_kind"]').click(function(e){
     var value = e.target.checked;
     self = this;
     if (value) {
@@ -635,7 +635,7 @@ $(document).on('turbolinks:load', function () {
           });
         });
       });
-    }
+    }  
   });
 
   /* DELETING all Other Incomes on selecting 'no' on Driver Question */

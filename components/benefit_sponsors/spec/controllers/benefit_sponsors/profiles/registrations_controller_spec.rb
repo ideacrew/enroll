@@ -448,6 +448,8 @@ module BenefitSponsors
 
     describe "PUT update", dbclean: :after_each do
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_npn).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_email).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
       end
 

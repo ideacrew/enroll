@@ -392,10 +392,10 @@ module BenefitSponsors
             {
               0 =>
               {
-                :npn => broker_role.npn,
+                :npn => npn,
                 :first_name => "Broker 12",
                 :last_name => "Gov",
-                :email => "gov@gov.com",
+                :email => email,
                 :phone => nil,
                 :status => nil,
                 :dob => dob,
@@ -458,16 +458,31 @@ module BenefitSponsors
             }
           }
         end
+        let(:npn) { '123412341' }
+        let(:email) { 'email@updated.com' }
 
         let(:office_location)         { broker_agency_profile.primary_office_location }
         let!(:broker_organization)    { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-        let(:person)                  { FactoryBot.create(:person) }
+        let(:person)                  { FactoryBot.create(:person, :with_work_email) }
         let!(:broker_role)            { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
         let(:broker_agency_profile)   { broker_organization.broker_agency_profile }
 
-        let!(:profile_factory)        { profile_factory_class.call(valid_broker_params_update) }
+        let(:profile_factory)        { profile_factory_class.call(valid_broker_params_update) }
+        let(:is_edit_npn_allowed)     { false }
+        let(:is_edit_email_allowed)   { false }
 
-        before { broker_organization.reload }
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_npn).and_return is_edit_npn_allowed
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_email).and_return is_edit_email_allowed
+          profile_factory
+
+          broker_organization.reload
+        end
 
         it 'should update broker organization legal name' do
           expect(broker_organization.legal_name).to eq new_organization_name
@@ -479,6 +494,53 @@ module BenefitSponsors
 
         it 'should update address' do
           expect(broker_organization.broker_agency_profile.primary_office_location.address.city).to eq city
+        end
+
+        context 'update npn' do
+
+          before do
+            valid_broker_params_update[:staff_roles_attributes][0][:npn] = npn
+          end
+
+          context 'when npn update is not allowed' do
+
+            it 'should not update npn' do
+              expect(broker_role.reload.npn).not_to eq npn
+            end
+          end
+
+          context 'when npn update is allowed' do
+
+            let(:is_edit_npn_allowed) { true }
+
+
+            it 'should update npn' do
+              expect(broker_role.reload.npn).to eq npn
+            end
+          end
+        end
+
+        context 'update email' do
+
+          before do
+            valid_broker_params_update[:staff_roles_attributes][0][:email] = email
+          end
+
+          context 'when email update is not allowed' do
+
+            it 'should not update email' do
+              expect(broker_role.reload.email.address).not_to eq email
+            end
+          end
+
+          context 'when email update is allowed' do
+
+            let(:is_edit_email_allowed) { true }
+
+            it 'should update email' do
+              expect(broker_role.email.reload.address).to eq email
+            end
+          end
         end
       end
 

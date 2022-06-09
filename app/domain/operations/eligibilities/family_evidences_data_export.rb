@@ -133,6 +133,8 @@ module Operations
           'Immigration status'
         ]
 
+        verification_type_names.append(VerificationType::LOCATION_RESIDENCY) if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
+
         data = if ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(person.citizen_status)
                  [person.citizen_status, nil]
                else

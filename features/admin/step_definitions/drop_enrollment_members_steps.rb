@@ -14,7 +14,7 @@ end
 
 When(/Admin sets termination date for dropped members/) do
   # format: MM/DD/YYYY
-  find(DropEnrollmentMembers.drop_enrollment_members_termination_date).click.set((TimeKeeper.date_of_record - 1.day).to_s)
+  find(DropEnrollmentMembers.drop_enrollment_members_termination_date).click.set((TimeKeeper.date_of_record + 1.day).to_s)
   find(DropEnrollmentMembers.drop_enrollment_members_title).click
 end
 
