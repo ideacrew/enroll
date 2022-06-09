@@ -80,9 +80,8 @@ module Operations
       end
 
       def notify_trading_partner(params)
-        transmit_drop = params.key?("transmit_hbx_#{base_enrollment.id}") ? true : false
-        base_enrollment.notify_enrollment_cancel_or_termination_event(transmit_drop)
-        new_enrollment.notify_of_coverage_start(transmit_drop)
+        base_enrollment.notify_enrollment_cancel_or_termination_event(true)
+        new_enrollment.notify_of_coverage_start(true)
       end
 
       def check_subscriber_drop
