@@ -67,7 +67,7 @@ registry:
         is_enabled: true
       - key: :primary_caregiver_relationship_other_question
         item: :primary_caregiver_relationship_other_question
-        is_enabled: false
+        is_enabled: <%= ENV['PRIMARY_CAREGIVER_RELATIONSHIP_OTHER_QUESTION_IS_ENABLED'] || false %>
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
         is_enabled: true
