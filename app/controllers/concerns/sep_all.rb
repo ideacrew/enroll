@@ -210,7 +210,6 @@ module SepAll
     special_enrollment_period.csl_num = sep_params[:csl_num] if sep_params[:csl_num].present?
     special_enrollment_period.next_poss_effective_date = Date.strptime(sep_params[:next_poss_effective_date], "%m/%d/%Y") if sep_params[:next_poss_effective_date].present?
     special_enrollment_period.effective_on = Date.strptime(sep_params[:next_poss_effective_date], "%m/%d/%Y") if sep_params[:next_poss_effective_date].present?
-
     date_arr = Array.new
     date_arr.push(Date.strptime(sep_params[:option1_date], "%m/%d/%Y").to_s) if sep_params[:option1_date].present?
     date_arr.push(Date.strptime(sep_params[:option2_date], "%m/%d/%Y").to_s) if sep_params[:option2_date].present?

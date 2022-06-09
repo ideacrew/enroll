@@ -1842,28 +1842,28 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "POST #add_new_sep" do
     let(:sep_params) do
-       {
-         calcuated_effective_date: (TimeKeeper.date_of_record.beginning_of_month + 1.month).to_s, 
-         firstName: person.first_name, 
-         lastName: person.last_name, 
-         sep_type: 'ivl', 
-         qle_reason: 'exceptional_circumstances', 
-         start_on: TimeKeeper.date_of_record.beginning_of_month.to_s, 
-         end_on:TimeKeeper.date_of_record.end_of_month.to_s, 
-         next_poss_effective_date: TimeKeeper.date_of_record.beginning_of_month.to_s, 
-         effective_on_date: (TimeKeeper.date_of_record.beginning_of_month + 1.month).to_s, 
-         event_date: TimeKeeper.date_of_record.beginning_of_month.to_s, 
-         sep_duration: '10', 
-         person_hbx_ids: person.hbx_id.to_s, 
-         qle_id: qle2.id, 
-         person: person.primary_family, 
-         effective_on_kind: 'first_of_next_month'}
+      {
+        calcuated_effective_date: (TimeKeeper.date_of_record.beginning_of_month + 1.month).to_s,
+        firstName: person.first_name,
+        lastName: person.last_name,
+        sep_type: 'ivl',
+        qle_reason: 'exceptional_circumstances',
+        start_on: TimeKeeper.date_of_record.beginning_of_month.to_s,
+        end_on: TimeKeeper.date_of_record.end_of_month.to_s,
+        next_poss_effective_date: TimeKeeper.date_of_record.beginning_of_month.to_s,
+        effective_on_date: (TimeKeeper.date_of_record.beginning_of_month + 1.month).to_s,
+        event_date: TimeKeeper.date_of_record.beginning_of_month.to_s,
+        sep_duration: '10',
+        person_hbx_ids: person.hbx_id.to_s,
+        qle_id: qle2.id,
+        person: person.primary_family,
+        effective_on_kind: 'first_of_next_month'
+      }
     end
     let(:person) do
       FactoryBot.create(:person, :with_hbx_staff_role, :with_family).tap do |person|
         FactoryBot.create(:permission, :super_admin).tap do |permission|
-          person.hbx_staff_role.update_attributes(permission_id: permission.id)
-          person
+          person.hbx_staff_role.update_attributes!(permission_id: permission.id)
         end
       end
     end
