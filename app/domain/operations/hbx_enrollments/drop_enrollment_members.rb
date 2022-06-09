@@ -32,6 +32,7 @@ module Operations
         @new_effective_date = (termination_date > base_enrollment.effective_on) ? termination_date + 1.day : base_enrollment.effective_on
         return Failure('Select termination date that would result member drop in present calender year.') unless new_effective_date.year == termination_date.year
         return Failure('Termination date cannot be outside of the current calender year.') unless termination_date.year == TimeKeeper.date_of_record.year
+        return Failure('Cannot Drop a retroactive dependents.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
 
         Success(params)
       end
@@ -46,6 +47,8 @@ module Operations
         @new_enrollment = clone_enrollment.value!
         dropped_enr_members = params[:options].select{|string| string.include?("terminate_member")}.values
         drop_selected_members(dropped_enr_members)
+        return Failure('No members were being dropped.') if base_enrollment.hbx_enrollment_members.map(&:applicant_id) == new_enrollment.hbx_enrollment_members.map(&:applicant_id)
+
         set_product_result = set_product_id
         return set_product_result if set_product_result.failure?
 

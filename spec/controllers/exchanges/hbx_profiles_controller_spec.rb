@@ -1235,30 +1235,30 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it "enrollment should be moved to #{aasm_state}" do
-        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
                                                        enrollment_id: enrollment.id }, format: :js, xhr: true
         enrollment.reload
         expect(enrollment.aasm_state).to eq aasm_state
-        expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
+        expect(enrollment.terminated_on).to eq Date.strptime((TimeKeeper.date_of_record + 1.day).to_s, "%m/%d/%Y")
         expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 2
       end
 
       it "should handle multiple dropped members" do
-        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members[1].id}".to_sym => enrollment.hbx_enrollment_members[1].id.to_s,
                                                        enrollment_id: enrollment.id }, format: :js, xhr: true
         enrollment.reload
         expect(enrollment.aasm_state).to eq aasm_state
-        expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
+        expect(enrollment.terminated_on).to eq Date.strptime((TimeKeeper.date_of_record + 1.day).to_s, "%m/%d/%Y")
         expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 1
       end
 
       it "should drop members if there would only be minors left after drop" do
         enrollment.hbx_enrollment_members.last.person.update_attributes!(dob: TimeKeeper.date_of_record - 15.years)
 
-        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
+        post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.first.id}".to_sym => enrollment.hbx_enrollment_members.first.id.to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members[1].id}".to_sym => enrollment.hbx_enrollment_members[1].id.to_s,
                                                        enrollment_id: enrollment.id }, format: :js, xhr: true

@@ -635,7 +635,7 @@ $(document).on('turbolinks:load', function () {
           });
         });
       });
-    }
+    }  
   });
 
   /* DELETING all Other Incomes on selecting 'no' on Driver Question */

@@ -68,7 +68,15 @@ module FinancialAssistance
 
         def compute_annual_income(income, income_start_date, income_end_date)
           income_per_day = daily_employee_income(income.frequency_kind, income.amount)
-          ((income_end_date.yday - income_start_date.yday + 1) * income_per_day).round(2)
+          end_date_year = income_end_date.year
+          start_date_year = income_start_date.year
+
+          start_day_of_year = income_start_date.yday
+          year_difference = end_date_year - start_date_year
+          days_in_start_year = Date.gregorian_leap?(income.start_on.year) ? 366 : 365
+          end_day_of_year = income_end_date.yday + (year_difference * days_in_start_year)
+
+          ((end_day_of_year - start_day_of_year + 1) * income_per_day).round(2)
         end
 
         def calculate_start_date(income, income_end_date)
