@@ -28,14 +28,13 @@ module Operations
     end
 
     def fetch_resource(validate_params)
-      hbx_assigned_id = validate_params[:subjects][0][:id]
-      family = Family.where(hbx_assigned_id: hbx_assigned_id).first
-      person = family&.primary_person
+      person_hbx_id = validate_params[:subjects][0][:id]
+      people = Person.by_hbx_id(person_hbx_id)
 
-      if person
-        Success(person)
+      if people.count == 1
+        Success(people.first)
       else
-        Failure({ :message => ["No primary person found for the given family_hbx_id: #{hbx_assigned_id}"] })
+        Failure({ :message => ["Found none or more than one people with given hbx_id: #{person_hbx_id}"] })
       end
     end
 

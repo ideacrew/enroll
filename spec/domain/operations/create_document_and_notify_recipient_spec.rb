@@ -22,7 +22,7 @@ module Operations
         :source => "polypress",
         :date => nil,
         :document_type => "notice",
-        :subjects => [{:id => family.hbx_assigned_id, :type => "Person"}],
+        :subjects => [{:id => person.hbx_id, :type => "Person"}],
         :version => nil,
         :id => "60d5468287bfe40001f5cc33",
         :extension => "pdf",
