@@ -175,5 +175,5 @@ end
 
 Then(/^the user selects a social security benefit type$/) do
   find('.ss_benefit_type .selectric span.label').click
-  find(".ss_benefit_type .selectric-items li", text: 'Disability Benefits').click
+  find(".ss_benefit_type .selectric-items li", text: 'Disability benefits').click
 end
