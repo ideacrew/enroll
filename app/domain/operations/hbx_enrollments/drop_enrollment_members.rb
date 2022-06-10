@@ -80,9 +80,8 @@ module Operations
       end
 
       def notify_trading_partner(params)
-        transmit_drop = params.key?("transmit_hbx_#{base_enrollment.id}") ? true : false
-        base_enrollment.notify_enrollment_cancel_or_termination_event(transmit_drop)
-        new_enrollment.notify_of_coverage_start(transmit_drop)
+        base_enrollment.notify_enrollment_cancel_or_termination_event(true)
+        new_enrollment.notify_of_coverage_start(true)
       end
 
       def check_subscriber_drop
@@ -115,7 +114,7 @@ module Operations
 
       def custom_params
         rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(base_enrollment.consumer_role.rating_address, during: new_effective_date)
-        return Failure('Rating area could be found.') unless rating_area.present?
+        return Failure('Rating area could not be found.') unless rating_area.present?
         Success({ predecessor_enrollment_id: base_enrollment.id,
                   rating_area_id: rating_area&.id })
       end
