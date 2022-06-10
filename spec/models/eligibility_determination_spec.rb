@@ -8,8 +8,20 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let(:person)                        { FactoryBot.create(:person, :with_consumer_role)}
   let(:consumer_role)                 { person.consumer_role }
-  let(:family)                        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let(:family_member) {FactoryBot.create(:family_member, family: household.family)}
+  let(:family)                        { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:family_member)                 { family.family_members[1] }
+  let!(:consumer_role1) do
+    cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+    family.family_members[1].person.consumer_role = cr
+    family.family_members[1].person.save!
+  end
+
+  let!(:consumer_role2) do
+    cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+    family.family_members[2].person.consumer_role = cr
+    family.family_members[2].person.save!
+  end
+
   let(:household)                     { family.households.first }
   let(:tax_household)                 { FactoryBot.create(:tax_household, household: household, effective_starting_on: start_on, effective_ending_on: nil) }
   let(:determined_at)                 { TimeKeeper.datetime_of_record }

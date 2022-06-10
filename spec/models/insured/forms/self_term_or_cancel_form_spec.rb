@@ -185,6 +185,18 @@ module Insured
     end
 
     describe "#for_aptc_update_post" do
+      let!(:consumer_role1) do
+        cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+        family.family_members[1].person.consumer_role = cr
+        family.family_members[1].person.save!
+      end
+
+      let!(:consumer_role2) do
+        cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+        family.family_members[2].person.consumer_role = cr
+        family.family_members[2].person.save!
+      end
+
       before(:each) do
         enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
         tax_household_member1.update_attributes(csr_percent_as_integer: 87)
