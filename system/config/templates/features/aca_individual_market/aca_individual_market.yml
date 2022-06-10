@@ -42,6 +42,8 @@ registry:
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
+      - key: :yearly_aggregate_drop_enrollment_member
+        is_enabled: false
       - key: :vlp_documents
         is_enabled: true
         settings:
