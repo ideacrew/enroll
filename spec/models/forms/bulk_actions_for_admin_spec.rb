@@ -238,6 +238,46 @@ describe Forms::BulkActionsForAdmin do
     end
   end
 
+  context "drop_enrollment_members for failure" do
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
+    let(:shopping_hbx_enrollment_member1) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record)}
+    let(:shopping_hbx_enrollment_member2) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record)}
+    let(:shopping_hbx_enrollment_member3) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.third.id, eligibility_date: TimeKeeper.date_of_record)}
+    let(:hbx_enrollment) do
+      enrollment = FactoryBot.build(:hbx_enrollment, :shop,
+                                    family: family,
+                                    aasm_state: 'coverage_enrolled',
+                                    hbx_enrollment_members: [shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2, shopping_hbx_enrollment_member3])
+      enrollment.save
+      enrollment
+    end
+
+    let(:drop_enrollment_members_arguments) do
+      { :family_actions_id => "family_actions_#{family.id}",
+        :family_id => family.id,
+        :commit => "Submit",
+        :controller => "exchanges/hbx_profiles",
+        :enrollment_id => hbx_enrollment.id.to_s,
+        "terminate_member_#{hbx_enrollment.hbx_enrollment_members.last.id}" => hbx_enrollment.hbx_enrollment_members.last.id.to_s,
+        "termination_date_#{hbx_enrollment.id}" => hbx_enrollment.effective_on}
+    end
+
+    let(:subject) { Forms::BulkActionsForAdmin.new(drop_enrollment_members_arguments)}
+
+    before do
+      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should not cancel enrollment include failure message" do
+      subject.drop_enrollment_members
+      hbx_enrollment.reload
+      expect(hbx_enrollment.aasm_state).not_to eq "coverage_canceled"
+      expect(subject.result[:failure].first.class).to eq Hash
+      expect(subject.result[:failure].first[:message]).to eq "Not an ivl enrollment."
+      expect(subject.result[:failure].first[:hbx]).to eq hbx_enrollment
+    end
+  end
+
   context 'enrollment market' do
     context "SHOP" do
       let(:termination_date) { Date.today + 1.month }
