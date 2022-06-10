@@ -81,6 +81,10 @@ Then(/^the save button should be enabled$/) do
   expect(find(:css, '.interaction-click-control-save')[:class].include?('disabled')).to eq(false)
 end
 
+Then(/^the save button should be disabled$/) do
+  expect(find(:css, '.interaction-click-control-save')[:class].include?('disabled')).to eq(true)
+end
+
 Then(/^the user saves the other income information$/) do
   click_button 'Save'
 end
@@ -155,4 +159,21 @@ end
 
 Then(/^the american indian or alaska native income choices should show$/) do
   expect(page).to have_content "HOW OFTEN *"
+end
+
+Given(/^ssi types feature is enabled$/) do
+  enable_feature :ssi_income_types, {registry_name: FinancialAssistanceRegistry}
+end
+
+Given(/^the user checks social security checkbox$/) do
+  find(:css, "#other_income_kind[value='social_security_benefit']").set(true)
+end
+
+Then(/^the social security benefit type choices should show$/) do
+  expect(page).to have_css('#ssi_type')
+end
+
+Then(/^the user selects a social security benefit type$/) do
+  find('.ss_benefit_type .selectric span.label').click
+  find(".ss_benefit_type .selectric-items li", text: 'Disability Benefits').click
 end
