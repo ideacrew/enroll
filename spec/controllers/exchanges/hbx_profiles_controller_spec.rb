@@ -1857,7 +1857,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         person_hbx_ids: person.hbx_id.to_s,
         qle_id: qle2.id,
         person: person.primary_family,
-        effective_on_kind: 'first_of_next_month'
+        effective_on_kind: 'first_of_next_month_coinciding'
       }
     end
     let(:person) do

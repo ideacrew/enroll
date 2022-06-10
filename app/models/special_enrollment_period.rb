@@ -317,6 +317,10 @@ private
     earliest_effective_date.end_of_month + 1.day
   end
 
+  def beginning_of_month?
+    qle_on == qle_on.beginning_of_month
+  end
+
   def first_of_next_month_coinciding_effective_date
     today = TimeKeeper.date_of_record
 
@@ -328,8 +332,10 @@ private
       end
     elsif today == today.beginning_of_month
       today
+    elsif beginning_of_month?
+      qle_on
     else
-      today.end_of_month.next_day
+      qle_on.end_of_month.next_day
     end
   end
 
