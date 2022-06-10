@@ -409,6 +409,8 @@ $(document).ready(function(){
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
   }
 
+  $('#is_primary_caregiver_no').parents(".row").next().addClass('hide');
+
   $("body").on("change", "#is_primary_caregiver_no", function(){
     if ($('#is_primary_caregiver_no').is(':checked')) {
       $('#is_primary_caregiver_for').parents('.row-form-wrapper').addClass('hide');
