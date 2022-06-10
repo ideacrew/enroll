@@ -330,8 +330,6 @@ private
       else
         qle_on.end_of_month.next_day
       end
-    elsif today == today.beginning_of_month
-      today
     elsif beginning_of_month?
       qle_on
     else
