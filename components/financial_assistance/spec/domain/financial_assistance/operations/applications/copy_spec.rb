@@ -648,11 +648,11 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
                                                 employer_name: 'Testing employer' })
 
       ssi_inc = ::FinancialAssistance::Income.new({ kind: 'social_security_benefit',
-                                                frequency_kind: 'yearly',
-                                                amount: 10_000.00,
-                                                start_on: TimeKeeper.date_of_record.prev_year,
-                                                end_on: TimeKeeper.date_of_record.prev_month,
-                                                ssi_type: 'survivors' })
+                                                    frequency_kind: 'yearly',
+                                                    amount: 10_000.00,
+                                                    start_on: TimeKeeper.date_of_record.prev_year,
+                                                    end_on: TimeKeeper.date_of_record.prev_month,
+                                                    ssi_type: 'survivors' })
       applicant.incomes << inc
       applicant.incomes << ssi_inc
       income = applicant.incomes.first
