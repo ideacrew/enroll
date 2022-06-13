@@ -29,7 +29,6 @@ class Family
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
 
   field :hbx_assigned_id, type: Integer
-  increments :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String # Eligibility system foreign key
   field :external_app_id, type: String # External system foreign key
@@ -70,10 +69,12 @@ class Family
   # removed it as it is not setting e_case_id on some cases randomly
   # before_save :clear_blank_fields
 
+  before_save :generate_hbx_assigned_id
+
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
-  # index({hbx_assigned_id: 1}, {unique: true})
+  index({hbx_assigned_id: 1}, {sparse: true, unique: true})
   index({e_case_id: 1}, { sparse: true })
   index({submitted_at: 1})
   index({person_id: 1})
@@ -1288,6 +1289,10 @@ class Family
 
   def application_applicable_year
     Family.application_applicable_year
+  end
+
+  def generate_hbx_assigned_id
+    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_member_id) if hbx_assigned_id.blank?
   end
 
 private
