@@ -317,8 +317,11 @@
 
               <div class="col-md-12 form-group form-group-lg">
                 <%= f.collection_check_boxes(:is_primary_caregiver_for, @application.applicants.select{ |applicant| applicant.age_of_the_applicant <= 18 }, :person_hbx_id, :full_name, {}, :id => 'is_primary_caregiver_for')  do |applicant| %>
-                  <div> <%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %> </div>
+                  <div><%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %></div>
                 <% end %>
+                <%= f.collection_check_boxes(:is_primary_caregiver_for, [OpenStruct.new({name: l10n('none_of_the_above'), value: "none"})], :value, :name, {:id => 'is_primary_caregiver_for_none'}) do |applicant|%>
+                  <div><%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %> </div>
+                <% end %>                
               </div>
 
             </div>
