@@ -17,6 +17,10 @@ describe HbxIdGenerator do
     it "generates payment_transaction ids" do
       expect(HbxIdGenerator.generate_payment_transaction_id).not_to eq nil
     end
+
+    it "generates family ids" do
+      expect(HbxIdGenerator.generate_family_id).not_to eq nil
+    end
   end
 
   describe "with an amqp source" do
@@ -62,6 +66,15 @@ describe HbxIdGenerator do
 
       it "returns the expected payment_transaction_id" do
         expect(generator.generate_payment_transaction_id).to eq sequence_number
+      end
+    end
+
+    describe "for family ids" do
+      let(:sequence_name) { "family_id" }
+      let(:sequence_number) { "234234234" }
+
+      it "returns the expected family_id" do
+        expect(generator.generate_family_id).to eq sequence_number
       end
     end
   end
