@@ -51,9 +51,9 @@ module FinancialAssistance
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
     SSI_TYPES = %w[disability retirement survivors].freeze
     SS_BENEFITS = {
-      disability: 'Disability Benefits',
-      retirement: 'Retirement Benefits',
-      survivors: 'Survivors Benefits'
+      disability: 'Disability benefits',
+      retirement: 'Retirement benefits',
+      survivors: 'Survivors benefits'
     }.freeze
 
     NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = EnrollRegistry[:negative_amount_income_types].setting(:income_types).item || %w[net_self_employment capital_gains farming_and_fishing].freeze
@@ -219,7 +219,7 @@ module FinancialAssistance
 
     def duplicate_instance(new_applicant)
       income_params = self.attributes.slice(:title, :kind, :wage_type, :hours_per_week, :amount, :amount_tax_exempt, :frequency_kind, :start_on,
-                                            :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights)
+                                            :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights, :ssi_type)
       new_income = new_applicant.incomes.build(income_params)
       build_new_employer_address(new_income) if employer_address.present?
       build_new_employer_phone(new_income) if employer_phone.present?
