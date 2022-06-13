@@ -360,6 +360,39 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(applicant.is_applying_coverage).to eq true
       end
     end
+
+    context "applicant's addresses are successfully updated" do
+
+      let(:applicant_params) do
+        {
+          application_id: application.id,
+          id: applicant.id,
+          applicant: {
+            is_applying_coverage: true,
+            relationship: nil,
+            first_name: 'John',
+            last_name: 'Smith',
+            gender: 'male',
+            dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+            ssn: nil,
+            is_incarcerated: false,
+            indian_tribe_member: false,
+            addresses_attributes: {'0': {kind: 'home', address_1: '1600 Pennsylvania Ave', city: 'Bar Harbor', state: 'ME', zip: '04401', county: 'Cumberland' }},
+            # :address_1, :address_2, :city, :state, :zip, :county,
+            is_consumer_role: false
+          }
+        }
+      end
+
+      let(:county_params) { applicant_params[:applicant][:addresses_attributes][:county] }
+
+      it "should update applicant's address" do
+        patch :update, params: applicant_params
+        applicant.reload
+        binding.irb
+        expect(applicant.addresses.first.county).to eql(county_params)
+      end
+    end
   end
 
   context "POST step" do
