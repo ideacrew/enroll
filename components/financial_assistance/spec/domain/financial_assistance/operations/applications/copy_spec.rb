@@ -646,7 +646,15 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
                                                 start_on: TimeKeeper.date_of_record.prev_year,
                                                 end_on: TimeKeeper.date_of_record.prev_month,
                                                 employer_name: 'Testing employer' })
+
+      ssi_inc = ::FinancialAssistance::Income.new({ kind: 'social_security_benefit',
+                                                    frequency_kind: 'yearly',
+                                                    amount: 10_000.00,
+                                                    start_on: TimeKeeper.date_of_record.prev_year,
+                                                    end_on: TimeKeeper.date_of_record.prev_month,
+                                                    ssi_type: 'survivors' })
       applicant.incomes << inc
+      applicant.incomes << ssi_inc
       income = applicant.incomes.first
       income.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
       income.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
@@ -679,6 +687,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
     before do
       @new_application = subject.call(application_id: application.id).success
       @new_applicant = @new_application.applicants.first
+      @ssi_income = @new_applicant.incomes.detect { |inc| inc.kind == "social_security_benefit" }
     end
 
     context 'for income' do
@@ -708,6 +717,10 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
       it 'should create employer_phone with created_at' do
         expect(@new_applicant.incomes.first.employer_phone.created_at).not_to be_nil
+      end
+
+      it 'should create ssi_type for social security income' do
+        expect(@ssi_income.ssi_type).not_to be_nil
       end
     end
 
