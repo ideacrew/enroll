@@ -217,8 +217,8 @@ private
     qle_on == qle_on.beginning_of_month
   end
 
-  def sep_effective_date? #sep_first_of_month_match?
-    EnrollRegistry.feature_enabled?(:sep_effective_date)
+  def sep_effective_date_match? 
+    EnrollRegistry.feature_enabled?(:sep_effective_date_match)
   end
 
   def next_poss_effective_date_within_range
@@ -337,10 +337,12 @@ private
       else
         qle_on.end_of_month.next_day
       end
-    elsif today == today.beginning_of_month && !sep_effective_date?
+    elsif today == today.beginning_of_month && !sep_effective_date_match?
       today
-    elsif beginning_of_month? && sep_effective_date?
+    elsif beginning_of_month? && sep_effective_date_match?
       qle_on
+    elsif qle_on > qle_on.beginning_of_month && sep_effective_date_match?
+      qle_on.end_of_month.next_day
     else
       today.end_of_month.next_day
     end
