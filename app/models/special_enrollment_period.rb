@@ -212,6 +212,15 @@ class SpecialEnrollmentPeriod
   end
 
 private
+
+  def beginning_of_month?
+    qle_on == qle_on.beginning_of_month
+  end
+
+  def sep_effective_date? #sep_first_of_month_match?
+    EnrollRegistry.feature_enabled?(:sep_effective_date)
+  end
+
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
@@ -223,6 +232,8 @@ private
       errors.add(:next_poss_effective_date, "out of range.")
     end
   end
+
+
 
   def optional_effective_on_dates_within_range
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
@@ -317,10 +328,6 @@ private
     earliest_effective_date.end_of_month + 1.day
   end
 
-  def beginning_of_month?
-    qle_on == qle_on.beginning_of_month
-  end
-
   def first_of_next_month_coinciding_effective_date
     today = TimeKeeper.date_of_record
 
@@ -330,10 +337,12 @@ private
       else
         qle_on.end_of_month.next_day
       end
-    elsif beginning_of_month?
+    elsif today == today.beginning_of_month && !sep_effective_date?
+      today
+    elsif beginning_of_month? && sep_effective_date?
       qle_on
     else
-      qle_on.end_of_month.next_day
+      today.end_of_month.next_day
     end
   end
 
