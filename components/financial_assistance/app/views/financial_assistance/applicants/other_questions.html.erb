@@ -308,7 +308,7 @@
             </div>
           </div>
           <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
-            <div class="row row-form-wrapper no-buffer check_box_collection <%= "hide" unless @applicant.is_primary_caregiver %>"></h5>
+            <div class="row row-form-wrapper no-buffer check_box_collection <%= "hide" unless @applicant.is_primary_caregiver %>">
 
               <div class="col-xs-12 form-group form-group-lg">
                 <h5 class="fa-text-color"><%= l10n("faa.primary_caretaker_for_text") %></h5>
