@@ -12,7 +12,7 @@ require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
-require 'capybara-screenshot/cucumber'
+# require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path("#{Rails.root}/lib/test/**/*.rb")].each { |f| load f }
@@ -71,8 +71,8 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
-Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
-Capybara::Screenshot.prune_strategy = :keep_last_run
+# Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
+# Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
