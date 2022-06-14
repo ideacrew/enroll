@@ -233,8 +233,6 @@ private
     end
   end
 
-
-
   def optional_effective_on_dates_within_range
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
 
