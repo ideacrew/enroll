@@ -49,6 +49,12 @@ module FinancialAssistance
     NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
+    SSI_TYPES = %w[disability retirement survivors].freeze
+    SS_BENEFITS = {
+      disability: 'Disability benefits',
+      retirement: 'Retirement benefits',
+      survivors: 'Survivors benefits'
+    }.freeze
 
     NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = EnrollRegistry[:negative_amount_income_types].setting(:income_types).item || %w[net_self_employment capital_gains farming_and_fishing].freeze
 
@@ -93,6 +99,7 @@ module FinancialAssistance
     field :employer_name, type: String
     field :employer_id, type: Integer
     field :has_property_usage_rights, type: Boolean
+    field :ssi_type, type: String
     field :submitted_at, type: DateTime
     field :workflow, type: Hash, default: { }
 
@@ -131,6 +138,7 @@ module FinancialAssistance
     validates :start_on, presence: true, on: [:step_1, :submission]
     validate :start_on_must_precede_end_on
     validate :check_if_valid_amount
+    validate :check_if_ssi_type, on: [:step_1, :submission]
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
@@ -211,7 +219,7 @@ module FinancialAssistance
 
     def duplicate_instance(new_applicant)
       income_params = self.attributes.slice(:title, :kind, :wage_type, :hours_per_week, :amount, :amount_tax_exempt, :frequency_kind, :start_on,
-                                            :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights)
+                                            :end_on, :is_projected, :tax_form, :employer_name, :employer_id, :has_property_usage_rights, :ssi_type)
       new_income = new_applicant.incomes.build(income_params)
       build_new_employer_address(new_income) if employer_address.present?
       build_new_employer_phone(new_income) if employer_phone.present?
@@ -242,6 +250,11 @@ module FinancialAssistance
       return if negative_income_accepted?
 
       errors.add(:amount, "$#{amount} must be greater than $0.") if amount.to_f < 0
+    end
+
+    def check_if_ssi_type
+      return unless kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types)
+      errors.add(:ssi_type, "You must provide a valid type for social security income.") unless ssi_type&.in?(SSI_TYPES)
     end
   end
 end

@@ -176,5 +176,23 @@ RSpec.describe ::Operations::Eligibilities::FamilyDataExportProcessor,
       expect(result.success?).to be_truthy
     end
   end
+
+  context "residency verification" do
+    it "should append residency verification details in headers if enabled" do
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
+      result = subject.call(required_params)
+      headers = CSV.open(result.success, 'r', &:first)
+      expect(headers.include?("Residency Evi Status")).to be_truthy
+      expect(headers.include?("Residency Evi Due Date")).to be_truthy
+    end
+
+    it "should append residency verification details in headers if disabled" do
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
+      result = subject.call(required_params)
+      headers = CSV.open(result.success, 'r', &:first)
+      expect(headers.include?("Residency Evi Status")).to be_falsey
+      expect(headers.include?("Residency Evi Due Date")).to be_falsey
+    end
+  end
 end
 

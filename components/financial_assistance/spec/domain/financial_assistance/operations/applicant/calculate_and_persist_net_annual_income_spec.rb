@@ -91,6 +91,46 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       end
     end
 
+    context 'Income (no deductions) has start date on 1st of present year and end date on 1st of next year and frequency kind is monthly' do
+      let(:params) do
+        {application_assistance_year: application.assistance_year, applicant: applicant}
+      end
+
+      let(:income) do
+        FactoryBot.build(:financial_assistance_income, start_on: Date.new(TimeKeeper.date_of_record.year, 1, 1),
+                                                       end_on: Date.new(TimeKeeper.date_of_record.next_year.year, 1, 1),
+                                                       amount: 94_000, frequency_kind: "monthly")
+      end
+
+      before do
+        applicant.incomes << income
+      end
+
+      context 'not a leap year' do
+        before do
+          allow(Date).to receive(:gregorian_leap?).with(income.start_on.year).and_return(false)
+        end
+
+        it 'should pass, calculate and persist net annual income on applicant' do
+          result = subject.call(params)
+          expect(result.success).to eq applicant
+          expect(applicant.net_annual_income.to_f.ceil).to eq 1_131_091
+        end
+      end
+
+      context 'leap year' do
+        before do
+          allow(Date).to receive(:gregorian_leap?).with(income.start_on.year).and_return(true)
+        end
+
+        it 'should pass, calculate and persist net annual income on applicant' do
+          result = subject.call(params)
+          expect(result.success).to eq applicant
+          expect(applicant.net_annual_income.to_f.ceil).to eq 1_134_181
+        end
+      end
+    end
+
     context 'Income and deductions have start date in future year and end date in future year and frequency kind is daily' do
       let(:params) do
         {application_assistance_year: application.assistance_year, applicant: applicant}

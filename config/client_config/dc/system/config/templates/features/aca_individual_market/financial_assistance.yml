@@ -59,6 +59,9 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
+      - key: :ssi_income_types
+        item: :ssi_income_types
+        is_enabled: false
       - key: :medicaid_tax_credits_link
         item: :medicaid_tax_credits_link
         is_enabled: true
@@ -104,11 +107,11 @@ registry:
     - :account_transfer
     features:
     - key: :real_time_transfer
-      is_enabled: false
+      is_enabled: <%= ENV['REAL_TIME_TRANSFER_IS_ENABLED'] || false %>
     - key: :batch_transfer
-      is_enabled: false
+      is_enabled: <%= ENV['BATCH_TRANSFER_IS_ENABLED'] || false %>
     - key: :transfer_service
-      is_enabled: false
+      is_enabled: <%= ENV['TRANSFER_SERVICE_IS_ENABLED'] || false %>
       item: "curam"
   - namespace:
     - :documents
