@@ -217,7 +217,7 @@ private
     qle_on == qle_on.beginning_of_month
   end
 
-  def sep_effective_date_match? 
+  def sep_effective_date_match?
     EnrollRegistry.feature_enabled?(:sep_effective_date_match)
   end
 
