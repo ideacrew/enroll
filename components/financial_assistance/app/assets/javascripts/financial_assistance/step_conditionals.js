@@ -410,8 +410,6 @@ $(document).ready(function(){
   }
 
   //start primary caregiver controls
-  $('#is_primary_caregiver_no').parents(".row").next().addClass('hide');
-
   $("body").on("change", "#is_primary_caregiver_no", function(){
     if ($('#is_primary_caregiver_no').is(':checked')) {
       $('#is_primary_caregiver_for').parents('.row-form-wrapper').addClass('hide');
