@@ -415,7 +415,7 @@ module Insured
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(679.8)
         FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment, tobacco_use: 'N')
-        EnrollRegistry[:yearly_aggregate_drop_enrollment_member].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:check_enrollment_member_eligibility].feature.stub(:is_enabled).and_return(true)
       end
 
       context 'when one of the member is not applying for coverage' do

@@ -59,7 +59,7 @@ module Insured
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
 
-        remove_invalid_enrollment_members(reinstatement) if EnrollRegistry[:yearly_aggregate_drop_enrollment_member].feature.is_enabled
+        drop_invalid_enrollment_members(reinstatement) if EnrollRegistry[:check_enrollment_member_eligibility].feature.is_enabled
         can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstatement})
 
         unless can_renew.success?
@@ -73,7 +73,7 @@ module Insured
         reinstatement.select_coverage!
       end
 
-      def self.remove_invalid_enrollment_members(reinstatement)
+      def self.drop_invalid_enrollment_members(reinstatement)
         @invalid_family_member_ids = []
 
         reinstatement.family.active_family_members.each do |fm|
