@@ -49,7 +49,9 @@ module Subscribers
       consumer_role = person.consumer_role
 
       identifying_information_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:identifying_information_attributes).item.map(&:to_sym)
-      if consumer_role.present? && (identifying_information_attributes & params[:payload].keys).present?
+      tribe_status_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:indian_tribe_attributes).item.map(&:to_sym)
+      valid_attributes = identifying_information_attributes + tribe_status_attributes
+      if consumer_role.present? && ((valid_attributes & params[:payload].keys).present?)
         result = ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id})
         result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
         subscriber_logger.info "PeopleSubscriber::Update, determine_verifications result: #{result_str}"
