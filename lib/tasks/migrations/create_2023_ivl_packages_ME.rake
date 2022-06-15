@@ -7,7 +7,7 @@ namespace :import do
     hbx = HbxProfile.current_hbx
 
     # Second lowest cost silver plan
-    slcs_products = BenefitMarkets::Products::Product.where(hios_id: "33653ME0050002-01")
+    slcs_products = BenefitMarkets::Products::Product.by_year(2023).where(hios_id: '54879ME0010003-01')
     slcsp_2023 =  slcs_products.select{|a| a.active_year == 2023}.first
     # check if benefit package is present for 2023
     bc_period_2023 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2023 }.first
