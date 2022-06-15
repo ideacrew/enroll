@@ -1840,6 +1840,54 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
+  describe "POST #add_new_sep" do
+    let(:sep_params) do
+      {
+        calcuated_effective_date: (TimeKeeper.date_of_record.beginning_of_month + 1.month).to_s,
+        firstName: person.first_name,
+        lastName: person.last_name,
+        sep_type: 'ivl',
+        qle_reason: 'exceptional_circumstances',
+        start_on: TimeKeeper.date_of_record.beginning_of_month.to_s,
+        end_on: TimeKeeper.date_of_record.end_of_month.to_s,
+        next_poss_effective_date: TimeKeeper.date_of_record.beginning_of_month.to_s,
+        effective_on_date: (TimeKeeper.date_of_record.beginning_of_month + 1.month).to_s,
+        event_date: TimeKeeper.date_of_record.beginning_of_month.to_s,
+        sep_duration: '10',
+        person_hbx_ids: person.hbx_id.to_s,
+        qle_id: qle2.id,
+        person: person.primary_family,
+        effective_on_kind: 'first_of_next_month_coinciding'
+      }
+    end
+    let(:person) do
+      FactoryBot.create(:person, :with_hbx_staff_role, :with_family).tap do |person|
+        FactoryBot.create(:permission, :super_admin).tap do |permission|
+          person.hbx_staff_role.update_attributes!(permission_id: permission.id)
+        end
+      end
+    end
+    let!(:qle2) { FactoryBot.create(:qualifying_life_event_kind, reason: '', is_active: true, effective_on_kinds: ["fixed_first_of_next_month"], market_kind: 'individual') }
+    let(:user) do
+      FactoryBot.create(:user, person: person)
+    end
+    let(:next_poss_effective_date) { Date.strptime(sep_params[:next_poss_effective_date], "%m/%d/%Y") }
+
+    let(:effective_on) { person.primary_family.special_enrollment_periods.first.effective_on }
+
+    before do
+      controller.instance_variable_set("@name", person.first_name)
+      allow(controller).to receive(:sep_params).and_return(sep_params)
+    end
+
+    it "sets effective date to match next poss effective date if present" do
+      sign_in(user)
+      post :add_new_sep, params: sep_params, format: :js, xhr: true
+      person.primary_family.reload
+      expect(effective_on).to eql(next_poss_effective_date)
+    end
+  end
+
   describe "POST update_fein", :dbclean => :around_each do
 
     context "of an hbx super admin clicks Submit in Change FEIN window" do

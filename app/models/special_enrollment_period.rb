@@ -212,6 +212,15 @@ class SpecialEnrollmentPeriod
   end
 
 private
+
+  def beginning_of_month?
+    qle_on == qle_on.beginning_of_month
+  end
+
+  def sep_effective_date_match?
+    EnrollRegistry.feature_enabled?(:sep_effective_date_match)
+  end
+
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
@@ -326,8 +335,12 @@ private
       else
         qle_on.end_of_month.next_day
       end
-    elsif today == today.beginning_of_month
+    elsif today == today.beginning_of_month && !sep_effective_date_match?
       today
+    elsif beginning_of_month? && sep_effective_date_match?
+      qle_on
+    elsif qle_on > qle_on.beginning_of_month && sep_effective_date_match?
+      qle_on.end_of_month.next_day
     else
       today.end_of_month.next_day
     end
