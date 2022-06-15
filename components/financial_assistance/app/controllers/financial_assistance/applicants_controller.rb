@@ -187,7 +187,7 @@ module FinancialAssistance
     end
 
     def applicant_parameters
-      [
+      result_hash = [
         :first_name,
         :last_name,
         :middle_name,
@@ -216,11 +216,14 @@ module FinancialAssistance
         :alien_number, :passport_number, :sevis_id, :visa_number,
         :receipt_number, :expiration_date, :card_number, :description,
         :i94_number, :country_of_citizenship,
-        { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county, :id, :_destroy] },
+        { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy]},
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
           :ethnicity => [], :immigration_doc_statuses => [] }
       ]
+      #result_hash << { :addresses_attributes => [:kind, :address_1, :address_2, :city, :county, :state, :zip, :id, :_destroy]} if true
+      result_hash.select {|key| key.is_a?(Hash) && key[:addresses_attributes]}.first[:addresses_attributes] << :county if true
+      result_hash
     end
   end
 end

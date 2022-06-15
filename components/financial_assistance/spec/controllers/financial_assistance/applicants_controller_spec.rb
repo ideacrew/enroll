@@ -363,7 +363,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
     context "applicant's addresses are successfully updated" do
 
-      let(:applicant_params) do
+      let!(:applicant_params) do
         {
           application_id: application.id,
           id: applicant.id,
@@ -377,7 +377,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
             ssn: nil,
             is_incarcerated: false,
             indian_tribe_member: false,
-            addresses_attributes: {'0': {kind: 'home', address_1: '1600 Pennsylvania Ave', city: 'Bar Harbor', state: 'ME', zip: '04401', county: 'Cumberland' }},
+            addresses_attributes: {'0': {kind: 'primary', address_1: '1600 Pennsylvania Ave', city: 'Bar Harbor', state: 'ME', zip: '04401', county: 'Cumberland' }},
             # :address_1, :address_2, :city, :state, :zip, :county,
             is_consumer_role: false
           }
@@ -385,6 +385,12 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       let(:county_params) { applicant_params[:applicant][:addresses_attributes][:county] }
+      let!(:address) { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
+
+      before do
+        applicant.addresses << address
+        applicant.save!
+      end
 
       it "should update applicant's address" do
         patch :update, params: applicant_params
