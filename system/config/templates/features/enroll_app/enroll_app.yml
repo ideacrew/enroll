@@ -217,8 +217,6 @@ registry:
             item: "single"
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
-          - key: :header_logo
-            item: "logo.png"
           - key: :eligibile_immigration_statuses_url
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :geographic_rating_area_model
