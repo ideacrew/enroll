@@ -716,6 +716,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:is_rt_transferrable?).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:rt_transfer).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:send_determination_to_ea).and_return(true)
       allow_any_instance_of(application.class).to receive(:trigger_local_mec)
       application.update(aasm_state: "submitted")
       application.determine!
