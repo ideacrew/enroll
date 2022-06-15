@@ -1,6 +1,6 @@
 name: rspec report
 on:
-  # push:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
           rabbitmq password: 'guest'
           rabbitmq vhost: '/'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -64,7 +64,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -114,7 +114,7 @@ jobs:
         with:
           mongoDBVersion: '4.2'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -127,7 +127,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
