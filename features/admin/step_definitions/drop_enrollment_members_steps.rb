@@ -46,5 +46,5 @@ Then(/Admin should see that the enrollment failed to terminate/) do
 end
 
 Then(/Admin should see that no members were selected to be dropped/) do
-  expect(page.has_css?(DropEnrollmentMembers.none_selected)).to eq true
+  expect(page.has_css?(DropEnrollmentMembers.failed_to_drop_members)).to eq true
 end
