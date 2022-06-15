@@ -11,7 +11,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends libsodium23
 
 # [Optional] Uncomment this line to install additional gems.
-RUN gem install bundler -v 2.2.27
+RUN gem install bundler -v 2.3.16
 
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
