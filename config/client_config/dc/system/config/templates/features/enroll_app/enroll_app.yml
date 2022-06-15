@@ -718,4 +718,4 @@ registry:
       - :enrollments
     features:
       - key: :display_enr_summary
-        is_enabled: false
+        is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
