@@ -78,6 +78,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
       context 'when retro active feature is turned off && termination date is past date' do
         before do
+          EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(false)
           @result = subject.call({hbx_enrollment: enrollment,
                                   options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 1.day).to_s,
                                             "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
@@ -387,7 +388,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         dropped_members = subject.call({hbx_enrollment: enrollment,
                                         options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
                                                   "terminate_member_#{hbx_enrollment_member3.id}" => nil}}).failure
-        expect(dropped_members).to eq 'Cannot Drop a retroactive dependent.'
+        expect(dropped_members).to eq 'No members were being dropped.'
       end
     end
   end
