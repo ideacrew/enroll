@@ -57,15 +57,12 @@ module FinancialAssistance
         self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
 
         if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          puts "???????????????????????"
           unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
-            puts "!!!!!!!!!!!!!!!!!!!!!!!"
             self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
             self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
             self.errors.add(:tribal_name, "cannot contain numbers") if !(tribal_name =~ /\d/).nil? && @indian_tribe_member
           end
         elsif !tribal_id.present? && @indian_tribe_member && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
-          puts "!!!!!!!!!!!!!!!!!!!!!!!"
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
@@ -112,7 +109,6 @@ module FinancialAssistance
             applicant.save!
           end
 
-          binding.irb
           # reloading the application to fetch the latest data updated through applicant callbacks to avoid duplicate relationships
           application.reload
           application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?

@@ -1100,7 +1100,7 @@ module FinancialAssistance
                                                                    :is_consumer_role,:vlp_document_id,:is_applying_coverage,:vlp_subject,:alien_number,
                                                                    :i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                                                    :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,
-                                                                   :issuing_country,:status,:indian_tribe_member,
+                                                                   :issuing_country,:status,:indian_tribe_member,:tribe_codes,
                                                                    :same_with_primary,:vlp_description,:tribal_state,:tribal_name)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})
       applicant_params.merge!(expiration_date: expiration_date.strftime('%d/%m/%Y')) if expiration_date.present?
@@ -1503,6 +1503,7 @@ module FinancialAssistance
       return unless application.draft?
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
+        binding.irb
         create_or_update_result = ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]

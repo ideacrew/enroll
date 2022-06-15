@@ -115,27 +115,34 @@ function applyFaaListenersFor(target) {
     }
   });
 
+  //start tribe option controls
   $("input[name='" + target + "[indian_tribe_member]']").change(function() {
-    if ($(this).val() == 'true') {
-      $('#tribal_container').show();
-      $('.tribal_container').show();
+    if (this.value === 'true') {
+      $('.tribal-container').removeClass('hide');
     } else {
-      $('#tribal_container').hide();
-      $('.tribal_container').hide();
-      $('.tribal_name_other_container').hide();
-      $('#tribal_id').val("");
-      
+      $('.tribal-container').addClass('hide');
+    }
+  });
+
+  $('select#tribal-state').change(function() {
+    if (this.value == 'ME') {
+      $('.featured-tribe-container').removeClass('hide');
+      $('.tribal-name-container').addClass('hide');
+    } else {
+      $('.tribal-name-container').removeClass('hide');
+      $('.featured-tribe-container').addClass('hide');
     }
   });
 
   $('input#applicant_tribe_codes_ot').change(function() {
-    if(this.checked){
-      $('.tribal_name_other_container').show();
+    if (this.checked){
+      $('.tribal-name-other-container').removeClass('hide');
     }
-    else{
-      $('.tribal_name_other_container').hide();
+    else {
+      $('.tribal-name-other-container').addClass('hide');
     }
   });
+  //end tribe option controls
 
 }
 
@@ -203,12 +210,12 @@ function applyFaaListeners() {
 }
 
 function validationForIndianTribeMember(e) {
-  if ($('#indian_tribe_area').length == 0) {
+  if ($('#indian-tribe-area').length == 0) {
     return false;
   };
 
   $('.close').click(function() {
-    $('#tribal_id_alert').hide()
+    $('#tribal-id-alert').hide()
     $('#tribal-state-alert').hide();
     $('#tribal-name-alert').hide();
   });
@@ -227,7 +234,7 @@ function validationForIndianTribeMember(e) {
     // for tribal_id
     var tribal_val = $('#tribal_id').val();
     if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_val == "undefined" || tribal_val == '')) {
-      $('#tribal_id_alert').show();
+      $('#tribal-id-alert').show();
       e.preventDefault && e.preventDefault();
       return false;
     }
