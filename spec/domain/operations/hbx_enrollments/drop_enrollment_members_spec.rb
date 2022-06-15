@@ -139,7 +139,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                  options: {"termination_date_#{enrollment.id}" => enrollment.effective_on.end_of_year.to_s,
                                            "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
 
-          expect(result.failure).to eq "Select termination date that would result in a member drop in the present calender year."
+          expect(result.failure).to eq "Select termination date that would result in a member drop in the present calendar year."
         end
 
         it 'should return a failure when hbx_enrollment is not an ivl' do
