@@ -857,7 +857,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories, :trigger_local_mec] do
         transitions from: :submitted, to: :determined
       end
 
@@ -999,10 +999,10 @@ module FinancialAssistance
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
-    def trigger_aces_call
+    def trigger_local_mec
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
     rescue StandardError => e
-      Rails.logger.error { "FAA trigger_aces_call error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+      Rails.logger.error { "FAA trigger_local_mec error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def is_local_mec_checkable?
@@ -1275,11 +1275,11 @@ module FinancialAssistance
     def is_application_valid?
       application_attributes_validity = self.valid?(:submission) ? true : false
 
-      if relationships_complete?
-        relationships_validity = true
-      else
-        relationships_validity = false
-      end
+      relationships_validity = if relationships_complete?
+                                 true
+                               else
+                                 false
+                               end
 
       if applicants_have_valid_addresses?
         addresses_validity = true
