@@ -7,7 +7,7 @@ FROM ruby:$RUBY_VERSION-slim-stretch as base
 LABEL author="IdeaCrew"
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG BUNDLER_VERSION=2.2.27
+ARG BUNDLER_VERSION=2.3.16
 
 # Must be set as ENV variable to overrride the default
 ENV BUNDLER_VERSION=$BUNDLER_VERSION
