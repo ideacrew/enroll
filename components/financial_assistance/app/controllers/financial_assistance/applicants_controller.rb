@@ -52,6 +52,7 @@ module FinancialAssistance
         @applicant.application_id = params[:application_id]
         @applicant.applicant_id = params[:id]
         @applicant.save
+
         redirect_to edit_application_path(@application)
       end
     end
