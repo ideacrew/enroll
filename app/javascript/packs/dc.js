@@ -1,1 +1,1 @@
-import '../css/dc.scss'
+import '../css/dc.scss';
