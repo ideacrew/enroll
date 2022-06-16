@@ -37,7 +37,7 @@ module Operations
       def update_aca_individual_eligibility_due_dates(values)
         results =
           values[:family].family_members.active.collect do |family_member|
-            update_person_eligibilities(family_member.person, values[:due_on])
+            update_person_eligibilities(family_member.person, values[:due_on], hard_update: values[:hard_update])
           end
 
         if results.all?(&:success?)
@@ -52,14 +52,14 @@ module Operations
         end
       end
 
-      def update_person_eligibilities(person, due_on)
+      def update_person_eligibilities(person, due_on, hard_update: true)
         outstanding_statuses = %w[outstanding review rejected]
 
-        type_names = ["Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
+        type_names = ["Social Security Number", "American Indian Status", "Citizenship", "Immigration status", ::VerificationType::LOCATION_RESIDENCY]
         type_names.each do |type_name|
           verification_types = person.verification_types.active.by_name(type_name)
           verification_types.each do |verification_type|
-            verification_type.due_date = due_on if verification_type && outstanding_statuses.include?(verification_type.validation_status)
+            verification_type.due_date = due_on if verification_type && outstanding_statuses.include?(verification_type.validation_status) && (hard_update || verification_type.due_date.nil?)
           end
         end
 
@@ -77,7 +77,7 @@ module Operations
         if application
           results =
             application.active_applicants.collect do |applicant|
-              update_applicant_evidence_due_dates(applicant, values[:due_on])
+              update_applicant_evidence_due_dates(applicant, values[:due_on], hard_update: values[:hard_update])
             end
 
           if results.all?(&:success?)
@@ -94,7 +94,7 @@ module Operations
         end
       end
 
-      def update_applicant_evidence_due_dates(applicant, due_on)
+      def update_applicant_evidence_due_dates(applicant, due_on, hard_update: true)
         evidences = %w[
           income_evidence
           esi_evidence
@@ -104,7 +104,7 @@ module Operations
 
         evidences.each do |evidence_name|
           evidence_record = applicant.send(evidence_name)
-          verify_and_update_evidence_due_on(evidence_record, due_on) if evidence_record
+          verify_and_update_evidence_due_on(evidence_record, due_on) if evidence_record && (hard_update || evidence_record.due_on.nil?)
         end
 
         applicant.save ? Success(applicant) : Failure(applicant.errors)
