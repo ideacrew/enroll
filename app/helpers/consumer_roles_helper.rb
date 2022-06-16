@@ -45,10 +45,10 @@ module ConsumerRolesHelper
 
   def featured_tribes_collection
     [
-        ["Maliseet", "HM"], 
-        ["Passamaquoddy", "PD"], 
-        ["Penobscot", "PE"], 
-        ["Micmac", "AM"], 
+        ["Maliseet", "HM"],
+        ["Passamaquoddy", "PD"],
+        ["Penobscot", "PE"],
+        ["Micmac", "AM"],
         ["Other", "OT"]
     ].map{|a| OpenStruct.new({name: a.first, value: a.last})}
   end

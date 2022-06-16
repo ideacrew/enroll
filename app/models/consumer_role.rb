@@ -721,7 +721,6 @@ class ConsumerRole
 
   def is_tribe_member?
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      binding.irb
       return false if tribal_state.blank? || (tribal_name.blank? && tribe_codes.empty?)
       !tribal_state.blank? && (!tribal_name.blank? || !tribe_codes.empty?)
     else

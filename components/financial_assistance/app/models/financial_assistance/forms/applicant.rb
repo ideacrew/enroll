@@ -98,7 +98,6 @@ module FinancialAssistance
         return false unless valid?
         is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
-        
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
