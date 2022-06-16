@@ -382,7 +382,6 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       let(:county_params) {  update_params[:applicant][:addresses_attributes][:'0'][:county]}
-      let!(:address) { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
 
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
