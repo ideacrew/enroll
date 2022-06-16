@@ -25,5 +25,6 @@
     "wbari",
     "YELLR"
   ],
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "workbench.iconTheme": "material-icon-theme"
 }
