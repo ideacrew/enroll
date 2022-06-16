@@ -226,3 +226,6 @@ registry:
       - key: :sort_sep_type
         item: Operations::QualifyingLifeEventKind::Sort.new
         is_enabled: true
+      - key: :sep_effective_date_match 
+        item: :sep_effective_date_match
+        is_enabled: false

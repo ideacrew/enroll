@@ -6,6 +6,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And a benchmark plan exists
     And the FAA feature configuration is enabled
     When the user will navigate to the FAA Household Info page
+    Given ssi types feature is enabled
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
     And they visit the other income page via the left nav
@@ -85,3 +86,12 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     Then the save button should be enabled
     And the user saves the other income information
     Then the negative other income information should be saved on the page
+
+  Scenario: User enters Social Security income type
+    Given the user answers yes to having other income
+    And the user checks social security checkbox
+    Then the social security benefit type choices should show
+    Then the save button should be disabled
+    Then the user selects a social security benefit type
+    Then the user fills out the required other income information
+    Then the save button should be enabled

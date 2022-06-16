@@ -61,7 +61,7 @@ module Forms
         result = ::Operations::HbxEnrollments::DropEnrollmentMembers.new.call({hbx_enrollment: hbx_enrollment, options: @params})
         return if result.failure == 'No members selected to drop.'
         if result.failure?
-          @result[:failure] << hbx_enrollment
+          @result[:failure] << {message: result.failure, hbx: hbx_enrollment}
           Rails.logger.error("Unable to drop enrollment members, error: #{result.failure}")
         end
 

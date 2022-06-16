@@ -1135,6 +1135,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
           end
 
           it 'should set effective date as next month beginning of month from qle on' do
@@ -1153,6 +1154,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
             end
           end
           before do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
           end
 
@@ -1178,6 +1180,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           let!(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
           end
 
           it 'should set effective date as beginning of month' do
@@ -1194,6 +1197,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
             before do
               TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+              allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
             end
 
             it 'should set effective date as today' do
@@ -1207,6 +1211,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
             let!(:reporting_date) { date.next_day }
 
             before do
+              allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
               TimeKeeper.set_date_of_record_unprotected!(reporting_date)
             end
 
@@ -1222,6 +1227,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
           end
 
           it 'should set effective date as beginning of next month' do
@@ -1269,6 +1275,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           end
 
           before do
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:sep_effective_date_match).and_return(false)
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
           end
 

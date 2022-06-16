@@ -30,6 +30,10 @@ class HbxIdGenerator
     provider.generate_application_id
   end
 
+  def generate_family_id
+    provider.generate_family_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
   end
@@ -52,6 +56,10 @@ class HbxIdGenerator
 
   def self.generate_application_id
     self.instance.generate_application_id
+  end
+
+  def self.generate_family_id
+    self.instance.generate_family_id
   end
 
   class AmqpSource
@@ -84,6 +92,10 @@ class HbxIdGenerator
     def self.generate_application_id
       generate_id_from_sequence("faa_application_id")
     end
+
+    def self.generate_family_id
+      generate_id_from_sequence("family_id")
+    end
   end
 
   class SlugSource
@@ -108,6 +120,10 @@ class HbxIdGenerator
     end
 
     def self.generate_application_id
+      random_uuid
+    end
+
+    def self.generate_family_id
       random_uuid
     end
   end
