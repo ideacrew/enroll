@@ -332,7 +332,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           gender: 'male',
           dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
           ssn: nil,
-          addresses_attributes: {'0': {kind: 'home', city: 'Bar Harbor', state: 'ME', zip: '04401', county: 'Cumberland', address_1: '1600 Main St'}},
+          addresses_attributes: {'0': {kind: 'home'}},
           is_consumer_role: false
         }
       }
