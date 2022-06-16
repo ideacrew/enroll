@@ -1407,7 +1407,7 @@ private
   end
 
   def update_verification_due_dates(assistance_year, new_due_date)
-    ::Operations::Eligibilities::UpdateVerificationDueDates.new.call(family: self, assistance_year: assistance_year, due_on: new_due_date)
+    ::Operations::Eligibilities::UpdateVerificationDueDates.new.call(family: self, assistance_year: assistance_year, due_on: new_due_date, hard_update: false)
   end
 
   def update_due_date_on_vlp_documents(new_due_date)

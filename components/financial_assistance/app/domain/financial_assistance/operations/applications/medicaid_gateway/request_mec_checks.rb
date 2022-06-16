@@ -35,7 +35,8 @@ module FinancialAssistance
           end
 
           def construct_payload(application)
-            FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+            result = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+            result.success? ? result : Failure("Failed to construct payload: #{result.failure}")
           end
 
           def validate_payload(payload)
