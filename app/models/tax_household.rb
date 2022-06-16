@@ -188,7 +188,7 @@ class TaxHousehold
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
     monthly_available_aptc = monthly_max_aptc(hbx_enrollment, effective_on)
-    member_aptc_hash = aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment)
+    member_aptc_hash = aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment, hbx_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
       sum + (member_aptc_hash[member.id.to_s] || 0)
     end
@@ -228,7 +228,7 @@ class TaxHousehold
     total_sum
   end
 
-  def aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment_id = nil)
+  def aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment_id = nil, hbx_enrollment = nil)
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
@@ -239,6 +239,7 @@ class TaxHousehold
 
     # FIXME should get hbx_enrollments by effective_starting_on
     enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
+    enrollments = enrollments.reject{|enr| enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id} if hbx_enrollment #Since when subscribers are same, existing enrollment for the month will get canceled/termed
     enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
     enrollments.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s

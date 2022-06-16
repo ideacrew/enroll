@@ -51,7 +51,6 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
-gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
 gem 'mongoid',                  '~> 7.0.2'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
@@ -165,7 +164,7 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               :require => false
+  gem 'cucumber-rails',               '2.0', :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'

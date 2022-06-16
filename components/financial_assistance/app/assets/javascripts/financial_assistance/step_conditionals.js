@@ -409,6 +409,7 @@ $(document).ready(function(){
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
   }
 
+  //start primary caregiver controls
   $("body").on("change", "#is_primary_caregiver_no", function(){
     if ($('#is_primary_caregiver_no').is(':checked')) {
       $('#is_primary_caregiver_for').parents('.row-form-wrapper').addClass('hide');
@@ -426,6 +427,19 @@ $(document).ready(function(){
   } else {
     $('#is_primary_caregiver_for').parents('.row-form-wrapper').addClass('hide');
   }
+
+  $("body").on("change", "#applicant_is_primary_caregiver_for_none", function(){
+    if ($('#applicant_is_primary_caregiver_for_none').is(':checked')) {
+      $('.interaction-choice-control-value-is-primary-caregiver-for').prop( "checked", false );
+    }
+  });
+
+  $("body").on("change", "#is_primary_caregiver_for", function(){
+    if ($('#is_primary_caregiver_for:checked').length > 0) {
+      $('#applicant_is_primary_caregiver_for_none').prop( "checked", false );
+    }
+  });
+  //end primary caregiver controls
 
   if($('#is_veteran_or_active_military_yes').is(':checked')) {
     $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
