@@ -16,6 +16,8 @@ registry:
         settings:
           - key: :identifying_information_attributes
             item: ['first_name', 'last_name', 'encrypted_ssn', 'dob']
+          - key: :indian_tribe_attributes
+            item: ['tribal_state', 'tribal_name', 'tribal_id']
           - key: :citizen_statuses
             item: ['us_citizen', 'naturalized_citizen', 'indian_tribe_member', 'alien_lawfully_present']
       - key: :special_enrollment_period
