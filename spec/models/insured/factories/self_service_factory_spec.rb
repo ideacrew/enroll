@@ -12,8 +12,8 @@ module Insured
     end
 
     let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
-    let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
-    let(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
     let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', metal_level_kind: :silver, benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
@@ -202,8 +202,7 @@ module Insured
       end
     end
 
-    # rubocop:disable Lint/UselessAssignment
-    describe "update enrollment for renewing enrollments" do
+    describe "#update_aptc" do
       let(:address) { family.primary_person.rating_address }
       let(:effective_date) { TimeKeeper.date_of_record.beginning_of_year }
       let(:application_period) { effective_date.beginning_of_year..effective_date.end_of_year }
@@ -264,8 +263,8 @@ module Insured
         effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
         tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
         eligibility_determination = FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000, determined_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
-        tax_household_member1 = tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)
-        tax_household_member2 = tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
+        tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)
+        tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
 
         @product = product
         service_area = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on.year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
@@ -276,46 +275,100 @@ module Insured
         enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(679.8)
+        cr1 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+        family.family_members[1].person.consumer_role = cr1
+        cr2 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+        family.family_members[2].person.consumer_role = cr2
+
+        family.save!
       end
 
-      it 'should return the updated enrollment' do
-        subject.update_aptc(enrollment.id, 1000)
-        enrollment.reload
-        family.reload
-        expect(enrollment.aasm_state).to eq "coverage_canceled"
-        expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
-      end
-
-      context 'for nil rating area' do
-        before :each do
-          allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
-          allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
-          person.addresses.update_all(county: "Zip code outside supported area")
-          ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
-        end
-
-        it 'should not create new enrollment' do
-          expect(family.active_household.hbx_enrollments.count).to eq 1
-          expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
+      describe "update enrollment for renewing enrollments" do
+        it 'should return the updated enrollment' do
+          subject.update_aptc(enrollment.id, 1000)
           enrollment.reload
           family.reload
-          expect(family.active_household.hbx_enrollments.count).to eq 1
+          expect(enrollment.aasm_state).to eq "coverage_canceled"
+          expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
+        end
+
+        context 'for nil rating area' do
+          before :each do
+            allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+            allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+            person.addresses.update_all(county: "Zip code outside supported area")
+            ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
+          end
+
+          it 'should not create new enrollment' do
+            expect(family.active_household.hbx_enrollments.count).to eq 1
+            expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
+            enrollment.reload
+            family.reload
+            expect(family.active_household.hbx_enrollments.count).to eq 1
+          end
+        end
+
+        context 'for nil service area' do
+          let(:setting) { double }
+          before :each do
+            allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(setting)
+            allow(setting).to receive(:settings).with(:service_area_model).and_return(double(item: 'county'))
+          end
+
+          it 'should not create new enrollment and raises error' do
+            expect(family.active_household.hbx_enrollments.count).to eq 1
+            expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
+            enrollment.reload
+            family.reload
+            expect(family.active_household.hbx_enrollments.count).to eq 1
+          end
         end
       end
 
-      context 'for nil service area' do
-        let(:setting) { double }
+      describe "for invalid members" do
         before :each do
-          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(setting)
-          allow(setting).to receive(:settings).with(:service_area_model).and_return(double(item: 'county'))
+          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment, tobacco_use: 'N')
+          EnrollRegistry[:check_enrollment_member_eligibility].feature.stub(:is_enabled).and_return(true)
         end
 
-        it 'should not create new enrollment and raises error' do
-          expect(family.active_household.hbx_enrollments.count).to eq 1
-          expect { subject.update_aptc(enrollment.id, 1000) }.to raise_error
-          enrollment.reload
-          family.reload
-          expect(family.active_household.hbx_enrollments.count).to eq 1
+        context 'when one of the member is not applying for coverage' do
+          it 'should reinstate enrollment with 2 valid members' do
+            expect(enrollment.hbx_enrollment_members.count).to eq 3
+            family.family_members[2].person.consumer_role.update_attributes!(is_applying_coverage: false)
+            subject.update_aptc(enrollment.id, 1000)
+            enrollment.reload
+            family.reload
+            expect(enrollment.aasm_state).to eq "coverage_canceled"
+            expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
+            expect(family.active_household.hbx_enrollments.last.hbx_enrollment_members.count).to eq 2
+          end
+        end
+
+        context 'when one of the member is incarcerated' do
+          it 'should reinstate enrollment with 2 valid members' do
+            expect(enrollment.hbx_enrollment_members.count).to eq 3
+            family.family_members[2].person.update_attributes!(is_incarcerated: true)
+            subject.update_aptc(enrollment.id, 1000)
+            enrollment.reload
+            family.reload
+            expect(enrollment.aasm_state).to eq "coverage_canceled"
+            expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
+            expect(family.active_household.hbx_enrollments.last.hbx_enrollment_members.count).to eq 2
+          end
+        end
+
+        context 'when one of the member is not_lawfully_present' do
+          it 'should reinstate enrollment with 2 valid members' do
+            expect(enrollment.hbx_enrollment_members.count).to eq 3
+            family.family_members[2].person.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: "not_lawfully_present_in_us")
+            subject.update_aptc(enrollment.id, 1000)
+            enrollment.reload
+            family.reload
+            expect(enrollment.aasm_state).to eq "coverage_canceled"
+            expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
+            expect(family.active_household.hbx_enrollments.last.hbx_enrollment_members.count).to eq 2
+          end
         end
       end
 
@@ -323,7 +376,6 @@ module Insured
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
     end
-    # rubocop:enable Lint/UselessAssignment
 
     describe "build_form_params" do
       let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}

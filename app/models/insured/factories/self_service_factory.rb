@@ -59,6 +59,7 @@ module Insured
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
 
+        drop_invalid_enrollment_members(reinstatement) if EnrollRegistry[:check_enrollment_member_eligibility].feature.is_enabled
         can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstatement})
 
         unless can_renew.success?
@@ -70,6 +71,28 @@ module Insured
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
 
         reinstatement.select_coverage!
+      end
+
+      def self.drop_invalid_enrollment_members(reinstatement)
+        @invalid_family_member_ids = []
+
+        reinstatement.family.active_family_members.each do |fm|
+          @invalid_family_member_ids << fm.id if fm.person.consumer_role.is_applying_coverage == false || fm.person.is_incarcerated == true || ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include?(fm.person.citizen_status)
+        end
+
+        dropped_member_ids(reinstatement)
+
+        @invalid_family_member_ids.flatten.uniq.compact.each do |id|
+          enrollment_member = reinstatement.hbx_enrollment_members.select{|em| em.applicant_id.to_s == id.to_s}.first
+          enrollment_member.delete if enrollment_member.present?
+        end
+      end
+
+      def self.dropped_member_ids(reinstatement)
+        all_family_member_ids = reinstatement.family.active_family_members.map(&:id)
+        reinstatement_family_member_ids = reinstatement.hbx_enrollment_members.map(&:applicant_id)
+
+        @invalid_family_member_ids << (all_family_member_ids | reinstatement_family_member_ids) - (all_family_member_ids & reinstatement_family_member_ids)
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)

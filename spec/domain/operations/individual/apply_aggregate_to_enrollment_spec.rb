@@ -41,11 +41,11 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:address) { person.rating_address }
   let(:consumer_role) { person.consumer_role }
-  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
   let!(:primary_fm) {family.primary_applicant}
   let!(:household) {family.active_household}
   let!(:start_on) {TimeKeeper.date_of_record.beginning_of_year}
-  let(:family_member1) {FactoryBot.create(:family_member, family: household.family)}
+  let(:family_member1) {family.family_members[1]}
   let!(:tax_household) do
     tax_household = FactoryBot.create(:tax_household, effective_ending_on: nil, household: family.households.first)
     FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: family_member1.id, is_ia_eligible: true)
@@ -90,6 +90,18 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     enr
   end
   let!(:hbx_enrollments) {[hbx_with_aptc_1]}
+
+  let!(:consumer_role1) do
+    cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+    family.family_members[1].person.consumer_role = cr
+    family.family_members[1].person.save!
+  end
+
+  let!(:consumer_role2) do
+    cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
+    family.family_members[2].person.consumer_role = cr
+    family.family_members[2].person.save!
+  end
 
   before(:each) do
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}

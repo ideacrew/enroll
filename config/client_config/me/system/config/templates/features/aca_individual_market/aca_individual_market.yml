@@ -42,6 +42,8 @@ registry:
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
+      - key: :check_enrollment_member_eligibility
+        is_enabled: true
       - key: :vlp_documents
         is_enabled: true
         settings:

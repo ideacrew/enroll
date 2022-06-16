@@ -739,7 +739,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period_14, rating_area: rating_area_14) }
 
     let!(:person_14) do
-      person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+      person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
       person.consumer_role.update_attributes(aasm_state: 'fully_verified')
       person
     end
@@ -807,6 +807,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       sign_in user
+      family_member2.person.update_attributes(is_incarcerated: false)
       post :edit_aptc, params: params
     end
 
