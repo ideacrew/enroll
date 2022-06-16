@@ -133,70 +133,125 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
   end
 
   context 'when valid attributes passed' do
-    before do
-      application.active_applicants.each do |applicant|
-        evidence_names.each do |evidence_name|
-          evidence = applicant.send(evidence_name)
-          applicant.set_evidence_outstanding(evidence)
-        end
-      end
-    end
-
-    it 'should set due on dates for applicant evidences' do
-      application.reload.active_applicants.each do |applicant|
-        evidence_names.each do |evidence_name|
-          evidence = applicant.send(evidence_name)
-          expect(evidence.outstanding?).to be_truthy
-        end
-      end
-
-      result = subject.call(required_params)
-      expect(result.success?).to be_truthy
-
-      application.reload.active_applicants.each do |applicant|
-        evidence_names.each do |evidence_name|
-          evidence = applicant.send(evidence_name)
-          expect(evidence.outstanding?).to be_truthy
-          expect(evidence.due_on).to eq due_on
-        end
-      end
-    end
-
-    it 'should set due dates on individual verification types' do
-      people.each do |person|
-        person.reload
-        expect(
-          person
-            .verification_types
-            .active
-            .where(:validation_status.in => outstanding_types)
-            .present?
-        ).to be_truthy
-        person.verification_types.active.each do |verification_type|
-          if verification_type_names.include?(verification_type.type_name) &&
-             outstanding_types.include?(verification_type.validation_status)
-            expect(verification_type.due_date).to be_blank
+    context 'default update' do
+      before do
+        application.active_applicants.each do |applicant|
+          evidence_names.each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            applicant.set_evidence_outstanding(evidence)
           end
         end
       end
 
-      result = subject.call(required_params)
-      expect(result.success?).to be_truthy
+      it 'should set due on dates for applicant evidences' do
+        application.reload.active_applicants.each do |applicant|
+          evidence_names.each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.outstanding?).to be_truthy
+          end
+        end
 
-      people.each do |person|
-        person.reload
-        expect(
-          person
-            .verification_types
-            .active
-            .where(:validation_status.in => outstanding_types)
-            .present?
-        ).to be_truthy
+        result = subject.call(required_params)
+        expect(result.success?).to be_truthy
 
-        person.verification_types.active.each do |verification_type|
-          if verification_type_names.include?(verification_type.type_name) &&
-             outstanding_types.include?(verification_type.validation_status)
-            expect(verification_type.due_date).to eq due_on
+        application.reload.active_applicants.each do |applicant|
+          evidence_names.each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.outstanding?).to be_truthy
+            expect(evidence.due_on).to eq due_on
+          end
+        end
+      end
+    end
+
+    context 'when hard update set to false' do
+
+      let(:required_params) do
+        { family: family.reload, assistance_year: TimeKeeper.date_of_record.year, due_on: due_on, hard_update: false }
+      end
+
+      it 'should not update due on dates for applicant evidences' do
+        allow_any_instance_of(::Eligibilities::Evidence).to receive(:due_on).and_return TimeKeeper.date_of_record
+        result = subject.call(required_params)
+        expect(result.success?).to be_truthy
+
+        application.reload.active_applicants.each do |applicant|
+          evidence_names.each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.due_on).to eq TimeKeeper.date_of_record
+          end
+        end
+      end
+    end
+
+    context 'default update' do
+      it 'should set due dates on individual verification types' do
+        people.each do |person|
+          person.reload
+          expect(
+            person
+              .verification_types
+              .active
+              .where(:validation_status.in => outstanding_types)
+              .present?
+          ).to be_truthy
+          person.verification_types.active.each do |verification_type|
+            if verification_type_names.include?(verification_type.type_name) &&
+               outstanding_types.include?(verification_type.validation_status)
+              expect(verification_type.due_date).to be_blank
+            end
+          end
+        end
+
+        result = subject.call(required_params)
+        expect(result.success?).to be_truthy
+
+        people.each do |person|
+          person.reload
+          expect(
+            person
+              .verification_types
+              .active
+              .where(:validation_status.in => outstanding_types)
+              .present?
+          ).to be_truthy
+
+          person.verification_types.active.each do |verification_type|
+            if verification_type_names.include?(verification_type.type_name) &&
+               outstanding_types.include?(verification_type.validation_status)
+              expect(verification_type.due_date).to eq due_on
+            end
+          end
+        end
+      end
+    end
+
+    context 'when hard update set to false' do
+      let(:required_params) do
+        { family: family.reload, assistance_year: TimeKeeper.date_of_record.year, due_on: due_on, hard_update: false }
+      end
+
+      it 'should not update due dates on individual verification types' do
+        allow_any_instance_of(::VerificationType).to receive(:due_date).and_return TimeKeeper.date_of_record
+
+        result = subject.call(required_params)
+        expect(result.success?).to be_truthy
+
+        people.each do |person|
+          person.reload
+          expect(
+            person
+              .verification_types
+              .active
+              .where(:validation_status.in => outstanding_types)
+              .present?
+          ).to be_truthy
+
+          person.verification_types.active.each do |verification_type|
+            if verification_type_names.include?(verification_type.type_name) &&
+               outstanding_types.include?(verification_type.validation_status)
+              expect(verification_type.due_date).to eq TimeKeeper.date_of_record
+            end
           end
         end
       end
