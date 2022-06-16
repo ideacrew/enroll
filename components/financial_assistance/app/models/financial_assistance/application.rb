@@ -994,7 +994,7 @@ module FinancialAssistance
     def publish_application_determined
       return unless predecessor_id.blank? && can_trigger_fdsh_calls?
 
-      Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
