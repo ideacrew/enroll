@@ -346,7 +346,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     context "primary applicant updating information" do
       it "should update primary's information when relationship param is blank" do
         patch :update, params: update_params
-        applicant.reload        
+        applicant.reload
         expect(applicant.is_applying_coverage).to eq false
         expect(applicant.first_name).to eq 'update'
       end
