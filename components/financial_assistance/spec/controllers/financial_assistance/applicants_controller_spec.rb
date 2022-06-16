@@ -332,7 +332,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           gender: 'male',
           dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
           ssn: nil,
-          addresses_attributes: {'0': {kind: 'home'}},
+          addresses_attributes: {'0': {kind: 'home', city: 'Bar Harbor', state: 'ME', zip: '04401', county: 'Cumberland', address_1: '1600 Main St'}},
           is_consumer_role: false
         }
       }
@@ -346,7 +346,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     context "primary applicant updating information" do
       it "should update primary's information when relationship param is blank" do
         patch :update, params: update_params
-        applicant.reload
+        applicant.reload        
         expect(applicant.is_applying_coverage).to eq false
         expect(applicant.first_name).to eq 'update'
       end
@@ -363,39 +363,39 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
     context "applicant's addresses are successfully updated" do
 
-      let!(:applicant_params) do
+      let(:update_params) do
         {
           application_id: application.id,
           id: applicant.id,
           applicant: {
-            is_applying_coverage: true,
+            is_applying_coverage: false,
             relationship: nil,
-            first_name: 'John',
-            last_name: 'Smith',
+            first_name: 'update',
+            last_name: 'updated',
             gender: 'male',
             dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
             ssn: nil,
-            is_incarcerated: false,
-            indian_tribe_member: false,
-            addresses_attributes: {'0': {kind: 'primary', address_1: '1600 Pennsylvania Ave', city: 'Bar Harbor', state: 'ME', zip: '04401', county: 'Cumberland' }},
-            # :address_1, :address_2, :city, :state, :zip, :county,
+            addresses_attributes: {'0': {kind: 'home', city: 'Bar Harbor', county: 'Cumberland', state: 'ME', zip: '04401', address_1: '1600 Main St'}},
             is_consumer_role: false
           }
         }
       end
 
-      let(:county_params) { applicant_params[:applicant][:addresses_attributes][:county] }
+      let(:county_params) {  update_params[:applicant][:addresses_attributes][:'0'][:county]}
       let!(:address) { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
 
       before do
-        applicant.addresses << address
-        applicant.save!
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
       end
 
       it "should update applicant's address" do
-        patch :update, params: applicant_params
+        patch :update, params: update_params
         applicant.reload
-        binding.irb
         expect(applicant.addresses.first.county).to eql(county_params)
       end
     end
