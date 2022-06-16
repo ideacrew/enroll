@@ -87,18 +87,18 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Add git HEAD info to docker image
         run: git show --quiet HEAD > release.txt
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           install: true
 
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           # Key is named differently to avoid collision
@@ -122,14 +122,14 @@ jobs:
 
       # Must use docker login in order to specify public registry
       - name: Login to Public ECR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ needs.prep.outputs.registry }}
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Build Image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
@@ -164,7 +164,7 @@ jobs:
 
       - name: upload Anchore scan SARIF report
         if: github.event_name != 'pull_request'
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
 
@@ -175,17 +175,14 @@ jobs:
 
   new-image-notification:
     if: github.event_name != 'pull_request'
-    needs: [
-        prep,
-        build-and-upload-image,
-      ]
+    needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     steps:
       - name: Git Commit Data w/ Message
         uses: jcputney/git-commit-data-action@1.0.2
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v1.18.0
+        uses: slackapi/slack-github-action@v1
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
           payload: |
@@ -216,7 +213,7 @@ jobs:
           echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v1.18.0
+        uses: slackapi/slack-github-action@v1
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
           payload: |
