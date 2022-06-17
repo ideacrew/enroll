@@ -20,7 +20,6 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Enrollment members failed to drop. Admin does not have access to use this tool.') unless params[:options][:admin_permission]
         return Failure('Member drop feature is turned off.') unless EnrollRegistry.feature_enabled?(:drop_enrollment_members)
         return Failure('Missing HbxEnrollment Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
@@ -34,6 +33,7 @@ module Operations
         return Failure('Select termination date that would result in a member drop in the present calendar year.') unless new_effective_date.year == termination_date.year
         return Failure('Termination date cannot be outside of the current calendar year.') unless termination_date.year == TimeKeeper.date_of_record.year
         return Failure('Cannot Drop a retroactive dependent.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
+        return Failure('Enrollment members failed to drop. Admin does not have access to use this tool.') unless params[:options][:admin_permission]
 
         Success(params)
       end
