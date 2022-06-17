@@ -20,7 +20,7 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Enrollment members failed to drop. Admin does not have access to use this tool.') unless pundit_allow(Family, :can_drop_enrollment_members?)
+        return Failure('Enrollment members failed to drop. Admin does not have access to use this tool.') unless current_user.person.hbx_staff_role.permission.can_drop_enrollment_members
         return Failure('Member drop feature is turned off.') unless EnrollRegistry.feature_enabled?(:drop_enrollment_members)
         return Failure('Missing HbxEnrollment Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
