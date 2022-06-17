@@ -709,27 +709,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  context 'calling trigger_local_mec on determination' do
-    before do
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:real_time_transfer).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:is_rt_transferrable?).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:rt_transfer).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:send_determination_to_ea).and_return(true)
-      allow_any_instance_of(application.class).to receive(:trigger_local_mec)
-      application.update(aasm_state: "submitted")
-      application.determine!
-    end
-
-    it 'should call trigger_local_mec method' do
-      expect(application).to have_received(:trigger_local_mec)
-    end
-  end
-
   context 'add_eligibility_determination' do
     let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family.xml')) }
     let(:message) do
