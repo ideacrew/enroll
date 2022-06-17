@@ -48,7 +48,7 @@ module Effective
           if ::EnrollRegistry.feature_enabled?(:drop_enrollment_members)
             dropdown.insert(5,
                             [l10n('admin_actions.drop_enrollment_members'),
-                             drop_enrollment_member_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"),
+                             drop_enrollment_member_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}", admin_permission: pundit_allow(Family, :can_drop_enrollment_members?)),
                              drop_enrollment_member_type(row, pundit_allow(Family, :can_drop_enrollment_members?))])
           end
 
@@ -142,7 +142,8 @@ module Effective
       end
 
       def drop_enrollment_member_type(family, allow)
-        return 'disabled' unless allow
+        # Don't return disabled for permission check, all admins can see this tool
+        # return 'disabled' unless allow
         ivl_enrollments = family.hbx_enrollments.individual_market.select{ |enr| enr.is_admin_terminate_eligible? && enr.hbx_enrollment_members.count > 1 }
         ivl_enrollments.any? ? 'ajax' : 'disabled'
       end
