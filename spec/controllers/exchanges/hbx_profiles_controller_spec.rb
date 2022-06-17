@@ -1231,7 +1231,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         it 'should render template' do
           post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date,
                                                          "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
-                                                         enrollment_id: enrollment.id }, format: :js, xhr: true
+                                                         enrollment_id: enrollment.id,
+                                                         "admin_permission" => true }, format: :js, xhr: true
           expect(response).to have_http_status(:success)
         end
       end
@@ -1239,7 +1240,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       it "enrollment should be moved to #{aasm_state}" do
         post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
-                                                       enrollment_id: enrollment.id }, format: :js, xhr: true
+                                                       enrollment_id: enrollment.id,
+                                                       "admin_permission" => true }, format: :js, xhr: true
         enrollment.reload
         expect(enrollment.aasm_state).to eq aasm_state
         expect(enrollment.terminated_on).to eq Date.strptime((TimeKeeper.date_of_record + 1.day).to_s, "%m/%d/%Y")
@@ -1250,7 +1252,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.last.id}".to_sym => enrollment.hbx_enrollment_members.last.id.to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members[1].id}".to_sym => enrollment.hbx_enrollment_members[1].id.to_s,
-                                                       enrollment_id: enrollment.id }, format: :js, xhr: true
+                                                       enrollment_id: enrollment.id,
+                                                       "admin_permission" => true }, format: :js, xhr: true
         enrollment.reload
         expect(enrollment.aasm_state).to eq aasm_state
         expect(enrollment.terminated_on).to eq Date.strptime((TimeKeeper.date_of_record + 1.day).to_s, "%m/%d/%Y")
@@ -1263,7 +1266,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.first.id}".to_sym => enrollment.hbx_enrollment_members.first.id.to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members[1].id}".to_sym => enrollment.hbx_enrollment_members[1].id.to_s,
-                                                       enrollment_id: enrollment.id }, format: :js, xhr: true
+                                                       enrollment_id: enrollment.id,
+                                                       "admin_permission" => true }, format: :js, xhr: true
         enrollment.reload
         expect(enrollment.aasm_state).to eq aasm_state
         expect(family.hbx_enrollments.count).to eq 2
