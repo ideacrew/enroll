@@ -5,11 +5,6 @@ registry:
     features:
       - key: :custom_email_templates
         is_enabled: false
-      - key: :application_font
-        is_enabled: true
-        settings:
-          - key: :font_family
-            item: 'Open Sans'
       - key: :selectric_hover
         is_enabled: true
         settings:

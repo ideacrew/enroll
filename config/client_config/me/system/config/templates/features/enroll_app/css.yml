@@ -8,11 +8,6 @@ registry:
         settings:
           - key: :email_template
             item: "email_template"
-      - key: :application_font
-        is_enabled: true
-        settings:
-          - key: :font_family
-            item: 'Barlow'
       - key: :selectric_hover
         is_enabled: true
         settings:
