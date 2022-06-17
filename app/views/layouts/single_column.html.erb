@@ -11,6 +11,8 @@
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
     <%= javascript_include_tag "application" %>
     <%= javascript_include_tag "sponsored_benefits/application" %>
+    <%= javascript_pack_tag ENV['CLIENT'] %>
+    <%= stylesheet_pack_tag ENV['CLIENT'] %>
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
     <%= csrf_meta_tags %>
 
