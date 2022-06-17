@@ -16,7 +16,6 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
-  CLIENT: dc
 
 jobs:
   prep:
