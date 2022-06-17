@@ -159,7 +159,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           @dropped_members = subject.call({hbx_enrollment: enrollment,
                                            options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                     admin_permission: true}}).success
+                                                     "admin_permission" => true}}).success
           allow(enrollment).to receive(:is_health_enrollment?).and_return(true)
         end
 
@@ -186,7 +186,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
             result = subject.call({hbx_enrollment: enrollment,
                                    options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                              "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                             admin_permission: true}})
+                                             "admin_permission" => true}})
             expect(result.failure).to eq 'Rating area could not be found.'
           end
         end
@@ -201,7 +201,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           @dropped_members = subject.call({hbx_enrollment: enrollment,
                                            options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                     admin_permission: true}}).success
+                                                     "admin_permission" => true}}).success
         end
 
         it 'should cancel previously existing enrollment' do
@@ -254,7 +254,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           @dropped_members = subject.call({hbx_enrollment: enrollment_2,
                                            options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
                                                      "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                     admin_permission: true}}).success
+                                                     "admin_permission" => true}}).success
         end
 
         it 'should return dropped member info' do
@@ -283,7 +283,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           it 'should return failure with new csr variant and product is not available.' do
             result = subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
                                                                            "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                                           admin_permission: true}})
+                                                                           "admin_permission" => true}})
             expect(result.failure).to eq "Could not find product for new enrollment with present csr kind."
           end
 
@@ -298,7 +298,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
             it 'enrollment with new product' do
               subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
                                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                                    admin_permission: true}})
+                                                                    "admin_permission" => true}})
 
               reinstatement = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
               expect(reinstatement.product.id).to eq product_1.id
@@ -308,7 +308,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
               allow(enrollment_2).to receive(:is_health_enrollment?).and_return(false)
               subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
                                                                     "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                                    admin_permission: true}})
+                                                                    "admin_permission" => true}})
               reinstatement = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
               expect(reinstatement.product.id).not_to eq product_1.id
             end
@@ -317,7 +317,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
               product_1.unset(:service_area_id)
               result = subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
                                                                              "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
-                                                                             admin_permission: true}})
+                                                                             "admin_permission" => true}})
               expect(result.failure).to eq "Product is NOT offered in service area."
             end
           end
@@ -348,7 +348,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       before do
         subject.call({hbx_enrollment: enrollment, options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                                             "terminate_member_#{hbx_enrollment_member3.id}" => enrollment.subscriber.id.to_s,
-                                                            admin_permission: true}})
+                                                            "admin_permission" => true}})
         @new_enrollment = family.hbx_enrollments.where(:id.ne => enrollment.id).last
       end
 
@@ -380,7 +380,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       before do
         @dropped_members = subject.call({hbx_enrollment: enrollment,
                                          options: {"termination_date_#{enrollment.id}" => TimeKeeper.date_of_record.to_s,
-                                                   admin_permission: true}}).failure
+                                                   "admin_permission" => true}}).failure
       end
 
       it 'should return dropped member info' do
@@ -397,7 +397,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         dropped_members = subject.call({hbx_enrollment: enrollment,
                                         options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
                                                   "terminate_member_#{hbx_enrollment_member3.id}" => nil,
-                                                  admin_permission: true}}).failure
+                                                  "admin_permission" => true}}).failure
         expect(dropped_members).to eq 'Cannot Drop a retroactive dependent.'
       end
     end
