@@ -142,7 +142,8 @@ module Effective
       end
 
       def drop_enrollment_member_type(family, allow)
-        return 'disabled' unless allow
+        # Don't return disabled for permission check, all admins can see this tool
+        # return 'disabled' unless allow
         ivl_enrollments = family.hbx_enrollments.individual_market.select{ |enr| enr.is_admin_terminate_eligible? && enr.hbx_enrollment_members.count > 1 }
         ivl_enrollments.any? ? 'ajax' : 'disabled'
       end
