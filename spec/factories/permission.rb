@@ -126,7 +126,7 @@ FactoryBot.define do
       can_access_new_consumer_application_sub_tab { true }
       can_access_age_off_excluded {true}
       can_access_pay_now { true }
-      can_drop_enrollment_members {true}
+      can_drop_enrollment_members {false}
     end
 
     trait :developer do
@@ -140,7 +140,7 @@ FactoryBot.define do
       approve_ga { false }
       modify_admin_tabs { false }
       view_admin_tabs  { false }
-      can_drop_enrollment_members {true}
+      can_drop_enrollment_members {false}
     end
 
     trait :hbx_tier3 do
