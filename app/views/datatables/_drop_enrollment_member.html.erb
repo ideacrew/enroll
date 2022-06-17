@@ -41,6 +41,7 @@
           <% end %>
           <tr>
             <td colspan = "12">
+              <%= hidden_field_tag :admin_permission, @admin_permission %>
               <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
               <%= hidden_field_tag :family_id, params[:family] %>
               <%= hidden_field_tag :enrollment_id, hbx.id %>

@@ -482,6 +482,7 @@ def employer_poc
 
   # drop action
   def drop_enrollment_member
+    @admin_permission = params[:admin_permission]
     @hbxs = Family.find(params[:family]).all_enrollments.individual_market.can_terminate.select{ |enr| enr.hbx_enrollment_members.count > 1 }
     @row = params[:family_actions_id]
     respond_to do |format|
@@ -902,7 +903,7 @@ def employer_poc
   end
 
   def uniq_enrollment_member_drop_params
-    params.keys.map { |key| key.match(/terminate_member_.*/) || key.match(/termination_date_.*/) || key.match(/family_.*/) || key.match(/enrollment_id/) || key.match(/transmit_hbx_.*/) }.compact.map(&:to_s)
+    params.keys.map { |key| key.match(/terminate_member_.*/) || key.match(/termination_date_.*/) || key.match(/family_.*/) || key.match(/enrollment_id/) || key.match(/transmit_hbx_.*/) || key.match(/admin_permission/) }.compact.map(&:to_s)
   end
 
   def uniq_cancel_params
