@@ -20,7 +20,7 @@ module FinancialAssistance
             valid_application  = yield validate_application(application)
             payload_param      = yield construct_payload(valid_application)
             payload_value      = yield validate_payload(payload_param)
-            payload            = yield publish(payload_value, valid_application.id)
+            payload            = yield publish(payload_value, valid_application.id, application)
 
             Success(payload)
           end
@@ -43,8 +43,9 @@ module FinancialAssistance
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
           end
 
-          def publish(payload, application_id)
-            FinancialAssistance::Operations::Applications::Verifications::MagiMedicaidApplicationDetermined.new.call(payload, application_id)
+          def publish(payload, application_id, application)
+            local_mec_check = application.is_local_mec_checkable?
+            FinancialAssistance::Operations::Applications::Verifications::MagiMedicaidApplicationDetermined.new.call(payload, application_id, local_mec_check)
           end
         end
       end
