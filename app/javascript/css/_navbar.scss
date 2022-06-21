@@ -2,8 +2,72 @@
   --header-border-color: var(--theme-primary-100);
 }
 
+.navbar {
+  padding: 0;
+
+  margin-bottom: 0;
+  background-color: var(--white);
+  border-bottom: solid 3px var(--theme-primary-100);
+  .navbar-header {
+    .navbar-brand {
+      border-right: solid 1px var(--grey-050);
+      min-height: 70px;
+      img {
+        max-height: 40px;
+      }
+    }
+  }
+  .navbar-collapse {
+    .header-text {
+      color: var(--grey-100, grey);
+      font-size: 14px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .navbar-nav:first-of-type {
+      a.portal {
+        text-align: center;
+        vertical-align: middle;
+        line-height: 50px;
+        padding: 23px 15px;
+        font-weight: 600;
+        color: var(--theme-primary-100, black);
+        &:hover {
+          // background-color: $background-hover;
+          text-decoration: none;
+        }
+      }
+    }
+    .navbar-right {
+      li:last-of-type {
+        text-align: right;
+      }
+      a.call-customer-service {
+        span:last-of-type {
+          .fa {
+            color: var(--theme-primary-100, black);
+          }
+          strong {
+            line-height: 0;
+            font-size: 16px;
+            color: var(--grey-130, black);
+          }
+        }
+      }
+      .my-portal-links {
+        min-height: 70px;
+        padding: 15px 15px;
+        display: block;
+        border-left: solid 1px #d7d7d7;
+        .users-name {
+          color: var(--grey-130, black);
+        }
+      }
+    }
+  }
+}
+
 .navbar-main {
-  // outline: 2px solid red;
   background-color: var(--white);
   border-bottom: solid 3px var(--header-border-color);
   .navbar-brand {
@@ -18,7 +82,7 @@
     font-size: 18px;
   }
   .header-text {
-    color: var(--gray-060);
+    color: var(--grey-060);
     font-size: 14px;
     text-transform: uppercase;
     font-weight: 600;
@@ -34,17 +98,23 @@
   }
 }
 
-#uic-primary-nav {
-  background: var(--theme-primary-100);
+.admin-nav {
+  background: var(--theme-primary-100, black);
+  height: 3.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  ul {
-    padding: 20px 0;
-    text-align: left;
+  > ul {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
     font-size: 14px;
-    line-height: 20px;
+    margin: 0;
+    width: Min(100%, var(--content-width));
   }
 
-  ul.dropdown-menu.show {
+  .dropdown-menu.show {
     margin: 20px 0;
     text-align: left;
     padding: 0;
@@ -58,7 +128,7 @@
     }
   }
 
-  ul li a.dropdown-toggle:after {
+  .dropdown-toggle:after {
     content: '';
     display: none;
   }
@@ -69,6 +139,7 @@
     font-weight: 500;
     line-height: 16px;
   }
+
   ul li a:hover {
     text-decoration: none;
     cursor: pointer;
@@ -106,8 +177,6 @@
 
   .list-inline > li {
     display: inline-block;
-    padding-right: 5px;
-    padding-left: 5px;
   }
 }
 
@@ -120,125 +189,12 @@
   }
 }
 
-#header-uic {
-  .navbar {
-    margin-bottom: 0;
-    background-color: var(--white);
-    border-bottom: solid 3px var(--theme-primary-100);
-    .navbar-header {
-      .navbar-brand {
-        border-right: solid 1px var(--grey-050);
-        min-height: 70px;
-        img {
-          max-height: 40px;
-        }
-      }
-    }
-    .navbar-collapse {
-      .header-text {
-        color: var(--grey-100, grey);
-        font-size: 14px;
-        text-transform: uppercase;
-        font-weight: 700;
-      }
-      .navbar-nav:first-of-type {
-        a.portal {
-          text-align: center;
-          vertical-align: middle;
-          line-height: 50px;
-          padding: 23px 15px;
-          font-weight: 600;
-          color: var(--theme-primary-100, black);
-          &:hover {
-            // background-color: $background-hover;
-            text-decoration: none;
-          }
-        }
-      }
-      .navbar-right {
-        li:last-of-type {
-          text-align: right;
-        }
-        a.call-customer-service {
-          span:last-of-type {
-            .fa {
-              color: var(--theme-primary-100, black);
-            }
-            strong {
-              line-height: 0;
-              font-size: 16px;
-              color: var(--grey-130, black);
-            }
-          }
-        }
-        .my-portal-links {
-          min-height: 70px;
-          padding: 15px 15px;
-          display: block;
-          border-left: solid 1px #d7d7d7;
-          .users-name {
-            color: var(--grey-130, black);
-          }
-        }
-      }
-    }
-  }
-}
-
 .fa-trash {
   color: var(--theme-primary-100);
 }
 
 .fa-trash:hover {
   cursor: pointer;
-}
-
-#uic-primary-nav {
-  background: var(--theme-primary-100, black);
-
-  ul {
-    margin: 20px 0;
-    text-align: left;
-  }
-
-  ul li a {
-    color: var(--white);
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 16px;
-  }
-  ul li a:hover {
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease 0s;
-    color: #e72b2d;
-  }
-
-  a:visited {
-    text-decoration: none;
-  }
-
-  a:active {
-    text-decoration: none;
-  }
-  .fa-caret-down {
-    color: var(--white);
-  }
-
-  ul.dropdown-menu li a {
-    color: var(--grey-130);
-    padding: 3px 20px;
-    margin-bottom: 5px;
-  }
-
-  ul.dropdown-menu li a:hover {
-    color: $orange;
-    transition: all 0.3s ease 0s;
-  }
-
-  .badge {
-    background-color: var(--primary-orange, black);
-  }
 }
 
 #uic-families-right-menu,
