@@ -209,58 +209,6 @@ function applyFaaListeners() {
   });
 }
 
-// function validationForIndianTribeMember(e) {
-//   if ($('#indian-tribe-area').length == 0) {
-//     return false;
-//   };
-
-//   $('.close').click(function() {
-//     $('#tribal-id-alert').hide()
-//     $('#tribal-state-alert').hide();
-//     $('#tribal-name-alert').hide();
-//   });
-
-//   $('form.new_applicant, form.edit_applicant').submit(function(e) {
-//     if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
-//       return true;
-//     }
-    
-//     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
-//       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
-//       e.preventDefault && e.preventDefault();
-//       return false;
-//     };
-
-//     // for tribal_id
-//     var tribal_val = $('#tribal_id').val();
-//     if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_val == "undefined" || tribal_val == '')) {
-//       $('#tribal-id-alert').show();
-//       e.preventDefault && e.preventDefault();
-//       return false;
-//     }
-
-//     // for tribal_state
-//     if ($('.tribal-state').length) {
-//       var tribal_state_val = $('#tribal_state').val();
-//       if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_state_val == "undefined" || tribal_state_val == '')) {
-//         $('#tribal-state-alert').show();
-//         e.preventDefault && e.preventDefault();
-//         return false;
-//       }
-//     }
-
-//     // for tribal_name
-//     if ($('.tribal-name').length) {
-//       var tribal_name = $('#tribal-name').val();
-//       if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_name == "undefined" || tribal_name == '')) {
-//         $('#tribal-name-alert').show();
-//         e.preventDefault && e.preventDefault();
-//         return false;
-//       }
-//     }
-//   });
-// }
-
 var ApplicantValidations = (function(window, undefined) {
 
   function manageRequiredValidations(this_obj) {
@@ -287,6 +235,10 @@ var ApplicantValidations = (function(window, undefined) {
   }
 
   function validationForIndianTribeMember(e) {
+    if ($('#indian-tribe-area').length == 0) {
+      return false;
+    }
+
     $('.close').click(function() {
       $('#tribal-id-alert').addClass('hide');
       $('#tribal-state-alert').addClass('hide');
@@ -294,7 +246,7 @@ var ApplicantValidations = (function(window, undefined) {
     });
 
     if ($('input[name="applicant[is_applying_coverage]"]').length > 0 
-      && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
+    && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
     
@@ -303,8 +255,7 @@ var ApplicantValidations = (function(window, undefined) {
 
     if (!tribe_member_yes && !tribe_member_no) {
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
-      e.preventDefault && e.preventDefault();
-      return false;
+      ApplicantValidations.restoreRequiredAttributes(e);
     };
 
     if(tribe_member_no){
@@ -353,7 +304,7 @@ var ApplicantValidations = (function(window, undefined) {
     }
   }
 
-  function validation_for_person_or_dependent() {
+  function validationForPersonOrDependent() {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
@@ -370,7 +321,7 @@ var ApplicantValidations = (function(window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
-    if (validation_for_person_or_dependent()) {
+    if (validationForPersonOrDependent()) {
       $('#showWarning').removeClass('hidden');
     }
     if ($('#vlp_documents_container').is(':visible')) {
@@ -525,20 +476,16 @@ var ApplicantValidations = (function(window, undefined) {
 
 function applicantDemographicValidations() {
   applyFaaListeners();
+
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
-    debugger
-    ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForUsCitizenOrUsNational(e);
     ApplicantValidations.validationForNaturalizedCitizen(e);
     ApplicantValidations.validationForEligibleImmigrationStatuses(e);
+    ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForIncarcerated(e);
     ApplicantValidations.validationForVlpDocuments(e);
     ApplicantValidations.validationForPrimaryRelationship(e);
-    if (
-      $('#showWarning').length &&
-      !$('#showWarning').hasClass('hidden') &&
-      !$('#showWarning').hasClass('shown')
-    ) {
+    if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
       $('#showWarning').addClass('shown');
       e.preventDefault();
       return false;
