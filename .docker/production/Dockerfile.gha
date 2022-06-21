@@ -195,7 +195,7 @@ ENV RABBITMQ_HOST=amqp://${HOSTNAME}
 # The CLIENT variable is required to build an image specific to the client
 ARG CLIENT
 
-RUN bundle exec rake configuration:client_configuration_toggler client=$CLIENT
+RUN bundle exec rake configuration:client_configuration_toggler
 RUN bundle exec rails assets:precompile \
   && yarn cache clean \
   && (rm -rf /tmp/* || true) \

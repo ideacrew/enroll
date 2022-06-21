@@ -857,7 +857,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories, :trigger_local_mec] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
         transitions from: :submitted, to: :determined
       end
 
@@ -992,8 +992,7 @@ module FinancialAssistance
     end
 
     def publish_application_determined
-      return unless predecessor_id.blank? && can_trigger_fdsh_calls?
-
+      return unless predecessor_id.blank? && (can_trigger_fdsh_calls? || is_local_mec_checkable?)
       ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }

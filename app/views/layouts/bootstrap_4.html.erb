@@ -7,14 +7,14 @@
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
+
+
     <%= javascript_pack_tag 'application' %>
     <%= stylesheet_pack_tag 'application' %>
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
     <%= action_cable_meta_tag %>
     <%= csrf_meta_tags %>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
       <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
     <% end %>
@@ -27,14 +27,8 @@
 
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
 
-          <style>
-            body {
-              font-family: <%= EnrollRegistry[:application_font].settings(:font_family).item %>;
-            }
-          </style>
-
   </head>
-  <body class="font">
+  <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm">
 
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
 
