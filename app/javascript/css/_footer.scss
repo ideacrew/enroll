@@ -1,0 +1,13 @@
+footer {
+  --footer-color: var(--theme-primary-100, black);
+
+  font-size: 14px;
+  color: var(--white, white);
+  background-color: var(--footer-color, black);
+
+  a,
+  a:hover {
+    color: var(--white, white);
+    text-decoration: none;
+  }
+}

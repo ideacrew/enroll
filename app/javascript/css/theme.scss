@@ -1,65 +1,12 @@
-.btn-outline-primary {
-  @include button-outline-variant($alt-blue, $alt-blue, lighten($white, 5%), $alt-blue);
-  font-weight: 600;
-  text-transform: capitalize;
-}
 
-.btn-primary {
-  @include button-variant($red, $red, darken($red, 10%), $red);
-  text-transform: uppercase;
-  font-weight: 600;
-  border-color: $dark-red;
-  border-bottom-width: medium;
-}
-
-.heading-text {
-  font-weight: 400;
-  color: $dark-blue;
-}
 
 .invalid-feedback {
   font-weight: bold;
 }
 
 .login-options {
-  border-left: solid 1px $alt-gray;
+  border-left: solid 1px var(--gray-060);
   min-height: 72px;
-}
-
-.navbar-main {
-  background-color: $white;
-  border-bottom: solid 3px $alt-blue;
-  .navbar-brand {
-    border-right: solid 1px $alt-gray;
-    img {
-      max-height: 40px;
-    }
-  }
-  .portal {
-    font-weight: 600;
-    color: $dark-gray !important;
-    font-size: 18px;
-  }
-  .header-text {
-    color: $alt-gray-2;
-    font-size: 14px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-  .list-group-item {
-    border: none;
-  }
-  .fa-phone {
-    color: $alt-blue;
-  }
-  .cc-number {
-    color: $dark-gray;
-  }
-}
-
-.sub-text {
-  font-weight: 200;
-  color: $dark-blue;
 }
 
 // This is for conditional styles used only in
@@ -68,23 +15,23 @@
   color: white !important;
   background-color: #003260 !important;
 
-   .call-customer-service {
+  .call-customer-service {
     color: white !important;
   }
 
-   span a {
+  span a {
     color: white !important;
   }
 
-   .header-text {
+  .header-text {
     color: white !important;
   }
 
-   span strong {
+  span strong {
     color: white !important;
   }
 
-   a.portal {
+  a.portal {
     color: white !important;
   }
 }

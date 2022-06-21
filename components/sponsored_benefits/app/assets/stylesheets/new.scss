@@ -1023,7 +1023,7 @@
     }
     h1 {
       margin-top: 0;
-      color: $primary-orange;
+      color: var(--primary-orange, black);
       & + .panel {
         border-radius: 0;
         ul {

@@ -7,3 +7,5 @@ BenefitSponsorsRegistry.configure do |config|
   config.created_at = DateTime.now
   config.load_path = "#{Rails.root.to_s.gsub('/components/benefit_sponsors/spec/dummy', '')}/system/config/templates/features"
 end
+
+# ENV.fetch("TERM_PROGRAM", false)

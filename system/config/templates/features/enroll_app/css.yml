@@ -5,11 +5,6 @@ registry:
     features:
       - key: :custom_email_templates
         is_enabled: false
-      - key: :selectric_hover
-        is_enabled: true
-        settings:
-          - key: :color
-            item: '#487ba2'
       - key: :qle_carousel
         is_enabled: true
         settings:
@@ -130,8 +125,3 @@ registry:
         settings:
           - key: :color
             item: '#777'
-      - key: :application_text_color
-        is_enabled: true
-        settings:
-          - key: :color
-            item: "#333"

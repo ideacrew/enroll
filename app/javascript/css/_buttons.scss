@@ -1,0 +1,45 @@
+:root {
+  --button-text-color: var(--theme-primary-100);
+  --button-border-color: var(--theme-primary-100);
+  --button-background-color: transparent;
+}
+
+.ic-button.btn-outline-primary {
+  // Dynamic properties
+  color: var(--button-text-color, black);
+  border-color: var(--button-border-color, black);
+  background-color: var(--button-background-color, transparent);
+
+  // Static properties
+  font-weight: 600;
+  text-transform: capitalize;
+
+  /////////////
+  /// States //
+  /////////////
+
+  &:hover {
+    --button-background-color: var(--white);
+
+    background-color: var(--button-background-color);
+  }
+}
+
+.btn-primary {
+  // @include button-variant($red, $red, darken($red, 10%), $red);
+  // @include button-variant(pink, pink, darken(pink, 10%), pink);
+  text-transform: uppercase;
+  font-weight: 600;
+  // border-color: $dark-red;
+  border-color: chartreuse;
+  border-bottom-width: medium;
+}
+
+.ic-button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ic-button-group.row {
+  margin: 0;
+}

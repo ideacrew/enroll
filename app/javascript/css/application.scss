@@ -1,11 +1,15 @@
 @import '~bootstrap/scss/bootstrap';
 @import 'colors';
 @import 'fonts';
+@import 'typography';
+@import 'buttons';
+@import 'footer';
+@import 'layout';
+@import 'global';
 @import 'main';
-@import 'variables';
 @import 'theme';
 @import 'tooltips';
 @import 'forms';
 @import 'alerts';
 @import 'message_form';
-@import 'admin_navbar';
+@import 'navbar';

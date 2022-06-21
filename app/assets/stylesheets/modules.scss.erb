@@ -61,7 +61,7 @@
       overflow-y: auto;
       tr {
         a {
-          color: $primary-black;
+          color: var(--grey-130, black);
           &:hover {
             text-decoration: none;
           }
@@ -72,7 +72,7 @@
           }
         }
         .fa {
-          color: $primary-gray;
+          color: var(--grey-100, grey);
         }
       }
     }
@@ -98,7 +98,7 @@
     }
     .sorter {
       a {
-        color: $primary-black;
+        color: var(--grey-130, black);
 
       }
       &:hover {
@@ -107,7 +107,7 @@
         }
       }
       .fa {
-        color: $primary-gray;
+        color: var(--grey-100, grey);
       }
       .fa-stack {
         position: relative;
@@ -318,7 +318,7 @@
 			text-transform: capitalize;
 		}
 	}
- 
+
  // ***** Consumer Documents Verification ******** //
 
   &.verification-process {
@@ -395,7 +395,7 @@
         margin: 5px;
       }
     }
-    
+
     .family-member {
       border: $new-style-gray-border;
     }

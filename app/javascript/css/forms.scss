@@ -1,5 +1,6 @@
 #new_user {
-  #pass_strength, #pass_match {
+  #pass_strength,
+  #pass_match {
     font-size: 12px;
   }
   span#complexity {
@@ -13,7 +14,7 @@
     margin-left: 5px;
   }
   .strong {
-    background-color: #FAD054;
+    background-color: #fad054;
     width: 40px;
   }
   .weak {
@@ -21,7 +22,7 @@
     width: 20px;
   }
   .stronger {
-    background-color: #93C9F4;
+    background-color: #93c9f4;
     width: 60px;
   }
   .strongest {
@@ -29,9 +30,11 @@
     width: 70px;
   }
   .fa-check {
-    color: $lime-green;
+    // color: $lime-green;
+    color: purple;
   }
   .fa-times {
-    color: $red;
+    // color: $red;
+    color: chartreuse;
   }
 }

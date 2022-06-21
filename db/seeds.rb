@@ -64,13 +64,13 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
 
   puts "*"*80
   puts "Loading Site seed"
-  glob_pattern = File.join(Rails.root, "db/seedfiles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/site_seed.rb")
+  glob_pattern = File.join(Rails.root, "db/seedfiles/#{ENV['CLIENT']}/site_seed.rb")
   load glob_pattern
-  __send__("load_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}_site_seed")
+  __send__("load_site_seed")
   puts "Loading benefit market seed"
-  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/benefit_markets_seed.rb")
+  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{ENV['CLIENT']}/benefit_markets_seed.rb")
   load bm_glob_pattern
-  __send__("load_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}_benefit_markets_seed")
+  __send__("load_benefit_markets_seed")
   puts "complete"
 
   puts "*"*80
@@ -80,11 +80,11 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
 
   puts "*"*80
   puts "Loading carriers"
-  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}")
+  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{ENV['CLIENT']}")
   if EnrollRegistry[:site_database_seed].setting(:seed_issuer_profiles)&.item
-    ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/issuer_profiles_seed.rb")
+    ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{ENV['CLIENT']}/issuer_profiles_seed.rb")
     load ra_glob_pattern
-    __send__("load_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}_issuer_profile_seed")
+    __send__("load_issuer_profile_seed")
   else
     system "bundle exec rake migrations:load_issuer_profiles"
   end
@@ -139,19 +139,23 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
 
   puts "*"*80
   # system "bundle exec rake load:benefit_market_catalog[2018]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2019]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2020]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2021]"
-  puts "::: complete :::"
+  # system "bundle exec rake load:dc_benefit_market_catalog[2019]"
+  # system "bundle exec rake load:dc_benefit_market_catalog[2020]"
+  # system "bundle exec rake load:dc_benefit_market_catalog[2021]"
+  # puts "::: complete :::"
   puts "*"*80
 
-
-  system "bundle exec rake migrations:add_contribution_models_to_product_package"
+  ## 6/2022
+  # Fails with Unable to find benefit market catalog for the 01/01/2022
+  # system "bundle exec rake migrations:add_contribution_models_to_product_package"
 
   puts "*"*80
   puts "Loading QLE kinds."
   require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
-  require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed') if is_individual_market_enabled?
+
+  ## 6/2022
+  # Fails with NoMethodError: undefined method `is_individual_market_enabled?' for main:Object
+  # require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed') if is_individual_market_enabled?
   system "bundle exec rake update_seed:qualifying_life_event"
   puts "::: complete :::"
 
@@ -213,14 +217,32 @@ puts "::: complete :::"
 puts "*"*80
 puts "Loading IVL benefit packages."
 # Need to fix this rake to handle based on year for IVL
-system "bundle exec rake import:create_2019_ivl_packages"
-system "bundle exec rake import:create_2020_ivl_packages"
-system "bundle exec rake import:create_2021_ivl_packages"
+
+## 6/2022
+# Failed with
+# ::: Creating 2019 IVL packages :::
+# rake aborted!
+# NoMethodError: undefined method `id' for nil:NilClass
+# /workspaces/enroll/lib/tasks/create_2019_ivl_packages.rake:31:in `block (2 levels) in <top (required)>'
+# system "bundle exec rake import:create_2019_ivl_packages"
+
+## 6/2022
+# Failed with
+# ::: Creating 2020 IVL packages :::
+# rake aborted!
+# NoMethodError: undefined method `title=' for nil:NilClass
+# /workspaces/enroll/lib/tasks/migrations/create_2020_ivl_pacakges.rake:22:in `block (2 levels) in <top (required)>'
+# system "bundle exec rake import:create_2020_ivl_packages"
+
+# 6/2022
+# Failed with
+# Don't know how to build task 'import:create_2021_ivl_packages' (See the list of available tasks with `rake --tasks`)
+# system "bundle exec rake import:create_2021_ivl_packages"
 puts "::: complete :::"
 puts "*"*80
 
 puts "*"*80
-system "bundle exec rake permissions:initial_hbx"
+system "bundle exec rake #{ENV['CLIENT']}_permissions:initial_hbx"
 # TODO FIX This
 permission = Permission.hbx_staff
 Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
@@ -248,7 +270,10 @@ puts "*"*80
 
 puts "*"*80
 puts "Creating Indexes"
-system "rake db:mongoid:create_indexes"
+## 6/2022
+# Failed with
+# Mongo::Error::OperationFailure: E11000 duplicate key error collection: enroll_development.families index: hbx_assigned_id_1 dup key: { hbx_assigned_id: 0 } (11000)
+# system "rake db:mongoid:create_indexes"
 puts "::: complete :::"
 
 puts "End of Seed Data"

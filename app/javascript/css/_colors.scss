@@ -1,0 +1,36 @@
+:root {
+  --white: #fff;
+  --grey-010: #fbfaf9;
+  --grey-020: #f3f2f1;
+  --grey-030: #edebe9;
+  --grey-040: #e0dedc;
+  --grey-050: hsl(30, 4%, 82%);
+  --grey-060: hsl(30, 4%, 78%);
+  --grey-090: hsl(30, 2%, 62%);
+  --grey-100: hsl(30, 1%, 43%);
+  --grey-130: hsl(30, 2%, 37%);
+  --grey-150: hsl(40, 3%, 23%);
+  --grey-160: hsl(30, 2%, 19%);
+  --grey-190: hsl(30, 3%, 12%);
+
+  --primary-orange: var(--grey-160);
+  --bob: gray;
+
+  --primary-black: hsl(0, 0%, 36%);
+
+  --grey-xxx: hsl(20, 1%, 52%);
+
+  --platinum-color: hsl(240, 2%, 37%);
+  --gold-color: hsl(43, 96%, 54%);
+  --silver-color: #bfbfbf;
+  --bronze-color: #cd8032;
+
+  --type-primary: var(--grey-160);
+  --type-secondary: var(--grey-130);
+  --type-placeholder: var(--grey-090);
+  --type-disabled: var(--grey-xxx);
+
+  --qle-carousel: var(--theme-primary-100);
+
+  --background-color: #f7f7f7;
+}

@@ -1,3 +1,13 @@
 :root {
   --font: Barlow, sans-serif;
+  --selectric-hover-color: #007bc4;
+
+  // Theme Colors
+  --theme-primary-100: #3d5d6f;
+  --theme-secondary-100: hsl(206, 38%, 47%);
+  --theme-tertiary-100: hsl(83, 37%, 36%);
+
+  // Token overrides
+
+  --primary-orange: var(--theme-secondary-100);
 }

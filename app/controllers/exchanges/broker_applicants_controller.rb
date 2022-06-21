@@ -2,7 +2,8 @@
 
 class Exchanges::BrokerApplicantsController < ApplicationController
   include Exchanges::BrokerApplicantsHelper
-  layout 'single_column'
+  # layout 'single_column'
+  layout 'bootstrap_4'
 
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]

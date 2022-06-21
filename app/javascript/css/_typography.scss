@@ -1,0 +1,21 @@
+body {
+  color: var(--type-primary);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--theme-primary-100);
+}
+
+h1 {
+  font-weight: 700;
+}
+
+h3 {
+  font-weight: 200;
+}
+
+.heading-text {
+  font-weight: 400;
+}

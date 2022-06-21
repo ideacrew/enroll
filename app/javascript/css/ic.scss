@@ -1,3 +1,11 @@
 :root {
-  --font: serif;
+  --font: 'Open Sans', sans-serif;
+
+  --theme-primary-100: #0050b2;
+}
+
+body.ic-sbm {
+  display: grid;
+  height: 100vh;
+  grid-template-rows: max-content 1fr max-content;
 }
