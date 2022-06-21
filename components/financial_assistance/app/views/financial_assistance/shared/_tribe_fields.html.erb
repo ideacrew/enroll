@@ -1,4 +1,4 @@
-<div class="row no-buffer <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>" id='indian_tribe_area'>
+<div class="row no-buffer no_coverage_tribe_details <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>" id='indian_tribe_area'>
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -33,7 +33,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
           <%= f.select(:tribal_state, options_for_select(State::NAME_IDS.map(&:last), selected: f.object.tribal_state), {include_blank: "SELECT STATE"}, id: "tribal-state")  %>
         </div>
-        <div id="tribal-state-alert" class="alert alert-warning alert-dismissible panel-footer hidden_field" role="alert">
+        <div id="tribal-state-alert" class="alert alert-warning alert-dismissible no-buffer hidden_field" role="alert">
           <button type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -59,7 +59,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd tribal-name">
           <%= f.text_field :tribal_name, class: "floatlabel form-control required", id: "tribal-name", placeholder: "#{l10n('insured.tribal_name')}" %>
         </div>
-        <div id="tribal-name-alert" class="alert alert-warning alert-dismissible panel-footer hidden_field" role="alert">
+        <div id="tribal-name-alert" class="alert alert-warning alert-dismissible no-buffer hidden_field" role="alert">
           <button type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -71,7 +71,7 @@
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= f.text_field :tribal_id, class: "floatlabel form-control required", id: "tribal-id", placeholder: 'TRIBAL ID' %>
         </div>
-        <div id="tribal-id-alert" class="alert alert-warning alert-dismissible panel-footer hidden_field" role="alert">
+        <div id="tribal-id-alert" class="alert alert-warning alert-dismissible no-buffer hidden_field" role="alert">
           <button type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
