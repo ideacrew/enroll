@@ -50,7 +50,8 @@ module FinancialAssistance
     def request_determination
       application = self.applicant.application
       payload = construct_payload(application)
-      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: { correlation_id: application.id })
+      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
+      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
     end
 
     def construct_payload(application)
