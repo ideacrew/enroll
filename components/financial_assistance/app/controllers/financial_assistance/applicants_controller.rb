@@ -188,7 +188,7 @@ module FinancialAssistance
     end
 
     def applicant_parameters
-      [
+      params = [
         :first_name,
         :last_name,
         :middle_name,
@@ -221,7 +221,10 @@ module FinancialAssistance
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
           :ethnicity => [], :immigration_doc_statuses => [] }
-      ]
+        ]
+      address_hash = params.find {|key| key.is_a?(Hash) && key[:addresses_attributes]}
+      address_hash[:addresses_attributes] << :county if EnrollRegistry.feature_enabled?(:display_county) && address_hash.present?
+      params
     end
   end
 end
