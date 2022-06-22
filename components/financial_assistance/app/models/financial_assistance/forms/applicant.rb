@@ -54,17 +54,10 @@ module FinancialAssistance
         return unless @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true"
 
         validate_citizen_status
-        self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
 
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
-            self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
-            self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
-            self.errors.add(:tribal_name, "cannot contain numbers") if !(tribal_name =~ /\d/).nil? && @indian_tribe_member
-          end
-        elsif !tribal_id.present? && @indian_tribe_member && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
-          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
-        end
+        self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
+        validate_tribe_details if @indian_tribe_member
+
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
 
@@ -77,6 +70,16 @@ module FinancialAssistance
                           "Naturalized citizen is required"
                         end
         self.errors.add(:base, error_message) if error_message.present?
+      end
+
+      def validate_tribe_details
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") unless tribal_state.present?
+          self.errors.add(:base, "cannot contain numbers") unless (tribal_name =~ /\d/).nil?
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled? && tribal_name.present?
+        elsif !tribal_id.present?
+          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
+        end
       end
 
       def persisted?
@@ -94,7 +97,7 @@ module FinancialAssistance
         @applicant = application.applicants.find(applicant_id) if applicant_id.present?
       end
 
-      def save
+      def save        
         return false unless valid?
         is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))

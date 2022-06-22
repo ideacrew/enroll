@@ -294,8 +294,17 @@ var ApplicantValidations = (function(window, undefined) {
         }
       }
       else {
-        $('#tribal-name-alert').show();
-        ApplicantValidations.restoreRequiredAttributes(e);
+        if ($('.tribal-name-container input#tribal-name').val() == ""){
+          $('#tribal-name-alert').show();
+          ApplicantValidations.restoreRequiredAttributes(e);
+        }
+      }
+
+      if($('#tribal-id').length > 0){
+        if ($('#tribal-id').val() == ""){
+          $('#tribal-id-alert').show();
+          ApplicantValidations.restoreRequiredAttributes(e);
+        }
       }
     }
 

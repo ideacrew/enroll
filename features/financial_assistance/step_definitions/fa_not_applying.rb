@@ -155,8 +155,8 @@ And(/the user clicks submit applicant form/) do
 end
 
 Then(/the user should see an error message for indian tribal state and name/) do
-  expect(page).to have_content("Tribal state is required")
-  expect(page).to have_content("Tribal name is required")
+  expect(page).to have_content(l10n("insured.tribal_state_alert").to_s)
+  expect(page).to have_content(l10n("insured.tribal_name_alert").to_s)
 end
 
 And(/the user enters a tribal name with a number/) do

@@ -32,6 +32,8 @@ And(/user will have to accept alert pop ups for missing fields$/) do
   page.driver.browser.switch_to.alert.accept
   sleep 1
   page.driver.browser.switch_to.alert.accept
+  sleep 1
+  page.driver.browser.switch_to.alert.accept
 end
 
 Then(/the applicant should have been created successfully$/) do
