@@ -23,9 +23,9 @@ module FinancialAssistance
     # DO NOT include applications from other families.
     def index
       @applications = []
-      last = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier).order_by([:updated_at, :desc ]).limit(1).first
-      if not last.nil?
-        others = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier, :id.ne => last.id )
+      last = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier).order_by([:updated_at, :desc]).limit(1).first
+      unless last.nil?
+        others = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier, :id.ne => last.id)
         @applications = others.insert(0, last)
       end
     end
