@@ -110,36 +110,34 @@ module Effective
       end
 
       def outstanding_verification_types(family)
-        outstanding_legacy_verification_types = outstanding_legacy_verification_types(family)
-        outstanding_evidence_types = outstanding_evidence_types(family)
+        subjects = family.eligibility_determination.subjects
+        outstanding_legacy_verification_types = outstanding_legacy_verification_types(subjects)
+        outstanding_evidence_types = outstanding_evidence_types(subjects)
 
-        (outstanding_legacy_verification_types + outstanding_evidence_types).join(', ')
+        (outstanding_legacy_verification_types + outstanding_evidence_types).map(&:to_s).map(&:humanize).join(', ')
       rescue StandardError => e
         Rails.logger.error { "Error while pulling outstanding verification types #{e}" }
         "Error: #{e}"
       end
 
-      def outstanding_legacy_verification_types(family)
-        family.family_members.inject([]) do |result, fm|
-          result << fm.person.verification_types.where(validation_status: 'outstanding').map(&:type_name)
+      def outstanding_legacy_verification_types(subjects)
+        subjects.inject([]) do |result, subject|
+          eligibility_state = subject.eligibility_states.where(eligibility_item_key: 'aca_individual_market_eligibility').first
+          next result if eligibility_state.blank?
+
+          result << eligibility_state.evidence_states.where(:status.in => [:outstanding, :in_review, :rejected]).map(&:evidence_item_key)
           result
         end.flatten.uniq
       end
 
-      def outstanding_evidence_types(family)
-        application = FinancialAssistance::Application.where(family_id: family.id).determined.order_by(:created_at => 'desc').first
-        return [] if application.blank?
+      def outstanding_evidence_types(subjects)
+        subjects.inject([]) do |result, subject|
+          eligibility_state = subject.eligibility_states.where(eligibility_item_key: 'aptc_csr_credit').first
+          next result if eligibility_state.blank?
 
-        applicants = application.applicants
-        applicants.inject([]) do |result, applicant|
-          next result unless applicant.is_applying_coverage
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_kind|
-            next if evidence_kind == :local_mec_evidence && !FinancialAssistanceRegistry.feature_enabled?(:mec_check)
-            evidence = applicant.send(evidence_kind)
-            result << evidence.title if evidence&.aasm_state == 'outstanding'
-          end
+          result << eligibility_state.evidence_states.where(:status.in => [:outstanding, :in_review, :rejected]).map(&:evidence_item_key)
           result
-        end.uniq
+        end.flatten.uniq
       end
 
       def verification_type_nested_filters
