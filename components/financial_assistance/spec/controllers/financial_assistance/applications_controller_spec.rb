@@ -198,7 +198,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   #set of objects that doesnt belong to the first family/user to validate the records returned only belong to the user logged in
   let(:person10) { FactoryBot.create(:person, :with_consumer_role)}
-  let!(:user2) { FactoryBot.create(:user, :person => person10) }
+  let!(:user2) { FactoryBot.create(:user, :person => person10, :email: "thisshouldnot@behappening.com") }
   let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
   let!(:person20) do
     per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
