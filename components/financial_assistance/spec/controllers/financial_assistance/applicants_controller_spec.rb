@@ -332,7 +332,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           gender: 'male',
           dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
           ssn: nil,
-          addresses_attributes: {'0': {kind: 'home'}},
+          addresses_attributes: {'0': {kind: 'home', city: 'Bar Harbor', county: 'Cumberland', state: 'ME', zip: '04401', address_1: '1600 Main St'}},
           is_consumer_role: false
         }
       }
@@ -358,6 +358,132 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         patch :update, params: update_params
         applicant.reload
         expect(applicant.is_applying_coverage).to eq true
+      end
+    end
+
+    context "applicant's addresses are successfully updated" do
+
+      let(:county_params) {  update_params[:applicant][:addresses_attributes][:'0'][:county]}
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      end
+
+      it "should update applicant's address" do
+        patch :update, params: update_params
+        applicant.reload
+        expect(applicant.addresses.first.county).to eql(county_params)
+      end
+    end
+
+    context "applicant's address attributes are nil" do
+
+      let(:blank_address_params) do
+        {
+          application_id: application.id,
+          id: applicant.id,
+          applicant: {
+            is_applying_coverage: false,
+            relationship: nil,
+            first_name: 'update',
+            last_name: 'updated',
+            gender: 'male',
+            dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+            ssn: nil,
+            addresses_attributes: {'0': {kind: '', city: '', county: '', state: '', zip: '', address_1: ''}},
+            is_consumer_role: false
+          }
+        }
+      end
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      end
+
+      it "should handle nil address attributes" do
+        patch :update, params: blank_address_params
+        applicant.reload
+        expect(applicant.addresses).to eql([])
+      end
+    end
+
+    context "applicant's address attributes do not contain county" do
+
+      let(:non_county_params) do
+        {
+          application_id: application.id,
+          id: applicant.id,
+          applicant: {
+            is_applying_coverage: false,
+            relationship: nil,
+            first_name: 'update',
+            last_name: 'updated',
+            gender: 'male',
+            dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+            ssn: nil,
+            addresses_attributes: {'0': {kind: 'home', city: 'Washington', state: 'DC', zip: '20003', address_1: '1600 Main St'}},
+            is_consumer_role: false
+          }
+        }
+      end
+
+      it "should not include county" do
+        patch :update, params: non_county_params
+        applicant.reload
+        expect(applicant.addresses.first.county).to be_blank
+      end
+    end
+
+    context "dependent's address is updated" do
+
+      let(:dependent) { application.applicants.last }
+
+      let(:dependent_params) do
+        {
+          application_id: application.id,
+          id: applicant.id,
+          applicant: {
+            is_applying_coverage: false,
+            relationship: 'spouse',
+            first_name: 'update',
+            last_name: 'updated',
+            gender: 'male',
+            dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+            ssn: nil,
+            addresses_attributes: {'0': {kind: 'home', city: 'Bar Harbor', county: 'Cumberland', state: 'ME', zip: '04401', address_1: '1600 Main St'}},
+            is_consumer_role: false
+          }
+        }
+      end
+
+      before do
+        allow(dependent).to receive(:relation_with_primary).and_return('spouse')
+        dependent_params[:id] = dependent.id
+        dependent.update_attributes!(relationship: 'spouse')
+        dependent.update_attributes!(same_with_primary: true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      end
+
+      it "should handle dependent's addresses" do
+        patch :update, params: dependent_params
+        application.reload
+        dependent.reload
+        expect(dependent.addresses.first.county).to eql('Cumberland')
       end
     end
   end
