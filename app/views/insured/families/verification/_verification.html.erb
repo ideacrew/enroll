@@ -40,12 +40,10 @@
                     <% end %>
                   </div>
                   <div class="v-type-status col-md-2 text-center">
-                    <% if f_member.is_applying_coverage %>
-                      <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
-                        <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
-                      </span>&nbsp;
-                        <%= pundit_span Family, :updateable? %>
-                    <% end %>
+                    <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
+                      <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
+                    </span>&nbsp;
+                      <%= pundit_span Family, :updateable? %>
                   </div>
 
                   <div class="v-type-due-date col-md-3">
@@ -56,7 +54,7 @@
                   </div>
 
                   <div class="v-type-upload col-md-3">
-                    <% if verif_type.type_unverified? && f_member.is_applying_coverage %>
+                    <% if display_upload_for_verification?(verif_type) %>
                       <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                         <span class="btn btn-default btn-file">
                           <i class="fa fa-upload" aria-hidden="true"></i>
