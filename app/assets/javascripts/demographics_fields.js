@@ -315,8 +315,6 @@ var PersonValidations = (function (window, undefined) {
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
-
-      debugger
     }
   }
 
