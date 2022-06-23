@@ -196,6 +196,34 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:admin_person) { FactoryBot.create(:person) }
   let(:admin_user) { FactoryBot.create(:user, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
 
+  #set of objects that doesnt belong to the first family/user to validate the records returned only belong to the user logged in
+  let(:person10) { FactoryBot.create(:person, :with_consumer_role)}
+  let!(:user2) { FactoryBot.create(:user, :person => person10, oim_id: '7734567899',email: "thisshouldnot@behappening.com") }
+  let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+  let!(:person20) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
+    person10.ensure_relationship_with(per, 'spouse')
+    person10.save!
+    per
+  end
+  let!(:family_member_20) { FactoryBot.create(:family_member, person: person20, family: family2)}
+  let!(:person30) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years)
+    person10.ensure_relationship_with(per, 'child')
+    person10.save!
+    per
+  end
+  let!(:family_member_30) { FactoryBot.create(:family_member, person: person30, family: family2)}
+  let!(:person40) do
+    per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years)
+    person10.ensure_relationship_with(per, 'child')
+    person10.save!
+    per
+  end
+  let!(:family_member_40) { FactoryBot.create(:family_member, person: person40, family: family2)}
+  let(:family_id2) { family2.id}
+  let(:application20) { FactoryBot.create(:application, family: family2, aasm_state: "draft", effective_on: effective_on, application_period: application_period)}
+
   before do
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
@@ -205,7 +233,18 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should assign applications", dbclean: :after_each do
       get :index
       applications = FinancialAssistance::Application.where(family_id: family_id)
-      expect(assigns(:applications)).to eq applications
+      expect(assigns(:applications)).to match_array(applications.to_a)
+    end
+
+    it "should assign last updated application first" do
+      get :index
+      expect(assigns(:applications).first).to eq application2
+    end
+
+    it "should assign a unique application correctly" do
+      application2.destroy
+      get :index
+      expect(assigns(:applications).first).to eq application
     end
   end
 
