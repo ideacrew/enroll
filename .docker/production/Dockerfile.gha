@@ -225,6 +225,9 @@ ENV REDIS_HOST_ENROLL=${HOSTNAME}
 ENV RABBITMQ_HOST=amqp://${HOSTNAME}
 ENV RABBITMQ_URL=amqp://${HOSTNAME}:5672
 
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
+
 # Copy prebuilt gems
 COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $BUNDLE_PATH $BUNDLE_PATH
 
