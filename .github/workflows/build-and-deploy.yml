@@ -151,6 +151,7 @@ jobs:
           build-args: |
             HOSTNAME=172.17.0.1
             CLIENT=${{ matrix.client }}
+            COMMIT_SHA=${{ needs.prep.outputs.short_sha }}
 
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
