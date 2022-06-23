@@ -59,8 +59,8 @@ module Operations
         update_member_effective_dates
         return Failure('Failed to save dropped member enrollment') unless new_enrollment.persisted?
 
-        update_household_applied_aptc if base_enrollment.applied_aptc_amount > 0
         terminate_base_enrollment
+        update_household_applied_aptc if base_enrollment.applied_aptc_amount > 0
         notify_trading_partner(params)
 
         dropped_member_info = []

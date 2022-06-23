@@ -274,6 +274,19 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           expect(reinstatement.product.id).to eq enrollment_2.product.id
         end
 
+        context 'when droping subscriber' do
+          it 'new enrollment should have aptc amount ' do
+            enrollment_2.update_attributes(aasm_state: 'coverage_selected')
+            HbxEnrollment.all.where(:family_id => enrollment_2.family_id, :id.ne => enrollment_2.id).delete
+            allow(enrollment_2).to receive(:is_health_enrollment?).and_return(false)
+            subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => TimeKeeper.date_of_record.to_s,
+                                                                  "terminate_member_#{hbx_enrollment_member1.id}" => hbx_enrollment_member1.id.to_s,
+                                                                  "admin_permission" => true}})
+            reinstatement = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
+            expect(reinstatement.applied_aptc_amount).not_to eq 0.0
+          end
+        end
+
         context 'when csr kind is different from base enrollment', dbclean: :around_each do
           before :each do
             enrollment_2.update_attributes(aasm_state: 'coverage_selected')
