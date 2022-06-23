@@ -248,7 +248,7 @@ module FinancialAssistance
                                                                                       :student_kind, :student_school_kind, :student_status_end_on, :is_self_attested_blind, :is_self_attested_disabled,
                                                                                       :is_self_attested_long_term_care, :is_veteran, :is_refugee, :is_trafficking_victim, :is_former_foster_care, :age_left_foster_care,
                                                                                       :foster_care_us_state, :had_medicaid_during_foster_care, :is_pregnant, :is_enrolled_on_medicaid, :is_post_partum_period,
-                                                                                      :children_expected_count, :pregnancy_due_on, :pregnancy_end_on, :is_primary_caregiver, :is_subject_to_five_year_bar,
+                                                                                      :children_expected_count, :pregnancy_due_on, :pregnancy_end_on, :is_primary_caregiver, :is_primary_caregiver_for, :is_subject_to_five_year_bar,
                                                                                       :is_five_year_bar_met, :is_forty_quarters, :is_ssn_applied, :non_ssn_apply_reason, :moved_on_or_after_welfare_reformed_law,
                                                                                       :is_veteran_or_active_military, :is_spouse_or_dep_child_of_veteran_or_active_military, :is_currently_enrolled_in_health_plan,
                                                                                       :has_daily_living_help, :need_help_paying_bills, :is_resident_post_092296, :is_vets_spouse_or_child, :has_job_income,

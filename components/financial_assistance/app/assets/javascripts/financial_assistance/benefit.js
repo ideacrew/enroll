@@ -48,7 +48,7 @@ document.addEventListener("turbolinks:load", function() {
       return true;
     });
 
-    $(document).on('click', 'input[type="checkbox"]', function(e) {
+    $(document).on('click', '.benefit-kind input[type="checkbox"]', function(e) {
       var value = e.target.checked,
           self = this;
       if (value) {
