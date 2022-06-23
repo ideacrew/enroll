@@ -90,7 +90,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Add git HEAD info to docker image
-        run: git show --quiet HEAD > release.txt
+        run: |
+          git show --quiet HEAD > release.txt
+          git show --quiet HEAD > public/release.txt
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -151,7 +153,6 @@ jobs:
           build-args: |
             HOSTNAME=172.17.0.1
             CLIENT=${{ matrix.client }}
-            COMMIT_SHA=${{ needs.prep.outputs.short_sha }}
 
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
