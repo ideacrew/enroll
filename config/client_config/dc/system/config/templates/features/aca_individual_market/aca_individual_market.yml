@@ -33,7 +33,7 @@ registry:
         is_enabled: true
       - key: :calculate_monthly_aggregate
         item: Operations::Individual::CalculateMonthlyAggregate.new
-        is_enabled: true
+        is_enabled: <%= ENV['CALCULATE_MONTHLY_AGGREGATE_IS_ENABLED'] || true %>
         settings:
           - key: :termination_date
             item: :end_of_month
