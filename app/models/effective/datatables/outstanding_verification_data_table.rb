@@ -20,7 +20,7 @@ module Effective
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| row.vlp_documents_status}, :filter => false, :sortable => true
         table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
-        table_column :outstanding_verification_types, :label => 'Outstanding Verification Types',:proc => proc { |row|  outstanding_verification_types(row) }, :filter => false, :sortable => false
+        table_column :outstanding_verification_types, :label => 'Outstanding Verification Types',:proc => proc { |row|  outstanding_person_verification_types(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]
@@ -107,6 +107,13 @@ module Effective
 
       def eligibility_earliest_due_date(family)
         family.eligibility_determination.outstanding_verification_earliest_due_date
+      end
+
+      def outstanding_person_verification_types(family)
+        family.family_members.inject([]) do |result, fm|
+          result << fm.person.verification_types.where(:validation_status.in => ['outstanding', 'review', 'rejected']).map(&:type_name)
+          result
+        end.flatten.uniq
       end
 
       def outstanding_verification_types(family)
