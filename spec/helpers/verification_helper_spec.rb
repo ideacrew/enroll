@@ -799,3 +799,22 @@ describe '#display_documents_tab?' do
     end
   end
 end
+
+describe '#display_upload_for_verification?' do
+  let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:verification_type) { person.verification_types.first }
+
+  context 'person applying for coverage' do
+    it 'should return true as verification_type is unverified' do
+      expect(helper.display_upload_for_verification?(verification_type)).to eq true
+    end
+  end
+
+  context 'person not applying for coverage' do
+    it 'should return true as verification_type is unverified' do
+      person.consumer_role.is_applying_coverage = false
+      person.consumer_role.save!
+      expect(helper.display_upload_for_verification?(verification_type)).to eq true
+    end
+  end
+end
