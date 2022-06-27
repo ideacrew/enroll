@@ -224,6 +224,10 @@ module VerificationHelper
     options_for_select(build_admin_actions_list(v_type, f_member))
   end
 
+  def display_upload_for_verification?(verification_type)
+    verification_type.type_unverified?
+  end
+
   def mod_attr(attr, val)
       attr.to_s + " => " + val.to_s
   end
