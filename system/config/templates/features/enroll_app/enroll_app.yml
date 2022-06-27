@@ -75,8 +75,7 @@ registry:
             item: "logo.png"
           - key: :make_their_premium_payments_online
             item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
-          - key: :tab_icon
-            item: "favicon.ico"
+
           - key: :mailer_logo_file_name
             item: "dchealthlink.jpg"
           - key: :employer_application_deadline_link

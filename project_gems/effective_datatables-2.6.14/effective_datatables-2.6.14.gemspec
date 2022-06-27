@@ -5,7 +5,7 @@ version: !ruby/object:Gem::Version
 platform: ruby
 authors:
 - Code and Effect
-autorequire: 
+autorequire:
 bindir: bin
 cert_chain: []
 date: 2016-10-07 00:00:00.000000000 Z
@@ -193,7 +193,6 @@ files:
 - spec/dummy/public/404.html
 - spec/dummy/public/422.html
 - spec/dummy/public/500.html
-- spec/dummy/public/favicon.ico
 - spec/dummy/script/rails
 - spec/effective_datatables_spec.rb
 - spec/spec_helper.rb
@@ -202,7 +201,7 @@ homepage: https://github.com/code-and-effect/effective_datatables
 licenses:
 - MIT
 metadata: {}
-post_install_message: 
+post_install_message:
 rdoc_options: []
 require_paths:
 - lib
@@ -217,9 +216,9 @@ required_rubygems_version: !ruby/object:Gem::Requirement
     - !ruby/object:Gem::Version
       version: '0'
 requirements: []
-rubyforge_project: 
+rubyforge_project:
 rubygems_version: 2.2.1
-signing_key: 
+signing_key:
 specification_version: 4
 summary: Uniquely powerful server-side searching, sorting and filtering of any ActiveRecord
   or Array collection as well as post-rendered content displayed as a frontend jQuery
@@ -250,7 +249,6 @@ test_files:
 - spec/dummy/public/404.html
 - spec/dummy/public/422.html
 - spec/dummy/public/500.html
-- spec/dummy/public/favicon.ico
 - spec/dummy/Rakefile
 - spec/dummy/README.rdoc
 - spec/dummy/script/rails

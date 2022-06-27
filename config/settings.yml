@@ -1,5 +1,4 @@
 site:
-  tab_icon: 'favicon.ico'
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   use_default_devise_path: true

@@ -77,8 +77,6 @@ registry:
             item: 'logo_me.svg'
           - key: :make_their_premium_payments_online
             item: ''
-          - key: :tab_icon
-            item: 'favicon.ico'
           - key: :employer_application_deadline_link
             item: ''
           - key: :s3_prefix
