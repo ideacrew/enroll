@@ -241,6 +241,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(assigns(:applications).first).to eq application2
     end
 
+    it "should reflect correctly if an applicant was modified" do
+      applicant_1 = FinancialAssistance::Application.where(family_id: family_id).first.applicants.first
+      applicant_1.is_joint_tax_filing = false
+      applicant_1.save
+      get :index
+      expect(assigns(:applications).first).to eq application
+    end
+
     it "should assign a unique application correctly" do
       application2.destroy
       get :index
