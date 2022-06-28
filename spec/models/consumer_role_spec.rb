@@ -978,11 +978,11 @@ describe "Indian tribe member" do
   end
 
   context 'american indian verification type on coverage purchase' do
-    it 'aasm state should be in verification outstanding and american indian status in outstanding upon coverage purchase' do
+    it 'aasm state should be in verification negative_response_received and american indian status in outstanding upon coverage purchase' do
       person.update_attributes!(tribal_id: "12345")
       consumer_role.coverage_purchased!(verification_attr)
       american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
-      expect(american_indian_status.validation_status).to eq 'outstanding'
+      expect(american_indian_status.validation_status).to eq 'negative_response_received'
       expect(consumer_role.aasm_state).to eq 'verification_outstanding'
     end
   end
