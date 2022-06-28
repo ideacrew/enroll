@@ -136,7 +136,7 @@ module Operations
       end
 
       def special_enrollment_period_reference(enrollment)
-        sep = enrollment.family.latest_active_sep
+        sep = enrollment.special_enrollment_period || enrollment.family.latest_active_sep
         qle = sep&.qualifying_life_event_kind
         sep_hash = {
           qle_on: sep.qle_on,

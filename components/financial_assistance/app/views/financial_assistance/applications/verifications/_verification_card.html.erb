@@ -18,7 +18,7 @@
     </div>
 
     <div class="v-type-upload col-md-3">
-      <% if evidence.type_unverified? && applicant.is_applying_coverage %>
+      <% if display_upload_for_evidence?(evidence) %>
         <%= form_tag financial_assistance.application_applicant_verification_documents_upload_path(application, applicant), multipart: true, method: :post do %>
           <span class="btn btn-default btn-file">
             <i class="fa fa-upload" aria-hidden="true"></i>
