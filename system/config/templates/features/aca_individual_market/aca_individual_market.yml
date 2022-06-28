@@ -43,7 +43,7 @@ registry:
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
       - key: :check_enrollment_member_eligibility
-        is_enabled: false
+        is_enabled: <%= ENV['CHECK_ENROLLMENT_MEMBER_ELIGIBILITY_IS_ENABLED'] || false %>
       - key: :vlp_documents
         is_enabled: true
         settings:

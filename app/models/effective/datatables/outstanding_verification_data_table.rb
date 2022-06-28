@@ -12,7 +12,6 @@ module Effective
         end
       end
 
-      # rubocop:disable Metrics/AbcSize
       def load_verification_type_columns
         table_column :name, :label => 'Name', :proc => proc { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
@@ -21,6 +20,7 @@ module Effective
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| row.vlp_documents_status}, :filter => false, :sortable => true
         table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
+        table_column :outstanding_verification_types, :label => 'Outstanding Verification Types',:proc => proc { |row|  outstanding_person_verification_types(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]
@@ -28,7 +28,6 @@ module Effective
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
-      # rubocop:enable Metrics/AbcSize
 
       def load_eligibility_determination_columns
         table_column :name, :label => 'Name', :proc => proc { |row| link_to eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id)}, :filter => false, :sortable => true
@@ -38,6 +37,7 @@ module Effective
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| document_status_for(row)}, :filter => false, :sortable => true
         table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
+        table_column :outstanding_verification_types, :label => 'Outstanding Verification Types',:proc => proc { |row|  outstanding_verification_types(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => eligibility_primary_family_member(row).person_id),"static"]
@@ -107,6 +107,44 @@ module Effective
 
       def eligibility_earliest_due_date(family)
         family.eligibility_determination.outstanding_verification_earliest_due_date
+      end
+
+      def outstanding_person_verification_types(family)
+        family.family_members.inject([]) do |result, fm|
+          result << fm.person.verification_types.where(:validation_status.in => ['outstanding', 'review', 'rejected']).map(&:type_name)
+          result
+        end.flatten.uniq
+      end
+
+      def outstanding_verification_types(family)
+        subjects = family.eligibility_determination.subjects
+        outstanding_legacy_verification_types = outstanding_legacy_verification_types(subjects)
+        outstanding_evidence_types = outstanding_evidence_types(subjects)
+
+        (outstanding_legacy_verification_types + outstanding_evidence_types).map(&:to_s).map(&:humanize).join(', ')
+      rescue StandardError => e
+        Rails.logger.error { "Error while pulling outstanding verification types #{e}" }
+        "Error: #{e}"
+      end
+
+      def outstanding_legacy_verification_types(subjects)
+        subjects.inject([]) do |result, subject|
+          eligibility_state = subject.eligibility_states.where(eligibility_item_key: 'aca_individual_market_eligibility').first
+          next result if eligibility_state.blank?
+
+          result << eligibility_state.evidence_states.where(:status.in => [:outstanding, :in_review, :rejected]).map(&:evidence_item_key)
+          result
+        end.flatten.uniq
+      end
+
+      def outstanding_evidence_types(subjects)
+        subjects.inject([]) do |result, subject|
+          eligibility_state = subject.eligibility_states.where(eligibility_item_key: 'aptc_csr_credit').first
+          next result if eligibility_state.blank?
+
+          result << eligibility_state.evidence_states.where(:status.in => [:outstanding, :in_review, :rejected]).map(&:evidence_item_key)
+          result
+        end.flatten.uniq
       end
 
       def verification_type_nested_filters
