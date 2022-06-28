@@ -111,10 +111,10 @@ class VerificationType
 
   def fail_type
     verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-    is_enrolled = person.families.any? { |family| family.person_has_an_active_enrollment?(person) }
     status = if self.reload.validation_status == 'rejected'
                'rejected'
              else
+               is_enrolled = person.families.any? { |family| family.person_has_an_active_enrollment?(person) }
                (is_enrolled ? 'outstanding' : 'negative_response_received')
              end
     attrs =
