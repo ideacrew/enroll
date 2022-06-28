@@ -76,7 +76,11 @@ module FinancialAssistance
         if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
           self.errors.add(:tribal_state, "is required when native american / alaska native is selected") unless tribal_state.present?
           self.errors.add(:tribal_name, "cannot contain numbers") unless (tribal_name =~ /\d/).nil?
-          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled? && tribal_name.present?
+          if FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+            self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && tribe_codes.include?("OT") && tribal_state = "ME"
+          else
+            self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present?
+          end
         else
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected") unless tribal_id.present?
           self.errors.add(:tribal_id, "Tribal id must be 9 digits") if tribal_id.present? && !tribal_id.match("[0-9]{9}")
