@@ -126,35 +126,38 @@ function applyListenersFor(target) {
     }
   );
 
-    //start tribe option controls
-    $("input[name='" + target + "[indian_tribe_member]']").change(function() {
-      if (this.value === 'true') {
-        $('.tribal-container').removeClass('hide');
-      } else {
-        $('.tribal-container').addClass('hide');
-      }
-    });
-  
-    $('select#tribal-state').change(function() {
-      if (this.value == 'ME') {
-        $('.featured-tribe-container').removeClass('hide');
-        $('.tribal-name-container').addClass('hide');
-        // $('.tribal-name-other-container input#tribal-name').val() = $('.tribal-name-container input#tribal-name').val();
-      } else {
+  //start tribe option controls
+  $("input[name='" + target + "[indian_tribe_member]']").change(function() {
+    if (this.value === 'true') {
+      $('.tribal-container').removeClass('hide');
+    } else {
+      $('.tribal-container').addClass('hide');
+    }
+  });
+
+  $('select#tribal-state').change(function() {
+    if (this.value == 'ME') {
+      $('.featured-tribe-container').removeClass('hide');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+      if (tribe_codes_array.includes("OT")){
         $('.tribal-name-container').removeClass('hide');
-        $('.featured-tribe-container').addClass('hide');
-        // $('.tribal-name-container input#tribal-name').val() = $('.tribal-name-other-container input#tribal-name').val();
-      }
-    });
-  
-    $('input#person_tribe_codes_ot').change(function() {
-      if (this.checked){
-        $('.tribal-name-other-container').removeClass('hide');
       } else {
-        $('.tribal-name-other-container').addClass('hide');
+        $('.tribal-name-container').addClass('hide');
       }
-    });
-    //end tribe option controls
+    } else {
+      $('.tribal-name-container').removeClass('hide');
+      $('.featured-tribe-container').addClass('hide');
+    }
+  });
+
+  $('input#person_tribe_codes_ot').change(function() {
+    if (this.checked){
+      $('.tribal-name-container').removeClass('hide');
+    } else {
+      $('.tribal-name-container').addClass('hide');
+    }
+  });
+  //end tribe option controls
 }
 
 function showOnly(selected) {
@@ -276,13 +279,13 @@ var PersonValidations = (function (window, undefined) {
 
     if (tribe_member_no){
       $('#tribal-state').val("");
-      $('input#tribal-name').each(function(){this.value = ""});
+      $('input#tribal-name').val("");
       $('#tribal-id').val("");
       $('.tribe_codes:checked').removeAttr('checked'); 
     }
 
     if (tribe_member_yes){
-      if ($('#tribal-state').val() == "" ){
+      if ($('#tribal-state').val() == ""){
         $('#tribal-state-alert').show();
         PersonValidations.restoreRequiredAttributes(e);
       }
@@ -290,30 +293,24 @@ var PersonValidations = (function (window, undefined) {
       if ($('#tribal-state').val() == "ME"){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
         if (tribe_codes_array.length < 1) { 
-          alert("At least one Tribe must be selected.");
+          alert("At least one tribe must be selected.");
           PersonValidations.restoreRequiredAttributes(e);
         }
 
-        if (tribe_codes_array.includes("OT") && $('.tribal-name-other-container input#tribal-name').val() == ""){ 
-          alert("Please provide an answer for 'Other' tribe name.");
-          PersonValidations.restoreRequiredAttributes(e);
+        if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
+            alert("Please provide an answer for 'Other' tribe name.");
+            PersonValidations.restoreRequiredAttributes(e);
         }
 
-        if (!tribe_codes_array.includes("OT")){
-          $('input#tribal-name').each(function(){this.value = ""});
-        }
-      } else {
-        if ($('.tribal-name-container input#tribal-name').val() == ""){
+      } 
+      else if ($('input#tribal-name').val() == ""){
           $('#tribal-name-alert').show();
           PersonValidations.restoreRequiredAttributes(e);
-        }
       }
 
-      if ($('#tribal-id').length > 0){
-        if ($('#tribal-id').val() == ""){
+      if ($('#tribal-id').length > 0 && $('#tribal-id').val() == ""){
           $('#tribal-id-alert').show();
           PersonValidations.restoreRequiredAttributes(e);
-        }
       }
     }
   }
