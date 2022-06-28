@@ -479,12 +479,12 @@ context 'Verification process and notices' do
           expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
         end
 
-        it "updates indian tribe validition status to outstanding and to pending for the rest" do
+        it "updates indian tribe validition status to negative_response_received and to pending for the rest" do
           consumer.tribal_id = "345543345"
           consumer.coverage_purchased!
           consumer.verification_types.each do |verif|
             if verif.type_name == 'American Indian Status'
-              expect(verif.validation_status).to eq('outstanding')
+              expect(verif.validation_status).to eq('negative_response_received')
             else
               expect(verif.validation_status).to eq('pending')
             end
@@ -941,12 +941,12 @@ describe "Indian tribe member" do
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "ssa" })}
 
   context 'Responses from local hub and ssa hub' do
-    it 'aasm state should be in verification outstanding if dc response is valid and consumer is tribe member' do
+    it 'aasm state should be in fully_verified if dc response is valid and consumer is tribe member' do
       person.update_attributes!(tribal_id: "12345")
       consumer_role.coverage_purchased!(verification_attr)
       consumer_role.pass_residency!
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
-      expect(consumer_role.aasm_state).to eq 'verification_outstanding'
+      expect(consumer_role.aasm_state).to eq 'fully_verified'
     end
 
     it 'aasm state should be in fully verified if dc response is valid and consumer is not a tribe member' do
