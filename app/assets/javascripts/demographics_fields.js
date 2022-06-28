@@ -290,7 +290,7 @@ var PersonValidations = (function (window, undefined) {
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('#tribal-state').val() == "ME"){
+      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == "ME"){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
         if (tribe_codes_array.length < 1) { 
           alert("At least one tribe must be selected.");
