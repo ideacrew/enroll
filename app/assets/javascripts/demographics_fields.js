@@ -285,12 +285,12 @@ var PersonValidations = (function (window, undefined) {
     }
 
     if (tribe_member_yes){
-      if ($('#tribal-state').val() == ""){
+      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == ""){
         $('#tribal-state-alert').show();
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == "ME"){
+      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
         if (tribe_codes_array.length < 1) { 
           alert("At least one tribe must be selected.");

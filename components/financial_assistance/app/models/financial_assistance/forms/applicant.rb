@@ -85,7 +85,7 @@ module FinancialAssistance
       end
 
       def validate_featured_tribes
-        if tribal_state == "ME"
+        if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
           self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if tribe_codes.include?("OT") && !tribal_name.present?
           self.errors.add(:base, "At least one tribe must be selected") if tribe_codes.empty?
         else
