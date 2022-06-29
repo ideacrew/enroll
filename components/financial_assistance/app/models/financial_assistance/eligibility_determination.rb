@@ -35,6 +35,13 @@ module FinancialAssistance
     scope :is_aptc_eligible, -> { where(:max_aptc.gte => 0.00) }
     scope :is_csr_eligible, -> { where(:csr_percent_as_integer.ne => 0) }
 
+    def self.find(ed_id)
+      return nil if ed_id.nil?
+      application = FinancialAssistance::Application.where("eligibility_determinations._id" => BSON::ObjectId.from_string(ed_id)).first
+      return nil if application.blank?
+      application.eligibility_determinations.detect { |eds| eds._id.to_s == ed_id.to_s }
+    end
+
     def applicants
       application.applicants.in(eligibility_determination_id: id)
     end
