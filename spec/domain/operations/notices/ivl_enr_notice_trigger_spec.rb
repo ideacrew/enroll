@@ -94,16 +94,34 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: qualifying_life_event_kind) }
 
       before :each do
-        enrollment.update_attributes(enrollment_kind: 'special_enrollment')
         person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: TimeKeeper.date_of_record - 1.day)}
         allow_any_instance_of(Events::Individual::Enrollments::Submitted).to receive(:publish).and_return true
       end
 
-      let(:params) {{ enrollment: enrollment }}
+      context 'latest sep on family' do
+        let(:params) {{ enrollment: enrollment }}
 
-      it 'should return success' do
-        result = subject.call(params)
-        expect(result.success?).to be_truthy
+        before :each do
+          enrollment.update_attributes(enrollment_kind: 'special_enrollment')
+        end
+
+        it 'should return success' do
+          result = subject.call(params)
+          expect(result.success?).to be_truthy
+        end
+      end
+
+      context 'sep from enrollment' do
+        let(:params) {{ enrollment: enrollment }}
+
+        before :each do
+          enrollment.update_attributes(enrollment_kind: 'special_enrollment', special_enrollment_period_id: sep.id)
+        end
+
+        it 'should return success' do
+          result = subject.call(params)
+          expect(result.success?).to be_truthy
+        end
       end
     end
   end
