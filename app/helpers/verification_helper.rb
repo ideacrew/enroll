@@ -114,7 +114,8 @@ module VerificationHelper
   end
 
   def can_show_due_date?(person)
-    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| VerificationType::DUE_DATE_STATES.include?(type.validation_status)}.any?
+    ed = person.primary_family&.eligibility_determination
+    ed&.outstanding_verification_earliest_due_date.present? || ed&.outstanding_verification_status&.to_s == 'outstanding'
   end
 
   def default_verification_due_date
