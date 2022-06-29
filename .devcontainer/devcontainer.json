@@ -26,7 +26,8 @@
     "alexkrechik.cucumberautocomplete",
     "EditorConfig.EditorConfig",
     "esbenp.prettier-vscode",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "ninoseki.vscode-gem-lens"
   ],
 
   // "postCreateCommand": "chmod +x ./.devcontainer/postCreateCommand.sh",
@@ -38,10 +39,7 @@
 
   "containerEnv": {
     "SECRET_KEY_BASE": "c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82",
-    "RAILS_ENV": "development",
-    "NODE_ENV": "development",
-    "CLIENT": "ic",
-    "COMMIT_SHA": "abcd123"
+    "CLIENT": "dc"
   }
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
