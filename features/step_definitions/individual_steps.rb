@@ -54,16 +54,8 @@ And(/^I can see the select effective date$/) do
   expect(page).to have_content "SELECT EFFECTIVE DATE"
 end
 
-When 'I click on continue button on select effective date' do
-  click_button "Continue"
-end
-
 Then(/^I can see the error message (.*?)$/) do |message|
   expect(page).to have_content(message)
-end
-
-And 'I select a effective date from list' do
-  find("[name='effective_on_kind'] option[value='date_of_event']").select_option
 end
 
 And(/the user sees Your Information page$/) do
@@ -80,6 +72,12 @@ When(/the user registers as an individual$/) do
   screenshot("register")
   find(IvlPersonalInformation.continue_btn).click
 end
+
+And(/the user will have to accept alert pop up for missing field$/) do
+  sleep 1
+  page.driver.browser.switch_to.alert.accept
+end
+
 
 When(/^\w+ clicks? on the Continue button$/) do
   find(IvlPersonalInformation.continue_btn, :wait => 10).click
@@ -118,7 +116,7 @@ Then(/^.+ sees form to enter personal information$/) do
   find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
-  sleep 2
+  sleep 30
 end
 
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
@@ -244,7 +242,6 @@ And(/should fill in valid sevis, passport expiration_date, tribe_member and inca
 end
 
 Then(/^Individual (.*) go to Authorization and Consent page$/) do |argument|
-
   if argument == 'does'
     expect(page).to have_content('Authorization and Consent')
   else
