@@ -34,6 +34,10 @@ class HbxIdGenerator
     provider.generate_family_id
   end
 
+  def generate_group_premium_credit_id
+    provider.generate_group_premium_credit_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
   end
@@ -60,6 +64,10 @@ class HbxIdGenerator
 
   def self.generate_family_id
     self.instance.generate_family_id
+  end
+
+  def self.generate_group_premium_credit_id
+    self.instance.generate_group_premium_credit_id
   end
 
   class AmqpSource
@@ -96,6 +104,10 @@ class HbxIdGenerator
     def self.generate_family_id
       generate_id_from_sequence("family_id")
     end
+
+    def self.generate_group_premium_credit_id
+      generate_id_from_sequence('group_premium_credit_id')
+    end
   end
 
   class SlugSource
@@ -124,6 +136,10 @@ class HbxIdGenerator
     end
 
     def self.generate_family_id
+      random_uuid
+    end
+
+    def self.generate_group_premium_credit_id
       random_uuid
     end
   end

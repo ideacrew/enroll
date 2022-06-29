@@ -54,6 +54,9 @@ class Family
 
   # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
+
+  embeds_many :group_premium_credits, cascade_callbacks: true, validate: true
+
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
@@ -72,6 +75,7 @@ class Family
   before_save :generate_hbx_assigned_id
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
+                                :group_premium_credits,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
   index({hbx_assigned_id: 1}, {sparse: true, unique: true})
