@@ -3,10 +3,11 @@
     <h4>
       <% if can_show_due_date?(@person) %>
           <%= l10n("document_due_date") %>:&nbsp;&nbsp;
-          <% if (@person.primary_family.best_verification_due_date || default_verification_due_date) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= @person.primary_family.best_verification_due_date %> (<%= l10n("past_due") %>)</span>
+          <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
+          <% if due_date <= TimeKeeper.date_of_record %>
+            <span class="label label-danger"><%= due_date %> (<%= l10n("past_due") %>)</span>
           <% else %>
-              <span class="label label-warning"><%= (@person.primary_family.best_verification_due_date || default_verification_due_date) %></span>
+            <span class="label label-warning"><%= due_date %></span>
           <% end %>
       <% end %>
     </h4>
