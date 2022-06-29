@@ -50,21 +50,21 @@ Feature: Start a new Financial Assistance Application
     And they should see each of their dependents listed
     And the user clicks Add Member
     And the user fills the applicant add member form with indian member yes
-    And the user selects ME from tribal state drop down
+    And the user selects tribal state from drop down
     Then the user should see tribe checkbox options
 
-  # Scenario: Featured Tribes Selection feature is disabled
-  #   Given AI AN Details feature is enabled
-  #   Given Featured Tribe Selection feature is disabled
-  #   When a consumer visits the Get Help Paying for coverage page
-  #   And selects yes they would like help paying for coverage
-  #   Then they should see a new finanical assistance application
-  #   And they should see each of their dependents listed
-  #   And the user clicks Add Member
-  #   And the user fills the applicant add member form with indian member yes
-  #   And the user selects ME from tribal state drop down
-  #   And the user clicks submit applicant form
-  #   Then the user should see an error message for indian tribal name
+  Scenario: Featured Tribes Selection feature is disabled
+    Given AI AN Details feature is enabled
+    Given Featured Tribe Selection feature is disabled
+    When a consumer visits the Get Help Paying for coverage page
+    And selects yes they would like help paying for coverage
+    Then they should see a new finanical assistance application
+    And they should see each of their dependents listed
+    And the user clicks Add Member
+    And the user fills the applicant add member form with indian member yes
+    And the user selects tribal state from drop down
+    And the user clicks submit applicant form
+    Then the user should see an error message for indian tribal name
 
   Scenario: Indian Alaskan Tribe Details feature is enabled and user enters a name with a number
     Given AI AN Details feature is enabled

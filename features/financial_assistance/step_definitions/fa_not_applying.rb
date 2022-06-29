@@ -145,7 +145,7 @@ And(/^the user fills the aplicant add member form with indian member no/) do
   sleep 3
 end
 
-And(/^the user selects ME from tribal state drop down/) do
+And(/^the user selects tribal state from drop down/) do
   find('#tribal-state-container .selectric span.label').click
   find("#tribal-state-container .selectric-items li", text: 'ME').click
 end
@@ -170,7 +170,8 @@ Then(/the user should see an error message for indian tribal state and name/) do
 end
 
 Then(/the user should see an error message for indian tribal name/) do
-  expect(page).to have_text(l10n("insured.tribal_name_alert").to_s)
+  sleep 1
+  expect(page).to have_text("Tribal name is required when native american / alaska native is selected")
 end
 
 Then(/the user should see an error message for indian tribal id/) do
