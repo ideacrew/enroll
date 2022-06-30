@@ -63,7 +63,7 @@
 
             <div class="col-md-9 no-pd <%= deduction_kind %>">
               <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] } %>
-              <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && EnrollRegistry.feature_enabled?(:divorce_agreement_year) %> 
+              <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %> 
             </div>
           </div>
 
@@ -87,7 +87,7 @@
       <div class="col-xs-12">
         <div class="back-link">
           <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <%= l10n_sentence("<b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>") %>
+          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <%= l10n_sentence("<b>BACK TO ALL HOUSEHOLD MEMBERS</b>") %> </a> <span>(<%= l10n_sentence("Go back and work on another person)") %></span>
         </div>
       </div>
     </div>
