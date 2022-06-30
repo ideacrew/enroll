@@ -44,13 +44,7 @@ module ConsumerRolesHelper
   end
 
   def featured_tribes_collection
-    [
-        ["Maliseet", "HM"],
-        ["Passamaquoddy", "PD"],
-        ["Penobscot", "PE"],
-        ["Micmac", "AM"],
-        ["Other", "OT"]
-    ].map{|a| OpenStruct.new({name: a.first, value: a.last})}
+    FinancialAssistanceRegistry[:featured_tribes_selection].setting(:featured_tribes).item.map{|a| OpenStruct.new({name: a.first, value: a.last})}
   end
 
   def show_naturalization_doc_type(obj)
