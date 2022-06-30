@@ -118,6 +118,34 @@ describe BrokerRole, dbclean: :around_each do
       end
     end
 
+    context 'allow_alphanumeric_npn' do
+      let(:person) { FactoryBot.create(:person)}
+      let(:broker_role) { FactoryBot.create(:broker_role, npn: "7775588", person: person, provider_kind: provider_kind) }
+      let(:new_npn) { 'abc1234567' }
+
+      context 'allow_alphanumeric_npn enabled' do
+        before do
+          EnrollRegistry[:allow_alphanumeric_npn].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it 'saves allow_alphanumeric' do
+          expect(broker_role.update_attributes(npn: new_npn)).to eq true
+          expect(broker_role.reload.npn).to eq new_npn
+        end
+      end
+
+      context 'allow_alphanumeric_npn disabled' do
+        before do
+          EnrollRegistry[:allow_alphanumeric_npn].feature.stub(:is_enabled).and_return(false)
+        end
+
+        it 'saves allow_alphanumeric' do
+          expect(broker_role.update_attributes(npn: new_npn)).to eq false
+          expect(broker_role.reload.npn).not_to eq new_npn
+        end
+      end
+    end
+
     context "a broker registers" do
       let(:person)  { FactoryBot.build(:person) }
       let(:registered_broker_role) { BrokerRole.new(person: person, npn: "2323334", provider_kind: "broker") }

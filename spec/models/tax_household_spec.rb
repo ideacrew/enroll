@@ -544,6 +544,11 @@ RSpec.describe TaxHousehold, type: :model do
               result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1, shopping_hbx_enrollment1.effective_on)
               expect(result.round(2)).to eq(500.00)
             end
+
+            it 'Should return remaining aptc with excluding enrollment.' do
+              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1, shopping_hbx_enrollment1.effective_on, aptc_enrollment1.id)
+              expect(result.round(2)).to eq(1000.00)
+            end
           end
         end
 
