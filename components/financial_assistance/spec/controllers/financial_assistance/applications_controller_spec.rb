@@ -233,26 +233,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should assign applications", dbclean: :after_each do
       get :index
       applications = FinancialAssistance::Application.where(family_id: family_id)
-      expect(assigns(:applications)).to match_array(applications.to_a)
-    end
-
-    it "should assign last updated application first" do
-      get :index
-      expect(assigns(:applications).first).to eq application2
-    end
-
-    it "should reflect correctly if an applicant was modified" do
-      applicant_1 = FinancialAssistance::Application.where(family_id: family_id).first.applicants.first
-      applicant_1.is_joint_tax_filing = false
-      applicant_1.save
-      get :index
-      expect(assigns(:applications).first).to eq application
-    end
-
-    it "should assign a unique application correctly" do
-      application2.destroy
-      get :index
-      expect(assigns(:applications).first).to eq application
+      expect(assigns(:applications)).to eq(applications.to_a)
     end
   end
 
