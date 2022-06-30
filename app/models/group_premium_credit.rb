@@ -74,7 +74,7 @@ class GroupPremiumCredit
   def authority_determination
     return nil if authority_determination_id.blank? || authority_determination_class_name.blank?
 
-    authority_determination_class_name.constantize.where(id: authority_determination_id.to_s).first
+    authority_determination_class_name.constantize.where(id: authority_determination_id).first
   rescue NameError, BSON::ObjectId::Invalid => e
     Rails.logger.error "GroupPremiumCredit Unable to find authority_determination error: #{e}, backtrace: #{e.backtrace.join('\n')}"
     nil
@@ -83,7 +83,7 @@ class GroupPremiumCredit
   def sub_group
     return nil if sub_group_id.blank? || sub_group_class_name.blank?
 
-    sub_group_class_name.constantize.find(sub_group_id.to_s)
+    sub_group_class_name.constantize.find(sub_group_id)
   rescue NameError, BSON::ObjectId::Invalid => e
     Rails.logger.error "GroupPremiumCredit Unable to find sub_group error: #{e}, backtrace: #{e.backtrace.join('\n')}"
     nil
