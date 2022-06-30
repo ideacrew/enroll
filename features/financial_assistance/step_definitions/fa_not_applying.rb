@@ -122,7 +122,7 @@ And(/^the user fills the applicant add member form with indian member yes/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 end
 
-And(/^the user fills the aplicant add member form with indian member no/) do
+And(/^the user fills the applicant add member form with indian member no/) do
   sleep 5
 
   expect(page).to have_content('Lives with primary subscriber')
