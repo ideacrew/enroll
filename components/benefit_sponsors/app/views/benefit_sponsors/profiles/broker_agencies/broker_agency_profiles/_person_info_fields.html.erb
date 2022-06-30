@@ -8,7 +8,7 @@
         <%= f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: "#{l10n('email')}", readonly: !EnrollRegistry.feature_enabled?(:allow_edit_broker_email) %>
       </div>
       <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
-        <%= f.text_field :npn, class: "floatlabel form-control npn_field interaction-field-control-person-npn", required: !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn), placeholder: "#{l10n('npn')}", readonly: !EnrollRegistry.feature_enabled?(:allow_edit_broker_npn) %>
+        <%= f.text_field :npn, class: "floatlabel form-control interaction-field-control-person-npn", required: !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn), placeholder: "#{l10n('npn')}", readonly: !EnrollRegistry.feature_enabled?(:allow_edit_broker_npn), maxlength:'10', onkeypress: EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn) ? 'return isAlphaNumeric(event);' : 'return isNumberKey(event);' %>
       </div>
     </div>
   </div>
