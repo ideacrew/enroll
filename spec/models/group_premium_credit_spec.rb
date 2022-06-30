@@ -45,7 +45,7 @@ RSpec.describe GroupPremiumCredit, type: :model do
     let(:group_pc) do
       FactoryBot.create(:group_premium_credit,
                         authority_determination_id: application.id,
-                        authority_determination_class_name: application.class.to_s,
+                        authority_determination_class: application.class.to_s,
                         family: family)
     end
 
@@ -63,7 +63,7 @@ RSpec.describe GroupPremiumCredit, type: :model do
       end
     end
 
-    context 'invalid authority_determination_class_name' do
+    context 'invalid authority_determination_class' do
       let(:application) do
         double(id: BSON::ObjectId.new, class: 'DummyTest')
       end
@@ -88,9 +88,9 @@ RSpec.describe GroupPremiumCredit, type: :model do
     let(:group_pc) do
       FactoryBot.create(:group_premium_credit,
                         authority_determination_id: application.id,
-                        authority_determination_class_name: application.class.to_s,
+                        authority_determination_class: application.class.to_s,
                         sub_group_id: eligibility_determination.id,
-                        sub_group_class_name: eligibility_determination.class.to_s,
+                        sub_group_class: eligibility_determination.class.to_s,
                         family: family)
     end
 
@@ -114,7 +114,7 @@ RSpec.describe GroupPremiumCredit, type: :model do
       end
     end
 
-    context 'invalid sub_group_class_name' do
+    context 'invalid sub_group_class' do
       let(:eligibility_determination) do
         double(id: BSON::ObjectId.new, class: 'DummyTest')
       end
