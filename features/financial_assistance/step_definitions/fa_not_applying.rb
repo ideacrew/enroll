@@ -147,7 +147,7 @@ end
 
 And(/^the user selects tribal state from drop down/) do
   find('#tribal-state-container .selectric span.label').click
-  find("#tribal-state-container .selectric-items li", text: 'ME').click
+  find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
 end
 
 Then(/the user should see tribe checkbox options/) do
