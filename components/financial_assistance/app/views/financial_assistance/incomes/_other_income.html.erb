@@ -6,20 +6,20 @@
     <div class="row row-form-wrapper no-buffer row-height">
       <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
       <div class="col-md-12  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel"><%= l10n("Social")&.upcase %> <%= l10n("Security")&.upcase %> <%= l10n("TYPE")&.upcase %> *</label>
+        <label class="static_label label-floatlabel"><%= l10n_sentence("Social Security Type")&.upcase %> *</label>
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= FinancialAssistance::Income::SS_BENEFITS[other_income.ssi_type&.to_sym] %></span>
       </div>
       <% end %>
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
         <% if show_net_amount_for(other_income) %>
-          <label class="static_label label-floatlabel"><%= l10n("NET")&.upcase %> <%= l10n("AMOUNT")&.upcase %> *</label>
+          <label class="static_label label-floatlabel"><%= l10n_sentence("NET AMOUNT") %> *</label>
         <% else %>
-          <label class="static_label label-floatlabel"><%= l10n("AMOUNT")&.upcase %> *</label>
+          <label class="static_label label-floatlabel"><%= l10n_sentence("AMOUNT") %> *</label>
         <% end %>
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= number_to_currency(other_income.amount) %></span>
       </div>
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel"><%= l10n("HOW")&.upcase %> <%= l10n("Often")&.upcase %> *</label>
+        <label class="static_label label-floatlabel"><%= l10n_sentence("HOW OFTEN") %> *</label>
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= frequency_kind_options.invert[other_income.frequency_kind] %></span>
       </div>
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">

@@ -9,11 +9,11 @@
           </span>
         </div>
         <h2 class="fa-darkblue">
-          Other Income for <%= @applicant.first_name.capitalize %>
+          <%= l10n_sentence("Other Income for") %> <%= @applicant.first_name.capitalize %>
         </h2>
       </div>
     </div>
-    <p>Tell us about this person's other income. When you're finished, select CONTINUE.</p>
+    <p><%= l10n_sentence("Tell us about this person's other income. When you're finished, select CONTINUE") %>.</p>
     <br>
 
     <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
@@ -44,7 +44,7 @@
           <% end %>
         </div>
 
-           <a class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
+           <a class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <%= l10n_sentence("<b> Add Another</b> Unemployment Income") %> </a>
 
         <div class='new-unemployment-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
@@ -76,14 +76,14 @@
     <div class='other_income_kinds'>
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-9">
-          <span> <b> Common types of income you must report </b></span>
+          <span> <b> <%= l10n_sentence("Common types of income you must report") %> </b></span>
         </div>
       </div>
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-12 lightgray">
-          <span> Check any boxes that apply to this person and enter details when requested. </span>
+          <span> <%= l10n_sentence("Check any boxes that apply to this person and enter details when requested") %>. </span>
           <br><br>
-          <p><b>Note:</b> For income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the income ended.</p>
+          <p><%= l10n_sentence("<b>Note:</b> For income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the income ended.") %></p>
         </div>
       </div>
       <br>
@@ -95,7 +95,7 @@
               <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
             <div class="col-md-9 no-pd">
-              <%= label %>
+              <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && EnrollRegistry.feature_enabled?(:divorce_agreement_year) %> 
             </div>
           </div>
           <div class="other-incomes-list">
@@ -117,7 +117,7 @@
     <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color">Is any of this person's <b> income from American Indian or Alaska Native tribal sources?</b> *</span>
+          <span class="fa-text-color"><%= l10n_sentence("Is any of this person's <b> income from American Indian or Alaska Native tribal sources?") %></b> *</span>
         </div>
         <div class='col-md-6 mt11'>
           <div class='col-md-3 no-padding'>
@@ -142,7 +142,7 @@
           <% end %>
         </div>
 
-        <a class='new-ai-an-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> American Indian/Alaskan Native Income </a>
+        <a class='new-ai-an-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <%= l10n_sentence("<b> Add Another</b> American Indian/Alaskan Native Income") %> </a>
 
         <div class='new-ai-an-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>

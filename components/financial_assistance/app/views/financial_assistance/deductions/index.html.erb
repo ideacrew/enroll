@@ -8,11 +8,11 @@
             <i class="fa fa-sliders"></i>
           </span>
         </div>
-        <h2 class="fa-darkblue">Income Adjustments for <%= @applicant.first_name.capitalize %></h2>
+        <h2 class="fa-darkblue"><%= l10n_sentence("Income Adjustments for") %> <%= @applicant.first_name.capitalize %></h2>
       </div>
     </div>
 
-    <p>Tell us about income adjustments for this person. When you're finished, select CONTINUE.</p>
+    <p><%= l10n_sentence("Tell us about income adjustments for this person. When you're finished, select CONTINUE") %>.</p>
     <br>
 
     <!--income adjustment driver question-->
@@ -23,11 +23,11 @@
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_deductions", true, @applicant.has_deductions, class: "radio-yml" ) %>
-          <label class="radio-yml" for="has_deductions_yes">Yes</label>
+          <label class="radio-yml" for="has_deductions_yes"><%= l10n("Yes") %></label>
         </div>
         <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_deductions", false, @applicant.has_deductions == false, class: "radio-yml" ) %>
-          <label class="radio-yml" for="has_deductions_no">No</label>
+          <label class="radio-yml" for="has_deductions_no"><%=l10n("No") %></label>
         </div>
         <div class="col-md-6 left-seprator">
            <a href="#has_deductions" data-toggle="modal" data-target="#has_deductions">Not sure?</a>
@@ -41,14 +41,14 @@
     <div class='deduction-kinds'>
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-9">
-          <h4 class="panel-title">
-              <b> Income adjustments you must report </b>
+          <h4 class="panel-title"> 
+              <b><%= l10n_sentence("Income adjustments you must report") %></b>
           </h4>
         </div>
       </div>
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-12 lightgray">
-          <span>  Check any boxes that apply to this person and enter details when requested. </span>
+          <span><%= l10n_sentence("Check any boxes that apply to this person and enter details when requested.") %></span>
         </div>
       </div>
 
@@ -63,6 +63,7 @@
 
             <div class="col-md-9 no-pd <%= deduction_kind %>">
               <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] } %>
+              <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && EnrollRegistry.feature_enabled?(:divorce_agreement_year) %> 
             </div>
           </div>
 
@@ -86,7 +87,7 @@
       <div class="col-xs-12">
         <div class="back-link">
           <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <%= l10n_sentence("<b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>") %>
         </div>
       </div>
     </div>
@@ -101,14 +102,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n_sentence("Permanently Remove This Info?") %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove this info?<br /><strong>This cannot be undone.</strong>
+          <%= l10n_sentence("Are you sure you want to remove this info?<br /><strong>This cannot be undone.</strong>") %>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal"><%= l10n_sentence("DON'T REMOVE") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n_sentence("CONTINUE & REMOVE") %></button>
         </div>
       </div>
     </div>
@@ -120,17 +121,17 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n_sentence("Permanently Remove This Info?") %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>?
+          <%= l10n_sentence("Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>") %>?
           <br />
-          This cannot be undone.
+          <%= l10n_sentence("This cannot be undone.") %>
           </strong>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n_sentence("DON'T REMOVE") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n_sentence("CONTINUE & REMOVE") %></button>
         </div>
       </div>
     </div>
@@ -142,15 +143,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n_sentence("You Have Unsaved Changes") %></h4>
         </div>
         <div class="modal-body">
-          If you leave without saving, you will lose all your changes.<br />
-          <strong>This cannot be undone.</strong>
+          <%= l10n_sentence("If you leave without saving, you will lose all your changes.<br />
+          <strong>This cannot be undone.</strong>") %>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
-          <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n_sentence("STAY ON THIS PAGE") %></button>
+          <button type="button" class="btn btn-primary"><%= l10n_sentence("LEAVE WITHOUT SAVING") %></button>
         </div>
       </div>
     </div>
