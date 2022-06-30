@@ -115,10 +115,11 @@ class PlanSelection
     enrollment_obj
   end
 
+  # for IVL market, we need to compare hios_ids instead of product IDs
   def existing_enrollment_for_covered_individuals
     previous_active_coverages.detect do |en|
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? &&
-        en.id != hbx_enrollment.id && (plan.present? ? plan.id == en.product_id : true)
+        en.id != hbx_enrollment.id && (plan.present? ? plan.is_same_plan_by_hios_id_and_active_year?(en.product) : false)
     end
   end
 

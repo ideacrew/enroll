@@ -123,7 +123,7 @@
           <label><%= l10n("insured.tribal_state") %> *</label>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
-            <%= f.select(:tribal_state, options_for_select(State::NAME_IDS.map(&:last), selected: f.object.tribal_state), {include_blank: "SELECT STATE"}, id: "tribal-state")  %>
+            <%= f.select(:tribal_state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: f.object.tribal_state), {include_blank: "SELECT STATE"}, id: "tribal-state")  %>
           </div>
           <div id="tribal-state-alert" class="alert alert-warning alert-dismissible panel-footer hidden_field" role="alert">
             <button type="button" class="close" aria-label="Close">

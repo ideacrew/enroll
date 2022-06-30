@@ -38,6 +38,10 @@ module FinancialAssistance
       options_for_select(build_actions_list(evidence))
     end
 
+    def display_upload_for_evidence?(evidence)
+      evidence.type_unverified?
+    end
+
     def build_actions_list(evidence)
       if evidence.aasm_state == "outstanding"
         Eligibilities::Evidence::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }

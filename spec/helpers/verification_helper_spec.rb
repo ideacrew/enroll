@@ -347,27 +347,24 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#can_show_due_date?" do
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryBot.create(:person, :with_family, :with_consumer_role) }
+    let(:family) { person.primary_family }
 
     before do
-      allow(person).to receive_message_chain("primary_family").and_return(family)
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
+      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
     end
-    it "returns true if any family members have verification types state as outstanding or pending " do
-      family.family_members.each do |member|
-        member.person = FactoryBot.create(:person, :with_consumer_role)
-        member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
-        member.save
-      end
+
+    it "returns true if due date is present on families eligibility determination" do
+      family.eligibility_determination.update!(outstanding_verification_earliest_due_date: TimeKeeper.date_of_record)
+      expect(helper.can_show_due_date?(person)).to eq true
+    end
+
+    it "returns true if any family members have verification types state in DUE_DATE_STATES" do
+      family.eligibility_determination.update!(outstanding_verification_status: "outstanding")
       expect(helper.can_show_due_date?(person)).to eq true
     end
 
     it "returns false if all family members have verification types state as verified " do
-      family.family_members.each do |member|
-        member.person = FactoryBot.create(:person, :with_consumer_role)
-        member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
-        member.save
-      end
       expect(helper.can_show_due_date?(person)).to eq false
     end
   end
@@ -796,6 +793,25 @@ describe '#display_documents_tab?' do
 
     it 'should return false if no members in a family have consumer role' do
       expect(helper.display_documents_tab?([resident_member], nil)).to eq false
+    end
+  end
+end
+
+describe '#display_upload_for_verification?' do
+  let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:verification_type) { person.verification_types.first }
+
+  context 'person applying for coverage' do
+    it 'should return true as verification_type is unverified' do
+      expect(helper.display_upload_for_verification?(verification_type)).to eq true
+    end
+  end
+
+  context 'person not applying for coverage' do
+    it 'should return true as verification_type is unverified' do
+      person.consumer_role.is_applying_coverage = false
+      person.consumer_role.save!
+      expect(helper.display_upload_for_verification?(verification_type)).to eq true
     end
   end
 end

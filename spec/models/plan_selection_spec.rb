@@ -38,6 +38,8 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
                       application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31))
   end
 
+  let(:previous_product) { product }
+
   let!(:previous_coverage) do
     FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                       enrollment_members: covered_individuals,
@@ -48,7 +50,7 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
                       enrollment_kind: 'open_enrollment',
                       kind: 'individual',
                       consumer_role: person.consumer_role,
-                      product: product,
+                      product: previous_product,
                       aasm_state: previous_enrollment_status,
                       terminated_on: terminated_on)
   end
@@ -116,6 +118,23 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
         it 'should return terminated enrollment' do
           expect(subject.existing_enrollment_for_covered_individuals).to eq previous_coverage
         end
+      end
+    end
+
+    context 'when product changes' do
+      let(:previous_product) do
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          hios_id: '11111111122304-01',
+          csr_variant_id: '01',
+          metal_level_kind: :silver,
+          benefit_market_kind: :aca_individual,
+          application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31)
+        )
+      end
+
+      it 'should return nothing' do
+        expect(subject.existing_enrollment_for_covered_individuals).to be_nil
       end
     end
 

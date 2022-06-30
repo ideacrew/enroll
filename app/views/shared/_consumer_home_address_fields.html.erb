@@ -85,7 +85,7 @@
         </div>
 
         <div class="col-xs-<%= "#{col_size}" %> form-group form-group-lg no-pd">
-          <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true) %>
+          <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true) %>
         </div>
 
         <div data-controller="zip-check">
