@@ -136,7 +136,7 @@ function applyListenersFor(target) {
   });
 
   $('select#tribal-state').change(function() {
-    if (this.value == $('#enroll_state_abbr').val()) {
+    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
       $('.featured-tribe-container').removeClass('hide');
       var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
       if (tribe_codes_array.includes("OT")){
@@ -302,6 +302,9 @@ var PersonValidations = (function (window, undefined) {
             PersonValidations.restoreRequiredAttributes(e);
         }
 
+        if (!tribe_codes_array.includes("OT")){
+          $('input#tribal-name').val("");
+        }
       } 
       else if ($('input#tribal-name').val() == ""){
           $('#tribal-name-alert').show();

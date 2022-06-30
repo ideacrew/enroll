@@ -124,7 +124,7 @@ function applyFaaListenersFor(target) {
   });
 
   $('select#tribal-state').change(function() {
-    if (this.value == $('#enroll_state_abbr').val()) {
+    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
       $('.featured-tribe-container').removeClass('hide');
       var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
       if (tribe_codes_array.includes("OT")){
@@ -284,7 +284,10 @@ var ApplicantValidations = (function(window, undefined) {
             alert("Please provide an answer for 'Other' tribe name.");
             ApplicantValidations.restoreRequiredAttributes(e);
         }
-
+        
+        if (!tribe_codes_array.includes("OT")){
+          $('input#tribal-name').val("");
+        }
       } 
       else if ($('input#tribal-name').val() == ""){
           $('#tribal-name-alert').show();
