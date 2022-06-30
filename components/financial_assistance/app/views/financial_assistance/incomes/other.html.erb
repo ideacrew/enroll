@@ -95,7 +95,7 @@
               <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
             <div class="col-md-9 no-pd">
-              <%= label %>
+              <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
             </div>
           </div>
           <div class="other-incomes-list">

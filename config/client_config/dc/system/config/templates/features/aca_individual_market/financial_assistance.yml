@@ -62,6 +62,9 @@ registry:
       - key: :ssi_income_types
         item: :ssi_income_types
         is_enabled: <%= ENV['SSI_INCOME_TYPES_IS_ENABLED'] || false %>
+      - key: :divorce_agreement_year
+        item: :divorce_agreement_year
+        is_enabled: <%= ENV['DIVORCE_AGREEMENT_YEAR_TOOLTIP_IS_ENABLED'] || false %>
       - key: :medicaid_tax_credits_link
         item: :medicaid_tax_credits_link
         is_enabled: true
