@@ -7,7 +7,7 @@ module FinancialAssistance
     end
 
     def l10n_sentence(translation_key, interpolated_keys = {})
-      t(translation_key, interpolated_keys.merge(default: translation_key)).html_safe
+      sanitize(t(translation_key, interpolated_keys.merge(default: translation_key)))
     end
   end
 end
