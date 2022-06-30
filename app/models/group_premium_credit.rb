@@ -20,13 +20,13 @@ class GroupPremiumCredit
 
   # AuthorityDetermination Information.
   # For IVL context,
-  #   authority_determination_class_name can be FinancialAssistance::Application and
+  #   authority_determination_class can be FinancialAssistance::Application and
   #   authority_determination_id can be the BSON::ObjectId of FinancialAssistance::Application
   # For SHOP context,
-  #   authority_determination_class_name can be BenefitSponsors::BenefitApplications::BenefitApplication and
+  #   authority_determination_class can be BenefitSponsors::BenefitApplications::BenefitApplication and
   #   authority_determination_id can be the BSON::ObjectId of BenefitSponsors::BenefitApplications::BenefitApplication
   field :authority_determination_id, type: BSON::ObjectId
-  field :authority_determination_class_name, type: String
+  field :authority_determination_class, type: String
 
   # Maximum Monthly Premium Credit
   # For IVL, premium_credit_monthly_cap is the monthly max_aptc for the entire group.
@@ -35,13 +35,13 @@ class GroupPremiumCredit
 
   # SubGroup Information.
   # For IVL context,
-  #   sub_group_class_name can be FinancialAssistance::EligibilityDetermination and
+  #   sub_group_class can be FinancialAssistance::EligibilityDetermination and
   #   sub_group_id can be the BSON::ObjectId of FinancialAssistance::EligibilityDetermination
   # For SHOP context,
-  #   sub_group_class_name can be BenefitSponsors::BenefitPackages::BenefitPackage and
+  #   sub_group_class can be BenefitSponsors::BenefitPackages::BenefitPackage and
   #   sub_group_id can be the BSON::ObjectId of BenefitSponsors::BenefitPackages::BenefitPackage
   field :sub_group_id, type: BSON::ObjectId
-  field :sub_group_class_name, type: String
+  field :sub_group_class, type: String
 
   field :expected_contribution_percentage, type: Float
 
@@ -72,24 +72,35 @@ class GroupPremiumCredit
   before_save :generate_hbx_id
 
   def authority_determination
-    return nil if authority_determination_id.blank? || authority_determination_class_name.blank?
+    return nil if authority_determination_id.blank? || authority_determination_class.blank?
 
-    authority_determination_class_name.constantize.where(id: authority_determination_id).first
+    fetch_class_name(authority_determination_class).where(id: authority_determination_id).first
   rescue NameError, BSON::ObjectId::Invalid => e
     Rails.logger.error "GroupPremiumCredit Unable to find authority_determination error: #{e}, backtrace: #{e.backtrace.join('\n')}"
     nil
   end
 
   def sub_group
-    return nil if sub_group_id.blank? || sub_group_class_name.blank?
+    return nil if sub_group_id.blank? || sub_group_class.blank?
 
-    sub_group_class_name.constantize.find(sub_group_id)
+    fetch_class_name(sub_group_class).find(sub_group_id)
   rescue NameError, BSON::ObjectId::Invalid => e
     Rails.logger.error "GroupPremiumCredit Unable to find sub_group error: #{e}, backtrace: #{e.backtrace.join('\n')}"
     nil
   end
 
   private
+
+  def fetch_class_name(class_name)
+    case class_name
+    when '::FinancialAssistance::Application', 'FinancialAssistance::Application'
+      FinancialAssistance::Application
+    when '::FinancialAssistance::EligibilityDetermination', 'FinancialAssistance::EligibilityDetermination'
+      FinancialAssistance::EligibilityDetermination
+    else
+      raise NameError
+    end
+  end
 
   def validate_dates
     return unless end_on.present? && start_on > end_on
