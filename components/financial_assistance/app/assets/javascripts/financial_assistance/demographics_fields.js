@@ -124,7 +124,7 @@ function applyFaaListenersFor(target) {
   });
 
   $('select#tribal-state').change(function() {
-    if (this.value == 'ME') {
+    if (this.value == $('#enroll_state_abbr').val()) {
       $('.featured-tribe-container').removeClass('hide');
       var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
       if (tribe_codes_array.includes("OT")){
