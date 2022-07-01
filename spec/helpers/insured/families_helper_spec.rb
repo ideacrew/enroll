@@ -234,10 +234,12 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     let!(:hbx_enrollment_double) do
       double(
         :is_shop? => false,
-        :kind => "coverall",
+        :kind => kind,
         :hbx_id => "12345"
       )
     end
+
+    let(:kind) { "coverall" }
 
     context "SHOP hbx_enrollment" do
       before :each do
@@ -257,6 +259,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
       it "should not throw exception" do
         expect(helper.current_premium(hbx_enrollment_double)).to eq('Not Available.')
+      end
+    end
+
+    context "IVL hbx_enrollment" do
+      let(:kind) { "individual" }
+
+      before :each do
+        allow(hbx_enrollment_double).to receive(:total_premium).and_return(400.00)
+        allow(hbx_enrollment_double).to receive(:total_ehb_premium).and_return(140.00)
+        allow(hbx_enrollment_double).to receive(:applied_aptc_amount).and_return(150.00)
+      end
+
+      it "shows total employee cost" do
+        expect(helper.current_premium(hbx_enrollment_double)).to eq(260.00)
       end
     end
   end
