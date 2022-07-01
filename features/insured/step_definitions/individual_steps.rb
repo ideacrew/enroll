@@ -97,9 +97,9 @@ Then(/^.+ enter personal information with american indian alaska native status w
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
- end
+end
 
- Then(/^.+ enter personal information with american indian alaska native status with other tribe$/) do
+Then(/^.+ enter personal information with american indian alaska native status with other tribe$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).click
@@ -118,4 +118,4 @@ Then(/^.+ enter personal information with american indian alaska native status w
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
- end
+end
