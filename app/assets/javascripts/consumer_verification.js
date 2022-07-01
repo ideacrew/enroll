@@ -24,6 +24,7 @@ var Verification = (function(){
        hideReturnForDef(target);
        hideHubCall(target);
        hideExtendAction(target);
+       hideViewHistory(target);
    }
    function hideVerifyAction(target){
        $('#'+target_id(target)).hide();
@@ -36,6 +37,9 @@ var Verification = (function(){
    }
    function hideExtendAction(target){
        $('#'+target_id(target)+'-extend').hide();
+   }
+   function hideViewHistory(target){
+       $('#'+target_id(target)+'-history').hide();
    }
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
