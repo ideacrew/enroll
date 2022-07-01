@@ -5,6 +5,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled
+    Given divorce agreement year feature is disabled
     When the user will navigate to the FAA Household Info page
     Given ssi types feature is enabled
     And they click ADD INCOME & COVERAGE INFO for an applicant
@@ -19,6 +20,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
   Scenario: User answers yes to having other income
     Given the user answers yes to having other income
     Then the other income choices should show
+    Then the divorce agreement copy should not show
 
   Scenario: Other Income form shows after checking an option
     Given the user answers yes to having other income
@@ -95,3 +97,11 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     Then the user selects a social security benefit type
     Then the user fills out the required other income information
     Then the save button should be enabled
+
+  Scenario: Divorce agreement copy displays
+    Given divorce agreement year feature is enabled
+    And they visit the other income page via the left nav
+    And the user will navigate to the Other Income page for the corresponding applicant
+    Given the user answers yes to having other income
+    Then the other income choices should show
+    Then the divorce agreement copy should show

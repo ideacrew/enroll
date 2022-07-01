@@ -45,6 +45,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_incomes.unemployment" => "Does this person receive <strong>unemployment compensation</strong>, or have they received it this year?*",
   "en.faa.other_incomes.other_sources" => "Does this person have <strong>income from other sources</strong>?*",
   "en.faa.deductions.income_adjustments" => "Does this person have <strong>adjustments to income</strong>?*",
+  "en.faa.deductions.divorce_agreement" => "(from a divorce agreement finalized before January 1, 2019)",
   "en.faa.eligibility_results" => "Eligibility Results",
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "MaineCare and Cub Care",
