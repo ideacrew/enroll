@@ -121,6 +121,10 @@ And(/^Individual clicks on view history$/) do
   find(:xpath, IvlDocumentsPage.view_history_option).click
 end
 
+And(/^Individual clicks on verify$/) do
+  find(:xpath, IvlDocumentsPage.verify_option).click
+end
+
 Then(/^Individual should see request histories and verification types$/) do
   expect(page).to have_content('Verification History')
   expect(page).to have_content('Fdsh Hub Call')
