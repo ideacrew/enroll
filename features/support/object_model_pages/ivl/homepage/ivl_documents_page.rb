@@ -22,8 +22,4 @@ class IvlDocumentsPage
   def self.view_history_option
     "//div[@class='selectric-scroll']/ul/li[contains(text(), 'View History')]"
   end
-
-  def self.verify_option
-    "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Verify')]"
-  end
 end

@@ -122,7 +122,7 @@ And(/^Individual clicks on view history$/) do
 end
 
 And(/^Individual clicks on verify$/) do
-  find(:xpath, IvlDocumentsPage.verify_option).click
+  find('li', :text => "Verify").click
 end
 
 Then(/^Individual should see request histories and verification types$/) do
