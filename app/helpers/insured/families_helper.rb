@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Insured::FamiliesHelper
+  include FloatHelper
 
   def display_change_tax_credits_button?(hbx_enrollment)
     hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
@@ -29,7 +30,8 @@ module Insured::FamiliesHelper
       elsif hbx_enrollment.kind == 'coverall'
         hbx_enrollment.total_premium
       else
-        hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+        cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min)
+        cost > 0 ? cost.round(2) : 0
       end
     rescue Exception => e
       exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id.to_s}"
