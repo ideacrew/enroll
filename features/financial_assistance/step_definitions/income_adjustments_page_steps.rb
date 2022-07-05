@@ -63,3 +63,19 @@ Then(/^the income adjustment form should not show$/) do
   expect(page).to_not have_content 'AMOUNT *'
   expect(page).to_not have_content 'How Often *'
 end
+
+Given(/^divorce agreement year feature is disabled$/) do
+  disable_feature :divorce_agreement_year, {registry_name: FinancialAssistanceRegistry}
+end
+
+Given(/^divorce agreement year feature is enabled$/) do
+  enable_feature :divorce_agreement_year, {registry_name: FinancialAssistanceRegistry}
+end
+
+Then(/^the divorce agreement copy should show$/) do
+  expect(page).to have_content 'from a divorce agreement finalized before January 1, 2019'
+end
+
+Then(/^the divorce agreement copy should not show$/) do
+  expect(page).to_not have_content 'from a divorce agreement finalized before January 1, 2019'
+end
