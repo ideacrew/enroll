@@ -29,7 +29,7 @@ describe "employers/census_employees/new.html.erb", dbclean: :after_each do
     end
 
     it "should have cobra checkbox" do
-      expect(rendered).to match(%r{Check the box if this person is already in enrolled into COBRA/Continuation outside of #{EnrollRegistry[:enroll_app].setting(:short_name).item}})
+      expect(rendered).to match("Check the box if this person is already enrolled in COBRA/Continuation outside of #{Settings.site.short_name}")
       expect(rendered).to have_selector('input#census_employee_existing_cobra')
     end
 
