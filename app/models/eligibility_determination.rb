@@ -150,14 +150,14 @@ private
     rating_address = primary_person.rating_address
     rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address) if rating_address
 
-    puts "*"*100
-    puts "rating_address: #{rating_address && rating_area_id}"
-    puts "*"*100
+    Rails.logger.info( "*"*100)
+    Rails.logger.info( "rating_address: #{rating_address && rating_area_id}")
+    Rails.logger.info( "*"*100)
 
     if rating_address && rating_area_id
-      puts "*"*100
-      puts "apply_aggregate_to_enrollment: #{EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) && self.persisted?}"
-      puts "*"*100
+      Rails.logger.info( "*"*100)
+      Rails.logger.info( "apply_aggregate_to_enrollment: #{EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) && self.persisted?}")
+      Rails.logger.info( "*"*100)
 
       Operations::Individual::ApplyAggregateToEnrollment.new.call({eligibility_determination: self}) if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) && self.persisted?
     else

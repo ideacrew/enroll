@@ -59,9 +59,9 @@ module Insured
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
 
-        puts "*"*100
-        puts "check_enrollment_member_eligibility: #{EnrollRegistry[:check_enrollment_member_eligibility].feature.is_enabled}"
-        puts "*"*100
+        Rails.logger.info( "*"*100)
+        Rails.logger.info( "check_enrollment_member_eligibility: #{EnrollRegistry[:check_enrollment_member_eligibility].feature.is_enabled}")
+        Rails.logger.info( "*"*100)
         
         drop_invalid_enrollment_members(reinstatement)
         can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstatement})
@@ -85,9 +85,9 @@ module Insured
         end
 
         dropped_member_ids(reinstatement)
-        puts "*"*100
-        puts "@invalid_family_member_ids: #{@invalid_family_member_ids}"
-        puts "*"*100
+        Rails.logger.info( "*"*100)
+        Rails.logger.info( "@invalid_family_member_ids: #{@invalid_family_member_ids}")
+        Rails.logger.info( "*"*100)
         @invalid_family_member_ids.flatten.uniq.compact.each do |id|
           enrollment_member = reinstatement.hbx_enrollment_members.select{|em| em.applicant_id.to_s == id.to_s}.first
           enrollment_member.delete if enrollment_member.present?
