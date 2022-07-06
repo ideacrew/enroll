@@ -602,7 +602,7 @@ module FinancialAssistance
 
     def is_eligible_for_non_magi_reasons(applicant)
       return unless FinancialAssistanceRegistry.feature_enabled?(:is_eligible_for_non_magi_reasons)
-       applicant.is_eligible_for_non_magi_reasons
+      applicant.is_eligible_for_non_magi_reasons
     end
 
     def has_mec_check?
