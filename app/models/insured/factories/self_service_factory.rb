@@ -62,8 +62,8 @@ module Insured
         Rails.logger.info( "*"*100)
         Rails.logger.info( "check_enrollment_member_eligibility: #{EnrollRegistry[:check_enrollment_member_eligibility].feature.is_enabled}")
         Rails.logger.info( "*"*100)
-        
-        drop_invalid_enrollment_members(reinstatement)
+
+        drop_invalid_enrollment_members(reinstatement) if EnrollRegistry[:check_enrollment_member_eligibility].feature.is_enabled
         can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstatement})
 
         unless can_renew.success?
