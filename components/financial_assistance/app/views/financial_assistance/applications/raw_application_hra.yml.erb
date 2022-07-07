@@ -46,7 +46,7 @@
         <% end %>
     OTHER QUESTIONS:
         Has this person applied for an SSN:  <%= applicant.is_ssn_applied %>
-        Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A' %>
+        Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason_readable.to_s : 'N/A' %>
         Is this person pregnant?:  <%= applicant.is_pregnant %>
         Pregnancy due date?:  <%=applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>
         How many children is this person expecting?:  <%=applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A' %>
