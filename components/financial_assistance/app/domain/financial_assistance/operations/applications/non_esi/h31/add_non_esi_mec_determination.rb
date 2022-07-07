@@ -37,9 +37,11 @@ module FinancialAssistance
             end
 
             def update_applicant(response_app_entity, application)
+              enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: application.family_id)
+
               response_app_entity.applicants.each do |response_applicant_entity|
                 applicant = find_matching_applicant(application, response_applicant_entity)
-                update_applicant_verifications(applicant, response_applicant_entity)
+                update_applicant_verifications(applicant, response_applicant_entity, enrollments)
               end
               Success('Successfully updated Applicant with evidences and verifications')
             end
@@ -50,13 +52,17 @@ module FinancialAssistance
               end
             end
 
-            def update_applicant_verifications(applicant, response_applicant_entity)
+            def update_applicant_verifications(applicant, response_applicant_entity, enrollments)
               response_non_esi_evidence = response_applicant_entity.non_esi_evidence
               applicant_non_esi_evidence = applicant.non_esi_evidence
 
               if applicant_non_esi_evidence.present?
                 if response_non_esi_evidence.aasm_state == 'outstanding'
-                  applicant.set_evidence_to_negative_response(applicant_non_esi_evidence)
+                  if enrolled?(applicant, enrollments)
+                    applicant.set_evidence_outstanding(applicant_non_esi_evidence)
+                  else
+                    applicant.set_evidence_to_negative_response(applicant_non_esi_evidence)
+                  end
                 else
                   applicant.set_evidence_attested(applicant_non_esi_evidence)
                 end
@@ -68,6 +74,13 @@ module FinancialAssistance
               end
 
               Success(applicant)
+            end
+
+            def enrolled?(applicant, enrollments)
+              return false if enrollments.blank?
+
+              family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+              family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
             end
           end
         end
