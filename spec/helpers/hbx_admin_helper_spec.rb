@@ -125,6 +125,7 @@ RSpec.describe HbxAdminHelper, :type => :helper do
     let!(:tax_household11) { FactoryBot.create(:tax_household, household: family.active_household) }
 
     before do
+      EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11,1) + 14.days)
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
     end
