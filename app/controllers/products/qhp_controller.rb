@@ -2,6 +2,7 @@ class Products::QhpController < ApplicationController
   include ContentType
   include Aptc
   include Acapi::Notifiers
+  include Insured::FamiliesHelper
   extend Acapi::Notifiers
   before_action :set_current_person, only: [:comparison, :summary]
   before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
@@ -58,6 +59,10 @@ class Products::QhpController < ApplicationController
       sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
       @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product_for(@market_kind)]).first
     else
+      # TODO: We need to get rid of reset_dates_on_previously_covered_members from here
+      # its re-creating hbx enrollment members, which is unnecessary at this point and leads to confusion
+      # PlanShoppingsController#thank_you is already using this method. Also need to make sure
+      # enrollments that are automatically created by the system needs to honor this logic before getting rid of this method
       @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.product)
       @member_group = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.product)
     end

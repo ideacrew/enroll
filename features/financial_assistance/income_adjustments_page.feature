@@ -4,6 +4,7 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     Given EnrollRegistry crm_update_family_save feature is disabled
     Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
     Given FAA job_income_warning_message feature is disabled
+    Given divorce agreement year feature is disabled
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
@@ -20,6 +21,7 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
   Scenario: User answers yes to having other income
     Given the user answers yes to having income adjustments
     Then the income adjustments choices should show
+    Then the divorce agreement copy should not show
 
   Scenario: Income adjustments form shows after checking an option
     Given the user answers yes to having income adjustments
@@ -52,3 +54,9 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     When the user cancels the form
     Then the income adjustments checkbox should be unchecked
     And the income adjustment form should not show
+
+  Scenario: Divorce agreement copy displays
+    Given divorce agreement year feature is enabled
+    And they visit the income adjustments page via the left nav
+    Given the user answers yes to having income adjustments
+    Then the divorce agreement copy should show

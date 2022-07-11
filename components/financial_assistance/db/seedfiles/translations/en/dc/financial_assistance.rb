@@ -45,6 +45,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_incomes.unemployment" => "Did this person receive <strong>Unemployment Income</strong> at any point in %{assistance_year}?*",
   "en.faa.other_incomes.other_sources" => "Does this person expect to have <strong> income from other sources </strong> in %{assistance_year}?*",
   "en.faa.deductions.income_adjustments" => "Does this person expect to have income adjustments in %{assistance_year}?*",
+  "en.faa.deductions.divorce_agreement" => "(from a divorce agreement finalized before January 1, 2019)",
   "en.faa.eligibility_results" => "Eligibility Results",
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "Medicaid",
