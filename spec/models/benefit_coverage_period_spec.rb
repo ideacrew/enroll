@@ -231,7 +231,8 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   end
 
   context "elected_plans_by_enrollment_members", dbclean: :before_each do
-    let(:person) {FactoryBot.create(:person, :with_family)}
+    let(:primary_fam_member) { family.family_members.where(is_primary_applicant: true).first }
+    let(:non_primary_fam_member) { family.family_members.where(is_primary_applicant: false).first }
     let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
     let(:household){ family.active_household }
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(Time.current.year,1,1)) }
@@ -240,8 +241,8 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:r1) {FactoryBot.create(:resident_role)}
     let(:r2) {FactoryBot.create(:resident_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
-    let(:member1){ FactoryBot.build(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, family_member: family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members.first.id) }
-    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id)}
+    let(:member1){ FactoryBot.build(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, family_member: primary_fam_member, applicant_id: primary_fam_member.id) }
+    let(:member2){ FactoryBot.build(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, family_member: non_primary_fam_member, applicant_id: non_primary_fam_member.id) }
     let(:hbx_enrollment) do
       enr = FactoryBot.create(:hbx_enrollment, kind: "individual", product: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true, family: family)
       hbx_enrollment_member = FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: true).first.id, hbx_enrollment: enr)
@@ -333,6 +334,68 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
           it 'should not return any plans' do
             allow(rule).to receive(:satisfied?).and_return [false, 'ok']
             expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq []
+          end
+        end
+
+        if rating_type == 'county'
+          # primary and subscriber residing in different counties
+          context 'reponsible party scenario' do
+            let(:county_zip_1) { create(:benefit_markets_locations_county_zip, county_name: "Hancock", zip: "04416", state: "ME") }
+            let(:county_zip_2) { create(:benefit_markets_locations_county_zip, county_name: "Waldo", zip: "04973", state: "ME") }
+
+            let!(:service_area_1)  do
+              FactoryBot.create(
+                :benefit_markets_locations_service_area,
+                active_year: TimeKeeper.date_of_record.year,
+                county_zip_ids: [county_zip_1.id],
+                issuer_provided_code: "Some issuer code",
+                issuer_profile_id: BSON::ObjectId.new
+              )
+            end
+            let!(:service_area_2) do
+              FactoryBot.create(
+                :benefit_markets_locations_service_area,
+                active_year: TimeKeeper.date_of_record.year,
+                county_zip_ids: [county_zip_2.id],
+                issuer_provided_code: "Some issuer code",
+                issuer_profile_id: BSON::ObjectId.new
+              )
+            end
+
+            let!(:primary_person) do
+              person = family.primary_person
+              person.addresses = [primary_address]
+              person.save!
+              person
+            end
+            let(:primary_fam_member) { family.family_members.where(is_primary_applicant: true).first }
+            let(:non_primary_fam_member) { family.family_members.where(is_primary_applicant: false).first }
+            let(:non_primary_person) { non_primary_fam_member.person }
+
+            let!(:non_primary_consumer) { create(:consumer_role, person: non_primary_person) }
+            let(:primary_address) { FactoryBot.build(:address, :mailing_kind, address_1: 'H St', city: 'Bucksport', county: 'Hancock', state: 'ME', zip: '04416') }
+            let!(:non_primary_address) do
+              address = FactoryBot.build(:address, :mailing_kind, address_1: 'F St', city: 'Searsmont', county: 'Waldo', state: 'ME', zip: '04973')
+              non_primary_person.addresses = [address]
+              non_primary_person.save!
+              non_primary_person.addresses[0]
+            end
+
+            before do
+              allow(EnrollRegistry[:service_area].setting(:service_area_model)).to receive(:item).and_return('county')
+              plan1.update_attributes(service_area_id: service_area_1.id)
+              plan2.update_attributes(service_area_id: service_area_1.id)
+              plan3.update_attributes(service_area_id: service_area_1.id)
+              plan4.update_attributes(service_area_id: service_area_1.id)
+              plan5.update_attributes(service_area_id: service_area_2.id)
+              plan6.update_attributes(service_area_id: service_area_2.id)
+            end
+
+            it 'should return plans from primarys service area' do
+              allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+              elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
+              expect(elected_plans_by_enrollment_members.all? { |plan| plan.service_area_id == service_area_1.id }).to be_truthy
+            end
           end
         end
       end
