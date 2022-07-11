@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
@@ -46,9 +48,32 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
   describe "type can be updated" do
     let(:due_date) { TimeKeeper.date_of_record + 96.days }
 
-    it "fail verification type" do
-      person.verification_types.each(&:fail_type)
-      expect(person.verification_types.all?{|type| type.is_type_outstanding?}).to be true
+    context 'when not enrolled' do
+      it "fail verification type" do
+        person.verification_types.each(&:fail_type)
+        expect(person.verification_types.all?(&:is_type_outstanding?)).to be false
+        expect(person.verification_types.all?(&:is_type_negative_response_received?)).to be true
+      end
+    end
+
+    context 'when enrolled' do
+      let(:person) { FactoryBot.create(:person, :with_family, :with_consumer_role)}
+      let(:family) { person.primary_family }
+      let!(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          enrollment_members: family.family_members,
+          family: person.primary_family,
+          kind: 'individual'
+        )
+      end
+
+      it "fail verification type" do
+        person.verification_types.each(&:fail_type)
+        expect(person.verification_types.all?(&:is_type_outstanding?)).to be true
+        expect(person.verification_types.all?(&:is_type_negative_response_received?)).to be false
+      end
     end
 
     context 'when setting verification_document_due_in_days is enabled' do
@@ -84,11 +109,11 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     end
 
     it "pass verification type" do
-      person.verification_types.each{|type| type.pass_type}
-      expect(person.verification_types.all?{|type| type.type_verified?}).to be true
+      person.verification_types.each(&:pass_type)
+      expect(person.verification_types.all?(&:type_verified?)).to be true
     end
     it "pending verification type" do
-      person.verification_types.each{|type| type.pending_type}
+      person.verification_types.each(&:pending_type)
       expect(person.verification_types.all?{|type| type.validation_status == "pending"}).to be true
     end
 
@@ -139,6 +164,18 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     let!(:ver_type) { person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified') }
 
     context 'for outstanding' do
+      let(:person) { FactoryBot.create(:person, :with_family, :with_consumer_role)}
+      let(:family) { person.primary_family }
+      let!(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          enrollment_members: family.family_members,
+          family: person.primary_family,
+          kind: 'individual'
+        )
+      end
+
       before { ver_type.fail_type }
 
       it 'should return true' do
@@ -147,6 +184,18 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
 
       it 'returns state as outstanding' do
         expect(ver_type.validation_status).to eq('outstanding')
+      end
+    end
+
+    context 'for negative_response_received' do
+      before { ver_type.fail_type }
+
+      it 'should return true' do
+        expect(ver_type.is_type_negative_response_received?).to eq(true)
+      end
+
+      it 'returns state as negative_response_received' do
+        expect(ver_type.validation_status).to eq('negative_response_received')
       end
     end
 

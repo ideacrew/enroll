@@ -1806,4 +1806,25 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe 'five_year_bar_applies, five_year_bar_met' do
+    context 'for five_year_bar information' do
+      let!(:update_applicant) do
+        applicant.five_year_bar_applies = true
+        applicant.five_year_bar_met = true
+        applicant.save!
+      end
+
+      before do
+        result = subject.call(application.reload)
+        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @applicant_entity = entity_init.success.applicants.first
+      end
+
+      it 'should include five_year_bar info in the result payload' do
+        expect(@applicant_entity.five_year_bar_applies).to eq(true)
+        expect(@applicant_entity.five_year_bar_met).to eq(true)
+      end
+    end
+  end
 end

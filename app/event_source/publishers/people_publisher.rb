@@ -6,5 +6,6 @@ module Publishers
     include ::EventSource::Publisher[amqp: 'enroll.people']
 
     register_event 'person_saved'
+    register_event 'person_updated'
   end
 end

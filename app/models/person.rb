@@ -337,6 +337,7 @@ class Person
   after_update :notify_updated
   after_update :person_create_or_update_handler
   after_save :generate_person_saved_event
+  after_update :publish_updated_event
 
 
   def self.api_staff_roles
@@ -463,6 +464,13 @@ class Person
     event.success.publish if event.success?
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
+  end
+
+  def publish_updated_event
+    event = event('events.person_updated', attributes: { gid: self.to_global_id.uri, payload: self.changed_attributes })
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate person update event due to #{e.backtrace}" }
   end
 
   def person_create_or_update_handler
