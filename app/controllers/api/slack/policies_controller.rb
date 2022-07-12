@@ -6,10 +6,10 @@ class ApiSlackPoliciesController < ApplicationController
   def policy_id_check
     token = params[:token]
     user_name = params[:user_name]
-    allowed_users = ["davidplapper"]
+    allowed_users = ENV['POLICY_ID_CHECK_USERS'].split(',')
 
     ## validate the token AND make sure the user requesting it has privligdges
-    if token == "VQp4kgdXbMQJ2sqnOL0xIB6p" && allowed_users.include?(user_name)
+    if token == ENV['SLACK_API_TOKEN'] && allowed_users.include?(user_name)
       ## valid request
       ## var1=value1 var2=value2
       ## string is split into array split by spaces for processing
@@ -65,7 +65,7 @@ class ApiSlackPoliciesController < ApplicationController
       ## error out
       ## respond
       slack = Slack::Incoming::Webhooks.new params[:response_url]
-      slack.post "Slack user with username #{user_name} does not have permission to run policy-id-check. Please contact David Plappert with this error message to be given permission."
+      slack.post "Slack user with username #{user_name} does not have permission to run policy-id-check. Please contact #{ENV['SLACK_API_ADMIN']} with this error message to be given permission."
     end
   end
 end
