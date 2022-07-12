@@ -95,6 +95,7 @@ class Person
   field :tribal_id, type: String
   field :tribal_state, type: String
   field :tribal_name, type: String
+  field :tribe_codes, type: Array
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :tobacco_use, type: Boolean # TODO: use above field
@@ -1229,7 +1230,8 @@ class Person
     return nil if citizen_status.blank?
 
     result = @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
-    result = @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+    result = @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+    # result = @indian_tribe_member ||= !(tribal_name.nil? || tribal_name.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
 
     result
   end
@@ -1380,19 +1382,22 @@ class Person
     return unless @is_consumer_role.to_s == 'true' && consumer_role.is_applying_coverage.to_s == 'true' #only check this for consumer flow.
 
     citizenship_validation
-    native_american_validation
+
+
+    self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
+    native_american_validation if @indian_tribe_member && @us_citizen
+
     incarceration_validation
   end
 
   def native_american_validation
-    self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
-    if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal state is required when native american / alaska native is selected") unless tribal_state.present?
-      self.errors.add(:base, "Tribal name is required when native american / alaska native is selected") unless tribal_name.present?
-    elsif !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
-    elsif !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && tribal_id.present? && !tribal_id.match("[0-9]{9}")
-      self.errors.add(:base, "Tribal id must be 9 digits")
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+      self.errors.add(:tribal_state, "required when native american / alaska native is selected") unless tribal_state.present?
+      self.errors.add(:tribal_name, "cannot contain numbers") unless (tribal_name =~ /\d/).nil?
+      self.errors.add(:tribal_name, "required when native american / alaska native is selected") if !tribal_name.present? && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+    else
+      self.errors.add(:tribal_id, "required when native american / alaska native is selected") unless tribal_id.present?
+      self.errors.add(:tribal_id, "must be 9 digits") if tribal_id.present? && !tribal_id.match("[0-9]{9}")
     end
   end
 

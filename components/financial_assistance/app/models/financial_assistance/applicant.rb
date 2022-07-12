@@ -264,6 +264,7 @@ module FinancialAssistance
     field :health_service_eligible, type: Boolean
     field :tribal_state, type: String
     field :tribal_name, type: String
+    field :tribe_codes, type: Array
 
     field :is_medicaid_cubcare_eligible, type: Boolean
 
@@ -1103,7 +1104,7 @@ module FinancialAssistance
                                                                    :is_consumer_role,:vlp_document_id,:is_applying_coverage,:vlp_subject,:alien_number,
                                                                    :i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                                                    :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,
-                                                                   :issuing_country,:status,:indian_tribe_member,
+                                                                   :issuing_country,:status,:indian_tribe_member,:tribe_codes,
                                                                    :five_year_bar_applies, :five_year_bar_met,
                                                                    :same_with_primary,:vlp_description,:tribal_state,:tribal_name)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})

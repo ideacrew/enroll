@@ -74,6 +74,12 @@ registry:
       - key: :primary_caregiver_relationship_other_question
         item: :primary_caregiver_relationship_other_question
         is_enabled: <%= ENV['PRIMARY_CAREGIVER_RELATIONSHIP_OTHER_QUESTION_IS_ENABLED'] || false %>
+      - key: :featured_tribes_selection
+        item: :featured_tribes_selection
+        is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
+        settings:
+        - key: :featured_tribes
+          item: [["Maliseet", "HM"], ["Passamaquoddy", "PD"], ["Penobscot", "PE"], ["Micmac", "AM"], ["Other", "OT"]]
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
         is_enabled: true

@@ -21,7 +21,7 @@ Feature: A dedicated page that gives the user access to Tax Info page for a give
     And FAA filing_as_head_of_household feature is enabled
 	Given the user is editing an application for financial assistance
     And user clicks household add member button
-    And the user fills the the aplicant add member form with indian member no
+    And the user fills the applicant add member form with indian member no
     And user clicks primary add income and coverage
 	And question will this person file taxes for year is marked as yes for primary applicant
     And filing jointly is selected no
@@ -33,7 +33,7 @@ Feature: A dedicated page that gives the user access to Tax Info page for a give
     And FAA filing_as_head_of_household feature is enabled
 	Given the user is editing an application for financial assistance
     And user clicks household add member button
-    And the user fills the the aplicant add member form with indian member no
+    And the user fills the applicant add member form with indian member no
     And user clicks primary add income and coverage
 	And question will this person file taxes for year is marked as yes for primary applicant
     And filing jointly is selected no
