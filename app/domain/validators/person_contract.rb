@@ -22,6 +22,7 @@ module Validators
       optional(:tribal_id).maybe(:string)
       optional(:tribal_state).maybe(:string)
       optional(:tribal_name).maybe(:string)
+      optional(:tribe_codes).maybe(:array)
 
       optional(:language_code).maybe(:string)
       optional(:no_dc_address).filled(:bool)

@@ -1,18 +1,17 @@
 function isApplyingCoverage(target){
-
   fields = "input[name='" + target + "[is_applying_coverage]']"
   $("#employer-coverage-msg").hide();
   $("#ssn-coverage-msg").hide();
-  if($(fields).length > 0){
+  if ($(fields).length > 0){
     addEventOnNoSsn(target);
     addEventOnSsn(target);
-    if($(fields).not(":checked").val() == "true"){
+    if ($(fields).not(":checked").val() == "true"){
       $("#consumer_fields_sets").hide();
       $("#employer-coverage-msg").show();
-      if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
+      if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
         $("#ssn-coverage-msg").show();
       }
-      if(!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
+      if (!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
         new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone')
         $('#indian_tribe_area').remove()
         new_tribe_form.insertBefore($('#consumer_fields_sets'))
@@ -20,19 +19,19 @@ function isApplyingCoverage(target){
 
     }
     $(fields).change(function () {
-      if($(fields).not(":checked").val() == "true"){
+      if ($(fields).not(":checked").val() == "true"){
         $("#consumer_fields_sets").hide();
         $("#employer-coverage-msg").show();
-        if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
+        if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
           $("#ssn-coverage-msg").show();
         }
-        if(!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
+        if (!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
           new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone')
           $('#indian_tribe_area').remove()
           new_tribe_form.insertBefore($('#consumer_fields_sets'))
         }
-      }else{
-        if($('.no_coverage_tribe_details').length > 0){
+      } else {
+        if ($('.no_coverage_tribe_details').length > 0){
           new_tribe_form = $('#indian_tribe_area').clone(true).removeClass('tribe-area-clone')
           $('#indian_tribe_area').remove()
           new_tribe_form.insertAfter($('#vlp_documents_container'))
@@ -47,9 +46,9 @@ function isApplyingCoverage(target){
 
 function addEventOnNoSsn(target){
   $("input[name='" + target + "[no_ssn]']").change(function() {
-    if($(this).is(":checked")) {
+    if ($(this).is(":checked")) {
        $("#ssn-coverage-msg").hide();
-    }else if($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
+    } else if ($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
         $("#ssn-coverage-msg").show();
     }
   });
@@ -57,9 +56,9 @@ function addEventOnNoSsn(target){
 
 function addEventOnSsn(target){
   $("input[name='" + target + "[ssn]']").keyup(function() {
-    if($(this).val() != '') {
+    if ($(this).val() != '') {
        $("#ssn-coverage-msg").hide();
-    }else if( !$("input[name='" + target + "[no_ssn]']").is(":checked") && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
+    } else if ( !$("input[name='" + target + "[no_ssn]']").is(":checked") && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
         $("#ssn-coverage-msg").show();
     }
   });
@@ -115,17 +114,38 @@ function applyFaaListenersFor(target) {
     }
   });
 
+  //start tribe option controls
   $("input[name='" + target + "[indian_tribe_member]']").change(function() {
-    if ($(this).val() == 'true') {
-      $('#tribal_container').show();
-      $('.tribal_container').show();
+    if (this.value === 'true') {
+      $('.tribal-container').removeClass('hide');
     } else {
-      $('#tribal_container').hide();
-      $('.tribal_container').hide();
-      $('#tribal_id').val("");
+      $('.tribal-container').addClass('hide');
     }
   });
 
+  $('select#tribal-state').change(function() {
+    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
+      $('.featured-tribe-container').removeClass('hide');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+      if (tribe_codes_array.includes("OT")){
+        $('.tribal-name-container').removeClass('hide');
+      } else {
+        $('.tribal-name-container').addClass('hide');
+      }
+    } else {
+      $('.tribal-name-container').removeClass('hide');
+      $('.featured-tribe-container').addClass('hide');
+    }
+  });
+
+  $('input#applicant_tribe_codes_ot').change(function() {
+    if (this.checked){
+      $('.tribal-name-container').removeClass('hide');
+    } else {
+      $('.tribal-name-container').addClass('hide');
+    }
+  });
+  //end tribe option controls
 }
 
 function showOnly(selected) {
@@ -191,55 +211,6 @@ function applyFaaListeners() {
   });
 }
 
-function validationForIndianTribeMember(e) {
-  if ($('#indian_tribe_area').length == 0) {
-    return false;
-  };
-  $('.close').click(function() {
-    $('#tribal_id_alert').hide()
-    $('#tribal-state-alert').hide();
-    $('#tribal-name-alert').hide();
-  });
-  $('form.new_applicant, form.edit_applicant').submit(function(e) {
-    if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
-      return true;
-    }
-    if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
-      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
-      e.preventDefault && e.preventDefault();
-      return false;
-    };
-
-    // for tribal_id
-    var tribal_val = $('#tribal_id').val();
-    if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_val == "undefined" || tribal_val == '')) {
-      $('#tribal_id_alert').show();
-      e.preventDefault && e.preventDefault();
-      return false;
-    }
-
-    // for tribal_state
-    if ($('.tribal-state').length) {
-      var tribal_state_val = $('#tribal_state').val();
-      if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_state_val == "undefined" || tribal_state_val == '')) {
-        $('#tribal-state-alert').show();
-        e.preventDefault && e.preventDefault();
-        return false;
-      }
-    }
-
-    // for tribal_name
-    if ($('.tribal-name').length) {
-      var tribal_name = $('#tribal-name').val();
-      if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_name == "undefined" || tribal_name == '')) {
-        $('#tribal-name-alert').show();
-        e.preventDefault && e.preventDefault();
-        return false;
-      }
-    }
-  });
-}
-
 var ApplicantValidations = (function(window, undefined) {
 
   function manageRequiredValidations(this_obj) {
@@ -262,6 +233,71 @@ var ApplicantValidations = (function(window, undefined) {
     if ($('input[name="applicant[us_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a US Citizen or US National?');
       ApplicantValidations.restoreRequiredAttributes(e);
+    }
+  }
+
+  function validationForIndianTribeMember(e) {
+    if ($('#indian_tribe_area').length == 0){
+      return false;
+    }
+
+    $('.close').click(function() {
+      $('#tribal-id-alert').addClass('hide');
+      $('#tribal-state-alert').addClass('hide');
+      $('#tribal-name-alert').addClass('hide');
+    });
+
+    if ($('input[name="applicant[is_applying_coverage]"]').length > 0 
+    && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
+
+    var tribe_member_yes = $("input#indian_tribe_member_yes").is(':checked');
+    var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
+
+    if (!tribe_member_yes && !tribe_member_no){
+      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
+      ApplicantValidations.restoreRequiredAttributes(e);
+    };
+
+    if (tribe_member_no){
+      $('#tribal-state').val("");
+      $('input#tribal-name').val("");
+      $('#tribal-id').val("");
+      $('.tribe_codes:checked').removeAttr('checked');
+    }
+
+    if (tribe_member_yes){
+      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == ""){
+        $('#tribal-state-alert').show();
+        ApplicantValidations.restoreRequiredAttributes(e);
+      }
+      
+      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
+        var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+        if (tribe_codes_array.length < 1) { 
+          alert("At least one tribe must be selected.");
+          ApplicantValidations.restoreRequiredAttributes(e);
+        }
+
+        if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
+            alert("Please provide an answer for 'Other' tribe name.");
+            ApplicantValidations.restoreRequiredAttributes(e);
+        }
+        
+        if (!tribe_codes_array.includes("OT")){
+          $('input#tribal-name').val("");
+        }
+      } 
+      else if ($('input#tribal-name').val() == ""){
+          $('#tribal-name-alert').show();
+          ApplicantValidations.restoreRequiredAttributes(e);
+      }
+
+      if ($('#tribal-id').length > 0 && $('#tribal-id').val() == ""){
+          $('#tribal-id-alert').show();
+          ApplicantValidations.restoreRequiredAttributes(e);
+      }
     }
   }
 
@@ -292,7 +328,7 @@ var ApplicantValidations = (function(window, undefined) {
     }
   }
 
-  function validation_for_person_or_dependent() {
+  function validationForPersonOrDependent() {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
@@ -309,7 +345,7 @@ var ApplicantValidations = (function(window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
-    if (validation_for_person_or_dependent()) {
+    if (validationForPersonOrDependent()) {
       $('#showWarning').removeClass('hidden');
     }
     if ($('#vlp_documents_container').is(':visible')) {
@@ -322,13 +358,10 @@ var ApplicantValidations = (function(window, undefined) {
             } else {
               $('#showWarning').removeClass('hidden');
             }
-          } else {
-
-          }
+          } 
         }
         if ($('#immigration_doc_type').val() == 'Naturalization Certificate' || $('#immigration_doc_type').val() == 'Certificate of Citizenship') {
-        }
-        else {
+        } else {
           if ($(this).attr('placeholder') == 'Alien Number') {
             if ($(this).val().length < 1) {
               if (!$('#showWarning').length) {
@@ -337,7 +370,7 @@ var ApplicantValidations = (function(window, undefined) {
               } else {
                 $('#showWarning').removeClass('hidden');
               }
-            } else {}
+            }
           }
         }
         if ($(this).attr('placeholder') == 'Document Description') {
@@ -348,7 +381,7 @@ var ApplicantValidations = (function(window, undefined) {
             } else {
               $('#showWarning').removeClass('hidden');
             }
-          } else {}
+          }
         }
         if ($(this).attr('placeholder') == 'Card Number') {
           if ($(this).val().length < 1) {
@@ -358,7 +391,7 @@ var ApplicantValidations = (function(window, undefined) {
             } else {
               $('#showWarning').removeClass('hidden');
             }
-          } else {}
+          }
         }
         if ($(this).attr('placeholder') == 'Naturalization Number') {
           if ($(this).val().length < 1) {
@@ -368,7 +401,7 @@ var ApplicantValidations = (function(window, undefined) {
             } else {
               $('#showWarning').removeClass('hidden');
             }
-          } else {}
+          }
         }
         if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' || $('#immigration_doc_type').val() == 'Temporary I-551 Stamp (on passport or I-94)' || $('#immigration_doc_type').val() == 'Other (With Alien Number)' || $('#immigration_doc_type').val() == 'Other (With I-94 Number)') {
 
@@ -381,7 +414,7 @@ var ApplicantValidations = (function(window, undefined) {
               } else {
                 $('#showWarning').removeClass('hidden');
               }
-            } else {}
+            }
           }
         }
         if ($(this).attr('placeholder') == 'I-766 Expiration Date') {
@@ -392,14 +425,14 @@ var ApplicantValidations = (function(window, undefined) {
             } else {
               $('#showWarning').removeClass('hidden');
             }
-          } else {}
+          }
         }
 //        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
 //          if ($(this).val().length != 10) {
 //            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
 //            ApplicantValidations.restoreRequiredAttributes(e);
 //
-//          } else {}
+//          }
 //        }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport') {
           if ($(this).attr('placeholder') == 'Passport Expiration Date') {
@@ -410,11 +443,10 @@ var ApplicantValidations = (function(window, undefined) {
               } else {
                 $('#showWarning').removeClass('hidden');
               }
-            } else {}
+            }
           }
         }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
-
         } else {
           if ($(this).attr('placeholder') == 'I 94 Number') {
             if ($(this).val().length < 1) {
@@ -424,7 +456,7 @@ var ApplicantValidations = (function(window, undefined) {
               } else {
                 $('#showWarning').removeClass('hidden');
               }
-            } else {}
+            }
           }
         }
 
@@ -437,13 +469,9 @@ var ApplicantValidations = (function(window, undefined) {
               } else {
                 $('#showWarning').removeClass('hidden');
               }
-            } else {}
+            }
           }
-        } else {
-
-        }
-
-
+        } 
       });
     }
   }
@@ -456,27 +484,23 @@ var ApplicantValidations = (function(window, undefined) {
     validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
-    restoreRequiredAttributes: restoreRequiredAttributes,
-    validationForIndianTribeMember: validationForIndianTribeMember
+    validationForIndianTribeMember: validationForIndianTribeMember,
+    restoreRequiredAttributes: restoreRequiredAttributes
   };
 
 })(window);
 
 function applicantDemographicValidations() {
   applyFaaListeners();
+
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
-    ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForUsCitizenOrUsNational(e);
     ApplicantValidations.validationForNaturalizedCitizen(e);
     ApplicantValidations.validationForEligibleImmigrationStatuses(e);
+    ApplicantValidations.validationForIndianTribeMember(e);
     ApplicantValidations.validationForIncarcerated(e);
     ApplicantValidations.validationForVlpDocuments(e);
-    ApplicantValidations.validationForPrimaryRelationship(e);
-    if (
-      $('#showWarning').length &&
-      !$('#showWarning').hasClass('hidden') &&
-      !$('#showWarning').hasClass('shown')
-    ) {
+    if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
       $('#showWarning').addClass('shown');
       e.preventDefault();
       return false;

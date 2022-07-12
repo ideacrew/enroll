@@ -9,7 +9,7 @@ module FinancialAssistance
       include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
-                    :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
+                    :tribe_codes, :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
 
       attr_writer :family
 
@@ -54,14 +54,10 @@ module FinancialAssistance
         return unless @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true"
 
         validate_citizen_status
+
         self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
-          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
-          self.errors.add(:tribal_name, "cannot contain numbers") if !(tribal_name =~ /\d/).nil? && @indian_tribe_member
-        elsif !tribal_id.present? && @indian_tribe_member
-          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
-        end
+        validate_tribe_details if @indian_tribe_member
+
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
 
@@ -74,6 +70,27 @@ module FinancialAssistance
                           "Naturalized citizen is required"
                         end
         self.errors.add(:base, error_message) if error_message.present?
+      end
+
+      def validate_tribe_details
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") unless tribal_state.present?
+          validate_featured_tribes if FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+          self.errors.add(:tribal_name, "cannot contain numbers") unless (tribal_name =~ /\d/).nil?
+        else
+          self.errors.add(:tribal_id, "is required when native american / alaska native is selected") unless tribal_id.present?
+          self.errors.add(:tribal_id, "Tribal id must be 9 digits") if tribal_id.present? && !tribal_id.match("[0-9]{9}")
+        end
+      end
+
+      def validate_featured_tribes
+        if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if tribe_codes.include?("OT") && !tribal_name.present?
+          self.errors.add(:base, "At least one tribe must be selected") if tribe_codes.empty?
+        else
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") unless tribal_id.present?
+        end
       end
 
       def persisted?
@@ -98,7 +115,6 @@ module FinancialAssistance
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
-
           if applicant.present? && applicant.persisted?
             applicant.update(values)
           else
@@ -146,6 +162,7 @@ module FinancialAssistance
           tribal_id: tribal_id,
           tribal_state: tribal_state,
           tribal_name: tribal_name,
+          tribe_codes: tribe_codes.to_a.reject(&:blank?),
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state,
           immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)

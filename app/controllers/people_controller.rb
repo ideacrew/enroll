@@ -412,6 +412,7 @@ private
       :tribal_id,
       :tribal_state,
       :tribal_name,
+      { :tribe_codes => [] },
       :no_dc_address,
       :is_homeless,
       :is_temporarily_out_of_state,
