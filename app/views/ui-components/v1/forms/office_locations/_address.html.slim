@@ -3,12 +3,12 @@
     h4 Office Location
   .row
     .col-md-9.col-sm-6.col-xs-12
-      label for="inputAddress1" Address
+      label for="inputAddress1" = l10n('employers.registration.address')
       = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true', id:'inputAddress1'
       .invalid-feedback
         | Please provide a valid address.
     .col-md-3.col-sm-6.col-xs-12
-      label for="inputKind" Kind
+      label for="inputKind" = l10n('employers.registration.kind')
       - kinds = f.object.office_kind_options; kinds = kinds.rotate if params[:child_index]
       = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: f.object.try(:kind)),{}, class: "form-control", required: true, id:'kindSelect',placeholder: 'KIND', onchange:'checkOLKind(this)'
       .invalid-feedback
@@ -21,17 +21,17 @@
 
   .row[data-controller='zip-check']
     .col-md-3.col-sm-12.col-xs-12
-      label for="inputCity" City
+      label for="inputCity" = l10n("employers.registration.city")
       = f.text_field :city, class: "form-control mb-1", required: true, placeholder: 'CITY'
       .invalid-feedback
         | Please provide a valid city.
     .col-md-3.col-sm-12.col-xs-12
-      label for="inputState" State
+      label for="inputState" = l10n('employers.registration.state')
       = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
       .invalid-feedback
         | Please select a state.
     .col-md-3.col-sm-12.col-xs-12
-      label for="inputZip" Zip
+      label for="inputZip" = l10n('employers.registration.zip')
       = f.text_field :zip, id:'inputZip', class:'form-control mb-1', minlength:'5', maxlength:'5'
       .invalid-feedback
         | Please provide a valid zipcode.
