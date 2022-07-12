@@ -185,3 +185,5 @@ group :production do
   gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'
 end
+
+gem 'slack-incoming-webhooks', '~> 0.3.0'
