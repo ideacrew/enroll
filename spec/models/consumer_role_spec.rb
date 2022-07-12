@@ -479,12 +479,12 @@ context 'Verification process and notices' do
           expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
         end
 
-        it "updates indian tribe validition status to outstanding and to pending for the rest" do
+        it "updates indian tribe validition status to negative_response_received and to pending for the rest" do
           consumer.tribal_id = "345543345"
           consumer.coverage_purchased!
           consumer.verification_types.each do |verif|
             if verif.type_name == 'American Indian Status'
-              expect(verif.validation_status).to eq('outstanding')
+              expect(verif.validation_status).to eq('negative_response_received')
             else
               expect(verif.validation_status).to eq('pending')
             end
@@ -941,12 +941,12 @@ describe "Indian tribe member" do
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "ssa" })}
 
   context 'Responses from local hub and ssa hub' do
-    it 'aasm state should be in verification outstanding if dc response is valid and consumer is tribe member' do
+    it 'aasm state should be in fully_verified if dc response is valid and consumer is tribe member' do
       person.update_attributes!(tribal_id: "12345")
       consumer_role.coverage_purchased!(verification_attr)
       consumer_role.pass_residency!
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
-      expect(consumer_role.aasm_state).to eq 'verification_outstanding'
+      expect(consumer_role.aasm_state).to eq 'fully_verified'
     end
 
     it 'aasm state should be in fully verified if dc response is valid and consumer is not a tribe member' do
@@ -978,11 +978,11 @@ describe "Indian tribe member" do
   end
 
   context 'american indian verification type on coverage purchase' do
-    it 'aasm state should be in verification outstanding and american indian status in outstanding upon coverage purchase' do
+    it 'aasm state should be in verification negative_response_received and american indian status in outstanding upon coverage purchase' do
       person.update_attributes!(tribal_id: "12345")
       consumer_role.coverage_purchased!(verification_attr)
       american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
-      expect(american_indian_status.validation_status).to eq 'outstanding'
+      expect(american_indian_status.validation_status).to eq 'negative_response_received'
       expect(consumer_role.aasm_state).to eq 'verification_outstanding'
     end
   end
@@ -1258,6 +1258,8 @@ describe 'coverage_purchased!' do
     unless EnrollRegistry.feature_enabled?(:ssa_h3)
       expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.ssa_verification_request',
                                                                                    {:person => person})
+      expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request',
+                                                                                   {:coverage_start_date => TimeKeeper.date_of_record, :person => person})
     end
     person.consumer_role.coverage_purchased!
   end

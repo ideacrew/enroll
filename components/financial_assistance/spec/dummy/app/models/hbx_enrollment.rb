@@ -4,6 +4,8 @@ class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  ENROLLED_STATUSES = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified coverage_reinstated].freeze
+
   belongs_to :family
 
   field :is_any_enrollment_member_outstanding, type: Boolean, default: false

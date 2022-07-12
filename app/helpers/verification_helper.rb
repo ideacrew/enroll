@@ -40,7 +40,7 @@ module VerificationHelper
     case status
     when 'verified', 'valid'
       'success'
-    when 'review'
+    when 'review', 'negative_response_received'
       'warning'
     when 'outstanding', 'rejected'
       'danger'
@@ -194,7 +194,7 @@ module VerificationHelper
     elsif status
       status = "verified" if status == "valid"
       status = l10n('verification_type.validation_status') if status == 'rejected'
-      status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+      status.titleize.center(12).gsub(' ', '&nbsp;').html_safe
     end
   end
 

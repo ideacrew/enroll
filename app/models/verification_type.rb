@@ -14,6 +14,7 @@ class VerificationType
   OUTSTANDING_STATES = %w[outstanding rejected].freeze
   DUE_DATE_STATES = %w[review outstanding rejected].freeze
   SATISFIED_STATES = %w[verified attested valid curam].freeze
+  NEGATIVE_STATES = %w[negative_response_received].freeze
 
 
   field :type_name, type: String
@@ -70,6 +71,10 @@ class VerificationType
     validation_status == "expired"
   end
 
+  def is_type_negative_response_received?
+    validation_status == 'negative_response_received'
+  end
+
   def outstanding_no_docs?
     is_type_outstanding? && vlp_documents.empty?
   end
@@ -106,7 +111,12 @@ class VerificationType
 
   def fail_type
     verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-    status = self.reload.validation_status == 'rejected' ? 'rejected' : 'outstanding'
+    status = if self.reload.validation_status == 'rejected'
+               'rejected'
+             else
+               is_enrolled = person.families.any? { |family| family.person_has_an_active_enrollment?(person) }
+               (is_enrolled ? 'outstanding' : 'negative_response_received')
+             end
     attrs =
       if EnrollRegistry.feature_enabled?(:set_due_date_upon_response_from_hub)
         {:validation_status => status, :due_date => (TimeKeeper.date_of_record + verification_document_due.days), :due_date_type => 'response_from_hub'}
