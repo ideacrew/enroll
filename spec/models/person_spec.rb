@@ -1642,4 +1642,15 @@ describe Person, :dbclean => :after_each do
 
     end
   end
+
+  context 'publish_updated_event' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+    before { person.first_name = 'updated' }
+
+    it 'should trigger publish_updated_event' do
+      expect_any_instance_of(Events::PersonUpdated).to receive(:publish)
+      person.save!
+    end
+  end
 end

@@ -53,6 +53,11 @@ FactoryBot.define do
       relationship { 'child' }
     end
 
+    trait :with_five_year_bar do
+      five_year_bar_applies { true }
+      five_year_bar_met { true }
+    end
+
     trait :spouse do
       relationship { 'spouse' }
     end
