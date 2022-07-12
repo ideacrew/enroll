@@ -20,7 +20,7 @@ module Operations
       private
 
       def validate(params)
-        if params[:family]&.is_a?(Family) && params[:new_effective_date]&.is_a?(Date)
+        if params[:family].is_a?(Family) && params[:new_effective_date].is_a?(Date)
           Success(params)
         else
           Failure('Invalid params. family should be an instance of Family and new_effective_date should be an instance of Date')

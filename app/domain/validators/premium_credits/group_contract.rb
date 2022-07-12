@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Validators
   module PremiumCredits
     # This class checks and validates the incoming params

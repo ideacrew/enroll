@@ -73,7 +73,13 @@ RSpec.describe Operations::Families::AddFaEligibilityDetermination, type: :model
         job_coverage_ended_in_past_3_months: false,
         job_coverage_end_date: nil,
         medicaid_and_chip: {
-          not_eligible_in_last_90_days: false,denied_on: nil,ended_as_change_in_eligibility: false,hh_income_or_size_changed: false,medicaid_or_chip_coverage_end_date: nil,ineligible_due_to_immigration_in_last_5_years: false, immigration_status_changed_since_ineligibility: false
+          not_eligible_in_last_90_days: false,
+          denied_on: nil,
+          ended_as_change_in_eligibility: false,
+          hh_income_or_size_changed: false,
+          medicaid_or_chip_coverage_end_date: nil,
+          ineligible_due_to_immigration_in_last_5_years: false,
+          immigration_status_changed_since_ineligibility: false
         },
         other_health_service: {
           has_received: false, is_eligible: false
@@ -143,7 +149,23 @@ RSpec.describe Operations::Families::AddFaEligibilityDetermination, type: :model
         },
         is_homeless: false,
         mitc_income: {
-          amount: 56_992,taxable_interest: 0,tax_exempt_interest: 0,taxable_refunds: 0,alimony: 0,capital_gain_or_loss: 0,pensions_and_annuities_taxable_amount: 0,farm_income_or_loss: 0,unemployment_compensation: 0,other_income: 0,magi_deductions: 0,adjusted_gross_income: 28_417,deductible_part_of_self_employment_tax: 0,ira_deduction: 0,student_loan_interest_deduction: 0,tution_and_fees: 0,other_magi_eligible_income: 0
+          amount: 56_992,
+          taxable_interest: 0,
+          tax_exempt_interest: 0,
+          taxable_refunds: 0,
+          alimony: 0,
+          capital_gain_or_loss: 0,
+          pensions_and_annuities_taxable_amount: 0,
+          farm_income_or_loss: 0,
+          unemployment_compensation: 0,
+          other_income: 0,
+          magi_deductions: 0,
+          adjusted_gross_income: 28_417,
+          deductible_part_of_self_employment_tax: 0,
+          ira_deduction: 0,
+          student_loan_interest_deduction: 0,
+          tution_and_fees: 0,
+          other_magi_eligible_income: 0
         },
         mitc_relationships: [],
         mitc_state_resident: true,
@@ -158,7 +180,27 @@ RSpec.describe Operations::Families::AddFaEligibilityDetermination, type: :model
         is_insurance_assistance_eligible: "Yes",
         tax_household_members: [{
           product_eligibility_determination: {
-            is_ia_eligible: true,is_medicaid_chip_eligible: false, is_totally_ineligible: nil,is_magi_medicaid: false, is_uqhp_eligible: nil,is_csr_eligible: true,csr: "73",is_non_magi_medicaid_eligible: false, is_without_assistance: false,magi_medicaid_monthly_household_income: "56992.0",medicaid_household_size: 1,magi_medicaid_monthly_income_limit: "0.0",magi_as_percentage_of_fpl: "419.0",magi_medicaid_category: "adult_group",magi_medicaid_ineligibility_reasons: ["Applicant's MAGI above the threshold for category"],is_eligible_for_non_magi_reasons: false,chip_ineligibility_reasons: ["Applicant did not meet the requirements for any CHIP category"],magi_medicaid_category_threshold: "18754.0",medicaid_chip_category: "None",medicaid_chip_category_threshold: "0.0",category_determinations: [{
+            is_ia_eligible: true,
+            is_medicaid_chip_eligible: false,
+            is_totally_ineligible: nil,
+            is_magi_medicaid: false,
+            is_uqhp_eligible: nil,
+            is_csr_eligible: true,
+            csr: "73",
+            is_non_magi_medicaid_eligible: false,
+            is_without_assistance: false,
+            magi_medicaid_monthly_household_income: "56992.0",
+            medicaid_household_size: 1,
+            magi_medicaid_monthly_income_limit: "0.0",
+            magi_as_percentage_of_fpl: "419.0",
+            magi_medicaid_category: "adult_group",
+            magi_medicaid_ineligibility_reasons: ["Applicant's MAGI above the threshold for category"],
+            is_eligible_for_non_magi_reasons: false,
+            chip_ineligibility_reasons: ["Applicant did not meet the requirements for any CHIP category"],
+            magi_medicaid_category_threshold: "18754.0",
+            medicaid_chip_category: "None",
+            medicaid_chip_category_threshold: "0.0",
+            category_determinations: [{
               category: "Residency",
               indicator_code: true,
               ineligibility_code: nil,
