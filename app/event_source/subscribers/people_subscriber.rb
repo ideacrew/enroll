@@ -14,9 +14,22 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "PeopleSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-    #   logger.info "PeopleSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "PeopleSubscriber, ack: #{payload}"
+      subscriber_logger.info "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "PeopleSubscriber::Save, ack: #{payload}"
+      ack(delivery_info.delivery_tag)
+    end
+
+    subscribe(:on_person_updated) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_person_updated)
+      payload = JSON.parse(response, symbolize_names: true)
+      pre_process_message(subscriber_logger, payload)
+
+      determine_verifications(payload, subscriber_logger) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:consumer_role_hub_call)
+
+      ack(delivery_info.delivery_tag)
+    rescue StandardError, SystemStackError => e
+      subscriber_logger.info "PeopleSubscriber::Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.info "PeopleSubscriber::Update,  ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -31,12 +44,26 @@ module Subscribers
       end
     end
 
+    def determine_verifications(params, subscriber_logger)
+      person = GlobalID::Locator.locate(params[:gid])
+      consumer_role = person.consumer_role
+
+      identifying_information_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:identifying_information_attributes).item.map(&:to_sym)
+      tribe_status_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:indian_tribe_attributes).item.map(&:to_sym)
+      valid_attributes = identifying_information_attributes + tribe_status_attributes
+      if consumer_role.present? && (valid_attributes & params[:payload].keys).present?
+        result = ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id})
+        result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
+        subscriber_logger.info "PeopleSubscriber::Update, determine_verifications result: #{result_str}"
+      end
+    rescue StandardError => e
+      subscriber_logger.info "Error: PeopleSubscriber::Update, response: #{e}"
+    end
+
     private
 
     def pre_process_message(subscriber_logger, payload)
-    #   logger.info '-' * 100 unless Rails.env.test?
       subscriber_logger.info "PeopleSubscriber, response: #{payload}"
-    #   logger.info "PeopleSubscriber payload: #{payload}" unless Rails.env.test?
     end
 
     def subscriber_logger_for(event)

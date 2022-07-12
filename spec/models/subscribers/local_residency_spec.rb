@@ -80,8 +80,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(@consumer_role.aasm_state).to eq('verification_outstanding')
           end
 
-          it 'should store dc residency type status to outstanding' do
-            expect(person.verification_type_by_name(EnrollRegistry[:enroll_app].setting(:state_residency).item).validation_status).to eq('outstanding')
+          it 'should store dc residency type status to negative_response_received' do
+            expect(person.verification_type_by_name(EnrollRegistry[:enroll_app].setting(:state_residency).item).validation_status).to eq('negative_response_received')
           end
 
           it 'should store the response payload' do

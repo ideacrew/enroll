@@ -14,6 +14,7 @@ class ConsumerRole
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
   include L10nHelper
+  include EventSource::Command
 
   embedded_in :person
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
@@ -96,6 +97,10 @@ class ConsumerRole
     PAROLEE
     AMERICAN INDIAN BORN IN CANADA EMPLOYMENT AUTHORIZED
   ].freeze
+
+  # Used to store FiveYearBar data that we receive from FDSH Gateway in VLP Response Payload.
+  field :five_year_bar_applies, type: Boolean
+  field :five_year_bar_met, type: Boolean
 
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
@@ -220,19 +225,21 @@ class ConsumerRole
   alias_method :is_state_resident?, :is_state_resident
   alias_method :is_incarcerated?,   :is_incarcerated
 
-  embeds_one :lawful_presence_determination, as: :ivl_role
+  embeds_one :lawful_presence_determination, as: :ivl_role, cascade_callbacks: true
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
   embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
-  after_create :create_initial_market_transition
+  after_create :create_initial_market_transition, :publish_created_event
   before_validation :ensure_verification_types
 
   before_validation :ensure_validation_states, on: [:create, :update]
 
   track_history :modifier_field_optional => true,
                 :on => [:five_year_bar,
+                        :five_year_bar_applies,
+                        :five_year_bar_met,
                         :aasm_state,
                         :marital_status,
                         :ssn_validation,
@@ -683,11 +690,8 @@ class ConsumerRole
 
   def invoke_verification!(*args)
     return if skip_residency_verification == true
-    if person.ssn.present? || is_native?
-      invoke_ssa
-    else
-      invoke_dhs
-    end
+    invoke_ssa if person.ssn.present? || is_native?
+    invoke_dhs
   end
 
   def verify_ivl_by_admin(*args)
@@ -1287,4 +1291,10 @@ class ConsumerRole
                    })
   end
 
+  def publish_created_event
+    event = event('events.individual.consumer_roles.created', attributes: { gid: self.to_global_id.uri })
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }
+  end
 end
