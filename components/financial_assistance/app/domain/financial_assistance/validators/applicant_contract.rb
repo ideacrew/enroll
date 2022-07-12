@@ -27,6 +27,7 @@ module FinancialAssistance
         optional(:tribal_id).maybe(:string)
         optional(:tribal_state).maybe(:string)
         optional(:tribal_name).maybe(:string)
+        optional(:tribe_codes).maybe(:array)
         optional(:health_service_eligible).maybe(:bool)
         optional(:health_service_through_referral).maybe(:bool)
 

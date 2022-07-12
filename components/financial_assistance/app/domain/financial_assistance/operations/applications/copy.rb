@@ -254,7 +254,7 @@ module FinancialAssistance
                                                                   :has_daily_living_help, :need_help_paying_bills, :is_resident_post_092296, :is_vets_spouse_or_child, :has_job_income,
                                                                   :has_self_employment_income, :has_other_income, :has_unemployment_income, :has_deductions, :has_enrolled_health_coverage,
                                                                   :has_eligible_health_coverage, :has_american_indian_alaskan_native_income, :medicaid_chip_ineligible, :immigration_status_changed,
-                                                                  :health_service_through_referral, :health_service_eligible, :tribal_state, :tribal_name, :is_medicaid_cubcare_eligible,
+                                                                  :health_service_through_referral, :health_service_eligible, :tribal_state, :tribal_name, :tribe_codes, :is_medicaid_cubcare_eligible,
                                                                   :has_eligible_medicaid_cubcare, :medicaid_cubcare_due_on, :has_eligibility_changed, :has_household_income_changed,
                                                                   :person_coverage_end_on, :has_dependent_with_coverage, :dependent_job_end_on, :transfer_referral_reason,
                                                                   :five_year_bar_applies, :five_year_bar_met)
