@@ -7,10 +7,10 @@ module Operations
   class UpdateDobSsn
     send(:include, Dry::Monads[:result, :do])
 
-    def call(person_id:, params:, info_changed:, dc_status:, current_user:, ssn_require:)
+    def call(person_id:, params:, current_user:, ssn_require:)
       person = yield fetch_person(person_id)
       yield validate_if_person_can_update(person)
-      update_person(person, params, info_changed, dc_status, current_user, ssn_require)
+      update_person(person, params, current_user, ssn_require)
     end
 
     private
@@ -29,7 +29,7 @@ module Operations
       end
     end
 
-    def update_person(person, params, info_changed, dc_status, current_user, ssn_require)
+    def update_person(person, params, current_user, ssn_require)
       person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
       if params[:person][:ssn].blank?
         if ssn_require
@@ -41,7 +41,6 @@ module Operations
         person.ssn = params[:person][:ssn]
       end
       person.save!
-      person.consumer_role.check_for_critical_changes(person.primary_family, info_changed: info_changed, no_dc_address: "false", dc_status: dc_status) if person.consumer_role && person.is_consumer_role_active?
       CensusEmployee.update_census_employee_records(person, current_user)
       Success([nil, dont_update_ssn])
     rescue StandardError => e
