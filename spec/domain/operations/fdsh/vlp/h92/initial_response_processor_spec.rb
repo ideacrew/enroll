@@ -130,6 +130,57 @@ module Operations
         end
       end
     end
+
+    context 'when negative response received' do
+      let(:response_payload) do
+        {
+          :ResponseMetadata => { :ResponseCode => "HX005001", :ResponseDescriptionText => "Unexpected Exception Occurred at Trusted Data Source" },
+          :InitialVerificationResponseSet => {
+            :InitialVerificationIndividualResponses => [
+                {
+                  :ResponseMetadata => {
+                    :ResponseCode => "HX005001",
+                    :ResponseDescriptionText => "Unexpected Exception Occurred at Trusted Data Source"
+                  },
+                  :ArrayOfErrorResponseMetadata => nil,
+                  :LawfulPresenceVerifiedCode => "N",
+                  :InitialVerificationIndividualResponseSet => {
+                    :CaseNumber => nil, :NonCitLastName => nil, :NonCitFirstName => nil, :NonCitMiddleName => nil,
+                    :NonCitBirthDate => nil, :NonCitEntryDate => nil, :AdmittedToDate => nil, :AdmittedToText => nil,
+                    :NonCitCountryBirthCd => nil, :NonCitCountryCitCd => nil, :NonCitCoaCode => nil, :NonCitProvOfLaw => nil,
+                    :NonCitEadsExpireDate => nil, :EligStatementCd => nil, :EligStatementTxt => nil, :IAVTypeCode => nil,
+                    :IAVTypeTxt => nil, :WebServSftwrVer => nil, :GrantDate => nil, :GrantDateReasonCd => nil, :USCitizenCode => nil,
+                    :SponsorDataFoundIndicator => nil, :ArrayOfSponsorshipData => nil, :SponsorshipReasonCd => nil,
+                    :AgencyAction => nil, :FiveYearBarApplyCode => nil, :QualifiedNonCitizenCode => nil, :FiveYearBarMetCode => nil
+                  }
+                }
+            ]
+          }
+        }
+      end
+
+      let(:response) do
+        AcaEntities::Fdsh::Vlp::H92::InitialVerificationResponse.new(response_payload)
+      end
+
+      let(:immigration_verification) { person.verification_types.by_name('Immigration status').first }
+
+      before do
+        person.consumer_role.update!(aasm_state: "dhs_pending")
+        person.consumer_role.lawful_presence_determination.update!(citizen_status: "not_lawfully_present_in_us")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => 'identifier', :verification_type => 'Immigration type')
+      end
+
+      subject do
+        described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
+      end
+
+      it "consumer_role should be valid" do
+        subject
+        expect(person.reload.consumer_role.aasm_state).to eq 'verification_outstanding'
+        expect(immigration_verification.reload.validation_status).to eq 'negative_response_received'
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

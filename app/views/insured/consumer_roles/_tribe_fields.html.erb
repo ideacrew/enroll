@@ -1,0 +1,87 @@
+<div class="row no-buffer <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
+<%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
+
+  <div class="row row-form-wrapper no-buffer" id="tribal_container">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <label>
+        <%= l10n("insured.tribe_member_pt1") %>
+        <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %> 
+        <%= l10n("or") %>
+        <%= render partial:"shared/glossary", locals: {key: "alaska_native", term: "Alaska Native" } %>
+        <%= l10n("insured.tribe_member_pt2") %>
+       </label>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+      <div class="radio">
+        <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes' %>
+        <label for="indian_tribe_member_yes"><span class="yes_no_pair"><%= l10n("Yes") %></span></label>
+      </div>
+    </div>
+    <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio">
+        <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
+        <label for="indian_tribe_member_no"><span class="yes_no_pair"><%= l10n("no") %></span></label>
+      </div>
+    </div>
+    <div class="col-md-2 not-sure-margin left-seprator">
+        <a href="#indian_tribe_member" data-toggle="modal" data-target="#indian_tribe_member">Not sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "indian_tribe_member"} %>
+      </div>
+  </div>
+
+  <div class="tribal-container <%= 'hide' unless @person.indian_tribe_member %>">
+    <% if EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>
+      <div class="row row-form-wrapper no-buffer" id="tribal-state-container">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 tribal-state">
+        <label><%= l10n("insured.tribal_state") %></label>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
+          <%= f.select(:tribal_state, options_for_select(State::NAME_IDS.map(&:last), selected: f.object.tribal_state), {include_blank: "SELECT STATE"}, id: "tribal-state")  %>
+        </div>
+        <div id="tribal-state-alert" class="alert alert-warning alert-dismissible no-buffer hidden_field" role="alert">
+          <button type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <%= l10n("insured.tribal_state_alert") %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer featured-tribe-container <%= 'hide' unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled? && @person.tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
+        <div class="col-md-12">
+          <label><%= l10n("insured.tribal_name") %></label>
+        </div>
+        <div class="col-md-12 form-group form-group-lg check_box_collection">
+          <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
+            <div> <%= tribe.label(:"data-value" => tribe.value) { tribe.check_box + tribe.text } %> </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer tribal-name-container <%= 'hide' unless @person.tribal_state != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item || (@person.tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item && @person.tribe_codes&.include?('OT')) %>">
+        <input type="hidden" id="enroll_state_abbr" value="<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd tribal-name">
+          <%= f.text_field :tribal_name, class: "floatlabel form-control required", id: "tribal-name", placeholder: 'TRIBE NAME' %>
+        </div>
+        <div id="tribal-name-alert" class="alert alert-warning alert-dismissible no-buffer hidden_field" role="alert">
+          <button type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <%= l10n("insured.tribal_name_alert") %>
+        </div>
+      </div>
+    <% else %>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :tribal_id, class: "floatlabel form-control required", id: "tribal-id", placeholder: 'TRIBAL ID' %>
+        </div>
+        <div id="tribal-id-alert" class="alert alert-warning alert-dismissible no-buffer hidden_field" role="alert">
+          <button type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <%= l10n("insured.tribal_id_alert") %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>

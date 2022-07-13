@@ -189,6 +189,7 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
   delegate :tribal_state,       :tribal_state=,      to: :person, allow_nil: true
   delegate :tribal_name,        :tribal_name=,       to: :person, allow_nil: true
+  delegate :tribe_codes,        :tribe_codes=,       to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
@@ -724,8 +725,8 @@ class ConsumerRole
 
   def is_tribe_member?
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      return false if tribal_state.blank? || tribal_name.blank?
-      !tribal_state.blank? && !tribal_name.blank?
+      return false if tribal_state.blank? || (tribal_name.blank? && tribe_codes.empty?)
+      !tribal_state.blank? && (!tribal_name.blank? || !tribe_codes.empty?)
     else
       return false if tribal_id.blank?
       !tribal_id.empty?

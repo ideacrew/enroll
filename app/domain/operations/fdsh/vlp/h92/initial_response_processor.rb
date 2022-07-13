@@ -41,10 +41,10 @@ module Operations
                   consumer_role.pass_dhs!(args) if consumer_role.may_pass_dhs?
                 else
                   args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
-                  consumer_role.fail_dhs!(args) if consumer_role.fail_dhs?
+                  consumer_role.fail_dhs!(args) if consumer_role.may_fail_dhs?
                 end
               end
-            elsif consumer_role.fail_dhs?
+            elsif consumer_role.may_fail_dhs?
               consumer_role.fail_dhs!(args)
             end
             consumer_role.save!

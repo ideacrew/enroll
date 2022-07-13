@@ -8,19 +8,11 @@ function isApplyingCoverage(target) {
     if ($(fields).not(':checked').val() == 'true') {
       $('#consumer_fields_sets').hide();
       $('#employer-coverage-msg').show();
-      if (
-        $("input[name='" + target + "[ssn]']").val() == '' &&
-        !$("input[name='" + target + "[no_ssn]']").is(':checked')
-      ) {
+      if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
         $('#ssn-coverage-msg').show();
       }
-      if (
-        !($(fields).not(':checked').val() == 'false') &&
-        $('.no_coverage_tribe_details').length > 0
-      ) {
-        new_tribe_form = $('#indian_tribe_area')
-          .clone(true)
-          .addClass('tribe-area-clone');
+      if (!($(fields).not(':checked').val() == 'false') && $('.no_coverage_tribe_details').length > 0 ) {
+        new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone');
         $('#indian_tribe_area').remove();
         new_tribe_form.insertBefore($('#consumer_fields_sets'));
       }
@@ -29,27 +21,17 @@ function isApplyingCoverage(target) {
       if ($(fields).not(':checked').val() == 'true') {
         $('#consumer_fields_sets').hide();
         $('#employer-coverage-msg').show();
-        if (
-          $("input[name='" + target + "[ssn]']").val() == '' &&
-          !$("input[name='" + target + "[no_ssn]']").is(':checked')
-        ) {
+        if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
           $('#ssn-coverage-msg').show();
         }
-        if (
-          !($(fields).not(':checked').val() == 'false') &&
-          $('.no_coverage_tribe_details').length > 0
-        ) {
-          new_tribe_form = $('#indian_tribe_area')
-            .clone(true)
-            .addClass('tribe-area-clone');
+        if (!($(fields).not(':checked').val() == 'false') && $('.no_coverage_tribe_details').length > 0 ) {
+          new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone');
           $('#indian_tribe_area').remove();
           new_tribe_form.insertBefore($('#consumer_fields_sets'));
         }
       } else {
         if ($('.no_coverage_tribe_details').length > 0) {
-          new_tribe_form = $('#indian_tribe_area')
-            .clone(true)
-            .removeClass('tribe-area-clone');
+          new_tribe_form = $('#indian_tribe_area').clone(true).removeClass('tribe-area-clone');
           $('#indian_tribe_area').remove();
           new_tribe_form.insertAfter($('#vlp_documents_container'));
         }
@@ -65,12 +47,7 @@ function addEventOnNoSsn(target) {
   $("input[name='" + target + "[no_ssn]']").change(function () {
     if ($(this).is(':checked')) {
       $('#ssn-coverage-msg').hide();
-    } else if (
-      $("input[name='" + target + "[ssn]']").val() == '' &&
-      $("input[name='" + target + "[is_applying_coverage]']")
-        .not(':checked')
-        .val() == 'true'
-    ) {
+    } else if ($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(':checked').val() == 'true') {
       $('#ssn-coverage-msg').show();
     }
   });
@@ -149,16 +126,38 @@ function applyListenersFor(target) {
     }
   );
 
-  $("input[name='" + target + "[indian_tribe_member]']").change(function () {
-    if ($(this).val() == 'true') {
-      $('#tribal_container').show();
-      $('.tribal_container').show();
+  //start tribe option controls
+  $("input[name='" + target + "[indian_tribe_member]']").change(function() {
+    if (this.value === 'true') {
+      $('.tribal-container').removeClass('hide');
     } else {
-      $('#tribal_container').hide();
-      $('.tribal_container').hide();
-      $('#tribal_id').val('');
+      $('.tribal-container').addClass('hide');
     }
   });
+
+  $('select#tribal-state').change(function() {
+    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
+      $('.featured-tribe-container').removeClass('hide');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+      if (tribe_codes_array.includes("OT")){
+        $('.tribal-name-container').removeClass('hide');
+      } else {
+        $('.tribal-name-container').addClass('hide');
+      }
+    } else {
+      $('.tribal-name-container').removeClass('hide');
+      $('.featured-tribe-container').addClass('hide');
+    }
+  });
+
+  $('input#person_tribe_codes_ot').change(function() {
+    if (this.checked){
+      $('.tribal-name-container').removeClass('hide');
+    } else {
+      $('.tribal-name-container').addClass('hide');
+    }
+  });
+  //end tribe option controls
 }
 
 function showOnly(selected) {
@@ -228,10 +227,7 @@ var PersonValidations = (function (window, undefined) {
     hidden_requireds = $('[required]').not(':visible');
     $('[required]').not(':visible').removeProp('required');
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
-    this_obj
-    .closest('div')
-    .find('.dependent-disable')
-    .attr('disabled', 'disabled');
+    this_obj.closest('div').find('.dependent-disable').attr('disabled', 'disabled');
   }
 
   function restoreRequiredAttributes(e) {
@@ -257,83 +253,69 @@ var PersonValidations = (function (window, undefined) {
     }
   }
 
-  function validationForIndianTribeMember() {
-    if ($('#indian_tribe_area').length == 0) {
+  function validationForIndianTribeMember(e) {
+    if ($('#indian_tribe_area').length == 0){
       return false;
     }
-    $('.close').click(function () {
-      $('#tribal_id_alert').hide();
-      $('#tribal-state-alert').hide();
-      $('#tribal-name-alert').hide();
+
+    $('.close').click(function() {
+      $('#tribal-id-alert').addClass('hide');
+      $('#tribal-state-alert').addClass('hide');
+      $('#tribal-name-alert').addClass('hide');
     });
-    $('form.edit_person, form.new_dependent, form.edit_dependent').submit(
-      function (e) {
-        if (
-          $('input[name="person[is_applying_coverage]"]').length > 0 &&
-          $('input[name="person[is_applying_coverage]"]').not(':checked').val() ==
-            'true'
-        ) {
-          return true;
-        }
-  
-        if (
-          $('input[name="dependent[is_applying_coverage]"]').length > 0 &&
-          $('input[name="dependent[is_applying_coverage]"]')
-            .not(':checked')
-            .val() == 'true'
-        ) {
-          return true;
-        }
-  
-        if (
-          !$('input#indian_tribe_member_yes').is(':checked') &&
-          !$('input#indian_tribe_member_no').is(':checked')
-        ) {
-          alert(
-            "Please select the option for 'Is this person a member of an American Indian or Alaska Native Tribe?'"
-          );
-          PersonValidations.restoreRequiredAttributes(e);
-          return false;
-        }
-  
-        // for tribal_id
-        var tribal_val = $('#tribal_id').val();
-        if (
-          $('input#indian_tribe_member_yes').is(':checked') &&
-          (tribal_val == 'undefined' || tribal_val == '')
-        ) {
-          $('#tribal_id_alert').show();
-          PersonValidations.restoreRequiredAttributes(e);
-          return false;
-        }
-  
-        // for tribal_state
-        if ($('.tribal-state').length) {
-          var tribal_state_val = $('#tribal_state').val();
-          if (
-            $('input#indian_tribe_member_yes').is(':checked') &&
-            (tribal_state_val == 'undefined' || tribal_state_val == '')
-          ) {
-            $('#tribal-state-alert').show();
-            PersonValidations.restoreRequiredAttributes(e);
-            return false;
-          }
-        }
-  
-        // for tribal_name
-        if ($('.tribal-name').length) {
-          var tribal_name = $('#tribal-name').val();
-          if (
-            $('input#indian_tribe_member_yes').is(':checked') &&
-            (tribal_name == 'undefined' || tribal_name == '')
-          ) {
-            $('#tribal-name-alert').show();
-            PersonValidations.restoreRequiredAttributes(e);
-            return false;
-          }
-        }
+
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 
+    && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
+
+    var tribe_member_yes = $("input#indian_tribe_member_yes").is(':checked');
+    var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
+
+    if (!tribe_member_yes && !tribe_member_no){
+      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
+      PersonValidations.restoreRequiredAttributes(e);
+    };
+
+    if (tribe_member_no){
+      $('#tribal-state').val("");
+      $('input#tribal-name').val("");
+      $('#tribal-id').val("");
+      $('.tribe_codes:checked').removeAttr('checked'); 
+    }
+
+    if (tribe_member_yes){
+      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == ""){
+        $('#tribal-state-alert').show();
+        PersonValidations.restoreRequiredAttributes(e);
       }
-    );
+
+      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
+        var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+        if (tribe_codes_array.length < 1) { 
+          alert("At least one tribe must be selected.");
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+
+        if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
+            alert("Please provide an answer for 'Other' tribe name.");
+            PersonValidations.restoreRequiredAttributes(e);
+        }
+
+        if (!tribe_codes_array.includes("OT")){
+          $('input#tribal-name').val("");
+        }
+      } 
+      else if ($('input#tribal-name').val() == ""){
+          $('#tribal-name-alert').show();
+          PersonValidations.restoreRequiredAttributes(e);
+      }
+
+      if ($('#tribal-id').length > 0 && $('#tribal-id').val() == ""){
+          $('#tribal-id-alert').show();
+          PersonValidations.restoreRequiredAttributes(e);
+      }
+    }
   }
 
   function validationForIncarcerated(e) {
@@ -406,7 +388,7 @@ var PersonValidations = (function (window, undefined) {
     }
   }
 
-  function validation_for_person_or_dependent() {
+  function validationForPersonOrDependent() {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
@@ -423,7 +405,7 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForVlpDocuments(e) {
-    if (validation_for_person_or_dependent()) {
+    if (validationForPersonOrDependent()) {
       $('#showWarning').removeClass('hidden');
     }
     if ($('#vlp_documents_container').is(':visible')) {
@@ -671,8 +653,7 @@ var PersonValidations = (function (window, undefined) {
     manageRequiredValidations: manageRequiredValidations,
     validationForUsCitizenOrUsNational: validationForUsCitizenOrUsNational,
     validationForNaturalizedCitizen: validationForNaturalizedCitizen,
-    validationForEligibleImmigrationStatuses:
-      validationForEligibleImmigrationStatuses,
+    validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
@@ -694,22 +675,17 @@ function demographicValidations() {
       PersonValidations.validationForUsCitizenOrUsNational(e);
       PersonValidations.validationForNaturalizedCitizen(e);
       PersonValidations.validationForEligibleImmigrationStatuses(e);
+      PersonValidations.validationForIndianTribeMember(e);
       PersonValidations.validationForIncarcerated(e);
       PersonValidations.validationForTobaccoUser(e);
       PersonValidations.validationForVlpDocuments(e);
       PersonValidations.validationForContactMethod(e);
-      PersonValidations.validationForIndianTribeMember(e);
-      if (
-        $('#showWarning').length &&
-        !$('#showWarning').hasClass('hidden') &&
-        !$('#showWarning').hasClass('shown')
-      ) {
+      if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
         $('#showWarning').addClass('shown');
         e.preventDefault();
         return false;
       }
-    }
-  );
+    });
 
   isApplyingCoverage('person');
 }

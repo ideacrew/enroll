@@ -22,6 +22,7 @@ module Entities
     attribute :tribal_id, Types::String.optional.meta(omittable: true)
     attribute :tribal_state, Types::String.optional.meta(omittable: true)
     attribute :tribal_name, Types::String.optional.meta(omittable: true)
+    attribute :tribe_codes, Types::Array.optional.meta(omittable: true)
 
     attribute :language_code, Types::String.optional.meta(omittable: true)
     attribute :no_dc_address, Types::Strict::Bool.meta(omittable: true)
