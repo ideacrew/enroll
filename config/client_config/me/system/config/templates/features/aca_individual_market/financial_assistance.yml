@@ -257,6 +257,8 @@ registry:
       is_enabled: false
     - key: :is_enrolled_on_medicaid
       is_enabled: false
+    - key: :no_ssn_reason_dropdown
+      is_enabled: <%= ENV['NO_SSN_DROPDOWN_IS_ENABLED'] || false %>
   - namespace:
     - :renewals
     features:

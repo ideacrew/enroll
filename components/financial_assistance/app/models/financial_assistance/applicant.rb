@@ -91,6 +91,16 @@ module FinancialAssistance
 
     EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
 
+    NO_SSN_REASONS = {
+      "Applicant will provide SSN later": "ApplicantWillProvideSSNLater",
+      "Can be issued for non-work reason only": "IssuedForNonWorkReasonOnly",
+      "Making best effort to apply": "MakingBestEffortToApply",
+      "Newborn without Enumeration at Birth": "NewBornWithoutEnumerationAtBirth",
+      "No good cause for not having SSN": "NoGoodCause",
+      "No SSN due to Religious objections": "ReligiousObjections",
+      "Not eligible for SSN": "NotEligible"
+    }.freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -420,6 +430,14 @@ module FinancialAssistance
       return nil if val.blank?
       ssn_val = val.to_s.gsub(/\D/, '')
       SymmetricEncryption.encrypt(ssn_val)
+    end
+
+    def non_ssn_apply_reason_readable
+      if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown)
+        NO_SSN_REASONS.key(self.non_ssn_apply_reason).to_s
+      else
+        self.non_ssn_apply_reason
+      end
     end
 
     def relation_with_primary
