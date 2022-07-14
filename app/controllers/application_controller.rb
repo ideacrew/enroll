@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
 
-  NON_AUTHENTICATE_KINDS = %w[welcome saml broker_roles office_locations invitations security_question_responses].freeze
+  NON_AUTHENTICATE_KINDS = %w[welcome saml broker_roles office_locations invitations security_question_responses api_slack_policies].freeze
 
   def format_js?
    request.format.js?
