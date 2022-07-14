@@ -65,6 +65,7 @@ class FamilyMember
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :tribal_state, to: :person, allow_nil: true
   delegate :tribal_name, to: :person, allow_nil: true
+  delegate :tribe_codes, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
   delegate :indian_tribe_member, to: :person, allow_nil: true

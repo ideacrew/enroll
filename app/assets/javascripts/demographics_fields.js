@@ -150,7 +150,7 @@ function applyListenersFor(target) {
     }
   });
 
-  $('input#person_tribe_codes_ot').change(function() {
+  $("input#" + target + "_tribe_codes_ot").change(function() {
     if (this.checked){
       $('.tribal-name-container').removeClass('hide');
     } else {
