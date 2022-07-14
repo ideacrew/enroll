@@ -50,6 +50,8 @@ module Operations
                      ssn: person.ssn,
                      dob: person.dob.strftime("%d/%m/%Y"),
                      is_applying_coverage: person.consumer_role.is_applying_coverage,
+                     five_year_bar_applies: person.consumer_role.five_year_bar_applies,
+                     five_year_bar_met: person.consumer_role.five_year_bar_met,
                      citizen_status: person.citizen_status,
                      relationship: get_relationship_kind(family, person),
                      is_consumer_role: true,

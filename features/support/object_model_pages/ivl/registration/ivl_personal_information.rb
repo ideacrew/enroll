@@ -140,8 +140,16 @@ class IvlPersonalInformation
     'label[for="indian_tribe_member_no"] span'
   end
 
+  def self.tribe_state_dropdown
+    '#tribal-state-container .selectric span.label'
+  end
+
   def self.tribal_id
     'person[tribal_id]'
+  end
+
+  def self.tribal_name
+    'tribal-name'
   end
 
   def self.incarcerated_yes_radiobtn

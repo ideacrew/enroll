@@ -41,7 +41,7 @@ module Operations
 
       def person_attributes(person)
         attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx,
-                 :gender, :ethnicity, :tribal_id, :tribal_state, :tribal_name, :no_ssn, :is_tobacco_user,
+                 :gender, :ethnicity, :tribal_id, :tribal_state, :tribal_name, :tribe_codes, :no_ssn, :is_tobacco_user,
                  :is_homeless, :is_temporarily_out_of_state].inject({}) do |att_hash, attribute|
                   att_hash[attribute] = person.send(attribute)
                   att_hash
@@ -50,6 +50,8 @@ module Operations
                      ssn: person.ssn,
                      dob: person.dob.present? ? person.dob.strftime("%d/%m/%Y") : nil,
                      is_applying_coverage: person.consumer_role.is_applying_coverage,
+                     five_year_bar_applies: person.consumer_role.five_year_bar_applies,
+                     five_year_bar_met: person.consumer_role.five_year_bar_met,
                      citizen_status: person.citizen_status,
                      is_consumer_role: true,
                      same_with_primary: false,

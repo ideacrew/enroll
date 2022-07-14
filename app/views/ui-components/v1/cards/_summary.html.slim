@@ -22,7 +22,7 @@
             = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
           - else
             - if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == :health
-              = number_to_currency(shopping_group_premium(@plan.total_employee_cost, @plan.total_ehb_premium, @plan.can_use_aptc?))
+              = number_to_currency(current_premium(@hbx_enrollment))
             - else
               = number_to_currency(@plan.total_employee_cost)
           br/

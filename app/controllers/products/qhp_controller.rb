@@ -2,6 +2,7 @@ class Products::QhpController < ApplicationController
   include ContentType
   include Aptc
   include Acapi::Notifiers
+  include Insured::FamiliesHelper
   extend Acapi::Notifiers
   before_action :set_current_person, only: [:comparison, :summary]
   before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]

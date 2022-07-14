@@ -11,16 +11,22 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   let(:active_household) {family.active_household}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record, eligibility_date: TimeKeeper.date_of_record) }
   let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
-  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, family: family, hbx_enrollment_members: [hbx_enrollment_member], rating_area_id: rating_area.id)}
+  let(:kind) { 'individual' }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, kind: kind, family: family, hbx_enrollment_members: [hbx_enrollment_member], rating_area_id: rating_area.id)}
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member.id, product_price: BigDecimal(100),sponsor_contribution: BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: mock_product, member_enrollments: [member_enrollment])}
-  let(:member_group) {double(group_enrollment: group_enrollment)}
-
+  let(:member_group) {double(attrs.merge(group_enrollment: group_enrollment))}
   let(:mock_issuer_profile) { double("IssuerProfile", :dba => "a carrier name", :legal_name => "name") }
 
   let(:mock_product) do
     double(
       "Product",
+      attrs
+    )
+  end
+
+  let(:attrs) do
+    {
       :active_year => 2018,
       :title => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
@@ -46,14 +52,18 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       metal_level: 'Bronze',
       network: 'nationwide',
       :can_use_aptc? => true,
-      :sbc_document => Document.new(
-        {
-          title: 'sbc_file_name',
-          subject: "SBC",
-          :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
-          "-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"
-        }
-      )
+      :sbc_document => document
+    }
+  end
+
+  let(:document) do
+    Document.new(
+      {
+        title: 'sbc_file_name',
+        subject: "SBC",
+        :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
+        "-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"
+      }
     )
   end
   let(:mock_qhp_cost_share_variance) { instance_double(Products::QhpCostShareVariance, :qhp_service_visits => []) }
@@ -128,6 +138,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
     it "should not have rx_formulary_url coverage_kind = dental" do
       allow(mock_product).to receive(:kind).and_return("dental")
+      allow(member_group).to receive(:kind).and_return("dental")
       allow(mock_product).to receive(:dental_level).and_return("high")
       render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_product.rx_formulary_url}/)
@@ -142,6 +153,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     it "should not have provider directory url if nationwide = false(for dc)" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_product).to receive(:nationwide).and_return(false)
+      allow(member_group).to receive(:nationwide).and_return(false)
       render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_product.provider_directory_url}/)
     end
@@ -157,6 +169,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   context 'for display of enrollment additional summary' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
+      allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
       render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
     end
 
@@ -178,6 +191,10 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
     it 'should include full name of person' do
       expect(rendered).to have_content(hbx_enrollment_member.person.full_name.titleize)
+    end
+
+    it 'should include premium of the enrollment' do
+      expect(rendered).to have_content(hbx_enrollment.total_premium)
     end
   end
 end

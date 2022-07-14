@@ -68,6 +68,12 @@ registry:
       - key: :medicaid_tax_credits_link
         item: :medicaid_tax_credits_link
         is_enabled: true
+      - key: :featured_tribes_selection
+        item: :featured_tribes_selection
+        is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
+        settings:
+        - key: :featured_tribes
+          item: []
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
         is_enabled: false
@@ -251,6 +257,8 @@ registry:
       is_enabled: true
     - key: :is_enrolled_on_medicaid
       is_enabled: true
+    - key: :no_ssn_reason_dropdown
+      is_enabled: <%= ENV['NO_SSN_DROPDOWN_IS_ENABLED'] || false %>
   - namespace:
     - :renewals
     features:

@@ -412,6 +412,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :tribal_id,
       :tribal_state,
       :tribal_name,
+      { :tribe_codes => [] },
       :no_dc_address,
       :no_dc_address_reason,
       :is_applying_coverage,
