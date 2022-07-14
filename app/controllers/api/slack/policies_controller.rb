@@ -1,5 +1,8 @@
 class ApiSlackPoliciesController < ApplicationController
   protect_from_forgery with: :null_session
+  skip_before_action :require_login
+  skip_before_action :authenticate_user_from_token!
+  skip_before_action :authenticate_me!
 
   ## test in slack with
   ## /policy-id-check hbx_id=20119053
