@@ -4,7 +4,7 @@ module Forms
     include ActiveModel::Validations
     include Config::AcaModelConcern
 
-    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :is_tobacco_user,
+    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :is_tobacco_user, :tribe_codes,
                   :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded, :immigration_doc_statuses
     attr_writer :family
     include ::Forms::PeopleNames
@@ -220,6 +220,7 @@ module Forms
         :tribal_id => tribal_id,
         :tribal_state => tribal_state,
         :tribal_name => tribal_name,
+        :tribe_codes => tribe_codes,
         :is_homeless => is_homeless,
         :is_temporarily_out_of_state => is_temporarily_out_of_state,
         :is_moving_to_state => is_moving_to_state,
@@ -279,6 +280,7 @@ module Forms
         :tribal_id => found_family_member.tribal_id,
         :tribal_state => found_family_member.tribal_state,
         :tribal_name => found_family_member.tribal_name,
+        :tribe_codes => found_family_member.tribe_codes,
         :same_with_primary => has_same_address_with_primary.to_s,
         :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
         :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
