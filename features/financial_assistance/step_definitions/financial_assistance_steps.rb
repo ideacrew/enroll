@@ -444,7 +444,8 @@ Given(/^the consumer has received a successful MEC check response$/) do
 end
 
 Given(/an applicant has local mec evidence/) do
-  application.active_applicants.first.update_attributes!(local_mec_evidence: {aasm_state: 'outstanding'})
+  application.active_applicants.first.update_attributes!(local_mec_evidence: FactoryBot.build(:evidence))
+  application.active_applicants.first.save!
 end
 
 Given(/^american indian or alaska native income feature is enabled$/) do
