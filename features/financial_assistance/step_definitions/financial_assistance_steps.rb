@@ -443,6 +443,10 @@ Given(/^the consumer has received a successful MEC check response$/) do
   consumer.person.mec_check_response = "Success"
 end
 
+Given(/an applicant has local mec evidence/) do
+  application.active_applicants.first.update_attributes!(local_mec_evidence: {aasm_state: 'outstanding'})
+end
+
 Given(/^american indian or alaska native income feature is enabled$/) do
   enable_feature :american_indian_alaskan_native_income
 end

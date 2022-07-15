@@ -75,3 +75,9 @@ Feature: Review your application page functionality
     When the user clicks CONTINUE
     Then the user should see a missing applicant info error message
     And the CONTINUE button is functionally DISABLED
+
+  Scenario: The user navigates to the review and submit page with applicant mec evidence
+      Given the user will navigate to the FAA Household Info page
+      And an applicant has local mec evidence
+      When the user clicks CONTINUE
+      Then they should see the MedicaidCurrently Enrolled warning text
