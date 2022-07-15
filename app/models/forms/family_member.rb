@@ -53,25 +53,33 @@ module Forms
           self.errors.add(:base, "Naturalized citizen is required")
         end
 
-        if @indian_tribe_member.nil?
-          self.errors.add(:base, "native american / alaska native status is required")
-        end
-
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          if @indian_tribe_member.to_s == 'false'
-            self.tribal_id = nil
-            self.tribal_state = nil
-            self.tribal_name = nil
-          end
-          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
-          self.errors.add(:tribal_name, "is required when native american / alaska native is selected")  if !tribal_name.present? && @indian_tribe_member
-        end
-
-        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_id.present? && @indian_tribe_member
+        self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
+        validate_tribe_details if @indian_tribe_member
       end
 
       return unless (@is_resident_role.to_s == "true" || @is_consumer_role.to_s == "true") && is_applying_coverage.to_s == "true" && @is_incarcerated.nil?
       self.errors.add(:base, "Incarceration status is required")
+    end
+
+    def validate_tribe_details
+      if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+        self.errors.add(:tribal_state, "is required when native american / alaska native is selected") unless tribal_state.present?
+        validate_featured_tribes if FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+        self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && !FinancialAssistanceRegistry[:featured_tribes_selection].enabled?
+        self.errors.add(:tribal_name, "cannot contain numbers") unless (tribal_name =~ /\d/).nil?
+      else
+        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") unless tribal_id.present?
+        self.errors.add(:tribal_id, "Tribal id must be 9 digits") if tribal_id.present? && !tribal_id.match("[0-9]{9}")
+      end
+    end
+
+    def validate_featured_tribes
+      if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if tribe_codes.include?("OT") && !tribal_name.present?
+        self.errors.add(:base, "At least one tribe must be selected") if tribe_codes.empty?
+      else
+        self.errors.add(:tribal_name, "is required when native american / alaska native is selected") unless tribal_id.present?
+      end
     end
 
     def ssn_validation
