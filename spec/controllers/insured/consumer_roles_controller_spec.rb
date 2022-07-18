@@ -298,6 +298,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
       EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+      EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
       allow(person).to receive(:mec_check_eligible?).and_return(false)
       person_params[:addresses_attributes] = addresses_attributes
       person_params[:consumer_role_attributes] = consumer_role_attributes
@@ -383,12 +384,62 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person).to receive(:employee_roles).and_return [employee_role]
         EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
         allow(person).to receive(:mec_check_eligible?).and_return(false)
         put :update, params: { person: person_params, id: "test" }
       end
 
       it "should update employee role contact method" do
         expect(person.consumer_role.contact_method).to eq(person.employee_roles.first.contact_method)
+      end
+    end
+
+    context "updates active employee roles if active employee roles are present for dual roles" do
+      let!(:person){ FactoryBot.create(:person) }
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+      let!(:primary) { family.primary_family_member }
+      let!(:dependents) { family.dependents }
+      let!(:household) { FactoryBot.create(:household, family: family) }
+      let!(:effective_on) {TimeKeeper.date_of_record.beginning_of_year - 1.year}
+      let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+      let!(:hbx_en_member1) do
+        FactoryBot.build(:hbx_enrollment_member,
+                         eligibility_date: effective_on,
+                         coverage_start_on: effective_on,
+                         applicant_id: primary.id)
+      end
+
+      let!(:hbx_en_member2) do
+        FactoryBot.build(:hbx_enrollment_member,
+                         eligibility_date: effective_on,
+                         coverage_start_on: effective_on,
+                         applicant_id: dependents.first.id)
+      end
+
+      let!(:enrollment1) do
+        FactoryBot.create(:hbx_enrollment,
+                          family: family,
+                          product: product,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          effective_on: effective_on,
+                          kind: 'employer_sponsored',
+                          hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
+                          aasm_state: 'coverage_selected')
+      end
+
+      before :each do
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        allow(person).to receive(:employee_roles).and_return [employee_role]
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+        allow(person).to receive(:mec_check_eligible?).and_return(false)
+        put :update, params: { person: person_params, id: "test" }
+      end
+
+      it "should update employee role contact method" do
+        expect(flash[:warning]).to match(/Person has shop coverage/i)
       end
     end
 
