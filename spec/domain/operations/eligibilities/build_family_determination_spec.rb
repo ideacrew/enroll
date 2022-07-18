@@ -168,7 +168,10 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
 
     it 'should persist eligibility determination' do
       family.reload
-      family.eligibility_determination.delete; family.reload if family.eligibility_determination
+      if family.eligibility_determination
+        family.eligibility_determination.delete
+        family.reload
+      end
       expect(family.eligibility_determination).to be_blank
       result = subject.call(required_params)
       family.reload
