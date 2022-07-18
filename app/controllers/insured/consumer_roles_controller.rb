@@ -210,6 +210,7 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :update?
     save_and_exit = params['exit_after_method'] == 'true'
     mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
+    check_shop_coverage if EnrollRegistry.feature_enabled?(:shop_coverage_check)
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
@@ -320,6 +321,13 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def mec_check(person_id)
     ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecCheck.new.call(person_id)
+  end
+
+  def check_shop_coverage
+    result = Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: @person.hbx_id, market: "employer_sponsored")
+
+    # Related work will be done in the ticket:
+    flash[:warning] = "Person has shop coverage" if result
   end
 
   def help_paying_coverage_redirect_path(result)
