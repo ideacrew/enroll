@@ -89,7 +89,7 @@ module FinancialAssistance
           self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if tribe_codes.include?("OT") && !tribal_name.present?
           self.errors.add(:base, "At least one tribe must be selected") if tribe_codes.empty?
         else
-          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") unless tribal_id.present?
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") unless tribal_name.present?
         end
       end
 
