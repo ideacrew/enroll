@@ -6,7 +6,7 @@ RSpec.describe Operations::Households::CheckExistingCoverageByPerson, db_clean: 
   subject do
     described_class.new.call(params)
   end
-  
+
   context "call the operation" do
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
