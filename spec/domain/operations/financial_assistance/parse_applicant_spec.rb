@@ -4,7 +4,9 @@ require 'rails_helper'
 RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, dbclean: :after_each do
   let!(:person) do
     per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
-    per.consumer_role.update_attributes!(active_vlp_document_id: per.consumer_role.vlp_documents.first.id)
+    addi_attrs = { active_vlp_document_id: per.consumer_role.vlp_documents.first.id,
+                   is_applying_coverage: true, five_year_bar_applies: true, five_year_bar_met: true }
+    per.consumer_role.update_attributes!(addi_attrs)
     per
   end
   let!(:family)        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -38,6 +40,13 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
 
     it 'should return hash with member hbx_id' do
       expect(result.success[:person_hbx_id]).to eq person.hbx_id
+    end
+
+    it 'should return consumer_role related attributes' do
+      result_hash = result.success
+      expect(result_hash[:is_applying_coverage]).to eq(true)
+      expect(result_hash[:five_year_bar_applies]).to eq(true)
+      expect(result_hash[:five_year_bar_met]).to eq(true)
     end
 
     it 'should return hash with is_homeless' do

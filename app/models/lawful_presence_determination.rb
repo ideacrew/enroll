@@ -8,6 +8,7 @@ class LawfulPresenceDetermination
   include Acapi::Notifiers
   include Mongoid::Attributes::Dynamic
   include Mongoid::History::Trackable
+  include EventSource::Command
 
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
@@ -23,6 +24,9 @@ class LawfulPresenceDetermination
   field :qualified_non_citizenship_result, type:  String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
+
+  after_create :publish_created_event
+  after_update :publish_updated_event
 
   track_history :modifier_field_optional => true,
                 :on => [:vlp_verified_at,
@@ -120,6 +124,23 @@ class LawfulPresenceDetermination
                             vlp_authority: denial_information.vlp_authority,
                             qualified_non_citizenship_result: qnc_result,
                             citizenship_result: ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
+  end
+
+  def publish_created_event
+    attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
+    # TODO: This should be refactored to use created instead of updated.
+    event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish lawful presence determination update event due to #{e.backtrace}" }
+  end
+
+  def publish_updated_event
+    attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
+    event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate lawful presence determination update event due to #{e.backtrace}" }
   end
 
   def record_transition(*args)

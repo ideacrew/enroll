@@ -348,6 +348,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :tribal_id => "test",
       :tribal_state => nil,
       :tribal_name => nil,
+      :tribe_codes => nil,
       :is_homeless => nil,
       :is_temporarily_out_of_state => false,
       :is_moving_to_state => false,
@@ -546,7 +547,8 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :is_incarcerated => "no",
       tribal_id: "test",
       tribal_state: nil,
-      tribal_name: nil
+      tribal_name: nil,
+      tribe_codes: nil
     }
   end
   let(:person) { double(:errors => double(:has_key? => false), home_address: nil, is_tobacco_user: nil) }

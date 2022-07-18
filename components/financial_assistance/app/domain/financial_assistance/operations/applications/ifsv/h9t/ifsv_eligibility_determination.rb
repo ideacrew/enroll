@@ -37,7 +37,9 @@ module FinancialAssistance
             end
 
             def update_applicant(response_app_entity, application)
+              enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: application.family_id)
               is_ifsv_eligible = response_app_entity.tax_households.first.is_ifsv_eligible
+
               status = is_ifsv_eligible ? "verified" : "outstanding"
 
               response_app_entity.applicants.each do |response_applicant_entity|
@@ -46,7 +48,7 @@ module FinancialAssistance
                   Rails.logger.error("Income Evidence Not Found for applicant with person_hbx_id: #{applicant.person_hbx_id} in application with hbx_id: #{application.hbx_id}")
                   next
                 end
-                update_applicant_evidence(applicant, status, response_applicant_entity)
+                update_applicant_evidence(applicant, status, response_applicant_entity, enrollments)
               end
               Success('Successfully updated Applicant with evidence')
             end
@@ -57,7 +59,7 @@ module FinancialAssistance
               end
             end
 
-            def update_applicant_evidence(applicant, status, response_applicant_entity)
+            def update_applicant_evidence(applicant, status, response_applicant_entity, enrollments)
               response_income_evidence = response_applicant_entity.income_evidence
               income_evidence = applicant.income_evidence
 
@@ -65,13 +67,24 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                applicant.set_evidence_to_negative_response(income_evidence)
+                if enrolled?(applicant, enrollments)
+                  applicant.set_evidence_outstanding(income_evidence)
+                else
+                  applicant.set_evidence_to_negative_response(income_evidence)
+                end
               end
 
               response_income_evidence.request_results&.each do |request_result|
                 income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
               end
               applicant.save!
+            end
+
+            def enrolled?(applicant, enrollments)
+              return false if enrollments.blank?
+
+              family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+              family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
             end
           end
         end

@@ -395,7 +395,7 @@
               <% if @cfl_service.displayable_field?('applicant', applicant.id, :non_ssn_apply_reason) %>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">Why doesn't this person have an SSN?</div>
-                  <div class="col-md-6"><%= applicant.non_ssn_apply_reason.to_s %></div>
+                  <div class="col-md-6"><%= applicant.non_ssn_apply_reason_readable.to_s %></div>
                 </div>
               <% end %>
             <% end %>

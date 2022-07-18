@@ -27,6 +27,7 @@ module FinancialAssistance
         optional(:tribal_id).maybe(:string)
         optional(:tribal_state).maybe(:string)
         optional(:tribal_name).maybe(:string)
+        optional(:tribe_codes).maybe(:array)
         optional(:health_service_eligible).maybe(:bool)
         optional(:health_service_through_referral).maybe(:bool)
 
@@ -57,6 +58,9 @@ module FinancialAssistance
         required(:is_consumer_role).filled(:bool)
         optional(:same_with_primary).maybe(:bool)
         required(:is_applying_coverage).filled(:bool)
+
+        optional(:five_year_bar_applies).maybe(:bool)
+        optional(:five_year_bar_met).maybe(:bool)
 
         optional(:addresses).maybe(:array)
         optional(:phones).maybe(:array)
