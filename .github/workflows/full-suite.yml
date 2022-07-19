@@ -14,6 +14,18 @@ env:
   CLIENT: 'dc'
 
 jobs:
+  chain_bench_scan_example:
+    runs-on: ubuntu-latest
+    name: Test Job
+    steps:
+      - name: Chain Bench
+        id: chain-bench
+        uses: aquasecurity/chain-bench-action@v1.0.0
+        with:
+          repository-url: ${{ github.server_url }}/${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Echo
+        run: echo ${{ steps.chain-bench.outputs.chain-bench-result }}
   view_linter:
     runs-on: ubuntu-latest
     steps:
