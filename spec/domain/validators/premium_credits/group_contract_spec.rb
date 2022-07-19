@@ -51,6 +51,7 @@ RSpec.describe Validators::PremiumCredits::GroupContract, type: :model, dbclean:
         start_on: start_of_month,
         member_premium_credits: [
           { kind: "kind", value: 'true', start_on: start_of_month, family_member_id: family.primary_applicant.id },
+          { kind: 'aptc_eligible', value: '73', start_on: start_of_month, family_member_id: family.primary_applicant.id },
           { kind: 'csr', value: 73, start_on: start_of_month, family_member_id: family.primary_applicant.id }
         ]
       }
@@ -59,7 +60,8 @@ RSpec.describe Validators::PremiumCredits::GroupContract, type: :model, dbclean:
     it 'should return failure with errors' do
       expect(result.errors.to_h).to eq(
         { member_premium_credits: { 0 => [{ text: 'invalid member_premium_credit', error: { kind: ['must be one of: aptc_eligible, csr'] } }],
-                                    1 => [{ text: 'invalid member_premium_credit', error: { value: ['must be a string'] } }] } }
+                                    1 => [{ error: { value: ["must be one of: #{MemberPremiumCredit::APTC_VALUES} for kind: aptc_eligible"]}, text: 'invalid member_premium_credit' }],
+                                    2 => [{ text: 'invalid member_premium_credit', error: { value: ['must be a string'] } }] } }
       )
     end
   end
