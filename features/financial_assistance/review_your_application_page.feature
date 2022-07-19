@@ -77,7 +77,15 @@ Feature: Review your application page functionality
     And the CONTINUE button is functionally DISABLED
 
   Scenario: The user navigates to the review and submit page with applicant mec evidence
-      Given the user will navigate to the FAA Household Info page
-      And an applicant has local mec evidence
-      When the user clicks CONTINUE
-      Then they should see the MedicaidCurrently Enrolled warning text
+    Given the mec check feature is enabled
+    Given the user will navigate to the FAA Household Info page
+    And an applicant has local mec evidence
+    When the user clicks CONTINUE
+    Then they should see the MedicaidCurrently Enrolled warning text
+
+  Scenario: The user navigates to the review and submit page with applicant shop coverage
+    Given the shop coverage check feature is enabled
+    Given the user will navigate to the FAA Household Info page
+    And an applicant has shop coverage
+    When the user clicks CONTINUE
+    Then they should see the shop coverage exists warning text

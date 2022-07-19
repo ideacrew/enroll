@@ -448,6 +448,28 @@ Given(/an applicant has local mec evidence/) do
   application.active_applicants.first.save!
 end
 
+Given(/the mec check feature is enabled/) do
+  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the mec check feature is disabled/) do
+  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+end
+
+Given(/the shop coverage check feature is enabled/) do
+  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the shop coverage check feature is disabled/) do
+  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+end
+
+Given(/an applicant has shop coverage/) do
+  p_hbx_id = application.active_applicants.first.person_hbx_id
+  family = Person.find_by(hbx_id: p_hbx_id)
+  FactoryBot.create(:hbx_enrollment, family: family)
+end
+
 Given(/^american indian or alaska native income feature is enabled$/) do
   enable_feature :american_indian_alaskan_native_income
 end
@@ -518,6 +540,11 @@ end
 
 Then(/^they should see the MedicaidCurrently Enrolled warning text$/) do
   expect(page).to have_content("It looks like you may already be enrolled in MaineCare or Cub Care")
+  expect(page).to have_content(l10n('faa.mc_continue'))
+end
+
+Then(/^they should see the shop coverage exists warning text$/) do
+  expect(page).to have_content(l10n('faa.shop_check_success'))
   expect(page).to have_content(l10n('faa.mc_continue'))
 end
 
