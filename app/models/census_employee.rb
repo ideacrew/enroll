@@ -616,7 +616,9 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
-    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.detect(&:is_active)
+    assignment = benefit_package_assignment_on(coverage_date)
+    assignment ||= benefit_group_assignments.detect(&:is_application_active?)
+    assignment || benefit_group_assignments.detect(&:is_active)
   end
 
   # Pass in active coverage_date to get the renewal benefit group assignment
