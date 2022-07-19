@@ -439,7 +439,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
 
       it "should update employee role contact method" do
-        expect(flash[:warning]).to match(/Person has shop coverage/i)
+        expect(assigns['shop_coverage_result']).to eq true
       end
     end
 

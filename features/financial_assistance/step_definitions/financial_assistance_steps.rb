@@ -465,9 +465,10 @@ Given(/the shop coverage check feature is disabled/) do
 end
 
 Given(/an applicant has shop coverage/) do
-  p_hbx_id = application.active_applicants.first.person_hbx_id
-  family = Person.find_by(hbx_id: p_hbx_id)
-  FactoryBot.create(:hbx_enrollment, family: family)
+  applicant = application.active_applicants.first
+  person = FactoryBot.create(:person, :with_family)
+  FactoryBot.create(:hbx_enrollment, family: person.primary_family)
+  applicant.update_attributes!(person_hbx_id: person.hbx_id)
 end
 
 Given(/^american indian or alaska native income feature is enabled$/) do
