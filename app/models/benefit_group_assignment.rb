@@ -155,6 +155,10 @@ class BenefitGroupAssignment
     benefit_package.benefit_application if benefit_package.present?
   end
 
+  def is_application_active?
+    benefit_application&.active?
+  end
+
   def belongs_to_offexchange_planyear?
     employer_profile = plan_year.employer_profile
     employer_profile.is_conversion? && plan_year.is_conversion
