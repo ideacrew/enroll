@@ -144,7 +144,7 @@ module FinancialAssistance
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       @local_mec_evidence = EnrollRegistry.feature_enabled?(:mec_check) ? local_mec_evidence_exists?(@application) : nil
       @shop_coverage = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? shop_enrollments_exist?(@application) : nil
-
+      
       unless @application.valid_relations?
         redirect_to application_relationships_path(@application)
         flash[:error] = l10n("faa.errors.inconsistent_relationships_error")
@@ -253,7 +253,7 @@ module FinancialAssistance
     def shop_enrollments_exist?(application)
       applicant_enrollments = []
       application.applicants.each do |applicant|
-        applicant_enrollments << Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: applicant.person_hbx_id, market: "employer_sponsored").success?
+        applicant_enrollments << ::Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: applicant.person_hbx_id, market: "employer_sponsored").success?
       end
       applicant_enrollments.include?(true)
     end
