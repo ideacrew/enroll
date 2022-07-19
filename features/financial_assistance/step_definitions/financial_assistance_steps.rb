@@ -656,6 +656,14 @@ And(/^user should have feature toggled questions in review$/) do
   end
 end
 
+And(/an applicant has an existing non ssn apply reason/) do
+  application.applicants.first.update_attributes!(non_ssn_apply_reason: 'ApplicantWillProvideSSNLater')
+end
+
+And(/the user will see the applicant's non ssn apply reason/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.non_ssn_apply_reason)
+end
+
 And(/^the user should click on the destroy applicant icon$/) do
   find_all('.close-2')[2].click
   find('.fa-times').click
