@@ -230,3 +230,38 @@ RSpec.shared_context "setup expired and active benefit applications", :shared_co
   let(:expired_sponsored_benefit) { expired_benefit_package.sponsored_benefit_for(coverage_kind) }
   let(:active_sponsored_benefit) { active_benefit_package.sponsored_benefit_for(coverage_kind) }
 end
+
+RSpec.shared_context "setup expired, expired and active benefit applications", :shared_context => :metadata do
+  include_context 'setup initial benefit application'
+
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year - 1.years }
+  let(:expired_start_on) { current_effective_date.prev_year }
+  let(:effective_period)   { expired_start_on..(expired_start_on.next_year.prev_day) }
+  let(:expired_benefit_application_one) do
+    initial_application.update_attributes(aasm_state: :expired, effective_period: effective_period)
+    initial_application
+  end
+
+  let!(:expired_benefit_application_two) do
+    application = expired_benefit_application_one.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application.update_attributes(aasm_state: :expired)
+    application
+  end
+
+  let!(:active_benefit_application) do
+    application = expired_benefit_application_two.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application.update_attributes(aasm_state: :active)
+    application
+  end
+
+  let(:expired_benefit_package_one) { expired_benefit_application_one.benefit_packages[0] }
+  let(:expired_benefit_package_two) { expired_benefit_application_two.benefit_packages[0] }
+  let(:active_benefit_package) { active_benefit_application.benefit_packages[0] }
+  let(:expired_sponsored_benefit_one) { expired_benefit_package_one.sponsored_benefit_for(coverage_kind) }
+  let(:expired_sponsored_benefit_two) { expired_benefit_package_two.sponsored_benefit_for(coverage_kind) }
+  let(:active_sponsored_benefit) { active_benefit_package.sponsored_benefit_for(coverage_kind) }
+end
