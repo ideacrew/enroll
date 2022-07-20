@@ -59,6 +59,7 @@ class GroupPremiumCredit
   # Scopes
   scope :by_year, ->(year) { where(start_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active, ->{ where(end_on: nil) }
+  scope :aptc_csr, ->{ where(kind: 'aptc_csr') }
 
   # Validations
   validates_presence_of :start_on
