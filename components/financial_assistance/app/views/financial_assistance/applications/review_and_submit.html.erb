@@ -17,12 +17,6 @@
         </div> 
       <% end %>
 
-      <% if @application.applicants.detect{|a|a.local_mec_evidence != nil}.present? %> 
-        <div id="mec-check-response">
-          <%= render partial: 'financial_assistance/applications/mec_check_results' %>
-        </div>
-      <% end %>
-
       <% if income_and_deductions_for_any(@application).present? %>
         <h3 class="darkblue">Income and Adjustments</h3>
         <div class="row white-background">
