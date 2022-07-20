@@ -50,6 +50,12 @@
                   <%= render partial: 'financial_assistance/applications/mec_check_results', locals: { person: @person } %>
                 </div>             
               <% end %>
+
+              <% if @shop_coverage_result %>
+                <div id="shop-check-response">
+                  <%= render partial: 'financial_assistance/applications/shop_check_results' %>
+                </div>             
+              <% end %>
             </div>
 
           </div>
