@@ -12,7 +12,7 @@ class MemberPremiumCredit
   KINDS = %w[aptc_eligible csr].freeze
 
   APTC_VALUES = %w[true false].freeze
-  CSR_VALUES = %w[100 94 87 73 0 -1].freeze
+  CSR_VALUES = %w[100 94 87 73 0 limited].freeze
 
   # Fields
   field :kind, type: String
