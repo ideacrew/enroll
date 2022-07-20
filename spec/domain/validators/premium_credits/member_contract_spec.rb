@@ -36,4 +36,24 @@ RSpec.describe Validators::PremiumCredits::MemberContract, type: :model, dbclean
       expect(result.errors.to_h).to eq({ kind: ['must be one of: aptc_eligible, csr'] })
     end
   end
+
+  context 'invalid value for kind csr' do
+    let(:params) do
+      { kind: 'csr', value: 'true', start_on: start_of_month, family_member_id: family.primary_applicant.id }
+    end
+
+    it 'should return failure with errors' do
+      expect(result.errors.to_h).to eq({ value: ["must be one of: #{MemberPremiumCredit::CSR_VALUES} for kind: csr"] })
+    end
+  end
+
+  context 'invalid value for kind aptc_eligible' do
+    let(:params) do
+      { kind: 'aptc_eligible', value: '73', start_on: start_of_month, family_member_id: family.primary_applicant.id }
+    end
+
+    it 'should return failure with errors' do
+      expect(result.errors.to_h).to eq({ value: ["must be one of: #{MemberPremiumCredit::APTC_VALUES} for kind: aptc_eligible"] })
+    end
+  end
 end

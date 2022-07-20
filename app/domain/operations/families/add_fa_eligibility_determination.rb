@@ -42,6 +42,9 @@ module Operations
       end
 
       def create_premium_credits(family, application_entity)
+        # There are no APTC CSR Eligible Members to create PremiumCredits
+        return Success(family) if application_entity.tax_households.map(&:aptc_csr_eligible_members).blank?
+
         group_premium_credits(family, application_entity).each do |gpc_params|
           result = ::Operations::PremiumCredits::Build.new.call({ family: family, gpc_params: gpc_params })
 
@@ -63,18 +66,24 @@ module Operations
       def group_premium_credits(family, application_entity)
         fa_application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
         return [] if fa_application.nil?
+
         application_entity.tax_households.inject([]) do |gpcs, thh_entity|
           eligibility_determination = fa_application.eligibility_determinations.where(hbx_assigned_id: thh_entity.hbx_id).first
-          gpcs << {
-            kind: 'aptc_csr',
-            authority_determination_id: fa_application.id.to_s,
-            authority_determination_class: fa_application.class.to_s,
-            premium_credit_monthly_cap: thh_entity.max_aptc.to_f,
-            sub_group_id: eligibility_determination.id.to_s,
-            sub_group_class: eligibility_determination.class.to_s,
-            start_on: thh_entity.effective_on,
-            member_premium_credits: member_premium_credits(thh_entity, family)
-          }
+          mpcs = member_premium_credits(thh_entity, family)
+          if mpcs.present?
+            gpcs << {
+              kind: 'aptc_csr',
+              authority_determination_id: fa_application.id.to_s,
+              authority_determination_class: fa_application.class.to_s,
+              premium_credit_monthly_cap: thh_entity.max_aptc.to_f,
+              sub_group_id: eligibility_determination.id.to_s,
+              sub_group_class: eligibility_determination.class.to_s,
+              start_on: thh_entity.effective_on,
+              member_premium_credits: mpcs
+            }
+          end
+
+          gpcs
         end
       end
 

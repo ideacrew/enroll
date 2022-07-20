@@ -14,6 +14,14 @@ module Validators
         optional(:end_on).maybe(:date)
         required(:family_member_id).filled(Types::Bson)
       end
+
+      rule(:value) do
+        if key? && value
+          key.failure("must be one of: #{MemberPremiumCredit::CSR_VALUES} for kind: csr") if values[:kind] == 'csr' && !MemberPremiumCredit::CSR_VALUES.include?(value)
+
+          key.failure("must be one of: #{MemberPremiumCredit::APTC_VALUES} for kind: aptc_eligible") if values[:kind] == 'aptc_eligible' && !MemberPremiumCredit::APTC_VALUES.include?(value)
+        end
+      end
     end
   end
 end
