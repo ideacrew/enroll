@@ -86,6 +86,19 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         it 'should return a failure' do
           expect(@result.failure).to eq "Cannot Drop a retroactive dependent."
         end
+
+        context 'and admin does not have permission to drop members' do
+          before do 
+            @result = subject.call({hbx_enrollment: enrollment,
+                                    options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 1.day).to_s,
+                                              "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
+                                              "admin_permission" => false}})
+          end
+
+          it 'should return the admin permission error' do
+            expect(@result.failure).to eq "Enrollment members failed to drop. Admin does not have access to use this tool."
+          end
+        end
       end
 
       context 'when sending invalid params' do
