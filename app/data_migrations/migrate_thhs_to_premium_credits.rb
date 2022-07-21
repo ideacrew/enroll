@@ -58,7 +58,7 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
           logger.info "----- Invalid family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
           next family
         end
-        aptc_csr_thhs = family.active_household.tax_households.where(:'tax_household_members.is_ia_eligible' => true)
+        aptc_csr_thhs = family.active_household.tax_households.where(tax_household_members: { :$elemMatch => { is_ia_eligible: true } })
 
         aptc_csr_thhs.each do |thh|
           result = ::Operations::PremiumCredits::Build.new.call({ family: family, gpc_params: group_premium_credit(thh) })
