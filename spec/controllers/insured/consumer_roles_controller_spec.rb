@@ -394,7 +394,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
     end
 
-    context "updates active employee roles if active employee roles are present for dual roles" do
+    context "should detect existing shop coverage for applicants when feature is enabled" do
       let!(:person){ FactoryBot.create(:person) }
       let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
       let!(:primary) { family.primary_family_member }
@@ -438,8 +438,8 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         put :update, params: { person: person_params, id: "test" }
       end
 
-      it "should update employee role contact method" do
-        expect(flash[:warning]).to match(/Person has shop coverage/i)
+      it "should return a success for existing shop coverage" do
+        expect(assigns['shop_coverage_result']).to eq true
       end
     end
 
