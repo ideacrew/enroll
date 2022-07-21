@@ -14,6 +14,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_ques.title" => "Other Questions for",
   "en.faa.other_ques.answer_request" => "Answer these questions for this person. When you're finished, select CONTINUE.",
   "en.faa.other_ques.ssn_apply" => "Has this person applied for an SSN?*",
+  "en.faa.other_ques.is_ssn_applied" => "Has this person applied for an SSN?",
   "en.faa.other_ques.why_no_ssn" => "Why doesn't this person have an SSN?",
   "en.faa.other_ques.is_pregnant" => "Is this person pregnant?*",
   "en.faa.other_ques.pregnancy_due_date" => "Pregnancy due date?",
