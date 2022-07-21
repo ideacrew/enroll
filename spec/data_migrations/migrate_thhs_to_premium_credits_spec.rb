@@ -44,8 +44,12 @@ describe MigrateThhsToPremiumCredits, dbclean: :after_each do
     let!(:ed1) { FactoryBot.create(:eligibility_determination, tax_household: th1) }
 
     let!(:th2) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: Date.new(system_date.year, 7, 31)) }
-    let!(:thhm12) { FactoryBot.create(:tax_household_member, applicant_id: fm1.id, tax_household: th2, is_totally_ineligible: true) }
-    let!(:thhm22) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2, is_medicaid_chip_eligible: true) }
+    let!(:thhm12) do
+      FactoryBot.create(:tax_household_member, applicant_id: fm1.id, tax_household: th2, is_totally_ineligible: true, is_ia_eligible: false)
+    end
+    let!(:thhm22) do
+      FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2, is_medicaid_chip_eligible: true, is_ia_eligible: false)
+    end
     let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 0.00) }
 
     context 'valid family' do
