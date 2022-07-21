@@ -59,8 +59,10 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
           next family
         end
 
+        aptc_csr_thh_count = 0
         family.active_household.tax_households.each do |thh|
           next thh unless thh.tax_household_members.any?(&:is_ia_eligible)
+          aptc_csr_thh_count += 1
           result = ::Operations::PremiumCredits::Build.new.call({ family: family, gpc_params: group_premium_credit(thh) })
           if result.success?
             family = result.success
@@ -75,7 +77,7 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
         else
           logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
         end
-        csv << [family.primary_person.hbx_id, family.hbx_assigned_id, aptc_csr_thhs.count, family.reload.group_premium_credits.count]
+        csv << [family.primary_person.hbx_id, family.hbx_assigned_id, aptc_csr_thh_count, family.reload.group_premium_credits.count]
       rescue StandardError => e
         logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
       end

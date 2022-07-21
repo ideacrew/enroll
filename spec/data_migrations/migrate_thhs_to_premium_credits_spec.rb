@@ -4,6 +4,9 @@ require 'rails_helper'
 require File.join(Rails.root, 'app', 'data_migrations', 'migrate_thhs_to_premium_credits')
 
 describe MigrateThhsToPremiumCredits, dbclean: :after_each do
+  let(:logger_name) { "#{Rails.root}/log/migrate_thhs_to_premium_credits_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log" }
+  let(:csv_name) { "#{Rails.root}/thhs_to_premim_credits_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_1.csv" }
+
   after :all do
     logger_name = "#{Rails.root}/log/migrate_thhs_to_premium_credits_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
     csv_name = "#{Rails.root}/thhs_to_premim_credits_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_1.csv"
@@ -63,6 +66,10 @@ describe MigrateThhsToPremiumCredits, dbclean: :after_each do
         expect(
           gpcs.first.member_premium_credits.pluck(:kind, :value, :family_member_id)
         ).to eq([['aptc_eligible', 'true', fm1.id], ['csr', '73', fm1.id]])
+        migrated_info = CSV.parse(File.read(csv_name), headers: true).first
+        expect(migrated_info[2]).to eq(migrated_info[3])
+        expect(migrated_info[0]).to eq(person.hbx_id)
+        expect(migrated_info[1]).to eq(family.hbx_assigned_id.to_s)
       end
     end
 
