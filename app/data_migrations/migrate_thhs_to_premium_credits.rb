@@ -28,7 +28,7 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
 
       members << {
         kind: 'csr',
-        value: aptc_csr_member.csr_eligibility_kind.delete('csr_'),
+        value: aptc_csr_member.csr_eligibility_kind.split('_').last,
         start_on: thh.effective_starting_on,
         end_on: thh.effective_ending_on,
         family_member_id: aptc_csr_member.applicant_id
