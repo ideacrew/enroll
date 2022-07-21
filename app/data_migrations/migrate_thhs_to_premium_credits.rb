@@ -53,9 +53,9 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
       csv << field_names
 
       families.no_timeout.limit(5_000).offset(offset_count).inject([]) do |_dummy, family|
-        # logger.info "---------- Processing Family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        logger.info "---------- Processing Family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
         unless family.valid?
-          # logger.info "----- Invalid family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
+          logger.info "----- Invalid family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
           next family
         end
 
@@ -65,27 +65,27 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
           if result.success?
             family = result.success
           else
-            # logger.info "----- Unable to build GroupPremiumCredit for thh_id: #{thh.id}, failure: #{failure_message(result)}"
+            logger.info "----- Unable to build GroupPremiumCredit for thh_id: #{thh.id}, failure: #{failure_message(result)}"
             next family
           end
         end
 
         if family.save
-          # logger.info "----- Successfully created PremiumCredits for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+          logger.info "----- Successfully created PremiumCredits for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
         else
-          # logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
+          logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
         end
         csv << [family.primary_person.hbx_id, family.hbx_assigned_id, aptc_csr_thhs.count, family.reload.group_premium_credits.count]
-      rescue StandardError => _e
-        # logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
+      rescue StandardError => e
+        logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
       end
     end
   end
 
   def migrate
-    # logger = Logger.new("#{Rails.root}/log/migrate_thhs_to_premium_credits_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    logger = Logger.new("#{Rails.root}/log/migrate_thhs_to_premium_credits_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     start_time = DateTime.current
-    # logger.info "MigrateThhsToPremiumCredits start_time: #{start_time}"
+    logger.info "MigrateThhsToPremiumCredits start_time: #{start_time}"
     families = Family.all_tax_households
     total_count = families.count
     familes_per_iteration = 5_000.0
@@ -95,10 +95,10 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
     while counter < number_of_iterations
       file_name = "#{Rails.root}/thhs_to_premim_credits_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
       offset_count = familes_per_iteration * counter
-      process_families(families, file_name, offset_count, 'logger')
+      process_families(families, file_name, offset_count, logger)
       counter += 1
     end
     end_time = DateTime.current
-    # logger.info "MigrateThhsToPremiumCredits end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
+    logger.info "MigrateThhsToPremiumCredits end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
   end
 end
