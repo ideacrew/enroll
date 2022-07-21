@@ -53,3 +53,13 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     And user should have feature toggled questions in review
     Then user should see need help paying question
     And user should have an answer related to applicant
+
+  Scenario: Review Application page shows Non SSN Apply Reason when Applicant has one
+    Given that a family has a Financial Assistance application in the submitted state
+    And an applicant has an existing non ssn apply reason
+    And the user navigates to the “Help Paying For Coverage” portal
+    When the user clicks the “Action” dropdown corresponding to the submitted application
+    And the “Review Application” link will be actionable
+    And clicks the “Review Application” link
+    Then the user will navigate to the Review Application page
+    And the user will see the applicant's non ssn apply reason
