@@ -42,7 +42,7 @@ module Subscribers
       assistance_year = enrollment.effective_on.year
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
-        family.fail_negative_and_pending_verifications(enrollment)
+        family.fail_negative_and_pending_verifications
         application = family.active_financial_assistance_application(assistance_year)
         application&.enrolled_with(enrollment)
       end
