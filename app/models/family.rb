@@ -1224,10 +1224,12 @@ class Family
   end
 
   def fail_negative_and_pending_verifications
+    negative_states = ["pending", "negative_response_received"]
     active_family_members.each do |family_member|
       consumer_role = family_member.person.consumer_role
-      negative_states = ["pending", "negative_response_received"]
       consumer_role.verification_types.where(:validation_status.in => negative_states).each(&:fail_type)
+    rescue StandardError => e
+      Rails.logger.error("Unable to update verification type for #{family_member&.person} due to #{e.inspect}")
     end
   end
 
