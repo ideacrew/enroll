@@ -36,7 +36,7 @@ module Subscribers
 
     def redetermine_family_eligibility(payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
-      return if enrollment.shopping?
+      return if enrollment.shopping? || Rails.env.test?
 
       family = enrollment.family
       assistance_year = enrollment.effective_on.year
