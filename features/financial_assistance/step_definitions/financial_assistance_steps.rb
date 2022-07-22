@@ -419,6 +419,11 @@ Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
 end
 
+When(/kaiser pay now feature is enabled/) do
+  EnrollRegistry[:kaiser_pay_now].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:kaiser_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
+end
+
 Given(/^the kaiser paynow feature configuration is enabled$/) do
   enable_feature :kaiser_pay_now
 end
