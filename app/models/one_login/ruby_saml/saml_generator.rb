@@ -150,7 +150,11 @@ module OneLogin
         when 'Subscriber Identifier'
           hbx_enrollment.subscriber.person.hbx_id.rjust(10, '0')
         when 'Additional Information'
-          hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+          if EnrollRegistry.feature_enabled?(:carefirst_pay_now) && EnrollRegistry[:carefirst_pay_now].setting(:embed_xml).item
+            Operations::XmlTransforms::SamlBuilder.new.call(enrollment_hbx_id: hbx_enrollment.hbx_id)
+          else
+            hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+          end
         end
       end
 
