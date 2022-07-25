@@ -30,6 +30,8 @@ class MemberPremiumCredit
 
   field :family_member_id, type: BSON::ObjectId
 
+  field :is_ia_eligible, type: Boolean # TODO: are we setting this?
+
   # Associations
   embedded_in :group_premium_credit
 

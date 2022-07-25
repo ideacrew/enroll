@@ -3,7 +3,7 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   include FloatHelper
 
-  attr_reader :hbx_enrollment, :elected_aptc, :tax_household, :child_age_limit
+  attr_reader :hbx_enrollment, :elected_aptc, :child_age_limit
 
   DISCOUNT_EXEMPT_RELATIONSHIPS = [
     "spouse",
@@ -11,11 +11,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     "life_partner"
   ].freeze
 
-  def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
+  def initialize(plan, hbx_enrollment, elected_aptc = 0, _tax_household = nil)
     super(plan)
     @hbx_enrollment = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
-    @tax_household = tax_household
     @child_age_limit = EnrollRegistry[:enroll_app].setting(:child_age_limit).item
     @can_round_cents = can_round_cents?
   end
