@@ -800,7 +800,6 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         :person,
         :with_consumer_role,
         :with_valid_native_american_information,
-        :with_mailing_address,
         first_name: 'Bruce',
         last_name: 'Wayne',
         dob: Date.today - 30.years
