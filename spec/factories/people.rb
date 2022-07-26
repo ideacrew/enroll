@@ -30,7 +30,6 @@ FactoryBot.define do
       indian_tribe_member { true }
       tribal_state { "ME"}
       tribe_codes { ["HM", "AM"] }
-      # tribe_codes { [] }
     end
 
     trait :with_bad_mailing_address do 
