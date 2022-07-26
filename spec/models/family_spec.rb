@@ -1518,7 +1518,106 @@ describe "set_due_date_on_verification_types" do
   end
 end
 
-describe "update_due_dates_on_vlp_docs_and_evidences" do
+describe Family, ".fail_negative_and_pending_verifications", dbclean: :after_each do
+  let!(:person1) do
+    FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                      first_name: 'test10', last_name: 'test30', gender: 'male')
+  end
+
+  let!(:person2) do
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                               first_name: 'test', last_name: 'test10', gender: 'male')
+    person1.ensure_relationship_with(person, 'child')
+    person
+  end
+
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
+  let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
+  let(:people) { [person1, person2] }
+
+  before do
+    people.each do |person|
+      person.verification_types.each{ |vt| vt.update!(validation_status: 'negative_response_received') }
+    end
+  end
+
+  context "when people are enrolled" do
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        enrollment_members: family.family_members,
+        family: person1.primary_family,
+        kind: 'individual'
+      )
+    end
+
+    it 'should update the verification_type status' do
+      people.each do |person|
+        person.reload.verification_types.active.each do |verification_type|
+          expect(verification_type.validation_status).to eq 'negative_response_received'
+        end
+      end
+
+      family.fail_negative_and_pending_verifications
+
+      people.each do |person|
+        person.reload.verification_types.active.each do |verification_type|
+          expect(verification_type.validation_status).to eq 'outstanding'
+        end
+      end
+    end
+  end
+
+  context "when people are not enrolled" do
+    it 'should update the verification_type status' do
+      people.each do |person|
+        person.reload.verification_types.active.each do |verification_type|
+          expect(verification_type.validation_status).to eq 'negative_response_received'
+        end
+      end
+
+      family.fail_negative_and_pending_verifications
+
+      people.each do |person|
+        person.reload.verification_types.active.each do |verification_type|
+          expect(verification_type.validation_status).to eq 'negative_response_received'
+        end
+      end
+    end
+  end
+
+  context "when only one family_member is enrolled" do
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        enrollment_members: [family.primary_applicant],
+        family: person1.primary_family,
+        kind: 'individual'
+      )
+    end
+    it 'should update the verification_type status' do
+      people.each do |person|
+        person.reload.verification_types.active.each do |verification_type|
+          expect(verification_type.validation_status).to eq 'negative_response_received'
+        end
+      end
+
+      family.fail_negative_and_pending_verifications
+
+      person1.reload.verification_types.active.each do |verification_type|
+        expect(verification_type.validation_status).to eq 'outstanding'
+      end
+
+      person2.reload.verification_types.active.each do |verification_type|
+        expect(verification_type.validation_status).to eq 'negative_response_received'
+      end
+    end
+  end
+end
+
+describe Family, "update_due_dates_on_vlp_docs_and_evidences", dbclean: :after_each do
   let!(:person1) do
     FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
                       first_name: 'test10', last_name: 'test30', gender: 'male')
