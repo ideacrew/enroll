@@ -17,6 +17,11 @@
     expiration_date: <%= check_citizen_immigration_status?(applicant) ? applicant.expiration_date : "N/A"%>
     issuing_country: <%= check_citizen_immigration_status?(applicant) ? applicant.issuing_country : "N/A"%>
     Are you a member of an American Indian or Alaska Native Tribe?: <%= applicant.indian_tribe_member%>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
+    Tribe State: <%= applicant.tribal_state %>
+    Tribe Name: <%= applicant.tribal_name %>
+    Tribe Codes: <%= applicant.tribe_codes %>
+    <% end %>
     Are you currently incarcerated?: <%= applicant.is_incarcerated%>
     What is your race/ethnicity? (OPTIONAL - check all that apply): <%= applicant.ethnicity %>
     ADDRESSES:

@@ -26,6 +26,13 @@ FactoryBot.define do
       addresses { [FactoryBot.build(:address, :mailing_kind)]}
     end
 
+    trait :with_valid_native_american_information do
+      indian_tribe_member { true }
+      tribal_state { "ME"}
+      tribe_codes { ["HM", "AM"] }
+      # tribe_codes { [] }
+    end
+
     trait :with_bad_mailing_address do 
       addresses { [FactoryBot.build(:address, :mailing_kind, :without_address_1, :without_city, :without_state, :without_zip)] }
     end

@@ -43,6 +43,7 @@ module Operations
                                         :tribal_id,
                                         :tribal_state,
                                         :tribal_name,
+                                        :tribe_codes,
                                         :no_ssn,
                                         :is_tobacco_user).symbolize_keys!
 
