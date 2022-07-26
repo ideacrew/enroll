@@ -549,6 +549,11 @@ Then(/^they should see the shop coverage exists warning text$/) do
   expect(page).to have_content(l10n('faa.mc_continue'))
 end
 
+Then(/^they should not see the shop coverage exists warning text$/) do
+  expect(page).to_not have_content(l10n('faa.shop_check_success'))
+  expect(page).to_not have_content(l10n('faa.mc_continue'))
+end
+
 # TODO: Refactor these with the resource_registry_world.rb helpers
 Given(/^Indian Health Service Question feature is enabled$/) do
   enable_feature :indian_health_service_question
