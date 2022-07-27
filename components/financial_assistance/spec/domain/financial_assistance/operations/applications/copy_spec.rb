@@ -829,46 +829,20 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
                         person_hbx_id: person20.hbx_id)
     end
 
-    let!(:application30) { FactoryBot.create(:financial_assistance_application, family_id: family20.id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'submitted') }
-    let!(:primary_applicant30) do
-      FactoryBot.create(:financial_assistance_applicant,
-                        dob: person20.dob,
-                        first_name: person20.first_name,
-                        last_name: person20.last_name,
-                        gender: person20.gender,
-                        ssn: person20.ssn,
-                        citizen_status: person20.citizen_status,
-                        is_incarcerated: person20.is_incarcerated,
-                        indian_tribe_member: true,
-                        tribal_state: "OK",
-                        tribal_name: "",
-                        is_applying_coverage: true,
-                        is_primary_applicant: true,
-                        application: application20,
-                        family_member_id: family20.family_members[0].id,
-                        person_hbx_id: person20.hbx_id)
-    end
-
-
     before do
-      @first_duplicate_application = subject.call(application_id: application20.id).success
-      @second_duplicate_application = subject.call(application_id: application30.id).success
+      @copy = subject.call(application_id: application20.id).success
     end
 
     it 'should copy the tribe state' do
-      expect(@first_duplicate_application.applicants.first.tribal_state).to eq(primary_applicant20.tribal_state)
+      expect(@copy.applicants.first.tribal_state).to eq(primary_applicant20.tribal_state)
     end
 
     it 'should copy the tribe codes' do
-      expect(@first_duplicate_application.applicants.first.tribe_codes).to eq(primary_applicant20.tribe_codes)
+      expect(@copy.applicants.first.tribe_codes).to eq(primary_applicant20.tribe_codes)
     end
 
     it 'the person model should override the tribal_state value on applicant model' do
-      expect(@first_duplicate_application.applicants.first.tribal_state).to eq(person20.tribal_state)
-    end
-
-    it 'the person model should override the tribe_codes value on applicant model' do
-      expect(@second_duplicate_application.applicants.first.tribe_codes).to eq(person20.tribe_codes)
+      expect(@copy.applicants.first.tribal_state).to eq(person20.tribal_state)
     end
 
   end
