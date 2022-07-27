@@ -38,11 +38,9 @@ describe 'applicant_outreach_report' do
       assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
     )
   end
-
   let!(:primary_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
-      # addresses: primary_person.addresses,
       addresses: primary_person.addresses,
       application: application,
       family_member_id: primary_fm.id,
