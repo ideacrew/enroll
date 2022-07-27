@@ -38,7 +38,8 @@ describe 'applicant_outreach_report' do
       :financial_assistance_application,
       submitted_at: yesterday,
       family_id: family.id,
-      aasm_state: 'draft'
+      aasm_state: 'draft',
+      transfer_id: 'tr12345'
     #   eligibility_determinations: eligibility_determinations
     )
   end
@@ -106,6 +107,7 @@ describe 'applicant_outreach_report' do
         program_eligible_for
         health_plan_hios_id
         dental_plan_id
+        transfer_id
       ]
   end
 
@@ -207,6 +209,11 @@ describe 'applicant_outreach_report' do
       eligible_programs = "MaineCare and Cub Care(Medicaid),Financial assistance(APTC eligible)"
       expect(@file_content[1][12]).to eq(eligible_programs)
       expect(@file_content[2][12]).to eq(eligible_programs)
+    end
+
+    it 'should match with the transfer id' do
+      expect(@file_content[1][15]).to eq(application.transfer_id)
+      expect(@file_content[2][15]).to eq(application.transfer_id)
     end
   end
 
