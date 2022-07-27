@@ -37,9 +37,11 @@ describe 'applicant_outreach_report' do
       transfer_id: 'tr12345'
     )
   end
+
   let!(:primary_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
+      # addresses: primary_person.addresses,
       addresses: primary_person.addresses,
       application: application,
       family_member_id: primary_fm.id,
