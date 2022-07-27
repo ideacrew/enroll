@@ -16,22 +16,17 @@ describe 'applicant_outreach_report' do
     member.save!
     member
   end
-
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_person, external_app_id: '12345') }
-  let!(:family_member) { family.primary_applicant }
-  let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
+  let!(:primary_fm) { family.primary_applicant }
+  let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
+  let!(:family_members) { [primary_fm, spouse_fm] }
   let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
   let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family) }
-
-#   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
-#   let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household) }
-#   let!(:tax_household2) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
-#   let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household2) }
-
-#   let!(:eligibility_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73') }
-#   let!(:eligibility_determination2) { FactoryBot.create(:eligibility_determination, max_aptc: 250.00, tax_household: tax_household2, csr_eligibility_kind: 'csr_87') }
-#   let(:eligibility_determinations) { [eligibility_determination, eligibility_determination2] }
-
+  let!(:enrollment_members) do
+    family_members.map do |member|
+      FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: health_enrollment, is_subscriber: member.is_primary_applicant)
+    end
+  end
   let(:yesterday) { Time.now.getlocal.prev_day }
   let!(:application) do
     FactoryBot.create(
@@ -40,17 +35,14 @@ describe 'applicant_outreach_report' do
       family_id: family.id,
       aasm_state: 'draft',
       transfer_id: 'tr12345'
-    #   eligibility_determinations: eligibility_determinations
     )
   end
-
   let!(:primary_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
-      # :with_home_address,
       addresses: primary_person.addresses,
       application: application,
-      family_member_id: family_member.id,
+      family_member_id: primary_fm.id,
       person_hbx_id: primary_person.hbx_id,
       is_primary_applicant: true,
       citizen_status: 'us_citizen',
@@ -62,7 +54,6 @@ describe 'applicant_outreach_report' do
       gender: primary_person.gender,
       dob: primary_person.dob,
       encrypted_ssn: primary_person.encrypted_ssn
-    #   eligibility_determination_id: eligibility_determination.id
     )
   end
   let!(:spouse_applicant) do
@@ -70,9 +61,8 @@ describe 'applicant_outreach_report' do
       :financial_assistance_applicant,
       :spouse,
       addresses: [spouse_person.home_address],
-      # :with_home_address,
       application: application,
-      family_member_id: family_member2.id,
+      family_member_id: spouse_fm.id,
       person_hbx_id: spouse_person.hbx_id,
       citizen_status: 'alien_lawfully_present',
       is_ia_eligible: false,
@@ -83,13 +73,10 @@ describe 'applicant_outreach_report' do
       gender: spouse_person.gender,
       dob: spouse_person.dob,
       encrypted_ssn: spouse_person.encrypted_ssn
-    #   eligibility_determination_id: eligibility_determination2.id
     )
   end
-  let!(:applicants) { [primary_applicant, spouse_applicant] }
-
-  # let(:primary_applicant) { application.applicants.first }
-  # let(:spouse_applicant) { application.applicants.last }
+  let(:applicants) { [primary_applicant, spouse_applicant] }
+  let!(:workflow_state_transition) { WorkflowStateTransition.new(to_state: 'draft', transition_at: Time.now) }
   let(:field_names) do
     %w[
         primary_hbx_id
@@ -107,12 +94,15 @@ describe 'applicant_outreach_report' do
         program_eligible_for
         health_plan_hios_id
         dental_plan_id
+        subscriber_indicator
         transfer_id
       ]
   end
 
   before :each do
     application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+    application.update(workflow_state_transitions: [workflow_state_transition])
+    health_enrollment.update(hbx_enrollment_members: enrollment_members)
     invoke_applicant_outreach_report
     @file_content = CSV.read("#{Rails.root}/applicant_outreach_report.csv")
   end
@@ -201,8 +191,7 @@ describe 'applicant_outreach_report' do
     end
 
     it 'should match with the date of the most recent aasm_state transition' do
-      # how to stub workflow state transition???
-      # expect(@file_content[1][8]).to eq(application.workflow_state_transitions.first.transition_at)
+      expect(@file_content[1][8]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
     end
 
     it 'should match with the programs that applicants are eligible for' do
@@ -212,8 +201,8 @@ describe 'applicant_outreach_report' do
     end
 
     it 'should match with the transfer id' do
-      expect(@file_content[1][15]).to eq(application.transfer_id)
-      expect(@file_content[2][15]).to eq(application.transfer_id)
+      expect(@file_content[1][16]).to eq(application.transfer_id)
+      expect(@file_content[2][16]).to eq(application.transfer_id)
     end
   end
 
@@ -247,6 +236,16 @@ describe 'applicant_outreach_report' do
     it 'should match with the user account last page visited' do
       expect(@file_content[1][11]).to eq(primary_person.user.last_portal_visited)
       expect(@file_content[2][11]).to eq(primary_person.user.last_portal_visited)
+    end
+  end
+
+  context 'hbx enrollment member' do
+    it 'should match with the subscriber indicator' do
+      health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
+      primary_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == primary_fm.id}
+      spouse_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == spouse_fm.id}
+      expect(@file_content[1][15]).to eq(primary_member.is_subscriber.to_s)
+      expect(@file_content[2][15]).to eq(spouse_member.is_subscriber.to_s)
     end
   end
 

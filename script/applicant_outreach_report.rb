@@ -1,4 +1,4 @@
-field_names  = %w[
+field_names = %w[
     primary_hbx_id
     first_name
     last_name
@@ -14,11 +14,9 @@ field_names  = %w[
     program_eligible_for
     health_plan_hios_id
     dental_plan_id
+    subscriber_indicator
     transfer_id
   ]
-
-#  ADD THESE FIELDS TO REPORT:
-#   - Subscriber indicator
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 
@@ -28,8 +26,6 @@ all_families = Family.where(:_id.nin => HbxEnrollment.individual_market.by_year(
 batch_size = 500
 offset = 0
 families_count = all_families.count
-
-# puts "Total families with no enrollments #{families_count}"
 
 def program_eligible_for(application)
   return if application.blank?
@@ -52,9 +48,15 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       application = FinancialAssistance::Application.where(family_id: family._id, assistance_year: current_year).order_by(:created_at.desc).first
       primary_person = family.primary_person
       application.applicants.each do |applicant|
-        person = family.family_members.detect {|fm| fm.hbx_id == applicant.person_hbx_id}&.person
+        family_member = family.family_members.detect {|fm| fm.hbx_id == applicant.person_hbx_id}
+        person = family_member&.person
         next unless applicant.is_applying_coverage && person # assuming the report should skip non-applicants
 
+        health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
+        dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
+
+        enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        enrollment_member ||= dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
@@ -68,21 +70,11 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 primary_person.user&.email, # only primary person has a User account
                 primary_person.user&.last_portal_visited,
                 program_eligible_for(application),
-                family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan&.hios_id,
-                family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}&.plan&.hios_id,
+                health_enrollment&.plan&.hios_id,
+                dental_enrollment&.plan&.hios_id,
+                enrollment_member&.is_subscriber,
                 application.transfer_id]
       end
-      # csv << [primary_person.hbx_id,
-      #         primary_person.first_name,
-      #         primary_person.last_name,
-      #         primary_person&.consumer_role&.contact_method,
-      #         primary_person.work_email_or_best,
-      #         application&.aasm_state,
-      #         application&.workflow_state_transitions&.first&.transition_at,
-      #         family.external_app_id,
-      #         primary_person.user&.email,
-      #         primary_person.user&.last_portal_visited,
-      #         program_eligible_for(application)]
     rescue StandardError => e
       puts "error for family #{family.id} due to #{e}"
     end
