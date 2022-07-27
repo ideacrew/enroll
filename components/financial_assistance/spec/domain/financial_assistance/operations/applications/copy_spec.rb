@@ -848,45 +848,31 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
                         person_hbx_id: person20.hbx_id)
     end
 
-
-    before do
-      #        EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
-      # allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
-      #      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
-
-
-      #EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
-      # expect(EnrollRegistry).to receive(:indian_alaskan_tribe_details).and_return(true)
-      # allow(::EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
-      # expect(::EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
-      # EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
-
-      # @first_duplicate_application = subject.call(application_id: application20.id).success
-      # @second_duplicate_application = subject.call(application_id: application30.id).success
-    end
-
     it 'should copy the tribe state' do
-      EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
-      @first_duplicate_application = subject.call(application_id: application20.id).success
-      expect(@first_duplicate_application.applicants.first.tribal_state).to eq(primary_applicant20.tribal_state)
+      copy = subject.call(application_id: application20.id).success
+      expect(copy.applicants.first.tribal_state).to eq(primary_applicant20.tribal_state)
     end
 
+    it 'should copy the tribe codes' do
+      copy = subject.call(application_id: application20.id).success
+      expect(copy.applicants.first.tribe_codes).to eq(primary_applicant20.tribe_codes)
+    end
 
-    # it 'should copy the tribe codes' do
-    #   expect(@first_duplicate_application.applicants.first.tribe_codes).to eq(primary_applicant20.tribe_codes)
-    # end
+    it 'should copy the indian tribe member status' do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+      copy = subject.call(application_id: application20.id).success
+      expect(copy.applicants.first.indian_tribe_member).to eq(primary_applicant20.indian_tribe_member)
+    end
 
-    # it 'should copy the indian tribe member status' do
-    #   expect(@first_duplicate_application.applicants.first.indian_tribe_member).to eq(primary_applicant20.indian_tribe_member)
-    # end
+    it 'the person model should override the tribal_state value on applicant model' do
+      copy = subject.call(application_id: application30.id).success
+      expect(copy.applicants.first.tribal_state).to eq(person20.tribal_state)
+    end
 
-    # it 'the person model should override the tribal_state value on applicant model' do
-    #   expect(@second_duplicate_application.applicants.first.tribal_state).to eq(person20.tribal_state)
-    # end
-
-    # it 'the person model should override the tribe_codes value on applicant model' do
-    #   expect(@second_duplicate_application.applicants.first.tribe_codes).to eq(person20.tribe_codes)
-    # end
+    it 'the person model should override the tribe_codes value on applicant model' do
+      copy = subject.call(application_id: application30.id).success
+      expect(copy.applicants.first.tribe_codes).to eq(person20.tribe_codes)
+    end
 
   end
 
