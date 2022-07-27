@@ -253,7 +253,8 @@ module FinancialAssistance
     def shop_enrollments_exist?(application)
       applicant_enrollments = []
       application.applicants.each do |applicant|
-        applicant_enrollments << ::Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: applicant.person_hbx_id, market: "employer_sponsored").success?
+        applicant_coverage = ::Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: applicant.person_hbx_id, market_kind: "employer_sponsored")
+        applicant_enrollments << (applicant_coverage.success? && applicant_coverage.success.present?)
       end
       applicant_enrollments.include?(true)
     end

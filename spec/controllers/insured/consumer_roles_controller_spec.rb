@@ -416,7 +416,21 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
                          applicant_id: dependents.first.id)
       end
 
-      let!(:enrollment1) do
+      before :each do
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        allow(person).to receive(:employee_roles).and_return [employee_role]
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+        allow(person).to receive(:mec_check_eligible?).and_return(false)
+      end
+
+      it "should not show shop coverage if no enrollments exist" do
+        put :update, params: { person: person_params, id: "test" }
+        expect(assigns['shop_coverage_result']).to eq false
+      end
+
+      it "should return a success for existing shop coverage" do
         FactoryBot.create(:hbx_enrollment,
                           family: family,
                           product: product,
@@ -426,19 +440,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
                           kind: 'employer_sponsored',
                           hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
                           aasm_state: 'coverage_selected')
-      end
-
-      before :each do
-        allow(controller).to receive(:update_vlp_documents).and_return(true)
-        allow(person).to receive(:employee_roles).and_return [employee_role]
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
-        allow(person).to receive(:mec_check_eligible?).and_return(false)
         put :update, params: { person: person_params, id: "test" }
-      end
-
-      it "should return a success for existing shop coverage" do
         expect(assigns['shop_coverage_result']).to eq true
       end
     end
