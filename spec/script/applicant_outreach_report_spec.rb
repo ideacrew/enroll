@@ -20,6 +20,7 @@ describe 'applicant_outreach_report' do
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_person, external_app_id: '12345') }
   let!(:family_member) { family.primary_applicant }
   let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
 
 #   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
 #   let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household) }
@@ -102,6 +103,7 @@ describe 'applicant_outreach_report' do
         user_account
         last_page_visited
         program_eligible_for
+        hios_id
       ]
   end
 
@@ -183,7 +185,6 @@ describe 'applicant_outreach_report' do
     end
 
     it 'should match with the spouse person mailing address' do
-      # binding.irb
       mailing_address = spouse_applicant.addresses.where(kind: 'mailing').first
       expect(@file_content[2][6]).to eq(mailing_address.to_s)
     end
@@ -211,6 +212,14 @@ describe 'applicant_outreach_report' do
     it 'should match with the family external app id' do
       expect(@file_content[1][9]).to eq(family.external_app_id)
       expect(@file_content[2][9]).to eq(family.external_app_id)
+    end
+
+    context 'plan' do
+      it 'should match with the most recent active plan hios id' do
+        plan = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan
+        expect(@file_content[1][13]).to eq(plan&.hios_id)
+        expect(@file_content[2][13]).to eq(plan&.hios_id)
+      end
     end
   end
 
