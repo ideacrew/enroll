@@ -5,6 +5,7 @@ field_names  = %w[
     communication_preference
     primary_email_address
     home_address
+    mailing_address
     application_aasm_state
     application_aasm_state_date
     external_id
@@ -14,7 +15,6 @@ field_names  = %w[
   ]
 
 #  ADD THESE FIELDS TO REPORT:
-#   - Address fields (home and mailing)
 #   - HIOS ID for the most recent active health plan (if present)
 #   - Dental plan ID for the most recent active plan (if present)
 #   - Subscriber indicator
@@ -61,6 +61,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 person&.consumer_role&.contact_method,
                 person.work_email_or_best,
                 applicant.home_address.to_s,
+                applicant.addresses.where(kind: 'mailing').first,
                 application&.aasm_state,
                 application&.workflow_state_transitions&.first&.transition_at,
                 family.external_app_id,

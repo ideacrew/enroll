@@ -9,7 +9,7 @@ describe 'applicant_outreach_report' do
 
   let!(:user) { FactoryBot.create(:user, person: primary_person, last_portal_visited: DateTime.now)}
   let(:person_dob_year) { Date.today.year - 48 }
-  let!(:primary_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.new(person_dob_year, 4, 4)) }
+  let!(:primary_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, :with_mailing_address, dob: Date.new(person_dob_year, 4, 4)) }
   let!(:spouse_person) do
     member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (primary_person.dob - 10.years))
     primary_person.ensure_relationship_with(member, 'spouse')
@@ -41,7 +41,7 @@ describe 'applicant_outreach_report' do
     )
   end
 
-  let!(:applicant) do
+  let!(:primary_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
       # :with_home_address,
@@ -62,11 +62,11 @@ describe 'applicant_outreach_report' do
     #   eligibility_determination_id: eligibility_determination.id
     )
   end
-  let!(:applicant2) do
+  let!(:spouse_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
       :spouse,
-      addresses: spouse_person.addresses,
+      addresses: [spouse_person.home_address],
       # :with_home_address,
       application: application,
       family_member_id: family_member2.id,
@@ -83,10 +83,10 @@ describe 'applicant_outreach_report' do
     #   eligibility_determination_id: eligibility_determination2.id
     )
   end
-  let!(:applicants) { [applicant, applicant2] }
+  let!(:applicants) { [primary_applicant, spouse_applicant] }
 
-  let(:primary_applicant) { application.applicants.first }
-  let(:spouse_applicant) { application.applicants.last }
+  # let(:primary_applicant) { application.applicants.first }
+  # let(:spouse_applicant) { application.applicants.last }
   let(:field_names) do
     %w[
         primary_hbx_id
@@ -95,6 +95,7 @@ describe 'applicant_outreach_report' do
         communication_preference
         primary_email_address
         home_address
+        mailing_address
         application_aasm_state
         application_aasm_state_date
         external_id
@@ -149,37 +150,79 @@ describe 'applicant_outreach_report' do
     it 'should match with the primary person home address' do
       expect(@file_content[1][5]).to eq(primary_person.home_address.to_s)
     end
+
+    it 'should match with the primary person mailing address' do
+      mailing_address = primary_applicant.addresses.where(kind: 'mailing').first
+      expect(@file_content[1][6]).to eq(mailing_address.to_s)
+    end
+  end
+
+  context 'spouse person' do
+    it 'should match with the spouse person hbx id' do
+      expect(@file_content[2][0]).to eq(spouse_person.hbx_id.to_s)
+    end
+
+    it 'should match with the spouse person first name' do
+      expect(@file_content[2][1]).to eq(spouse_person.first_name)
+    end
+
+    it 'should match with the spouse person last name' do
+      expect(@file_content[2][2]).to eq(spouse_person.last_name)
+    end
+
+    it 'should match with the spouse person contact method' do
+      expect(@file_content[2][3]).to eq(spouse_person.consumer_role.contact_method)
+    end
+
+    it 'should match with the spouse person email address' do
+      expect(@file_content[2][4]).to eq(spouse_person.work_email_or_best)
+    end
+
+    it 'should match with the spouse person home address' do
+      expect(@file_content[2][5]).to eq(spouse_applicant.home_address.to_s)
+    end
+
+    it 'should match with the spouse person mailing address' do
+      # binding.irb
+      mailing_address = spouse_applicant.addresses.where(kind: 'mailing').first
+      expect(@file_content[2][6]).to eq(mailing_address.to_s)
+    end
   end
 
   context 'application' do
     it 'should match with the application aasm_state' do
-      expect(@file_content[1][6]).to eq(application.aasm_state)
+      expect(@file_content[1][7]).to eq(application.aasm_state)
+      expect(@file_content[2][7]).to eq(application.aasm_state)
     end
 
     it 'should match with the date of the most recent aasm_state transition' do
       # how to stub workflow state transition???
-      # expect(@file_content[1][6]).to eq(application.workflow_state_transitions.first.transition_at)
+      # expect(@file_content[1][8]).to eq(application.workflow_state_transitions.first.transition_at)
     end
 
     it 'should match with the programs that applicants are eligible for' do
       eligible_programs = "MaineCare and Cub Care(Medicaid),Financial assistance(APTC eligible)"
-      expect(@file_content[1][11]).to eq(eligible_programs)
+      expect(@file_content[1][12]).to eq(eligible_programs)
+      expect(@file_content[2][12]).to eq(eligible_programs)
     end
   end
 
   context 'family' do
     it 'should match with the family external app id' do
-      expect(@file_content[1][8]).to eq(family.external_app_id)
+      expect(@file_content[1][9]).to eq(family.external_app_id)
+      expect(@file_content[2][9]).to eq(family.external_app_id)
     end
   end
 
   context 'user' do
     it 'should match with the user account email' do
-      expect(@file_content[1][9]).to eq(primary_person.user.email)
+      expect(@file_content[1][10]).to eq(primary_person.user.email)
+      expect(@file_content[2][10]).to eq(primary_person.user.email)
     end
 
     it 'should match with the user account last page visited' do
-      expect(@file_content[1][10]).to eq(primary_person.user.last_portal_visited)
+      expect(@file_content[1][11]).to eq(primary_person.user.last_portal_visited)
+      expect(@file_content[2][11]).to eq(primary_person.user.last_portal_visited)
     end
   end
 
