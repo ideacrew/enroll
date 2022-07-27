@@ -20,7 +20,8 @@ describe 'applicant_outreach_report' do
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_person, external_app_id: '12345') }
   let!(:family_member) { family.primary_applicant }
   let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
+  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
+  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family) }
 
 #   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
 #   let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household) }
@@ -103,7 +104,8 @@ describe 'applicant_outreach_report' do
         user_account
         last_page_visited
         program_eligible_for
-        hios_id
+        health_plan_hios_id
+        dental_plan_id
       ]
   end
 
@@ -215,10 +217,16 @@ describe 'applicant_outreach_report' do
     end
 
     context 'plan' do
-      it 'should match with the most recent active plan hios id' do
-        plan = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan
-        expect(@file_content[1][13]).to eq(plan&.hios_id)
-        expect(@file_content[2][13]).to eq(plan&.hios_id)
+      it 'should match with the most recent active health plan hios id' do
+        health_plan = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan
+        expect(@file_content[1][13]).to eq(health_plan&.hios_id)
+        expect(@file_content[2][13]).to eq(health_plan&.hios_id)
+      end
+
+      it 'should match with the most recent active dental plan id' do
+        dental_plan = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}&.plan
+        expect(@file_content[1][14]).to eq(dental_plan&.hios_id)
+        expect(@file_content[2][14]).to eq(dental_plan&.hios_id)
       end
     end
   end

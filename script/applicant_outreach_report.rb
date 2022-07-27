@@ -12,11 +12,11 @@ field_names  = %w[
     user_account
     last_page_visited
     program_eligible_for
-    hios_id
+    health_plan_hios_id
+    dental_plan_id
   ]
 
 #  ADD THESE FIELDS TO REPORT:
-#   - Dental plan ID for the most recent active plan (if present)
 #   - Subscriber indicator
 #   - ACES transfer ID
 
@@ -68,7 +68,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 primary_person.user&.email, # only primary person has a User account
                 primary_person.user&.last_portal_visited,
                 program_eligible_for(application),
-                family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan&.hios_id
+                family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan&.hios_id,
+                family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}&.plan&.hios_id
               ]
       end
       # csv << [primary_person.hbx_id,
