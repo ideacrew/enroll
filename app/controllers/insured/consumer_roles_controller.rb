@@ -324,7 +324,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def check_shop_coverage
-    Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: @person.hbx_id, market: "employer_sponsored")
+    Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: @person.hbx_id, market_kind: "employer_sponsored")
   end
 
   def help_paying_coverage_redirect_path(result)

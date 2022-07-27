@@ -33,7 +33,7 @@
         Is this person currently enrolled in health coverage?: <%= applicant.has_enrolled_health_coverage %>
         Does this person currently have access to other health coverage, including through another person?: <%=applicant.has_eligible_health_coverage %>
     OTHER QUESTIONS:
-        Has this person applied for an SSN:  <%= applicant.is_ssn_applied %>
+        Has this person applied for an SSN?:  <%= applicant.is_ssn_applied %>
         Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason_readable.to_s : 'N/A' %>
         Is this person pregnant?:  <%= applicant.is_pregnant %>
         Pregnancy due date?:  <%=applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>

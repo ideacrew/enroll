@@ -596,12 +596,12 @@ module FinancialAssistance
     end
 
     def has_non_magi_medicaid_eligible(applicant)
-      return unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible)
+      return false unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible)
       applicant.is_non_magi_medicaid_eligible
     end
 
     def is_eligible_for_non_magi_reasons(applicant)
-      return unless FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons)
+      return false unless FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons)
       applicant.is_eligible_for_non_magi_reasons
     end
 

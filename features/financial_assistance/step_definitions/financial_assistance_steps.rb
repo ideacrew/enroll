@@ -467,7 +467,10 @@ end
 Given(/an applicant has shop coverage/) do
   applicant = application.active_applicants.first
   person = FactoryBot.create(:person, :with_family)
-  FactoryBot.create(:hbx_enrollment, family: person.primary_family)
+  fm = person.primary_family.family_members.where(person_id: person.id).first
+  hbx = FactoryBot.create(:hbx_enrollment, family: person.primary_family)
+  hbx.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: fm.id)
+  hbx.save!
   applicant.update_attributes!(person_hbx_id: person.hbx_id)
 end
 
@@ -547,6 +550,11 @@ end
 Then(/^they should see the shop coverage exists warning text$/) do
   expect(page).to have_content(l10n('faa.shop_check_success'))
   expect(page).to have_content(l10n('faa.mc_continue'))
+end
+
+Then(/^they should not see the shop coverage exists warning text$/) do
+  expect(page).to_not have_content(l10n('faa.shop_check_success'))
+  expect(page).to_not have_content(l10n('faa.mc_continue'))
 end
 
 # TODO: Refactor these with the resource_registry_world.rb helpers
@@ -657,7 +665,13 @@ And(/^user should have feature toggled questions in review$/) do
 end
 
 And(/an applicant has an existing non ssn apply reason/) do
-  application.applicants.first.update_attributes!(non_ssn_apply_reason: 'ApplicantWillProvideSSNLater')
+  application.applicants.first.update_attributes!(non_ssn_apply_reason: 'ApplicantWillProvideSSNLater',
+                                                  no_ssn: '1',
+                                                  is_ssn_applied: false)
+end
+
+And(/the user will see the applicant's is ssn applied answer/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.is_ssn_applied)
 end
 
 And(/the user will see the applicant's non ssn apply reason/) do
