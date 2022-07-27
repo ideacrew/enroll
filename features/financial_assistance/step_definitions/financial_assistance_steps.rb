@@ -665,7 +665,13 @@ And(/^user should have feature toggled questions in review$/) do
 end
 
 And(/an applicant has an existing non ssn apply reason/) do
-  application.applicants.first.update_attributes!(non_ssn_apply_reason: 'ApplicantWillProvideSSNLater')
+  application.applicants.first.update_attributes!(non_ssn_apply_reason: 'ApplicantWillProvideSSNLater',
+                                                  no_ssn: '1',
+                                                  is_ssn_applied: false)
+end
+
+And(/the user will see the applicant's is ssn applied answer/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.is_ssn_applied)
 end
 
 And(/the user will see the applicant's non ssn apply reason/) do
