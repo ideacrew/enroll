@@ -4,6 +4,7 @@ field_names  = %w[
     last_name
     communication_preference
     primary_email_address
+    home_address
     application_aasm_state
     application_aasm_state_date
     external_id
@@ -13,7 +14,7 @@ field_names  = %w[
   ]
 
 #  ADD THESE FIELDS TO REPORT:
-#   - Address fields
+#   - Address fields (home and mailing)
 #   - HIOS ID for the most recent active health plan (if present)
 #   - Dental plan ID for the most recent active plan (if present)
 #   - Subscriber indicator
@@ -50,17 +51,34 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     all_families.offset(offset).limit(batch_size).no_timeout.each do |family|
       application = FinancialAssistance::Application.where(family_id: family._id, assistance_year: current_year).order_by(:created_at.desc).first
       primary_person = family.primary_person
-      csv << [primary_person.hbx_id,
-              primary_person.first_name,
-              primary_person.last_name,
-              primary_person&.consumer_role&.contact_method,
-              primary_person.work_email_or_best,
-              application&.aasm_state,
-              application&.workflow_state_transitions&.first&.transition_at,
-              family.external_app_id,
-              primary_person.user&.email,
-              primary_person.user&.last_portal_visited,
-              program_eligible_for(application)]
+      application.applicants.each do |applicant|
+        person = family.family_members.detect {|fm| fm.hbx_id == applicant.person_hbx_id}&.person
+        next unless applicant.is_applying_coverage && person # assuming the report should skip non-applicants
+
+        csv << [person.hbx_id,
+                person.first_name,
+                person.last_name,
+                person&.consumer_role&.contact_method,
+                person.work_email_or_best,
+                applicant.home_address.to_s,
+                application&.aasm_state,
+                application&.workflow_state_transitions&.first&.transition_at,
+                family.external_app_id,
+                primary_person.user&.email, # only primary person has a User account
+                primary_person.user&.last_portal_visited,
+                program_eligible_for(application)]
+      end
+      # csv << [primary_person.hbx_id,
+      #         primary_person.first_name,
+      #         primary_person.last_name,
+      #         primary_person&.consumer_role&.contact_method,
+      #         primary_person.work_email_or_best,
+      #         application&.aasm_state,
+      #         application&.workflow_state_transitions&.first&.transition_at,
+      #         family.external_app_id,
+      #         primary_person.user&.email,
+      #         primary_person.user&.last_portal_visited,
+      #         program_eligible_for(application)]
     rescue StandardError => e
       puts "error for family #{family.id} due to #{e}"
     end
