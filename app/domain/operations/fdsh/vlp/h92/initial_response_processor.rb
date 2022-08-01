@@ -36,6 +36,7 @@ module Operations
               individual_response = response.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first
               args.qualified_non_citizenship_result = individual_response.dig(:InitialVerificationIndividualResponseSet, :QualifiedNonCitizenCode)
               if individual_response.dig(:ResponseMetadata, :ResponseCode) == "HS000000"
+                args.qualified_non_citizenship_result = parse_qnc_code(consumer_role, individual_response)
                 if individual_response[:LawfulPresenceVerifiedCode] == "Y"
                   args.citizenship_result = get_citizen_status(individual_response.dig(:InitialVerificationIndividualResponseSet, :EligStatementTxt))
                   consumer_role.pass_dhs!(args) if consumer_role.may_pass_dhs?
@@ -87,6 +88,19 @@ module Operations
             consumer_role.person.save! if individual_response[:FiveYearBarApplyCode].present? || individual_response[:FiveYearBarMetCode].present?
           rescue StandardError => e
             Rails.logger.error "Failed to update Consumer Role with Five Year Bar information, message: #{e.message}"
+          end
+
+          def parse_qnc_code(consumer_role, individual_response)
+            qnc_code = individual_response.dig(:InitialVerificationIndividualResponseSet, :QualifiedNonCitizenCode)
+
+            case qnc_code&.upcase
+            when 'Y', 'P'
+              'Y'
+            when 'X'
+              consumer_role.us_citizen ? 'N' : 'Y'
+            else
+              'N'
+            end
           end
 
           def vlp_response_code_to_boolean(code_value)
