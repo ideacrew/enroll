@@ -346,12 +346,14 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
 
         before do
           person1.consumer_role.update_attributes!(mocked_params)
+          person1.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'Y')
           @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
         it 'should copy five_year_bar_applies & five_year_bar_met' do
           expect(@duplicate_applicant.five_year_bar_applies).to eq(true)
           expect(@duplicate_applicant.five_year_bar_met).to eq(true)
+          expect(@duplicate_applicant.qualified_non_citizen).to eq(true)
         end
       end
     end
