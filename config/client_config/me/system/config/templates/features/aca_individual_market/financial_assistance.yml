@@ -291,5 +291,10 @@ registry:
     - key: :job_income_warning_message
       item: :job_income_warning_message
       is_enabled: true
+  - namespace:
+    - :premium_credit_results
+    features:
+    - key: :display_eligibility_results_per_tax_household
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
