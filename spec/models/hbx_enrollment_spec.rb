@@ -5129,7 +5129,6 @@ describe '.eligible_to_reinstate?', dbclean: :around_each do
   end
 end
 
-
 describe '.term_or_cancel_benefit_group_assignment', dbclean: :around_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
@@ -5548,6 +5547,94 @@ describe ".propogate_cancel" do
         expect(Services::IvlEnrollmentService).to receive_message_chain('new.trigger_enrollment_notice').with(ivl_enrollment)
         ivl_enrollment.select_coverage!
       end
+    end
+  end
+end
+
+describe '.reset_dates_on_previously_covered_members' do
+
+  let!(:person1) do
+    FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                      first_name: 'test10', last_name: 'test30', gender: 'male')
+  end
+
+  let!(:person2) do
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                               first_name: 'test', last_name: 'test10', gender: 'male')
+    person1.ensure_relationship_with(person, 'child')
+    person
+  end
+
+  let!(:family) do
+    FactoryBot.create(:family, :with_primary_family_member, person: person1)
+  end
+
+  let!(:dependent_family_member) do
+    FactoryBot.create(:family_member, family: family, person: person2)
+  end
+
+  let(:household) { FactoryBot.create(:household, family: family) }
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year}
+  let(:new_effective_on) { Date.new(effective_on.year, 6, 1) }
+
+  let!(:active_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      kind: "individual",
+                      coverage_kind: "health",
+                      product: product,
+                      aasm_state: 'coverage_selected',
+                      effective_on: effective_on,
+                      hbx_enrollment_members: [
+                        FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: effective_on, coverage_start_on: effective_on, is_subscriber: true)
+                      ])
+  end
+
+  let!(:shopping_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: new_effective_on,
+                      household: family.active_household,
+                      kind: "individual",
+                      coverage_kind: "health",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [
+                        FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: true),
+                        FactoryBot.build(:hbx_enrollment_member, applicant_id: dependent_family_member.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: false)
+                      ])
+  end
+
+  let(:primary_enrollment_member) { shopping_enrollment.hbx_enrollment_members.detect{|enm| enm.applicant_id == family.primary_applicant.id} }
+  let(:dependent_enrollment_member) { shopping_enrollment.hbx_enrollment_members.detect{|enm| enm.applicant_id != family.primary_applicant.id} }
+
+  context 'when same product passed' do
+    let(:new_product) { product }
+
+    it 'should reset coverage_start_on dates on previously enrolled members' do
+      expect(primary_enrollment_member.coverage_start_on).to eq new_effective_on
+      expect(dependent_enrollment_member.coverage_start_on).to eq new_effective_on
+
+      shopping_enrollment.reset_dates_on_previously_covered_members(new_product)
+
+      expect(primary_enrollment_member.reload.coverage_start_on).to eq effective_on
+      expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
+    end
+  end
+
+  context 'when different product passed' do
+
+    let(:new_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '02')}
+
+    it 'should not reset coverage_start_on dates on previously enrolled members' do
+      expect(primary_enrollment_member.coverage_start_on).to eq new_effective_on
+      expect(dependent_enrollment_member.coverage_start_on).to eq new_effective_on
+
+      shopping_enrollment.reset_dates_on_previously_covered_members(new_product)
+
+      expect(primary_enrollment_member.reload.coverage_start_on).to eq new_effective_on
+      expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
     end
   end
 end
