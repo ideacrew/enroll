@@ -46,22 +46,34 @@ module Operations
                   att_hash[attribute] = person.send(attribute)
                   att_hash
         end
+        consumer_role = person.consumer_role
         attrs.merge!(person_hbx_id: person.hbx_id,
                      ssn: person.ssn,
                      dob: person.dob.present? ? person.dob.strftime("%d/%m/%Y") : nil,
-                     is_applying_coverage: person.consumer_role.is_applying_coverage,
-                     five_year_bar_applies: person.consumer_role.five_year_bar_applies,
-                     five_year_bar_met: person.consumer_role.five_year_bar_met,
+                     is_applying_coverage: consumer_role.is_applying_coverage,
+                     five_year_bar_applies: consumer_role.five_year_bar_applies,
+                     five_year_bar_met: consumer_role.five_year_bar_met,
+                     qualified_non_citizen: construct_qualified_non_citizen(consumer_role),
                      citizen_status: person.citizen_status,
                      is_consumer_role: true,
                      same_with_primary: false,
-                     indian_tribe_member: person.consumer_role.is_tribe_member?,
+                     indian_tribe_member: consumer_role.is_tribe_member?,
                      is_incarcerated: person.is_incarcerated,
                      addresses: construct_association_fields(person.addresses),
                      phones: construct_association_fields(person.phones),
                      emails: construct_association_fields(person.emails))
 
         attrs.merge(vlp_document_params(person.consumer_role))
+      end
+
+      def construct_qualified_non_citizen(consumer_role)
+        qnc_code = consumer_role.lawful_presence_determination&.qualified_non_citizenship_result
+        case qnc_code
+        when 'Y'
+          true
+        else
+          false
+        end
       end
 
       def vlp_document_params(consumer_role)
