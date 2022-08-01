@@ -284,6 +284,8 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
+      mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
+      @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
       set_current_person
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
