@@ -284,6 +284,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
+      find_consumer_role if EnrollRegistry.feature_enabled?(:mec_check) || EnrollRegistry.feature_enabled?(:shop_coverage_check)
       mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
       @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
       set_current_person
