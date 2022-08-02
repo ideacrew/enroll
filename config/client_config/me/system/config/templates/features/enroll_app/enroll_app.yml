@@ -20,7 +20,7 @@ registry:
           - key: :policies_url
             item: ''
           - key: :faqs_url
-            item: ''
+            item: 'https://www.coverme.gov/get-help'
           - key: :help_url
             item: 'https://www.coverme.gov/help/'
           - key: :business_resource_center_url
