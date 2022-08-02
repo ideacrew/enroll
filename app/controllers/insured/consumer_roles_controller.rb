@@ -255,6 +255,9 @@ class Insured::ConsumerRolesController < ApplicationController
     consumer = @person.consumer_role
     if @person.completed_identity_verification? || consumer.identity_verified?
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      find_consumer_role if EnrollRegistry.feature_enabled?(:mec_check) || EnrollRegistry.feature_enabled?(:shop_coverage_check)
+      mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
+      @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
       consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
       redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : consumer_redirection_path
     else
@@ -284,9 +287,6 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
-      find_consumer_role if EnrollRegistry.feature_enabled?(:mec_check) || EnrollRegistry.feature_enabled?(:shop_coverage_check)
-      mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
-      @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
       set_current_person
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
@@ -331,7 +331,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def help_paying_coverage_redirect_path(result)
-    ivl_oe_end_date = Settings.aca.individual_market.open_enrollment.end_on
+    ivl_oe_end_date = Settings.aca.individual_market.open_enrollment.end_on.to_date
     return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection) && ivl_oe_end_date >= TimeKeeper.date_of_record
     financial_assistance.application_checklist_application_path(id: result.success)
   end
