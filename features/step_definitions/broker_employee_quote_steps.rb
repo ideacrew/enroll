@@ -141,6 +141,7 @@ end
 
 Then(/^.+ selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
   wait_for_ajax(3, 2)
+  sleep 5
   find(BrokerHealthBenefitsPage.by_meta_level_tab).click
   wait_for_ajax(3, 2)
   expect(page).to have_content("Gold")
