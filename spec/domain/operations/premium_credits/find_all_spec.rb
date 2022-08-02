@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Operations::PremiumCredits::Find, dbclean: :after_each do
+RSpec.describe Operations::PremiumCredits::FindAll, dbclean: :after_each do
 
   let(:result) { subject.call(params) }
 
@@ -40,16 +40,16 @@ RSpec.describe Operations::PremiumCredits::Find, dbclean: :after_each do
   end
 
   context 'valid params' do
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:group_premium_credit) { FactoryBot.create(:group_premium_credit, family: family)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:group_premium_credits) { FactoryBot.create_list(:group_premium_credit, 2, family: family)}
 
     let(:params) do
-      { family: Family.new, year: TimeKeeper.date_of_record.year, kind: 'aptc_csr' }
+      { family: family, year: TimeKeeper.date_of_record.year, kind: 'aptc_csr' }
     end
 
-    it 'returns success' do
+    it 'returns success & all group premium credits' do
       expect(result.success?).to eq true
-      expect(result.value!).to eq group_premium_credit
+      expect(result.value!.size).to eq 2
     end
   end
 end

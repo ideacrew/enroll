@@ -485,11 +485,11 @@ class Insured::PlanShoppingsController < ApplicationController
     # TODO: This can be removed once we get rid of temporary config.
     # rubocop:disable Style/IfInsideElse
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      group_premium_credit(@person.primary_family, hbx_enrollment.effective_on.year) if @person.present?
+      group_premium_credits(@person.primary_family, hbx_enrollment.effective_on.year) if @person.present?
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
     end
-    if @shopping_tax_household.present? || @group_premium_credit.present?
+    if @shopping_tax_household.present? || @group_premium_credits.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f
     else
@@ -499,18 +499,18 @@ class Insured::PlanShoppingsController < ApplicationController
     # rubocop:enable Style/IfInsideElse
   end
 
-  def group_premium_credit(family, year)
-    return @group_premium_credit if defined? @group_premium_credit
+  def group_premium_credits(family, year)
+    return @group_premium_credits if defined? @group_premium_credits
 
-    result = ::Operations::PremiumCredits::Find.new.call({ family: family, year: year, kind: 'aptc_csr' })
-    @group_premium_credit = result.value! if result.success?
+    result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: year, kind: 'aptc_csr' })
+    @group_premium_credits = result.value! if result.success?
   end
 
   def can_apply_aptc?(plan)
     return false if @enrollment.is_shop?
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      @group_premium_credit.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+      @group_premium_credits.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
     else
       @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
     end

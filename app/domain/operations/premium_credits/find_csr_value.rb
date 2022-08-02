@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module PremiumCredits
-    # This operation is to find Group Premium Credit.
+    # This operation is to find Csr value.
     class FindCsrValue
       include Dry::Monads[:result, :do]
 
@@ -19,14 +19,17 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Invalid params. group_premium_credit should be an instance of Group Premium Credit') unless params[:group_premium_credit].is_a?(GroupPremiumCredit)
+        return Failure('Invalid params. missing group_premium_credits') if params[:group_premium_credits].blank?
+        return Failure('Invalid params. group_premium_credits should be an instance of Group Premium Credit') if params[:group_premium_credits].any? { |gp| !gp.is_a?(GroupPremiumCredit) }
         return Failure('Missing family member ids') unless params[:family_member_ids]
 
         Success(params)
       end
 
       def find_csr_value(values)
-        @member_premium_credits = values[:group_premium_credit].member_premium_credits.csr_eligible.where(:family_member_id.in => values[:family_member_ids])
+        @member_premium_credits = values[:group_premium_credits].collect do |group_premium_credit|
+          group_premium_credit.member_premium_credits.csr_eligible.select { |member_premium_credit| values[:family_member_ids].include? member_premium_credit.family_member_id }
+        end.flatten
 
         @csr_hash = @member_premium_credits.inject({}) do |result, member_premium_credit|
           result[member_premium_credit.family_member_id] = member_premium_credit.value
@@ -54,8 +57,8 @@ module Operations
           @csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member && !member_premium_credit.is_ia_eligible
         end
 
-        family_members_with_ai_an = @member_premium_credits.map(&:family_member).select { |fm| fm.person.indian_tribe_member }
-        @member_premium_credits = @member_premium_credits.where(:family_member_id.nin => family_members_with_ai_an.map(&:id))
+        family_members_with_ai_an = @member_premium_credits.map(&:family_member).select { |fm| fm.person.indian_tribe_member }.map(&:id)
+        @member_premium_credits = @member_premium_credits.reject { |member_premium_credit| family_members_with_ai_an.include? member_premium_credit.family_member_id }
       end
 
       def retrieve_csr(csr_values)
