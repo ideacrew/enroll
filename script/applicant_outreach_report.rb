@@ -19,7 +19,7 @@ field_names = %w[
   ]
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
-enrollment_year = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
+enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
 all_families = Family.where(:_id.nin => HbxEnrollment.individual_market.by_year(enrollment_year).enrolled_and_renewing.distinct(:family_id))
 batch_size = 500
 offset = 0
