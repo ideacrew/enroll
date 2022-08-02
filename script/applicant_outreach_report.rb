@@ -19,10 +19,8 @@ field_names = %w[
   ]
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
-
-# Are there times of the year, e.g., during open enrollment, that we would not want to use the current year when looking for enrollments?
-current_year = TimeKeeper.date_of_record.year
-all_families = Family.where(:_id.nin => HbxEnrollment.individual_market.by_year(current_year).enrolled_and_renewing.distinct(:family_id))
+enrollment_year = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
+all_families = Family.where(:_id.nin => HbxEnrollment.individual_market.by_year(enrollment_year).enrolled_and_renewing.distinct(:family_id))
 batch_size = 500
 offset = 0
 families_count = all_families.count
@@ -45,7 +43,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
   while offset < families_count
     all_families.offset(offset).limit(batch_size).no_timeout.each do |family|
-      application = FinancialAssistance::Application.where(family_id: family._id, assistance_year: current_year).order_by(:created_at.desc).first
+      application = FinancialAssistance::Application.where(family_id: family._id, assistance_year: enrollment_year).order_by(:created_at.desc).first
       primary_person = family.primary_person
       application.applicants.each do |applicant|
         family_member = family.family_members.detect {|fm| fm.hbx_id == applicant.person_hbx_id}
