@@ -97,7 +97,7 @@ module FinancialAssistance
       "Making best effort to apply": "MakingBestEffortToApply",
       "Newborn without Enumeration at Birth": "NewBornWithoutEnumerationAtBirth",
       "No good cause for not having SSN": "NoGoodCause",
-      "No SSN due to Religious objections": "ReligiousObjections",
+      "No SSN due to religious objections": "ReligiousObjections",
       "Not eligible for SSN": "NotEligible"
     }.freeze
 
