@@ -30,6 +30,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :is_applying_coverage => true,
          five_year_bar_applies: true,
          five_year_bar_met: true,
+         qualified_non_citizen: true,
          :citizen_status => "us_citizen",
          :is_consumer_role => true,
          :same_with_primary => false,
@@ -74,8 +75,8 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
       it 'should create a applicant object' do
         expect(application.reload.applicants.count).to eq(2)
         expect(
-          application.applicants.where(:id.ne => applicant.id).pluck(:five_year_bar_applies, :five_year_bar_met)
-        ).to eq([[true, true]])
+          application.applicants.where(:id.ne => applicant.id).pluck(:five_year_bar_applies, :five_year_bar_met, :qualified_non_citizen)
+        ).to eq([[true, true, true]])
       end
     end
 
@@ -184,6 +185,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :is_tobacco_user => "unknown",
          five_year_bar_applies: true,
          five_year_bar_met: true,
+         qualified_non_citizen: true,
          :issuing_country => nil,
          :last_name => "bond",
          :middle_name => nil,

@@ -13,6 +13,10 @@ module FinancialAssistance
       '[data-cuke="applicant-paying-bills"]'
     end
 
+    def self.is_ssn_applied
+      '[data-cuke="review_is_ssn_applied"]'
+    end
+
     def self.non_ssn_apply_reason
       '[data-cuke="review_no_ssn_reason"]'
     end

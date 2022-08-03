@@ -13,7 +13,7 @@
       <div class="row row-form-wrapper no-buffer check_box_collection" id="ssi_type">
         <div class="col-xs-12 form-group form-group-lg ss_benefit_type">
            <%= f.label :frequency_kind, "#{l10n("Social").upcase} #{l10n("Security").upcase} #{l10n("Benefit").upcase} #{l10n("TYPE").upcase} *", class: "label-color" %>
-           <%= f.select(:ssi_type, options_for_select(FinancialAssistance::Income::SS_BENEFITS.map {|k, v| [v, k]}, selected: other_income.ssi_type), {include_blank: "Choose"}, {disabled: false, required: true}) %>
+           <%= f.select(:ssi_type, options_for_select(FinancialAssistance::Income::SS_BENEFITS.map {|k, v| [v, k]}, selected: other_income.ssi_type), {prompt: "Choose"}, {disabled: false, required: true}) %>
         </div>
       </div>
     <% end %>

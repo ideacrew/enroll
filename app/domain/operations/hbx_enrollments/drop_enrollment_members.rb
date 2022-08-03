@@ -20,20 +20,20 @@ module Operations
       private
 
       def validate(params)
+        return Failure('Unable to disenroll member(s). Admin does not have access to use this tool.') if params[:options]["admin_permission"].in? ["false", false]
         return Failure('Member drop feature is turned off.') unless EnrollRegistry.feature_enabled?(:drop_enrollment_members)
         return Failure('Missing HbxEnrollment Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         @base_enrollment = params[:hbx_enrollment]
         return Failure('Enrollment need be in an active state to drop dependent.') unless base_enrollment.is_admin_terminate_eligible?
         return Failure('Not an ivl enrollment.') unless base_enrollment.is_ivl_by_kind? # Added per the request, also need further development if to be used for shop
-        return Failure('No enrollment members selected for termination.') if params[:options].select{|string| string.include?("terminate_member")}.empty?
-        return Failure('No termination date given.') if params[:options].select{|string| string.include?("termination_date")}.empty?
+        return Failure('Member(s) have not been selected for termination.') if params[:options].select{|string| string.include?("terminate_member")}.empty?
+        return Failure('Termination date has not been selected.') if params[:options].select{|string| string.include?("termination_date")}.empty?
         @termination_date = Date.strptime(params[:options]["termination_date_#{params[:hbx_enrollment].id}"], "%m/%d/%Y")
         @new_effective_date = (termination_date > base_enrollment.effective_on) ? termination_date + 1.day : base_enrollment.effective_on
-        return Failure('Select termination date that would result in a member drop in the present calendar year.') unless new_effective_date.year == termination_date.year
+        return Failure('Termination date must be in current calendar year.') unless new_effective_date.year == termination_date.year
         return Failure('Termination date cannot be outside of the current calendar year.') unless termination_date.year == TimeKeeper.date_of_record.year
-        return Failure('Cannot Drop a retroactive dependent.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
-        return Failure('Enrollment members failed to drop. Admin does not have access to use this tool.') if params[:options]["admin_permission"] == ("false" || false)
+        return Failure('Unable to disenroll member(s) because of retroactive date selection.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
 
         Success(params)
       end

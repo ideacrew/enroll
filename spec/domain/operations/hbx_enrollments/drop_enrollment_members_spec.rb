@@ -84,7 +84,20 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should return a failure' do
-          expect(@result.failure).to eq "Cannot Drop a retroactive dependent."
+          expect(@result.failure).to eq "Unable to disenroll member(s) because of retroactive date selection."
+        end
+
+        context 'and admin does not have permission to drop members' do
+          before do
+            @result = subject.call({hbx_enrollment: enrollment,
+                                    options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 1.day).to_s,
+                                              "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s,
+                                              "admin_permission" => false}})
+          end
+
+          it 'should return the admin permission error' do
+            expect(@result.failure).to eq "Unable to disenroll member(s). Admin does not have access to use this tool."
+          end
         end
       end
 
@@ -124,14 +137,14 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           result = subject.call({hbx_enrollment: enrollment,
                                  options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s}})
 
-          expect(result.failure).to eq "No enrollment members selected for termination."
+          expect(result.failure).to eq "Member(s) have not been selected for termination."
         end
 
         it 'should return a failure when hbx_enrollment is not an ivl' do
           result = subject.call({hbx_enrollment: enrollment,
                                  options: {"terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
 
-          expect(result.failure).to eq "No termination date given."
+          expect(result.failure).to eq "Termination date has not been selected."
         end
 
         it 'should return a failure when hbx_enrollment is not an ivl' do
@@ -139,7 +152,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                  options: {"termination_date_#{enrollment.id}" => enrollment.effective_on.end_of_year.to_s,
                                            "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
 
-          expect(result.failure).to eq "Select termination date that would result in a member drop in the present calendar year."
+          expect(result.failure).to eq "Termination date must be in current calendar year."
         end
 
         it 'should return a failure when hbx_enrollment is not an ivl' do
@@ -397,7 +410,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       end
 
       it 'should return dropped member info' do
-        expect(@dropped_members).to eq 'No enrollment members selected for termination.'
+        expect(@dropped_members).to eq 'Member(s) have not been selected for termination.'
       end
 
       it 'should not terminate previously existing enrollment' do
@@ -411,7 +424,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                         options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
                                                   "terminate_member_#{hbx_enrollment_member3.id}" => nil,
                                                   "admin_permission" => true}}).failure
-        expect(dropped_members).to eq 'Cannot Drop a retroactive dependent.'
+        expect(dropped_members).to eq 'Unable to disenroll member(s) because of retroactive date selection.'
       end
     end
   end

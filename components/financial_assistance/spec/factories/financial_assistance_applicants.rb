@@ -56,6 +56,7 @@ FactoryBot.define do
     trait :with_five_year_bar do
       five_year_bar_applies { true }
       five_year_bar_met { true }
+      qualified_non_citizen { true }
     end
 
     trait :spouse do
