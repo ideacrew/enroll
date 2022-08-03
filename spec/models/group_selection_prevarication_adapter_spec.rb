@@ -360,4 +360,24 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
     end
   end
 
+  context '.is_offering_dental' do
+
+    context 'when there is no valid benefit package assigned to employee' do
+
+      before do
+        employee_role.census_employee.benefit_group_assignments.delete_all
+      end
+
+      it 'should return nil' do
+        expect(adapter.is_offering_dental(employee_role)).to be_blank
+      end
+    end
+
+    context 'when benefit package assigned to employee' do
+
+      it 'should return boolean' do
+        expect(adapter.is_offering_dental(employee_role)).to be_truthy
+      end
+    end
+  end
 end

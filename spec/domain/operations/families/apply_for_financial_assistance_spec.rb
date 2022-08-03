@@ -33,7 +33,7 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
 
     it 'should have all the matching keys' do
       [:person_hbx_id, :is_applying_coverage, :citizen_status, :is_consumer_role,
-       :five_year_bar_applies, :five_year_bar_met,
+       :five_year_bar_applies, :five_year_bar_met, :qualified_non_citizen,
        :indian_tribe_member, :is_incarcerated, :addresses, :phones, :emails,
        :family_member_id, :is_primary_applicant].each do |key|
         expect(@result.success.first.keys).to include(key)
@@ -177,6 +177,7 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
       consumer.consumer_role.five_year_bar_applies = true
       consumer.consumer_role.five_year_bar_met = true
       consumer.save!
+      consumer.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'N')
       consumer
     end
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -188,6 +189,7 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
     it 'should match with person hbx_id' do
       expect(@result.success.first[:five_year_bar_applies]).to eq(person.consumer_role.five_year_bar_applies)
       expect(@result.success.first[:five_year_bar_met]).to eq(person.consumer_role.five_year_bar_met)
+      expect(@result.success.first[:qualified_non_citizen]).to eq(false)
     end
   end
 end

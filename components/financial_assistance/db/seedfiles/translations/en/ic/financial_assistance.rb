@@ -14,6 +14,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_ques.title" => "Other Questions for",
   "en.faa.other_ques.answer_request" => "Answer these questions for this person. When you're finished, select CONTINUE.",
   "en.faa.other_ques.ssn_apply" => "Has this person applied for an SSN?*",
+  "en.faa.other_ques.is_ssn_applied" => "Has this person applied for an SSN?",
   "en.faa.other_ques.why_no_ssn" => "Why doesn't this person have an SSN?",
   "en.faa.other_ques.is_pregnant" => "Is this person pregnant?*",
   "en.faa.other_ques.pregnancy_due_date" => "Pregnancy due date?",
@@ -169,6 +170,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
   # FAA start new application page
+  "en.faa.cost_savings_applications" => "Cost Savings Applications",
+  "en.faa.cost_savings_applications_desc" => "If you started or completed an application for premium reductions, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.",
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
   "en.faa.cancel" => "Cancel",
