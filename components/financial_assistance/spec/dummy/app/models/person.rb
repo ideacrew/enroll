@@ -63,6 +63,9 @@ class Person
   field :ethnicity, type: Array
   field :race, type: String
   field :tribal_id, type: String
+  field :tribal_state, type: String
+  field :tribal_name, type: String
+  field :tribe_codes, type: Array
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
