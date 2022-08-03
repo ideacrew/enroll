@@ -599,6 +599,7 @@ module FinancialAssistance
       if FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible)
         applicant.is_non_magi_medicaid_eligible
       else
+        # block transfer if non_magi_medicaid_eligible feature is disabled
         !applicant.is_non_magi_medicaid_eligible
       end
     end
@@ -607,6 +608,7 @@ module FinancialAssistance
       if FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons)
         applicant.is_eligible_for_non_magi_reasons
       else
+        # block transfer if eligible_for_non_magi_reasons feature is disabled
         !applicant.is_eligible_for_non_magi_reasons
       end
     end
