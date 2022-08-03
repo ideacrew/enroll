@@ -77,6 +77,9 @@ registry:
         settings:
         - key: :featured_tribes
           item: []
+      - key: :tribes_information_raw_review
+        item: :tribes_information_raw_review
+        is_enabled: <%= ENV['TRIBES_INFORMATION_RAW_REVIEW_IS_ENABLED'] || false %>
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
         is_enabled: false

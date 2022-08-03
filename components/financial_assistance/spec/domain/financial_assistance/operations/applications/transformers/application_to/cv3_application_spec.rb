@@ -1812,6 +1812,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       let!(:update_applicant) do
         applicant.five_year_bar_applies = true
         applicant.five_year_bar_met = true
+        applicant.qualified_non_citizen = false
         applicant.save!
       end
 
@@ -1824,6 +1825,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should include five_year_bar info in the result payload' do
         expect(@applicant_entity.five_year_bar_applies).to eq(true)
         expect(@applicant_entity.five_year_bar_met).to eq(true)
+      end
+
+      it 'should include qualified_non_citizen in payload' do
+        expect(@applicant_entity.qualified_non_citizen).to eq(false)
       end
     end
   end
