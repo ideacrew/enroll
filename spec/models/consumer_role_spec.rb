@@ -379,6 +379,105 @@ context 'Verification process and notices' do
     end
   end
 
+  describe 'can_receive_paper_communication?' do
+
+    let(:contact_method) { 'Paper and Electronic communications' }
+    let(:consumer_role) { create(:consumer_role, contact_method: contact_method) }
+    let(:subject) { consumer_role.can_receive_paper_communication? }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(contact_method_via_dropdown)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+    end
+
+    context 'when contact_method_via_dropdown feature is enabled' do
+      let(:contact_method_via_dropdown) { true }
+      let(:contact_method) { 'Paper and Electronic communications' }
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+
+      context 'when consumer did not opt for paper' do
+        let(:contact_method) { 'Only Electronic communications' }
+
+        it 'returns false' do
+          expect(subject).to be_falsey
+        end
+      end
+    end
+
+    context 'when contact_method_via_dropdown feature is disabled' do
+      let(:contact_method_via_dropdown) { false }
+      let(:contact_method) { 'Paper, Electronic and Text Message communications' }
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+
+      context 'when consumer did not opt for paper' do
+        let(:contact_method) { 'Electronic and Text Message communications' }
+
+        it 'returns false' do
+          expect(subject).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe 'can_receive_electronic_communication?' do
+    let(:contact_method) { 'Paper and Electronic communications' }
+    let(:consumer_role) { create(:consumer_role, contact_method: contact_method) }
+    let(:subject) { consumer_role.can_receive_electronic_communication? }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(contact_method_via_dropdown)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+    end
+
+    context 'when contact_method_via_dropdown feature is enabled' do
+      let(:contact_method_via_dropdown) { true }
+      let(:contact_method) { 'Paper and Electronic communications' }
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+
+      context 'when consumer did not opt for electronic' do
+        let(:contact_method) { 'Only Paper communication' }
+
+        it 'returns false' do
+          expect(subject).to be_falsey
+        end
+      end
+    end
+
+    context 'when contact_method_via_dropdown feature is disabled' do
+      let(:contact_method_via_dropdown) { false }
+      let(:contact_method) { 'Paper, Electronic and Text Message communications' }
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+
+      context 'when consumer did not opt for electronic' do
+        let(:contact_method) { 'Paper and Text Message communications' }
+
+        it 'returns false' do
+          expect(subject).to be_falsey
+        end
+      end
+    end
+  end
+
   describe 'state machine' do
     let(:consumer) { person.consumer_role }
     let(:verification_types) { consumer.verification_types }

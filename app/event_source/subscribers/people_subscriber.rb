@@ -36,9 +36,9 @@ module Subscribers
     def redetermine_family_eligibility(payload)
       person = GlobalID::Locator.locate(payload[:gid])
 
-      person.families.each do |_family|
+      person.families.each do |family|
         ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
-          family: person.primary_family,
+          family: family,
           effective_date: TimeKeeper.date_of_record
         )
       end

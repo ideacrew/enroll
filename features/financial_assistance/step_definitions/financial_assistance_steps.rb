@@ -543,7 +543,7 @@ Then(/the "Send To OFI" button will be disabled and the user will see the button
 end
 
 Then(/^they should see the MedicaidCurrently Enrolled warning text$/) do
-  expect(page).to have_content("It looks like you may already be enrolled in MaineCare or Cub Care")
+  expect(page).to have_content(l10n('faa.mc_success')[0,62])
   expect(page).to have_content(l10n('faa.mc_continue'))
 end
 

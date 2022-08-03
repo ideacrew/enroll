@@ -1644,6 +1644,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     let(:test_applicant) do
       applicant.five_year_bar_applies = five_year_bar
       applicant.five_year_bar_met = five_year_bar
+      applicant.qualified_non_citizen = qualified_non_citizen
       applicant.save!
       applicant
     end
@@ -1652,28 +1653,34 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'for five_year_bar is set to true' do
       let(:five_year_bar) { true }
+      let(:qualified_non_citizen) { true }
 
       it 'should include the keys and assign correct values' do
         expect(@result[:five_year_bar_applies]).to eq(true)
         expect(@result[:five_year_bar_met]).to eq(true)
+        expect(@result[:qualified_non_citizen]).to eq(true)
       end
     end
 
-    context 'for five_year_bar is set to false' do
+    context 'for five_year_bar and qualified_non_citizen set to false' do
       let(:five_year_bar) { false }
+      let(:qualified_non_citizen) { false }
 
       it 'should include the keys and assign correct values' do
         expect(@result[:five_year_bar_applies]).to eq(false)
         expect(@result[:five_year_bar_met]).to eq(false)
+        expect(@result[:qualified_non_citizen]).to eq(false)
       end
     end
 
-    context 'for five_year_bar is set to nil' do
+    context 'for five_year_bar and qualified_non_citizen set to nil' do
       let(:five_year_bar) { nil }
+      let(:qualified_non_citizen) { nil }
 
       it 'should include the keys and assign correct values' do
         expect(@result[:five_year_bar_applies]).to eq(nil)
         expect(@result[:five_year_bar_met]).to eq(nil)
+        expect(@result[:qualified_non_citizen]).to eq(nil)
       end
     end
   end
