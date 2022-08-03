@@ -27,7 +27,7 @@ EMPLOYER_TRANSLATIONS = {
   :'en.employers.registration.city' => 'City *',
   :'en.employers.registration.state' => 'State *',
   :'en.employers.registration.zip' => 'Zip *',
-  :'en.ossie_eligibility_description' => "OSSE Eligibility on the organization level is defaulted to 'No', however can be updated by authorized user below. Eligibility for OSSE will be applied to the plan year at creation of initial or renewal plan year. Updating organization eligibility after creation of the plan year will not apply the update to existing plan years regarding of its state.",
-  :'en.ossie_eligibility_question' => 'Does this business qualify for OSSE subsidies?',
+  :'en.osse_eligibility_description' => "OSSE Eligibility on the organization level is defaulted to 'No', however can be updated by authorized user below. Eligibility for OSSE will be applied to the plan year at creation of initial or renewal plan year. Updating organization eligibility after creation of the plan year will not apply the update to existing plan years regarding of its state.",
+  :'en.osse_eligibility_question' => 'Does this business qualify for OSSE subsidies?',
   :'en.eligibility_history' => 'View eligibility history'
 }.freeze
