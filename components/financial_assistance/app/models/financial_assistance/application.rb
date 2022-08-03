@@ -591,7 +591,7 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || has_non_magi_medicaid_eligible(applicant) || applicant.is_medicare_eligible || is_eligible_for_non_magi_reasons(applicant)
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || has_non_magi_medicaid_eligible?(applicant) || applicant.is_medicare_eligible || is_eligible_for_non_magi_reasons?(applicant)
       end
     end
 
