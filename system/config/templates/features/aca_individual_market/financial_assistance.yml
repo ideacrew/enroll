@@ -68,6 +68,9 @@ registry:
       - key: :medicaid_tax_credits_link
         item: :medicaid_tax_credits_link
         is_enabled: true
+      - key: :application_submission_error_status
+        item: :application_submission_error_status
+        is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS'] || false %>
       - key: :featured_tribes_selection
         item: :featured_tribes_selection
         is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
