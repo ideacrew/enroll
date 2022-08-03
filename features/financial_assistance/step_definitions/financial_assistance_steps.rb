@@ -46,7 +46,7 @@ When(/^selects yes they would like help paying for coverage$/) do
 end
 
 When(/^.+ click 'Start New Application' button$/) do
-  click_button 'Start new application'
+  click_button 'Start New Application'
 end
 
 Then(/^they should see a new finanical assistance application$/) do

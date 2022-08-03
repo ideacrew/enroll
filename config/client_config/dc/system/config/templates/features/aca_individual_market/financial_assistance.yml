@@ -68,6 +68,9 @@ registry:
       - key: :medicaid_tax_credits_link
         item: :medicaid_tax_credits_link
         is_enabled: true
+      - key: :application_submission_error_status
+        item: :application_submission_error_status
+        is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS'] || false %>
       - key: :featured_tribes_selection
         item: :featured_tribes_selection
         is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
@@ -290,6 +293,11 @@ registry:
       is_enabled: :false
     - key: :job_income_warning_message
       item: :job_income_warning_message
+      is_enabled: false
+  - namespace:
+    - :premium_credit_results
+    features:
+    - key: :display_eligibility_results_per_tax_household
       is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

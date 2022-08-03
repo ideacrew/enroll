@@ -1,75 +1,70 @@
 <div aria-labelledby="aria-labelledby"class="tab-pane fade in active" id="home">
-  <div class="container" style="margin-top: 20px;">
+  <div class="container" class="mt-2">
     <div class="row">
-    <div class="col-md-2">
-      <%= render 'ui-components/v1/navs/families_navigation' %>
-    </div>
-    <div class="col-md-10">
-      <h1 class="darkblue no-buffer">Cost Savings Applications</h1>
-      <h4>
-        If you started or completed an application for premium reductions, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.
-      </h4>
-      <div class="">
-        <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app') do %>
+      <div class="col-md-2">
+        <%= render 'ui-components/v1/navs/families_navigation' %>
+      </div>
+      <div class="col-md-10">
+        <h1 class="darkblue no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
+        <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
+  
+        <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', class: "mb-1 text-right") do %>
           <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
           <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-            <%= submit_tag "Start new application", class: "btn btn-primary pull-right"%>
+            <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
           <% else %>
-            <%= submit_tag "Start new application", onclick: "StartNewAppModal()", class: "btn btn-primary pull-right"%>
+            <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
           <% end %>
         <% end %>
-        <%= raw "&nbsp;" * 10%>
+        
+        <% if @applications.present? %>
+          <table class="table table-striped">
+            <thead class="form-heading">
+              <tr>
+                <th class="form-heading"><%= l10n('id').upcase %></th>
+                <th class="form-heading"><%= l10n('application_year').upcase %></th>
+                <th class="form-heading"><%= l10n('status').upcase %></th>
+                <th class="form-heading"><%= l10n('started_on').upcase %></th>
+                <th class="form-heading"><%= l10n('submitted_on').upcase %></th>
+                <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+                  <th class="form-heading"><%= l10n('determination').upcase %></th>
+                <% end %>
+                <th class="form-heading"><%= l10n('actions').upcase %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @applications.each do |application| %>
+              <tr>
+                <td><%= application.hbx_id %></td>
+                <td><%= application.assistance_year %></td>
+                <td><%= application_state_for_display(application) %></td>
+                <td><%= to_est application.created_at %></td>
+                <td><%= to_est application.submitted_at %></td>
+                <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+                  <td></td>
+                <% end %>
+                <% dropdown = [
+                    ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
+                    ['Copy to new application', copy_application_path(application), (application.is_draft? || application.is_closed? || (application.imported? ? !current_user.has_hbx_staff_role? : false)) ? 'disabled' : 'static'],
+                    ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
+                    ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+                  ] %>
+                <% if current_user.has_hbx_staff_role? %>
+                  <% dropdown += [
+                    ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+                  ]
+                  %>
+                <% end %>
+                <td>
+                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
+                </td>
+              </tr>
+              <%end%>
+            </tbody>
+          </table>
+        <%end%>
       </div>
-      <%if @applications.present?%>
-      <table class="table table-striped mt10">
-        <thead class="form-heading">
-          <tr>
-            <th class="form-heading">ID</th>
-            <th class="form-heading">APPLICATION YEAR</th>
-            <th class="form-heading">STATUS</th>
-            <th class="form-heading">STARTED ON</th>
-            <th class="form-heading">SUBMITTED ON</th>
-            <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-              <th class="form-heading">DETERMINATION</th>
-            <% end %>
-            <th class="form-heading">ACTIONS</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @applications.each do |application| %>
-          <tr>
-            <td><%=application.hbx_id%></td>
-            <td><%= application.assistance_year %></td>
-            <td><%= application_state_for_display(application) %></td>
-            <td><%=to_est application.created_at%></td>
-            <td><%=to_est application.submitted_at%></td>
-            <% unless FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-              <td></td>
-            <% end %>
-            <%
-              dropdown = [
-                ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
-                ['Copy to new application', copy_application_path(application), (application.is_draft? || application.is_closed? || (application.imported? ? !current_user.has_hbx_staff_role? : false)) ? 'disabled' : 'static'],
-                ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
-                ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
-              ]
-            %>
-            <% if current_user.has_hbx_staff_role? %>
-              <% dropdown += [
-                ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
-              ]
-              %>
-            <% end %>
-            <td>
-              <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
-            </td>
-          </tr>
-          <%end%>
-        </tbody>
-      </table>
-      <%end%>
     </div>
-  </div>
   </div>
 </div>
 
