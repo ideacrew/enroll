@@ -595,20 +595,20 @@ module FinancialAssistance
       end
     end
 
-    def has_non_magi_medicaid_eligible(applicant)
+    def has_non_magi_medicaid_eligible?(applicant)
       if FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible)
         applicant.is_non_magi_medicaid_eligible
       else
-        # block transfer if non_magi_medicaid_eligible feature is disabled
+        # blocks transfer if non_magi_medicaid_eligible feature is disabled
         !applicant.is_non_magi_medicaid_eligible
       end
     end
 
-    def is_eligible_for_non_magi_reasons(applicant)
+    def is_eligible_for_non_magi_reasons?(applicant)
       if FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons)
         applicant.is_eligible_for_non_magi_reasons
       else
-        # block transfer if eligible_for_non_magi_reasons feature is disabled
+        # blocks transfer if eligible_for_non_magi_reasons feature is disabled
         !applicant.is_eligible_for_non_magi_reasons
       end
     end
