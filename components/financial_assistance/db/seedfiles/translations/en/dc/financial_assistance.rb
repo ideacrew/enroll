@@ -164,9 +164,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in Medicaid or CHIP. If you need to update information like your income, address, or who is in your household, contact DC Health Link at <a href='tel:1-855-532-5465'>1-855-532-5465</a> to make these changes before completing a DC Health Link application.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a DC Health Link application.",
   # FAA display evidence type
-  "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
+  "en.faa.evidence_type_aces" => "Coverage from Medicaid and CHIP",
   "en.faa.evidence_type_esi" => "Coverage from a job",
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
