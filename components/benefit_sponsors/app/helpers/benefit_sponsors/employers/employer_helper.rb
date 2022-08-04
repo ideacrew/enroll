@@ -18,8 +18,6 @@ module BenefitSponsors
         return true, person.first
       end
 
-
-
       def staff_for_benefit_sponsors_employer(employer_profile)
         Person.where(:benefit_sponsors_employer_staff_roles => {
             '$elemMatch' => {
