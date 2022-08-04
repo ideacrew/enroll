@@ -226,7 +226,11 @@ class Insured::ConsumerRolesController < ApplicationController
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
           # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: shop_coverage_result) : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          consumer_redirection_path = if EnrollRegistry.feature_enabled?(:financial_assistance)
+                                        help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: shop_coverage_result)
+                                      else
+                                        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+                                      end
           redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
           redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
