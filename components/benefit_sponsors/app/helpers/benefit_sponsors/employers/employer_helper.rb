@@ -18,6 +18,8 @@ module BenefitSponsors
         return true, person.first
       end
 
+
+
       def staff_for_benefit_sponsors_employer(employer_profile)
         Person.where(:benefit_sponsors_employer_staff_roles => {
             '$elemMatch' => {
@@ -69,6 +71,10 @@ module BenefitSponsors
 
       def display_sic_field_for_employer?
         Settings.aca.employer_has_sic_field
+      end
+
+      def osse_eligibility_is_enabled?
+        ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false
       end
 
       def display_referred_by_field_for_employer?
