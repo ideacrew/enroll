@@ -210,7 +210,7 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :update?
     save_and_exit = params['exit_after_method'] == 'true'
     mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
-    @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
+    shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
@@ -226,7 +226,7 @@ class Insured::ConsumerRolesController < ApplicationController
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
           # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: shop_coverage_result) : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
           redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
           redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
@@ -288,6 +288,7 @@ class Insured::ConsumerRolesController < ApplicationController
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
+      @shop_coverage_result = params[:shop_coverage_result]
     else
       render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
     end
