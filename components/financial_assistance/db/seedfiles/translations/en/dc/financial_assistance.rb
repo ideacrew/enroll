@@ -51,7 +51,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "Medicaid",
   "en.faa.eligible_for_medicaid" => "These people <span>likely qualify</span> for ",
-  "en.faa.eligible_for_medicaid2" => "",
+  "en.faa.eligible_for_medicaid2" => "&#58", # use html character code for colon so l10n helper doesn't break
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
@@ -164,9 +164,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in Medicaid or CHIP. If you need to update information like your income, address, or who is in your household, contact DC Health Link at <a href='tel:1-855-532-5465'>1-855-532-5465</a> to make these changes before completing a DC Health Link application.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a DC Health Link application.",
+  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
   # FAA display evidence type
-  "en.faa.evidence_type_aces" => "Coverage from Medicaid and CHIP",
+  "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
   "en.faa.evidence_type_esi" => "Coverage from a job",
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
