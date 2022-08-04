@@ -324,6 +324,10 @@ module Employers::EmployerHelper
     Settings.aca.employer_has_sic_field
   end
 
+  def osse_eligibility_is_enabled?
+    ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false
+  end
+
   def display_referred_by_field_for_employer?
     Settings.aca.employer_registration_has_referred_by_field
   end
