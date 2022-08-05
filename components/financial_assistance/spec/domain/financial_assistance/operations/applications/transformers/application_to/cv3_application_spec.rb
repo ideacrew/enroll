@@ -42,7 +42,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
-                                  is_post_partum_period: false)
+                                  is_post_partum_period: false,
+                                  is_veteran_or_active_military: true)
     applicant
   end
 
@@ -369,6 +370,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should not return nil for is_veteran_or_active_military' do
         expect(@applicant[:demographic][:is_veteran_or_active_military]).not_to be_nil
+        expect(@applicant[:demographic][:is_veteran_or_active_military]).to be_truthy
       end
 
       it 'should not return nil for is_vets_spouse_or_child' do
