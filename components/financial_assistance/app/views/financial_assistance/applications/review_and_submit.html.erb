@@ -5,16 +5,18 @@
       <p><strong> You're almost done! </strong>Review the application summary below and make sure it's correct. Select the
       pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
 
-      <% if @local_mec_evidence %> 
-        <div id="mec-check-response">
-          <%= render partial: 'financial_assistance/applications/mec_check_results' %>
-        </div>
-      <% end %>
+      <% if FinancialAssistanceRegistry[:coverage_check_banners].enabled? %>
+        <% if @local_mec_evidence %> 
+          <div id="mec-check-response">
+            <%= render partial: 'financial_assistance/applications/mec_check_results' %>
+          </div>
+        <% end %>
 
-      <% if @shop_coverage %> 
-        <div id="shop-check-response">
-          <%= render partial: 'financial_assistance/applications/shop_check_results' %>
-        </div> 
+        <% if @shop_coverage %> 
+          <div id="shop-check-response">
+            <%= render partial: 'financial_assistance/applications/shop_check_results' %>
+          </div> 
+        <% end %>
       <% end %>
 
       <% if income_and_deductions_for_any(@application).present? %>

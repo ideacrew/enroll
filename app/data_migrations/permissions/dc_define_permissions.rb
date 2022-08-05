@@ -126,6 +126,7 @@ class DcDefinePermissions < MigrationTask
     hbx_admin_can_access_age_off_excluded
     hbx_admin_can_manage_qles
     hbx_admin_can_change_username_and_email
+    hbx_admin_can_edit_osse_eligibility
   end
 
   def build_test_roles
@@ -170,6 +171,12 @@ class DcDefinePermissions < MigrationTask
     HbxStaffRole.create!(person: p6, permission_id: Permission.developer.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(person: p7, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(person: p8, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile_id)
+  end
+
+  def hbx_admin_can_edit_osse_eligibility
+    Permission.hbx_staff.update_attributes!(can_edit_osse_eligibility: true)
+    Permission.super_admin.update_attributes!(can_edit_osse_eligibility: true)
+    Permission.hbx_tier3.update_attributes!(can_edit_osse_eligibility: true)
   end
 
   def hbx_admin_can_update_ssn
