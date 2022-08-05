@@ -51,7 +51,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "MaineCare and Cub Care",
   "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for ",
-  "en.faa.eligible_for_medicaid2" => "MaineCare (Medicaid) or Cub Care (the Children's Health Insurance Program). Because of this, they do not qualify for a tax credit.",
+  "en.faa.eligible_for_medicaid2" => "MaineCare (Medicaid) or Cub Care (the Children's Health Insurance Program). Because of this, they do not qualify for a tax credit:",
   "en.faa.dhs_decision" => "<span>Next step: The Office for Family Independence will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare and Cub Care</span>.</span>",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
   "en.faa.primary_caretaker_for_text" => "Which member(s) of the household is this person the caretaker for? (choose all that apply)",
