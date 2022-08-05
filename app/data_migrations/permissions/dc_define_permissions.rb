@@ -176,7 +176,7 @@ class DcDefinePermissions < MigrationTask
   def hbx_admin_can_edit_osse_eligibility
     Permission.hbx_staff.update_attributes!(can_edit_osse_eligibility: true)
     Permission.super_admin.update_attributes!(can_edit_osse_eligibility: true)
-    Permission.hbx__tier3.update_attributes!(can_edit_osse_eligibility: true)
+    Permission.hbx_tier3.update_attributes!(can_edit_osse_eligibility: true)
   end
 
   def hbx_admin_can_update_ssn
