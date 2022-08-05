@@ -50,11 +50,12 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         next unless applicant.is_applying_coverage && person # assuming the report should skip non-applicants
 
-        health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
-        dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
-
-        enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
-        enrollment_member ||= dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        # THESE LINES DON'T DO WHAT THEY SHOULD -- HOW TO GET HIOS ID for the most recent active health (and dental) plan (if present)?
+        # look at hbx_enrollment statuses... terminated?  renewing?
+        # health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
+        # dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
+        # enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        # enrollment_member ||= dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
