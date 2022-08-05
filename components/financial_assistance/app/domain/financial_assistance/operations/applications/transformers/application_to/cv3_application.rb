@@ -323,7 +323,7 @@ module FinancialAssistance
                dob: applicant.dob,
                ethnicity: applicant.ethnicity,
                race: applicant.race,
-               is_veteran_or_active_military: applicant.is_veteran.present?,
+               is_veteran_or_active_military: applicant.is_veteran_or_active_military.present?,
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}
             end
 
