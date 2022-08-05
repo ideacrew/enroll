@@ -464,6 +464,14 @@ Given(/the shop coverage check feature is disabled/) do
   EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
 end
 
+Given(/the coverage check banners feature is enabled/) do
+  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the coverage check banners feature is disabled/) do
+  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(false)
+end
+
 Given(/an applicant has shop coverage/) do
   applicant = application.active_applicants.first
   person = FactoryBot.create(:person, :with_family)
