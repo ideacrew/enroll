@@ -12,8 +12,8 @@ field_names = %w[
     user_account
     last_page_visited
     program_eligible_for
-    health_plan_hios_id
-    dental_plan_id
+    most_recent_active_health_plan
+    most_recent_active_dental_plan
     subscriber_indicator
     transfer_id
   ]
@@ -52,10 +52,10 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
 
         # THESE LINES DON'T DO WHAT THEY SHOULD -- HOW TO GET HIOS ID for the most recent active health (and dental) plan (if present)?
         # look at hbx_enrollment statuses... terminated?  renewing?
-        # health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
-        # dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
-        # enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
-        # enrollment_member ||= dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
+        dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
+        enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        enrollment_member ||= dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,

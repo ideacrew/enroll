@@ -92,8 +92,8 @@ describe 'applicant_outreach_report' do
         user_account
         last_page_visited
         program_eligible_for
-        health_plan_hios_id
-        dental_plan_id
+        most_recent_active_health_plan
+        most_recent_active_dental_plan
         subscriber_indicator
         transfer_id
       ]
