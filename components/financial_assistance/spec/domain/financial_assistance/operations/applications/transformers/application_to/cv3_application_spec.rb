@@ -294,8 +294,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(@applicant[:family_member_reference][:is_primary_family_member]).not_to be_nil
       end
 
-      it 'should not return nil for is_resident_post_092296' do
-        expect(@applicant[:citizenship_immigration_status_information][:is_resident_post_092296]).not_to be_nil
+      it 'should return nil for is_resident_post_092296 if value is nil' do
+        expect(@applicant[:citizenship_immigration_status_information][:is_resident_post_092296]).to be_nil
       end
 
       it 'should not return nil for is_lawful_presence_self_attested' do

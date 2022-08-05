@@ -51,7 +51,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "Medicaid",
   "en.faa.eligible_for_medicaid" => "These people <span>likely qualify</span> for ",
-  "en.faa.eligible_for_medicaid2" => "",
+  "en.faa.eligible_for_medicaid2" => "&#58", # use html character code for colon so l10n helper doesn't break
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",

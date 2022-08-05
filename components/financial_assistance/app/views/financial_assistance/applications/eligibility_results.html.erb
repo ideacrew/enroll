@@ -14,13 +14,10 @@
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
               <p>
+                <% medicaid_chip = FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item %>
                 <%= l10n("faa.eligible_for_medicaid") %>
-                <%= render partial:'shared/glossary', locals: {key: 'medicaid', title: FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item, term:  FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item } %>
-                <% if EnrollRegistry[:enroll_app].setting(:site_key).item == :me %>
-                  <%= l10n("faa.eligible_for_medicaid2") %>:
-                <% else %>
-                  :
-                <% end %>
+                <%= render partial:'shared/glossary', locals: {key: 'medicaid', title: medicaid_chip, term:  medicaid_chip } %>
+                <%= l10n("faa.eligible_for_medicaid2") %>
               </p>
 
               <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
