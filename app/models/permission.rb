@@ -57,6 +57,7 @@ class Permission
   field :change_enrollment_end_date, type: Boolean, default: false
   field :can_drop_enrollment_members, type: Boolean, default: false
   field :can_call_hub, type: Boolean, default: false
+  field :can_edit_osse_eligibility, type: Boolean, default: false
 
   class << self
     def hbx_staff
