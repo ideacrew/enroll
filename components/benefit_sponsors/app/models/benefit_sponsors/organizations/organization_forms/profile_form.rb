@@ -28,6 +28,7 @@ module BenefitSponsors
       attribute :referred_by, String
       attribute :referred_reason, String
       attribute :referred_by_options, Array
+      attribute :osse_eligibility, Boolean, :default => false
 
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
