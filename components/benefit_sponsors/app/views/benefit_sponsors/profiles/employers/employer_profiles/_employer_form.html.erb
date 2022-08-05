@@ -120,6 +120,32 @@
             </div>
           <% end %>
           </div>
+          <% if osse_eligibility_is_enabled? %>
+            <div class="mt-2">
+              <h1><%=l10n('subsidies')%></h1>
+              <div>
+                <%=l10n('osse_eligibility_description')%>
+              <div>
+              <div class="row no-buffer vertically-aligned-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 15px; background-color: #fff;">
+                <%=l10n('osse_eligibility_question')%>
+                <div class="form-check form-check-inline col-md-2 col-xs-12 form-group form-group-lg">
+                  <label>
+                    <%= f_profile.radio_button :osse_eligibility, true, class: "n-radio" %>
+                    <span><%=l10n('yes')%></span>
+                  </label>
+                </div>
+                <div class="form-check form-check-inline col-md-2 col-xs-12 form-group form-group-lg">
+                  <label>
+                    <%= f_profile.radio_button :osse_eligibility, false, class: "n-radio"  %>
+                    <span><%=l10n('no')%></span>
+                  </label>
+                </div>
+                <div class="form-check form-check-inline col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                <a class="form-check-label"><%=l10n('eligibility_history')%></a>
+                </div>
+              </div>
+            </div>
+          <%end%>
           <h2> Office Locations </h2>
           <div data-controller="office-locations">
             <div data-target="office-locations.officeLocations">
