@@ -35,7 +35,6 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
      "profile_id"=>employer_profile.id.to_s,
      "current_user_id"=>BSON::ObjectId("#{user.id}")}
   end
-  
 
   let(:agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(params) }
 
