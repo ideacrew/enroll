@@ -18,22 +18,22 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
   let(:user) { FactoryBot.create(:user) }
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:params) do
-    {"organization"=>
-         {"legal_name"=>"Cava LLC",
-          "dba"=>"",
-          "fein"=>"987654312",
-          "profile_attributes"=>
-              {"id"=>employer_profile.id.to_s,
-               "sic_code"=>"0111",
-               "entity_kind"=>"c_corporation",
-               "office_locations_attributes"=>
-                   {"0"=>
-                        {"address_attributes"=>
-                             {"kind"=>"primary", "address_1"=>"4 Privet Drive", "address_2"=>"", "city"=>"Surrey", "state"=>"DC", "zip"=>"20003"},
-                         "phone_attributes" => { "kind" => "work", "area_code" => "333", "number" => "111-2222", "extension" => "111" }}},
-               "contact_method"=>"paper_and_electronic"}},
-     "profile_id"=>employer_profile.id.to_s,
-     "current_user_id"=>BSON::ObjectId("#{user.id}")}
+    {"organization" =>
+         {"legal_name" => "Cava LLC",
+          "dba" => "",
+          "fein" => "987654312",
+          "profile_attributes" =>
+              {"id" => employer_profile.id.to_s,
+               "sic_code" => "0111",
+               "entity_kind" => "c_corporation",
+               "office_locations_attributes" =>
+                   {"0" =>
+                   {"address_attributes" =>
+                   {"kind" => "primary", "address_1" => "4 Privet Drive", "address_2" => "", "city" => "Surrey", "state" => "DC", "zip" => "20003"},
+                    "phone_attributes" => { "kind" => "work", "area_code" => "333", "number" => "111-2222", "extension" => "111" }}},
+               "contact_method" => "paper_and_electronic"}},
+     "profile_id" => employer_profile.id.to_s,
+     "current_user_id" => BSON::ObjectId(user.id.to_s)}
   end
 
   let(:agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(params) }
@@ -44,7 +44,6 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     view.extend BenefitSponsors::Employers::EmployerHelper
     view.extend BenefitSponsors::ApplicationHelper
     view.extend BenefitSponsors::RegistrationHelper
-    allow(view).to receive(:total_active_census_employees).with(employer_profile.id).and_return 0
     allow(view).to receive(:osse_eligibility_is_enabled?).and_return(true)
     assign(:agency, agency)
   end
