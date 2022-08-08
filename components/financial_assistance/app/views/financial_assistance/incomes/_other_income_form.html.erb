@@ -7,7 +7,7 @@
   <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income_id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
 <% end %>
 <div class="focus_effect_module">
-  <div class="row row-form-wrapper no-buffer row-height row-edit-border">
+  <div class="row row-form-wrapper no-buffer row-height row-edit-border overflow-hidden">
     <%= f.hidden_field :kind, value: kind %>
     <% if (other_income.kind == "social_security_benefit" || kind == :social_security_benefit) && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
       <div class="row row-form-wrapper no-buffer check_box_collection" id="ssi_type">
