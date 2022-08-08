@@ -120,7 +120,7 @@
             </div>
           <% end %>
           </div>
-          <% if osse_eligibility_is_enabled? %>
+          <% if osse_eligibility_is_enabled? && pundit_allow(HbxProfile, :can_edit_osse_eligibility?) %>
             <div class="mt-2">
               <h1><%=l10n('subsidies')%></h1>
               <div>
