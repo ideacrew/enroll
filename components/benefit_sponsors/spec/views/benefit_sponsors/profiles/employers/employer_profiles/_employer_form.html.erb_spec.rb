@@ -19,7 +19,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:params) do
     {"organization" =>
-         {"legal_name" => "Cava LLC",
+         {"legal_name" => "ABC Corp",
           "dba" => "",
           "fein" => "987654312",
           "profile_attributes" =>
@@ -29,7 +29,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
                "office_locations_attributes" =>
                    {"0" =>
                    {"address_attributes" =>
-                   {"kind" => "primary", "address_1" => "4 Privet Drive", "address_2" => "", "city" => "Surrey", "state" => "DC", "zip" => "20003"},
+                   {"kind" => "primary", "address_1" => "4 Privet Drive", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "20003"},
                     "phone_attributes" => { "kind" => "work", "area_code" => "333", "number" => "111-2222", "extension" => "111" }}},
                "contact_method" => "paper_and_electronic"}},
      "profile_id" => employer_profile.id.to_s,
