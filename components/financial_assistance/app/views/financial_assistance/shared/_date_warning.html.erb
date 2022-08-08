@@ -1,0 +1,27 @@
+<%# <input type="hidden" id='date_warning_message_<%= raw "#{form_object_id}" _seen' value="false"> %>
+<div class="row hidden" id=<%="date_warning_message_#{form_object_id}"%>>
+  <div class="col-md-12">
+    <%# <div class="focus_effect_module income-warning-error"> %>
+      <%# <div class="row row-form-wrapper no-buffer row-height"> %>
+        <%# <div class="row flash module"> %>
+          <div class="alert alert-warning">
+            <%# <div class="row"> %>
+              <%# <div class="col-xs-12"> %>
+                <% current_year = TimeKeeper.date_of_record.year.to_s %>
+                <% next_year = (TimeKeeper.date_of_record + 1.year).year.to_s %>
+                <ul>
+                  <li id=<%="start_date_warning_#{form_object_id}"%> class="hidden">
+                    <%= l10n('faa.start_date_warning', current_year: current_year, next_year: next_year) %>
+                  </li>
+                  <li id=<%="end_date_warning_#{form_object_id}"%> class="hidden">
+                    <%= l10n('faa.end_date_warning') %>
+                  </li>
+                </ul>
+              <%# </div> %>
+            <%# </div> %>
+          </div>
+        <%# </div> %>
+      <%# </div> %>
+    <%# </div> %>
+  </div>
+</div>
