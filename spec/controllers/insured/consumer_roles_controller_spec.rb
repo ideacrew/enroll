@@ -426,6 +426,15 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
 
       it "should not show shop coverage if no enrollments exist" do
+        FactoryBot.create(:hbx_enrollment,
+                          family: family,
+                          product: product,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          effective_on: effective_on,
+                          kind: 'employer_sponsored',
+                          hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
+                          aasm_state: 'coverage_terminated')
         put :update, params: { person: person_params, id: "test" }
         expect(assigns['shop_coverage_result']).to eq false
       end
