@@ -51,7 +51,7 @@
                 </div>             
               <% end %>
 
-              <% if @shop_coverage_result %>
+              <% if @shop_coverage_result.to_s == "true" %>
                 <div id="shop-check-response">
                   <%= render partial: 'financial_assistance/applications/shop_check_results' %>
                 </div>             

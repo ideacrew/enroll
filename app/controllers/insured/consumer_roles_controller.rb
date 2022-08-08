@@ -292,7 +292,7 @@ class Insured::ConsumerRolesController < ApplicationController
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
-      @shop_coverage_result = params[:shop_coverage_result]
+      @shop_coverage_result ||= params[:shop_coverage_result]
     else
       render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
     end
