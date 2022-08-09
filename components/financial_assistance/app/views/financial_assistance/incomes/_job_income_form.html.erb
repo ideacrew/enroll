@@ -8,13 +8,9 @@
   <% end %>
 
   <% if FinancialAssistanceRegistry.feature_enabled?(:income_and_deduction_date_warning) %>
-    <% onchange_date_event = raw "validateDateWarnings('#{income_id}')"%>
-    <% onclick_save_event = "hideDateWarningPanel('#{income_id}')" %>
-    <% onclick_cancel_event = "hideDateWarningPanel('#{income_id}')" %>
+    <% onchange_date = raw "validateDateWarnings('#{income_id}')"%>
   <% else %>
-    <% onchange_date_event = ""%>
-    <% onclick_save_event = ""%>
-    <% onclick_cancel_event = ""%>
+    <% onchange_date = ""%>
   <% end %>
 
   <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
@@ -39,10 +35,10 @@
         </div>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date_event %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
       </div>
-      <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date_event %>
+      <div class="col-md-3 overflow-hidden">
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
       </div>
     </div>
     <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>

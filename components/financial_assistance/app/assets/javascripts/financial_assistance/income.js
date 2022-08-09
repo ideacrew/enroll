@@ -57,16 +57,6 @@ function validateDateWarnings(id) {
   }
 }
 
-// function showDateWarningPanel(id) {
-//   var warning_div = document.getElementById("date_warning_message_" + id);
-//   warning_div.classList.remove('hidden');
-// }
-
-function hideDateWarningPanel(id) {
-  var warning_div = document.getElementById("date_warning_message_" + id);
-  warning_div.classList.add('hidden');
-}
-
 function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };
