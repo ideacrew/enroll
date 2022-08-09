@@ -171,8 +171,12 @@ module Insured
       end
 
       def calculate_max_applicable_aptc(enrollment, new_effective_on)
-        selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
-        Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: new_effective_on}).value!
+        else
+          selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
+          Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
+        end
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime, current_enrollment_effective_on)
