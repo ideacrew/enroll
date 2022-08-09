@@ -29,6 +29,10 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
   end
 
   context 'valid params' do
+    before do
+      allow(hbx_enrollment).to receive(:total_ehb_premium).and_return 2000.00
+    end
+
     let(:params) do
       { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on }
     end
@@ -86,11 +90,39 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         context 'with non enrolled family member' do
           context 'with current active enrollment' do
             let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_shopping, :with_enrollment_members, enrollment_members: [family.primary_applicant], family: family)}
-            let!(:current_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, enrollment_members: (family.family_members - [family.primary_applicant]), family: family)}
 
-            it 'returns total premium_credit_monthly_cap as available aptc' do
-              expect(result.success?).to eq true
-              expect(result.value!).to eq premium_credit_monthly_cap
+            context 'with zero applied aptc on current enrollment' do
+              let!(:current_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, enrollment_members: (family.family_members - [family.primary_applicant]), family: family)}
+
+              it 'returns total premium_credit_monthly_cap as available aptc' do
+                expect(result.success?).to eq true
+                expect(result.value!).to eq premium_credit_monthly_cap
+              end
+            end
+
+            context 'with applied aptc on current enrollment' do
+              let(:applied_premium_credit) { 100.0 }
+              let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_shopping, :with_enrollment_members, enrollment_members: family.family_members, family: family)}
+
+              context 'new enrollment replacing existing enrollment' do
+                let!(:current_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, enrollment_members: family.family_members, family: family, applied_premium_credit: applied_premium_credit) }
+
+                it 'returns total premium_credit_monthly_cap as available aptc' do
+                  expect(result.success?).to eq true
+                  expect(result.value!).to eq premium_credit_monthly_cap
+                end
+              end
+
+              context 'new enrollment without replacing existing enrollment' do
+                let!(:current_hbx_enrollment) do
+                  FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, enrollment_members: (family.family_members - [family.primary_applicant]), family: family, applied_premium_credit: applied_premium_credit)
+                end
+
+                it 'returns by removing current applied premium on enrollment from total premium_credit_monthly_cap as available aptc' do
+                  expect(result.success?).to eq true
+                  expect(result.value!).to eq premium_credit_monthly_cap - 100.0
+                end
+              end
             end
           end
 
@@ -119,6 +151,17 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             it 'returns by removing benchmark premium of non enrolling family_members from premium_credit_monthly_cap as available aptc' do
               expect(result.success?).to eq true
               expect(result.value!).to eq(premium_credit_monthly_cap - non_enrolled_members_bp)
+            end
+          end
+
+          context 'when ehb premium is less than available aptc' do
+            before do
+              allow(hbx_enrollment).to receive(:total_ehb_premium).and_return premium_credit_monthly_cap - 100.0
+            end
+
+            it 'returns total ehb premium as available aptc' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq premium_credit_monthly_cap - 100.0
             end
           end
         end

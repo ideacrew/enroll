@@ -49,7 +49,20 @@ module Operations
       end
 
       def available_aptc
-        available_aptc_hash.values.sum
+        aptc = available_aptc_hash.values.sum - utilized_aptc
+
+        [aptc, @hbx_enrollment.total_ehb_premium].min
+      end
+
+      def utilized_aptc
+        return 0.0 if active_enrollments.blank?
+
+        @hbx_enrollment.generate_hbx_signature
+
+        active_enrollments.reject do |previous_enrollment|
+          previous_enrollment.generate_hbx_signature
+          previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature
+        end.sum(&:applied_premium_credit).to_f
       end
 
       def available_aptc_hash
@@ -73,13 +86,15 @@ module Operations
       end
 
       def aptc_eligible_non_enrolled_family_members_without_active_enrollment(group_premium_credit)
-        active_enrollments = @family.active_household.hbx_enrollments.enrolled
-
         aptc_eligible_non_enrolled_family_member_ids = group_premium_credit.member_premium_credits.map(&:family_member_id).uniq - enrolled_family_member_ids
 
         return aptc_eligible_non_enrolled_family_member_ids if active_enrollments.blank?
 
         aptc_eligible_non_enrolled_family_member_ids - active_enrollments.map(&:hbx_enrollment_members).flatten.map(&:applicant_id).uniq
+      end
+
+      def active_enrollments
+        @active_enrollments ||= @family.active_household.hbx_enrollments.enrolled.individual_market
       end
 
       def benchmark_premium_of_non_enrolling(group_premium_credit)
