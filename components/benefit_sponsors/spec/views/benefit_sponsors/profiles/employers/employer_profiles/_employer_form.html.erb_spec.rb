@@ -53,7 +53,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
 
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
@@ -80,7 +80,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
   context "without permissions" do
 
     let!(:hbx_csr_tier1_user) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryBot.create(:person, user: hbx_csr_tier1_user )}
+    let!(:person) { FactoryBot.create(:person, user: hbx_csr_tier1_user)}
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
