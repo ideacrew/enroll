@@ -90,7 +90,7 @@ registry:
       - key: :immigration_status_question_required
         is_enabled: false
       - key: :mec_check
-        is_enabled: true
+        is_enabled: <%= ENV['MEC_CHECK_IS_ENABLED'] || true %>
       - key: :shop_coverage_check
         is_enabled: <%= ENV['SHOP_COVERAGE_CHECK_IS_ENABLED'] || false %>
       - key: :include_faa_outstanding_verifications

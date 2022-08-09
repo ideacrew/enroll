@@ -673,6 +673,8 @@ def employer_poc
     end
   end
 
+  # For creating Financial Assistance Eligibility Determination(FAED)
+  # --Start of FAED
   def new_eligibility
     authorize  HbxProfile, :can_add_pdc?
     @person = Person.find(params[:person_id])
@@ -684,9 +686,18 @@ def employer_poc
 
   def create_eligibility
     @element_to_replace_id = params[:person][:family_actions_id]
-    family = Person.find(params[:person][:person_id]).primary_family
-    family.active_household.create_new_tax_household(params[:person]) rescue nil
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      ::Operations::Actions::CreateEligibility.new.call(params[:person])
+    else
+      family = Person.find(params[:person][:person_id]).primary_family
+      begin
+        family.active_household.create_new_tax_household(params[:person])
+      rescue StandardError => e
+        Rails.logger.error { "Create Eligibility Error - #{e}" }
+      end
+    end
   end
+  # --End of FAED
 
   def eligibility_kinds_hash(value)
     if value['pdc_type'] == 'is_medicaid_chip_eligible'

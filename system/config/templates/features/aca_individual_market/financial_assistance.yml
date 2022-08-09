@@ -90,7 +90,7 @@ registry:
         item: :primary_caregiver_relationship_other_question
         is_enabled: false
       - key: :mec_check
-        is_enabled: false
+        is_enabled: <%= ENV['MEC_CHECK_IS_ENABLED'] || false %>
       - key: :shop_coverage_check
         is_enabled: <%= ENV['SHOP_COVERAGE_CHECK_IS_ENABLED'] || false %>
       - key: :include_faa_outstanding_verifications
