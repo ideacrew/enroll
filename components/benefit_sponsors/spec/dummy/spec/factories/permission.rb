@@ -16,5 +16,15 @@ FactoryBot.define do
       can_complete_resident_application { true }
       can_add_sep { true }
     end
+
+    trait :super_admin do
+      can_edit_osse_eligibility {true}
+      can_add_sep { true }
+    end
+
+    trait :hbx_csr_tier1 do
+      can_edit_osse_eligibility {false}
+      can_add_sep { true }
+    end
   end
 end

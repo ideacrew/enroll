@@ -10,13 +10,12 @@ end
 
 RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
+  include L10nHelper
 
   let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
   let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
   let!(:employer_profile) {general_org.employer_profile}
-  let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
   let(:user) { FactoryBot.create(:user) }
-  let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:params) do
     {"organization" =>
          {"legal_name" => "ABC Corp",
@@ -44,46 +43,61 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     view.extend BenefitSponsors::Employers::EmployerHelper
     view.extend BenefitSponsors::ApplicationHelper
     view.extend BenefitSponsors::RegistrationHelper
-    allow(view).to receive(:osse_eligibility_is_enabled?).and_return(true)
+    view.extend BenefitSponsors::PermissionHelper
     assign(:agency, agency)
   end
 
   context "with permissions" do
-    let!(:super_admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: super_admin_person) }
     let!(:super_admin_permission) { FactoryBot.create(:permission, :super_admin) }
-    let!(:super_admin_person) { FactoryBot.create(:person) }
-    let!(:hbx_super_admin_staff_role) do
-      HbxStaffRole.create!(person: super_admin_person, permission_id: super_admin_permission.id, subrole: super_admin_subrole, hbx_profile_id: hbx_profile.id)
-    end
-    let(:super_admin_subrole) { 'super_admin' }
+
+    let!(:security_question)  { FactoryBot.create_default :security_question }
+
+    let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+
+    let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization_with_hbx_profile)  { site.owner_organization }
+    let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+    let(:bap_id) { organization.broker_agency_profile.id }
 
     before do
-      sign_in super_admin_user
-      mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
+      user_with_hbx_staff_role.person.hbx_staff_role.permission_id = super_admin_permission.id
+      user_with_hbx_staff_role.person.hbx_staff_role.save!
+      allow(view).to receive(:osse_eligibility_is_enabled?).and_return(true)
+      allow(view).to receive(:pundit_allow).with(HbxProfile, :can_edit_osse_eligibility?).and_return(true)
     end
 
     it "should display subsidies form" do
+      sign_in(user_with_hbx_staff_role)
+      mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
       expect(rendered).to have_content(l10n('subsidies'))
     end
   end
 
   context "without permissions" do
-    let!(:hbx_csr_tier1_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: hbx_csr_tier1_person) }
+
+    let!(:hbx_csr_tier1_user) { FactoryBot.create(:user, :with_hbx_staff_role) }
+    let!(:person) { FactoryBot.create(:person, user: hbx_csr_tier1_user )}
+    let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization_with_hbx_profile)  { site.owner_organization }
+    let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
     let!(:hbx_csr_tier1_permission) { FactoryBot.create(:permission, :hbx_csr_tier1) }
-    let!(:hbx_csr_tier1_person) { FactoryBot.create(:person) }
-    let!(:hbx_csr_tier1_role) do
-      HbxStaffRole.create!(person: hbx_csr_tier1_person, permission_id: hbx_csr_tier1_permission.id, subrole: hbx_csr_tier1_subrole, hbx_profile_id: hbx_profile.id)
-    end
-    let(:hbx_csr_tier1_subrole) { 'hbx_csr_tier1' }
 
     before do
-      sign_in hbx_csr_tier1_user
-      mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
+      hbx_csr_tier1_user.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
+      hbx_csr_tier1_user.person.hbx_staff_role.permission_id = hbx_csr_tier1_permission.id
+      hbx_csr_tier1_user.person.hbx_staff_role.save!
+      allow(view).to receive(:osse_eligibility_is_enabled?).and_return(true)
+      allow(view).to receive(:pundit_allow).with(HbxProfile, :can_edit_osse_eligibility?).and_return(false)
     end
 
     it "should not display subsidies form" do
+      sign_in(hbx_csr_tier1_user)
+      mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
       expect(rendered).to_not have_content(l10n('subsidies'))
     end
   end
