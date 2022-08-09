@@ -1338,6 +1338,28 @@ module FinancialAssistance
       applicants.build(applicant_params)
     end
 
+    def aptc_applicants
+      applicants.aptc_eligible
+    end
+
+    def medicaid_or_chip_applicants
+      applicants.medicaid_or_chip_eligible
+    end
+
+    # UQHP, is_without_assistance
+    def uqhp_applicants
+      applicants.uqhp_eligible
+    end
+
+    def ineligible_applicants
+      applicants.ineligible
+    end
+
+    # is_eligible_for_non_magi_reasons, is_non_magi_medicaid_eligible
+    def applicants_with_non_magi_reasons
+      applicants.eligible_for_non_magi_reasons
+    end
+
     private
 
     # If MemberA is parent to MemberB,

@@ -12,7 +12,7 @@
           </div>
         <% end %>
 
-        <% if @shop_coverage %> 
+        <% if @shop_coverage.to_s == "true" %> 
           <div id="shop-check-response">
             <%= render partial: 'financial_assistance/applications/shop_check_results' %>
           </div> 
