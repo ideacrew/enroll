@@ -158,7 +158,7 @@
         <% if osse_eligibility_is_enabled? %>
         <p>
           <label><%= l10n("osse_amount") %>:</label>
-          <strong>$0.00</strong>/<%= l10n("month").to_s.downcase %>
+          <strong><%='$0.00'%></strong>/<%= l10n("month").to_s.downcase %>
         </p>
         <% else %>
         &nbsp;
