@@ -1,0 +1,152 @@
+<div id="new_person_wrapper" class="lightgray">
+  <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
+    <div class="eligibility-results">
+      <h1 data-cuke='eligibility_results' class='dir'><b><%= l10n("faa.results.eligibility_results") %></b></h1>
+
+      <% @application.eligibility_determinations.each_with_index do |ed, i| %>
+        <h3 data-cuke='tax_household' class='mt-10'><b><%= l10n("faa.results.tax_household", thh_number: i.next) %></b></h3>
+
+        <!-- Start: Section for APTC/CSR Applicants -->
+        <% aptc_applicants = ed.aptc_applicants %>
+        <% if aptc_applicants.present? %>
+          <!-- Start: Section for APTC Applicants -->
+          <h5 data-cuke='review_eligibility_header'><b><%= l10n("faa.results.review_eligibility_header") %></b></h5>
+          <p data-cuke='aptc_text'><%= l10n("faa.results.aptc_text", aptc: number_with_delimiter(ed.max_aptc, :delimiter => ',')) %></p>
+          <ul>
+            <% aptc_applicants.each do |applicant| %>
+              <li data-cuke='full_name'><b><%= full_name(applicant) %></b></li>
+            <% end %>
+          </ul>
+          <!-- End: Section for APTC Applicants -->
+
+          <!-- Start: Section for CSR Applicants -->
+          <p data-cuke='csr_text'><%= l10n("faa.results.csr_text") %></p>
+          <ul>
+            <% aptc_applicants.each do |applicant| %>
+              <li data-cuke='csr'>
+                <b><%= full_name(applicant) %>: </b><%= l10n("faa.results.csr", csr: display_csr(applicant)) %>
+              </li>
+            <% end %>
+          </ul>
+          <!-- End: Section for CSR Applicants -->
+        <% end %>
+        <!-- End: Section for APTC/CSR Applicants -->
+
+        <!-- Start: Section for Magi Medicaid / Medicaid CHIP Applicants -->
+        <% medicaid_or_chip_applicants = ed.medicaid_or_chip_applicants %>
+        <% if medicaid_or_chip_applicants.present? %>
+          <h5 data-cuke='medicaid_or_chip'><b><%= l10n("faa.results.medicaid_or_chip") %></b></h5>
+          <p data-cuke='medicaid_or_chip_text'><%= l10n("faa.results.medicaid_or_chip_text") %></p>
+          <ul>
+            <% medicaid_or_chip_applicants.each do |applicant| %>
+              <li><b><%= full_name(applicant) %></b></li>
+            <% end %>
+          </ul>
+        <% end %>
+        <!-- End: Section for Magi Medicaid / Medicaid CHIP Applicants -->
+
+        <!-- Start: Section for UQHP / Without Assistance Applicants -->
+        <% uqhp_applicants = ed.uqhp_applicants %>
+        <% if uqhp_applicants.present? %>
+          <h5 data-cuke='private_health_insurance'><b><%= l10n("faa.private_health_insurance") %></b></h5>
+          <h5 data-cuke='private_health_insurance_text'><%= l10n("faa.private_health_insurance_text") %></h5>
+          <ul>
+            <% uqhp_applicants.each do |applicant| %>
+              <li><b><%= full_name(applicant) %></b></li>
+            <% end %>
+          </ul>
+        <% end %>
+        <!-- End: Section for UQHP / Without Assistance Applicants -->
+
+        <!-- Start: Section for Ineligible / Totally Ineligible Applicants -->
+        <% ineligible_applicants = ed.ineligible_applicants %>
+        <% if ineligible_applicants.present? %>
+          <h5 data-cuke='does_not_qualify'><b><%= l10n("faa.does_not_qualify") %></b></h5>
+          <h5 data-cuke='does_not_qualify_text'><%= l10n("faa.does_not_qualify_text") %></h5>
+          <ul>
+            <% ineligible_applicants.each do |applicant| %>
+              <li><b><%= full_name(applicant) %></b></li>
+            <% end %>
+          </ul>
+        <% end %>
+        <!-- End: Section for Ineligible / Totally Ineligible Applicants -->
+
+        <!-- Display only if the RR configuration is enabled and atleast one member is eligible for Non-MAGI Reasons -->
+        <!-- Start: Section for Applicants with Non-MAGI Reasons -->
+        <% applicants_with_non_magi_reasons = ed.applicants_with_non_magi_reasons %>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:non_magi_referral_display) && applicants_with_non_magi_reasons.present? %>
+          <h5 data-cuke='referral'><b><%= l10n("faa.referral") %></b></h5>
+          <h5 data-cuke='qualified_reason'><%= l10n("faa.qualified_reason") %></h5>
+          <ul>
+            <% applicants_with_non_magi_reasons.each do |applicant| %>
+              <li><b><%= full_name(applicant) %></b></li>
+            <% end %>
+          </ul>
+        <% end %>
+        <!-- End: Section for Applicants with Non-MAGI Reasons -->
+      <% end %>
+
+      <h3 data-cuke='next_steps'><b><%= l10n("faa.results.next_steps") %></b></h3>
+      <h5 data-cuke='next_steps_text'><%= l10n("faa.results.next_steps_text") %></h5>
+
+      <!-- Start: Return to Account Home -->
+      <% unless @application.applicants.all?(&:is_medicaid_chip_eligible) || @application.applicants.all?(&:is_totally_ineligible) %>
+        <div data-cuke='return_to_account_home'>
+          <%= link_to l10n('faa.results.return_to_account_home'), main_app.family_account_path, class: "btn btn-small btn-primary" %>
+        </div>
+      <% end %>
+      <!-- End: Return to Account Home -->
+
+      <h5 data-cuke='continue_text'><%= l10n("faa.results.continue_text") %></h5>
+      <h5 data-cuke='your_application_reference_2'><%= l10n("faa.results.your_application_reference_2", application_hbx_id: @application.hbx_id)%></h5>
+
+      <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
+        @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
+        @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? &&
+        !@application.is_transferrable? %>
+        <div class="er-medicaid mt-20" data-cuke='other_actions'>
+          <div class="er-title">
+            <h3>
+              <%= l10n("other_actions") %>
+              <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
+            </h3>
+            <div class="border-bottom-2px"></div>
+          </div>
+          <div id="fa_other_actions" class="panel-collapse collapse">
+            <div class="panel-body">
+              <!-- Sub panels -->
+              <div class="panel-group" id="accordion">
+                <%= l10n("faa.full_long_name_determination",
+                      program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+                      program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item) %>
+                <br/>
+                <br/>
+                <div>
+                  <%= link_to l10n("faa.send_to_external_verification"), update_transfer_requested_application_url, method: :put, class: "btn btn-small btn-primary", id: "btn-request-transfer", remote: true %>
+                </div>
+                <br/>
+                <%= l10n("faa.do_not_agree",
+                    appeal_link: EnrollRegistry[:enroll_app].setting(:appeal_link).item,
+                    find_expert_link: EnrollRegistry[:enroll_app].setting(:find_expert_link).item) %>
+                <br/>
+                <br/>
+                <div>
+                  <%= link_to l10n("faa.results.view_my_applications"), applications_path, class: "btn btn-small btn-primary" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class='col-md-2'>
+    <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, consumer_role_id: @person.consumer_role.id) %>
+    <% find_sep_url = main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id) %>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+        previous_url: applications_path,
+        next_url: @person.consumer_role.present? && is_under_open_enrollment? ? group_selection_url : find_sep_url
+      } %>
+  </div>
+</div>

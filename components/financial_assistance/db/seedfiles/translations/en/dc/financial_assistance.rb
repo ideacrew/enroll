@@ -10,7 +10,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
       If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid. Please call DC Health Link at (855) 532-5465 to make updates to your case.
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
-  "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   "en.faa.other_ques.title" => "Other Questions for",
   "en.faa.other_ques.answer_request" => "Answer these questions for this person. When you're finished, select CONTINUE.",
   "en.faa.other_ques.ssn_apply" => "Has this person applied for an SSN?*",
@@ -47,7 +46,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_incomes.other_sources" => "Does this person expect to have <strong> income from other sources </strong> in %{assistance_year}?*",
   "en.faa.deductions.income_adjustments" => "Does this person expect to have income adjustments in %{assistance_year}?*",
   "en.faa.deductions.divorce_agreement" => "(from a divorce agreement finalized before January 1, 2019)",
-  "en.faa.eligibility_results" => "Eligibility Results",
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "Medicaid",
   "en.faa.eligible_for_medicaid" => "These people <span>likely qualify</span> for ",
@@ -62,10 +60,12 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.qualify_for_csr_limited" => "These people won’t pay anything for services they receive from an Indian Health Service provider.",
   "en.faa.silver_plan_checkmark" => "This benefit is only available if these people select a silver plan. Look for this check mark ",
   "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
-  "en.faa.does_not_qualify" => "Does not qualify",
+  "en.faa.does_not_qualify" => "Does Not Qualify",
+  "en.faa.does_not_qualify_text" => "These people likely don't qualify for Medicaid , and don't qualify for private health insurance through CoverME.gov.",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
   "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through DC Health Link:",
   "en.faa.private_health_insurance" => "Private Health Insurance",
+  "en.faa.private_health_insurance_text" => "These people qualify to enroll in a private health insurance plan.",
   "en.faa.qualified_to_enroll" => "These people are not eligible for lower monthly premiums. They <span> qualify to enroll </span> in a private health insurance plan.",
   "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. <a href= %{appeal_link} target='_blank'>Find out more about the appeal process</a> or <a href= %{find_expert_link}  target='_blank'>get help</a> by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
@@ -188,6 +188,21 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.errors.key_application_id_missing_error" => 'Missing application_id key.',
   "en.faa.errors.unable_to_find_application_error" => 'Unable to find application with given application_id.',
   "en.faa.errors.given_application_is_not_submitted_error" => 'Unable to find application with given application_id.',
-  "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members."
+  "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members.",
+
+  "en.faa.results.eligibility_results" => "Eligibility Results",
+  "en.faa.results.tax_household" => "Tax Household %{thh_number}",
+  "en.faa.results.review_eligibility_header" => "Your Application for Lower Premiums",
+  "en.faa.results.aptc_text" => "These people qualify for lower monthly premiums with savings of $%{aptc} per month to be applied to the monthly premium amount selected during plan selection.",
+  "en.faa.results.csr_text" => "These people qualify for lower out-of-pocket costs called Cost-Sharing Reductions. Select a silver plan to use this benefit.",
+  "en.faa.results.csr" => "Cost Sharing Reduction %{csr}",
+  "en.faa.results.medicaid_or_chip" => "Maine Care & Cub Care",
+  "en.faa.results.medicaid_or_chip_text" => "These people appear to be eligible for Medicaid MaineCare (Medicaid) or Cub Care (the Children's Health Insurance Program). The Office for Family Independence will make a final decision on whether those listed qualify for MaineCare and Cub Care. They will send you a letter, and may ask you to provide documents. If you haven’t heard from OFI within 45 days, you may want to ask for an update by calling (855) 797-4357 / TTY: 711.",
+  "en.faa.results.next_steps" => 'Next Steps',
+  "en.faa.results.next_steps_text" => "If you’re already enrolled in a CoverME.gov individual & family plan, you’re finished! You'll see updates applied to your plan in a minute or two. Select ’Return to Account Home’.",
+  "en.faa.results.return_to_account_home" => 'Return to Account Home',
+  "en.faa.results.continue_text" => "Select 'CONTINUE' to see your plan options and/or add or remove someone",
+  "en.faa.results.your_application_reference_2" => "Application Reference ID: %{application_hbx_id}",
+  "en.faa.results.view_my_applications" => "View my Applications"
 }.freeze
 # rubocop:enable Layout/LineLength

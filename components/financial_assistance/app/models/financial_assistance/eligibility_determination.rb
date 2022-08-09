@@ -39,6 +39,28 @@ module FinancialAssistance
       application.applicants.in(eligibility_determination_id: id)
     end
 
+    def aptc_applicants
+      applicants.aptc_eligible
+    end
+
+    def medicaid_or_chip_applicants
+      applicants.medicaid_or_chip_eligible
+    end
+
+    # UQHP, is_without_assistance
+    def uqhp_applicants
+      applicants.uqhp_eligible
+    end
+
+    def ineligible_applicants
+      applicants.ineligible
+    end
+
+    # is_eligible_for_non_magi_reasons, is_non_magi_medicaid_eligible
+    def applicants_with_non_magi_reasons
+      applicants.eligible_for_non_magi_reasons
+    end
+
     def is_aptc_eligible?
       BigDecimal((max_aptc || 0).to_s) > 0
     end
