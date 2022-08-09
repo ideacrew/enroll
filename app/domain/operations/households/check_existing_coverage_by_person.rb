@@ -44,8 +44,9 @@ module Operations
       end
 
       def query_builder(params)
+        eligibile_statuses = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::WAIVED_STATUSES
         query = {:family_id => {"$in" => params[:family_ids]},
-                 :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES }}
+                 :aasm_state => {"$in" => eligibile_statuses }}
 
         query.merge!(kind: params[:market_kind]) if params[:market_kind].present?
         Success(query)
