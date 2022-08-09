@@ -11,7 +11,7 @@ module Subscribers
       pre_process_message(subscriber_logger, payload)
 
       # Add subscriber operations below this line
-      redetermine_family_eligibility(payload)
+      redetermine_family_eligibility(payload) unless Rails.env.test?
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -36,7 +36,7 @@ module Subscribers
 
     def redetermine_family_eligibility(payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
-      return if enrollment.shopping? || Rails.env.test?
+      return if enrollment.shopping?
 
       family = enrollment.family
       assistance_year = enrollment.effective_on.year

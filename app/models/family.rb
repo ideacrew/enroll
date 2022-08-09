@@ -103,6 +103,12 @@ class Family
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
   index({"households.tax_households.eligibility_determinations.csr_percent_as_integer" => 1}, {name: 'csr_percent_as_integer_index'})
 
+  # Premium Credits
+  index({ 'group_premium_credits.start_on' => 1 })
+  index({ 'group_premium_credits.kind' => 1 })
+  index({ 'group_premium_credits.member_premium_credits.kind' => 1 })
+  index({ 'group_premium_credits.member_premium_credits.value' => 1 })
+
   index({"irs_groups.hbx_assigned_id" => 1})
 
   index({"special_enrollment_periods._id" => 1})
@@ -306,6 +312,10 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
+  # Premium Credits
+  scope :all_premium_credits,      ->{ exists({:'group_premium_credits.0' => true}) }
+  scope :aptc_csr_premium_credits, ->{ where(:'group_premium_credits.kind' => 'aptc_csr') }
 
   # It fetches active or renewal application for the family based on the year passed
   def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)
@@ -1306,7 +1316,7 @@ class Family
   end
 
   def generate_hbx_assigned_id
-    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_member_id) if hbx_assigned_id.blank?
+    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_family_id) if hbx_assigned_id.blank?
   end
 
 private

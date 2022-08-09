@@ -932,6 +932,7 @@ module ApplicationHelper
   end
 
   def csr_percentage_options_for_select
+    return MemberPremiumCredit::CSR_VALUES if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
     EligibilityDetermination::CSR_PERCENT_VALUES.inject([]) do |csr_options, csr|
       ui_display = csr == '-1' ? 'limited' : csr
       csr_options << [ui_display, csr]
