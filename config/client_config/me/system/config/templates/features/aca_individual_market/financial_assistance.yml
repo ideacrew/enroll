@@ -303,6 +303,6 @@ registry:
     - :premium_credit_results
     features:
     - key: :display_eligibility_results_per_tax_household
-      is_enabled: <%= ENV['DISPLAY_ELIGIBILITY_RESULTS_PER_THH'] || false %>
+      is_enabled: <%= ENV['DISPLAY_ELIGIBILITY_RESULTS_PER_THH_IS_ENABLED'] || false %>
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
