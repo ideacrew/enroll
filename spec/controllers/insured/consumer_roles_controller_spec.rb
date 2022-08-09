@@ -416,6 +416,17 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
                          applicant_id: dependents.first.id)
       end
 
+      let!(:shop_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          family: family,
+                          product: product,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          effective_on: effective_on,
+                          kind: 'employer_sponsored',
+                          hbx_enrollment_members: [hbx_en_member1, hbx_en_member2])
+      end
+
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(person).to receive(:employee_roles).and_return [employee_role]
@@ -426,29 +437,19 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
 
       it "should not show shop coverage if no enrollments exist" do
-        FactoryBot.create(:hbx_enrollment,
-                          family: family,
-                          product: product,
-                          household: family.active_household,
-                          coverage_kind: "health",
-                          effective_on: effective_on,
-                          kind: 'employer_sponsored',
-                          hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
-                          aasm_state: 'coverage_terminated')
+        shop_enrollment.update_attributes!(aasm_state: 'coverage_terminated')
         put :update, params: { person: person_params, id: "test" }
         expect(assigns['shop_coverage_result']).to eq false
       end
 
       it "should return a success for existing shop coverage" do
-        FactoryBot.create(:hbx_enrollment,
-                          family: family,
-                          product: product,
-                          household: family.active_household,
-                          coverage_kind: "health",
-                          effective_on: effective_on,
-                          kind: 'employer_sponsored',
-                          hbx_enrollment_members: [hbx_en_member1, hbx_en_member2],
-                          aasm_state: 'coverage_selected')
+        shop_enrollment.update_attributes!(aasm_state: 'coverage_selected')
+        put :update, params: { person: person_params, id: "test" }
+        expect(assigns['shop_coverage_result']).to eq true
+      end
+
+      it "should return a success for waived shop coverage" do
+        shop_enrollment.update_attributes!(aasm_state: 'inactive')
         put :update, params: { person: person_params, id: "test" }
         expect(assigns['shop_coverage_result']).to eq true
       end
