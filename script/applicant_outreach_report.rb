@@ -19,8 +19,9 @@ field_names = %w[
   ]
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
-enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
-all_families = Family.where(:_id.nin => HbxEnrollment.individual_market.by_year(enrollment_year).enrolled_and_renewing.distinct(:family_id))
+enrollment_year = FinancialAssistanceRegistry[:application_year].item.call.value!
+# Target all families with an application in the current enrollment year
+all_families = Family.where(:_id.in => FinancialAssistance::Application.by_year(enrollment_year).distinct(:family_id))
 batch_size = 500
 offset = 0
 families_count = all_families.count
@@ -48,10 +49,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       application.applicants.each do |applicant|
         family_member = family.family_members.detect {|fm| fm.hbx_id == applicant.person_hbx_id}
         person = family_member&.person
-        next unless applicant.is_applying_coverage && person # assuming the report should skip non-applicants
+        next unless applicant.is_applying_coverage && person
 
-        # THESE LINES DON'T DO WHAT THEY SHOULD -- HOW TO GET HIOS ID for the most recent active health (and dental) plan (if present)?
-        # look at hbx_enrollment statuses... terminated?  renewing?
         health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
         dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
         enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
