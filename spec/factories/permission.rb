@@ -40,6 +40,9 @@ FactoryBot.define do
       can_drop_enrollment_members {true}
       can_call_hub {true}
       can_edit_osse_eligibility {true}
+      if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
+        can_edit_broker_agency_profile {true}
+      end
     end
 
     trait :hbx_update_ssn do
@@ -84,6 +87,7 @@ FactoryBot.define do
         can_terminate_enrollment {true}
         change_enrollment_end_date {true}
         can_drop_enrollment_members {true}
+        can_edit_broker_agency_profile {true}
       end
     end
 
@@ -108,6 +112,7 @@ FactoryBot.define do
         can_terminate_enrollment {true}
         change_enrollment_end_date {true}
         can_drop_enrollment_members {true}
+        can_edit_broker_agency_profile {true}
       end
     end
 
@@ -128,6 +133,7 @@ FactoryBot.define do
       can_access_age_off_excluded {true}
       can_access_pay_now { true }
       can_drop_enrollment_members {false}
+      can_edit_broker_agency_profile {true}
     end
 
     trait :developer do
@@ -169,6 +175,7 @@ FactoryBot.define do
       can_drop_enrollment_members {true}
       can_call_hub {true}
       can_edit_osse_eligibility {true}
+      can_edit_broker_agency_profile {true}
     end
 
     trait :super_admin do
@@ -192,6 +199,7 @@ FactoryBot.define do
       can_drop_enrollment_members {true}
       can_call_hub {true}
       can_edit_osse_eligibility {true}
+      can_edit_broker_agency_profile {true}
     end
   end
 end

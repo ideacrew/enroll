@@ -26,5 +26,9 @@ FactoryBot.define do
       can_edit_osse_eligibility {false}
       can_add_sep { true }
     end
+
+    trait :hbx_read_only do
+      can_edit_broker_agency_profile {false}
+    end
   end
 end
