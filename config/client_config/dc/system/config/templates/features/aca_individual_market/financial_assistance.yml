@@ -277,12 +277,12 @@ registry:
     - :renewals
     features:
     - key: :create_renewals_on_date_change
-      is_enabled: true
+      is_enabled: <%= ENV['CREATE_RENEWALS_ON_DATE_CHANGE_IS_ENABLED'] || false %>
       settings:
         - key: :renewals_creation_month
-          item: 10
+          item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
-          item: 16
+          item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation
