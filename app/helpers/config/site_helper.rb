@@ -336,9 +336,6 @@ module Config
       EnrollRegistry.feature_enabled?(:tobacco_user_field)
     end
 
-    def edit_broker_tab_is_enabled?
-      EnrollRegistry.feature_enabled?(:edit_broker_agency_profile)
-    end
   end
 end
 # rubocop:enable Metrics/ModuleLength
