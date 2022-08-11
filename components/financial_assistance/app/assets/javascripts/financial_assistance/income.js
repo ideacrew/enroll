@@ -298,7 +298,7 @@ document.addEventListener("turbolinks:load", function () {
     $('.incomes-list').on('click', 'a.income-cancel', function (e) {
       e.preventDefault();
       var incomeEl = $(this).parents('.income');
-      $(this).parents('.new-income-form').addClass("hidden");
+      $(this).parents('.new-income-form').addClass("hidden");      
       incomeEl.find('.income-edit-form').addClass('hidden');
       incomeEl.find('.display-income').removeClass('hidden');
 
@@ -314,6 +314,7 @@ document.addEventListener("turbolinks:load", function () {
       }
 
       stopEditingIncome();
+      $(this).parents('.new-income-form').remove();
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
 
@@ -389,7 +390,7 @@ document.addEventListener("turbolinks:load", function () {
       var length = incomeListEl.find(".income").length;
       $(clonedForm).find('select').selectric();
       //$(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
+      $(clonedForm).find(".datepicker-js").datepicker({dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });      
       clonedForm.find('.interaction-click-control-save').addClass("disabled");
     });
 
@@ -872,7 +873,7 @@ $(document).on('turbolinks:load', function () {
     });
   });
 
-  /* cancel unemployment income edits */
+  /* cancel AI/AN income edits */
   $('.ai-an-incomes-list').on('click', 'a.ai-an-income-cancel', function (e) {
     e.preventDefault();
     stopEditingIncome();
