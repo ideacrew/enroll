@@ -102,6 +102,8 @@ registry:
         is_enabled: <%= ENV['MEC_CHECK_IS_ENABLED'] || true %>
       - key: :shop_coverage_check
         is_enabled: <%= ENV['SHOP_COVERAGE_CHECK_IS_ENABLED'] || false %>
+      - key: :coverage_check_banners
+        is_enabled: <%= ENV['COVERAGE_CHECK_BANNERS_IS_ENABLED'] || false %>
       - key: :include_faa_outstanding_verifications
         is_enabled: true
       - key: :skip_aptc_families_from_document_reminder_notices
@@ -304,6 +306,6 @@ registry:
     - :premium_credit_results
     features:
     - key: :display_eligibility_results_per_tax_household
-      is_enabled: false
+      is_enabled: <%= ENV['DISPLAY_ELIGIBILITY_RESULTS_PER_THH_IS_ENABLED'] || false %>
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

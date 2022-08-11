@@ -34,10 +34,19 @@ class Permission
   field :change_enrollment_end_date, type: Boolean, default: false
   field :can_change_username_and_email, type: Boolean, default: false
   field :can_drop_enrollment_members, type: Boolean, default: false
+  field :can_edit_osse_eligibility, type: Boolean, default: false
 
   class << self
     def hbx_staff
       Permission.where(name: 'hbx_staff').first
+    end
+
+    def super_admin
+      Permission.where(name: 'super_admin').first
+    end
+
+    def hbx_csr_tier1
+      Permission.where(name: 'hbx_csr_tier1').first
     end
   end
 end

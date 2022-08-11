@@ -155,7 +155,7 @@ class BenefitCoveragePeriod
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household = nil, market = nil)
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
-    primary_person = hbx_enrollment.family.primary_person
+    subcriber = hbx_enrollment_members.detect(&:is_subscriber)
     family_members = hbx_enrollment_members.map(&:family_member)
     american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
     csr_kind = if tax_household
@@ -167,7 +167,7 @@ class BenefitCoveragePeriod
                                     effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     market = market.nil? || market == 'coverall' ? 'individual' : market
-    product_entries({market: market, coverage_kind: coverage_kind, csr_kind: csr_kind, elected_product_ids: elected_product_ids, primary_person: primary_person, effective_on: hbx_enrollment.effective_on})
+    product_entries({market: market, coverage_kind: coverage_kind, csr_kind: csr_kind, elected_product_ids: elected_product_ids, subcriber: subcriber, effective_on: hbx_enrollment.effective_on})
   end
 
   def get_benefit_packages(**attrs)
@@ -196,7 +196,8 @@ class BenefitCoveragePeriod
     if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
       elected_products.entries
     else
-      address = attrs[:primary_person].rating_address
+      person = attrs[:subcriber].family_member.person
+      address = person.home_address || person.mailing_address
       service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: attrs[:effective_on]).map(&:id)
       elected_products.where(:service_area_id.in => service_area_ids).entries
     end

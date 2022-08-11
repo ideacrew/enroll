@@ -120,6 +120,7 @@ describe HbxProfilePolicy do
       expect(policy.can_delete_identity_application_documents?).to be false
       expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
+      expect(policy.can_edit_osse_eligibility?).to be true
     end
 
     it 'hbx_read_only' do
@@ -136,6 +137,7 @@ describe HbxProfilePolicy do
       expect(policy.can_delete_identity_application_documents?).to be false
       expect(policy.can_access_age_off_excluded?).to be false
       expect(policy.can_send_secure_message?).to be false
+      expect(policy.can_edit_osse_eligibility?).to be false
     end
 
     it 'hbx_csr_supervisor' do
@@ -152,6 +154,7 @@ describe HbxProfilePolicy do
       expect(policy.can_delete_identity_application_documents?).to be false
       expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
+      expect(policy.can_edit_osse_eligibility?).to be false
     end
 
     it 'hbx_csr_tier2' do
@@ -168,6 +171,7 @@ describe HbxProfilePolicy do
       expect(policy.can_delete_identity_application_documents?).to be false
       expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
+      expect(policy.can_edit_osse_eligibility?).to be false
     end
 
     it 'csr_tier1' do
@@ -181,6 +185,7 @@ describe HbxProfilePolicy do
       expect(policy.can_submit_time_travel_request?).to be false
       expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
+      expect(policy.can_edit_osse_eligibility?).to be false
     end
 
     it 'super_admin' do
@@ -193,11 +198,13 @@ describe HbxProfilePolicy do
       expect(policy.can_modify_plan_year?).to be true
       expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be true
+      expect(policy.can_edit_osse_eligibility?).to be true
     end
 
     it 'hbx_tier3' do
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_tier3))
       expect(policy.can_send_secure_message?).to be true
+      expect(policy.can_edit_osse_eligibility?).to be true
     end
   end
 

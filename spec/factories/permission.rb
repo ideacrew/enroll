@@ -39,6 +39,7 @@ FactoryBot.define do
       change_enrollment_end_date {true}
       can_drop_enrollment_members {true}
       can_call_hub {true}
+      can_edit_osse_eligibility {true}
     end
 
     trait :hbx_update_ssn do
@@ -167,6 +168,7 @@ FactoryBot.define do
       change_enrollment_end_date {true}
       can_drop_enrollment_members {true}
       can_call_hub {true}
+      can_edit_osse_eligibility {true}
     end
 
     trait :super_admin do
@@ -189,6 +191,7 @@ FactoryBot.define do
       change_enrollment_end_date {true}
       can_drop_enrollment_members {true}
       can_call_hub {true}
+      can_edit_osse_eligibility {true}
     end
   end
 end

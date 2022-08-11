@@ -1,7 +1,10 @@
 namespace :load do
   task :dc_benefit_market_catalog, [:year] => :environment do |task, args|
 
-    [:aca_shop, :fehb].each do |kind|
+    market_kinds = []
+    market_kinds << :aca_shop if EnrollRegistry.feature_enabled?(:aca_shop_market)
+    market_kinds << :fehb if EnrollRegistry.feature_enabled?(:fehb_market)
+    market_kinds.each do |kind|
 
       benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => EnrollRegistry[:enroll_app].setting(:site_key).item, kind: kind).first
 
