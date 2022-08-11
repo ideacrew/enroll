@@ -1,3 +1,5 @@
+# Script will output to the console the total time elapsed during exuction
+start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 field_names = %w[
     primary_hbx_id
     first_name
@@ -17,7 +19,6 @@ field_names = %w[
     subscriber_indicator
     transfer_id
   ]
-
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
 # Target all families with an application in the current enrollment year
@@ -40,6 +41,7 @@ def program_eligible_for(application)
   eligible_programs.join(",")
 end
 
+puts "Generating applicant outreach report...."
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
   while offset < families_count
@@ -79,3 +81,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     offset += batch_size
   end
 end
+puts "Applicant outreach report complete. Output file is located at: #{file_name}"
+end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+seconds_elapsed = end_time - start_time
+hr_min_sec = format("%02dhr %02dmin %02dsec", seconds_elapsed / 3600, seconds_elapsed / 60 % 60, seconds_elapsed % 60)
+puts "Total time for report to complete: #{hr_min_sec}"
