@@ -35,7 +35,7 @@ describe 'applicant_outreach_report' do
       family_id: family.id,
       aasm_state: 'draft',
       transfer_id: 'tr12345',
-      assistance_year: FinancialAssistanceRegistry[:application_year].item.call.value!
+      assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
     )
   end
   let!(:primary_applicant) do
