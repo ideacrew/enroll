@@ -19,7 +19,7 @@ field_names = %w[
   ]
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
-enrollment_year = FinancialAssistanceRegistry[:application_year].item.call.value!
+enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
 # Target all families with an application in the current enrollment year
 all_families = Family.where(:_id.in => FinancialAssistance::Application.by_year(enrollment_year).distinct(:family_id))
 batch_size = 500
