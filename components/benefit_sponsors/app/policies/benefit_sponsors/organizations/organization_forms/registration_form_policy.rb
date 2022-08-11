@@ -41,7 +41,10 @@ module BenefitSponsors
           else
             role.permission.modify_admin_tabs
           end
-          
+        end
+
+        def edit_broker_agency_profile_is_enabled?
+          EnrollRegistry.feature_enabled?(:edit_broker_agency_profile)
         end
 
         def admin?
