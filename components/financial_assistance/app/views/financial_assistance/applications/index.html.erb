@@ -51,7 +51,8 @@
                   ] %>
                 <% if current_user.has_hbx_staff_role? %>
                   <% dropdown += [
-                    ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+                    ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'],
+                    ['Transfer History', transfer_history_application_path(application), 'static']
                   ]
                   %>
                 <% end %>

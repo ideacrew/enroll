@@ -192,6 +192,58 @@ module FinancialAssistance
       end
     end
 
+    def transfer_history
+      unless current_user.has_hbx_staff_role?
+        flash[:error] = 'You are not authorized to access'
+        redirect_to applications_path
+        return
+      end
+
+      @application = FinancialAssistance::Application.where(id: params['id'], family_id: get_current_person.financial_assistance_identifier).first
+
+      @transfers = []
+      if @application.account_transferred || !@application.transfer_id.nil?
+        @transfers << {
+          transfer_id: @application.transfer_id, 
+          direction: transfer_direction(@application),
+          timestamp: "",
+          reason: transfer_reason(@application),
+          source: transfer_source(@application)
+        }
+      end
+
+      if @application.nil? 
+        redirect_to applications_path
+      end
+    end
+
+    def transfer_direction(application)
+      unless application.transfer_id.nil?
+         'In'
+      end
+      if application.account_transferred
+        'Out'
+      end
+    end
+
+    def transfer_reason(application)
+      if transfer_direction(application) == "Out"
+        application.transfer_requested ? "User request" : "Medicaid/CHIP assessment"
+      elsif transfer_direction(application) == "In"
+        "Medicaid/CHIP Ineligible "
+      end
+    end
+
+    def transfer_source(application)
+      if application.transfer_id.nil? || application.transfer_id&.include?('SBM')
+        'SBM'
+      elsif application.transfer_id&.include? 'MEA'
+        'SMA'
+      elsif application.transfer_id&.include? 'FFM'
+        'FFM'
+      end
+    end
+
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
