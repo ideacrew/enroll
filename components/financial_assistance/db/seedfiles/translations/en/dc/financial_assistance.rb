@@ -180,7 +180,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.not_applicable_abbreviation" => "N/A",
   # Transfer History
   "en.faa.transfer_history" => "Transfer History",
-  "en.faa.transfer_history_desc" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tristique amet convallis eleifend nunc lacus. Aliquam risus maecenas eget volutpat nec vestibulum.",
+  "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",

@@ -107,6 +107,7 @@ module FinancialAssistance
     field :transfer_requested, type: Boolean, default: false
     # Account was transferred to medicaid service via atp
     field :account_transferred, type: Boolean, default: false
+    field :transferred_at, type: DateTime #time account was transfered in or out of Enroll (when batch process completes)
 
     # Transfer ID of to be set if the application was transferred into Enroll via ATP
     field :transfer_id, type: String

@@ -26,6 +26,7 @@ module FinancialAssistance
             application = yield find_application(application_id)
             _apps = yield build_applicants(payload, application, family)
             _applicants = yield fill_applicants_form(payload, application)
+            _record = yield record(application)
             Success(application_id)
           end
 
@@ -530,6 +531,10 @@ module FinancialAssistance
             Failure("Fill applicant form validation: #{e.summary}")
           rescue StandardError => e
             Failure("Fill applicant form: #{e}")
+          end
+
+          def record(application)
+             application.set(transferred_at: DateTime.now.utc)
           end
         end
       end

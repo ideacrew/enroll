@@ -6,10 +6,10 @@
       </div>
       <div class="col-md-10">
         <h1 class="darkblue no-buffer"><%= l10n('faa.transfer_history') %></h1>
-        <h4><%= l10n('faa.transfer_history_desc') %></h4>
+        <h4><%= l10n('faa.transfer_history_desc', site_short_name: site_short_name) %></h4>
   
         <div style="text-align: right;">
-            <%= link_to "Back to Applications", applications_path, class: "btn btn-small btn-primary" %>
+            <%= link_to l10n('back_to_applications'), applications_path, class: "btn btn-small btn-primary" %>
         </div>
         
         <h3><%= l10n('transactions_for') %> <%= @application.hbx_id %></h3>

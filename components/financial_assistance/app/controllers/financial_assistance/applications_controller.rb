@@ -206,7 +206,7 @@ module FinancialAssistance
         @transfers << {
           transfer_id: @application.transfer_id, 
           direction: transfer_direction(@application),
-          timestamp: "",
+          timestamp: @application.transferred_at,
           reason: transfer_reason(@application),
           source: transfer_source(@application)
         }
@@ -228,9 +228,9 @@ module FinancialAssistance
 
     def transfer_reason(application)
       if transfer_direction(application) == "Out"
-        application.transfer_requested ? "User request" : "Medicaid/CHIP assessment"
+        application.transfer_requested ? "User request" : "Medicaid/CHIP Assessment"
       elsif transfer_direction(application) == "In"
-        "Medicaid/CHIP Ineligible "
+        return "Medicaid/CHIP Assessment"
       end
     end
 
