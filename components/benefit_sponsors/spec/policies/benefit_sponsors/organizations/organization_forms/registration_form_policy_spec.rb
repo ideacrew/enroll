@@ -6,7 +6,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 # benefit_sponsors module
 module BenefitSponsors
-  describe Organizations::OrganizationForms::RegistrationFormPolicy do
+  RSpec.describe Organizations::OrganizationForms::RegistrationFormPolicy, dbclean: :after_each  do
     let!(:user) { FactoryBot.create(:user, :with_hbx_staff_role) }
     let!(:person) {FactoryBot.create(:person, user: user)}
     let!(:super_admin_permission) { FactoryBot.create(:permission, :super_admin) }
