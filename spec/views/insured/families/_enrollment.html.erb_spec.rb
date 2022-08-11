@@ -610,7 +610,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         expect(rendered).to have_content(l10n('osse_amount'))
       end
     end
-  
+
     context "osse_eligibility is not present" do
 
       before do
