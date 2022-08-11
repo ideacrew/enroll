@@ -37,7 +37,7 @@ module BenefitSponsors
           if is_employer_profile?
             return role.permission.modify_employer
           elsif edit_broker_agency_profile_is_enabled? && is_broker_profile?
-            return role.permission.can_edit_broker_agency_profile
+            role.permission.can_edit_broker_agency_profile
           else
             role.permission.modify_admin_tabs
           end

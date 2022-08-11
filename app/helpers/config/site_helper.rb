@@ -335,7 +335,6 @@ module Config
     def tobacco_user_field_enabled?
       EnrollRegistry.feature_enabled?(:tobacco_user_field)
     end
-
   end
 end
 # rubocop:enable Metrics/ModuleLength

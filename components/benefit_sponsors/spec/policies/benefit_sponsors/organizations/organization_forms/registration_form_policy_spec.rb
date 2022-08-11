@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# benefit_sponsors module
 module BenefitSponsors
   describe Organizations::OrganizationForms::RegistrationFormPolicy do
     let!(:user) { FactoryBot.create(:user, :with_hbx_staff_role) }
@@ -18,7 +21,7 @@ module BenefitSponsors
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:edit_broker_agency_profile).and_return(true)
       allow(subject).to receive(:profile_type).and_return(profile_type)
     end
-  
+
     context "broker_agency_profile with an hbx_admin with edit_broker_agency_profile permissions" do
 
       before do
