@@ -52,12 +52,13 @@ RSpec.describe ::Eligibilities::Visitors::HealthProductEnrollmentStatusVisitor,
       csr_variant_id: '01'
     )
   end
+  let(:enrollment_members_on_1) { family.family_members }
 
   let!(:hbx_enrollment1) do
     FactoryBot.create(
       :hbx_enrollment,
       :with_enrollment_members,
-      enrollment_members: family.family_members,
+      enrollment_members: enrollment_members_on_1,
       kind: 'individual',
       product: product1,
       household: family.latest_household,
@@ -79,13 +80,14 @@ RSpec.describe ::Eligibilities::Visitors::HealthProductEnrollmentStatusVisitor,
       .success
   end
 
-  let(:effective_date) { Date.today }
+  let(:effective_date) { TimeKeeper.date_of_record }
 
   let(:evidence_item) { eligibility_item.evidence_items.first }
+  let(:visitor_subject) { family.primary_applicant }
 
   subject do
     visitor = described_class.new
-    visitor.subject = family.primary_applicant
+    visitor.subject = visitor_subject
     visitor.evidence_item = evidence_item
     visitor.effective_date = effective_date
     visitor
@@ -115,6 +117,49 @@ RSpec.describe ::Eligibilities::Visitors::HealthProductEnrollmentStatusVisitor,
     it 'should not build evidence state for the given eligibility item' do
       subject.call
       expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_falsey
+    end
+  end
+
+  context 'when there are more than one health enrollments' do
+    let(:visitor_subject) { family.family_members[1] }
+
+    let(:enrollment_members_on_1) { [family.family_members[0]] }
+    let(:enrollment_members_on_2) { [family.family_members[1]] }
+
+    let!(:product2) do
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        csr_variant_id: '01'
+      )
+    end
+
+    let!(:hbx_enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        enrollment_members: enrollment_members_on_2,
+        kind: 'individual',
+        product: product2,
+        household: family.latest_household,
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        enrollment_kind: 'open_enrollment',
+        family: family,
+        aasm_state: 'coverage_selected',
+        consumer_role: person1.consumer_role,
+        enrollment_signature: true
+      )
+    end
+
+    it 'should successfully build evidence state' do
+      subject.call
+      expect(subject.evidence).to be_a(Hash)
+    end
+
+    it 'should build evidence state for the given eligibility item' do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
     end
   end
 end
