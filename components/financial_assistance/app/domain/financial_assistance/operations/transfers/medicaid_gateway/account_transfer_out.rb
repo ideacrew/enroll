@@ -65,7 +65,7 @@ module FinancialAssistance
             end
             result.success? ? Success("recorded transfer") : Failure("could not set transfer attribute")
           end
-          
+
         end
       end
     end

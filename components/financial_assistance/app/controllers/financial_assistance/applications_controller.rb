@@ -204,7 +204,7 @@ module FinancialAssistance
       @transfers = []
       if @application.account_transferred || !@application.transfer_id.nil?
         @transfers << {
-          transfer_id: @application.transfer_id, 
+          transfer_id: @application.transfer_id,
           direction: transfer_direction(@application),
           timestamp: @application.transferred_at,
           reason: transfer_reason(@application),
@@ -212,25 +212,20 @@ module FinancialAssistance
         }
       end
 
-      if @application.nil? 
-        redirect_to applications_path
-      end
+      redirect_to applications_path if @application.nil?
     end
 
     def transfer_direction(application)
-      unless application.transfer_id.nil?
-         'In'
-      end
-      if application.account_transferred
-        'Out'
-      end
+      'In' unless application.transfer_id.nil?
+      'Out' if application.account_transferred
     end
 
     def transfer_reason(application)
-      if transfer_direction(application) == "Out"
+      case transfer_direction(application)
+      when "Out"
         application.transfer_requested ? "User request" : "Medicaid/CHIP Assessment"
-      elsif transfer_direction(application) == "In"
-        return "Medicaid/CHIP Assessment"
+      when "In"
+        "Medicaid/CHIP Assessment"
       end
     end
 

@@ -534,7 +534,7 @@ module FinancialAssistance
           end
 
           def record(application)
-             application.set(transferred_at: DateTime.now.utc)
+            application.set(transferred_at: DateTime.now.utc)
           end
         end
       end
