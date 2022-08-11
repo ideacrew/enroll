@@ -4,7 +4,7 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 
 # This class is for migrating TaxHousehold, TaxhouseholdMember, and EligibilityDetermination to GroupPremiumCredit, and MemberPremiumCredit
 class MigrateThhsToPremiumCredits < MongoidMigrationTask
-  def group_premium_credit(thh)
+  def group_premium_credit(thh, family)
     {
       kind: 'aptc_csr',
       premium_credit_monthly_cap: thh.current_max_aptc.to_f,
@@ -12,7 +12,8 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
       sub_group_class: thh.class.to_s,
       start_on: thh.effective_starting_on,
       end_on: thh.effective_ending_on,
-      member_premium_credits: member_premium_credits(thh)
+      member_premium_credits: member_premium_credits(thh),
+      family_id: family.id
     }
   end
 
@@ -63,19 +64,19 @@ class MigrateThhsToPremiumCredits < MongoidMigrationTask
         family.active_household.tax_households.each do |thh|
           next thh unless thh.tax_household_members.any?(&:is_ia_eligible)
           aptc_csr_thh_count += 1
-          result = ::Operations::PremiumCredits::Build.new.call({ family: family, gpc_params: group_premium_credit(thh) })
+          result = ::Operations::PremiumCredits::Build.new.call({ gpc_params: group_premium_credit(thh, family) })
           if result.success?
-            family = result.success
+            group_premium_credit = result.success
+
+            if group_premium_credit.save
+              logger.info "----- Successfully created PremiumCredits for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+            else
+              logger.info "----- Errors persisting group_premium_credit with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{group_premium_credit.errors.full_messages}"
+            end
           else
             logger.info "----- Unable to build GroupPremiumCredit for thh_id: #{thh.id}, failure: #{failure_message(result)}"
             next family
           end
-        end
-
-        if family.save
-          logger.info "----- Successfully created PremiumCredits for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
-        else
-          logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
         end
         csv << [family.primary_person.hbx_id, family.hbx_assigned_id, aptc_csr_thh_count, family.reload.group_premium_credits.count]
       rescue StandardError => e

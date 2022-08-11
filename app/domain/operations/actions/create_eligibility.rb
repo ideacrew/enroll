@@ -38,6 +38,7 @@ module Operations
 
       def transform_params(params, family)
         tranformed_params = {
+          family_id: family.id,
           kind: 'aptc_csr',
           premium_credit_monthly_cap: params[:max_aptc],
           start_on: params[:effective_date],
@@ -78,13 +79,14 @@ module Operations
         # There are no APTC/CSR eligible members to create PremiumCredits
         return Success(family) if gpc_params[:member_premium_credits].blank?
 
-        result = ::Operations::PremiumCredits::Build.new.call({ family: family, gpc_params: gpc_params })
+        result = ::Operations::PremiumCredits::Build.new.call({ gpc_params: gpc_params })
+
         if result.success?
-          if family.save
-            Success(family)
-          else
-            Failure("Errors persisting family #{family.errors.full_messages}")
-          end
+          group_premium_credit = result.success
+
+          return Failure("Errors persisting group_premium_credit #{group_premium_credit.errors.full_messages}") unless group_premium_credit.save
+
+          Success(family)
         else
           Failure("Unable to build Group Premium Credit, failure: #{failure_message(result)} ")
         end

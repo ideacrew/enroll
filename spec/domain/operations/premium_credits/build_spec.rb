@@ -16,8 +16,8 @@ RSpec.describe Operations::PremiumCredits::Build, type: :model, dbclean: :after_
 
   let(:params) do
     {
-      family: family,
       gpc_params: {
+        family_id: family.id,
         kind: "aptc_csr",
         authority_determination_id: BSON::ObjectId.new,
         authority_determination_class: "FinancialAssistance::Application",
@@ -36,8 +36,8 @@ RSpec.describe Operations::PremiumCredits::Build, type: :model, dbclean: :after_
   let(:result) { subject.call(params) }
 
   context 'with valid input params' do
-    it 'should return a family with a group_premium_credit and member_premium_credits' do
-      gpc = result.success.group_premium_credits.first
+    it 'should return a group_premium_credit and member_premium_credits' do
+      gpc = result.success
       expect(gpc).to be_a(GroupPremiumCredit)
       expect(gpc.member_premium_credits.size).to eq(2)
       expect(gpc.member_premium_credits.first).to be_a(MemberPremiumCredit)
@@ -55,11 +55,11 @@ RSpec.describe Operations::PremiumCredits::Build, type: :model, dbclean: :after_
   end
 
   context 'with bad params' do
-    before { params[:family] = 'family' }
+    before { params[:gpc_params].delete(:family_id) }
 
     it 'should return a failure with errors' do
-      expect(result.failure).to eq(
-        'Invalid params. family should be an instance of Family'
+      expect(result.failure.errors.to_h).to eq(
+        {:family_id => ["is missing", "must be BSON::ObjectId"]}
       )
     end
   end

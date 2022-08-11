@@ -46,20 +46,15 @@ module Operations
         return Success(family) if application_entity.tax_households.map(&:aptc_csr_eligible_members).blank?
 
         group_premium_credits(family, application_entity).each do |gpc_params|
-          result = ::Operations::PremiumCredits::Build.new.call({ family: family, gpc_params: gpc_params })
+          result = ::Operations::PremiumCredits::Build.new.call({ gpc_params: gpc_params })
 
           if result.success?
-            family = result.success
-            next gpc_params
+            group_premium_credit = result.success
+
+            return Failure("Errors persisting group_premium_credit #{group_premium_credit.errors.full_messages}") unless group_premium_credit.save
           end
 
-          return Failure('Unable to create Group Premium Credit')
-        end
-
-        if family.save
           Success(family)
-        else
-          Failure("Errors persisting family #{family.errors.full_messages}")
         end
       end
 
@@ -72,6 +67,7 @@ module Operations
           mpcs = member_premium_credits(thh_entity, family)
           if mpcs.present?
             gpcs << {
+              family_id: family.id,
               kind: 'aptc_csr',
               authority_determination_id: fa_application.id.to_s,
               authority_determination_class: fa_application.class.to_s,

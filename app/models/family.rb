@@ -55,8 +55,6 @@ class Family
   # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
 
-  embeds_many :group_premium_credits, cascade_callbacks: true, validate: true
-
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
@@ -75,7 +73,6 @@ class Family
   before_save :generate_hbx_assigned_id
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
-                                :group_premium_credits,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
   index({hbx_assigned_id: 1}, {sparse: true, unique: true})
@@ -102,12 +99,6 @@ class Family
   index({"households.tax_households.eligibility_determinations.determined_at" => 1})
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
   index({"households.tax_households.eligibility_determinations.csr_percent_as_integer" => 1}, {name: 'csr_percent_as_integer_index'})
-
-  # Premium Credits
-  index({ 'group_premium_credits.start_on' => 1 })
-  index({ 'group_premium_credits.kind' => 1 })
-  index({ 'group_premium_credits.member_premium_credits.kind' => 1 })
-  index({ 'group_premium_credits.member_premium_credits.value' => 1 })
 
   index({"irs_groups.hbx_assigned_id" => 1})
 
@@ -316,6 +307,14 @@ class Family
   # Premium Credits
   scope :all_premium_credits,      ->{ exists({:'group_premium_credits.0' => true}) }
   scope :aptc_csr_premium_credits, ->{ where(:'group_premium_credits.kind' => 'aptc_csr') }
+
+  def group_premium_credits
+    ::GroupPremiumCredit.where(family_id: self.id)
+  end
+
+  def aptc_csr_premium_credits
+    group_premium_credits.where(kind: 'aptc_csr')
+  end
 
   # It fetches active or renewal application for the family based on the year passed
   def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)

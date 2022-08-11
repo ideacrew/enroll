@@ -9,6 +9,7 @@ module Validators
 
       params do
         required(:kind).filled(included_in?: ::GroupPremiumCredit::KINDS)
+        required(:family_id).maybe(Types::Bson)
         optional(:authority_determination_id).maybe(Types::Bson)
         optional(:authority_determination_class).maybe(:string)
         optional(:premium_credit_monthly_cap).maybe(:float)

@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :group_premium_credit, class: '::GroupPremiumCredit' do
-    association :family
+    family_id { FactoryBot.create(:family, :with_primary_family_member)}
 
     kind  { 'aptc_csr' }
     premium_credit_monthly_cap { '300.00' }

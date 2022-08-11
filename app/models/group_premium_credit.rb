@@ -50,9 +50,9 @@ class GroupPremiumCredit
   field :end_on, type: Date
 
   field :hbx_id, type: String
+  field :family_id, type: BSON::ObjectId
 
   # Associations
-  embedded_in :family
   embeds_many :member_premium_credits, cascade_callbacks: true, validate: true
   accepts_nested_attributes_for :member_premium_credits
 
@@ -88,6 +88,10 @@ class GroupPremiumCredit
   rescue NameError, BSON::ObjectId::Invalid => e
     Rails.logger.error "GroupPremiumCredit Unable to find sub_group error: #{e}, backtrace: #{e.backtrace.join('\n')}"
     nil
+  end
+
+  def family
+    Family.find(family_id)
   end
 
   private
