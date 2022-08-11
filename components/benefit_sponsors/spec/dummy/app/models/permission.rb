@@ -49,7 +49,7 @@ class Permission
       Permission.where(name: 'hbx_csr_tier1').first
     end
 
-    def hbx_read_only do
+    def hbx_read_only
       Permission.where(name: 'hbx_read_only').first
     end
   end
