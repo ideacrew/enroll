@@ -53,7 +53,6 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         next unless applicant.is_applying_coverage && person
 
-        # health_enrollment = family.active_household.hbx_enrollments.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
         health_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
         dental_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
         enrollment_member = if health_enrollment
