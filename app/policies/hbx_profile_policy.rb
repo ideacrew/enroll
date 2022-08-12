@@ -201,7 +201,12 @@ class HbxProfilePolicy < ApplicationPolicy
   def can_edit_osse_eligibility?
     role = user_hbx_staff_role
     return false unless role
-    role.permission.can_edit_osse_eligibility
+    return true unless role.permission.can_edit_osse_eligibility
+  end
+
+  def can_view_osse_eligibility?
+    role = user_hbx_staff_role
+    true if role
   end
 
   private
