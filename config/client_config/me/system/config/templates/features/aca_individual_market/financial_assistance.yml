@@ -20,12 +20,12 @@ registry:
         is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
         item: :enrollment_dates
-        is_enabled: true
+        is_enabled: <%= ENV['ENROLLMENT_DATES_IS_ENABLED'] || true %>
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 19
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_DAY_OF_MONTH'] || 1 %>
           - key: :application_new_year_effective_date_month_of_year
-            item: 9
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_MONTH_OF_YEAR'] || 8 %>
           - key: :enrollment_due_day_of_month
             is_enabled: true
             item: 15
