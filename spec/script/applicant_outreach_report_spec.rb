@@ -254,51 +254,17 @@ describe 'applicant_outreach_report' do
 
   context 'family with application in previous enrollment year' do
     let!(:primary_person2) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, :with_mailing_address, dob: Date.new(person_dob_year, 4, 4)) }
-    # let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: primary_person2, external_app_id: '12345') }
-    # let!(:primary_fm2) { family2.primary_applicant }
-    # let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
-    # let!(:family_members2) { [primary_fm2] }
-    # let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, family: family2) }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_person, external_app_id: '12345') }
     let!(:primary_fm) { family.primary_applicant }
-    # let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
     let!(:family_members) { [primary_fm] }
-    # let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
-    # let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family) }
-    # let!(:enrollment_members) do
-    #   family_members.map do |member|
-    #     FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: health_enrollment, is_subscriber: member.is_primary_applicant)
-    #   end
-    # end
-    # let(:yesterday) { Time.now.getlocal.prev_day }
     let!(:application) do
       FactoryBot.create(
         :financial_assistance_application,
-        # submitted_at: yesterday,
         family_id: family.id,
-        # aasm_state: 'draft',
-        # transfer_id: 'tr12345',
         assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! - 1
       )
     end
-    let!(:primary_applicant) do
-      FactoryBot.create(:financial_assistance_applicant)
-        # addresses: primary_person.addresses,
-        # application: application,
-        # family_member_id: primary_fm.id,
-        # person_hbx_id: primary_person.hbx_id,
-        # is_primary_applicant: true,
-        # citizen_status: 'us_citizen',
-        # is_ia_eligible: true,
-        # is_medicaid_chip_eligible: false,
-        # csr_percent_as_integer: 73,
-        # first_name: primary_person.first_name,
-        # last_name: primary_person.last_name,
-        # gender: primary_person.gender,
-        # dob: primary_person.dob,
-        # encrypted_ssn: primary_person.encrypted_ssn
-      # )
-    end
+    let!(:primary_applicant) { FactoryBot.create(:financial_assistance_applicant) }
     let(:applicants) { [primary_applicant] }
 
     before do
