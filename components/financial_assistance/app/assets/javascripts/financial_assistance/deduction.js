@@ -16,36 +16,6 @@ function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };
 
-function validateDateWarnings(id) {
-  var startDate = $("#start_on_" + id).datepicker('getDate');
-  var endDate = $("#end_on_" + id).datepicker('getDate');
-  var today = new Date();
-  var warning_div = document.getElementById("date_warning_message_" + id);
-  var startDateWarning = document.getElementById("start_date_warning_" + id)
-  var endDateWarning = document.getElementById("end_date_warning_" + id)
-  var requiresStartDateWarning = startDate > today
-  var requiresEndDateWarning = endDate
-
-  if ($(warning_div).is(":visible") && !requiresStartDateWarning && !requiresEndDateWarning) {
-    warning_div.classList.add('hidden');
-    return;
-  }
-
-  if (requiresStartDateWarning || requiresEndDateWarning) {
-    warning_div.classList.remove('hidden');
-    if (startDate > today) {
-      startDateWarning.classList.remove('hidden');
-    } else {
-      startDateWarning.classList.add('hidden');
-    }
-    if (endDate) {
-      endDateWarning.classList.remove('hidden');
-    } else {
-      endDateWarning.classList.add('hidden');
-    }
-  }
-};
-
 $(document).on('turbolinks:load', function () {
   if ($('.deduction-kinds').length) {
     $(window).bind('beforeunload', function(e) {

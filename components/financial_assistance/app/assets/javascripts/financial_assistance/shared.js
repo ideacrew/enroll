@@ -44,3 +44,33 @@ function showTemporaryMessageDiv(form_object_id, form_type) {
     window.event.preventDefault();
   };
 }
+
+function validateDateWarnings(id) {
+  var startDate = $("#start_on_" + id).datepicker('getDate');
+  var endDate = $("#end_on_" + id).datepicker('getDate');
+  var today = new Date();
+  var requiresStartDateWarning = startDate > today
+  var requiresEndDateWarning = endDate
+  var warning_div = $("#date_warning_message_" + id);
+  var startDateWarning = $("#start_date_warning_" + id)
+  var endDateWarning = $("#end_date_warning_" + id)
+
+  if (warning_div.is(":visible") && !requiresStartDateWarning && !requiresEndDateWarning) {
+    warning_div.addClass('hidden');
+    return;
+  }
+
+  if (requiresStartDateWarning || requiresEndDateWarning) {
+    warning_div.removeClass('hidden');
+    if (startDate > today) {
+      startDateWarning.removeClass('hidden');
+    } else {
+      startDateWarning.addClass('hidden');
+    }
+    if (endDate) {
+      endDateWarning.removeClass('hidden');
+    } else {
+      endDateWarning.addClass('hidden');
+    }
+  }
+};
