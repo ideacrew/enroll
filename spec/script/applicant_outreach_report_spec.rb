@@ -20,8 +20,8 @@ describe 'applicant_outreach_report' do
   let!(:primary_fm) { family.primary_applicant }
   let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
   let!(:family_members) { [primary_fm, spouse_fm] }
-  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
-  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family) }
+  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family) }
+  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family) }
   let!(:enrollment_members) do
     family_members.map do |member|
       FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: health_enrollment, is_subscriber: member.is_primary_applicant)
@@ -93,8 +93,8 @@ describe 'applicant_outreach_report' do
         user_account
         last_page_visited
         program_eligible_for
-        most_recent_active_health_plan
-        most_recent_active_dental_plan
+        most_recent_active_health_plan_id
+        most_recent_active_dental_plan_id
         subscriber_indicator
         transfer_id
       ]
@@ -216,13 +216,13 @@ describe 'applicant_outreach_report' do
 
       context 'plan' do
         it 'should match with the most recent active health plan hios id' do
-          health_plan = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}&.plan
+          health_plan = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}&.product
           expect(@file_content[1][13]).to eq(health_plan&.hios_id)
           expect(@file_content[2][13]).to eq(health_plan&.hios_id)
         end
 
         it 'should match with the most recent active dental plan id' do
-          dental_plan = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}&.plan
+          dental_plan = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}&.product
           expect(@file_content[1][14]).to eq(dental_plan&.hios_id)
           expect(@file_content[2][14]).to eq(dental_plan&.hios_id)
         end
