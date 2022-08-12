@@ -55,7 +55,7 @@ function validateDateWarnings(id) {
       endDateWarning.classList.add('hidden');
     }
   }
-}
+};
 
 function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
