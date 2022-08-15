@@ -72,6 +72,30 @@ And(/^the user fills out the required employer information with incorrect dates$
   fill_in IvlIapJobIncomeInformationPage.income_employer_zip, with: "22046"
 end
 
+And(/^the user enters a start date in the future$/) do
+  fill_in IvlIapJobIncomeInformationPage.income_from, with: Date.new(Date.today.year + 1, 1, 1).strftime('%m/%d/%Y')
+end
+
+Then(/^the user should see the start date warning message$/) do
+  current_year = TimeKeeper.date_of_record.year.to_s
+  next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
+  expect(page.html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
+end
+
+And(/^the user enters an end date$/) do
+  fill_in IvlIapJobIncomeInformationPage.income_to, with: Date.today.strftime('%m/%d/%Y')
+end
+
+Then(/^the user should see the end date warning message$/) do
+  expect(page.html).to include(l10n('faa.end_date_warning'))
+end
+
+Then(/^the user should see the start date and end date warning messages$/) do
+  current_year = TimeKeeper.date_of_record.year.to_s
+  next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
+  expect(page.html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year) + l10n('faa.end_date_warning'))
+end
+
 And(/^the user saves the employer information$/) do
   find(IvlIapJobIncomeInformationPage.income_save_btn).click
 end
