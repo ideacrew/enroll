@@ -99,6 +99,11 @@ FactoryBot.define do
       product { FactoryBot.create(:benefit_markets_products_health_products_health_product)}
     end
 
+    trait :with_dental_product do
+      coverage_kind { "dental" }
+      product { FactoryBot.create(:benefit_markets_products_dental_products_dental_product)}
+    end
+
     trait :coverage_selected do
       aasm_state { "coverage_selected" }
     end

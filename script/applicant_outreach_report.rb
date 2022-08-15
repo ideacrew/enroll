@@ -14,8 +14,8 @@ field_names = %w[
     user_account
     last_page_visited
     program_eligible_for
-    most_recent_active_health_plan
-    most_recent_active_dental_plan
+    most_recent_active_health_plan_id
+    most_recent_active_dental_plan_id
     subscriber_indicator
     transfer_id
   ]
@@ -53,10 +53,13 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         next unless applicant.is_applying_coverage && person
 
-        health_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'health'}
-        dental_enrollment = family.active_household.active_hbx_enrollments.detect {|enr| enr.coverage_kind == 'dental'}
-        enrollment_member = health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
-        enrollment_member ||= dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        health_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
+        dental_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
+        enrollment_member = if health_enrollment
+                              health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+                            else
+                              enrollment_member = dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+                            end
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
@@ -70,8 +73,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 primary_person.user&.email, # only primary person has a User account
                 primary_person.user&.last_portal_visited,
                 program_eligible_for(application),
-                health_enrollment&.plan&.hios_id,
-                dental_enrollment&.plan&.hios_id,
+                health_enrollment&.product&.hios_id,
+                dental_enrollment&.product&.hios_id,
                 enrollment_member&.is_subscriber,
                 application.transfer_id]
       end
