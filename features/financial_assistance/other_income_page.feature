@@ -85,6 +85,25 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And the user saves the other income information
     Then the other income information should be saved on the page
 
+  Scenario: User enters unemployment information with a start date in the future
+    Given FAA income_and_deduction_date_warning feature is enabled
+    Given the user answers yes to having unemployment income
+    And the user enters a start date in the future
+    Then the user should see the start date warning message
+
+  Scenario: User enters unemployment information with an end date
+    Given FAA income_and_deduction_date_warning feature is enabled
+    Given the user answers yes to having unemployment income
+    And the user enters an end date
+    Then the user should see the end date warning message
+
+  Scenario: User enters unemployment information with a start date in the future and an end date
+    Given FAA income_and_deduction_date_warning feature is enabled
+    Given the user answers yes to having unemployment income
+    And the user enters a start date in the future
+    And the user enters an end date
+    Then the user should see the start date and end date warning messages
+
   Scenario: Unemployment Cancel button functionality
     Given the user answers yes to having unemployment income
     When the user cancels the form
