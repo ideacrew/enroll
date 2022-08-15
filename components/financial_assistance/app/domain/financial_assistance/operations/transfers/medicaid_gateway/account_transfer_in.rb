@@ -12,7 +12,7 @@ module FinancialAssistance
         # Operation receives ATP payload from medicaid gateway
         class AccountTransferIn
           include ::FinancialAssistance::MeCountyHelper
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:result, :do, :try]
 
           PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
 
@@ -26,6 +26,7 @@ module FinancialAssistance
             application = yield find_application(application_id)
             _apps = yield build_applicants(payload, application, family)
             _applicants = yield fill_applicants_form(payload, application)
+            _record = yield record(application)
             Success(application_id)
           end
 
@@ -531,6 +532,14 @@ module FinancialAssistance
           rescue StandardError => e
             Failure("Fill applicant form: #{e}")
           end
+
+          def record(application)
+            result = Try do
+              application.set(transferred_at: DateTime.now.utc)
+            end
+            result.success? ? Success("recorded transferred_at") : Failure("could not set transferred_at")
+          end
+
         end
       end
     end

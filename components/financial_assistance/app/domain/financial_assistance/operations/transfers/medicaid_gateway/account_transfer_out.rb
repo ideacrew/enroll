@@ -61,9 +61,11 @@ module FinancialAssistance
           def record(application)
             result = Try do
               application.set(account_transferred: true)
+              application.set(transferred_at: DateTime.now.utc)
             end
             result.success? ? Success("recorded transfer") : Failure("could not set transfer attribute")
           end
+
         end
       end
     end
