@@ -36,7 +36,6 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     And the user saves the income adjustments information
     Then the income adjustment should be saved on the page
 
-# 
   Scenario: User enters other income information with a start date in the future
     Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having income adjustments
@@ -58,7 +57,7 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     And the user enters a start date in the future
     And the user enters an end date
     Then the user should see the start date and end date warning messages
-# 
+
   Scenario: Existing adjustments are deleted when user selects "No" to income adjustments driver question
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
