@@ -68,6 +68,9 @@ registry:
       - key: :application_submission_error_status
         item: :application_submission_error_status
         is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS_IS_ENABLED'] || false %>
+      - key: :filtered_application_list
+        item: :filtered_application_list
+        is_enabled: <%= ENV['FILTERED_APPLICATION_LIST_IS_ENABLED'] || false %>
       - key: :divorce_agreement_year
         item: :divorce_agreement_year
         is_enabled: <%= ENV['DIVORCE_AGREEMENT_YEAR_TOOLTIP_IS_ENABLED'] || false %>
