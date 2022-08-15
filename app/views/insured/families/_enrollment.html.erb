@@ -143,8 +143,8 @@
       <div class="enrollment-type info vertical-align-top">
         <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
         <p>
-          <label><%= l10n("APTC_amount") %>:</label>
-          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/<%= l10n("month").to_s.downcase %>
+          <label><strong><%= l10n("APTC_amount") %>:</strong></label>
+          <%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %>/<%= l10n("month").to_s.downcase %>
         </p>
         <% else %>
         &nbsp;
@@ -157,8 +157,8 @@
       <div class="enrollment-type info vertical-align-top">
         <% if osse_eligibility_is_enabled? %>
         <p>
-          <label><%= l10n("osse_amount") %>:</label>
-          <strong><%='$0.00'%></strong>/<%= l10n("month").to_s.downcase %>
+          <label><strong><%= l10n("osse_amount") %>:</strong></label>
+          <%='$0.00'%>/<%= l10n("month").to_s.downcase %>
         </p>
         <% else %>
         &nbsp;
