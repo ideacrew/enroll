@@ -62,19 +62,19 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the employer information
     Then the user should see a JS alert
 
-  Scenario: User enters a start date in the future
+  Scenario: User enters employer information with a start date in the future
     Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having and income from an employer
     And the user enters a start date in the future
     Then the user should see the start date warning message
 
-  Scenario: User enters an end date
+  Scenario: User enters employer information with an end date
     Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having and income from an employer
     And the user enters an end date
     Then the user should see the end date warning message
 
-  Scenario: User enters a start date in the future and an end date
+  Scenario: User enters employer information with a start date in the future and an end date
     Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having and income from an employer
     And the user enters a start date in the future
@@ -104,6 +104,25 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Then the save button should be enabled
     And the user saves the self employment information
     # Then I should see a JS alert
+
+  Scenario: User enters self employment information with a start date in the future
+    Given FAA income_and_deduction_date_warning feature is enabled
+    Given the user answers yes to having self employment income
+    And the user enters a start date in the future
+    Then the user should see the start date warning message
+
+  Scenario: User enters self employment information with an end date
+    Given FAA income_and_deduction_date_warning feature is enabled
+    Given the user answers yes to having self employment income
+    And the user enters an end date
+    Then the user should see the end date warning message
+
+  Scenario: User enters self employment information with a start date in the future and an end date
+    Given FAA income_and_deduction_date_warning feature is enabled
+    Given the user answers yes to having self employment income
+    And the user enters a start date in the future
+    And the user enters an end date
+    Then the user should see the start date and end date warning messages
 
   Scenario: User enters self employment information when there is more than one self employment income
     Given the user has entered at least one self employment information
