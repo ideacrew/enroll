@@ -40,22 +40,22 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
-    And the user enters a start date in the future
+    And the user enters a start date in the future for the deduction
     Then the user should see the start date warning message
 
   Scenario: User enters other income information with an end date
     Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
-    And the user enters an end date
+    And the user enters an end date for the deduction
     Then the user should see the end date warning message
 
   Scenario: User enters other income information with a start date in the future and an end date
     Given FAA income_and_deduction_date_warning feature is enabled
    Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
-    And the user enters a start date in the future
-    And the user enters an end date
+    And the user enters a start date in the future for the deduction
+    And the user enters an end date for the deduction
     Then the user should see the start date and end date warning messages
 
   Scenario: Existing adjustments are deleted when user selects "No" to income adjustments driver question

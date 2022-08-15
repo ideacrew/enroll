@@ -79,7 +79,9 @@ end
 Then(/^the user should see the start date warning message$/) do
   current_year = TimeKeeper.date_of_record.year.to_s
   next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
-  expect(page.html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
+  date_warning_html = find("#date_warnings_list")['innerHTML']
+  expect(date_warning_html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
+  expect(date_warning_html).not_to include(l10n('faa.end_date_warning'))
 end
 
 And(/^the user enters an end date$/) do
@@ -87,13 +89,19 @@ And(/^the user enters an end date$/) do
 end
 
 Then(/^the user should see the end date warning message$/) do
-  expect(page.html).to include(l10n('faa.end_date_warning'))
+  current_year = TimeKeeper.date_of_record.year.to_s
+  next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
+  date_warning_html = find("#date_warnings_list")['innerHTML']
+  expect(date_warning_html).not_to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
+  expect(date_warning_html).to include(l10n('faa.end_date_warning'))
 end
 
 Then(/^the user should see the start date and end date warning messages$/) do
   current_year = TimeKeeper.date_of_record.year.to_s
   next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
-  expect(page.html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year) + l10n('faa.end_date_warning'))
+  date_warning_html = find("#date_warnings_list")['innerHTML']
+  expect(date_warning_html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
+  expect(date_warning_html).to include(l10n('faa.end_date_warning'))
 end
 
 And(/^the user saves the employer information$/) do
