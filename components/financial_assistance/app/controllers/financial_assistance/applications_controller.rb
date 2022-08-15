@@ -23,6 +23,7 @@ module FinancialAssistance
     # DO NOT include applications from other families.
     def index
       @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
+      @filtered_applications = params[:filter] ? @applications.where(:assistance_year => params[:filter][:year]) : @applications
     end
 
     def new
