@@ -92,6 +92,11 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           expect(@immediate_family_coverage_household_members.map(&:family_member_id)).to eq @immediate_family_members.map(&:id)
         end
       end
+
+      it 'should set the transferred_at field'  do
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.transferred_at).not_to eq nil
+      end
     end
   end
 

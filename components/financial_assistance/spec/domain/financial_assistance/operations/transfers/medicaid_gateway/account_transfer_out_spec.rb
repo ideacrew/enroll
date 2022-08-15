@@ -120,6 +120,11 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       it 'should return success with message' do
         expect(@result.success).to eq('Successfully published the payload to medicaid_gateway to be transferred out to ACES')
       end
+
+      it 'should set the transferred_at field'  do
+        app = FinancialAssistance::Application.first
+        expect(app.transferred_at).not_to eq nil
+      end
     end
   end
 

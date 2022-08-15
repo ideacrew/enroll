@@ -15,17 +15,17 @@ registry:
           - key: :file_location
             item: 'db/documents/ivl_checklist_me.pdf'
       - key: :iap_year_selection
-        is_enabled: false
+        is_enabled: <%= ENV['IAP_YEAR_SELECTION_IS_ENABLED'] || false %>
       - key: :iap_assistance_year_display
-        is_enabled: false
+        is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
         item: :enrollment_dates
-        is_enabled: true
+        is_enabled: <%= ENV['ENROLLMENT_DATES_IS_ENABLED'] || true %>
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 19
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_DAY_OF_MONTH'] || 1 %>
           - key: :application_new_year_effective_date_month_of_year
-            item: 9
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_MONTH_OF_YEAR'] || 11 %>
           - key: :enrollment_due_day_of_month
             is_enabled: true
             item: 15
@@ -62,6 +62,9 @@ registry:
       - key: :ssi_income_types
         item: :ssi_income_types
         is_enabled: <%= ENV['SSI_INCOME_TYPES_IS_ENABLED'] || false %>
+      - key: :transfer_history_page
+        item: :transfer_history_page
+        is_enabled: <%= ENV['TRANSFER_HISTORY_PAGE'] || false %>
       - key: :application_submission_error_status
         item: :application_submission_error_status
         is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS'] || false %>
@@ -277,12 +280,12 @@ registry:
     - :renewals
     features:
     - key: :create_renewals_on_date_change
-      is_enabled: false
+      is_enabled: <%= ENV['CREATE_RENEWALS_ON_DATE_CHANGE_IS_ENABLED'] || false %>
       settings:
         - key: :renewals_creation_month
-          item: 10
+          item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
-          item: 16
+          item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
     - key: :skip_employer_address_validation
       is_enabled: :true
     - key: :skip_employer_phone_validation
