@@ -35,6 +35,7 @@ class Permission
   field :can_change_username_and_email, type: Boolean, default: false
   field :can_drop_enrollment_members, type: Boolean, default: false
   field :can_edit_osse_eligibility, type: Boolean, default: false
+  field :can_edit_broker_agency_profile, type: Boolean, default: false
 
   class << self
     def hbx_staff
@@ -47,6 +48,10 @@ class Permission
 
     def hbx_csr_tier1
       Permission.where(name: 'hbx_csr_tier1').first
+    end
+
+    def hbx_read_only
+      Permission.where(name: 'hbx_read_only').first
     end
   end
 end

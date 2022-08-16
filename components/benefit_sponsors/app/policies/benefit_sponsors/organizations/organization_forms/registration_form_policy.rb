@@ -36,8 +36,15 @@ module BenefitSponsors
           return true unless role = user && user.person && user.person.hbx_staff_role
           if is_employer_profile?
             return role.permission.modify_employer
+          elsif edit_broker_agency_profile_is_enabled? && is_broker_profile?
+            role.permission.can_edit_broker_agency_profile
+          else
+            role.permission.modify_admin_tabs
           end
-          role.permission.modify_admin_tabs
+        end
+
+        def edit_broker_agency_profile_is_enabled?
+          EnrollRegistry.feature_enabled?(:edit_broker_agency_profile)
         end
 
         def admin?
