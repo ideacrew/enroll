@@ -213,6 +213,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.return_to_account_home" => 'Return to Account Home',
   "en.faa.results.continue_text" => "Select 'CONTINUE' to see your plan options and/or add or remove someone",
   "en.faa.results.your_application_reference_2" => "Application Reference ID: %{application_hbx_id}",
-  "en.faa.results.view_my_applications" => "View my Applications"
+  "en.faa.results.view_my_applications" => "View my Applications",
+  "en.faa.go_to_my_account" => "Go to my account"
 }.freeze
 # rubocop:enable Layout/LineLength
