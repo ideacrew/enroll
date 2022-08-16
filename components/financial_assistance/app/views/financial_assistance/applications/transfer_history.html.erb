@@ -25,16 +25,24 @@
             </thead>
             <tbody>
                 <% @transfers.each do |transfer| %>
+                  <tr>
+                      <td><%= transfer[:transfer_id] %></td>
+                      <td><%= transfer[:direction] %></td>
+                      <td><%= to_est transfer[:timestamp] %></td>
+                      <td><%= transfer[:reason] %></td>
+                      <td><%= transfer[:source] %></td>
+                  </tr>
+                <% end %>
+                <% if @transfers.empty? %>
                 <tr>
-                    <td><%= transfer[:transfer_id] %></td>
-                    <td><%= transfer[:direction] %></td>
-                    <td><%= to_est transfer[:timestamp] %></td>
-                    <td><%= transfer[:reason] %></td>
-                    <td><%= transfer[:source] %></td>
+                  <td colspan="5">
+                    <%= l10n('No_history_available').humanize %>
+                  </td>
                 </tr>
-                <%end%>
+                <% end %>
             </tbody>
         </table>
+
 
       </div>
     </div>
