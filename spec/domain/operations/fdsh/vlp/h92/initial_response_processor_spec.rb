@@ -181,6 +181,58 @@ module Operations
         expect(immigration_verification.reload.validation_status).to eq 'negative_response_received'
       end
     end
+
+    context 'when LawfulPresenceVerifiedCode is X(not applicable)' do
+      let(:response_payload) do
+        {
+          :ResponseMetadata => {:ResponseCode => "HS000000", :ResponseDescriptionText => "Successful."},
+          :InitialVerificationResponseSet => {
+            :InitialVerificationIndividualResponses => [
+              { :ResponseMetadata => {:ResponseCode => "HS000000", :ResponseDescriptionText => "Successful."},
+                :ArrayOfErrorResponseMetadata => nil,
+                :LawfulPresenceVerifiedCode => "X",
+                :InitialVerificationIndividualResponseSet => {
+                  :CaseNumber => "6000060033064OC", :NonCitLastName => "Benstce",
+                  :NonCitFirstName => "Jamison", :NonCitMiddleName => nil,
+                  :NonCitBirthDate => Date.new(1993, 10, 21), :NonCitEntryDate => nil,
+                  :AdmittedToDate => nil, :AdmittedToText => nil, :NonCitCountryBirthCd => "IND",
+                  :NonCitCountryCitCd => nil, :NonCitCoaCode => nil, :NonCitProvOfLaw => "A02",
+                  :NonCitEadsExpireDate => Date.new(2025, 10, 21), :EligStatementCd => 10,
+                  :EligStatementTxt => "TEMPORARY EMPLOYMENT AUTHORIZED", :IAVTypeCode => nil,
+                  :IAVTypeTxt => nil, :WebServSftwrVer => "37", :GrantDate => nil,
+                  :GrantDateReasonCd => "Not Applicable", :SponsorDataFoundIndicator => false,
+                  :ArrayOfSponsorshipData => nil, :SponsorshipReasonCd => nil,
+                  :AgencyAction => "Invoke CloseCase Web method to close the case.",
+                  :FiveYearBarApplyCode => "X", :QualifiedNonCitizenCode => "N",
+                  :FiveYearBarMetCode => "X", :USCitizenCode => "X"
+                }}
+            ]
+          }
+        }
+      end
+
+      let(:response) do
+        AcaEntities::Fdsh::Vlp::H92::InitialVerificationResponse.new(response_payload)
+      end
+
+      let(:immigration_verification) { person.verification_types.by_name('Immigration status').first }
+
+      before do
+        person.consumer_role.update!(aasm_state: "dhs_pending")
+        person.consumer_role.lawful_presence_determination.update!(citizen_status: "not_lawfully_present_in_us")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => 'identifier', :verification_type => 'Immigration type')
+      end
+
+      subject do
+        described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
+      end
+
+      it "consumer_role should be valid" do
+        subject
+        expect(person.reload.consumer_role.aasm_state).to eq 'fully_verified'
+        expect(immigration_verification.reload.validation_status).to eq 'verified'
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

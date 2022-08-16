@@ -536,11 +536,19 @@ class ConsumerRole
   end
 
   def can_receive_paper_communication?
-    ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
+    if EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
+      ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
+    else
+      CONTACT_METHOD_MAPPING.values.select { |value| value.include?('Paper') }.include?(contact_method)
+    end
   end
 
   def can_receive_electronic_communication?
-    ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+    if EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
+      ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+    else
+      CONTACT_METHOD_MAPPING.values.select { |value| value.include?('Electronic') }.include?(contact_method)
+    end
   end
 
   ## TODO: Move RIDP to user model
@@ -725,8 +733,8 @@ class ConsumerRole
 
   def is_tribe_member?
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      return false if tribal_state.blank? || (tribal_name.blank? && tribe_codes.empty?)
-      !tribal_state.blank? && (!tribal_name.blank? || !tribe_codes.empty?)
+      return false if tribal_state.blank? || (tribal_name.blank? && tribe_codes.blank?)
+      !tribal_state.blank? && (!tribal_name.blank? || !tribe_codes.blank?)
     else
       return false if tribal_id.blank?
       !tribal_id.empty?

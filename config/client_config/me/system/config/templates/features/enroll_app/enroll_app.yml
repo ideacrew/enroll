@@ -20,7 +20,7 @@ registry:
           - key: :policies_url
             item: ''
           - key: :faqs_url
-            item: ''
+            item: 'https://www.coverme.gov/get-help'
           - key: :help_url
             item: 'https://www.coverme.gov/help/'
           - key: :business_resource_center_url
@@ -766,3 +766,5 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || true %>
+      - key: :osse_eligibility
+        is_enabled: <%= ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false %>

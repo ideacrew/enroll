@@ -324,5 +324,16 @@ module FinancialAssistance
 
       BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
     end
+
+    def full_name(applicant)
+      applicant.full_name.split.map(&:capitalize).join(' ')
+    end
+
+    def display_csr(applicant)
+      applicant.csr_eligibility_kind.split('_').last.capitalize.tap do |csr|
+        return csr if csr == 'Limited'
+        return "#{csr}%"
+      end
+    end
   end
 end

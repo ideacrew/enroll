@@ -107,6 +107,7 @@ module FinancialAssistance
     field :transfer_requested, type: Boolean, default: false
     # Account was transferred to medicaid service via atp
     field :account_transferred, type: Boolean, default: false
+    field :transferred_at, type: DateTime #time account was transfered in or out of Enroll (when batch process completes)
 
     # Transfer ID of to be set if the application was transferred into Enroll via ATP
     field :transfer_id, type: String
@@ -591,18 +592,16 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || has_non_magi_medicaid_eligible(applicant) || applicant.is_medicare_eligible || is_eligible_for_non_magi_reasons(applicant)
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || has_non_magi_medicaid_eligible?(applicant) || applicant.is_medicare_eligible || is_eligible_for_non_magi_reasons?(applicant)
       end
     end
 
-    def has_non_magi_medicaid_eligible(applicant)
-      return false unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible)
-      applicant.is_non_magi_medicaid_eligible
+    def has_non_magi_medicaid_eligible?(applicant)
+      FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible) ? applicant.is_non_magi_medicaid_eligible : false
     end
 
-    def is_eligible_for_non_magi_reasons(applicant)
-      return false unless FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons)
-      applicant.is_eligible_for_non_magi_reasons
+    def is_eligible_for_non_magi_reasons?(applicant)
+      FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons) ? applicant.is_eligible_for_non_magi_reasons : false
     end
 
     def has_mec_check?
@@ -1338,6 +1337,28 @@ module FinancialAssistance
 
     def build_new_applicant(applicant_params)
       applicants.build(applicant_params)
+    end
+
+    def aptc_applicants
+      applicants.aptc_eligible
+    end
+
+    def medicaid_or_chip_applicants
+      applicants.medicaid_or_chip_eligible
+    end
+
+    # UQHP, is_without_assistance
+    def uqhp_applicants
+      applicants.uqhp_eligible
+    end
+
+    def ineligible_applicants
+      applicants.ineligible
+    end
+
+    # is_eligible_for_non_magi_reasons, is_non_magi_medicaid_eligible
+    def applicants_with_non_magi_reasons
+      applicants.eligible_for_non_magi_reasons
     end
 
     private

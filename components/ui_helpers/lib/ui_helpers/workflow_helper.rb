@@ -1,28 +1,28 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ModuleLength, Style/Documentation
 module UIHelpers
   module WorkflowHelper
     def find_previous_from_step_one
       model_name = @model.class.to_s.split('::').last.downcase
-      if  model_name == "applicant"
+      case model_name
+      when "applicant"
         financial_assistance.edit_application_path(@application)
-      elsif model_name == "application"
+      when "application"
         financial_assistance.review_and_submit_application_path(@application)
       else
         send("financial_assistance.application_applicant_#{model_name.pluralize}_path", @application, @applicant)
       end
     end
 
-    def workflow_form_for(model)
+    def workflow_form_for(model, &block)
       path, method = if model.new_record?
                        [controller.request.path.sub('new', 'step'), :post]
                      else
                        [controller.request.path.sub('new', "#{model.id}/step"), :put]
                      end
       path.gsub!(%r{step/\d$}, 'step')
-      form_tag path, method: method do
-        yield
-      end
+      form_tag path, method: method, &block
     end
 
     def previous_step_for
@@ -62,16 +62,18 @@ module UIHelpers
     # Personalize heading_text from steps.yml
     def personalize_heading_text(heading_text)
       if heading_text.include? '<family-member-name-placeholder>'
-
-        first_name = if @model.is_a?(FinancialAssistance::Applicant)
+        # rubocop:disable Lint/DuplicateBranch
+        first_name = case @model
+                     when FinancialAssistance::Applicant
                        @model.first_name
-                     elsif @model.is_a?(FinancialAssistance::Application)
+                     when FinancialAssistance::Application
                        @model.primary_applicant.first_name
                      else
                        @model.first_name
                      end
+        # rubocop:enable Lint/DuplicateBranch
 
-        heading_text.sub! '<family-member-name-placeholder>', first_name.capitalize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
+        heading_text.sub! '<family-member-name-placeholder>', first_name.capitalize
       else
         translation_placeholder_text(heading_text)
       end
@@ -87,14 +89,17 @@ module UIHelpers
     end
 
     # TODO: All these Settings calls will have to be refactored for platformization
-    def translation_placeholder_text(text)
+    # rubocop:disable Metrics/AbcSize
+    def translation_placeholder_text(value)
+      text = value.dup.to_s
+
       text.gsub! '<board_of_elections_address-placeholder>', Settings.contact_center.board_of_elections_address
       text.gsub! '<board_of_elections_email-placeholder>', Settings.contact_center.board_of_elections_email
       text.gsub! '<board_of_elections_entity-placeholder>', Settings.contact_center.board_of_elections_entity
       text.gsub! '<board_of_elections_phone_number-placeholder>', Settings.contact_center.board_of_elections_phone_number
       text.gsub! '<contact-center-phone_number-placeholder>', Settings.contact_center.phone_number
       text.gsub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
-      text.gsub! '<short-name-placeholder>', EnrollRegistry[:enroll_app].setting(:short_name).item
+      text.gsub! '<short-name-placeholder>', ::EnrollRegistry[:enroll_app].setting(:short_name).item
       text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
       text.gsub! '<reviewed-information>', l10n('insured.review_information')
 
@@ -126,6 +131,8 @@ module UIHelpers
 
       text
     end
+    # rubocop:enable Metrics/AbcSize
+
 
     # set YAML text placeholders
     def set_text_placeholders(text) # rubocop:disable Naming/AccessorMethodName
@@ -157,3 +164,4 @@ module UIHelpers
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength, Style/Documentation

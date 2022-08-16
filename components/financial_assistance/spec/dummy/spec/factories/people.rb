@@ -67,5 +67,12 @@ FactoryBot.define do
         FactoryBot.create :individual_market_transition, person: person
       end
     end
+
+    trait :with_valid_native_american_information do
+      indian_tribe_member { true }
+      tribal_state { "ME"}
+      tribe_codes { ["HM", "AM"] }
+    end
+
   end
 end

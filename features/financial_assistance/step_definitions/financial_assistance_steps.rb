@@ -464,6 +464,14 @@ Given(/the shop coverage check feature is disabled/) do
   EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
 end
 
+Given(/the coverage check banners feature is enabled/) do
+  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the coverage check banners feature is disabled/) do
+  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(false)
+end
+
 Given(/an applicant has shop coverage/) do
   applicant = application.active_applicants.first
   person = FactoryBot.create(:person, :with_family)
@@ -543,7 +551,7 @@ Then(/the "Send To OFI" button will be disabled and the user will see the button
 end
 
 Then(/^they should see the MedicaidCurrently Enrolled warning text$/) do
-  expect(page).to have_content("It looks like you may already be enrolled in MaineCare or Cub Care")
+  expect(page).to have_content(l10n('faa.mc_success')[0,62])
   expect(page).to have_content(l10n('faa.mc_continue'))
 end
 

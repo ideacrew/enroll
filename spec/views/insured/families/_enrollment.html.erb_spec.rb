@@ -551,4 +551,76 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
     end
   end
+
+  describe "osse_eligibility" do
+
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        id: "hbxenrollmentid",
+        family: family,
+        hbx_id: "hbxenrollmenthbxid",
+        enroll_step: 1,
+        aasm_state: "coverage_selected",
+        product: product,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        effective_on: 1.month.ago.to_date,
+        updated_at: DateTime.now,
+        created_at: DateTime.now,
+        kind: "employer_sponsored",
+        is_coverage_waived?: false,
+        coverage_year: 2018,
+        employer_profile: employer_profile,
+        coverage_terminated?: false,
+        coverage_canceled?: false,
+        coverage_kind: "dental",
+        coverage_termination_pending?: true,
+        coverage_expired?: false,
+        total_premium: 200.00,
+        terminated_on: TimeKeeper.date_of_record.next_month.end_of_month,
+        total_employer_contribution: 100.00,
+        total_employee_cost: 100.00,
+        benefit_group: nil,
+        consumer_role_id: nil,
+        consumer_role: nil,
+        future_enrollment_termination_date: "",
+        :is_ivl_actively_outstanding? => false,
+        covered_members_first_names: []
+      )
+    end
+
+    before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
+      allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+      allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+    end
+    context "osse_eligibility is present" do
+
+      before do
+        allow(view).to receive(:osse_eligibility_is_enabled?).and_return(true)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+
+      it "should display osse amount" do
+        expect(rendered).to have_content(l10n('osse_amount'))
+      end
+    end
+
+    context "osse_eligibility is not present" do
+
+      before do
+        allow(view).to receive(:osse_eligibility_is_enabled?).and_return(false)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+
+      it "should not display osse amount" do
+        expect(view).to_not have_content(l10n('osse_amount'))
+      end
+    end
+  end
 end

@@ -61,6 +61,7 @@ module FinancialAssistance
 
         optional(:five_year_bar_applies).maybe(:bool)
         optional(:five_year_bar_met).maybe(:bool)
+        optional(:qualified_non_citizen).maybe(:bool)
 
         optional(:addresses).maybe(:array)
         optional(:phones).maybe(:array)

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_each do
 
   let!(:application) do
-    FactoryBot.create(:application,
+    FactoryBot.create(:financial_assistance_application,
                       family_id: BSON::ObjectId.new,
                       aasm_state: 'draft',
                       assistance_year: TimeKeeper.date_of_record.year,
@@ -13,7 +13,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   end
 
   let!(:applicant) do
-    FactoryBot.create(:applicant,
+    FactoryBot.create(:financial_assistance_applicant,
                       application: application,
                       dob: Date.today - 40.years,
                       is_primary_applicant: true,
@@ -23,6 +23,50 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   let(:income) do
     income = FactoryBot.build(:financial_assistance_income)
     applicant.incomes << income
+  end
+
+  describe "scopes" do
+    let!(:applicant2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        dob: Date.today - 30.years,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    describe '.aptc_eligible' do
+      it 'returns only aptc_eligible applicants' do
+        applicant.update_attributes!(is_ia_eligible: true)
+        expect(application.applicants.aptc_eligible).to match([applicant])
+      end
+    end
+
+    describe '.medicaid_or_chip_eligible' do
+      it 'returns only medicaid_or_chip_eligible applicants' do
+        applicant.update_attributes!(is_medicaid_chip_eligible: true)
+        expect(application.applicants.medicaid_or_chip_eligible).to match([applicant])
+      end
+    end
+
+    describe '.uqhp_eligible' do
+      it 'returns only uqhp_eligible applicants' do
+        applicant.update_attributes!(is_without_assistance: true)
+        expect(application.applicants.uqhp_eligible).to match([applicant])
+      end
+    end
+
+    describe '.ineligible' do
+      it 'returns only ineligible applicants' do
+        applicant.update_attributes!(is_totally_ineligible: true)
+        expect(application.applicants.ineligible).to match([applicant])
+      end
+    end
+
+    describe '.eligible_for_non_magi_reasons' do
+      it 'returns only eligible_for_non_magi_reasons applicants' do
+        applicant.update_attributes!(is_eligible_for_non_magi_reasons: true)
+        expect(application.applicants.eligible_for_non_magi_reasons).to match([applicant])
+      end
+    end
   end
 
   context "is primary caregiver" do
@@ -1644,6 +1688,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     let(:test_applicant) do
       applicant.five_year_bar_applies = five_year_bar
       applicant.five_year_bar_met = five_year_bar
+      applicant.qualified_non_citizen = qualified_non_citizen
       applicant.save!
       applicant
     end
@@ -1652,28 +1697,34 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'for five_year_bar is set to true' do
       let(:five_year_bar) { true }
+      let(:qualified_non_citizen) { true }
 
       it 'should include the keys and assign correct values' do
         expect(@result[:five_year_bar_applies]).to eq(true)
         expect(@result[:five_year_bar_met]).to eq(true)
+        expect(@result[:qualified_non_citizen]).to eq(true)
       end
     end
 
-    context 'for five_year_bar is set to false' do
+    context 'for five_year_bar and qualified_non_citizen set to false' do
       let(:five_year_bar) { false }
+      let(:qualified_non_citizen) { false }
 
       it 'should include the keys and assign correct values' do
         expect(@result[:five_year_bar_applies]).to eq(false)
         expect(@result[:five_year_bar_met]).to eq(false)
+        expect(@result[:qualified_non_citizen]).to eq(false)
       end
     end
 
-    context 'for five_year_bar is set to nil' do
+    context 'for five_year_bar and qualified_non_citizen set to nil' do
       let(:five_year_bar) { nil }
+      let(:qualified_non_citizen) { nil }
 
       it 'should include the keys and assign correct values' do
         expect(@result[:five_year_bar_applies]).to eq(nil)
         expect(@result[:five_year_bar_met]).to eq(nil)
+        expect(@result[:qualified_non_citizen]).to eq(nil)
       end
     end
   end

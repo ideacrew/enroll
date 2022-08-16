@@ -23,6 +23,7 @@ FinancialAssistance::Engine.routes.draw do
     get :eligibility_response_error, on: :member
     get 'checklist_pdf', on: :collection, action: 'checklist_pdf', as: 'checklist_pdf'
     put :update_transfer_requested, on: :member
+    get :transfer_history, on: :member
 
     resources :relationships
 

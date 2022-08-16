@@ -155,6 +155,91 @@ module FinancialAssistance
       end
       spreadsheet_rows
     end
+
+    def setup_applicant_eligible_for_max_aptc_and_csr(application)
+      coverage_year = TimeKeeper.date_of_record.year
+      application.eligibility_determinations.create!(
+        max_aptc: 200.00,
+        is_eligibility_determined: true,
+        effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+        determined_at: TimeKeeper.datetime_of_record - 30.days,
+        source: 'Faa'
+      ).save!
+      application.applicants.each do |applicant|
+        applicant.update_attributes!(
+          is_medicaid_chip_eligible: false,
+          is_ia_eligible: true,
+          is_without_assistance: false,
+          csr_percent_as_integer: 73,
+          eligibility_determination_id: application.eligibility_determinations.first.id
+        )
+      end
+      application.update_attributes!(aasm_state: 'determined')
+    end
+
+    def setup_applicant_eligible_for_medicaid_or_chip(application)
+      coverage_year = TimeKeeper.date_of_record.year
+      application.eligibility_determinations.create!(
+        max_aptc: 0.00,
+        is_eligibility_determined: true,
+        effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+        determined_at: TimeKeeper.datetime_of_record - 30.days,
+        source: 'Faa'
+      ).save!
+
+      application.applicants.each do |applicant|
+        applicant.update_attributes!(
+          is_medicaid_chip_eligible: true,
+          is_ia_eligible: false,
+          is_without_assistance: false,
+          eligibility_determination_id: application.eligibility_determinations.first.id
+        )
+      end
+      application.update_attributes!(aasm_state: 'determined')
+    end
+
+    def setup_applicant_eligible_for_uqhp_and_non_magi_reasons(application)
+      coverage_year = TimeKeeper.date_of_record.year
+      application.eligibility_determinations.create!(
+        max_aptc: 0.00,
+        is_eligibility_determined: true,
+        effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+        determined_at: TimeKeeper.datetime_of_record - 30.days,
+        source: 'Faa'
+      ).save!
+
+      application.applicants.each do |applicant|
+        applicant.update_attributes!(
+          is_medicaid_chip_eligible: false,
+          is_ia_eligible: false,
+          is_eligible_for_non_magi_reasons: true,
+          is_without_assistance: true,
+          eligibility_determination_id: application.eligibility_determinations.first.id
+        )
+      end
+      application.update_attributes!(aasm_state: 'determined')
+    end
+
+    def setup_applicant_eligible_for_ineligible_determination(application)
+      coverage_year = TimeKeeper.date_of_record.year
+      application.eligibility_determinations.create!(
+        max_aptc: 0.00,
+        is_eligibility_determined: true,
+        effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+        determined_at: TimeKeeper.datetime_of_record - 30.days,
+        source: 'Faa'
+      ).save!
+
+      application.applicants.each do |applicant|
+        applicant.update_attributes!(
+          is_medicaid_chip_eligible: false,
+          is_ia_eligible: false,
+          is_totally_ineligible: true,
+          eligibility_determination_id: application.eligibility_determinations.first.id
+        )
+      end
+      application.update_attributes!(aasm_state: 'determined')
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

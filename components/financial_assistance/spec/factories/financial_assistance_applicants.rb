@@ -28,6 +28,7 @@ FactoryBot.define do
     is_self_attested_blind { false }
     has_daily_living_help { false }
     need_help_paying_bills { false }
+    is_resident_post_092296 { false }
 
     trait :with_ssn do
       sequence(:ssn) { |n| 222_222_220 + n }
@@ -56,6 +57,7 @@ FactoryBot.define do
     trait :with_five_year_bar do
       five_year_bar_applies { true }
       five_year_bar_met { true }
+      qualified_non_citizen { true }
     end
 
     trait :spouse do

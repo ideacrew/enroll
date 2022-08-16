@@ -106,7 +106,7 @@ Then(/^Individual should see cost saving documents for evidences$/) do
   expect(page).to have_css(IvlDocumentsPage.income_evidence)
   expect(page).to have_content('Coverage from a job')
   expect(page).to have_content('Coverage from another program')
-  expect(page).to have_content('Coverage from MaineCare and Cub Care')
+  expect(page).to have_content(l10n('faa.evidence_type_aces'))
 end
 
 And(/^Individual clicks on Actions dropdown$/) do
