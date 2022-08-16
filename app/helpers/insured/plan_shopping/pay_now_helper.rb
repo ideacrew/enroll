@@ -13,7 +13,8 @@ module Insured
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
-        "Northeast Delta Dental" => "https://www.nedelta.com/Home"
+        "Northeast Delta Dental" => "https://www.nedelta.com/Home",
+        "Taro" => "https://www.tarohealth.com/"
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity

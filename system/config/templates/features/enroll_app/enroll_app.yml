@@ -520,6 +520,17 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: false
+      - key: :taro_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: false
+          - key: :enrollment_tile
+            item: false
+          - key: :carriers_long_name
+            item: 'Taro'
+          - key: :connect_test
+            item: false
       - key: :carrier_abbrev_list
         item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
         is_enabled: true

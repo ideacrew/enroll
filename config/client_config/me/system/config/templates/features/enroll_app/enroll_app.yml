@@ -542,8 +542,19 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: true
+      - key: :taro_pay_now
+        is_enabled: true
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Taro'
+          - key: :connect_test
+            item: true
       - key: :carrier_abbrev_list
-        item: ['CHO', 'HPHC', 'ANTHM', 'NEDD']
+        item: ['CHO', 'HPHC', 'ANTHM', 'NEDD', 'TARO']
         is_enabled: true
   - namespace:
       - :features
