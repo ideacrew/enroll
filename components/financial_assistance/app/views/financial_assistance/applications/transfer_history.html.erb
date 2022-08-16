@@ -1,0 +1,42 @@
+<div aria-labelledby="aria-labelledby"class="tab-pane fade in active" id="home">
+  <div class="container" class="mt-2">
+    <div class="row">
+      <div class="col-md-2">
+        <%= render 'ui-components/v1/navs/families_navigation' %>
+      </div>
+      <div class="col-md-10">
+        <h1 class="darkblue no-buffer"><%= l10n('faa.transfer_history') %></h1>
+        <h4><%= l10n('faa.transfer_history_desc', site_short_name: site_short_name) %></h4>
+  
+        <div style="text-align: right;">
+            <%= link_to l10n('back_to_applications'), applications_path, class: "btn btn-small btn-primary" %>
+        </div>
+        
+        <h3><%= l10n('transactions_for') %> <%= @application.hbx_id %></h3>
+        <table class="table table-striped">
+            <thead class="form-heading">
+                <tr>
+                    <th class="form-heading"><%= l10n('transfer_id').upcase %></th>
+                    <th class="form-heading"><%= l10n('in_out_bound').upcase %></th>
+                    <th class="form-heading"><%= l10n('timestamp').upcase %></th>
+                    <th class="form-heading"><%= l10n('reason').upcase %></th>
+                    <th class="form-heading"><%= l10n('source').upcase %></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @transfers.each do |transfer| %>
+                <tr>
+                    <td><%= transfer[:transfer_id] %></td>
+                    <td><%= transfer[:direction] %></td>
+                    <td><%= to_est transfer[:timestamp] %></td>
+                    <td><%= transfer[:reason] %></td>
+                    <td><%= transfer[:source] %></td>
+                </tr>
+                <%end%>
+            </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -178,6 +178,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.cancel" => "Cancel",
   "en.faa.income_temporary_message" => "<ul><li><strong>Start Date: </strong>If this is income you currently have, you must enter the date you began receiving this income in the 'From' field, or 1/1/%{current_year} (if the income started before this year). Do not enter a date in the future (for example, 1/1/%{next_year}) unless this is income that has not started but you expect to have in the future.</li><li><strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.</li></ul>",
   "en.faa.not_applicable_abbreviation" => "N/A",
+  # Transfer History
+  "en.faa.transfer_history" => "Transfer History",
+  "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
@@ -203,6 +206,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.return_to_account_home" => 'Return to Account Home',
   "en.faa.results.continue_text" => "Select 'CONTINUE' to see your plan options and/or add or remove someone",
   "en.faa.results.your_application_reference_2" => "Application Reference ID: %{application_hbx_id}",
-  "en.faa.results.view_my_applications" => "View my Applications"
+  "en.faa.results.view_my_applications" => "View my Applications",
+  "en.faa.go_to_my_account" => "Go to my account"
 }.freeze
 # rubocop:enable Layout/LineLength

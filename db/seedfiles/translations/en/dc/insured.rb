@@ -191,6 +191,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.families.future_enrollment_termination_date' => "Future enrollment termination date",
   :'en.market_type' => "Market Type",
   :'en.APTC_amount' => "APTC amount",
+  :"en.osse_amount" => "OSSE amount",
   :'en.covered' => "Covered",
   :'en.insured.plan_contact_info' => "Plan Contact Info",
   :'en.make_changes' => "<b>Make changes</b> to my coverage",

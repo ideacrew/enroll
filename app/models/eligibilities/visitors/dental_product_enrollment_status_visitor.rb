@@ -8,12 +8,12 @@ module Eligibilities
       attr_accessor :evidence, :subject, :evidence_item, :effective_date
 
       def call
-        enrollment = hbx_enrollment_instance_for(subject, effective_date)
-        unless enrollment
+        enrollments = hbx_enrollment_instances_for(subject, effective_date)
+        unless enrollments.present?
           @evidence = Hash[evidence_item[:key], {}]
           return
         end
-        enrollment.accept(self)
+        enrollments.each { |enrollment| enrollment.accept(self) }
       end
 
       def visit(enrollment_member)
@@ -24,7 +24,7 @@ module Eligibilities
 
       private
 
-      def hbx_enrollment_instance_for(subject, effective_date)
+      def hbx_enrollment_instances_for(subject, effective_date)
         HbxEnrollment
           .where(
             :family_id => subject.family.id,
@@ -34,7 +34,6 @@ module Eligibilities
           .individual_market
           .by_dental
           .enrolled_and_renewing
-          .last
       end
 
       def evidence_state_for(enrollment_member)
