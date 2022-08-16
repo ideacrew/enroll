@@ -361,6 +361,9 @@ module FinancialAssistance
     scope :uqhp_eligible,                 -> { where(is_without_assistance: true) } # UQHP, is_without_assistance
     scope :ineligible,                    -> { where(is_totally_ineligible: true) }
     scope :eligible_for_non_magi_reasons, -> { where(is_eligible_for_non_magi_reasons: true) }
+    scope :csr_73_87_or_94,               -> { where(:csr_percent_as_integer.in => [94, 87, 73]) }
+    scope :csr_0_or_100,                  -> { where(:csr_percent_as_integer.in => [0, 100]) }
+    scope :csr_nal,                       -> { where(csr_percent_as_integer: -1) }
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
