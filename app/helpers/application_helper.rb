@@ -965,10 +965,10 @@ module ApplicationHelper
   end
 
   def carrier_name(name)
-    if name&.include?("taro")
-      name.gsub(/[,.]/, '').gsub(' ', '_')
-    else
-      name.gsub(' ', '_')
-    end
+    carrier = if name&.include?("taro")
+                name.gsub(/[,.]/, '').gsub(' ', '_')
+              else
+                name.gsub(' ', '_')
+              end
   end
 end
