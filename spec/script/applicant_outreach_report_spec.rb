@@ -208,12 +208,6 @@ describe 'applicant_outreach_report' do
         expect(@file_content[1][8]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
       end
 
-      # it 'should match with the programs that applicants are eligible for' do
-      #   eligible_programs = "MaineCare and Cub Care(Medicaid),Financial assistance(APTC eligible)"
-      #   expect(@file_content[1][12]).to eq(eligible_programs)
-      #   expect(@file_content[2][12]).to eq(eligible_programs)
-      # end
-
       it 'should match with the transfer id' do
         expect(@file_content[1][16]).to eq(application.transfer_id)
         expect(@file_content[2][16]).to eq(application.transfer_id)
