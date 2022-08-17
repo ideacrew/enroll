@@ -44,7 +44,7 @@ describe 'daily_eligibility_determination_change_report' do
   end
 
   it 'should have FPL_Amount' do
-    expect((@file_content.flatten[15]).to eq("FPL_Amount")
+    expect(@file_content.flatten[15]).to eq("FPL_Amount")
   end
 
   after :each do
