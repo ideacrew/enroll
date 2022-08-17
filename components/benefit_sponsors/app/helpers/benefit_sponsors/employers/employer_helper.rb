@@ -72,7 +72,7 @@ module BenefitSponsors
       end
 
       def osse_eligibility_is_enabled?
-        ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false
+        EnrollRegistry.feature_enabled?(:osse_eligibility)
       end
 
       def display_referred_by_field_for_employer?

@@ -1491,7 +1491,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
           expect(permission.can_cancel_enrollment).to eq true
           expect(permission.can_terminate_enrollment).to eq true
           expect(permission.change_enrollment_end_date).to eq true
-          expect(permission.can_drop_enrollment_members).to eq true
+          expect(permission.can_drop_enrollment_members).to eq false
         end
       end
 
@@ -1506,7 +1506,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
           expect(permission.can_cancel_enrollment).to eq true
           expect(permission.can_terminate_enrollment).to eq true
           expect(permission.change_enrollment_end_date).to eq true
-          expect(permission.can_drop_enrollment_members).to eq true
+          expect(permission.can_drop_enrollment_members).to eq false
         end
       end
 
@@ -1545,7 +1545,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq true
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
-        expect(permission.can_drop_enrollment_members).to eq true
+        expect(permission.can_drop_enrollment_members).to eq false
         expect(permission.can_call_hub).to eq true
       end
 

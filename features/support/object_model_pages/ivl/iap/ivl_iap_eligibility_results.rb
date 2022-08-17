@@ -10,12 +10,16 @@ class IvlIapEligibilityResults
     "[data-cuke='tax_household']"
   end
 
-  def self.review_eligibility_header
-    "[data-cuke='review_eligibility_header']"
+  def self.aptc_heading
+    "[data-cuke='aptc_heading']"
   end
 
   def self.aptc_text
     "[data-cuke='aptc_text']"
+  end
+
+  def self.csr_73_87_or_94_text
+    "[data-cuke='csr_73_87_or_94_text']"
   end
 
   def self.full_name
@@ -30,36 +34,36 @@ class IvlIapEligibilityResults
     "[data-cuke='csr_text']"
   end
 
-  def self.medicaid_or_chip
-    "[data-cuke='medicaid_or_chip']"
+  def self.medicaid_or_chip_heading
+    "[data-cuke='medicaid_or_chip_heading']"
   end
 
   def self.medicaid_or_chip_text
     "[data-cuke='medicaid_or_chip_text']"
   end
 
-  def self.private_health_insurance
-    "[data-cuke='private_health_insurance']"
+  def self.uqhp_heading
+    "[data-cuke='uqhp_heading']"
   end
 
-  def self.private_health_insurance_text
-    "[data-cuke='private_health_insurance_text']"
+  def self.uqhp_text
+    "[data-cuke='uqhp_text']"
   end
 
-  def self.does_not_qualify
-    "[data-cuke='does_not_qualify']"
+  def self.totally_ineligible_heading
+    "[data-cuke='totally_ineligible_heading']"
   end
 
-  def self.does_not_qualify_text
-    "[data-cuke='does_not_qualify_text']"
+  def self.totally_ineligible_text
+    "[data-cuke='totally_ineligible_text']"
   end
 
-  def self.referral
-    "[data-cuke='referral']"
+  def self.non_magi_referral_heading
+    "[data-cuke='non_magi_referral_heading']"
   end
 
-  def self.qualified_reason
-    "[data-cuke='qualified_reason']"
+  def self.non_magi_referral_text
+    "[data-cuke='non_magi_referral_text']"
   end
 
   def self.next_steps
