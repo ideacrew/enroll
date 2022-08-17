@@ -963,4 +963,12 @@ module ApplicationHelper
       true
     end
   end
+
+  def carrier_name(name)
+    carrier = if name&.include?("taro")
+                name.gsub(/[,.]/, '').gsub(' ', '_')
+              else
+                name.gsub(' ', '_')
+              end
+  end
 end
