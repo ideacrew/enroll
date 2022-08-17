@@ -71,6 +71,20 @@ Given(/^the user will navigate to the FAA Household Info page$/) do
   visit financial_assistance.edit_application_path(application.id.to_s)
 end
 
+Given(/the No SSN Dropdown feature is disabled/) do
+  EnrollRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(false)
+  FinancialAssistanceRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(false)
+end
+
+Given(/the No SSN Dropdown feature is enabled/) do
+  EnrollRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(true)
+  FinancialAssistanceRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(true)
+end
+
+Then(/the no ssn reason dropdown is displayed/) do
+  expect(page.has_css?(FinancialAssistance::OtherQuestionsPage.no_ssn_dropdown)).to eq true
+end
+
 Given(/^the user SSN is nil$/) do
   consumer.person.primary_family.family_members.each do |fm|
     fm&.person&.update_attributes(no_ssn: "1")

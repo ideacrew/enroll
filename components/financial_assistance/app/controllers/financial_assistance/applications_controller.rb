@@ -142,6 +142,8 @@ module FinancialAssistance
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
+      @local_mec_evidence = EnrollRegistry.feature_enabled?(:mec_check) ? local_mec_evidence_exists?(@application) : nil
+      @shop_coverage = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? shop_enrollments_exist?(@application) : nil
 
       unless @application.valid_relations?
         redirect_to application_relationships_path(@application)
@@ -187,6 +189,53 @@ module FinancialAssistance
           application_hash[1]["financial_assistance_info"]["INCOME"] = generate_income_hash(applicant)
           @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
         end
+      end
+    end
+
+    def transfer_history
+      unless current_user.has_hbx_staff_role?
+        flash[:error] = 'You are not authorized to access'
+        redirect_to applications_path
+        return
+      end
+
+      @application = FinancialAssistance::Application.where(id: params['id'], family_id: get_current_person.financial_assistance_identifier).first
+
+      @transfers = []
+      if @application.account_transferred || !@application.transfer_id.nil?
+        @transfers << {
+          transfer_id: @application.transfer_id,
+          direction: transfer_direction(@application),
+          timestamp: @application.transferred_at,
+          reason: transfer_reason(@application),
+          source: transfer_source(@application)
+        }
+      end
+
+      redirect_to applications_path if @application.nil?
+    end
+
+    def transfer_direction(application)
+      'In' unless application.transfer_id.nil?
+      'Out' if application.account_transferred
+    end
+
+    def transfer_reason(application)
+      case transfer_direction(application)
+      when "Out"
+        application.transfer_requested ? "User request" : "Medicaid/CHIP Assessment"
+      when "In"
+        "Medicaid/CHIP Assessment"
+      end
+    end
+
+    def transfer_source(application)
+      if application.transfer_id.nil? || application.transfer_id&.include?('SBM')
+        'SBM'
+      elsif application.transfer_id&.include? 'MEA'
+        'SMA'
+      elsif application.transfer_id&.include? 'FFM'
+        'FFM'
       end
     end
 
@@ -243,6 +292,19 @@ module FinancialAssistance
     end
 
     private
+
+    def local_mec_evidence_exists?(application)
+      application.applicants.detect{|a| !a.local_mec_evidence.nil?}.present?
+    end
+
+    def shop_enrollments_exist?(application)
+      applicant_enrollments = []
+      application.applicants.each do |applicant|
+        applicant_coverage = ::Operations::Households::CheckExistingCoverageByPerson.new.call(person_hbx_id: applicant.person_hbx_id, market_kind: "employer_sponsored")
+        applicant_enrollments << (applicant_coverage.success? && applicant_coverage.success.present?)
+      end
+      applicant_enrollments.include?(true)
+    end
 
     def eligibility_results_received?(application)
       application.success_status_codes?(application.determination_http_status_code) && application.determined?

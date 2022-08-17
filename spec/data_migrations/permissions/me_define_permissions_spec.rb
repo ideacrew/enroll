@@ -122,6 +122,41 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
       end
     end
 
+    describe 'update permissions for hbx staff role to be able to edit broker agency profiles' do
+      let(:given_task_name) {':hbx_admin_can_send_secure_message'}
+
+      before do
+        User.all.delete
+        Person.all.delete
+        @hbx_staff_person = FactoryBot.create(:person)
+        @super_admin = FactoryBot.create(:person)
+        @hbx_tier3 = FactoryBot.create(:person)
+        @hbx_read_only_person = FactoryBot.create(:person)
+        @hbx_csr_supervisor_person = FactoryBot.create(:person)
+        @hbx_csr_tier1_person = FactoryBot.create(:person)
+        @hbx_csr_tier2_person = FactoryBot.create(:person)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
+        subject.hbx_admin_can_send_secure_message
+      end
+
+      it "updates can_edit_broker_agency_profile to true" do
+        expect(Person.all.to_a.count).to eq(7)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_edit_broker_agency_profile).to be true
+        expect(@super_admin.hbx_staff_role.permission.can_edit_broker_agency_profile).to be true
+        expect(@hbx_tier3.hbx_staff_role.permission.can_edit_broker_agency_profile).to be true
+        expect(@hbx_read_only_person.hbx_staff_role.permission.can_edit_broker_agency_profile).to be false
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_edit_broker_agency_profile).to be true
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_edit_broker_agency_profile).to be true
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_edit_broker_agency_profile).to be true
+      end
+    end
+
     describe 'update permissions for hbx staff role to be able to access send secure message' do
       let(:given_task_name) {':hbx_admin_can_send_secure_message'}
 
@@ -1456,7 +1491,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
           expect(permission.can_cancel_enrollment).to eq true
           expect(permission.can_terminate_enrollment).to eq true
           expect(permission.change_enrollment_end_date).to eq true
-          expect(permission.can_drop_enrollment_members).to eq true
+          expect(permission.can_drop_enrollment_members).to eq false
         end
       end
 
@@ -1471,7 +1506,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
           expect(permission.can_cancel_enrollment).to eq true
           expect(permission.can_terminate_enrollment).to eq true
           expect(permission.change_enrollment_end_date).to eq true
-          expect(permission.can_drop_enrollment_members).to eq true
+          expect(permission.can_drop_enrollment_members).to eq false
         end
       end
 
@@ -1510,7 +1545,7 @@ describe MeDefinePermissions, dbclean: :around_each, if: EnrollRegistry[:enroll_
         expect(permission.can_cancel_enrollment).to eq true
         expect(permission.can_terminate_enrollment).to eq true
         expect(permission.change_enrollment_end_date).to eq true
-        expect(permission.can_drop_enrollment_members).to eq true
+        expect(permission.can_drop_enrollment_members).to eq false
         expect(permission.can_call_hub).to eq true
       end
 

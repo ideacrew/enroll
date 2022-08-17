@@ -1,6 +1,7 @@
 Feature: Start a new Financial Assistance Application and answers questions on Other Questions page
 
   Background: User logs in and visits applicant's other questions page
+    Given the No SSN Dropdown feature is disabled
     And the FAA feature configuration is enabled
     And the primary caretaker question configuration is enabled
     And FAA student_follow_up_questions feature is enabled
@@ -20,6 +21,14 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the have you applied for an SSN question should display
     And the user answers no to the have you applied for an SSN question
     Then the reason why question is displayed
+
+  Scenario: SSN Dropdown
+    Given the No SSN Dropdown feature is enabled
+    Given the user SSN is nil
+    And the user will navigate to the Other Questions page for the corresponding applicant
+    And the have you applied for an SSN question should display
+    And the user answers no to the have you applied for an SSN question
+    Then the no ssn reason dropdown is displayed
 
   Scenario: Answered yes to military question
     Given the user answers yes to having an eligible immigration status

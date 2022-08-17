@@ -400,7 +400,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def is_offering_dental(employee)
-    employee.benefit_package.is_offering_dental?
+    employee.benefit_package&.is_offering_dental?
   end
 
   def fetch_benefit_package_for_sep(employee_role)
@@ -423,8 +423,8 @@ class GroupSelectionPrevaricationAdapter
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
     [
-      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start),
-      eligibility_checker(benefit_group, :dental).can_cover?(family_member, coverage_start)
+      benefit_group && eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start),
+      benefit_group && eligibility_checker(benefit_group, :dental).can_cover?(family_member, coverage_start)
     ]
   end
 
@@ -456,7 +456,7 @@ class GroupSelectionPrevaricationAdapter
     if benefit_group.present? && (employee_role.employer_profile == benefit_group.sponsor_profile)
       benefit_group
     else
-      select_benefit_group_from_qle_and_employee_role(qle, possible_employee_role)
+      select_benefit_group_from_qle_and_employee_role(qle, employee_role)
     end
   end
 

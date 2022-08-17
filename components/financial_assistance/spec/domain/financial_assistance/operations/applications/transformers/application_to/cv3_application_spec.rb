@@ -42,7 +42,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
-                                  is_post_partum_period: false)
+                                  is_post_partum_period: false,
+                                  is_veteran_or_active_military: true)
     applicant
   end
 
@@ -294,8 +295,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(@applicant[:family_member_reference][:is_primary_family_member]).not_to be_nil
       end
 
-      it 'should not return nil for is_resident_post_092296' do
-        expect(@applicant[:citizenship_immigration_status_information][:is_resident_post_092296]).not_to be_nil
+      it 'should return nil for is_resident_post_092296 if value is nil' do
+        expect(@applicant[:citizenship_immigration_status_information][:is_resident_post_092296]).to be_nil
       end
 
       it 'should not return nil for is_lawful_presence_self_attested' do
@@ -369,6 +370,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should not return nil for is_veteran_or_active_military' do
         expect(@applicant[:demographic][:is_veteran_or_active_military]).not_to be_nil
+        expect(@applicant[:demographic][:is_veteran_or_active_military]).to be_truthy
       end
 
       it 'should not return nil for is_vets_spouse_or_child' do
@@ -1812,6 +1814,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       let!(:update_applicant) do
         applicant.five_year_bar_applies = true
         applicant.five_year_bar_met = true
+        applicant.qualified_non_citizen = false
         applicant.save!
       end
 
@@ -1824,6 +1827,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should include five_year_bar info in the result payload' do
         expect(@applicant_entity.five_year_bar_applies).to eq(true)
         expect(@applicant_entity.five_year_bar_met).to eq(true)
+      end
+
+      it 'should include qualified_non_citizen in payload' do
+        expect(@applicant_entity.qualified_non_citizen).to eq(false)
       end
     end
   end

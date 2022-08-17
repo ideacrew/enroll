@@ -15,17 +15,17 @@ registry:
           - key: :file_location
             item: 'db/documents/ivl_checklist_me.pdf'
       - key: :iap_year_selection
-        is_enabled: false
+        is_enabled: <%= ENV['IAP_YEAR_SELECTION_IS_ENABLED'] || false %>
       - key: :iap_assistance_year_display
-        is_enabled: false
+        is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
         item: :enrollment_dates
-        is_enabled: true
+        is_enabled: <%= ENV['ENROLLMENT_DATES_IS_ENABLED'] || true %>
         settings:
           - key: :application_new_year_effective_date_day_of_month
-            item: 19
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_DAY_OF_MONTH'] || 1 %>
           - key: :application_new_year_effective_date_month_of_year
-            item: 9
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_MONTH_OF_YEAR'] || 11 %>
           - key: :enrollment_due_day_of_month
             is_enabled: true
             item: 15
@@ -62,6 +62,12 @@ registry:
       - key: :ssi_income_types
         item: :ssi_income_types
         is_enabled: <%= ENV['SSI_INCOME_TYPES_IS_ENABLED'] || false %>
+      - key: :transfer_history_page
+        item: :transfer_history_page
+        is_enabled: <%= ENV['TRANSFER_HISTORY_PAGE'] || false %>
+      - key: :application_submission_error_status
+        item: :application_submission_error_status
+        is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS'] || false %>
       - key: :divorce_agreement_year
         item: :divorce_agreement_year
         is_enabled: <%= ENV['DIVORCE_AGREEMENT_YEAR_TOOLTIP_IS_ENABLED'] || false %>
@@ -74,6 +80,15 @@ registry:
       - key: :primary_caregiver_relationship_other_question
         item: :primary_caregiver_relationship_other_question
         is_enabled: <%= ENV['PRIMARY_CAREGIVER_RELATIONSHIP_OTHER_QUESTION_IS_ENABLED'] || false %>
+      - key: :featured_tribes_selection
+        item: :featured_tribes_selection
+        is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
+        settings:
+        - key: :featured_tribes
+          item: [["Maliseet", "HM"], ["Passamaquoddy", "PD"], ["Penobscot", "PE"], ["Micmac", "AM"], ["Other", "OT"]]
+      - key: :tribes_information_raw_review
+        item: :tribes_information_raw_review
+        is_enabled: <%= ENV['TRIBES_INFORMATION_RAW_REVIEW_IS_ENABLED'] || false %>
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
         is_enabled: true
@@ -84,7 +99,11 @@ registry:
       - key: :immigration_status_question_required
         is_enabled: false
       - key: :mec_check
-        is_enabled: true
+        is_enabled: <%= ENV['MEC_CHECK_IS_ENABLED'] || true %>
+      - key: :shop_coverage_check
+        is_enabled: <%= ENV['SHOP_COVERAGE_CHECK_IS_ENABLED'] || false %>
+      - key: :coverage_check_banners
+        is_enabled: <%= ENV['COVERAGE_CHECK_BANNERS_IS_ENABLED'] || false %>
       - key: :include_faa_outstanding_verifications
         is_enabled: true
       - key: :skip_aptc_families_from_document_reminder_notices
@@ -116,6 +135,10 @@ registry:
     - key: :transfer_service
       is_enabled: <%= ENV['TRANSFER_SERVICE_IS_ENABLED'] || true %>
       item: "aces"
+    - key: :non_magi_medicaid_eligible
+      is_enabled: <%= ENV['NON_MAGI_MEDICAID_ELIGIBLE_IS_ENABLED'] || false %>
+    - key: :eligible_for_non_magi_reasons
+      is_enabled: <%= ENV['ELIGIBLE_FOR_NON_MAGI_REASONS_IS_ENABLED'] || false %>
   - namespace:
     - :documents
     features:
@@ -251,16 +274,18 @@ registry:
       is_enabled: false
     - key: :is_enrolled_on_medicaid
       is_enabled: false
+    - key: :no_ssn_reason_dropdown
+      is_enabled: <%= ENV['NO_SSN_DROPDOWN_IS_ENABLED'] || false %>
   - namespace:
     - :renewals
     features:
     - key: :create_renewals_on_date_change
-      is_enabled: false
+      is_enabled: <%= ENV['CREATE_RENEWALS_ON_DATE_CHANGE_IS_ENABLED'] || false %>
       settings:
         - key: :renewals_creation_month
-          item: 10
+          item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
-          item: 16
+          item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
     - key: :skip_employer_address_validation
       is_enabled: :true
     - key: :skip_employer_phone_validation
@@ -277,5 +302,10 @@ registry:
     - key: :job_income_warning_message
       item: :job_income_warning_message
       is_enabled: true
+  - namespace:
+    - :premium_credit_results
+    features:
+    - key: :display_eligibility_results_per_tax_household
+      is_enabled: <%= ENV['DISPLAY_ELIGIBILITY_RESULTS_PER_THH_IS_ENABLED'] || false %>
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

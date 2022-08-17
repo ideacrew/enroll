@@ -46,7 +46,7 @@ When(/^selects yes they would like help paying for coverage$/) do
 end
 
 When(/^.+ click 'Start New Application' button$/) do
-  click_button 'Start new application'
+  click_button 'Start New Application'
 end
 
 Then(/^they should see a new finanical assistance application$/) do
@@ -443,6 +443,45 @@ Given(/^the consumer has received a successful MEC check response$/) do
   consumer.person.mec_check_response = "Success"
 end
 
+Given(/an applicant has local mec evidence/) do
+  application.active_applicants.first.update_attributes!(local_mec_evidence: FactoryBot.build(:evidence))
+  application.active_applicants.first.save!
+end
+
+Given(/the mec check feature is enabled/) do
+  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the mec check feature is disabled/) do
+  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+end
+
+Given(/the shop coverage check feature is enabled/) do
+  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the shop coverage check feature is disabled/) do
+  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+end
+
+Given(/the coverage check banners feature is enabled/) do
+  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/the coverage check banners feature is disabled/) do
+  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(false)
+end
+
+Given(/an applicant has shop coverage/) do
+  applicant = application.active_applicants.first
+  person = FactoryBot.create(:person, :with_family)
+  fm = person.primary_family.family_members.where(person_id: person.id).first
+  hbx = FactoryBot.create(:hbx_enrollment, family: person.primary_family)
+  hbx.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: fm.id)
+  hbx.save!
+  applicant.update_attributes!(person_hbx_id: person.hbx_id)
+end
+
 Given(/^american indian or alaska native income feature is enabled$/) do
   enable_feature :american_indian_alaskan_native_income
 end
@@ -512,8 +551,18 @@ Then(/the "Send To OFI" button will be disabled and the user will see the button
 end
 
 Then(/^they should see the MedicaidCurrently Enrolled warning text$/) do
-  expect(page).to have_content("It looks like you may already be enrolled in MaineCare or Cub Care")
+  expect(page).to have_content(l10n('faa.mc_success')[0,62])
   expect(page).to have_content(l10n('faa.mc_continue'))
+end
+
+Then(/^they should see the shop coverage exists warning text$/) do
+  expect(page).to have_content(l10n('faa.shop_check_success'))
+  expect(page).to have_content(l10n('faa.mc_continue'))
+end
+
+Then(/^they should not see the shop coverage exists warning text$/) do
+  expect(page).to_not have_content(l10n('faa.shop_check_success'))
+  expect(page).to_not have_content(l10n('faa.mc_continue'))
 end
 
 # TODO: Refactor these with the resource_registry_world.rb helpers
@@ -621,6 +670,20 @@ And(/^user should have feature toggled questions in review$/) do
      FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
     expect(page).to have_content(l10n("faa.primary_caretaker_question_text"))
   end
+end
+
+And(/an applicant has an existing non ssn apply reason/) do
+  application.applicants.first.update_attributes!(non_ssn_apply_reason: 'ApplicantWillProvideSSNLater',
+                                                  no_ssn: '1',
+                                                  is_ssn_applied: false)
+end
+
+And(/the user will see the applicant's is ssn applied answer/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.is_ssn_applied)
+end
+
+And(/the user will see the applicant's non ssn apply reason/) do
+  page.has_css?(FinancialAssistance::ReviewApplicationPage.non_ssn_apply_reason)
 end
 
 And(/^the user should click on the destroy applicant icon$/) do

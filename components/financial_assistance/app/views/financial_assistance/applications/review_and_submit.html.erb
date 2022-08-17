@@ -5,6 +5,20 @@
       <p><strong> You're almost done! </strong>Review the application summary below and make sure it's correct. Select the
       pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
 
+      <% if FinancialAssistanceRegistry[:coverage_check_banners].enabled? %>
+        <% if @local_mec_evidence %> 
+          <div id="mec-check-response">
+            <%= render partial: 'financial_assistance/applications/mec_check_results' %>
+          </div>
+        <% end %>
+
+        <% if @shop_coverage.to_s == "true" %> 
+          <div id="shop-check-response">
+            <%= render partial: 'financial_assistance/applications/shop_check_results' %>
+          </div> 
+        <% end %>
+      <% end %>
+
       <% if income_and_deductions_for_any(@application).present? %>
         <h3 class="darkblue">Income and Adjustments</h3>
         <div class="row white-background">
@@ -395,7 +409,7 @@
               <% if @cfl_service.displayable_field?('applicant', applicant.id, :non_ssn_apply_reason) %>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">Why doesn't this person have an SSN?</div>
-                  <div class="col-md-6"><%= applicant.non_ssn_apply_reason.to_s %></div>
+                  <div class="col-md-6"><%= applicant.non_ssn_apply_reason_readable.to_s %></div>
                 </div>
               <% end %>
             <% end %>

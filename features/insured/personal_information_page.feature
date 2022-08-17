@@ -24,6 +24,7 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on the Continue button of the Account Setup page
     Then Individual sees form to enter personal information but doesn't check every box
     Then Individual clicks on continue
+    And the user will have to accept alert pop up for missing field
     Then Individual sees form to enter personal information
     Then Individual clicks on continue
     Then Individual agrees to the privacy agreeement

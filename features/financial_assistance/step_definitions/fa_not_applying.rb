@@ -104,7 +104,7 @@ And(/^the user fills the the add member form/) do
   expect(page).to have_content("#{l10n('family_information')}")
 end
 
-And(/^the user fills the the applicant add member form with indian member yes/) do
+And(/^the user fills the applicant add member form with indian member yes/) do
   expect(page).to have_content('Lives with primary subscriber')
   fill_in "applicant[first_name]", :with => "John"
   fill_in "applicant[last_name]", :with => "Doe"
@@ -122,7 +122,7 @@ And(/^the user fills the the applicant add member form with indian member yes/) 
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 end
 
-And(/^the user fills the the aplicant add member form with indian member no/) do
+And(/^the user fills the applicant add member form with indian member no/) do
   sleep 5
 
   expect(page).to have_content('Lives with primary subscriber')
@@ -145,6 +145,16 @@ And(/^the user fills the the aplicant add member form with indian member no/) do
   sleep 3
 end
 
+And(/^the user selects tribal state from drop down/) do
+  find('#tribal-state-container .selectric span.label').click
+  find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
+end
+
+Then(/the user should see tribe checkbox options/) do
+  expect(page).to have_content(l10n("insured.tribal_name").to_s)
+  expect(page).to have_css(".check_box_collection")
+end
+
 Then(/user should still see the member of a tribe question/) do
   expect(page).to have_content('Is this person a member of an')
   expect(page).to_not have_content('Are you a US Citizen or US National?')
@@ -155,8 +165,17 @@ And(/the user clicks submit applicant form/) do
 end
 
 Then(/the user should see an error message for indian tribal state and name/) do
-  expect(page).to have_content("Tribal state is required")
-  expect(page).to have_content("Tribal name is required")
+  expect(page).to have_content(l10n("insured.tribal_state_alert").to_s)
+  expect(page).to have_content(l10n("insured.tribal_name_alert").to_s)
+end
+
+Then(/the user should see an error message for indian tribal name/) do
+  sleep 1
+  expect(page).to have_text("Tribal name is required when native american / alaska native is selected")
+end
+
+Then(/the user should see an error message for indian tribal id/) do
+  expect(page).to have_content(l10n("insured.tribal_id_alert").to_s)
 end
 
 And(/the user enters a tribal name with a number/) do
@@ -171,8 +190,20 @@ Given(/AI AN Details feature is enabled/) do
   enable_feature :indian_alaskan_tribe_details
 end
 
+Given(/AI AN Details feature is disabled/) do
+  disable_feature :indian_alaskan_tribe_details
+end
+
 Given(/No coverage tribe details feature is enabled/) do
   enable_feature :no_coverage_tribe_details, {registry_name: FinancialAssistanceRegistry}
+end
+
+Given(/Featured Tribe Selection feature is enabled/) do
+  enable_feature :featured_tribes_selection, {registry_name: FinancialAssistanceRegistry}
+end
+
+Given(/Featured Tribe Selection feature is disabled/) do
+  disable_feature :featured_tribes_selection, {registry_name: FinancialAssistanceRegistry}
 end
 
 Then(/the user should see the AI AN Details fields/) do

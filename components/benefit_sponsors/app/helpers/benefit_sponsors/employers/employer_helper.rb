@@ -71,6 +71,10 @@ module BenefitSponsors
         Settings.aca.employer_has_sic_field
       end
 
+      def osse_eligibility_is_enabled?
+        EnrollRegistry.feature_enabled?(:osse_eligibility)
+      end
+
       def display_referred_by_field_for_employer?
         Settings.aca.employer_registration_has_referred_by_field
       end

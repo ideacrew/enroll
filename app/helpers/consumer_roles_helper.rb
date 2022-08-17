@@ -43,6 +43,10 @@ module ConsumerRolesHelper
     obj.try(:indian_tribe_member)
   end
 
+  def featured_tribes_collection
+    FinancialAssistanceRegistry[:featured_tribes_selection].setting(:featured_tribes).item.map{|a| OpenStruct.new({name: a.first, value: a.last})}
+  end
+
   def show_naturalization_doc_type(obj)
     show_naturalized_citizen_container(obj) and obj.try(:naturalized_citizen)
   end

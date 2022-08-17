@@ -17,6 +17,11 @@
     expiration_date: <%= check_citizen_immigration_status?(applicant) ? applicant.expiration_date : "N/A"%>
     issuing_country: <%= check_citizen_immigration_status?(applicant) ? applicant.issuing_country : "N/A"%>
     Are you a member of an American Indian or Alaska Native Tribe?: <%= applicant.indian_tribe_member%>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
+    Tribe State: <%= applicant.tribal_state %>
+    Tribe Name: <%= applicant.tribal_name %>
+    Tribe Codes: <%= applicant.tribe_codes %>
+    <% end %>
     Are you currently incarcerated?: <%= applicant.is_incarcerated%>
     What is your race/ethnicity? (OPTIONAL - check all that apply): <%= applicant.ethnicity %>
     ADDRESSES:
@@ -33,8 +38,8 @@
         Is this person currently enrolled in health coverage?: <%= applicant.has_enrolled_health_coverage %>
         Does this person currently have access to other health coverage, including through another person?: <%=applicant.has_eligible_health_coverage %>
     OTHER QUESTIONS:
-        Has this person applied for an SSN:  <%= applicant.is_ssn_applied %>
-        Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A' %>
+        Has this person applied for an SSN?:  <%= applicant.is_ssn_applied %>
+        Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason_readable.to_s : 'N/A' %>
         Is this person pregnant?:  <%= applicant.is_pregnant %>
         Pregnancy due date?:  <%=applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>
         How many children is this person expecting?:  <%=applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A' %>

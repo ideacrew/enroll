@@ -7,6 +7,7 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
     addi_attrs = { active_vlp_document_id: per.consumer_role.vlp_documents.first.id,
                    is_applying_coverage: true, five_year_bar_applies: true, five_year_bar_met: true }
     per.consumer_role.update_attributes!(addi_attrs)
+    per.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'Y')
     per
   end
   let!(:family)        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -47,6 +48,10 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
       expect(result_hash[:is_applying_coverage]).to eq(true)
       expect(result_hash[:five_year_bar_applies]).to eq(true)
       expect(result_hash[:five_year_bar_met]).to eq(true)
+    end
+
+    it 'should return qualified_non_citizen status' do
+      expect(result.success[:qualified_non_citizen]).to eq(true)
     end
 
     it 'should return hash with is_homeless' do

@@ -91,6 +91,16 @@ module FinancialAssistance
 
     EVIDENCES = [:income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence].freeze
 
+    NO_SSN_REASONS = {
+      "Applicant will provide SSN later": "ApplicantWillProvideSSNLater",
+      "Can be issued for non-work reason only": "IssuedForNonWorkReasonOnly",
+      "Making best effort to apply": "MakingBestEffortToApply",
+      "Newborn without Enumeration at Birth": "NewBornWithoutEnumerationAtBirth",
+      "No good cause for not having SSN": "NoGoodCause",
+      "No SSN due to religious objections": "ReligiousObjections",
+      "Not eligible for SSN": "NotEligible"
+    }.freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -264,6 +274,7 @@ module FinancialAssistance
     field :health_service_eligible, type: Boolean
     field :tribal_state, type: String
     field :tribal_name, type: String
+    field :tribe_codes, type: Array
 
     field :is_medicaid_cubcare_eligible, type: Boolean
 
@@ -285,6 +296,7 @@ module FinancialAssistance
     # Used to store FiveYearBar data that we receive from FDSH Gateway in VLP Response Payload.
     field :five_year_bar_applies, type: Boolean
     field :five_year_bar_met, type: Boolean
+    field :qualified_non_citizen, type: Boolean
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income", cascade_callbacks: true, validate: true
@@ -342,6 +354,13 @@ module FinancialAssistance
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
     before_destroy :destroy_relationships, :propagate_destroy
+
+    # Scopes
+    scope :aptc_eligible,                 -> { where(is_ia_eligible: true) }
+    scope :medicaid_or_chip_eligible,     -> { where(is_medicaid_chip_eligible: true) }
+    scope :uqhp_eligible,                 -> { where(is_without_assistance: true) } # UQHP, is_without_assistance
+    scope :ineligible,                    -> { where(is_totally_ineligible: true) }
+    scope :eligible_for_non_magi_reasons, -> { where(is_eligible_for_non_magi_reasons: true) }
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
@@ -419,6 +438,14 @@ module FinancialAssistance
       return nil if val.blank?
       ssn_val = val.to_s.gsub(/\D/, '')
       SymmetricEncryption.encrypt(ssn_val)
+    end
+
+    def non_ssn_apply_reason_readable
+      if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown)
+        NO_SSN_REASONS.key(self.non_ssn_apply_reason).to_s
+      else
+        self.non_ssn_apply_reason
+      end
     end
 
     def relation_with_primary
@@ -1103,8 +1130,8 @@ module FinancialAssistance
                                                                    :is_consumer_role,:vlp_document_id,:is_applying_coverage,:vlp_subject,:alien_number,
                                                                    :i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                                                    :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,
-                                                                   :issuing_country,:status,:indian_tribe_member,
-                                                                   :five_year_bar_applies, :five_year_bar_met,
+                                                                   :issuing_country,:status,:indian_tribe_member,:tribe_codes,
+                                                                   :five_year_bar_applies, :five_year_bar_met, :qualified_non_citizen,
                                                                    :same_with_primary,:vlp_description,:tribal_state,:tribal_name)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})
       applicant_params.merge!(expiration_date: expiration_date.strftime('%d/%m/%Y')) if expiration_date.present?

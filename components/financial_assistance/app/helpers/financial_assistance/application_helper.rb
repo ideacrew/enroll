@@ -314,6 +314,7 @@ module FinancialAssistance
     def application_state_for_display(application)
       return 'IRS Consent' if application.income_verification_extension_required?
       return 'Submission Error' if application.mitc_magi_medicaid_eligibility_request_errored?
+      return 'Submission Error' if FinancialAssistanceRegistry[:application_submission_error_status].enabled? && application.aasm_state == "submitted" && DateTime.now.utc > application.submitted_at + 2.minutes
 
       application.aasm_state.titleize
     end
@@ -322,6 +323,17 @@ module FinancialAssistance
       return [] unless address&.zip
 
       BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
+    end
+
+    def full_name(applicant)
+      applicant.full_name.split.map(&:capitalize).join(' ')
+    end
+
+    def display_csr(applicant)
+      applicant.csr_eligibility_kind.split('_').last.capitalize.tap do |csr|
+        return csr if csr == 'Limited'
+        return "#{csr}%"
+      end
     end
   end
 end

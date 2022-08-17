@@ -143,12 +143,13 @@ module FinancialAssistance
                            native_american_information: native_american_information(applicant),
                            citizenship_immigration_status_information: { citizen_status: applicant.citizen_status,
                                                                          is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
-                                                                         is_resident_post_092296: applicant.is_resident_post_092296.present? },
+                                                                         is_resident_post_092296: applicant.is_resident_post_092296 },
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
                            is_applying_coverage: applicant.is_applying_coverage.present?,
                            five_year_bar_applies: applicant.five_year_bar_applies.present?,
                            five_year_bar_met: applicant.five_year_bar_met.present?,
+                           qualified_non_citizen: applicant.qualified_non_citizen.present?,
                            is_consent_applicant: applicant.is_consent_applicant.present?,
                            vlp_document: vlp_document(applicant),
                            family_member_reference: {family_member_hbx_id: applicant.person_hbx_id.to_s,
@@ -322,7 +323,7 @@ module FinancialAssistance
                dob: applicant.dob,
                ethnicity: applicant.ethnicity,
                race: applicant.race,
-               is_veteran_or_active_military: applicant.is_veteran.present?,
+               is_veteran_or_active_military: applicant.is_veteran_or_active_military.present?,
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}
             end
 
