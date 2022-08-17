@@ -42,7 +42,7 @@ class ApiSlackBrokersController < ApplicationController
         end
 
         def publish(payload, headers)
-          Dir.mkdir(@dir) unless File.exists?(@dir)
+          # Dir.mkdir(@dir) unless File.exists?(@dir)
           File.open(File.join(@dir, "#{broker_npn}.xml"), 'w') do |f|
             f.puts payload
           end
