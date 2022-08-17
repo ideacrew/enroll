@@ -74,34 +74,30 @@ end
 
 And(/^the user enters a start date in the future$/) do
   fill_in IvlIapJobIncomeInformationPage.income_from, with: Date.new(Date.today.year + 1, 1, 1).strftime('%m/%d/%Y')
+  find(IvlIapJobIncomeInformationPage.calendar).click
 end
 
 Then(/^the user should see the start date warning message$/) do
-  current_year = TimeKeeper.date_of_record.year.to_s
-  next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
-  date_warning_html = find("#date_warnings_list")['innerHTML']
-  expect(date_warning_html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
-  expect(date_warning_html).not_to include(l10n('faa.end_date_warning'))
+  find("#date_warnings_list", wait: 5)
+  expect(page).to have_selector(IvlIapJobIncomeInformationPage.start_date_warning)
+  expect(page).not_to have_selector(IvlIapJobIncomeInformationPage.end_date_warning)
 end
 
 And(/^the user enters an end date$/) do
   fill_in IvlIapJobIncomeInformationPage.income_to, with: Date.today.strftime('%m/%d/%Y')
+  find(IvlIapJobIncomeInformationPage.calendar).click
 end
 
 Then(/^the user should see the end date warning message$/) do
-  current_year = TimeKeeper.date_of_record.year.to_s
-  next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
-  date_warning_html = find("#date_warnings_list")['innerHTML']
-  expect(date_warning_html).not_to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
-  expect(date_warning_html).to include(l10n('faa.end_date_warning'))
+  find("#date_warnings_list", wait: 5)
+  expect(page).not_to have_selector(IvlIapJobIncomeInformationPage.start_date_warning)
+  expect(page).to have_selector(IvlIapJobIncomeInformationPage.end_date_warning)
 end
 
 Then(/^the user should see the start date and end date warning messages$/) do
-  current_year = TimeKeeper.date_of_record.year.to_s
-  next_year = (TimeKeeper.date_of_record + 1.year).year.to_s
-  date_warning_html = find("#date_warnings_list")['innerHTML']
-  expect(date_warning_html).to include(l10n('faa.start_date_warning', current_year: current_year, next_year: next_year))
-  expect(date_warning_html).to include(l10n('faa.end_date_warning'))
+  find("#date_warnings_list", wait: 5)
+  expect(page).to have_selector(IvlIapJobIncomeInformationPage.start_date_warning)
+  expect(page).to have_selector(IvlIapJobIncomeInformationPage.end_date_warning)
 end
 
 And(/^the user saves the employer information$/) do

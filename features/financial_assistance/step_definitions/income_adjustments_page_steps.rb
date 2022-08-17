@@ -57,10 +57,12 @@ end
 
 Given(/^the user enters a start date in the future for the deduction$/) do
   fill_in 'deduction[start_on]', with: Date.new(Date.today.year + 1, 1, 1).strftime('%m/%d/%Y')
+  find('table[class="ui-datepicker-calendar"]').click
 end
 
 Given(/^the user enters an end date for the deduction$/) do
   fill_in 'deduction[end_on]', with: Date.today.strftime('%m/%d/%Y')
+  find('table[class="ui-datepicker-calendar"]').click
 end
 
 Then(/^the income adjustments checkbox should be unchecked$/) do

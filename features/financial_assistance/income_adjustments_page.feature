@@ -9,6 +9,7 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled
+    Given FAA income_and_deduction_date_warning feature is enabled
     When the user will navigate to the FAA Household Info page
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
@@ -37,21 +38,18 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     Then the income adjustment should be saved on the page
 
   Scenario: User enters other income information with a start date in the future
-    Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
     And the user enters a start date in the future for the deduction
     Then the user should see the start date warning message
 
   Scenario: User enters other income information with an end date
-    Given FAA income_and_deduction_date_warning feature is enabled
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
     And the user enters an end date for the deduction
     Then the user should see the end date warning message
 
   Scenario: User enters other income information with a start date in the future and an end date
-    Given FAA income_and_deduction_date_warning feature is enabled
    Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
     And the user enters a start date in the future for the deduction

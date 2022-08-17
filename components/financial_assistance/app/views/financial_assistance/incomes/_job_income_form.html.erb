@@ -6,8 +6,8 @@
     <% end %>
     <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income_id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
   <% end %>
-  
-  <% onchange_date = FinancialAssistanceRegistry.feature_enabled?(:income_and_deduction_date_warning) ? (raw "validateDateWarnings('#{income_id}')") : "" %>
+
+  <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
   <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
   <div class="focus_effect_module row-edit-border">
     <div class="row row-form-wrapper no-buffer row-height">
@@ -84,7 +84,7 @@
     </div>
   </div>
 
-  <% if FinancialAssistanceRegistry.feature_enabled?(:income_and_deduction_date_warning) %>
+  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
     <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
   <% end %>
 <% end %>
