@@ -150,11 +150,9 @@
         <% end %>
 
         <!-- Start: Return to Account Home -->
-        <% unless @application.applicants.all?(&:is_medicaid_chip_eligible) || @application.applicants.all?(&:is_totally_ineligible) %>
-          <div data-cuke='return_to_account_home'>
-            <%= link_to l10n('faa.results.return_to_account_home'), main_app.family_account_path, class: "btn btn-small btn-primary" %>
-          </div>
-        <% end %>
+        <div data-cuke='return_to_account_home'>
+          <%= link_to l10n('faa.results.return_to_account_home'), main_app.family_account_path, class: "btn btn-small btn-primary" %>
+        </div>
         <!-- End: Return to Account Home -->
 
         <h5 data-cuke='your_application_reference_2'><%= l10n("faa.results.your_application_reference_2", application_hbx_id: @application.hbx_id)%></h5>
