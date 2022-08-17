@@ -28,8 +28,8 @@ class ApiSlackBrokersController < ApplicationController
 
       ## copied from scripts/write_broker_files.rb
       controller = Events::BrokersController.new
-      PropertiesSlug = Struct.new(:reply_to, :headers)
-      ConnectionSlug = Struct.new(:broker_npn) do
+      properties_slug = Struct.new(:reply_to, :headers)
+      connection_slug = Struct.new(:broker_npn) do
         def create_channel
           self
         end
@@ -52,8 +52,8 @@ class ApiSlackBrokersController < ApplicationController
         pers.broker_role.npn
       end
       npn_list.each do |npn|
-        properties_slug = PropertiesSlug.new("", {:broker_id => npn})
-        controller.resource(ConnectionSlug.new(npn), "", properties_slug, "")
+        ps = properties_slug.new("", {:broker_id => npn})
+        controller.resource(connection_slug.new(npn), "", ps, "")
       end
 
       ## generate zip file of broker xmls
