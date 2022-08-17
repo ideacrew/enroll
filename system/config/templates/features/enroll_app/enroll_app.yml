@@ -520,7 +520,7 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: false
-      - key: :taro_pay_now
+      - key: :taro_health_plan_of_maine_inc_pay_now
         is_enabled: false
         settings:
           - key: :plan_shopping
@@ -528,7 +528,7 @@ registry:
           - key: :enrollment_tile
             item: false
           - key: :carriers_long_name
-            item: 'Taro'
+            item: 'Taro Health Plan of Maine, Inc.'
           - key: :connect_test
             item: false
       - key: :carrier_abbrev_list

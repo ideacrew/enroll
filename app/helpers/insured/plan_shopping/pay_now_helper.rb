@@ -14,12 +14,17 @@ module Insured
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
-        "Taro" => "https://www.tarohealth.com/"
+        "Taro Health Plan of Maine, Inc." => "https://www.tarohealth.com/"
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
-        @issuer_key = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        carrier_name = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase
+        @issuer_key = if carrier_name.include?("taro")
+                        carrier_name&.gsub(/[,.]/, '').gsub(' ', '_')
+                      else
+                        carrier_nam&.gsub(' ', '_')
+                      end
         return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
         rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
         return false unless rr_feature_enabled == true
