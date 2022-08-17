@@ -320,13 +320,23 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
   end
 
   describe '#display_csr' do
-    context 'csr other than limited' do
-      let(:csr_kind) { ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0'].sample }
+    context 'csr eligible for 94, 87, 73' do
+      let(:csr_kind) { ['csr_94', 'csr_87', 'csr_73'].sample }
 
       it 'should return displayable csr' do
         applicant.csr_eligibility_kind = csr_kind
         applicant.save!
         expect(helper.display_csr(applicant.reload)).to eq("#{csr_kind.split('_').last}%")
+      end
+    end
+
+    context 'csr eligible for 100, 0' do
+      let(:csr_kind) { ['csr_100', 'csr_0'].sample }
+
+      it 'should return displayable csr' do
+        applicant.csr_eligibility_kind = csr_kind
+        applicant.save!
+        expect(helper.display_csr(applicant.reload)).to eq("100%")
       end
     end
 
