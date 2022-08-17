@@ -43,6 +43,10 @@ describe 'daily_eligibility_determination_change_report' do
     expect(@file_content[1][10]).to eq('Curam')
   end
 
+  it 'should have FPL_Amount' do
+    expect((@file_content.flatten[15]).to eq("FPL_Amount")
+  end
+
   after :each do
     FileUtils.rm_rf("#{Rails.root}/daily_eligibility_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
     FileUtils.rm_rf("#{Rails.root}/daily_eligibility_report_logger_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
