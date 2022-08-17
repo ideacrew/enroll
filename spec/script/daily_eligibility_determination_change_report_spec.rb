@@ -11,6 +11,9 @@ describe 'daily_eligibility_determination_change_report' do
 
   before :each do
     tax_household.update_attributes!(created_at: Time.now.getlocal.prev_day)
+    tax_household.tax_household_members.first.family_member = family.primary_family_member
+    tax_household.save
+    tax_household.reload
     invoke_daily_eligibility_change_script
     @file_content = CSV.read("#{Rails.root}/daily_eligibility_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
   end
@@ -43,8 +46,8 @@ describe 'daily_eligibility_determination_change_report' do
     expect(@file_content[1][10]).to eq('Curam')
   end
 
-  it 'should have FPL_Amount' do
-    expect(@file_content.flatten[15]).to eq("FPL_Amount")
+  it 'should display FPL amount' do
+    expect(@file_content[1][15]).to eq("0.0")
   end
 
   after :each do

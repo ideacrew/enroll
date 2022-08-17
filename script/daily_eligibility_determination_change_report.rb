@@ -51,7 +51,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         current_max_aptc = current_ed&.max_aptc&.to_f.present? ? format('%.2f', current_ed.max_aptc.to_f) : 'N/A'
         current_csr_percent = current_ed&.csr_percent_as_integer.present? ? current_ed.csr_percent_as_integer.to_s : 'N/A'
         current_csr_kind = current_ed&.source.present? ? source_mapper[current_ed.source] : 'N/A'
-        thm = current_thh&.tax_household_members.detect { |member| member.family_member_id == family.primary_family_member.id }
+        thm = new_thh&.tax_household_members&.detect { |member| member.family_member_id == family.primary_family_member.id }
         thm_fpl_amount = thm.present? ? thm&.magi_as_percentage_of_fpl : 'N/A'
 
         if active_enrollments.present?
