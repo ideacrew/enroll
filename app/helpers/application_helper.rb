@@ -964,11 +964,8 @@ module ApplicationHelper
     end
   end
 
-  def carrier_name(name)
-    carrier = if name&.include?("taro")
-                name.gsub(/[,.]/, '').gsub(' ', '_')
-              else
-                name.gsub(' ', '_')
-              end
+  def fetch_issuer_name(issuer_name)
+    carrier_legal_name = issuer_name.downcase
+    carrier_legal_name&.include?("taro") ? carrier_legal_name.gsub(/[,.]/, '').gsub(' ', '_') : carrier_legal_name.downcase&.gsub(' ', '_')
   end
 end

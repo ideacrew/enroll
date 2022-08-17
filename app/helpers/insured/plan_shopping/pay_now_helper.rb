@@ -20,7 +20,7 @@ module Insured
       # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
         carrier_name = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase
-        @issuer_key = carrier_name(carrier_name)
+        @issuer_key = fetch_issuer_name(carrier_name)
         return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
         rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
         return false unless rr_feature_enabled == true
@@ -106,11 +106,6 @@ module Insured
         else
           "https://"
         end
-      end
-
-      def fetch_issuer_name(issuer_name)
-        carrier_legal_name = issuer_name.downcase
-        carrier_legal_name&.include?("taro") ? carrier_legal_name.gsub(/[,.]/, '').gsub(' ', '_') : carrier_legal_name.downcase&.gsub(' ', '_')
       end
 
       def enable_pay_now(hbx_enrollment)
