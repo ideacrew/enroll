@@ -19,12 +19,12 @@ class ApiSlackBrokersController < ApplicationController
     if token == ENV['SLACK_API_TOKEN'] && allowed_users.include?(user_name)
 
       # https://arjunphp.com/delete-file-ruby/
-      file = 'broker_xmls.zip'
-      dir = 'broker_xmls'
-      File.delete(file) if File.exist?(file)
+      @file = 'broker_xmls.zip'
+      @dir = 'broker_xmls'
+      File.delete(@file) if File.exist?(@file)
       # https://stackoverflow.com/questions/6015692/how-to-delete-a-non-empty-directory-using-the-dir-class
-      FileUtils.rm_r(dir) if File.directory?(dir)
-      Dir.mkdir(dir)
+      FileUtils.rm_r(@dir) if File.directory?(@dir)
+      Dir.mkdir(@dir)
 
       ## copied from scripts/write_broker_files.rb
       controller = Events::BrokersController.new
@@ -42,8 +42,8 @@ class ApiSlackBrokersController < ApplicationController
         end
 
         def publish(payload, headers)
-          Dir.mkdir(dir) unless File.exists?(dir)
-          File.open(File.join(dir, "#{broker_npn}.xml"), 'w') do |f|
+          Dir.mkdir(@dir) unless File.exists?(@dir)
+          File.open(File.join(@dir, "#{broker_npn}.xml"), 'w') do |f|
             f.puts payload
           end
         end
@@ -58,15 +58,15 @@ class ApiSlackBrokersController < ApplicationController
 
       ## generate zip file of broker xmls
       # https://www.botreetechnologies.com/blog/password-protected-zip-using-ruby-on-rails/
-      broker_xml_files = Dir.entries(dir)
+      broker_xml_files = Dir.entries(@dir)
       zip_password = ENV['ALL_BROKER_DATA_ZIP_PASSWORD']
       buffer = Zip::OutputStream.write_buffer(::StringIO.new(''), Zip::TraditionalEncrypter.new(zip_password)) do |zos|
         files.each do |bxf|
           zos.put_next_entry bxf
-          zos.write File.open("#{dir}/#{bxf}").read
+          zos.write File.open("#{@dir}/#{bxf}").read
         end
       end
-      File.open(file, 'wb') {|f| f.write(buffer.string) }
+      File.open(@file, 'wb') {|f| f.write(buffer.string) }
       buffer.rewind
 
       s3 = Aws::S3::Resource.new(region: 'us-east-1')
