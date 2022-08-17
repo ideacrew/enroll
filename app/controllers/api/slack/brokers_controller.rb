@@ -66,7 +66,7 @@ class ApiSlackBrokersController < ApplicationController
           zos.write File.open("#{@dir}/#{bxf}").read
         end
       end
-      File.open(@file 'wb') {|f| f.write(buffer.string) }
+      File.open(@file, 'wb') {|f| f.write(buffer.string) }
       buffer.rewind
 
       s3 = Aws::S3::Resource.new(region: 'us-east-1')
