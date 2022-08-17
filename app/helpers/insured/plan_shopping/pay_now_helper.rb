@@ -117,8 +117,8 @@ module Insured
       end
 
       def fetch_issuer_name(issuer_name)
-        carrier_legal_name = issuer_name.downcase
-        carrier_legal_name&.downcase&.gsub(' ', '_').gsub(/[,.]/, '')
+        carrier_legal_name = issuer_name&.downcase
+        carrier_legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
       end
     end
   end
