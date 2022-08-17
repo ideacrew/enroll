@@ -31,7 +31,7 @@ module Insured
       # rubocop:enable Metrics/CyclomaticComplexity
 
       def issuer_key(enrollment)
-        enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        carrier_name(enrollment&.product&.issuer_profile&.legal_name&.downcase)
       end
 
       def can_pay_now?(hbx_enrollment)
@@ -54,7 +54,7 @@ module Insured
       def has_any_previous_enrollments?(hbx_enrollment)
         all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          enr.product.issuer_profile.legal_name.downcase&.gsub(' ', '_') == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+          carrier_name(enr.product.issuer_profile.legal_name.downcase) == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
         end
         enrollments = all_carrier_enrollments - hbx_enrollment.to_a
         enrollments.present? ? true : false
@@ -76,7 +76,7 @@ module Insured
       end
 
       def carrier_paynow_enabled(issuer)
-        issuer = issuer.downcase&.gsub(' ', '_')
+        issuer = carrier_name(issuer.downcase)
         issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
       end
 
@@ -85,13 +85,14 @@ module Insured
       end
 
       def carrier_long_name(issuer)
-        issuer_key = issuer.downcase&.gsub(' ', '_')
+        issuer_key = carrier_name(issuer.downcase)
+
         carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
       end
 
       def pay_now_url(issuer_name)
         if carrier_paynow_enabled(issuer_name)
-          issuer_name = issuer_name.downcase&.gsub(' ', '_')
+          issuer_name = carrier_name(issuer_name.downcase)
           SamlInformation.send("#{issuer_name}_pay_now_url")
         else
           "https://"
@@ -100,7 +101,7 @@ module Insured
 
       def pay_now_relay_state(issuer_name)
         if carrier_paynow_enabled(issuer_name)
-          issuer_name = issuer_name.downcase&.gsub(' ', '_')
+          issuer_name = carrier_name(issuer_name.downcase)
           SamlInformation.send("#{issuer_name}_pay_now_relay_state")
         else
           "https://"
