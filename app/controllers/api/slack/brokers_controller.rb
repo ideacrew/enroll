@@ -13,7 +13,7 @@ class ApiSlackBrokersController < ApplicationController
   def all_broker_xmls
     token = params[:token]
     user_name = params[:user_name]
-    allowed_users = ENV['SLACK_API_ALL_BROKER_DATA_USERS'].split(',')
+    allowed_users = ENV['ALL_BROKER_DATA_USERS'].split(',')
 
     ## validate the token AND make sure the user requesting it has privligdges
     if token == ENV['SLACK_API_TOKEN'] && allowed_users.include?(user_name)
@@ -28,8 +28,8 @@ class ApiSlackBrokersController < ApplicationController
 
       ## copied from scripts/write_broker_files.rb
       controller = Events::BrokersController.new
-      PropertiesSlug = Struct.new(:reply_to, :headers)
-      ConnectionSlug = Struct.new(:broker_npn) do
+      properties_slug = Struct.new(:reply_to, :headers)
+      connection_slug = Struct.new(:broker_npn) do
         def create_channel
           self
         end
@@ -52,14 +52,14 @@ class ApiSlackBrokersController < ApplicationController
         pers.broker_role.npn
       end
       npn_list.each do |npn|
-        properties_slug = PropertiesSlug.new("", {:broker_id => npn})
-        controller.resource(ConnectionSlug.new(npn), "", properties_slug, "")
+        ps = properties_slug.new("", {:broker_id => npn})
+        controller.resource(connection_slug.new(npn), "", ps, "")
       end
 
       ## generate zip file of broker xmls
       # https://www.botreetechnologies.com/blog/password-protected-zip-using-ruby-on-rails/
       broker_xml_files = Dir.entries(@dir)
-      zip_password = ENV['SLACK_API_ALL_BROKER_DATA_ZIP_PASSWORD']
+      zip_password = ENV['ALL_BROKER_DATA_ZIP_PASSWORD']
       buffer = Zip::OutputStream.write_buffer(::StringIO.new(''), Zip::TraditionalEncrypter.new(zip_password)) do |zos|
         files.each do |bxf|
           zos.put_next_entry bxf
@@ -70,8 +70,8 @@ class ApiSlackBrokersController < ApplicationController
       buffer.rewind
 
       s3 = Aws::S3::Resource.new(region: 'us-east-1')
-      bucket = ENV['SLACK_API_ALL_BROKER_DATA_S3_BUCKET']
-      key = ENV['SLACK_API_ALL_BROKER_DATA_S3_KEY']
+      bucket = ENV['ALL_BROKER_DATA_S3_BUCKET']
+      key = ENV['ALL_BROKER_DATA_S3_KEY']
       # acl:'public-read'
       s3.bucket(bucket).object(key).put(body:buffer, storage_class:'INTELLIGENT_TIERING')
       # return S3 public link to csv (zipped + password protected)
