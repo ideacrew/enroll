@@ -8,7 +8,7 @@ module Eligibilities
       include Mongoid::Timestamps
       # include ::EventSource::Command
       # include Dry::Monads[:result, :do, :try]
-      # include GlobalID::Identification
+      include GlobalID::Identification
       # include Eligibilities::Eventable
 
       # DUE_DATE_STATES = %w[review outstanding rejected].freeze
@@ -24,13 +24,54 @@ module Eligibilities
       # field :update_reason, type: String
   
       embeds_one :subject, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
-      embeds_many :evidences, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
-      embeds_many :grants, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
+      embeds_many :evidences, class_name: "::Eligibilities::Osse::Evidence", cascade_callbacks: true
+      embeds_many :grants, class_name: "::Eligibilities::Osse::Grant", cascade_callbacks: true
 
-      accepts_nested_attributes_for :evidences, :grants
+      accepts_nested_attributes_for :subject, :evidences, :grants
   
       validates_presence_of :start_on  
-     
+
+      after_create :generate_grants
+
+      def generate_grants
+        grant_values = evidences.inject([]) do |grant_values, evidence|
+          grants_result = Operations::Eligibilities::Osse::GenerateGrants.new.call(
+            {
+              eligibility_gid: self.to_global_id,
+              evidence_key: evidence.key
+            }
+          )
+
+          grant_values += grant_result.success if grant_result.success?
+          grant_values
+        end
+
+        persist_grants(grant_values)
+      end
+
+      def persist_grants(grant_values)
+        grant_values.each do |attributes|
+          grant = self.grants.new
+          grant.assign_attributes(attributes.except(:value))
+          grant.value = grant_value_klass.new(attributes[:value])
+          grant.save
+        end
+      end
+
+      def grant_value_klass
+        if subject.klass == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
+          Eligibilities::Osse:BenefitSponsorshipOssePolicy
+        else
+          # Eligibilities::Osse:BenefitSponsorshipOssePolicy
+        end
+      end
+
+      def grant_for(value)
+        grants.detect do |grant|
+          value_instance = grant.value
+          value_instance.value == value
+        end
+      end
     end
   end
 end

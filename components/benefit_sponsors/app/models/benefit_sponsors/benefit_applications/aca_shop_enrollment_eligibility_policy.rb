@@ -19,7 +19,14 @@ module BenefitSponsors
     include BenefitMarkets::BusinessRulesEngine
 
     rule  :minimum_participation_rule,
-            validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum},
+            validate: ->(benefit_application){
+              if eligibility = benefit_application.benefit_sponsorship.eligibility_for(:osse_subsidy)
+                grant = eligibility.grant_for(:minimum_participation_rule)
+                return grant.value.run(benefit_application)
+              end
+
+              benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum
+            },
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"Number of eligible members enrolling: (#{benefit_application.total_enrolled_count}) is less than minimum required: #{benefit_application.eligible_to_enroll_count * benefit_application.employee_participation_ratio_minimum}" }
 
