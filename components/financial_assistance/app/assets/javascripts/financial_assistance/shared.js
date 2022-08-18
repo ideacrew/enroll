@@ -55,22 +55,7 @@ function validateDateWarnings(id) {
   var startDateWarning = $("#start_date_warning_" + id)
   var endDateWarning = $("#end_date_warning_" + id)
 
-  if (warning_div.is(":visible") && !requiresStartDateWarning && !requiresEndDateWarning) {
-    warning_div.addClass('hidden');
-    return;
-  }
-
-  if (requiresStartDateWarning || requiresEndDateWarning) {
-    warning_div.removeClass('hidden');
-    if (startDate > today) {
-      startDateWarning.removeClass('hidden');
-    } else {
-      startDateWarning.addClass('hidden');
-    }
-    if (endDate) {
-      endDateWarning.removeClass('hidden');
-    } else {
-      endDateWarning.addClass('hidden');
-    }
-  }
+  warning_div.add(startDateWarning).add(endDateWarning).addClass('hidden');
+  if (requiresStartDateWarning) warning_div.add(startDateWarning).removeClass('hidden');
+  if (requiresEndDateWarning) warning_div.add(endDateWarning).removeClass('hidden');
 };

@@ -73,7 +73,7 @@
   </div>
 
   <div class="row">
-    <div class="col-md-3 pull-right cancel-save-mt">
+    <div class="col-md-3 pull-right mt-1 mb-1">
       <a class="btn btn-default income-cancel">Cancel</a>
       <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
         <% onclick_save_event = raw "showTemporaryMessageDiv('#{income_id}', 'income')" %>
