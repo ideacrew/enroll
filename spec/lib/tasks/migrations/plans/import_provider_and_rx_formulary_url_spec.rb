@@ -73,6 +73,7 @@ describe "import_provider_and_rx_formulary_url" do
         expect(@plan.provider_directory_url).to eq @row_info[14]
         expect(@plan.network_information).to eq @row_info[11]
         expect(@plan.name).to eq plan_name
+        expect(@plan.is_standard_plan).to be_truthy
       end
 
       it "should update product attributes" do
@@ -80,6 +81,7 @@ describe "import_provider_and_rx_formulary_url" do
         expect(@health_product2.rx_formulary_url).to eq "http://#{@row_info[13]}"
         expect(@health_product2.provider_directory_url).to eq @row_info[14]
         expect(@health_product2.title).to eq product_name
+        expect(@health_product2.is_standard_plan).to be_truthy
       end
     end
   end
@@ -91,6 +93,6 @@ end
 
 def read_excel(file)
   result = Roo::Spreadsheet.open(file)
-  sheet_data = result.sheet("2018_QHP")
+  sheet_data = result.sheet("SHOP Q1")
   @row_info = sheet_data.row(2)
 end
