@@ -358,6 +358,12 @@ module BenefitSponsors
       primary_office_location.present? && primary_office_location.address.present?
     end
 
+    def eligibility_for(evidence_key)
+      eligibilies.select do |eligibility|
+        eligibility_instance.evidences.by_key(values[:evidence_key]).present?
+      end.last
+    end
+
     # Inverse of Profile#benefit_sponsorship
     def profile
       return @profile if defined?(@profile)
