@@ -37,16 +37,16 @@ module Operations
         end
 
         def build_eligibility(values)
-          {
+          Success({
             title: "#{values[:evidence_key]} Eligibility",
             start_on: values[:effective_date],
-            subject: construct_subject(values),
-            evidences: construct_evidences(values)
-          }
+            subject: construct_subject(values).success,
+            evidences: construct_evidences(values).success
+          })
         end
 
         def create_eligibility(eligibility_params)
-          ::Operations::Eligibilities::Create.new.call(determination_hash)
+          ::Operations::Eligibilities::Create.new.call(eligibility_params)
         end
 
         def construct_subject(values)
@@ -54,16 +54,15 @@ module Operations
 
           Success({
             title: "Subject for #{values[:evidence_key]}",
-            key: values[:subject_gid],
+            key: values[:subject_gid].uri,
             klass: subject_instance.class.to_s
           })
         end
 
         def construct_evidences(values)
           Success([
-            { 
-
-              title: "Evidence for #{value[:evidence_key]}",
+            {
+              title: "Evidence for #{values[:evidence_key]}",
               key: values[:evidence_key],
               is_satisfied: is_satisfied?(values[:evidence_value])
             }

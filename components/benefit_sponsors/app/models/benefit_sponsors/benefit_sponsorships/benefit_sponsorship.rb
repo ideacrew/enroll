@@ -22,6 +22,7 @@ module BenefitSponsors
     include BenefitSponsors::Concerns::EmployerDatatableConcern
     include BenefitSponsors::Concerns::Observable
     include BenefitSponsors::ModelEvents::BenefitSponsorship
+    include GlobalID::Identification
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
