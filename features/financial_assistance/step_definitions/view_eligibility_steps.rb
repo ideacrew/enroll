@@ -132,15 +132,15 @@ end
 Then(/^the user will navigate to the Eligibility Results page and will find APTC and CSR eligibility text$/) do
   expect(page.has_css?(IvlIapEligibilityResults.eligibility_results)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.tax_household)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.review_eligibility_header)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.aptc_heading)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.aptc_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.full_name)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.csr)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.csr_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.csr_73_87_or_94_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
 
@@ -151,11 +151,10 @@ end
 Then(/^the user will navigate to the Eligibility Results page and will find Medicaid or CHIP eligibility text$/) do
   expect(page.has_css?(IvlIapEligibilityResults.eligibility_results)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.tax_household)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.medicaid_or_chip)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.medicaid_or_chip_heading)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.medicaid_or_chip_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
 
@@ -166,14 +165,14 @@ end
 Then(/^the user will navigate to the Eligibility Results page and will find UQHP and Non-MAGI Medicaid text$/) do
   expect(page.has_css?(IvlIapEligibilityResults.eligibility_results)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.tax_household)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.private_health_insurance)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.private_health_insurance_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.referral)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.qualified_reason)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.uqhp_heading)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.uqhp_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.non_magi_referral_heading)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.non_magi_referral_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
 
@@ -184,10 +183,11 @@ end
 Then(/^the user will navigate to the Eligibility Results page and will find Ineligibility text$/) do
   expect(page.has_css?(IvlIapEligibilityResults.eligibility_results)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.tax_household)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.does_not_qualify)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.does_not_qualify_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.totally_ineligible_heading)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.totally_ineligible_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
