@@ -64,7 +64,7 @@ registry:
         is_enabled: <%= ENV['SSI_INCOME_TYPES_IS_ENABLED'] || false %>
       - key: :transfer_history_page
         item: :transfer_history_page
-        is_enabled: <%= ENV['TRANSFER_HISTORY_PAGE'] || false %>
+        is_enabled: <%= ENV['TRANSFER_HISTORY_PAGE_IS_ENABLED'] || false %>
       - key: :application_submission_error_status
         item: :application_submission_error_status
         is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS_IS_ENABLED'] || false %>
