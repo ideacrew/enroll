@@ -101,6 +101,10 @@ module BenefitSponsors
       class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
       inverse_of: :benefit_sponsorship
 
+    has_many :eligibilites,
+      class_name: "::Eligibilities::Osse::Eligibility",
+      as: :eligibility
+
     has_many    :census_employees,
       class_name: "::CensusEmployee"
 

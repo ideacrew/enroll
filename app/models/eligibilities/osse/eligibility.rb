@@ -13,7 +13,7 @@ module Eligibilities
 
       # DUE_DATE_STATES = %w[review outstanding rejected].freeze
 
-      embedded_in :eligible, polymorphic: true
+      belongs_to :eligibility, polymorphic: true
   
       field :title, type: String
       field :description, type: String
@@ -23,7 +23,7 @@ module Eligibilities
       # field :updated_by, type: String
       # field :update_reason, type: String
   
-      embeds_many :subject, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
+      embeds_one :subject, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
       embeds_many :evidences, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
       embeds_many :grants, class_name: "::Eligibilities::Osse::Subject", cascade_callbacks: true
 
