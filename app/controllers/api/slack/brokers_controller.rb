@@ -81,7 +81,7 @@ class ApiSlackBrokersController < ApplicationController
       # return S3 public link to csv (zipped + password protected)
       s3_link = "s3://#{bucket}/#{key}"
 
-      ouput_lines = [s3_link]
+      output_lines = [s3_link]
 
       ## respond on slack
       slack = Slack::Incoming::Webhooks.new params[:response_url]
