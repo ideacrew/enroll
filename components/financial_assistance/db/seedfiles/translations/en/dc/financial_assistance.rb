@@ -181,6 +181,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Transfer History
   "en.faa.transfer_history" => "Transfer History",
   "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
+  "en.faa.no_history_available" => "No history available.",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
