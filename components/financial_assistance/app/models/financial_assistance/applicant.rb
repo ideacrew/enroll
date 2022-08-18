@@ -362,7 +362,7 @@ module FinancialAssistance
     scope :ineligible,                    -> { where(is_totally_ineligible: true) }
     scope :eligible_for_non_magi_reasons, -> { where(is_eligible_for_non_magi_reasons: true) }
     scope :csr_73_87_or_94,               -> { where(:csr_percent_as_integer.in => [94, 87, 73]) }
-    scope :csr_0_or_100,                  -> { where(:csr_percent_as_integer.in => [0, 100]) }
+    scope :csr_100,                       -> { where(csr_percent_as_integer: 100) }
     scope :csr_nal,                       -> { where(csr_percent_as_integer: -1) }
 
     def generate_hbx_id
