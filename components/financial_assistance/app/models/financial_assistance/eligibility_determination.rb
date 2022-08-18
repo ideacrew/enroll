@@ -61,6 +61,10 @@ module FinancialAssistance
       applicants.eligible_for_non_magi_reasons
     end
 
+    def csr_limited_applicants
+      applicants.select(&:is_csr_limited?)
+    end
+
     def is_aptc_eligible?
       BigDecimal((max_aptc || 0).to_s) > 0
     end
