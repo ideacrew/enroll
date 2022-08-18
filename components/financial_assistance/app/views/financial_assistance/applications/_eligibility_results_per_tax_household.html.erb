@@ -37,22 +37,22 @@
             <% end %>
             <!-- End: Section for CSR 73, 87, 94 Applicants -->
 
-            <!-- Start: Section for CSR 0, 100 Applicants -->
-            <% csr_0_or_100_applicants = aptc_applicants.csr_0_or_100 %>
-            <% if csr_0_or_100_applicants.present? %>
-              <p data-cuke='csr_0_or_100_text'><%= l10n("faa.results.csr_0_or_100_text") %></p>
+            <!-- Start: Section for CSR 100 Applicants -->
+            <% csr_100_applicants = aptc_applicants.csr_100 %>
+            <% if csr_100_applicants.present? %>
+              <p data-cuke='csr_100_text'><%= l10n("faa.results.csr_100_text") %></p>
               <ul>
-                <% csr_0_or_100_applicants.each do |applicant| %>
+                <% csr_100_applicants.each do |applicant| %>
                   <li data-cuke='csr'>
                     <b><%= full_name(applicant) %>: </b><%= l10n("faa.results.csr", csr: display_csr(applicant)) %>
                   </li>
                 <% end %>
               </ul>
             <% end %>
-            <!-- End: Section for CSR 0, 100 Applicants -->
+            <!-- End: Section for CSR 100 Applicants -->
 
             <!-- Start: Section for CSR limited Applicants -->
-            <% csr_nal_applicants = aptc_applicants.csr_nal %>
+            <% csr_nal_applicants = ed.csr_limited_applicants %>
             <% if csr_nal_applicants.present? %>
               <p data-cuke='csr_nal_text'><%= l10n("faa.results.csr_nal_text") %></p>
               <ul>

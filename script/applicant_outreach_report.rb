@@ -27,17 +27,15 @@ batch_size = 500
 offset = 0
 families_count = all_families.count
 
-def program_eligible_for(application)
-  return if application.blank?
-
-  active_applicants = application.active_applicants
-  return if active_applicants.blank?
+def program_eligible_for(applicant)
+  return if applicant.blank?
 
   eligible_programs = []
-  eligible_programs << "MaineCare and Cub Care(Medicaid)" if active_applicants.where(is_medicaid_chip_eligible: true).present?
-  eligible_programs << "Financial assistance(APTC eligible)" if active_applicants.where(is_ia_eligible: true).present?
-  eligible_programs << "Does not qualify" if active_applicants.where(is_totally_ineligible: true).present?
-  eligible_programs << "Special Maine care eligible" if application.applicants.pluck(:is_eligible_for_non_magi_reasons).any?(true)
+  eligible_programs << "MaineCare and Cub Care(Medicaid)" if applicant.is_medicaid_chip_eligible
+  eligible_programs << "Financial assistance(APTC eligible)" if applicant.is_ia_eligible
+  eligible_programs << "Does not qualify" if applicant.is_totally_ineligible
+  eligible_programs << "QHP without financial assistance" if applicant.is_without_assistance
+  eligible_programs << "Special Maine care eligible" if applicant.is_eligible_for_non_magi_reasons
   eligible_programs.join(",")
 end
 
@@ -72,7 +70,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 family.external_app_id,
                 primary_person.user&.email, # only primary person has a User account
                 primary_person.user&.last_portal_visited,
-                program_eligible_for(application),
+                program_eligible_for(applicant),
                 health_enrollment&.product&.hios_id,
                 dental_enrollment&.product&.hios_id,
                 enrollment_member&.is_subscriber,
