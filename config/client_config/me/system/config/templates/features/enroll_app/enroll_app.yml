@@ -768,3 +768,10 @@ registry:
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || true %>
       - key: :osse_eligibility
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
+      - key: issuer_provided_code
+        item: 'MES002'
+        is_enabled: true
+      - key: exchange_provided_code
+        item: 'R-ME001'
+        is_enabled: true
+

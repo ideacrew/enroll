@@ -719,4 +719,9 @@ registry:
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
       - key: :osse_eligibility
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
-      
+      - key: issuer_provided_code
+        item: 'DCS002'
+        is_enabled: true
+      - key: exchange_provided_code
+        item: 'R-DC001'
+        is_enabled: true
