@@ -51,8 +51,8 @@ namespace :import do
                 if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
                   rx_formulary_url = row_info[@headers["rx formulary url"]]
                   plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
-                  if sheet_name == "IVL" && year > 2017
-                    plan.is_standard_plan = row_info[@headers["standard plan?"]]
+                  if ["IVL", "SHOP Q1"].include?(sheet_name) && year > 2017
+                    plan.is_standard_plan = row_info[@headers["standard plan?"]] == 'Y'
                   end
                 end
                 plan.save
@@ -67,8 +67,8 @@ namespace :import do
                 if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
                   rx_formulary_url = row_info[@headers["rx formulary url"]]
                   product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
-                  if sheet_name == "IVL" && year > 2017
-                    product.is_standard_plan = row_info[@headers["standard plan?"]]
+                  if ["IVL", "SHOP Q1"].include?(sheet_name) && year > 2017
+                    product.is_standard_plan = row_info[@headers["standard plan?"]] == 'Y'
                   end
                 end
                 product.save
