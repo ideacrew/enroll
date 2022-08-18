@@ -110,7 +110,7 @@ namespace :new_model do
         issuer_profile_id: product.issuer_profile_id
       ).first
 
-      next if ::BenefitMarkets::Products::Product.by_year(2022).where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind).present?
+      next if ::BenefitMarkets::Products::Product.by_year(mock_year).where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind).present?
 
       new_product = product.dup
       new_product.application_period = (product.application_period.min + 1.year..product.application_period.max + 1.year)
