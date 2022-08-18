@@ -332,7 +332,6 @@ module FinancialAssistance
     def display_csr(applicant)
       applicant.csr_eligibility_kind.split('_').last.capitalize.tap do |csr|
         return csr if csr == 'Limited'
-        return '100%' if csr == '0'
         return "#{csr}%"
       end
     end
