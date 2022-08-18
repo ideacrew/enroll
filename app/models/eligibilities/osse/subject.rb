@@ -15,7 +15,7 @@ module Eligibilities
 
       field :title, type: String
       field :description, type: String
-      field :key, type: string
+      field :key, type: String
       field :klass, type: String
 
       validates_presence_of :key, :klass
