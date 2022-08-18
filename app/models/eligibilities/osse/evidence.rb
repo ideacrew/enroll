@@ -18,6 +18,8 @@ module Eligibilities
       field :key, type: Symbol
       field :is_satisfied, type: Boolean
       field :updated_by, type: String
+
+      scope :by_key, ->(key) { where(key: key) }
     end
   end
 end

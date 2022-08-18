@@ -10,7 +10,7 @@ module Operations
       class BuildEligibility
         send(:include, Dry::Monads[:result, :do])
 
-        # @param [Hash] opts Options to build determination
+        # @param [Hash] opts Options to build eligibility
         # @option opts [<GlobalID>] :subject_gid required
         # @option opts [<String>]   :evidence_key required
         # @option opts [<String>]   :evidence_value required
@@ -29,8 +29,8 @@ module Operations
         def validate(params)
           errors = []
           errors << 'subject global id missing' unless params[:subject_gid]
-          errors << 'eligibility key missing' unless params[:evidence_key]
-          errors << 'eligibility value missing' unless params[:evidence_value]
+          errors << 'evidence key missing' unless params[:evidence_key]
+          errors << 'evidence value missing' unless params[:evidence_value]
           errors << 'effective date missing' unless params[:effective_date]
 
           errors.empty? ? Success(params) : Failure(errors)
