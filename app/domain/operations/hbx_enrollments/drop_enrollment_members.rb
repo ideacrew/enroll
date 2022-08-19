@@ -55,12 +55,12 @@ module Operations
 
         new_enrollment.check_for_subscriber
         updates_for_subscriber_drop unless check_subscriber_drop
-        new_enrollment.select_coverage! if new_enrollment.may_select_coverage?
-        update_member_effective_dates
-        return Failure('Failed to save dropped member enrollment') unless new_enrollment.persisted?
+        return Failure('Failed to save dropped member enrollment') unless new_enrollment.save
 
+        update_member_effective_dates
         terminate_base_enrollment
         update_household_applied_aptc if base_enrollment.applied_aptc_amount > 0
+        new_enrollment.select_coverage! if new_enrollment.may_select_coverage?
         notify_trading_partner(params)
 
         dropped_member_info = []
@@ -74,7 +74,7 @@ module Operations
         Success(dropped_member_info)
       end
 
-      def drop_selected_members(dropped_enr_members)
+      def drop_selected_members(dropped_enr_members) 
         all_enr_members = base_enrollment.hbx_enrollment_members
         non_eligible_members = all_enr_members.select{ |member| dropped_enr_members.include?(member.id.to_s) }
         new_enrollment.hbx_enrollment_members.delete_if {|mem| non_eligible_members.pluck(:applicant_id).include?(mem.applicant_id)}
