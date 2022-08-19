@@ -99,6 +99,7 @@ module FinancialAssistance
                                         max_aptc: thh_entity.max_aptc.to_f,
                                         determined_at: thh_entity.determined_on,
                                         aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
+                                        yearly_expected_contribution: thh_entity.yearly_expected_contribution,
                                         aptc_annual_income_limit: Money.new(0, 'USD'),
                                         csr_annual_income_limit: thh_entity.csr_annual_income_limit || Money.new(0, 'USD'),
                                         source: 'Faa' })

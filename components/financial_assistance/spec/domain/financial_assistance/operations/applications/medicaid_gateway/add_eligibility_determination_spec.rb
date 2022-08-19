@@ -74,6 +74,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
           expect(@ed.max_aptc.to_f).to eq(496.0)
         end
 
+        it 'should update yearly_expected_contribution' do
+          expect(@ed.yearly_expected_contribution.to_f).to eq(1_672.20)
+        end
+
         it 'should update is_eligibility_determined' do
           expect(@ed.is_eligibility_determined).to eq(true)
         end

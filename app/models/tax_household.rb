@@ -24,6 +24,8 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
+  field :yearly_expected_contribution, type: Money, default: 0.00
+
   embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
 
