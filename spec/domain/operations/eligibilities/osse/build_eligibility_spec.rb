@@ -34,10 +34,15 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
 
   context 'when required attributes passed' do
 
-    it 'should build eligibility' do
+    it 'should be success' do
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
     end
+
+    it 'should create eligibility' do
+      expect { subject.call(required_params) }.to change(benefit_sponsorship.reload.eligibilities, :count).by(1)
+    end
+
   end
 
   context 'when required attributes not passed' do
