@@ -28,6 +28,7 @@ module FinancialAssistance
 
     field :determined_at, type: Date
 
+    field :yearly_expected_contribution, type: Money, default: 0.00
 
     scope :eligibility_determination_with_year, ->(year) { where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
     scope :active_eligibility_determination, ->{ where(effective_ending_on: nil, is_eligibility_determined: true) }
