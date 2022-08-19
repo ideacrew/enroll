@@ -169,11 +169,6 @@ module BenefitSponsors
       it "should persist osse_eligibility" do
         expect(benefit_sponsorship.profile.osse_eligibility).to eql(true)
       end
-
-      it "should create an eligibility" do
-        benefit_sponsorship.profile.save!
-        expect(benefit_sponsorship.eligibilities).to be_present
-      end
     end
 
     context "Adding a second or greater BenefitSponsorship" do
