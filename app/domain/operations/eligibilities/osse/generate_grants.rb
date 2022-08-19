@@ -32,7 +32,7 @@ module Operations
           errors.empty? ? Success(params) : Failure(errors)
         end
 
-        # TODO next sprint: implement visitor pattern for checking evidence satisfied
+        # TODO: next sprint: implement visitor pattern for checking evidence satisfied
         def verify_evidence_satisfied?(values)
           eligibility_instance = GlobalID::Locator.locate(values[:eligibility_gid])
           evidence = eligibility_instance.evidences.by_key(values[:evidence_key]).last
@@ -75,8 +75,8 @@ module Operations
         end
 
         def market_kind_for(eligibility_instance)
-          subject =  GlobalID::Locator.locate(eligibility_instance.subject.key)
-          subject.market_kind 
+          subject = GlobalID::Locator.locate(eligibility_instance.subject.key)
+          subject.market_kind
         end
 
         # following method returns

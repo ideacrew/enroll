@@ -37,12 +37,14 @@ module Operations
         end
 
         def build_eligibility(values)
-          Success({
-            title: "#{values[:evidence_key]} Eligibility",
-            start_on: values[:effective_date],
-            subject: construct_subject(values).success,
-            evidences: construct_evidences(values).success
-          })
+          Success(
+            {
+              title: "#{values[:evidence_key]} Eligibility",
+              start_on: values[:effective_date],
+              subject: construct_subject(values).success,
+              evidences: construct_evidences(values).success
+            }
+          )
         end
 
         def create_eligibility(eligibility_params)
@@ -52,11 +54,13 @@ module Operations
         def construct_subject(values)
           subject_instance = GlobalID::Locator.locate(values[:subject_gid])
 
-          Success({
-            title: "Subject for #{values[:evidence_key]}",
-            key: values[:subject_gid].uri,
-            klass: subject_instance.class.to_s
-          })
+          Success(
+            {
+              title: "Subject for #{values[:evidence_key]}",
+              key: values[:subject_gid].uri,
+              klass: subject_instance.class.to_s
+            }
+          )
         end
 
         def construct_evidences(values)
@@ -71,7 +75,7 @@ module Operations
 
         def is_satisfied?(value)
           return value if value.is_a?(Boolean)
-          value.to_s == 'true' ? true : false
+          value.to_s == 'true'
         end
       end
     end

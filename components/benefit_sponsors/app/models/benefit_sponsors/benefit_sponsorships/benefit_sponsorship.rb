@@ -102,9 +102,8 @@ module BenefitSponsors
       class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
       inverse_of: :benefit_sponsorship
 
-    has_many :eligibilites,
-      class_name: "::Eligibilities::Osse::Eligibility",
-      as: :eligibility
+    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
+                             as: :eligibility
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
@@ -359,8 +358,8 @@ module BenefitSponsors
     end
 
     def eligibility_for(evidence_key)
-      eligibilies.select do |eligibility|
-        eligibility_instance.evidences.by_key(values[:evidence_key]).present?
+      eligibilities.select do |eligibility|
+        eligibility.evidences.by_key(evidence_key).present?
       end.last
     end
 

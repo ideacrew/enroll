@@ -16,8 +16,8 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
   let(:effective_date) { TimeKeeper.date_of_record }
 
   let(:required_params) do
-    { 
-      subject_gid: subject_ref, 
+    {
+      subject_gid: subject_ref,
       evidence_key: :osse_subsidy,
       evidence_value: "true",
       effective_date: effective_date
