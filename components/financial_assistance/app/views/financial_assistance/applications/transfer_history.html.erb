@@ -25,17 +25,23 @@
             </thead>
             <tbody>
                 <% @transfers.each do |transfer| %>
-                <tr>
-                    <td><%= transfer[:transfer_id] %></td>
-                    <td><%= transfer[:direction] %></td>
-                    <td><%= to_est transfer[:timestamp] %></td>
-                    <td><%= transfer[:reason] %></td>
-                    <td><%= transfer[:source] %></td>
-                </tr>
-                <%end%>
+                    <tr>
+                        <td><%= transfer[:transfer_id] %></td>
+                        <td><%= transfer[:direction] %></td>
+                        <td><%= to_est transfer[:timestamp] %></td>
+                        <td><%= transfer[:reason] %></td>
+                        <td><%= transfer[:source] %></td>
+                    </tr>
+                <% end %>
+                <% if @transfers.empty? %>
+                    <tr>
+                        <td colspan="5">
+                            <%= l10n('faa.no_history_available').humanize %>
+                        </td>
+                    </tr>
+                <% end %>
             </tbody>
         </table>
-
       </div>
     </div>
   </div>

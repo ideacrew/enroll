@@ -47,8 +47,7 @@ describe 'applicant_outreach_report' do
       person_hbx_id: primary_person.hbx_id,
       is_primary_applicant: true,
       citizen_status: 'us_citizen',
-      is_ia_eligible: true,
-      is_medicaid_chip_eligible: false,
+      is_without_assistance: true,
       csr_percent_as_integer: 73,
       first_name: primary_person.first_name,
       last_name: primary_person.last_name,
@@ -66,7 +65,6 @@ describe 'applicant_outreach_report' do
       family_member_id: spouse_fm.id,
       person_hbx_id: spouse_person.hbx_id,
       citizen_status: 'alien_lawfully_present',
-      is_ia_eligible: false,
       is_medicaid_chip_eligible: true,
       csr_percent_as_integer: 87,
       first_name: spouse_person.first_name,
@@ -155,6 +153,13 @@ describe 'applicant_outreach_report' do
       end
     end
 
+    context 'primary applicant' do
+      it 'should match with the programs that the applicant is eligible for' do
+        eligible_programs = "QHP without financial assistance"
+        expect(@file_content[1][12]).to eq(eligible_programs)
+      end
+    end
+
     context 'spouse person' do
       it 'should match with the spouse person hbx id' do
         expect(@file_content[2][0]).to eq(spouse_person.hbx_id.to_s)
@@ -186,6 +191,13 @@ describe 'applicant_outreach_report' do
       end
     end
 
+    context 'spouse applicant' do
+      it 'should match with the programs that the applicant is eligible for' do
+        eligible_programs = "MaineCare and Cub Care(Medicaid)"
+        expect(@file_content[2][12]).to eq(eligible_programs)
+      end
+    end
+
     context 'application' do
       it 'should match with the application aasm_state' do
         expect(@file_content[1][7]).to eq(application.aasm_state)
@@ -194,12 +206,6 @@ describe 'applicant_outreach_report' do
 
       it 'should match with the date of the most recent aasm_state transition' do
         expect(@file_content[1][8]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
-      end
-
-      it 'should match with the programs that applicants are eligible for' do
-        eligible_programs = "MaineCare and Cub Care(Medicaid),Financial assistance(APTC eligible)"
-        expect(@file_content[1][12]).to eq(eligible_programs)
-        expect(@file_content[2][12]).to eq(eligible_programs)
       end
 
       it 'should match with the transfer id' do
