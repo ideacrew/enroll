@@ -816,6 +816,7 @@ Rails.application.routes.draw do
   post '/api/slack/policies/policy_id_check', to: 'api_slack_policies#policy_id_check'
   post '/api/slack/iam/iam_create_user', to: 'api_slack_iam#iam_create_user'
   post '/api/slack/brokers/all_broker_xmls', to: 'api_slack_brokers#all_broker_xmls'
+  post '/api/slack/enrollments/enrollment_state', to: 'api_slack_enrollments#enrollment_state'
 
   root 'welcome#index'
 end
