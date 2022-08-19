@@ -48,7 +48,7 @@ module Operations
             grant_params = {
               title: rule_pair[:key].to_s,
               key: rule_pair[:key],
-              start_on: evidence.start_on,
+              start_on: eligibility_instance.start_on,
                # TODO: figure out how to identify value class name
               value: rule_pair
             }
@@ -70,7 +70,7 @@ module Operations
         def fetch_grant_configurations_for(eligibility_instance, evidence)
           market_kind = market_kind_for(eligibility_instance)
           feature = EnrollRegistry["#{market_kind}_#{evidence.key}_#{eligibility_instance.start_on.year}"]
-          grant_keys = feature.setting(:registered_grants).item
+          grant_keys = feature.setting("registered_grants_#{eligibility_instance.start_on.year}".to_sym).item
           fetch_rules_configurations(grant_keys)
         end
 

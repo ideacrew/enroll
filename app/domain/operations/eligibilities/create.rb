@@ -26,7 +26,18 @@ module Operations
       end
 
       def create(values)
-        Success(AcaEntities::Eligibilities::Osse::Eligibility.new(values))
+        eligibility_hash = AcaEntities::Eligibilities::Osse::Eligibility.new(values).to_h
+        subject = subject(values[:subject][:key])
+        eligibility = subject.eligibilities.new(eligibility_hash)
+        if eligibility.valid? && eligibility.save!
+          Success(eligibility)
+        else
+          Failure("Unable to create eligibility for gid: #{values[:subject][:key]}")
+        end
+      end
+
+      def subject(gid)
+        GlobalID::Locator.locate(gid)
       end
     end
   end
