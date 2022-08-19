@@ -1227,6 +1227,15 @@ module BenefitSponsors
       [:canceled, :retroactive_canceled].include?(aasm_state)
     end
 
+    def validate_minimum_participation_rule
+      if (eligibility = benefit_sponsorship.eligibility_for(:osse_subsidy))
+        grant = eligibility.grant_for(:minimum_participation_rule)
+        return grant.value.run(self)
+      end
+
+      enrollment_ratio >= employee_participation_ratio_minimum
+    end
+
     private
 
     def can_retroactive_cancel?
