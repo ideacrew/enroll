@@ -13,6 +13,7 @@ module BenefitSponsors
       # Profile subclass may sponsor benefits
       field :is_benefit_sponsorship_eligible, type: Boolean,  default: false
       field :contact_method,                  type: Symbol,   default: :paper_and_electronic
+      field :osse_eligibility,                type: Boolean, default: false
 
       # TODO: Add logic to manage benefit sponsorships for Gapped coverage, early termination, banned employers
 
@@ -48,6 +49,7 @@ module BenefitSponsors
         allow_blank: false
 
       after_save :publish_profile_event
+      after_save :build_osse_eligibility
 
       def profile_type
         self._type
@@ -59,6 +61,19 @@ module BenefitSponsors
             benefit_sponsorship.profile_event_subscriber(:primary_office_location_change)
           end
         end
+      end
+
+      def build_osse_eligibility
+        if self.osse_eligibility_changed? && osse_eligibility == true
+          benefit_sponsorship = self.benefit_sponsorships.first
+          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(osse_eligibility_params)
+          if result.success?
+            eligibility = result.success
+            eligibility.save!
+          end
+        end
+      rescue StandardError => e
+        Rails.logger.error { "error building osse eligibility due to: #{e.message}" }
       end
 
       def is_new_employer?
@@ -148,6 +163,15 @@ module BenefitSponsors
       end
 
       private
+
+      def osse_eligibility_params
+        {
+          subject_gid: self.benefit_sponsorships.first.to_global_id,
+          evidence_key: :osse_subsidy,
+          evidence_value: osse_eligibility,
+          effective_date: TimeKeeper.date_of_record
+        }
+      end
 
       # Subclasses may extend this method
       def initialize_profile
