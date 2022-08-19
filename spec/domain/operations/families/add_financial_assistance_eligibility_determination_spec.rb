@@ -114,6 +114,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
      :eligibility_determinations =>
          [{"_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "max_aptc" => {"cents" => 5826.0, "currency_iso" => "USD"},
+           "yearly_expected_contribution" => {"cents" => 167_220.00, "currency_iso" => "USD"},
            "csr_percent_as_integer" => 94,
            "aptc_csr_annual_household_income" => {"cents" => 3342466.0, "currency_iso" => "USD"},
            "aptc_annual_income_limit" => {"cents" => 4752000.0, "currency_iso" => "USD"},
@@ -148,6 +149,10 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
     it 'should create Tax Household Member object' do
       expect(@thhs.first.tax_household_members.first.applicant_id).to eq(family.primary_applicant.id)
+    end
+
+    it 'should update yearly_expected_contribution value' do
+      expect(@thhs.first.yearly_expected_contribution.to_f).to eq(1_672.20)
     end
 
     it 'should create Eligibility Determination object' do
@@ -320,6 +325,29 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
     it 'should not create Tax Household object' do
       expect(@thhs.count).to eq(0)
+    end
+  end
+
+  describe '#call' do
+    before do
+      bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      bcp.update_attributes!(slcsp_id: product.id)
+      @result = subject.call(params: input_params)
+      family.reload
+      @thhs = family.active_household.tax_households
+    end
+
+    context 'when yearly_expected_contribution is nil' do
+      let(:input_params) do
+        eligibility_determination = params[:eligibility_determinations].first
+        eligibility_determination.merge!('yearly_expected_contribution' => nil)
+        params
+      end
+
+      it 'should successfully create thh object' do
+        expect(@thhs.first).to be_a(TaxHousehold)
+        expect(@thhs.first.yearly_expected_contribution).to be_nil
+      end
     end
   end
 end
