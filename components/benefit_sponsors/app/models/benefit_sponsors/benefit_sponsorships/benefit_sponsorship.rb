@@ -363,6 +363,13 @@ module BenefitSponsors
       end.last
     end
 
+    # def osse_eligible?
+    #   #eligibility_for(:osse_eligibility).present?
+    #   eligibility = eligibility_for(:osse_eligibility) 
+    #   return false if eligibility.nil?
+    #   eligibility.evidences.by_key(:osse_eligibility).first&.is_satisfied == true
+    # end
+
     # Inverse of Profile#benefit_sponsorship
     def profile
       return @profile if defined?(@profile)
