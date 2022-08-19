@@ -9,8 +9,8 @@
         <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
 
         <div style="display:flex; justify-content: space-between; padding: 10px 0px;">
-          <% if @applications.present? && FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) %>
-            <%= form_with url: "", method: "get", class:"" do %>
+          <%= form_with url: "", method: "get", class:"" do %>
+            <% if @applications.present? && FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) %>
               <label class="font-weight-bold"><%= l10n('application_year') %></label>
               <%= select("filter", "year", @applications.distinct(:assistance_year).sort.reverse.each,
               {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
@@ -46,7 +46,7 @@
             <tbody>
               <% @filtered_applications.each do |application| %>
               <tr>
-                <td>
+                <td class="text-nowrap">
                   <%= application.hbx_id %>
                   <% if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) && application.hbx_id == @recent_determined_hbx_id %>
                     <span class="bg-primary current-app-label">
