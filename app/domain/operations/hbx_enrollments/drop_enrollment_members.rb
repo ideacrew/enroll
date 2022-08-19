@@ -74,7 +74,7 @@ module Operations
         Success(dropped_member_info)
       end
 
-      def drop_selected_members(dropped_enr_members) 
+      def drop_selected_members(dropped_enr_members)
         all_enr_members = base_enrollment.hbx_enrollment_members
         non_eligible_members = all_enr_members.select{ |member| dropped_enr_members.include?(member.id.to_s) }
         new_enrollment.hbx_enrollment_members.delete_if {|mem| non_eligible_members.pluck(:applicant_id).include?(mem.applicant_id)}
