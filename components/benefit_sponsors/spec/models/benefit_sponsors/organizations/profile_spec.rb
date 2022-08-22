@@ -162,10 +162,10 @@ module BenefitSponsors
 
     end
 
-    context "osse_eligibility" do 
+    context "osse_eligibility" do
       let(:subject) {described_class.new(params)}
-      let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile: subject ) }
-  
+      let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile: subject) }
+
       it "should persist osse_eligibility" do
         expect(benefit_sponsorship.profile.osse_eligibility).to eql(true)
       end

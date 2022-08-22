@@ -45,12 +45,18 @@ module Operations
           grant_rules = fetch_grant_configurations_for(eligibility_instance, evidence)
 
           grants = grant_rules.collect do |rule_pair|
+            value = {
+              title: rule_pair.keys[0].to_s,
+              key: rule_pair.values[0].to_s,
+              value: rule_pair.values[0].to_s
+            }
+
             grant_params = {
-              title: rule_pair[:key].to_s,
-              key: rule_pair[:key],
+              title: rule_pair.keys[0].to_s,
+              key: rule_pair.values[0].to_s,
               start_on: eligibility_instance.start_on,
                # TODO: figure out how to identify value class name
-              value: rule_pair
+              value: value
             }
 
             grant_result = create_grant(grant_params)

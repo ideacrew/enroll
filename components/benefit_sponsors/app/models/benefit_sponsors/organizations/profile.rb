@@ -64,8 +64,7 @@ module BenefitSponsors
       end
 
       def build_osse_eligibility
-        if self.osse_eligibility_changed? && osse_eligibility == true
-          benefit_sponsorship = self.benefit_sponsorships.first
+        if self.osse_eligibility_changed?
           result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(osse_eligibility_params)
           if result.success?
             eligibility = result.success
