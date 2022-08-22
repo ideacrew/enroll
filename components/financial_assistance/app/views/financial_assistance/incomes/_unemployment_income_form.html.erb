@@ -1,44 +1,37 @@
 <%= income_form_for @application, @applicant, income do |f| %>
-<% income_id = income.id %>
-<% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) && local_assigns[:new_form] %>
-  <% if income_id.blank? %>
-    <% income_id = BSON::ObjectId.new.to_s %>
+  <% income_id = income.id %>
+  <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
+  <div class="focus_effect_module">
+    <div class="row row-form-wrapper no-buffer row-height row-edit-border">
+      <%= f.hidden_field :kind, value: 'unemployment_income' %>
+      <div class="col-md-3">
+        <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+        <div class="faa-amount">
+          <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true %>
+        </div>
+      </div>
+      <div class="col-md-3 fa-select select-box">
+        <%= f.label :frequency_kind, 'HOW OFTEN *', class: "label-color" %>
+        <div class="fa-frequency-kind" data-cuke="unemployment-income-how-often-dropdown">
+          <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {include_blank: "Choose"}, {:disabled => false, :required => true}) %>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
+      </div>
+      <div class="col-md-3 overflow-hidden">
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 pull-right">
+        <a class="btn btn-default unemployment-income-cancel">Cancel</a>
+        <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      </div>
+    </div>
+  </div>
+
+  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
   <% end %>
-  <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income_id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
-<% end %>
-<div class="focus_effect_module">
-  <div class="row row-form-wrapper no-buffer row-height row-edit-border">
-    <%= f.hidden_field :kind, value: 'unemployment_income' %>
-    <div class="col-md-3">
-      <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
-      <div class="faa-amount">
-        <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true %>
-      </div>
-    </div>
-    <div class="col-md-3 fa-select select-box">
-      <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
-      <%= f.label :frequency_kind, 'HOW OFTEN *', class: "label-color" %>
-      <div class="fa-frequency-kind" data-cuke="unemployment-income-how-often-dropdown">
-        <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {include_blank: "Choose"}, {:disabled => false, :required => true}) %>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel" %>
-    </div>
-    <div class="col-md-3">
-      <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel" %>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-3 pull-right">
-      <a class="btn btn-default unemployment-income-cancel">Cancel</a>
-        <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
-          <% onclick_save_event = raw "showTemporaryMessageDiv('#{income_id}', 'income')" %>
-        <% else %>
-          <% "checkDate('#{income_id}')" %>
-        <% end %>
-      <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", :data => { :cuke => "unemployment-income-save-button" }, onclick: onclick_save_event %>
-    </div>
-  </div>
-</div>
 <% end %>

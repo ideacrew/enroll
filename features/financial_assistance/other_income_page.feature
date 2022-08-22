@@ -5,6 +5,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled
+    Given FAA income_and_deduction_date_warning feature is enabled
     Given divorce agreement year feature is disabled
     When the user will navigate to the FAA Household Info page
     Given ssi types feature is enabled
@@ -35,6 +36,25 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     And the user saves the other income information
     Then the other income information should be saved on the page
 
+  Scenario: User enters other income information with a start date in the future
+    Given the user answers yes to having other income
+    And the user checks a other income checkbox
+    And the user enters a start date in the future
+    Then the user should see the start date warning message
+
+  Scenario: User enters other income information with an end date
+    Given the user answers yes to having other income
+    And the user checks a other income checkbox
+    And the user enters an end date
+    Then the user should see the end date warning message
+
+  Scenario: User enters other income information with a start date in the future and an end date
+    Given the user answers yes to having other income
+    And the user checks a other income checkbox
+    And the user enters a start date in the future
+    And the user enters an end date
+    Then the user should see the start date and end date warning messages
+
   Scenario: Cancel button functionality
     Given the user answers yes to having other income
     And the user checks a other income checkbox
@@ -62,6 +82,22 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     Then the save button should be enabled
     And the user saves the other income information
     Then the other income information should be saved on the page
+
+  Scenario: User enters unemployment information with a start date in the future
+    Given the user answers yes to having unemployment income
+    And the user enters a start date in the future
+    Then the user should see the start date warning message
+
+  Scenario: User enters unemployment information with an end date
+    Given the user answers yes to having unemployment income
+    And the user enters an end date
+    Then the user should see the end date warning message
+
+  Scenario: User enters unemployment information with a start date in the future and an end date
+    Given the user answers yes to having unemployment income
+    And the user enters a start date in the future
+    And the user enters an end date
+    Then the user should see the start date and end date warning messages
 
   Scenario: Unemployment Cancel button functionality
     Given the user answers yes to having unemployment income

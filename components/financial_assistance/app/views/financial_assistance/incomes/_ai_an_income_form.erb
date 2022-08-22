@@ -1,4 +1,6 @@
 <%= income_form_for @application, @applicant, income do |f| %>
+  <% income_id = income.id %>
+  <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
   <div class="focus_effect_module">
     <div class="row row-form-wrapper no-buffer row-height row-edit-border">
       <%= f.hidden_field :kind, value: 'american_indian_and_alaskan_native' %>
@@ -15,10 +17,10 @@
         </div>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income.id}", class: "datepicker-js floatlabel" %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income.id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
       </div>
-      <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income.id}", class: "datepicker-js floatlabel" %>
+      <div class="col-md-3 overflow-hidden">
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income.id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
       </div>
     </div>
     <div class="row">
@@ -28,4 +30,8 @@
       </div>
     </div>
   </div>
+
+  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+  <% end %>
 <% end %>

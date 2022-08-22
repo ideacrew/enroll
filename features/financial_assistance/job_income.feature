@@ -5,11 +5,11 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
   Background: User logs in and visits applicant's Job income page
     Given EnrollRegistry crm_update_family_save feature is disabled
     Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
-    Given FAA job_income_warning_message feature is disabled
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled
+    Given FAA income_and_deduction_date_warning feature is enabled
     When the user will navigate to the FAA Household Info page
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
@@ -62,6 +62,22 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the employer information
     Then the user should see a JS alert
 
+  Scenario: User enters employer information with a start date in the future
+    Given the user answers yes to having and income from an employer
+    And the user enters a start date in the future
+    Then the user should see the start date warning message
+
+  Scenario: User enters employer information with an end date
+    Given the user answers yes to having and income from an employer
+    And the user enters an end date
+    Then the user should see the end date warning message
+
+  Scenario: User enters employer information with a start date in the future and an end date
+    Given the user answers yes to having and income from an employer
+    And the user enters a start date in the future
+    And the user enters an end date
+    Then the user should see the start date and end date warning messages
+
   Scenario: User enters employer information when there is more than one employer
     Given the user has entered at least one job income information
     When the Add Another Job Income link appears
@@ -85,6 +101,22 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Then the save button should be enabled
     And the user saves the self employment information
     # Then I should see a JS alert
+
+  Scenario: User enters self employment information with a start date in the future
+    Given the user answers yes to having self employment income
+    And the user enters a start date in the future
+    Then the user should see the start date warning message
+
+  Scenario: User enters self employment information with an end date
+    Given the user answers yes to having self employment income
+    And the user enters an end date
+    Then the user should see the end date warning message
+
+  Scenario: User enters self employment information with a start date in the future and an end date
+    Given the user answers yes to having self employment income
+    And the user enters a start date in the future
+    And the user enters an end date
+    Then the user should see the start date and end date warning messages
 
   Scenario: User enters self employment information when there is more than one self employment income
     Given the user has entered at least one self employment information

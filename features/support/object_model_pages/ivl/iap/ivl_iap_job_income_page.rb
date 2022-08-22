@@ -165,4 +165,12 @@ class IvlIapJobIncomeInformationPage
   def self.continue_btn
     '.interaction-click-control-continue'
   end
+
+  def self.start_date_warning
+    '[data-cuke="start-date-warning"]'
+  end
+
+  def self.end_date_warning
+    '[data-cuke="end-date-warning"]'
+  end
 end
