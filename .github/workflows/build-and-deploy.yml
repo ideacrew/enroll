@@ -152,10 +152,10 @@ jobs:
           # create local image (for scanning) if it is a pull request
           load: ${{ github.event_name == 'pull_request' }}
           tags: |
-            ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client }}
-            ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.latestTag, matrix.client }}
-            ${{ format('{0}/{1}-{2}', steps.ghcr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client }}
-            ${{ format('{0}/{1}-{2}', steps.ghcr_login.inputs.registry, needs.prep.outputs.latestTag, matrix.client }}
+            ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.latestTag, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', steps.ghcr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', steps.ghcr_login.inputs.registry, needs.prep.outputs.latestTag, matrix.client) }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
@@ -170,7 +170,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@v3
         with:
-          image: ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client }}
+          image: ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
