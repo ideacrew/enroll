@@ -156,7 +156,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:family_id) { family.id}
   let(:family_member_id) { family.primary_applicant.id }
-  let!(:application) { FactoryBot.create(:application, hbx_id: 1234, assistance_year: Date.today.year, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
+  let!(:application) { FactoryBot.create(:application, hbx_id: 1234, assistance_year: Date.today.year, created_at: Date.today - 1.day, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   person_hbx_id: 1234,
@@ -189,7 +189,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
                                   citizen_status: 'us_citizen')
     applicant
   end
-  let!(:application2) { FactoryBot.create(:application, hbx_id: 3456, assistance_year: Date.today.year, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
+  let!(:application2) { FactoryBot.create(:application, hbx_id: 3456, assistance_year: Date.today.year + 1, created_at: Date.today + 1.day, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
   let!(:applicant2) { FactoryBot.create(:applicant, application: application2,  family_member_id: family_member_id) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
@@ -233,8 +233,25 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should assign applications", dbclean: :after_each do
       get :index
       applications = FinancialAssistance::Application.where(family_id: family_id)
-      expect(assigns(:applications)).to eq(applications.to_a)
+      expect(assigns(:applications)).to match_array(applications.to_a)
     end
+
+    context "with :filtered_application_list on" do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
+      end
+
+      it "should display applications in order", dbclean: :after_each do
+        get :index
+        expect(assigns(:filtered_applications).first[:created_at]).to be > assigns(:filtered_applications).last[:created_at]
+      end
+
+      it "should filter applications by year", dbclean: :after_each do
+        get :index, params: { filter: { year: Date.today.year } }
+        expect(assigns(:filtered_applications).count).to eq(1)
+      end
+    end
+
   end
 
   context "GET new" do
@@ -270,7 +287,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     end
   end
-
 
   context "POST step" do
     before do
@@ -591,6 +607,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
   end
+
   describe  "GET wait_for_eligibility_response" do
     context "With valid data" do
       it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do

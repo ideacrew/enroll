@@ -13,11 +13,18 @@ namespace :import do
     puts 'No current HBX present' if hbx.blank?
     abort if hbx.blank?
 
-    # Second lowest cost silver plan
-    slcs_products = BenefitMarkets::Products::Product.where(hios_id: "94506DC0390005-01")
-    slcsp_for_current_year =  slcs_products.select{|a| a.active_year == current_year}.first
+    #
     # check if benefit package is present
+    #
     bc_period_for_current_year = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == current_year }.first
+
+    #
+    # Second lowest cost silver plan
+    #
+    slcsp_id = bc_period_for_current_year.slcsp_id
+    slcsp_hios_id = BenefitMarkets::Products::Product.where(id: slcsp_id).first&.hios_id || "94506DC0390005-01"
+    slcs_products = BenefitMarkets::Products::Product.where(hios_id: slcsp_hios_id)
+    slcsp_for_current_year =  slcs_products.select{|a| a.active_year == current_year}.first
 
     puts 'No slcsp_for_current_year present' if slcsp_for_current_year.blank?
     abort if slcsp_for_current_year.blank?

@@ -35,9 +35,15 @@ module Operations
           assistance_criteria = applicants.pluck("is_ia_eligible", "is_medicaid_chip_eligible", "is_totally_ineligible", "is_magi_medicaid", "is_non_magi_medicaid_eligible", "is_without_assistance")
           next unless assistance_criteria.flatten.any?(true)
 
+          parsed_yearly_expected_contribution = if faa_ed["yearly_expected_contribution"].present?
+                                                  yearly_expected_contribution = Money.new(faa_ed["yearly_expected_contribution"]["cents"], 'USD')
+                                                  yearly_expected_contribution.to_f > 0.00 ? yearly_expected_contribution.to_f : 0.00
+                                                end
+
           th = family.active_household.tax_households.build(hbx_assigned_id: faa_ed["hbx_assigned_id"],
-                                                       effective_starting_on: faa_ed["effective_starting_on"],
-                                                       is_eligibility_determined: faa_ed["is_eligibility_determined"])
+                                                            effective_starting_on: faa_ed["effective_starting_on"],
+                                                            yearly_expected_contribution: parsed_yearly_expected_contribution,
+                                                            is_eligibility_determined: faa_ed["is_eligibility_determined"])
           applicants.each do |applicant| #todo select instead
             create_tax_household_members(family, th, applicant, faa_ed)
           end
