@@ -12,9 +12,9 @@ module Eligibilities
       # include Eligibilities::Eventable
 
       RELAXED_RULES = [
-        :minimum_participation_rule_relaxed,
-        :all_contribution_levels_min_met_relaxed,
-        :benefit_application_fte_count_relaxed
+        :minimum_participation_rule,
+        :all_contribution_levels_min_met,
+        :benefit_application_fte_count
       ].freeze
 
       embedded_in :grant, class_name: "::Eligibilities::Osse::Grant"
@@ -23,9 +23,8 @@ module Eligibilities
 
       validates_presence_of :value
 
-      def run(_model_instance)
-        return true if RELAXED_RULES.include?(key)
-        false
+      def run
+        RELAXED_RULES.include?(key)
       end
     end
   end

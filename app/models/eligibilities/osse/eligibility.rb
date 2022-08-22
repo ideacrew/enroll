@@ -50,10 +50,11 @@ module Eligibilities
       end
 
       def persist_grants(grant_values)
-        grant_values.each do |attributes|
+        grant_values.each do |grant_value|
+          attributes = grant_value.to_h
           grant = self.grants.new
           grant.assign_attributes(attributes.except(:value))
-          grant.value = grant_value_klass.new(attributes[:value])
+          grant.value = grant_value_klass.constantize.new(attributes[:value].merge(value: attributes[:key]))
           grant.save
         end
       end
@@ -62,7 +63,7 @@ module Eligibilities
       # TODO: returns other classes in the future
       #
       def grant_value_klass
-        return unless subject.klass == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
+        return unless subject[:klass] == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
 
         'Eligibilities::Osse::BenefitSponsorshipOssePolicy'
       end
@@ -70,7 +71,7 @@ module Eligibilities
       def grant_for(value)
         grants.detect do |grant|
           value_instance = grant.value
-          value_instance.value == value
+          value_instance.value.to_s == value.to_s
         end
       end
     end

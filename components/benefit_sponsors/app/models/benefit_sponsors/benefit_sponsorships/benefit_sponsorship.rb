@@ -365,7 +365,7 @@ module BenefitSponsors
 
     # def osse_eligible?
     #   #eligibility_for(:osse_eligibility).present?
-    #   eligibility = eligibility_for(:osse_eligibility) 
+    #   eligibility = eligibility_for(:osse_eligibility)
     #   return false if eligibility.nil?
     #   eligibility.evidences.by_key(:osse_eligibility).first&.is_satisfied == true
     # end

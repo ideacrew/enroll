@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: eb92f465ce40b99aba0d30125f0dc8dcf713dfe1
+  revision: 78c3d2463265c080c763a5fa73e7725ea170f644
   branch: osse_eligibility
   specs:
     aca_entities (0.10.0)
