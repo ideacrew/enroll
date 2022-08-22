@@ -1,11 +1,6 @@
 <%= income_form_for @application, @applicant, income do |f| %>
   <% income_id = income.id %>
-  <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) && local_assigns[:new_form] %>
-    <% if income.id.blank? %>
-      <% income_id = BSON::ObjectId.new.to_s %>
-    <% end %>
-    <%= render partial: 'financial_assistance/shared/temporary_warning_message', locals: { form_object_id: income_id, translation_key: "faa.income_temporary_message", translation_interpolation_keys: {current_year: TimeKeeper.date_of_record.year.to_s, next_year: (TimeKeeper.date_of_record + 1.year).year.to_s} } %>
-  <% end %>
+  <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
   <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
   <div class="focus_effect_module row-edit-border">
     <div class="row row-form-wrapper no-buffer row-height">
@@ -13,7 +8,6 @@
         <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
       </div>
     </div>
-
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-3">
         <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
@@ -28,10 +22,10 @@
         </div>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel" %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
       </div>
-      <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel" %>
+      <div class="col-md-3 overflow-hidden">
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
       </div>
     </div>
     <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
@@ -71,15 +65,14 @@
     <% end %>
   </div>
 
-    <div class="row">
-      <div class="col-md-3 pull-right cancel-save-mt">
-        <a class="btn btn-default income-cancel">Cancel</a>
-        <% if FinancialAssistanceRegistry.feature_enabled?(:job_income_warning_message) %>
-         <% onclick_save_event = raw "showTemporaryMessageDiv('#{income_id}', 'income')" %>
-        <% else %>
-          <% onclick_save_event = "checkDate('#{income_id}')" %>
-        <% end %>
-        <%= f.submit 'Save', class: 'btn btn-danger', :data => { :cuke => "job-income-save-button" }, onclick: onclick_save_event %>
-      </div>
+  <div class="row">
+    <div class="col-md-3 pull-right mt-1 mb-1">
+      <a class="btn btn-default income-cancel">Cancel</a>
+      <%= f.submit 'Save', class: 'btn btn-danger', :data => { :cuke => "job-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
     </div>
+  </div>
+
+  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+  <% end %>
 <% end %>

@@ -74,6 +74,9 @@ registry:
       - key: :application_submission_error_status
         item: :application_submission_error_status
         is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS_IS_ENABLED'] || false %>
+      - key: :filtered_application_list
+        item: :filtered_application_list
+        is_enabled: <%= ENV['FILTERED_APPLICATION_LIST_IS_ENABLED'] || false %>
       - key: :featured_tribes_selection
         item: :featured_tribes_selection
         is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
@@ -299,9 +302,9 @@ registry:
           item: ["net_self_employment", "capital_gains", "farming_and_fishing"]
     - key: :skip_zero_income_amount_validation
       is_enabled: :false
-    - key: :job_income_warning_message
-      item: :job_income_warning_message
-      is_enabled: false
+    - key: :income_and_deduction_date_warning
+      item: :income_and_deduction_date_warning
+      is_enabled: <%= ENV['INCOME_AND_DEDUCTION_DATE_WARNING_IS_ENABLED'] || false %>
   - namespace:
     - :premium_credit_results
     features:

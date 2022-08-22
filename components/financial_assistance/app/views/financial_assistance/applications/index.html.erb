@@ -1,4 +1,4 @@
-<div aria-labelledby="aria-labelledby"class="tab-pane fade in active" id="home">
+<div aria-labelledby="aria-labelledby" class="tab-pane fade in active" id="home">
   <div class="container" class="mt-2">
     <div class="row">
       <div class="col-md-2">
@@ -7,17 +7,28 @@
       <div class="col-md-10">
         <h1 class="darkblue no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
         <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
-  
-        <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', class: "mb-1 text-right") do %>
-          <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
-          <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-            <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
-          <% else %>
-            <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
+
+        <div style="display:flex; justify-content: space-between; padding: 10px 0px;">
+          <%= form_with url: "", method: "get", class:"" do %>
+            <% if @applications.present? && FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) %>
+              <label class="font-weight-bold"><%= l10n('application_year') %></label>
+              <%= select("filter", "year", @applications.distinct(:assistance_year).sort.reverse.each,
+              {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
+              {:onchange => "this.form.submit();"})%>
+            <% end %>
           <% end %>
-        <% end %>
-        
-        <% if @applications.present? %>
+
+          <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', style: "align-self:flex-end;") do %>
+            <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+              <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
+            <% else %>
+              <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
+            <% end %>
+          <% end %>
+        </div>
+
+        <% if @filtered_applications.present? %>
           <table class="table table-striped">
             <thead class="form-heading">
               <tr>
@@ -33,9 +44,16 @@
               </tr>
             </thead>
             <tbody>
-              <% @applications.each do |application| %>
+              <% @filtered_applications.each do |application| %>
               <tr>
-                <td><%= application.hbx_id %></td>
+                <td class="text-nowrap">
+                  <%= application.hbx_id %>
+                  <% if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) && application.hbx_id == @recent_determined_hbx_id %>
+                    <span class="bg-primary current-app-label">
+                      <%= l10n('current') %>
+                    </span> 
+                  <% end %>
+                </td>
                 <td><%= application.assistance_year %></td>
                 <td><%= application_state_for_display(application) %></td>
                 <td><%= to_est application.created_at %></td>
@@ -60,7 +78,10 @@
               <%end%>
             </tbody>
           </table>
-        <%end%>
+        <% end %>
+
+
+        
       </div>
     </div>
   </div>
