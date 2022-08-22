@@ -3,12 +3,12 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
   Background: User logs in and visits applicant's income adjustments page
     Given EnrollRegistry crm_update_family_save feature is disabled
     Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
-    Given FAA job_income_warning_message feature is disabled
     Given divorce agreement year feature is disabled
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled
+    Given FAA income_and_deduction_date_warning feature is enabled
     When the user will navigate to the FAA Household Info page
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
@@ -35,6 +35,25 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     Then the save button should be enabled
     And the user saves the income adjustments information
     Then the income adjustment should be saved on the page
+
+  Scenario: User enters other income information with a start date in the future
+    Given the user answers yes to having income adjustments
+    And the user checks a income adjustments checkbox
+    And the user enters a start date in the future for the deduction
+    Then the user should see the start date warning message
+
+  Scenario: User enters other income information with an end date
+    Given the user answers yes to having income adjustments
+    And the user checks a income adjustments checkbox
+    And the user enters an end date for the deduction
+    Then the user should see the end date warning message
+
+  Scenario: User enters other income information with a start date in the future and an end date
+   Given the user answers yes to having income adjustments
+    And the user checks a income adjustments checkbox
+    And the user enters a start date in the future for the deduction
+    And the user enters an end date for the deduction
+    Then the user should see the start date and end date warning messages
 
   Scenario: Existing adjustments are deleted when user selects "No" to income adjustments driver question
     Given the user answers yes to having income adjustments
