@@ -13,6 +13,7 @@ class TaxHousehold
   # when determining eligibility for Insurance Assistance and Medicaid
 
   embedded_in :household
+  embedded_in :tax_household_group
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
@@ -24,10 +25,17 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
+  field :max_aptc, type: Money
+  field :monthly_expected_contribution, type: Money
+  field :determination_id, type: BSON::ObjectId
+
   embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
 
   embeds_many :eligibility_determinations, cascade_callbacks: true
+
+  embeds_one :aptc_accumulator
+  embeds_one :contribution_accumulator
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
