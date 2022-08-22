@@ -17,7 +17,8 @@ RSpec.describe BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorC
   let(:effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:market_kind)    { :aca_shop }
   let(:service_areas)  { FactoryBot.create(:benefit_markets_locations_service_area).to_a }
-  let(:params)         { {enrollment_eligibility: double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas)} }
+  let(:benefit_sponsorship_id) { BSON::ObjectId.new }
+  let(:params)         { {enrollment_eligibility: double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas, benefit_sponsorship_id: benefit_sponsorship_id)} }
 
   context 'sending required parameters' do
 

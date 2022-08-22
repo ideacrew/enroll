@@ -3,6 +3,7 @@
 require "rails_helper"
 
 RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
 
   let!(:site) do
     FactoryBot.create(
@@ -195,9 +196,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
     }
   end
 
-  let(:enrollment_eligibility_initial)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas) }
+  let(:enrollment_eligibility_initial)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas, benefit_sponsorship_id: BSON::ObjectId.new) }
   let(:params)                 {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility_initial }}
 
+  before do
+    allow(subject).to receive(:osse_min_contribution_eligibility).and_return(Success(true))
+  end
 
   context 'sending required parameters' do
     it 'should assign ContributionModel for initial' do
@@ -210,7 +214,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   end
 
   context 'sending required parameters' do
-    let(:enrollment_eligibility_renewal)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :renewal, service_areas: service_areas) }
+    let(:enrollment_eligibility_renewal)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :renewal, service_areas: service_areas, benefit_sponsorship_id: BSON::ObjectId.new) }
     let(:params)                          {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility_renewal }}
 
     it 'should assign ContributionModel for renewal' do
