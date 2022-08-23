@@ -121,12 +121,9 @@
           <% end %>
           </div>
           <% if osse_eligibility_is_enabled? && pundit_allow(HbxProfile, :can_view_osse_eligibility?) %>
-            <%puts "user: #{current_user.inspect}"%>
             <div class="mt-2">
-              <h1><%=l10n('subsidies')%></h1>
-              <div>
-                <%=l10n('osse_eligibility_description')%>
-              <div>
+              <h2><%=l10n('osse_subsidy_title')%></h2>
+              <p><%=l10n('osse_eligibility_description')%></p>
               <div class="row no-buffer vertically-aligned-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 15px; background-color: #fff;">
                 <%=l10n('osse_eligibility_question')%>
                 <div class="form-checkform-check-inline col-md-2 col-xs-12 form-group form-group-lg">
