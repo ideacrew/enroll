@@ -66,6 +66,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
       user_with_hbx_staff_role.person.hbx_staff_role.permission_id = super_admin_permission.id
       user_with_hbx_staff_role.person.hbx_staff_role.save!
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility_history).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_view_osse_eligibility?).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_edit_osse_eligibility?).and_return(true)
       sign_in(user_with_hbx_staff_role)
@@ -74,7 +75,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     end
 
     it "should view the subsidies form" do
-      expect(rendered).to have_content(l10n('subsidies'))
+      expect(rendered).to have_content(l10n('osse_subsidy_title'))
     end
 
     it "should display subsidies form" do
@@ -96,6 +97,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
       hbx_csr_tier1_user.person.hbx_staff_role.permission_id = hbx_csr_tier1_permission.id
       hbx_csr_tier1_user.person.hbx_staff_role.save!
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility_history).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_view_osse_eligibility?).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_edit_osse_eligibility?).and_return(false)
       sign_in(hbx_csr_tier1_user)
@@ -104,7 +106,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     end
 
     it "should view the subsidies form" do
-      expect(rendered).to have_content(l10n('subsidies'))
+      expect(rendered).to have_content(l10n('osse_subsidy_title'))
     end
 
     it "should disable subsides button" do
