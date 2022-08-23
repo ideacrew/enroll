@@ -27,6 +27,8 @@ jobs:
       branchName: ${{ steps.prep.outputs.branch_name }}
       latestTag: ${{ steps.prep.outputs.latest_tag }}
       repositoryName: ${{ steps.prep.outputs.repository_name }}
+      registryEcr: ${{ steps.prep.outputs.registry_ecr }}
+      registryGhcr: ${{ steps.prep.outputs.registry_ghcr }}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -44,6 +46,8 @@ jobs:
           echo ::set-output name=branch_name::${{ env.GIT_BRANCH_NAME }}
           echo ::set-output name=repository_name::$REPO
           echo ::set-output name=latest_tag::${IMAGE}:latest
+          echo ::set-output name=registry_ecr::public.ecr.aws
+          echo ::set-output name=registry_ghcr::ghcr.io
 
   # Uses buildx to build and push the image
   build-and-upload-image:
@@ -152,10 +156,10 @@ jobs:
           # create local image (for scanning) if it is a pull request
           load: ${{ github.event_name == 'pull_request' }}
           tags: |
-            ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
-            ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.latestTag, matrix.client) }}
-            ${{ format('{0}/{1}-{2}', steps.ghcr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
-            ${{ format('{0}/{1}-{2}', steps.ghcr_login.inputs.registry, needs.prep.outputs.latestTag, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.latestTag, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.latestTag, matrix.client) }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
