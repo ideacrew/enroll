@@ -177,7 +177,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@v3
         with:
-          image: ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
+          image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
