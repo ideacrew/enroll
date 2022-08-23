@@ -15,7 +15,8 @@ report_field_names = %w[First_Name
                         Application_Year
                         Current_Plan_Name
                         Current_HIOS_ID
-                        Current_Applied_APTC]
+                        Current_Applied_APTC
+                        Current_FPL_Amount]
 
 logger_field_names = %w[Family_ID Backtrace]
 
@@ -50,6 +51,8 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         current_max_aptc = current_ed&.max_aptc&.to_f.present? ? format('%.2f', current_ed.max_aptc.to_f) : 'N/A'
         current_csr_percent = current_ed&.csr_percent_as_integer.present? ? current_ed.csr_percent_as_integer.to_s : 'N/A'
         current_csr_kind = current_ed&.source.present? ? source_mapper[current_ed.source] : 'N/A'
+        thm = current_thh&.tax_household_members&.detect { |member| member.family_member_id == family.primary_family_member.id }
+        thm_fpl_amount = thm.present? ? thm&.magi_as_percentage_of_fpl : 'N/A'
 
         if active_enrollments.present?
           active_enrollments.each do |enrollment|
@@ -59,7 +62,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
                            new_ed.csr_percent_as_integer, new_ed.determined_at,
                            current_csr_kind, new_csr_kind,
                            year, enrollment.product&.title, enrollment.product&.hios_id,
-                           enrollment&.applied_aptc_amount]
+                           enrollment&.applied_aptc_amount, thm_fpl_amount]
           end
         else
           report_csv << [primary_person.first_name, primary_person.last_name,
@@ -67,7 +70,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
                          format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
                          new_ed.csr_percent_as_integer, new_ed.determined_at,
                          current_csr_kind, new_csr_kind,
-                         year, 'N/A', 'N/A', 'N/A']
+                         year, 'N/A', 'N/A', 'N/A', thm_fpl_amount]
         end
       end
     rescue StandardError => e

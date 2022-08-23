@@ -23,11 +23,12 @@ jobs:
     outputs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
       tag: ${{ steps.prep.outputs.tag }}
-      registry: ${{ steps.prep.outputs.registry }}
       shortSha: ${{ steps.prep.outputs.short_sha}}
       branchName: ${{ steps.prep.outputs.branch_name }}
       latestTag: ${{ steps.prep.outputs.latest_tag }}
       repositoryName: ${{ steps.prep.outputs.repository_name }}
+      registryEcr: ${{ steps.prep.outputs.registry_ecr }}
+      registryGhcr: ${{ steps.prep.outputs.registry_ghcr }}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -38,14 +39,15 @@ jobs:
           SHORT_SHA=$(echo $GITHUB_SHA | head -c7)
           REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
-          IMAGE=public.ecr.aws/ideacrew/$REPO
+          IMAGE=ideacrew/$REPO
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
           echo ::set-output name=tag::${TAG}
-          echo ::set-output name=registry::public.ecr.aws
           echo ::set-output name=short_sha::$SHORT_SHA
           echo ::set-output name=branch_name::${{ env.GIT_BRANCH_NAME }}
           echo ::set-output name=repository_name::$REPO
           echo ::set-output name=latest_tag::${IMAGE}:latest
+          echo ::set-output name=registry_ecr::public.ecr.aws
+          echo ::set-output name=registry_ghcr::ghcr.io
 
   # Uses buildx to build and push the image
   build-and-upload-image:
@@ -125,15 +127,17 @@ jobs:
       # Must use docker login in order to specify public registry
       - name: Login to Public ECR
         uses: docker/login-action@v2
+        id: ecr_login
         with:
-          registry: ${{ needs.prep.outputs.registry }}
+          registry: ${{ needs.prep.outputs.registryEcr }}
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Login to GHCR
         uses: docker/login-action@v2
+        id: ghcr_login 
         with:
-          registry: ghcr.io
+          registry: ${{ needs.prep.outputs.registryGhcr }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -151,7 +155,11 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           # create local image (for scanning) if it is a pull request
           load: ${{ github.event_name == 'pull_request' }}
-          tags: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}, ${{ needs.prep.outputs.latestTag }}-${{ matrix.client }}
+          tags: |
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.latestTag, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.latestTag, matrix.client) }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
@@ -166,7 +174,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@v3
         with:
-          image: ${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}
+          image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
@@ -216,6 +224,7 @@ jobs:
     strategy:
       matrix:
         client: ['dc', 'me']
+        registry: ['public.ecr.aws', 'ghcr.io']
     steps:
       - run: |
           MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
@@ -232,7 +241,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*${{ env.CLIENT }} image*:\n`${{ needs.prep.outputs.taggedImage }}-${{ matrix.client }}`"
+                    "text": "*${{ format('{0} {1} image*:\n`{2}/{3}-{4}`', env.CLIENT, matrix.registry, matrix.registry, needs.prep.outputs.taggedImage, matrix.client) }}"
                   }
                 },
                 {
