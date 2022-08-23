@@ -74,7 +74,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     end
 
     it "should view the subsidies form" do
-      expect(rendered).to have_content(l10n('subsidies'))
+      expect(rendered).to have_content(l10n('osse_subsidy_title'))
     end
 
     it "should display subsidies form" do
@@ -104,7 +104,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     end
 
     it "should view the subsidies form" do
-      expect(rendered).to have_content(l10n('subsidies'))
+      expect(rendered).to have_content(l10n('osse_subsidy_title'))
     end
 
     it "should disable subsides button" do
