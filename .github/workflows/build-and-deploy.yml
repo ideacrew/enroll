@@ -56,9 +56,6 @@ jobs:
       matrix:
         client: ['dc', 'me']
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     services:
       rabbitmq:
         image: rabbitmq:latest
@@ -132,7 +129,7 @@ jobs:
         uses: docker/login-action@v2
         id: ecr_login
         with:
-          registry: public.ecr.aws
+          registry: ${{ needs.prep.outputs.registryEcr }}
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -140,7 +137,7 @@ jobs:
         uses: docker/login-action@v2
         id: ghcr_login 
         with:
-          registry: ghcr.io
+          registry: ${{ needs.prep.outputs.registryGhcr }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -177,7 +174,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@v3
         with:
-          image: ${{ format('{0}/{1}-{2}', steps.ecr_login.inputs.registry, needs.prep.outputs.taggedImage, matrix.client) }}
+          image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
           acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
