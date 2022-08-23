@@ -123,7 +123,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       expect(assigns(:coverage_kind)).to eq "dental"
     end
 
-    it "should return summary of a plan for shop and coverage_kind as health" do
+    it "should return summary of a plan for individual and coverage_kind as health" do
       allow(qhp_cost_share_variance).to receive(:product_for).with("individual").and_return(product)
       sign_in(user)
       get :summary, params: {enrollment_plan_id: enrollment_plan_id, standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_health_enrollment.id,
