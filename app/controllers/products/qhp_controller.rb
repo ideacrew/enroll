@@ -101,7 +101,7 @@ class Products::QhpController < ApplicationController
                    elsif params[:market_kind] == "shop" || @hbx_enrollment.is_shop?
                      "aca_shop"
                    else
-                     "aca_individual"
+                     "individual"
                    end
 
     @coverage_kind = if @hbx_enrollment.product.present?
