@@ -276,7 +276,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'should recalculate aptc for reinstated enrollment' do
-          reinstatement = family.hbx_enrollments.where(:id.ne => enrollment.id).last
+          reinstatement = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
           expect(reinstatement.elected_aptc_pct).to_not eq 0.0 #Since there will be a change to coverage_start on member level to new effective date.
           expect(reinstatement.applied_aptc_amount).to_not eq 0
           expect(reinstatement.aggregate_aptc_amount).to_not eq 0
