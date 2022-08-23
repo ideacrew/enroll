@@ -56,6 +56,9 @@ jobs:
       matrix:
         client: ['dc', 'me']
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     services:
       rabbitmq:
         image: rabbitmq:latest
