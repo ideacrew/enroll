@@ -32,7 +32,7 @@
       <div class="col-xs-12 vertically-aligned-row mt-1">
         <div class="enrollment-premium info vertical-align-top">
           <p class="mb-0">
-            <strong><%= l10n("premium") %>:</strong>
+            <strong><%= l10n("premium_you_pay") %>:</strong>
             <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/<%= l10n("month").to_s.downcase %>
           </p>
         </div>
@@ -157,7 +157,7 @@
       <div class="enrollment-type info vertical-align-top">
         <% if osse_eligibility_is_enabled? %>
         <p>
-          <label><strong><%= l10n("osse_amount") %>:</strong></label>
+          <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
           <%='$0.00'%>/<%= l10n("month").to_s.downcase %>
         </p>
         <% else %>
