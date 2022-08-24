@@ -12,7 +12,7 @@
           <%= form_with url: "", method: "get", class:"" do %>
             <% if @applications.present? && FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) %>
               <label class="font-weight-bold"><%= l10n('application_year') %></label>
-              <%= select("filter", "year", @applications.distinct(:assistance_year)&.sort&.reverse&.each,
+              <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each,
               {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
               {:onchange => "this.form.submit();"})%>
             <% end %>
@@ -70,7 +70,7 @@
                 <% if current_user.has_hbx_staff_role? %>
                   <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
                   <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
-                <% end %>                
+                <% end %>
                 <td>
                   <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
                 </td>

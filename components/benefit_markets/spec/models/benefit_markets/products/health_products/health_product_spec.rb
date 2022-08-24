@@ -67,7 +67,6 @@ module BenefitMarkets
     end
 
     context "A new HealthProduct instance" do
-
       context "with no arguments" do
         subject { described_class.new }
 
@@ -134,11 +133,53 @@ module BenefitMarkets
           expect(subject).to be_valid
         end
       end
-
     end
 
+    describe '#covers_pediatric_dental?' do
+      let!(:health_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, kind: :health) }
+      let!(:qhp) do
+        ::Products::Qhp.create(
+          {
+            issuer_id: "1234", state_postal_code: "DC",
+            active_year: health_product.application_period.min.year,
+            standard_component_id: health_product.hios_base_id,
+            plan_marketing_name: "gold plan", hios_product_id: "1234",
+            network_id: "123", service_area_id: "12", formulary_id: "123",
+            is_new_plan: "yes", plan_type: "test", metal_level: "bronze",
+            unique_plan_design: "", qhp_or_non_qhp: "qhp",
+            insurance_plan_pregnancy_notice_req_ind: "yes",
+            is_specialist_referral_required: "yes", hsa_eligibility: "yes",
+            emp_contribution_amount_for_hsa_or_hra: "1000", child_only_offering: "no",
+            is_wellness_program_offered: "yes", plan_effective_date: "04/01/2015".to_date,
+            out_of_country_coverage: "yes", out_of_service_area_coverage: "yes",
+            national_network: "yes", summary_benefit_and_coverage_url: "www.example.com"
+          }
+        )
+      end
+      let!(:child_dental_checkup) { qhp.qhp_benefits.create(benefit_type_code: 'Dental Check-Up for Children', is_benefit_covered: 'Covered') }
 
+      context "with 'Dental Check-Up for Children' qhp_benefit" do
+        it 'returns false' do
+          expect(health_product.covers_pediatric_dental?).to eq(false)
+        end
+      end
 
+      context "with 'Dental Check-Up for Children' & 'Basic Dental Care - Child' qhp_benefits" do
+        let!(:child_basic_dental) { qhp.qhp_benefits.create(benefit_type_code: 'Basic Dental Care - Child', is_benefit_covered: 'Covered') }
 
+        it 'returns false' do
+          expect(health_product.covers_pediatric_dental?).to eq(false)
+        end
+      end
+
+      context "with 'Dental Check-Up for Children', 'Basic Dental Care - Child' & 'Major Dental Care - Child' qhp_benefits" do
+        let!(:child_basic_dental) { qhp.qhp_benefits.create(benefit_type_code: 'Basic Dental Care - Child', is_benefit_covered: 'Covered') }
+        let!(:child_major_dental) { qhp.qhp_benefits.create(benefit_type_code: 'Major Dental Care - Child', is_benefit_covered: 'Covered') }
+
+        it 'returns true' do
+          expect(health_product.covers_pediatric_dental?).to eq(true)
+        end
+      end
+    end
   end
 end
