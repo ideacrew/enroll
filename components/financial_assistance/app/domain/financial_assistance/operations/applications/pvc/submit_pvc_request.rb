@@ -58,8 +58,9 @@ module FinancialAssistance
 
           def submit(params, families)
             applications_with_evidences = []
+            count = 0
             pvc_logger = Logger.new("#{Rails.root}/log/pvc_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-            pvc_logger.info("********************************* start submitting pvc requests *********************************") if count % 100 == 0
+            pvc_logger.info("********************************* start submitting pvc requests *********************************") 
 
             families.each do |family|
                 determined_application = fetch_application(family, params[:assistance_year])
