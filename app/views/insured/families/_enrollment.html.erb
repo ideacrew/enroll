@@ -152,18 +152,20 @@
       </div>
     </div>
     <div class="col-xs-12 vertically-aligned-row">
-      <div>
-      </div>
-      <div class="enrollment-type info vertical-align-top">
-        <% if osse_eligibility_is_enabled? %>
-        <p>
-          <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
-          <%='$0.00'%>/<%= l10n("month").to_s.downcase %>
-        </p>
-        <% else %>
-        &nbsp;
-        <% end %>
-      </div>
+      <% if osse_eligibility_is_enabled? %>
+        <div>
+        </div>
+        <div class="enrollment-type info vertical-align-top">
+          <% if osse_eligibility_is_enabled? %>
+            <p>
+              <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
+              <%='$0.00'%>/<%= l10n("month").to_s.downcase %>
+            </p>
+          <% else %>
+            &nbsp;
+          <% end %>
+        </div>
+      <% end %>
     </div>
     <div class="col-xs-12 vertically-aligned-row">
       <% names = hbx_enrollment.covered_members_first_names %>
