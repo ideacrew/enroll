@@ -27,6 +27,21 @@ module Eligibilities
     def add_full_name
       self.full_name = [first_name, last_name].join(' ')
     end
+
+    def csr_by_year(year)
+      eligibility_state = eligibility_states.where(eligibility_item_key: 'aptc_csr_credit').first
+      grant = eligibility_state.grants.where(key: 'csr_grant', year: year).first
+
+      grant&.value
+    end
+
+    def family_member
+      ::FamilyMember.find(gid)
+    end
+
+    def person
+      ::Person.find(person_id)
+    end
   end
 end
 
