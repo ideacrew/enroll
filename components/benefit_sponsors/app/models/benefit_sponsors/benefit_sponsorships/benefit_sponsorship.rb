@@ -359,16 +359,10 @@ module BenefitSponsors
 
     def eligibility_for(evidence_key)
       eligibilities.select do |eligibility|
-        eligibility.evidences.by_key(evidence_key).present?
+        el = eligibility.evidences.by_key(evidence_key).first
+        el&.is_satisfied == true
       end.last
     end
-
-    # def osse_eligible?
-    #   #eligibility_for(:osse_eligibility).present?
-    #   eligibility = eligibility_for(:osse_eligibility)
-    #   return false if eligibility.nil?
-    #   eligibility.evidences.by_key(:osse_eligibility).first&.is_satisfied == true
-    # end
 
     # Inverse of Profile#benefit_sponsorship
     def profile
