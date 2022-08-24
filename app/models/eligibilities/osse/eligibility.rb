@@ -31,9 +31,9 @@ module Eligibilities
 
       validates_presence_of :start_on
 
-      after_create :generate_grants
+      after_create :create_grants
 
-      def generate_grants
+      def create_grants
         grant_values = evidences.inject([]) do |values, evidence|
           grant_result = Operations::Eligibilities::Osse::GenerateGrants.new.call(
             {
