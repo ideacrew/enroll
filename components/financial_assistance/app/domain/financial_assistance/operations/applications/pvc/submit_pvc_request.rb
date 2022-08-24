@@ -8,7 +8,7 @@ module FinancialAssistance
   module Operations
     module Applications
       module Pvc
-        # operation to manually trigger rrv events.
+        # operation to manually trigger pvc events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
         class SubmitPvcSet
           include Dry::Monads[:result, :do]
