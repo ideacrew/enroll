@@ -67,10 +67,8 @@
                     ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
                     ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
                   ] %>
-                <% if current_user.has_hbx_staff_role? %> <!-- this includes CSR roles -->
+                <% if current_user.has_hbx_staff_role? %>
                   <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
-                <% end %>
-                <% if current_user.roles.include?("hbx_staff") %> <!-- note: this does NOT include CSR roles which is why this check is necessary and distinct from above -->
                   <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
                 <% end %>
                 <td>
