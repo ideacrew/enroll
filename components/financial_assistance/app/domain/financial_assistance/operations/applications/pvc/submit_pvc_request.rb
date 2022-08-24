@@ -10,7 +10,7 @@ module FinancialAssistance
       module Pvc
         # operation to manually trigger pvc events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
-        class SubmitPvcSet
+        class SubmitPvcRequest
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging
