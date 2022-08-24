@@ -607,7 +607,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it "should display osse amount" do
-        expect(rendered).to have_content(l10n('osse_amount'))
+        expect(rendered).to have_content(l10n('hc44cc_premium_discount'))
       end
     end
 
