@@ -98,12 +98,13 @@ class Products::QhpController < ApplicationController
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
     @market_kind = if params[:market_kind] == "fehb"
                      "fehb"
+                   elsif params[:market_kind] == "individual"
+                     "individual"
                    elsif params[:market_kind] == "shop" || @hbx_enrollment.is_shop?
                      "aca_shop"
                    else
                      "aca_individual"
                    end
-
     @coverage_kind = if @hbx_enrollment.product.present?
       @hbx_enrollment.product.kind.to_s
     else
