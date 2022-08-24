@@ -12,7 +12,7 @@
           <%= form_with url: "", method: "get", class:"" do %>
             <% if @applications.present? && FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list) %>
               <label class="font-weight-bold"><%= l10n('application_year') %></label>
-              <%= select("filter", "year", @applications.distinct(:assistance_year)&.sort&.reverse&.each,
+              <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each,
               {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
               {:onchange => "this.form.submit();"})%>
             <% end %>
