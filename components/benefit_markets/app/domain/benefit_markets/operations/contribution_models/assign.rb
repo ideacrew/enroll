@@ -15,26 +15,15 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Entities::ProductPackage> ] product_packages ProductPackage
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
         def call(product_package_values:, enrollment_eligibility:)
-          osse_eligibility       = yield osse_min_contribution_eligibility(enrollment_eligibility)
           criteria               = yield find_criteria(enrollment_eligibility)
           filtered_criteria      = yield filter_criteria(criteria, product_package_values[:contribution_models])
           matched_criterion      = yield match_criterion(filtered_criteria, enrollment_eligibility)
-          product_package_values = yield assign(product_package_values, matched_criterion, osse_eligibility)
+          product_package_values = yield assign(product_package_values, matched_criterion, enrollment_eligibility)
 
           Success({product_package_values: product_package_values })
         end
 
         private
-
-        def osse_min_contribution_eligibility(enrollment_eligibility)
-          benefit_sponsorship = benefit_sponsorship(enrollment_eligibility.benefit_sponsorship_id)
-          eligibility = benefit_sponsorship&.eligibility_for(:osse_subsidy)
-          Success(eligibility&.grant_for(:all_contribution_levels_min_met))
-        end
-
-        def benefit_sponsorship(benefit_sponsorship_id)
-          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: benefit_sponsorship_id).first
-        end
 
         def find_criteria(enrollment_eligibility)
           namespace = namespace_for(enrollment_eligibility.market_kind, enrollment_eligibility.effective_date.year)
@@ -64,9 +53,9 @@ module BenefitMarkets
         end
 
         # TODO: hard coded contribution model key for OSSE for now
-        def assign(product_package_values, matched_criterion, osse_eligibility)
+        def assign(product_package_values, matched_criterion, enrollment_eligibility)
           criterion_contribution_key =
-            if osse_eligibility
+            if enrollment_eligibility.osse_min_employer_contribution
               :zero_percent_sponsor_fixed_percent_contribution_model
             else
               matched_criterion.setting(:contribution_model_key).item
