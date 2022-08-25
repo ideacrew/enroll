@@ -324,8 +324,12 @@ module Employers::EmployerHelper
     Settings.aca.employer_has_sic_field
   end
 
-  def osse_eligibility_is_enabled?
-    EnrollRegistry.feature_enabled?(:osse_eligibility)
+  def ivl_osse_eligibility_is_enabled?
+    EnrollRegistry.feature_enabled?(:ivl_osse_eligibility)
+  end
+
+  def shop_osse_eligibility_is_enabled?
+    EnrollRegistry.feature_enabled?(:shop_osse_eligibility)
   end
 
   def osse_eligibility_history_is_enabled?

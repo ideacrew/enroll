@@ -602,7 +602,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "osse_eligibility is present" do
 
       before do
-        allow(view).to receive(:osse_eligibility_is_enabled?).and_return(true)
+        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(true)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -614,7 +614,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "osse_eligibility is not present" do
 
       before do
-        allow(view).to receive(:osse_eligibility_is_enabled?).and_return(false)
+        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
