@@ -31,9 +31,18 @@ module Eligibilities
 
       validates_presence_of :start_on
 
-      after_create :generate_grants
+      after_create :create_grants
 
-      def generate_grants
+      scope :by_date, lambda { |compare_date = TimeKeeper.date_of_record|
+        where(
+          "$or" => [
+            { :start_on.lte => compare_date, :end_on => nil},
+            { :start_on.lte => compare_date, :end_on.gte => compare_date }
+          ]
+        )
+      }
+
+      def create_grants
         grant_values = evidences.inject([]) do |values, evidence|
           grant_result = Operations::Eligibilities::Osse::GenerateGrants.new.call(
             {
@@ -50,10 +59,11 @@ module Eligibilities
       end
 
       def persist_grants(grant_values)
-        grant_values.each do |attributes|
+        grant_values.each do |grant_value|
+          attributes = grant_value.to_h
           grant = self.grants.new
           grant.assign_attributes(attributes.except(:value))
-          grant.value = grant_value_klass.new(attributes[:value])
+          grant.value = grant_value_klass.constantize.new(attributes[:value].merge(value: attributes[:key]))
           grant.save
         end
       end
@@ -62,7 +72,7 @@ module Eligibilities
       # TODO: returns other classes in the future
       #
       def grant_value_klass
-        return unless subject.klass == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
+        return unless subject[:klass] == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
 
         'Eligibilities::Osse::BenefitSponsorshipOssePolicy'
       end
@@ -70,7 +80,7 @@ module Eligibilities
       def grant_for(value)
         grants.detect do |grant|
           value_instance = grant.value
-          value_instance.value == value
+          value_instance.value.to_s == value.to_s
         end
       end
     end
