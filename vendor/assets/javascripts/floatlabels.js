@@ -74,7 +74,7 @@
                 thisElement.on('keyup blur change', function( e ) {
                     self.checkValue( e );
                 });
-                thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : '#838780' }); });
+                thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : '#767676' }); });
                 thisElement.on('focus', function() { thisElement.prev('label').css({ 'color' : '#2996cc' }); });
                 window.setTimeout( function() {
                     self.$label.css( animationCss );
