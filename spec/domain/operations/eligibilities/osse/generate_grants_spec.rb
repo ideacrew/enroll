@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers.rb"
 
-RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
+RSpec.describe ::Operations::Eligibilities::Osse::GenerateGrants,
                type: :model,
                dbclean: :after_each do
 
@@ -13,19 +13,35 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
   let(:dc_profile)                 { dc_employer_organization.employer_profile  }
   let(:benefit_sponsorship)         { dc_profile.add_benefit_sponsorship }
   let(:subject_ref) { benefit_sponsorship.to_global_id }
-  let(:effective_date) { TimeKeeper.date_of_record }
+  let(:effective_date) { Date.new(2023,1,1) }
+  let(:evidence_key) { :osse_subsidy }
+
+  let!(:eligibility) do
+    benefit_sponsorship.save!
+    result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call({
+      subject_gid: subject_ref,
+      evidence_key: evidence_key,
+      evidence_value: "true",
+      effective_date: effective_date
+    })
+
+    eligibility = benefit_sponsorship.eligibilities.build(result.success.to_h)
+    eligibility.save!
+    eligibility
+  end
 
   let(:required_params) do
     {
-      subject_gid: subject_ref,
-      evidence_key: :osse_subsidy,
-      evidence_value: "true",
-      effective_date: effective_date
+      eligibility_gid: eligibility.to_global_id,
+      evidence_key: evidence_key
     }
   end
 
-  before do
-    benefit_sponsorship.save!
+  let(:grant_keys) do
+    feature = EnrollRegistry["#{benefit_sponsorship.market_kind}_benefit_sponsorship_#{evidence_key}_#{effective_date.year}"]
+    feature.setting(:grants_offered).item.collect do |key|
+      EnrollRegistry[key].item
+    end
   end
 
   it 'should be a container-ready operation' do
@@ -39,17 +55,19 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
       expect(result.success?).to be_truthy
     end
 
-    it 'should create eligibility' do
+    it 'should return grants' do
       result = subject.call(required_params)
-      expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
+
+      expect(result.success).to be_an_instance_of(Array)
+      expect(result.success.map(&:key)).to eq grant_keys
     end
   end
 
   context 'when required attributes not passed' do
     it 'should fail with validation error' do
-      result = subject.call(required_params.except(:effective_date))
+      result = subject.call(required_params.except(:evidence_key))
       expect(result.failure?).to be_truthy
-      expect(result.failure).to include("effective date missing")
+      expect(result.failure).to include("evidence key missing")
     end
   end
 end

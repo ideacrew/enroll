@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Eligibilities
     module Osse
-      # Build eligibility for the subject with given eligibility and effective date
+      # Build grants for the given evidence
       class GenerateGrants
         send(:include, Dry::Monads[:result, :do])
 
@@ -15,9 +15,9 @@ module Operations
         # @option opts [<String>]   :evidence_key required
         # @return [Dry::Monad] result
         def call(params)
-          values = yield validate(params)
+          values   = yield validate(params)
           evidence = yield verify_evidence_satisfied?(values)
-          grants = yield create_grants(values, evidence)
+          grants   = yield create_grants(values, evidence)
 
           Success(grants)
         end
@@ -34,31 +34,16 @@ module Operations
 
         # TODO: next sprint: implement visitor pattern for checking evidence satisfied
         def verify_evidence_satisfied?(values)
-          eligibility_instance = GlobalID::Locator.locate(values[:eligibility_gid])
-          evidence = eligibility_instance.evidences.by_key(values[:evidence_key]).last
+          @eligibility_instance = GlobalID::Locator.locate(values[:eligibility_gid])
+          evidence = @eligibility_instance.evidences.by_key(values[:evidence_key]).last
           return Success(evidence) if evidence.is_satisfied
           Failure("#{values[:evidence_key]} is not satisfield")
         end
 
         def create_grants(values, evidence)
-          eligibility_instance = GlobalID::Locator.locate(values[:eligibility_gid])
-          grant_rules = fetch_grant_configurations_for(eligibility_instance, evidence)
-
+          grant_rules = fetch_grant_configurations_for(evidence)
           grants = grant_rules.collect do |rule_pair|
-            value = {
-              title: rule_pair.keys[0].to_s,
-              key: rule_pair.values[0].to_s,
-              value: rule_pair.values[0].to_s
-            }
-
-            grant_params = {
-              title: rule_pair.keys[0].to_s,
-              key: rule_pair.values[0].to_s,
-              start_on: eligibility_instance.start_on,
-               # TODO: figure out how to identify value class name
-              value: value
-            }
-
+            grant_params = build_grant(rule_pair)
             grant_result = create_grant(grant_params)
             grant_result.success if grant_result.success?
           end.compact
@@ -66,38 +51,58 @@ module Operations
           Success(grants)
         end
 
-          # following method returns grant_keys as below
-          #   [
-          #     :minimum_participation_rule_relaxed,
-          #     :all_contribution_levels_min_met_relaxed,
-          #     :benefit_application_fte_count_relaxed,
-          #     :employer_metal_level_products_restricted
-          #   ]
-        def fetch_grant_configurations_for(eligibility_instance, evidence)
-          market_kind = market_kind_for(eligibility_instance)
-          feature = EnrollRegistry["#{market_kind}_#{evidence.key}_#{eligibility_instance.start_on.year}"]
-          grant_keys = feature.setting("registered_grants_#{eligibility_instance.start_on.year}".to_sym).item
+        def create_grant(grant_params)
+          ::Operations::Eligibilities::Osse::CreateGrant.new.call(grant_params)
+        end
+
+        def fetch_grant_configurations_for(evidence)
+          feature = EnrollRegistry["#{market_kind}_#{subject_name}_#{evidence.key}_#{eligibility_year}"]
+          grant_keys = feature.setting(:grants_offered).item
           fetch_rules_configurations(grant_keys)
         end
 
-        def market_kind_for(eligibility_instance)
-          subject = GlobalID::Locator.locate(eligibility_instance.subject.key)
+        def build_grant(rule_pair)
+          {
+            title: rule_pair.keys[0].to_s,
+            key: rule_pair.values[0].to_s,
+            start_on: start_on,
+             # TODO: figure out how to identify value class name
+            value: build_grant_value(rule_pair)
+          }
+        end
+
+        def build_grant_value(rule_pair)
+          {
+            title: rule_pair.keys[0].to_s,
+            key: rule_pair.values[0].to_s,
+            value: rule_pair.values[0].to_s
+          }
+        end
+
+        def start_on
+          @eligibility_instance.start_on
+        end
+
+        def eligibility_year
+          start_on.year
+        end
+
+        def subject
+          GlobalID::Locator.locate(@eligibility_instance.subject.key)
+        end
+
+        def subject_name
+          subject&.class.name.demodulize.underscore
+        end
+
+        def market_kind
           subject.market_kind
         end
 
-        # following method returns
-        #  [{
-        #     key: :minimum_participation_rule_relaxed,
-        #     value: :minimum_participation_rule
-        #   }]
         def fetch_rules_configurations(grant_keys)
           grant_keys.reduce([]) do |rule_pairs, key|
             rule_pairs << Hash[key, EnrollRegistry[key].item]
           end
-        end
-
-        def create_grant(grant_params)
-          ::Operations::Eligibilities::Osse::CreateGrant.new.call(grant_params)
         end
       end
     end

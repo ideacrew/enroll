@@ -1230,7 +1230,7 @@ module BenefitSponsors
     end
 
     def eligibility_for(eligibility_type)
-      benefit_sponsorship.eligibility_for(eligibility_type)
+      benefit_sponsorship.eligibility_for(eligibility_type, start_on)
     end
 
     def grant_value_for(eligibility_type, grant_type)
@@ -1241,7 +1241,7 @@ module BenefitSponsors
 
     def validate_minimum_participation_rule
       if (value = grant_value_for(:osse_subsidy, :minimum_participation_rule))
-        value.run
+        return value.run
       end
 
       enrollment_ratio >= employee_participation_ratio_minimum
