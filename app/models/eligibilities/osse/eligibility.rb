@@ -33,6 +33,15 @@ module Eligibilities
 
       after_create :create_grants
 
+      scope :by_date, ->(compare_date = TimeKeeper.date_of_record) {
+        where(
+          "$or" => [
+            { :start_on.lte => compare_date, :end_on => nil},
+            { :start_on.lte => compare_date, :end_on.gte => compare_date }
+          ]
+        )
+      }
+
       def create_grants
         grant_values = evidences.inject([]) do |values, evidence|
           grant_result = Operations::Eligibilities::Osse::GenerateGrants.new.call(

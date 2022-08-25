@@ -357,9 +357,9 @@ module BenefitSponsors
       primary_office_location.present? && primary_office_location.address.present?
     end
 
-    def eligibility_for(evidence_key)
-      eligibilities.select do |eligibility|
-        el = eligibility.evidences.by_key(evidence_key).first
+    def eligibility_for(evidence_key, start_on)
+      eligibilities.by_date(start_on).select do |eligibility|
+        el = eligibility.evidences.by_key(evidence_key).last
         el&.is_satisfied == true
       end.last
     end

@@ -23,6 +23,7 @@ module BenefitSponsors
       delegate :dba,        :dba=,        to: :organization, allow_nil: true
       delegate :fein,       :fein=,       to: :organization, allow_nil: true
       delegate :entity_kind,              to: :organization, allow_nil: true
+      delegate :active_benefit_sponsorship, to: :organization, allow_nil: true
 
       embeds_many :office_locations,
                   class_name:"BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
@@ -65,9 +66,15 @@ module BenefitSponsors
 
       def build_osse_eligibility
         if self.osse_eligibility_changed?
-          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(osse_eligibility_params)
+          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call({
+            subject_gid: active_benefit_sponsorship.to_global_id,
+            evidence_key: :osse_subsidy,
+            evidence_value: osse_eligibility,
+            effective_date: TimeKeeper.date_of_record
+          })
+
           if result.success?
-            eligibility = result.success
+            eligibility = active_benefit_sponsorship.eligibilities.build(result.success.to_h)
             eligibility.save!
           end
         end
@@ -80,7 +87,7 @@ module BenefitSponsors
       end
 
       def fetch_sponsorship_source_kind
-        organization.active_benefit_sponsorship.source_kind
+        active_benefit_sponsorship.source_kind
       end
 
       def is_a_conversion_employer?
@@ -162,15 +169,6 @@ module BenefitSponsors
       end
 
       private
-
-      def osse_eligibility_params
-        {
-          subject_gid: self.benefit_sponsorships.first.to_global_id,
-          evidence_key: :osse_subsidy,
-          evidence_value: osse_eligibility,
-          effective_date: TimeKeeper.date_of_record
-        }
-      end
 
       # Subclasses may extend this method
       def initialize_profile
