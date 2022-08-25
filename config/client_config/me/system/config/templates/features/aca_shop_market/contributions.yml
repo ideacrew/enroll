@@ -516,12 +516,16 @@ registry:
     - :catalog_2022
     - :osse_eligibility_criteria
     features:
-      - key: :aca_shop_osse_subsidy_2022
+      - key: :aca_shop_benefit_sponsorship_osse_subsidy_2022
         item: :osse_eligibility_criterion
         is_enabled: false
         settings:
-        - key: :registered_grants_2022
-          item: ['minimum_participation_rule_relaxed_2022', 'all_contribution_levels_min_met_relaxed_2022', 'benefit_application_fte_count_relaxed_2022', 'employer_metal_level_products_restricted_2022']
+        - key: :grants_offered
+          item:
+            - :minimum_participation_rule_relaxed_2022
+            - :all_contribution_levels_min_met_relaxed_2022
+            - :benefit_application_fte_count_relaxed_2022
+            - :employer_metal_level_products_restricted_2022
       - key: :minimum_participation_rule_relaxed_2022
         item: minimum_participation_rule
         is_enabled: false
@@ -541,12 +545,16 @@ registry:
     - :catalog_2023
     - :osse_eligibility_criteria
     features:
-      - key: :aca_shop_osse_subsidy_2023
+      - key: :aca_shop_benefit_sponsorship_osse_subsidy_2023
         item: :osse_eligibility_criterion
         is_enabled: false
         settings:
-        - key: :registered_grants_2023
-          item: ['minimum_participation_rule_relaxed_2023', 'all_contribution_levels_min_met_relaxed_2023', 'benefit_application_fte_count_relaxed_2023', 'employer_metal_level_products_restricted_2023']
+        - key: :grants_offered
+          item:
+            - :minimum_participation_rule_relaxed_2023
+            - :all_contribution_levels_min_met_relaxed_2023
+            - :benefit_application_fte_count_relaxed_2023
+            - :employer_metal_level_products_restricted_2023
       - key: :minimum_participation_rule_relaxed_2023
         item: minimum_participation_rule
         is_enabled: false
