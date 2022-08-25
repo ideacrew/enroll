@@ -22,4 +22,8 @@ class IvlCostSavings
   def self.submit_new_application_btn
     'input[value="Start new application"]'
   end
+
+  def self.select_transfer_history
+    '.interaction-click-control-transfer-history'
+  end
 end

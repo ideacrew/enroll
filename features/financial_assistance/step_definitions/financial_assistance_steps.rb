@@ -691,6 +691,30 @@ And(/^the user should click on the destroy applicant icon$/) do
   find('.fa-times').click
 end
 
+Given(/^the Transfer history feature configuration is enabled$/) do
+  enable_feature :transfer_history_page, {registry_name: FinancialAssistanceRegistry}
+end
+
+When(/^admin clicks on the Cost Savings link$/) do
+  find_link('Cost Savings').click
+end
+
+Then(/^admin should see Transfer history$/) do
+  expect(page).to have_content "Transfer History"
+end
+
+When(/^admin clicks on actions dropdown$/) do
+  find(IvlCostSavings.actions_dropdown).click
+end
+
+When(/^admin clicks on Transfer History$/) do
+  find(IvlCostSavings.select_transfer_history).click
+end
+
+Then(/^Transfer History page should display$/) do
+  expect(page).to have_content('Transfer History')
+end
+
 Then(/^user should see need help paying question$/) do
   page.has_css?(FinancialAssistance::ReviewApplicationPage.need_help_paying_bills)
 end
