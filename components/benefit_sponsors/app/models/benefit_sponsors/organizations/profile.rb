@@ -23,7 +23,6 @@ module BenefitSponsors
       delegate :dba,        :dba=,        to: :organization, allow_nil: true
       delegate :fein,       :fein=,       to: :organization, allow_nil: true
       delegate :entity_kind,              to: :organization, allow_nil: true
-      delegate :active_benefit_sponsorship, to: :organization, allow_nil: true
 
       embeds_many :office_locations,
                   class_name:"BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
@@ -65,6 +64,8 @@ module BenefitSponsors
       end
 
       def build_osse_eligibility
+        return unless active_benefit_sponsorship
+
         if self.osse_eligibility_changed?
           result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
             {
