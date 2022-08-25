@@ -603,6 +603,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
       before do
         allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(true)
+        allow(view).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -619,7 +620,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it "should not display osse amount" do
-        expect(view).to_not have_content(l10n('osse_amount'))
+        expect(view).to_not have_content(l10n('hc44cc_premium_discount'))
       end
     end
   end
