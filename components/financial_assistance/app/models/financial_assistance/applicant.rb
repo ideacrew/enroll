@@ -819,7 +819,7 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
-      questions_array << non_ssn_apply_reason if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) && is_ssn_applied == false && is_applying_coverage
+      questions_array << (non_ssn_apply_reason == "" ? nil : non_ssn_apply_reason) if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) && is_ssn_applied == false && is_applying_coverage
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
