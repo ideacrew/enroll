@@ -21,11 +21,11 @@ class User
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
-      errors.add :oim_id, "cannot contain special characters ; # % = | + , \" > < \\ \/"
+      errors.add :oim_id, "Username cannot contain special characters ; # % = | + , \" > < \\ \/"
     elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
-      errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
+      errors.add :oim_id, "Username must be at least #{MIN_USERNAME_LENGTH} characters"
     elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
-      errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
+      errors.add :oim_id, "Username can NOT exceed #{MAX_USERNAME_LENGTH} characters"
     end
   end
 
