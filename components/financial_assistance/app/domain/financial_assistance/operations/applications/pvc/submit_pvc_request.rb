@@ -95,7 +95,7 @@ module FinancialAssistance
           end
 
           def build_event(payload)
-            event('events.iap.applications.periodic_verification_confirmation', attributes: payload)
+            event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { applications: payload })
           end
 
           def publish(payload)
