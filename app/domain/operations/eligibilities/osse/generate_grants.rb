@@ -40,7 +40,7 @@ module Operations
           Failure("#{values[:evidence_key]} is not satisfield")
         end
 
-        def create_grants(values, evidence)
+        def create_grants(_values, evidence)
           grant_rules = fetch_grant_configurations_for(evidence)
           grants = grant_rules.collect do |rule_pair|
             grant_params = build_grant(rule_pair)
@@ -92,7 +92,7 @@ module Operations
         end
 
         def subject_name
-          subject&.class.name.demodulize.underscore
+          subject&.class&.name&.demodulize&.underscore
         end
 
         def market_kind
