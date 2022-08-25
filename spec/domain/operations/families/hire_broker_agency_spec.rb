@@ -17,7 +17,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent.id,
-                        start_date: TimeKeeper.datetime_of_record,
+                        start_date: DateTime.now,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
@@ -39,7 +39,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent.id,
-                        start_date: TimeKeeper.datetime_of_record,
+                        start_date: DateTime.now,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
@@ -61,7 +61,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent2.id,
-                        start_date: TimeKeeper.datetime_of_record,
+                        start_date: DateTime.now,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
@@ -72,12 +72,27 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
       end
     end
 
+    context 'hiring broker in imported state' do
+      it 'should return failure' do
+        writing_agent.update_attributes(aasm_state: 'imported')
+        hire_params = { family_id: family.id,
+                        terminate_date: TimeKeeper.date_of_record,
+                        broker_role_id: writing_agent.id,
+                        start_date: DateTime.now,
+                        current_broker_account_id: family&.current_broker_agency&.id }
+
+        result = subject.call(hire_params)
+        expect(result).to be_a(Dry::Monads::Result::Failure)
+        expect(result.failure.messages.map(&:text)).to eq ["Cant Hire Broker with imported state"]
+      end
+    end
+
     context 'when invalid params passed' do
       it 'should return failure' do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: BSON::ObjectId.new,
-                        start_date: TimeKeeper.datetime_of_record,
+                        start_date: DateTime.now,
                         current_broker_account_id: BSON::ObjectId.new }
 
         result = subject.call(hire_params)
