@@ -5,7 +5,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddContributionModelsToProductPackage < MongoidMigrationTask
 
   def migrate
-    date = Date.new(2022,1,1)
+    application_date = ENV['APPLICATION_DATE'] || TimeKeeper.date_of_record
+    date = application_date.to_date
     puts "creating contribution models for year #{date.year}" unless Rails.env.test?
     site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first
 
