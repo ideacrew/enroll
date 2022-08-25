@@ -3,6 +3,8 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
+
+
 module Operations
   module PremiumCredits
     # This operation is to find Csr value.
@@ -19,29 +21,26 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Invalid params. missing group_premium_credits') if params[:group_premium_credits].blank?
-        return Failure('Invalid params. group_premium_credits should be an instance of Group Premium Credit') if params[:group_premium_credits].any? { |gp| !gp.is_a?(GroupPremiumCredit) }
         return Failure('Missing family member ids') unless params[:family_member_ids]
+        return Failure('Missing family') unless params[:family]
+        return Failure('Missing year') unless params[:year]
 
         Success(params)
       end
 
       def find_csr_value(values)
-        @member_premium_credits = values[:group_premium_credits].collect do |group_premium_credit|
-          group_premium_credit.member_premium_credits.csr_eligible.select { |member_premium_credit| values[:family_member_ids].include? member_premium_credit.family_member_id }
-        end.flatten
+        @subjects = values[:family].eligibility_determination.subjects.where(:gid.in => values[:family_member_ids])
 
-        @csr_hash = @member_premium_credits.inject({}) do |result, member_premium_credit|
-          result[member_premium_credit.family_member_id] = member_premium_credit.value
+        @csr_hash = @subjects.inject({}) do |result, subject|
+          result[subject.gid] = subject.csr_by_year(values[:year])
           result
         end
+
+        any_member_ia_not_eligible = values[:family_member_ids].any? { |family_member_id| @csr_hash[family_member_id].nil? }
 
         csr_values = @csr_hash.values.uniq
 
         handle_native_american_csr
-
-        # TODO: is_ia_eligible doesn't exist on member premium credit.
-        any_member_ia_not_eligible = @member_premium_credits.any? { |member_premium_credit| !member_premium_credit.is_ia_eligible }
 
         csr_value = (any_member_ia_not_eligible || csr_values.blank?) ? 'csr_0' : retrieve_csr(csr_values)
 
@@ -51,23 +50,22 @@ module Operations
       def handle_native_american_csr
         return if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
 
-        @member_premium_credits.each do |member_premium_credit|
-          family_member = member_premium_credit.family_member
-          # TODO: is_ia_eligible doesn't exist on member premium credit.
-          @csr_hash[family_member.id] = 'csr_limited' if family_member.person.indian_tribe_member && !member_premium_credit.is_ia_eligible
+        @subjects.each do |subject|
+          @csr_hash[subject.gid] = 'csr_limited' if subject.person.indian_tribe_member
         end
 
-        family_members_with_ai_an = @member_premium_credits.map(&:family_member).select { |fm| fm.person.indian_tribe_member }.map(&:id)
-        @member_premium_credits = @member_premium_credits.reject { |member_premium_credit| family_members_with_ai_an.include? member_premium_credit.family_member_id }
+        family_members_with_ai_an = @subjects.map(&:person).select(&:indian_tribe_member).map(&:gid)
+
+        @subjects = @subjects.reject { |subject| family_members_with_ai_an.include? subject.gid }
       end
 
       def retrieve_csr(csr_values)
         return 'csr_0' if csr_values.include?('0')
         return 'csr_0' if csr_values.include?('limited') && (csr_values.include?('73') || csr_values.include?('87') || csr_values.include?('94'))
-        return 'csr_73' if csr_values.include?('csr_73')
-        return 'csr_87' if csr_values.include?('csr_87')
-        return 'csr_94' if csr_values.include?('csr_94')
-        return 'csr_100' if csr_values.include?('csr_100')
+        return 'csr_73' if csr_values.include?('73')
+        return 'csr_87' if csr_values.include?('87')
+        return 'csr_94' if csr_values.include?('94')
+        return 'csr_100' if csr_values.include?('100')
         'csr_0'
       end
     end

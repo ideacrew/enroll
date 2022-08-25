@@ -1539,9 +1539,7 @@ class HbxEnrollment
     end
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: effective_on.year, kind: 'aptc_csr' })
-      group_premium_credits = result.value! if result.success?
-      elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, group_premium_credits, market)
+      elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, nil, market)
     else
       tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
       elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)

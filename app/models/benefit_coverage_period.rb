@@ -155,7 +155,7 @@ class BenefitCoveragePeriod
 
   # TODO: This can be removed once we get rid of temporary config.
   # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Style/ConditionalAssignment
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, group_premium_credits = nil, market = nil)
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household = nil, market = nil)
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
     subcriber = hbx_enrollment_members.detect(&:is_subscriber)
@@ -163,16 +163,17 @@ class BenefitCoveragePeriod
     american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      csr_kind = if group_premium_credits
-                   result = ::Operations::PremiumCredits::FindCsrValue.new.call({ group_premium_credits: group_premium_credits, family_member_ids: shopping_family_member_ids })
+      subjects = hbx_enrollment.family.eligibility_determination&.subjects
+
+      csr_kind = if subjects&.where(:"eligibility_states.eligibility_item_key" => 'aptc_csr_credit').present?
+                   result = ::Operations::PremiumCredits::FindCsrValue.new.call({ family: hbx_enrollment.family, year: hbx_enrollment.effective_on.year, family_member_ids: shopping_family_member_ids })
                    result.value!
                  elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
                    'csr_limited'
                  end
     else
-      # group_premium_credits is singular tax_household here.
-      csr_kind = if group_premium_credits
-                   extract_csr_kind(group_premium_credits, shopping_family_member_ids)
+      csr_kind = if tax_household
+                   extract_csr_kind(tax_household, shopping_family_member_ids)
                  elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
                    'csr_limited'
                  end

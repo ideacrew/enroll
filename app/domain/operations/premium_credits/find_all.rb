@@ -27,10 +27,9 @@ module Operations
       end
 
       def find_all(values)
-        active_group_premium_credits = values[:family].group_premium_credits.where(kind: values[:kind]).active
-        group_premium_credits = active_group_premium_credits.by_year(values[:year]).order_by(:created_at.desc)
+        grants = values[:family].eligibility_determination&.grants&.where(key: values[:kind], year: values[:year])
 
-        Success(group_premium_credits)
+        Success(grants)
       end
     end
   end

@@ -36,7 +36,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
-    plan_selection.apply_aptc_if_needed(@elected_aptc, @max_aptc) if can_apply_aptc?(@enrollment.product)
+    plan_selection.apply_aptc_if_needed(@elected_aptc, @max_aptc) if can_apply_aptc?(plan_selection.plan)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
@@ -193,18 +193,28 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_eligibility_data
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      @grants = aptc_grants(@person.primary_family, @hbx_enrollment.effective_on.year)
+      @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: @hbx_enrollment, effective_on: @hbx_enrollment.effective_on}).value!
       @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
       session[:max_aptc] = @max_aptc
       default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
       @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
+      @tax_household = @grants
     else
-      session[:max_aptc] = 0
-      session[:elected_aptc] = 0
+      shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+
+      if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
+        @tax_household = shopping_tax_household
+        @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+        @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
+        session[:max_aptc] = @max_aptc
+        default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+        @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
+      else
+        session[:max_aptc] = 0
+        session[:elected_aptc] = 0
+      end
     end
   end
 
@@ -485,11 +495,11 @@ class Insured::PlanShoppingsController < ApplicationController
     # TODO: This can be removed once we get rid of temporary config.
     # rubocop:disable Style/IfInsideElse
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      group_premium_credits(@person.primary_family, hbx_enrollment.effective_on.year) if @person.present?
+      aptc_grants(@person.primary_family, hbx_enrollment.effective_on.year) if @person.present?
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
     end
-    if @shopping_tax_household.present? || @group_premium_credits.present?
+    if @shopping_tax_household.present? || @aptc_grants.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f
     else
@@ -499,18 +509,18 @@ class Insured::PlanShoppingsController < ApplicationController
     # rubocop:enable Style/IfInsideElse
   end
 
-  def group_premium_credits(family, year)
-    return @group_premium_credits if defined? @group_premium_credits
+  def aptc_grants(family, year)
+    return @aptc_grants if defined? @aptc_grants
 
-    result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: year, kind: 'aptc_csr' })
-    @group_premium_credits = result.value! if result.success?
+    result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: year, kind: 'aptc_grant' })
+    @aptc_grants = result.value! if result.success?
   end
 
   def can_apply_aptc?(plan)
     return false if @enrollment.is_shop?
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      @group_premium_credits.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+      @aptc_grants.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
     else
       @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
     end

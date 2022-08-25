@@ -36,22 +36,23 @@ module Operations
       end
 
       def not_eligible?
-        result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'aptc_csr' })
+        result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'aptc_grant' })
 
         return true if result.failure?
 
-        @group_premium_credits = result.value!
+        @aptc_grants = result.value!
 
-        return true if @group_premium_credits.blank?
-        return true if (@group_premium_credits.map(&:member_premium_credits).flatten.map(&:family_member_id).uniq && enrolled_family_member_ids).blank?
+        return true if @aptc_grants.blank?
+        return true if (@aptc_grants.map(&:member_ids).flatten.uniq & enrolled_family_member_ids).blank?
 
         false
       end
 
       def available_aptc
-        aptc = available_aptc_hash.values.sum - utilized_aptc
+        available_aptc_hash.values.sum - utilized_aptc
+        # aptc = available_aptc_hash.values.sum - utilized_aptc
 
-        [aptc, @hbx_enrollment.total_ehb_premium].min
+        # [aptc, @hbx_enrollment.total_ehb_premium].min
       end
 
       def utilized_aptc
@@ -66,27 +67,27 @@ module Operations
       end
 
       def available_aptc_hash
-        @group_premium_credits.where(:"member_premium_credits.family_member_id".in => enrolled_family_member_ids).inject({}) do |result, group_premium_credit|
-          available_aptc = current_max_aptc_hash[group_premium_credit.id] - benchmark_premium_of_non_enrolling(group_premium_credit)
+        @aptc_grants.where(:member_ids.in => enrolled_family_member_ids).inject({}) do |result, aptc_grant|
+          available_aptc = current_max_aptc_hash[aptc_grant.id] - benchmark_premium_of_non_enrolling(aptc_grant)
           available_aptc = (available_aptc > 0.0) ? available_aptc : 0.0
-          result[group_premium_credit.id] = available_aptc
+          result[aptc_grant.id] = available_aptc
           result
         end
       end
 
       def current_max_aptc_hash
-        @group_premium_credits.where(:"member_premium_credits.family_member_id".in => enrolled_family_member_ids).inject({}) do |result, group_premium_credit|
-          result[group_premium_credit.id] = group_premium_credit.premium_credit_monthly_cap
+        @aptc_grants.where(:member_ids.in => enrolled_family_member_ids).inject({}) do |result, aptc_grant|
+          result[aptc_grant.id] = aptc_grant.value
           result
         end
       end
 
       def enrolled_family_member_ids
-        @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
+        @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
       end
 
-      def aptc_eligible_non_enrolled_family_members_without_active_enrollment(group_premium_credit)
-        aptc_eligible_non_enrolled_family_member_ids = group_premium_credit.member_premium_credits.map(&:family_member_id).uniq - enrolled_family_member_ids
+      def aptc_eligible_non_enrolled_family_members_without_active_enrollment(aptc_grant)
+        aptc_eligible_non_enrolled_family_member_ids = aptc_grant.member_ids - enrolled_family_member_ids
 
         return aptc_eligible_non_enrolled_family_member_ids if active_enrollments.blank?
 
@@ -97,8 +98,8 @@ module Operations
         @active_enrollments ||= @family.active_household.hbx_enrollments.enrolled.individual_market
       end
 
-      def benchmark_premium_of_non_enrolling(group_premium_credit)
-        aptc_eligible_non_enrolled_family_members_without_active_enrollment(group_premium_credit).reduce(0) do |_sum, member_id|
+      def benchmark_premium_of_non_enrolling(aptc_grant)
+        aptc_eligible_non_enrolled_family_members_without_active_enrollment(aptc_grant).reduce(0) do |_sum, member_id|
           # TODO: use benchmark_premiums method instead of instance variable.
           @benchmark_premiums[member_id][:premium]
         end
@@ -108,7 +109,10 @@ module Operations
         # We're going to persist these values.
         # We're going to mock for the time being.
 
-        @benchmark_premiums = []
+        @benchmark_premiums = @family.family_members.inject({}) do |result, family_member|
+          result[family_member.id] = { premium: 0.0 }
+          result
+        end
       end
     end
   end
