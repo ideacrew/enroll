@@ -96,7 +96,7 @@ module Operations
 
       def update_member_effective_dates
         new_enrollment.hbx_enrollment_members.each do |member|
-          if base_enrollment.product.hios_id == new_enrollment.product.hios_id
+          if base_enrollment.product.is_same_plan_by_hios_id_and_active_year?(new_enrollment.product)
             member.update_attributes(eligibility_date: new_enrollment.effective_on, coverage_start_on: new_enrollment.effective_on)
           else
             member.update_attributes(eligibility_date: new_enrollment.effective_on)
