@@ -17,7 +17,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent.id,
-                        start_date: TimeKeeper.datetime_of_record,
+                        start_date: TimeKeeper.date_of_record,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
@@ -78,7 +78,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent.id,
-                        start_date: TimeKeeper.datetime_of_record,
+                        start_date: TimeKeeper.date_of_record,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
