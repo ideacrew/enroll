@@ -100,7 +100,7 @@ module FinancialAssistance
 
           def publish(payload)
             event = build_event(payload)
-            event.success.publish
+            event.publish
 
             Success("Successfully published the pvc batch")
           end
