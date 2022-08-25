@@ -19,11 +19,11 @@ RSpec.describe ::Operations::Eligibilities::Osse::GenerateGrants,
   let!(:eligibility) do
     benefit_sponsorship.save!
     result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call({
-      subject_gid: subject_ref,
-      evidence_key: evidence_key,
-      evidence_value: "true",
-      effective_date: effective_date
-    })
+                                                                            subject_gid: subject_ref,
+                                                                            evidence_key: evidence_key,
+                                                                            evidence_value: "true",
+                                                                            effective_date: effective_date
+                                                                          })
 
     eligibility = benefit_sponsorship.eligibilities.build(result.success.to_h)
     eligibility.save!

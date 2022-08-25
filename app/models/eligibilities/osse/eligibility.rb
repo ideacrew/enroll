@@ -33,7 +33,7 @@ module Eligibilities
 
       after_create :create_grants
 
-      scope :by_date, ->(compare_date = TimeKeeper.date_of_record) {
+      scope :by_date, lambda { |compare_date = TimeKeeper.date_of_record|
         where(
           "$or" => [
             { :start_on.lte => compare_date, :end_on => nil},

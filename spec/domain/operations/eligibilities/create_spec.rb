@@ -15,8 +15,8 @@ RSpec.describe ::Operations::Eligibilities::Create,
   let(:subject_ref) { benefit_sponsorship.to_global_id }
 
   let(:required_params) do
-    { 
-      title:"osse_subsidy Eligibility",
+    {
+      title: "osse_subsidy Eligibility",
       start_on: TimeKeeper.date_of_record,
       subject: {
         title: "Subject for osse_subsidy",

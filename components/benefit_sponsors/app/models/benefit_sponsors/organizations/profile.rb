@@ -66,12 +66,14 @@ module BenefitSponsors
 
       def build_osse_eligibility
         if self.osse_eligibility_changed?
-          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call({
-            subject_gid: active_benefit_sponsorship.to_global_id,
-            evidence_key: :osse_subsidy,
-            evidence_value: osse_eligibility,
-            effective_date: TimeKeeper.date_of_record
-          })
+          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
+            {
+              subject_gid: active_benefit_sponsorship.to_global_id,
+              evidence_key: :osse_subsidy,
+              evidence_value: osse_eligibility,
+              effective_date: TimeKeeper.date_of_record
+            }
+          )
 
           if result.success?
             eligibility = active_benefit_sponsorship.eligibilities.build(result.success.to_h)
