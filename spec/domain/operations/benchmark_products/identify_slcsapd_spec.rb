@@ -4,6 +4,11 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
 
 RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  include_context 'family with 2 family members with county_zip, rating_area & service_area'
   include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
 
   describe '#call' do
