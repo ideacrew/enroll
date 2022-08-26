@@ -592,7 +592,7 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        return false if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination) && applicant.full_medicaid_determination
+        return false if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination) && self.full_medicaid_determination
         return false if FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible) && applicant.is_non_magi_medicaid_eligible
         return false if FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons) && applicant.is_eligible_for_non_magi_reasons
 
