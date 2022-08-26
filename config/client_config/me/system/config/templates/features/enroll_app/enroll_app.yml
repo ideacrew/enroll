@@ -774,9 +774,3 @@ registry:
         is_enabled: true
       - key: :osse_eligibility_history
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
-
-
-      - key: :ivl_osse_eligibility
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
-      - key: :shop_osse_eligibility
-        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
