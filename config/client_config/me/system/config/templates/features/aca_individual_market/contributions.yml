@@ -18,6 +18,3 @@ registry:
         - key: :aca_ivl_osse_subsidy_2023
           item: :aca_ivl_osse_subsidy_2023
           is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
-
-        
-
