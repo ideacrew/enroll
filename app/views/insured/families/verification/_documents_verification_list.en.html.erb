@@ -9,25 +9,25 @@
 <h4><b><%= state_abbreviation %> Residency:</b></h4>
 <p>Documents you can use to verify <%= state_abbreviation %> residency include:</p>
 <ul>
-  <li>A copy of an active lease agreement, certified deed, or mortgage statement with <%= state_abbreviation %> address</li>
-  <li>A phone or utility bill from within the past two months</li>
-  <li><%= state_abbreviation %> voter registration card</li>
-  <li>A valid District of Columbia motor vehicle registration or <%= state_abbreviation %> DMV identification card</li>
-  <li>Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months</li>
-  <li>Utility bills with a <%= state_abbreviation %> address, and payment receipts within the past 2 months</li>
-  <li>Proof of automobile insurance showing the person’s <%= state_abbreviation %> residency address</li>
-  <li>A signed <%= state_abbreviation %> Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: <a href="<%= EnrollRegistry[:enroll_app].setting(:site_key).item %>" target= "_blank"><%= EnrollRegistry[:enroll_app].setting(:site_key).item %></a>)</li>
-  <li>Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence</li>
+  <li>A copy of an active lease agreement, certified deed, or mortgage statement with the <%= state_abbreviation %> address you have listed on your <%= site_short_name %> account</li>
+  <li>A phone or utility bill from within the past two months with the <%= state_abbreviation %> address you have listed on your <%=  site_short_name %> account</li>
+  <li><%= state_abbreviation %> voter registration card with the <%= state_abbreviation %> address you have listed on your <%=  site_short_name%> account</li>
+  <li>A valid <%= state_abbreviation %> motor vehicle registration or <%= state_abbreviation %> DMV identification card with the <%= state_abbreviation %> address you have listed on your <%= site_short_name %> account</li>
+  <li>Cancelled checks or receipts for mortgage or rental payments within the past 2 months for a residence at the <%= state_abbreviation %> address you have listed on your <%= site_short_name %> account</li>
+  <li>Utility bills with the <%= state_abbreviation %> address you have listed on your <%= site_short_name %> account, and payment receipts within the past 2 months</li>
+  <li>Proof of automobile insurance showing the <%= state_abbreviation %> residency address you have listed on your <%= site_short_name %> account</li>
+  <li>A signed <a href="https://dmv.dc.gov/page/proof-dc-residency-certifications" target="_blank" rel="noopener noreferrer"><%= state_abbreviation %> Department of Motor Vehicles proof of residency form</a> from another District resident stating that the applicant lives at the <%= state_abbreviation %> address you have listed on your <%= site_short_name %> account</li>
+  <li>Self-attestation of <%= state_abbreviation %> residency without paper documentation in exceptional circumstances, including homelessness, in cases where you are temporarily absent from the District but intend to return, and in cases where you lack access to proof of <%= state_abbreviation%> residency as a result of domestic violence</li>
 </ul>
 
 <h4><b>Citizenship:</b></h4>
-<h5>Primary documentation: (only one needed)</h5>
+<h5>Primary documentation: (only one (1) needed)</h5>
 <ul>
   <li>U.S. Passport (Note: Expired passports are acceptable)</li>
   <li>Certificate of Naturalization</li>
   <li>Certificate of Citizenship</li>
   <li>Consular report of Birth Abroad of U.S. Citizen</li>
-  <li>A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license</li>
+  <li>A valid Driver’s License from a state that requires proof of citizenship or immigration status and verification of Social Security Number prior to issuance of the license</li>
   <li>A tribal document issued by a federally-recognized Indian Tribe, which must:</li>
   <ul>
     <li>Identify the Tribe issuing the document</li>
@@ -70,7 +70,7 @@
   <li>Employment Authorization Card (EAD or I-766)</li>
   <li>Arrival/Departure Record (I-94 or I-94A)</li>
   <li>Arrival/Departure Record in foreign passport (I-94)</li>
-  <li>Foreign passport</li>
+  <li>Unexpired visa in a foreign passport</li>
   <li>Country of issuance Reentry Permit (I-327)</li>
   <li>Refugee travel document (I-571)</li>
   <li>Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)</li>
@@ -105,4 +105,28 @@
     </ul>
   </li>
 </ul>
+<h4><b>Income:</b></h4>
+<p>Documents you can use to verify income include:</p>
+<ul>
+  <li>Most recent tax return, including all forms and schedules</li>
+  <li>If your income has changed, you can also provide the following:
+    <ul>
+      <li>Paystubs: Copies of your most recent consecutive pay stubs (no older than 30 days from the date document(s) received)</li>
+      <li>Letter from your employer (If you are employed but do not receive pay stubs)</li>
+      <li>Award Letters (such as Civil Service Retirement, Social Security, Railroad Retirement)</li>
+      <li>Documentation of adjustments to income that you intend to take on your federal tax return (i.e. alimony payments, self-employed health insurance payments, health savings account deductions, and moving expenses)</li>
+      <li>Personnel Action or termination letter from your prior employer</li>
+      <li>Documentation of any other income (Example: Interest, dividend, annuities, trust income)</li>
+      <li>Unemployment benefits letter</li>
+    </ul>
+  </li>
+</ul>
+<h4><b>Access to Other Health Coverage:</b></h4>
+<p>Documents you can use to verify you do not have access to other health coverage include:</p>
+<ul>
+  <li>A certificate of coverage or letter from your former health insurance company showing the end date of coverage</li>
+  <li>A government-issued document showing the date coverage ended or ineligibility for a program</li>
+  <li>A <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employer%20Coverage%20Tool.pdf" target="_blank" rel="noopener noreferrer">statement from your employer</a> that indicates the coverage they offer doesn’t meet the minimum value standard</li>
+</ul>
+
 </div>

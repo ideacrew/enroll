@@ -39,9 +39,10 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
     end
     let(:consumer_role) { FactoryBot.create(:consumer_role) }
 
+    let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual) }
     let!(:enrollment) do
       hbx_enrollment = FactoryBot.create(:hbx_enrollment,
-                                         :with_product,
+                                         product: product2,
                                          family: family,
                                          household: family.active_household,
                                          hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],
@@ -57,6 +58,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       hbx_enrollment.save!
       hbx_enrollment
     end
+
 
     before :each do
       EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
@@ -223,8 +225,10 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         end
 
         it 'member should have coverage start on as new enrollment effective on' do
+          # since checking product hios_id instead of subscriber drop for coverage start on,
+          # member's start on will be the effective date of the old enrollment
           new_enrollment = family.hbx_enrollments.where(:id.ne => enrollment.id).last
-          expect(new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [new_enrollment.effective_on, enrollment.hbx_enrollment_members.first.eligibility_date]
+          expect(new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [enrollment.effective_on]
         end
       end
 

@@ -65,7 +65,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
       user_with_hbx_staff_role.person.hbx_staff_role.permission_id = super_admin_permission.id
       user_with_hbx_staff_role.person.hbx_staff_role.save!
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:shop_osse_eligibility).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility_history).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_view_osse_eligibility?).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_edit_osse_eligibility?).and_return(true)
@@ -96,7 +96,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
       hbx_csr_tier1_user.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
       hbx_csr_tier1_user.person.hbx_staff_role.permission_id = hbx_csr_tier1_permission.id
       hbx_csr_tier1_user.person.hbx_staff_role.save!
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:shop_osse_eligibility).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:osse_eligibility_history).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_view_osse_eligibility?).and_return(true)
       allow(view).to receive(:pundit_allow).with(HbxProfile, :can_edit_osse_eligibility?).and_return(false)

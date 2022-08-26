@@ -717,8 +717,6 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
-      - key: :osse_eligibility
-        is_enabled: <%= ENV['OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
       - key: issuer_provided_code
         item: 'DCS002'
         is_enabled: true
@@ -728,3 +726,8 @@ registry:
       - key: :osse_eligibility_history
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
 
+      - key: :ivl_osse_eligibility
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
+      - key: :shop_osse_eligibility
+        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
+      
