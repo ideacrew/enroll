@@ -22,14 +22,16 @@ describe AddContributionModelsToProductPackage do
     let(:current_effective_date) { TimeKeeper.date_of_record }
     let!(:product_packages) { current_benefit_market_catalog.product_packages }
 
-    it 'should update minimum_contribution_factor on all contribution units' do
-      subject.migrate
-      current_benefit_market_catalog.reload
-      current_benefit_market_catalog.product_packages.each do |product_package|
-        product_package.reload
-        expect(product_package.contribution_models.present?).to be_truthy
-        product_package.contribution_models.each do |contribution_model|
-          expect(contribution_model.contribution_units.present?).to be_truthy
+    it 'should update minimum_contribution_ factor on all contribution units' do
+      ClimateControl.modify APPLICATION_DATE: current_effective_date.strftime do
+        subject.migrate
+        current_benefit_market_catalog.reload
+        current_benefit_market_catalog.product_packages.each do |product_package|
+          product_package.reload
+          expect(product_package.contribution_models.present?).to be_truthy
+          product_package.contribution_models.each do |contribution_model|
+            expect(contribution_model.contribution_units.present?).to be_truthy
+          end
         end
       end
     end

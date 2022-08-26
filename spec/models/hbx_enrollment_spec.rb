@@ -1393,6 +1393,42 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
+  describe "broker agency account for EDI" do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    let(:hire_broker) {family.hire_broker_agency(writing_agent.id)}
+    let(:subject) {HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, family: family)}
+
+    before(:each) do
+      family.hire_broker_agency(writing_agent.id)
+      family.reload
+      family.broker_agency_accounts.first.update_attributes(start_on: TimeKeeper.date_of_record - 1.day)
+    end
+
+    context "family with imported broker agency assignment" do
+      it "should not return broker agency account" do
+        writing_agent.update_attributes(aasm_state: 'imported')
+        expect(subject.broker_agency_account_for_edi).to eq nil
+      end
+    end
+
+    context "family with broker assistor assignment" do
+      it "should not return broker agency account" do
+        writing_agent.npn = 'SMECDOA08'
+        writing_agent.save(validate: false)
+        expect(subject.broker_agency_account_for_edi).to eq nil
+      end
+    end
+
+    context "family with active broker assignment" do
+      it "should return broker agency account" do
+        expect(subject.broker_agency_account_for_edi.writing_agent.npn).to eq writing_agent.npn
+      end
+    end
+  end
+
   describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'", dbclean: :around_each do
     subject {HbxEnrollment.new({:enrollment_kind => "special_enrollment"})}
 
