@@ -1,42 +1,5 @@
 # frozen_string_literal: true
 
-# {
-#   family_id: ,
-#   effective_date: ,
-#   geographic_rating_area_model: ,
-#   primary_applicant_id: ,
-#   rating_address: ,
-#   households: [
-#     {
-#       type_of_household: ,
-#       health_product_hios_id: ,
-#       dental_product_hios_id: ,
-#       total_benchmark_ehb_premium: ,
-#       members: [
-#         {
-#           family_member_id: ,
-#           member_ehb_benchmark_health_premium: ,
-#           member_ehb_benchmark_dental_premium: ,
-#           age_on_effective_date: ,
-#         }
-#       ]
-#     }
-#   ]
-# }
-
-# Given:
-#   family_id
-#   effective_date
-#     households: [
-#       {
-#         members: [
-#           {
-#             family_member_id:
-#           }
-#         ]
-#       }
-#     ]
-
 module Operations
   module BenchmarkProducts
     # This class is to identify SLCSP with Pediatric Dental Costs for a group of family_members & effective date.
@@ -79,7 +42,6 @@ module Operations
         bpm_params = benchmark_product_model.to_h
         bpm_params[:households].each_with_index do |household, ind|
           next unless check_slcsapd_enabled?(household, benchmark_product_model)
-          # household or household hash should be the result
           result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
             { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
           )
