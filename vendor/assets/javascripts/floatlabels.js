@@ -66,7 +66,7 @@
                     'opacity'                       : '0',
                     'font-size'                     : '11px',
                     'font-weight'                   : 'bold',
-                    'color'                         : '#838780'
+                    'color'                         : '#767676'
                 });
                 if( !settings.slideInput ) {                    
                     thisElement.css({ 'padding-top' : this.inputPaddingTop });
