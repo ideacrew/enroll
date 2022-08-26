@@ -39,7 +39,7 @@ module Operations
         def build_eligibility(values)
           Success(
             {
-              title: "#{values[:evidence_key].to_s.gsub('_', ' ').titleize} Eligibility",
+              title: "#{title(values[:evidence_key])} Eligibility",
               start_on: values[:effective_date],
               subject: construct_subject(values).success,
               evidences: construct_evidences(values).success
@@ -79,7 +79,7 @@ module Operations
         end
 
         def title(key)
-          key.to_s.gsub('_', ' ').titleize
+          key.to_s.titleize
         end
       end
     end
