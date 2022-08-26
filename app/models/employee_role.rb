@@ -6,10 +6,14 @@ class EmployeeRole
   include BenefitSponsors::ModelEvents::EmployeeRole
   include BenefitSponsors::Concerns::Observable
   include Mongoid::History::Trackable
+  include GlobalID::Identification
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
 
   embedded_in :person
+
+  has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
+                           as: :eligibility
 
   field :employer_profile_id, type: BSON::ObjectId
   field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId

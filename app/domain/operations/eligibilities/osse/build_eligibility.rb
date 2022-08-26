@@ -39,7 +39,7 @@ module Operations
         def build_eligibility(values)
           Success(
             {
-              title: "#{values[:evidence_key]} Eligibility",
+              title: "#{values[:evidence_key].to_s.gsub('_', ' ').titleize} Eligibility",
               start_on: values[:effective_date],
               subject: construct_subject(values).success,
               evidences: construct_evidences(values).success
@@ -56,7 +56,7 @@ module Operations
 
           Success(
             {
-              title: "Subject for #{values[:evidence_key]}",
+              title: "Subject for #{title(values[:evidence_key])}",
               key: values[:subject_gid].uri,
               klass: subject_instance.class.to_s
             }
@@ -66,7 +66,7 @@ module Operations
         def construct_evidences(values)
           Success([
             {
-              title: "Evidence for #{values[:evidence_key]}",
+              title: "Evidence for #{title(values[:evidence_key])}",
               key: values[:evidence_key],
               is_satisfied: is_satisfied?(values[:evidence_value])
             }
@@ -76,6 +76,10 @@ module Operations
         def is_satisfied?(value)
           return value if value.is_a?(Boolean)
           value.to_s == 'true'
+        end
+
+        def title(key)
+          key.to_s.gsub('_', ' ').titleize
         end
       end
     end
