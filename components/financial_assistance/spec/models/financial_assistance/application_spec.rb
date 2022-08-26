@@ -1922,7 +1922,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it 'should return false if applicant is non magi medicaid eligible' do
         expect(application.full_medicaid_determination).to eq(true)
-        expect(application.is_transferrable?(@applicant)).to eq(false)
+        expect(application.is_transferrable?).to eq(false)
       end
     end
   end
