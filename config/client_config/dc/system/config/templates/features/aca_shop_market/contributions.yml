@@ -518,7 +518,7 @@ registry:
     features:
       - key: :aca_shop_benefit_sponsorship_osse_subsidy_2022
         item: :osse_eligibility_criterion
-        is_enabled: true
+        is_enabled: false
         settings:
         - key: :grants_offered
           item:
@@ -528,16 +528,16 @@ registry:
             - :employer_metal_level_products_restricted_2022
       - key: :minimum_participation_rule_relaxed_2022
         item: minimum_participation_rule
-        is_enabled: true
+        is_enabled: false
       - key: :all_contribution_levels_min_met_relaxed_2022
         item: 'all_contribution_levels_min_met'
-        is_enabled: true
+        is_enabled: false
       - key: :benefit_application_fte_count_relaxed_2022
         item: 'benefit_application_fte_count'
-        is_enabled: true
+        is_enabled: false
       - key: :employer_metal_level_products_restricted_2022
         item: 'employer_metal_level_products'
-        is_enabled: true
+        is_enabled: false
   - namespace:
     - :enroll_app
     - :aca_shop_market
