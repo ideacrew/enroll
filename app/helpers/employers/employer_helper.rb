@@ -325,11 +325,19 @@ module Employers::EmployerHelper
   end
 
   def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+    if year == (TimeKeeper.date_of_record.year || TimeKeeper.date_of_record.next_year.year)
+      EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+    else
+      false
+    end
   end
 
   def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+    if year == (TimeKeeper.date_of_record.year || TimeKeeper.date_of_record.next_year.year)
+      EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+    else
+      false
+    end
   end
 
   def osse_eligibility_history_is_enabled?
