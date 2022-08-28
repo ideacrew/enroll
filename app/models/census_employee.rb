@@ -41,6 +41,7 @@ class CensusEmployee < CensusMember
   include Insured::FamiliesHelper
   include BenefitSponsors::ModelEvents::CensusEmployee
   include Ssn
+  include GlobalID::Identification
 
   require 'roo'
 
@@ -117,6 +118,7 @@ class CensusEmployee < CensusMember
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
+  after_save :publish_employee_created, only: [:create]
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events]
 
@@ -652,6 +654,18 @@ class CensusEmployee < CensusMember
 
   def most_recent_expired_benefit_application
     benefit_sponsorship.most_recent_expired_benefit_application
+  end
+
+  def publish_employee_created
+    publish_event('created', { employee_global_id: self.to_global_id.to_s })
+  end
+
+  def publish_event(event, payload)
+    event = event("events.benefit_sponsors.census_employee.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for census_employee: #{self.id} event due to #{e.backtrace}" }
   end
 
   # DEPRECATE IF POSSIBLE
