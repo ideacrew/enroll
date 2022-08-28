@@ -66,7 +66,7 @@ module Subscribers
 
       def subscriber_logger
         return @subscriber_logger if defined? @subscriber_logger
-        @subscriber_logger = Logger.new("#{Rails.root}/log/on_open_enrollment_began_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") 
+        @subscriber_logger = Logger.new("#{Rails.root}/log/on_open_enrollment_began_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       end
     end
   end

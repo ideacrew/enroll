@@ -17,7 +17,7 @@ module Subscribers
         logger.info "CensusEmployeeSubscriber on_census_employee_created payload: #{payload}"
 
         create_employee_osse_eligibility(census_employee)
-        
+
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
         subscriber_logger.info "CensusEmployeeSubscriber, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
@@ -52,9 +52,9 @@ module Subscribers
             errors =
               case result.failure
               when Array
-                  result.failure
+                result.failure
               when Dry::Validation::Result
-                  result.failure.errors.to_h
+                result.failure.errors.to_h
               end
             subscriber_logger.info "on_census_employee_created employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, census_employee: #{census_employee.full_name}"
             logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for census_employee: #{census_employee.full_name}, employer fein: #{employer.fein}"
@@ -69,7 +69,7 @@ module Subscribers
         eligible_date = census_employee.earliest_eligible_date
         active_assignment = active_benefit_group_assignment(eligible_date)
         is_osse_eligibile_with_assignment?(active_assignment)
-        
+
         renewal_assignment = renewal_benefit_group_assignment
         is_osse_eligibile_with_assignment?(renewal_assignment)
 
@@ -79,9 +79,7 @@ module Subscribers
       def is_osse_eligibile_with_assignment?(assignment)
         benefit_application = assignment&.benefit_package&.benefit_application
         return unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(application.aasm_state)
-        if benefit_application && benefit_application.eligibility_for(:osse_subsidy).present?
-          @eligible_applications << benefit_application
-        end
+        @eligible_applications << benefit_application if benefit_application && benefit_application.eligibility_for(:osse_subsidy).present?
       end
     end
   end
