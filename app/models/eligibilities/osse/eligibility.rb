@@ -43,6 +43,8 @@ module Eligibilities
       }
 
       def create_grants
+        return if subject[:klass] == 'EmployeeRole'
+
         grant_values = evidences.inject([]) do |values, evidence|
           grant_result = Operations::Eligibilities::Osse::GenerateGrants.new.call(
             {

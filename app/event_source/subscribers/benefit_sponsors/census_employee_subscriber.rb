@@ -40,7 +40,7 @@ module Subscribers
               subject_gid: employee_role.to_global_id,
               evidence_key: :osse_subsidy,
               evidence_value: 'true',
-              effective_date: benefit_application.start_on
+              effective_date: benefit_application.start_on.to_date
             }
           )
 
