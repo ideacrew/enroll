@@ -8,7 +8,7 @@ module BenefitSponsors
     include ::BenefitSponsors::ModelEvents::BenefitApplication
     include ::BenefitSponsors::Employers::EmployerHelper
     include EventSource::Command
-
+    include GlobalID::Identification
     include AASM
 
     embedded_in :benefit_sponsorship,
@@ -1230,12 +1230,12 @@ module BenefitSponsors
       [:canceled, :retroactive_canceled].include?(aasm_state)
     end
 
-    def eligibility_for(eligibility_type)
-      benefit_sponsorship.eligibility_for(eligibility_type, start_on)
+    def eligibility_for(evidence_key)
+      benefit_sponsorship.eligibility_for(evidence_key, start_on)
     end
 
-    def grant_value_for(eligibility_type, grant_type)
-      eligibility = eligibility_for(eligibility_type)
+    def grant_value_for(evidence_key, grant_type)
+      eligibility = eligibility_for(evidence_key)
       grant = eligibility&.grant_for(grant_type)
       grant&.value
     end
@@ -1275,12 +1275,14 @@ module BenefitSponsors
 
     private
 
+    # We may have to send actual payload hash along with the event. since external systems will not have access for enroll records.
+    # Build a standard payload schema for applications that includes employer information
     def publish_enrollment_open_event
-      publish_event('open_enrollment_began', { benefit_sponsorship_hbx_id: benefit_sponsorship.hbx_id, effective_date: start_on })
+      publish_event('open_enrollment_began', { application_global_id: self.to_global_id.to_s })
     end
 
     def publish_event(event, payload)
-      event = event("events.benefit_sponsors.benefit_applications.#{event}", attributes: payload)
+      event = event("events.benefit_sponsors.benefit_application.#{event}", attributes: payload)
 
       event.success.publish if event.success?
     rescue StandardError => e
