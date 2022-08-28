@@ -7,6 +7,7 @@ module BenefitSponsors
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
     include ::BenefitSponsors::Employers::EmployerHelper
+    include EventSource::Command
 
     include AASM
 
@@ -862,7 +863,7 @@ module BenefitSponsors
       ## End optional states for exception processing
 
       # TODO: send_employee_invites - needs to be moved to observer pattern.
-      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
+      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites, :publish_enrollment_open_event] # Approved application has entered open enrollment period
       state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
       state :binder_paid            # made binder payment - used by initial applications only
@@ -1273,6 +1274,18 @@ module BenefitSponsors
     end
 
     private
+
+    def publish_enrollment_open_event
+      publish_event('open_enrollment_began', { benefit_sponsorship_hbx_id: benefit_sponsorship.hbx_id, effective_date: start_on })
+    end
+
+    def publish_event(event, payload)
+      event = event("events.benefit_sponsors.benefit_applications.#{event}", attributes: payload)
+
+      event.success.publish if event.success?
+    rescue StandardError => e
+      Rails.logger.error { "Couldn't publish #{event} for benefit_application: #{self.id} event due to #{e.backtrace}" }
+    end
 
     def can_retroactive_cancel?
       start_on <= TimeKeeper.date_of_record

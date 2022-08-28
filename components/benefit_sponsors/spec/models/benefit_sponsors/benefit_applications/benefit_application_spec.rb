@@ -399,6 +399,13 @@ module BenefitSponsors
                 end
               end
             end
+
+            context "publishes event when open enrollment begins" do
+              it "should call publish_enrollment_open_event" do
+                expect(benefit_application).to receive(:publish_enrollment_open_event)
+                benefit_application.begin_open_enrollment!
+              end
+            end
           end
 
           context 'revert reverse_enrollment_eligibility' do
