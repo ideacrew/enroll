@@ -32,6 +32,7 @@ module Subscribers
         benefit_sponsorship = benefit_application.benefit_sponsorship
         benefit_sponsorship.census_employees.without_cobra.non_terminated.each do |census_employee|
           employee_role = census_employee.employee_role
+          next unless employee_role
           result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
             {
               subject_gid: employee_role.to_global_id,

@@ -42,6 +42,7 @@ class CensusEmployee < CensusMember
   include BenefitSponsors::ModelEvents::CensusEmployee
   include Ssn
   include GlobalID::Identification
+  include EventSource::Command
 
   require 'roo'
 

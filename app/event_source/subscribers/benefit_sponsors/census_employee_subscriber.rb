@@ -29,6 +29,7 @@ module Subscribers
 
       def create_employee_osse_eligibility(census_employee)
         @eligible_applications = []
+        return unless census_employee.employee_role
         return unless is_census_employee_osse_eligible?(census_employee)
 
         @eligible_applications.each do |benefit_application|
@@ -67,19 +68,25 @@ module Subscribers
         return false if ::CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include?(census_employee.aasm_state)
 
         eligible_date = census_employee.earliest_eligible_date
-        active_assignment = active_benefit_group_assignment(eligible_date)
+        active_assignment = census_employee.active_benefit_group_assignment(eligible_date)
         is_osse_eligibile_with_assignment?(active_assignment)
 
-        renewal_assignment = renewal_benefit_group_assignment
+        renewal_assignment = census_employee.renewal_benefit_group_assignment
         is_osse_eligibile_with_assignment?(renewal_assignment)
 
         @eligible_applications.present?
       end
 
-      def is_osse_eligibile_with_assignment?(assignment)
+      def is_osse_eligibile_with_assignment?(assignment = nil)
         benefit_application = assignment&.benefit_package&.benefit_application
-        return unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(application.aasm_state)
-        @eligible_applications << benefit_application if benefit_application && benefit_application.eligibility_for(:osse_subsidy).present?
+        return unless benefit_application
+        return unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(benefit_application.aasm_state)
+        @eligible_applications << benefit_application if benefit_application.eligibility_for(:osse_subsidy).present?
+      end
+
+      def subscriber_logger
+        return @subscriber_logger if defined? @subscriber_logger
+        @subscriber_logger = Logger.new("#{Rails.root}/log/on_open_enrollment_began_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       end
     end
   end
