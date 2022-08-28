@@ -55,13 +55,7 @@ module BenefitSponsors
          }
 
     rule  :benefit_application_fte_count,
-          validate: lambda { |benefit_application|
-                      if benefit_application.is_renewing?
-                        true
-                      else
-                        benefit_application.fte_count >= EMPLOYEE_MINIMUM_COUNT && benefit_application.fte_count < EMPLOYEE_MAXIMUM_COUNT
-                      end
-                    },
+          validate: ->(benefit_application){ benefit_application.validate_fte_count },
           success: ->(_benfit_application)  { "validated successfully" },
           fail: ->(_benefit_application) { "Small business should have #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
 
@@ -102,18 +96,7 @@ module BenefitSponsors
          fail: ->(_benefit_application) { "This employer is ineligible to enroll for coverage at this time" }
 
     rule :all_contribution_levels_min_met,
-         validate: lambda { |benefit_application|
-           if benefit_application.benefit_packages.map(&:sponsored_benefits).flatten.present?
-             if benefit_application.effective_period.min.month == 1
-               true
-             else
-               all_contributions = benefit_application.benefit_packages.collect(&:sorted_composite_tier_contributions)
-               all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
-             end
-           else
-             false
-           end
-         },
+         validate: ->(benefit_application){ benefit_application.validate_minimum_employer_contribution_rule },
          success: ->(_benfit_application)  { "validated successfully" },
          fail: ->(_benefit_application) { "one or more contribution minimum not met" }
 

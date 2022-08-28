@@ -336,7 +336,7 @@ registry:
         is_enabled: true
         settings:
           - key: :contribution_model_key
-            item: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: :fifty_percent_sponsor_fixed_percent_contribution_model
           - key: :benefit_application_kind
             item: :initial
           - key: :effective_period
@@ -509,3 +509,61 @@ registry:
           item: 0
         - key: :employer_family_contribution_percent_minimum
           item: 0
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
+    - :catalog_2022
+    - :osse_eligibility_criteria
+    features:
+      - key: :aca_shop_benefit_sponsorship_osse_subsidy_2022
+        item: :osse_eligibility_criterion
+        is_enabled: false
+        settings:
+        - key: :grants_offered
+          item:
+            - :minimum_participation_rule_relaxed_2022
+            - :all_contribution_levels_min_met_relaxed_2022
+            - :benefit_application_fte_count_relaxed_2022
+            - :employer_metal_level_products_restricted_2022
+      - key: :minimum_participation_rule_relaxed_2022
+        item: minimum_participation_rule
+        is_enabled: false
+      - key: :all_contribution_levels_min_met_relaxed_2022
+        item: 'all_contribution_levels_min_met'
+        is_enabled: false
+      - key: :benefit_application_fte_count_relaxed_2022
+        item: 'benefit_application_fte_count'
+        is_enabled: false
+      - key: :employer_metal_level_products_restricted_2022
+        item: 'employer_metal_level_products'
+        is_enabled: false
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
+    - :catalog_2023
+    - :osse_eligibility_criteria
+    features:
+      - key: :aca_shop_benefit_sponsorship_osse_subsidy_2023
+        item: :osse_eligibility_criterion
+        is_enabled: true
+        settings:
+        - key: :grants_offered
+          item:
+            - :minimum_participation_rule_relaxed_2023
+            - :all_contribution_levels_min_met_relaxed_2023
+            - :benefit_application_fte_count_relaxed_2023
+            - :employer_metal_level_products_restricted_2023
+      - key: :minimum_participation_rule_relaxed_2023
+        item: minimum_participation_rule
+        is_enabled: true
+      - key: :all_contribution_levels_min_met_relaxed_2023
+        item: 'all_contribution_levels_min_met'
+        is_enabled: true
+      - key: :benefit_application_fte_count_relaxed_2023
+        item: 'benefit_application_fte_count'
+        is_enabled: true
+      - key: :employer_metal_level_products_restricted_2023
+        item: 'employer_metal_level_products'
+        is_enabled: true

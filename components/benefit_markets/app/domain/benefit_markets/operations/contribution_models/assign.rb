@@ -18,7 +18,7 @@ module BenefitMarkets
           criteria               = yield find_criteria(enrollment_eligibility)
           filtered_criteria      = yield filter_criteria(criteria, product_package_values[:contribution_models])
           matched_criterion      = yield match_criterion(filtered_criteria, enrollment_eligibility)
-          product_package_values = yield assign(product_package_values, matched_criterion)
+          product_package_values = yield assign(product_package_values, matched_criterion, enrollment_eligibility)
 
           Success({product_package_values: product_package_values })
         end
@@ -52,8 +52,14 @@ module BenefitMarkets
           Success(criterion)
         end
 
-        def assign(product_package_values, matched_criterion)
-          criterion_contribution_key = matched_criterion.setting(:contribution_model_key).item
+        # TODO: hard coded contribution model key for OSSE for now
+        def assign(product_package_values, matched_criterion, enrollment_eligibility)
+          criterion_contribution_key =
+            if enrollment_eligibility.osse_min_employer_contribution
+              :zero_percent_sponsor_fixed_percent_contribution_model
+            else
+              matched_criterion.setting(:contribution_model_key).item
+            end
 
           product_package_values[:assigned_contribution_model] = product_package_values[:contribution_models].detect do |contribution_model|
             contribution_model.key == criterion_contribution_key

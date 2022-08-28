@@ -10,6 +10,7 @@ module BenefitSponsors
     let(:fein)              { "100001001" }
     let(:entity_kind)       { :c_corporation }
     let(:contact_method)    { :paper_and_electronic }
+    let(:osse_eligibility) { true }
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                 site: site,
@@ -31,6 +32,7 @@ module BenefitSponsors
         organization: organization,
         office_locations: office_locations,
         contact_method: contact_method,
+        osse_eligibility: osse_eligibility
       }
     end
 
@@ -158,6 +160,15 @@ module BenefitSponsors
 
       end
 
+    end
+
+    context "osse_eligibility" do
+      let(:subject) {described_class.new(params)}
+      let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile: subject) }
+
+      it "should persist osse_eligibility" do
+        expect(benefit_sponsorship.profile.osse_eligibility).to eql(true)
+      end
     end
 
     context "Adding a second or greater BenefitSponsorship" do
