@@ -39,7 +39,11 @@ module Operations
         def build_eligibility(values)
           Success(
             {
+<<<<<<< HEAD
               title: "#{title(values[:evidence_key])} Eligibility",
+=======
+              title: "#{values[:evidence_key]} Eligibility",
+>>>>>>> origin/trunk
               start_on: values[:effective_date],
               subject: construct_subject(values).success,
               evidences: construct_evidences(values).success
