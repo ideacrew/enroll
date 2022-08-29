@@ -30,5 +30,6 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_eligibility_description' => "Licensed child development centers and homes and their employees are eligible for premium reductions. Eligibility is applied to an initial or renewal plan year when the plan year is created.",
   :'en.osse_eligibility_question' => 'Does this business qualify for OSSE subsidies?',
   :'en.eligibility_history' => 'View eligibility history',
-  :'en.osse_subsidy_title' => 'Healthcare4Childcare (HC4CC) Program'
+  :'en.osse_subsidy_title' => 'Healthcare4Childcare (HC4CC) Program',
+  :'en.osse_subsidy_title_shortname' => 'HC4CC'
 }.freeze

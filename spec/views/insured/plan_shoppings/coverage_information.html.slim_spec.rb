@@ -27,4 +27,9 @@ describe "insured/plan_shoppings/_coverage_information.html.slim", dbclean: :aft
     render "insured/plan_shoppings/coverage_information", enrollment: enrollment
     expect(rendered).to have_selector('td', text: 0.0)
   end
+
+  it "should display osse amount if the enrollment has an osse subsidy" do
+    expect(rendered).to have_content(l10n("osse_subsidy_title_shortname"))
+  end
+
 end

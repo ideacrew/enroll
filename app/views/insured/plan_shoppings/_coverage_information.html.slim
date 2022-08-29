@@ -8,6 +8,7 @@
         th.text-right scope="col" = l10n("premium")
         th.text-right width="50" scope="col" = l10n("employer_contribution")
         th.text-right width="50" scope="col" = l10n("you_pay")
+        th.text-nowrap.text-center colspan="2" scope="colgroup" = l10n("program_assistance")
     tbody
       - @enrollment.hbx_enrollment_members.each do |member|
         tr
@@ -17,6 +18,8 @@
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency (member_enrollment = @member_group.group_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == member.id }).product_price)
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.sponsor_contribution)
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.employee_cost)
+          td.text-right = l10n("osse_subsidy_title_shortname") 
+          td.text-center = (number_to_currency member_enrollment.employee_cost)
       tr.gray-row
         td.ext-right.capital colspan="3"
           strong Totals
@@ -26,8 +29,11 @@
           strong = number_to_currency(@member_group.group_enrollment.sponsor_contribution_total)
         td.text-right
           strong = number_to_currency(@member_group.group_enrollment.employee_cost_total)
+        td.text-right
+        td.text-center
+          strong = number_to_currency(@member_group.group_enrollment.employee_cost_total)
       tr
-        td.text-right colspan="5" Your coverage start date :
+        td.text-right colspan="7" Your coverage start date :
         td
           span.coverage_effective_date = @enrollment.effective_on.strftime("%m/%d/%Y")
       - if @terminate.present? && @terminate_date.present?
