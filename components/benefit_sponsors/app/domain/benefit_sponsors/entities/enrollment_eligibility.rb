@@ -10,6 +10,7 @@ module BenefitSponsors
       attribute :effective_date,                  Types::Strict::Date
       attribute :benefit_application_kind,        Types::Strict::Symbol
       attribute :service_areas,                   Types::Array.of(BenefitMarkets::Entities::ServiceArea)
+      attribute :osse_min_employer_contribution,  Types::Strict::Bool
 
     end
   end

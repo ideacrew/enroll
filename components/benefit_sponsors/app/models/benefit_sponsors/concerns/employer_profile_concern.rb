@@ -23,6 +23,7 @@ module BenefitSponsors
         # scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
         # delegate :legal_name, :end_on, :entity_kind, to: :organization
+        delegate :active_benefit_sponsorship, to: :organization
         delegate :roster_size, :broker_agency_accounts, to: :active_benefit_sponsorship
         delegate :general_agency_accounts, to: :plan_design_organization, allow_nil: true
       end
@@ -112,11 +113,6 @@ module BenefitSponsors
 
       def latest_benefit_application
         renewal_benefit_application || current_benefit_application
-      end
-
-      def active_benefit_sponsorship
-        return @benefit_sponsorship if defined? @benefit_sponsorship
-        @benefit_sponsorship = organization.active_benefit_sponsorship rescue nil
       end
 
       def benefit_applications

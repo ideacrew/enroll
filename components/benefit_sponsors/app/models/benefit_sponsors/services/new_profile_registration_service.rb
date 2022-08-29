@@ -140,7 +140,7 @@ module BenefitSponsors
           if is_cca_sponsor_profile?
             form.attributes.slice(:contact_method, :id, :sic_code, :referred_by, :referred_reason)
           else
-            form.attributes.slice(:contact_method, :id)
+            form.attributes.slice(:contact_method, :id, :osse_eligibility)
           end
         end
       end
