@@ -8,11 +8,11 @@ module Operations
       include Dry::Monads[:result, :do]
       include FloatHelper
 
+      # Identify the type of APTC household
+      # Identify the SLCSADP
+      # Calculate adjusted EHB premium values
+      # Identify the SLCSP for the tax household
       def call(params)
-        # Identify the type of APTC household
-        # Identify the SLCSADP
-        # Calculate adjusted EHB premium values
-        # Identify the SLCSP for the tax household
         benchmark_product_model = yield validate(params)
         family, benchmark_product_model = yield identify_type_of_household(benchmark_product_model)
         benchmark_product_model = yield identify_rating_and_service_areas(family, benchmark_product_model)

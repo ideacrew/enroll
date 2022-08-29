@@ -7,15 +7,14 @@ module Operations
       include Dry::Monads[:result, :do]
       include FloatHelper
 
+      # Identify all silver  plans offered within the service area
+      # Calculate the EHB cost of all available silver plans based on the rating area
+      # Identify plans that have embedded pediatric dental.
+      #   In SERFF PedDentalCovered = IIF([denChPrevIsCovered]='Covered' AND [denChBasicIsCovered]='Covered' AND [denChMajorIsCovered]='Covered',1,0)
+      # Adjust the EHB cost of all health plans that do not have pediatric dental benefits embedded
+      #   Add the EHB premium of the SLCSADP
       def call(params)
         # params = { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
-
-        # Identify all silver  plans offered within the service area
-        # Calculate the EHB cost of all available silver plans based on the rating area
-        # Identify plans that have embedded pediatric dental.
-        #   In SERFF PedDentalCovered = IIF([denChPrevIsCovered]='Covered' AND [denChBasicIsCovered]='Covered' AND [denChMajorIsCovered]='Covered',1,0)
-        # Adjust the EHB cost of all health plans that do not have pediatric dental benefits embedded
-        #   Add the EHB premium of the SLCSADP
 
         silver_health_products = yield fetch_silver_health_products(params)
         product_to_ehb_premium_hash = yield calculate_ehb_premiums(params, silver_health_products)

@@ -42,7 +42,6 @@ module BenefitMarkets
         }
       )
 
-
       alias_method :is_standard_plan?, :is_standard_plan
 
       def metal_level
