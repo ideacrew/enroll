@@ -3,7 +3,7 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
 
-RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts, :type => :model, dbclean: :after_each do
+RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts, type: :model, dbclean: :after_each do
   before :all do
     DatabaseCleaner.clean
   end
@@ -22,11 +22,11 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
             members: [
               {
                 family_member_id: family_member1.id,
-                relationship_kind: 'self'
+                relationship_with_primary: 'self'
               },
               {
                 family_member_id: family_member2.id,
-                relationship_kind: 'spouse'
+                relationship_with_primary: 'spouse'
               }
             ]
           }
@@ -44,7 +44,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
             members: [
               {
                 family_member_id: family_member1.id,
-                relationship_kind: 'self'
+                relationship_with_primary: 'self'
               }
             ]
           },
@@ -52,7 +52,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
             members: [
               {
                 family_member_id: family_member2.id,
-                relationship_kind: 'spouse'
+                relationship_with_primary: 'spouse'
               }
             ]
           }
@@ -77,10 +77,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         end
 
         it 'should return success with dental and health hios_ids' do
-          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.map(&:dental_product_hios_id)).to eq(['48396ME0860005', '48396ME0860005'])
           expect(@result.success.households.map(&:health_product_hios_id)).to eq(['48396ME0860011', '48396ME0860011'])
         end
@@ -101,10 +101,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
         it 'should return success with dental_hios_id' do
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
-          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.first.dental_product_hios_id).to eq('48396ME0860005')
         end
       end
@@ -119,10 +119,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
         it 'should return success with dental_hios_id' do
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
-          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.first.dental_product_hios_id).to eq('48396ME0860007')
         end
       end
@@ -138,10 +138,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
         it 'should return success without dental_hios_id' do
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
-          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
-          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium).compact).to be_empty
+          expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium).compact).to be_empty
           expect(@result.success.households.first.dental_product_hios_id).to eq(nil)
         end
       end
@@ -159,10 +159,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
           it 'should return success with health_hios_id' do
             expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
-            expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
             expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
-            expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
-            expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
             expect(@result.success.households.first.health_product_hios_id).to eq('48396ME0860011')
           end
         end
@@ -175,10 +175,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
           it 'should return success with health_hios_id' do
             expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
-            expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
             expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
-            expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
-            expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
             expect(@result.success.households.first.health_product_hios_id).to eq('48396ME0860013')
           end
         end

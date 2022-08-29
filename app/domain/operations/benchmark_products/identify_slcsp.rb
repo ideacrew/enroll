@@ -67,11 +67,11 @@ module Operations
       end
 
       def group_ehb_premium(health_product, benchmark_product_model)
-        child_members = @members.select { |member| member[:relationship_kind] == 'child' }
+        child_members = @members.select { |member| member[:relationship_with_primary] == 'child' }
 
         members = if child_members.count > 3
                     eligible_children = child_thhms.sort_by { |k| k[:age_on_effective_date] }.last(3)
-                    eligible_children + @members.reject { |member| member[:relationship_kind] == 'child' }
+                    eligible_children + @members.reject { |member| member[:relationship_with_primary] == 'child' }
                   else
                     @members
                   end
@@ -83,7 +83,7 @@ module Operations
         health_only_members_ehb_premium = BigDecimal((members_premium * health_product.ehb).round(2).to_s)
 
         if check_slcsapd_enabled?(@household, benchmark_product_model) && !health_product.covers_pediatric_dental?
-          [health_only_members_ehb_premium, health_only_members_ehb_premium + @household[:total_dental_benchmark_ehb_premium]]
+          [health_only_members_ehb_premium, health_only_members_ehb_premium + @household[:household_dental_benchmark_ehb_premium]]
         else
           [health_only_members_ehb_premium, health_only_members_ehb_premium]
         end
@@ -99,7 +99,7 @@ module Operations
         household[:health_product_hios_id] = product.hios_id
         household[:health_product_id] = product.id
         household[:health_ehb] = product.ehb
-        household[:total_health_benchmark_ehb_premium] = health_ehb_premium
+        household[:household_health_benchmark_ehb_premium] = health_ehb_premium
         household[:health_product_covers_pediatric_dental_costs] = product.covers_pediatric_dental?
         household[:household_benchmark_ehb_premium] = health_with_ped_ehb_premium
 

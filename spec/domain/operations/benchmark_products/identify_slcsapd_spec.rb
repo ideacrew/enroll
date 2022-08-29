@@ -22,11 +22,11 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
             members: [
               {
                 family_member_id: family_member1.id,
-                relationship_kind: 'self'
+                relationship_with_primary: 'self'
               },
               {
                 family_member_id: family_member2.id,
-                relationship_kind: 'spouse'
+                relationship_with_primary: 'spouse'
               }
             ]
           }
@@ -58,7 +58,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
         expect(@result.success[:dental_ehb]).not_to be_nil
-        expect(@result.success[:total_dental_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
 
@@ -76,7 +76,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
         expect(@result.success[:dental_ehb]).not_to be_nil
-        expect(@result.success[:total_dental_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
 

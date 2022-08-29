@@ -31,7 +31,7 @@ module Operations
         household[:dental_product_id] = product.id
         household[:dental_rating_method] = product.rating_method
         household[:dental_ehb] = product.ehb
-        household[:total_dental_benchmark_ehb_premium] = ehb_premium
+        household[:household_dental_benchmark_ehb_premium] = ehb_premium
 
         Success(household)
       end
@@ -94,11 +94,11 @@ module Operations
       end
 
       def total_premium(dental_product)
-        child_members = @members.select { |member| member[:relationship_kind] == 'child' }
+        child_members = @members.select { |member| member[:relationship_with_primary] == 'child' }
 
         members = if child_members.count > 3
                     eligible_children = child_thhms.sort_by { |k| k[:age_on_effective_date] }.last(3)
-                    eligible_children + @members.reject { |member| member[:relationship_kind] == 'child' }
+                    eligible_children + @members.reject { |member| member[:relationship_with_primary] == 'child' }
                   else
                     @members
                   end
@@ -114,7 +114,7 @@ module Operations
       end
 
       def family_tier_value
-        if @members.select { |member| member[:relationship_kind] == 'spouse' }
+        if @members.select { |member| member[:relationship_with_primary] == 'spouse' }
           couple_tier_value
         else
           primary_tier_value

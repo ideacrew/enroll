@@ -17,7 +17,7 @@ module Operations
         benchmark_product_model = yield identify_rating_and_service_areas(family, benchmark_product_model)
         benchmark_product_model = yield identify_slcsapd(family, benchmark_product_model)
         benchmark_product_model = yield identify_slcsp(family, benchmark_product_model)
-        benchmark_product_model = yield calculate_group_benchmark_ehb_premium(benchmark_product_model)
+        benchmark_product_model = yield calculate_household_group_benchmark_ehb_premium(benchmark_product_model)
 
         Success(benchmark_product_model)
       end
@@ -71,10 +71,10 @@ module Operations
         validate(bpm_params)
       end
 
-      def calculate_group_benchmark_ehb_premium(benchmark_product_model)
-        group_benchmark_ehb_premium = benchmark_product_model.households.sum(&:household_benchmark_ehb_premium)
+      def calculate_household_group_benchmark_ehb_premium(benchmark_product_model)
+        household_group_benchmark_ehb_premium = benchmark_product_model.households.sum(&:household_benchmark_ehb_premium)
         bpm_params = benchmark_product_model.to_h
-        bpm_params.merge!({ group_benchmark_ehb_premium: group_benchmark_ehb_premium })
+        bpm_params.merge!({ household_group_benchmark_ehb_premium: household_group_benchmark_ehb_premium })
 
         validate(bpm_params)
       end
