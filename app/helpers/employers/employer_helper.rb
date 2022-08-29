@@ -325,7 +325,7 @@ module Employers::EmployerHelper
   end
 
   def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    if year == (TimeKeeper.date_of_record.year || TimeKeeper.date_of_record.next_year.year)
+    if year >= 2021
       EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
     else
       false
@@ -333,7 +333,7 @@ module Employers::EmployerHelper
   end
 
   def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    if year == (TimeKeeper.date_of_record.year || TimeKeeper.date_of_record.next_year.year)
+    if year >= 2021
       EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
     else
       false
