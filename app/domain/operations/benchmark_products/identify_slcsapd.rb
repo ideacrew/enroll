@@ -5,7 +5,6 @@ module Operations
     # This Operation is used to identify the second lowest cost standalone dental plan.
     class IdentifySlcsapd
       include Dry::Monads[:result, :do]
-      include FloatHelper
 
       # find all dental products
       #   Pediatric-only dental plans are offered in ME
@@ -32,7 +31,7 @@ module Operations
         household[:dental_product_id] = product.id
         household[:dental_rating_method] = product.rating_method
         household[:dental_ehb] = product.ehb
-        household[:total_dental_benchmark_ehb_premium] = float_fix(ehb_premium)
+        household[:total_dental_benchmark_ehb_premium] = ehb_premium
 
         Success(household)
       end

@@ -6,7 +6,6 @@ module Operations
     # This class considers rating address of primary person of the given family to determine available products and their ratings.
     class IdentifySlcspWithPediatricDentalCosts
       include Dry::Monads[:result, :do]
-      include FloatHelper
 
       # Identify the type of APTC household
       # Identify the SLCSADP
@@ -75,7 +74,7 @@ module Operations
       def calculate_group_benchmark_ehb_premium(benchmark_product_model)
         group_benchmark_ehb_premium = benchmark_product_model.households.sum(&:household_benchmark_ehb_premium)
         bpm_params = benchmark_product_model.to_h
-        bpm_params.merge!({ group_benchmark_ehb_premium: float_fix(group_benchmark_ehb_premium) })
+        bpm_params.merge!({ group_benchmark_ehb_premium: group_benchmark_ehb_premium })
 
         validate(bpm_params)
       end

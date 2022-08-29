@@ -12,7 +12,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
     include_context 'family with 2 family members with county_zip, rating_area & service_area'
     include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
 
-    let(:input_params) do
+    let(:one_household) do
       {
         family_id: family.id,
         effective_date: start_of_year,
@@ -34,8 +34,57 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
       }
     end
 
+    let(:two_households) do
+      {
+        family_id: family.id,
+        effective_date: start_of_year,
+        exchange_provided_code: rating_area.exchange_provided_code,
+        households: [
+          {
+            members: [
+              {
+                family_member_id: family_member1.id,
+                relationship_kind: 'self'
+              }
+            ]
+          },
+          {
+            members: [
+              {
+                family_member_id: family_member2.id,
+                relationship_kind: 'spouse'
+              }
+            ]
+          }
+        ]
+      }
+    end
+
     before do
       EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].settings(start_of_year.year.to_s.to_sym).stub(:item).and_return(true)
+    end
+
+    context 'geographic_rating_area_model: single' do
+      before :each do
+        EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('single')
+        EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('single')
+      end
+
+      context 'household_type: child_only' do
+        before do
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
+          @result = subject.call(two_households)
+        end
+
+        it 'should return success with dental and health hios_ids' do
+          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:dental_product_hios_id)).to eq(['48396ME0860005', '48396ME0860005'])
+          expect(@result.success.households.map(&:health_product_hios_id)).to eq(['48396ME0860011', '48396ME0860011'])
+        end
+      end
     end
 
     context 'geographic_rating_area_model: county' do
@@ -47,11 +96,15 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
       context 'household_type: child_only' do
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
-          @result = subject.call(input_params)
+          @result = subject.call(one_household)
         end
 
         it 'should return success with dental_hios_id' do
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.first.dental_product_hios_id).to eq('48396ME0860005')
         end
       end
@@ -61,11 +114,15 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
-          @result = subject.call(input_params)
+          @result = subject.call(one_household)
         end
 
         it 'should return success with dental_hios_id' do
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.first.dental_product_hios_id).to eq('48396ME0860007')
         end
       end
@@ -76,11 +133,15 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
-          @result = subject.call(input_params)
+          @result = subject.call(one_household)
         end
 
         it 'should return success without dental_hios_id' do
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+          expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+          expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
+          expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium).compact).to be_empty
           expect(@result.success.households.first.dental_product_hios_id).to eq(nil)
         end
       end
@@ -93,11 +154,15 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
           before do
             ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-            @result = subject.call(input_params)
+            @result = subject.call(one_household)
           end
 
           it 'should return success with health_hios_id' do
             expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+            expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
             expect(@result.success.households.first.health_product_hios_id).to eq('48396ME0860011')
           end
         end
@@ -105,11 +170,15 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         context 'silver products without covers_pediatric_dental' do
           before do
             ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-            @result = subject.call(input_params)
+            @result = subject.call(one_household)
           end
 
           it 'should return success with health_hios_id' do
             expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+            expect(@result.success.group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:total_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:total_dental_benchmark_ehb_premium)).not_to include(nil)
             expect(@result.success.households.first.health_product_hios_id).to eq('48396ME0860013')
           end
         end

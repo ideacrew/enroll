@@ -5,7 +5,6 @@ module Operations
     # This Operation Calculats adjusted EHB premium values and identifies the SLCSP for the household.
     class IdentifySlcsp
       include Dry::Monads[:result, :do]
-      include FloatHelper
 
       # Identify all silver  plans offered within the service area
       # Calculate the EHB cost of all available silver plans based on the rating area
