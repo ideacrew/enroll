@@ -29,7 +29,7 @@ module Validators
           optional(:household_dental_benchmark_ehb_premium).maybe(::AcaEntities::Types::Money)
           required(:members).array(:hash) do
             required(:family_member_id).filled(Types::Bson)
-            required(:relationship_with_primary).filled(:string)
+            required(:relationship_with_primary).filled(:string, included_in?: (::PersonRelationship::Relationships + ['self']))
             optional(:date_of_birth).maybe(:date)
             optional(:age_on_effective_date).maybe(:integer)
           end
