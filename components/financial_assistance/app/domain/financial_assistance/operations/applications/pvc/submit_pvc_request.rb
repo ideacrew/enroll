@@ -61,7 +61,8 @@ module FinancialAssistance
             count = 0
             pvc_logger = Logger.new("#{Rails.root}/log/pvc_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
             pvc_logger.info("********************************* start submitting pvc requests *********************************") 
-
+            # puts families
+            # puts params
             families.each do |family|
                 determined_application = fetch_application(family, params[:assistance_year])
                 next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
@@ -100,7 +101,7 @@ module FinancialAssistance
 
           def publish(payload)
             event = build_event(payload)
-            event.publish
+            event.success.publish
 
             Success("Successfully published the pvc batch")
           end
