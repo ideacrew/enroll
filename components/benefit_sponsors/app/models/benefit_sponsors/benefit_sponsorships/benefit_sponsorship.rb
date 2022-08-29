@@ -22,6 +22,7 @@ module BenefitSponsors
     include BenefitSponsors::Concerns::EmployerDatatableConcern
     include BenefitSponsors::Concerns::Observable
     include BenefitSponsors::ModelEvents::BenefitSponsorship
+    include GlobalID::Identification
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
@@ -100,6 +101,9 @@ module BenefitSponsors
     embeds_many :benefit_applications,
       class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
       inverse_of: :benefit_sponsorship
+
+    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
+                             as: :eligibility
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
@@ -351,6 +355,13 @@ module BenefitSponsors
 
     def has_primary_office_address?
       primary_office_location.present? && primary_office_location.address.present?
+    end
+
+    def eligibility_for(evidence_key, start_on)
+      eligibilities.by_date(start_on).select do |eligibility|
+        el = eligibility.evidences.by_key(evidence_key).last
+        el&.is_satisfied == true
+      end.last
     end
 
     # Inverse of Profile#benefit_sponsorship
