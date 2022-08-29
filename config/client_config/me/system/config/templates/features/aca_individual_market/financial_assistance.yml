@@ -139,7 +139,7 @@ registry:
       is_enabled: <%= ENV['TRANSFER_SERVICE_IS_ENABLED'] || true %>
       item: "aces"
     - key: :non_magi_transfer
-      is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || false %>
+      is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || true %>
   - namespace:
     - :documents
     features:
