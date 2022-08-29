@@ -6,6 +6,7 @@ class EmployeeRole
   include BenefitSponsors::ModelEvents::EmployeeRole
   include BenefitSponsors::Concerns::Observable
   include Mongoid::History::Trackable
+  include EventSource::Command
   include GlobalID::Identification
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
@@ -58,6 +59,20 @@ class EmployeeRole
 
   after_create :notify_on_create
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_employee_role_events]
+
+  after_create :publish_employee_role_created
+
+  def publish_employee_role_created
+    publish_event('created', { employee_role_global_id: self.to_global_id.to_s })
+  end
+
+  def publish_event(event, payload)
+    event = event("events.benefit_sponsors.employee_role.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for employee_role: #{self.id} event due to #{e.backtrace}" }
+  end
 
   # hacky fix for nested attributes
   # TODO: remove this when it is no longer needed
