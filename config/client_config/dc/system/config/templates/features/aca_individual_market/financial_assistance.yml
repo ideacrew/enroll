@@ -138,10 +138,8 @@ registry:
     - key: :transfer_service
       is_enabled: <%= ENV['TRANSFER_SERVICE_IS_ENABLED'] || false %>
       item: "curam"
-    - key: :non_magi_medicaid_eligible
-      is_enabled: <%= ENV['NON_MAGI_MEDICAID_ELIGIBLE_IS_ENABLED'] || false %>
-    - key: :eligible_for_non_magi_reasons
-      is_enabled: <%= ENV['ELIGIBLE_FOR_NON_MAGI_REASONS_IS_ENABLED'] || false %>
+    - key: :non_magi_transfer
+      is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || false %>
   - namespace:
     - :documents
     features:

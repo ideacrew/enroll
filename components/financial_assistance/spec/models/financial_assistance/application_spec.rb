@@ -1913,32 +1913,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe 'has_non_magi_medicaid_eligible?' do
-    context 'non_magi_medicaid_eligible feature disabled' do
+  describe 'is_transferrable?' do
+    context 'non_magi_transfer feature disabled' do
       before do
-        @applicant = application.applicants.first
-        @applicant.update(is_non_magi_medicaid_eligible: true)
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_medicaid_eligible).and_return(false)
+        application.update(full_medicaid_determination: true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
       end
 
       it 'should return false if applicant is non magi medicaid eligible' do
-        expect(@applicant.is_non_magi_medicaid_eligible).to eq(true)
-        expect(application.has_non_magi_medicaid_eligible?(@applicant)).to eq(false)
-      end
-    end
-  end
-
-  describe 'is_eligible_for_non_magi_reasons?' do
-    context 'eligible_for_non_magi_reasons feature disabled' do
-      before do
-        @applicant = application.applicants.first
-        @applicant.update(is_eligible_for_non_magi_reasons: true)
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:eligible_for_non_magi_reasons).and_return(false)
-      end
-
-      it 'should return false if applicant is eligible for non magi reasons' do
-        expect(@applicant.is_eligible_for_non_magi_reasons).to eq(true)
-        expect(application.is_eligible_for_non_magi_reasons?(@applicant)).to eq(false)
+        expect(application.full_medicaid_determination).to eq(true)
+        expect(application.is_transferrable?).to eq(false)
       end
     end
   end
