@@ -61,6 +61,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
     end
 
     before do
+      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].feature.stub(:is_enabled).and_return(true)
       EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].settings(start_of_year.year.to_s.to_sym).stub(:item).and_return(true)
     end
 

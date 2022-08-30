@@ -107,6 +107,8 @@ module Operations
       end
 
       def check_slcsapd_enabled?(household, benchmark_product_model)
+        return unless EnrollRegistry.feature_enabled?(:atleast_one_silver_plan_donot_cover_pediatric_dental_cost)
+
         effective_year = benchmark_product_model.effective_date.year.to_s.to_sym
         EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(effective_year)&.item && household[:type_of_household] != 'adult_only'
       end
