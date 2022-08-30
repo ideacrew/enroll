@@ -58,41 +58,27 @@ module FinancialAssistance
 
           def submit(params, families)
             applications_with_evidences = []
-            count = 0
             pvc_logger = Logger.new("#{Rails.root}/log/pvc_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
             pvc_logger.info("********************************* start submitting pvc requests *********************************") 
-            # puts families
-            # puts params
             families.each do |family|
-                determined_application = fetch_application(family, params[:assistance_year])
-                next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
-                determined_application.create_rrv_evidences
-                cv3_application = transform_and_construct(family, params[:assistance_year])
-                applications_with_evidences << cv3_application.to_h
-                count += 1
-                rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
-
-                if count % params[:applications_per_event] == 0
-                  publish(applications_with_evidences)
-                  applications_with_evidences = []
-                end
+              determined_application = fetch_application(family, params[:assistance_year])
+              next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
+              determined_application.create_rrv_evidences
+              cv3_application = transform_and_construct(family, params[:assistance_year])
+              applications_with_evidences << cv3_application.to_h
+              pvc_logger.info("********************************* processed #{applications_with_evidences.length}*********************************") if applications_with_evidences.length % 100 == 0
+              if applications_with_evidences.length % params[:applications_per_event] == 0
+                publish(applications_with_evidences)
+                applications_with_evidences = []
+              end
+            rescue StandardError => e
+              pvc_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
             if applications_with_evidences.any?
                 publish(applications_with_evidences)
             end
-            pvc_logger.info("********************************* end submitting pvc requests *********************************") if count % 100 == 0
+            pvc_logger.info("********************************* end submitting pvc requests *********************************") if applications_with_evidences.length % 100 == 0
 
-            # skip = params[:skip] || 0
-            # applications_per_event = params[:applications_per_event]
-
-            # while skip < families.count
-            #   criteria = families.skip(skip).limit(applications_per_event)
-            #   publish({families: criteria.pluck(:id), assistance_year: params[:assistance_year]})
-            #   puts "Total number of records processed #{skip + criteria.pluck(:id).length}"
-            #   skip += applications_per_event
-
-            #   break if params[:max_applications].present? && params[:max_applications] > skip
-            # end
           end
 
           def build_event(payload)
