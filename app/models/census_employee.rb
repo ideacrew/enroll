@@ -121,9 +121,7 @@ class CensusEmployee < CensusMember
   after_save :construct_employee_role
 
   after_save do |document|
-    if document._id_changed?
-      publish_employee_created
-    end
+    publish_employee_created if document._id_changed?
   end
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events]
@@ -1760,6 +1758,23 @@ class CensusEmployee < CensusMember
         }
       }
     )
+  end
+
+  def osse_eligible?
+    return false if COBRA_STATES.include?(aasm_state)
+    return false if EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
+
+    osse_eligible_applications.present?
+  end
+
+  def osse_eligible_applications
+    active_assignment = active_benefit_group_assignment(earliest_eligible_date)
+    assignments = [active_assignment, renewal_benefit_group_assignment].compact
+    assignments.collect do |assignment|
+      benefit_application = assignment&.benefit_package&.benefit_application
+      next unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(benefit_application&.aasm_state)
+      benefit_application if benefit_application.osse_eligible?
+    end.compact
   end
 
   private

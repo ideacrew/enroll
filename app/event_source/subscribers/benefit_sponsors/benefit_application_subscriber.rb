@@ -28,7 +28,8 @@ module Subscribers
       private
 
       def create_employee_osse_eligibilies(benefit_application)
-        return unless is_benefit_application_osse_eligible?(benefit_application)
+        return unless benefit_application.osse_eligible?
+
         benefit_sponsorship = benefit_application.benefit_sponsorship
         benefit_sponsorship.census_employees.without_cobra.non_terminated.each do |census_employee|
           employee_role = census_employee.employee_role
@@ -59,10 +60,6 @@ module Subscribers
             logger.info "BenefitApplicationsSubscriber: acked, FailureResult: #{errors} for census_employee: #{census_employee.id}"
           end
         end
-      end
-
-      def is_benefit_application_osse_eligible?(benefit_application)
-        benefit_application.eligibility_for(:osse_subsidy).present?
       end
 
       def subscriber_logger

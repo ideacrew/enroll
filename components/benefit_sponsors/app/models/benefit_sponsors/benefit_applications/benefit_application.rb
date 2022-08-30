@@ -1273,6 +1273,10 @@ module BenefitSponsors
       end
     end
 
+    def osse_eligible?
+      eligibility_for(:osse_subsidy).present?
+    end
+
     private
 
     # We may have to send actual payload hash along with the event. since external systems will not have access for enroll records.

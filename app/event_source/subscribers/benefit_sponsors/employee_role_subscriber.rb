@@ -29,14 +29,13 @@ module Subscribers
       private
 
       def create_employee_osse_eligibility(employee_role)
-        @osse_eligible_applications = []
         person = employee_role.person
         census_employee = employee_role.census_employee
 
         return unless census_employee
-        return unless is_census_record_osse_eligible?(census_employee)
+        return unless census_employee&.osse_eligible?
 
-        @osse_eligible_applications.each do |benefit_application|
+        census_employee.osse_eligible_applications.each do |benefit_application|
           employer = benefit_application.employer_profile
           result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
             {
@@ -64,27 +63,6 @@ module Subscribers
             logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{person.full_name}, employer fein: #{employer.fein}"
           end
         end
-      end
-
-      def is_census_record_osse_eligible?(census_employee)
-        return false if ::CensusEmployee::COBRA_STATES.include?(census_employee.aasm_state)
-        return false if ::CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include?(census_employee.aasm_state)
-
-        eligible_date = census_employee.earliest_eligible_date
-        active_assignment = census_employee.active_benefit_group_assignment(eligible_date)
-        is_osse_eligibile_with_assignment?(active_assignment)
-
-        renewal_assignment = census_employee.renewal_benefit_group_assignment
-        is_osse_eligibile_with_assignment?(renewal_assignment)
-
-        @osse_eligible_applications.present?
-      end
-
-      def is_osse_eligibile_with_assignment?(assignment = nil)
-        benefit_application = assignment&.benefit_package&.benefit_application
-        return unless benefit_application
-        return unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(benefit_application.aasm_state)
-        @osse_eligible_applications << benefit_application if benefit_application.eligibility_for(:osse_subsidy).present?
       end
 
       def subscriber_logger

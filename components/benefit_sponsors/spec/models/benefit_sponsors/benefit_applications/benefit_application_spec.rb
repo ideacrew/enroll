@@ -1523,6 +1523,30 @@ module BenefitSponsors
           end
         end
       end
+
+      describe '.osse_eligible?' do
+        let!(:benefit_application) do
+          create(
+            :benefit_sponsors_benefit_application,
+            :with_benefit_package,
+            benefit_sponsorship: benefit_sponsorship
+          )
+        end
+
+        context 'when sponsor is osse eligible' do
+          let(:eligibility) { build(:eligibility, :with_subject, :with_evidences) }
+          let!(:add_eligibility) do
+            benefit_sponsorship.eligibilities << eligibility
+            benefit_sponsorship.save!
+          end
+
+          it { expect(benefit_application.osse_eligible?).to be_truthy }
+        end
+
+        context 'when sponsor is not osse eligible' do
+          it { expect(benefit_application.osse_eligible?).to be_falsey }
+        end
+      end
     end
 
     RSpec.describe 'aasm_state#cancel', type: :model, :dbclean => :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
