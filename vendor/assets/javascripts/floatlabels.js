@@ -75,7 +75,7 @@
                     self.checkValue( e );
                 });
                 thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : 'var(--floatlabel-color)' }); });
-                thisElement.on('focus', function() { thisElement.prev('label').css({ 'color' : 'var(--floatlabel-color)' }); });
+                thisElement.on('focus', function() { thisElement.prev('label').css({ 'color' : 'var(--floatlabel-onclick-color)' }); });
                 window.setTimeout( function() {
                     self.$label.css( animationCss );
                     self.$element.css( animationCss );
