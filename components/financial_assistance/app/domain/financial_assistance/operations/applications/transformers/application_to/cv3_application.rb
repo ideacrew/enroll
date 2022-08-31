@@ -711,8 +711,7 @@ module FinancialAssistance
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
             def mitc_households(application)
-              # address_people_combinations = [{ application.primary_applicant.home_address => [{ person_id: application.primary_applicant.person_hbx_id }] }]
-              address_people_combinations = [{ application.primary_applicant.home_address => [{ person_id: application.primary_applicant.person_hbx_id.to_i }] }]
+              address_people_combinations = [{ application.primary_applicant.home_address => [{ person_id: application.primary_applicant.person_hbx_id }] }]
               non_primary_applicants = application.applicants.where(is_primary_applicant: false)
 
               non_primary_applicants.each do |dependent|
