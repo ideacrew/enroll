@@ -16,11 +16,14 @@ module FinancialAssistance
           include EventSource::Logging
 
           def call(params)
+            start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
             values = yield validate(params)
             families = find_families(values)
             submit(params, families)
-
-            Success('Successfully Submitted PVC Set')
+            end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+            seconds_elapsed = end_time - start_time
+            hr_min_sec = format("%02dhr %02dmin %02dsec", seconds_elapsed / 3600, seconds_elapsed / 60 % 60, seconds_elapsed % 60)
+            Success("Successfully Submitted PVC Set / Total time to complete: #{hr_min_sec}")
           end
 
           private
@@ -55,18 +58,19 @@ module FinancialAssistance
             eligibility.present? && (eligibility.is_aptc_eligible? || eligibility.is_csr_eligible?)
           end
 
-
           def submit(params, families)
+            counter = 0
             applications_with_evidences = []
             pvc_logger = Logger.new("#{Rails.root}/log/pvc_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-            pvc_logger.info("********************************* start submitting pvc requests *********************************") 
+            pvc_logger.info("********************************* start submitting pvc requests *********************************")
             families.each do |family|
               determined_application = fetch_application(family, params[:assistance_year])
               next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
               determined_application.create_rrv_evidences
               cv3_application = transform_and_construct(family, params[:assistance_year])
               applications_with_evidences << cv3_application.to_h
-              pvc_logger.info("********************************* processed #{applications_with_evidences.length}*********************************") if applications_with_evidences.length % 100 == 0
+              counter += 1
+              pvc_logger.info("**************** current batch: #{applications_with_evidences.length} , total: #{counter} ************************") if applications_with_evidences.length % 100 == 0
               if applications_with_evidences.length % params[:applications_per_event] == 0
                 publish(applications_with_evidences)
                 applications_with_evidences = []
@@ -74,11 +78,8 @@ module FinancialAssistance
             rescue StandardError => e
               pvc_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
-            if applications_with_evidences.any?
-                publish(applications_with_evidences)
-            end
-            pvc_logger.info("*************** end submitting pvc process, captured #{applications_with_evidences.length} applications ***********************") 
-
+            publish(applications_with_evidences) if applications_with_evidences.any?
+            pvc_logger.info("*************** end submitting pvc process, total #{counter} applications ***********************")
           end
 
           def build_event(payload)
