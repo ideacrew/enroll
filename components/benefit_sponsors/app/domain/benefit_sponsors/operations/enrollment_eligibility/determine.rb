@@ -42,10 +42,17 @@ module BenefitSponsors
             benefit_sponsorship_id: benefit_sponsorship._id,
             effective_date: effective_date,
             benefit_application_kind: application_type(effective_date, benefit_sponsorship),
-            service_areas: service_areas_entities.as_json
+            service_areas: service_areas_entities.as_json,
+            osse_min_employer_contribution: osse_eligibility(benefit_sponsorship, effective_date)
           }
 
           Success(params)
+        end
+
+        def osse_eligibility(entity, effective_date)
+          benefit_sponsorship = find_benefit_sponsorship(entity._id)
+          eligibility = benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_date)
+          eligibility&.grant_for(:all_contribution_levels_min_met).present?
         end
 
         def get_service_areas_entities(effective_date, benefit_sponsorship_entity)

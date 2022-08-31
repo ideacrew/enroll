@@ -14,6 +14,8 @@ module BenefitSponsors
                 class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
                 inverse_of: :benefit_applications
 
+    EMPLOYEE_MINIMUM_COUNT = 1
+    EMPLOYEE_MAXIMUM_COUNT = 50
     APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
     APPLICATION_DRAFT_STATES      = [:draft, :imported] + APPLICATION_EXCEPTION_STATES.freeze
     APPLICATION_APPROVED_STATES   = [:approved].freeze
@@ -1225,6 +1227,49 @@ module BenefitSponsors
 
     def canceled?
       [:canceled, :retroactive_canceled].include?(aasm_state)
+    end
+
+    def eligibility_for(eligibility_type)
+      benefit_sponsorship.eligibility_for(eligibility_type, start_on)
+    end
+
+    def grant_value_for(eligibility_type, grant_type)
+      eligibility = eligibility_for(eligibility_type)
+      grant = eligibility&.grant_for(grant_type)
+      grant&.value
+    end
+
+    def validate_minimum_participation_rule
+      if (value = grant_value_for(:osse_subsidy, :minimum_participation_rule))
+        return value.run
+      end
+
+      enrollment_ratio >= employee_participation_ratio_minimum
+    end
+
+    def validate_minimum_employer_contribution_rule
+      if (value = grant_value_for(:osse_subsidy, :all_contribution_levels_min_met))
+        value.run
+      elsif benefit_packages.map(&:sponsored_benefits).flatten.present?
+        if effective_period.min.month == 1
+          true
+        else
+          all_contributions = benefit_packages.collect(&:sorted_composite_tier_contributions)
+          all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+        end
+      else
+        false
+      end
+    end
+
+    def validate_fte_count
+      if (value = grant_value_for(:osse_subsidy, :benefit_application_fte_count))
+        value.run
+      elsif is_renewing?
+        true
+      else
+        fte_count >= EMPLOYEE_MINIMUM_COUNT && fte_count < EMPLOYEE_MAXIMUM_COUNT
+      end
     end
 
     private

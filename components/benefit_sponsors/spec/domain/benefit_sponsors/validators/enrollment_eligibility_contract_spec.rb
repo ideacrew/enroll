@@ -10,7 +10,14 @@ RSpec.describe BenefitSponsors::Validators::EnrollmentEligibilityContract do
   let(:benefit_application_kind)   { :initial }
   let(:service_area)               { FactoryBot.create(:benefit_markets_locations_service_area) }
 
-  let(:missing_params)             { {market_kind: market_kind, effective_date: effective_date, benefit_sponsorship_id: benefit_sponsorship_id  } }
+  let(:missing_params) do
+    {
+      market_kind: market_kind,
+      effective_date: effective_date,
+      benefit_sponsorship_id: benefit_sponsorship_id,
+      osse_min_employer_contribution: false
+    }
+  end
   let(:invalid_params)             { missing_params.merge({service_areas: service_area.as_json, benefit_application_kind: 'initial' })}
   let(:error_message1)             { {:service_areas => ["is missing", "must be an array"], :benefit_application_kind => ["is missing", "must be Symbol"]} }
   let(:error_message2)             { {:service_areas => ["must be an array"]} }

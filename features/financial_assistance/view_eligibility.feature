@@ -69,8 +69,7 @@ Feature: A dedicated page that visit the eligibility determination page
     Given FAA fa_send_to_external_verification feature is enabled
     Given FAA display_eligibility_results_per_tax_household feature is disabled
     Given FAA transfer_service feature is enabled
-    Given FAA non_magi_medicaid_eligible feature is enabled
-    Given FAA eligible_for_non_magi_reasons feature is enabled
+    Given FAA non_magi_transfer feature is disabled
     Given that a user with a family has a Financial Assistance application with tax households
     And the user has a 73% CSR
     And the user navigates to the "Help Paying For Coverage" portal
