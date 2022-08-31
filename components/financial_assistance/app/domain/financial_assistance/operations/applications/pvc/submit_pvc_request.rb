@@ -77,7 +77,7 @@ module FinancialAssistance
             if applications_with_evidences.any?
                 publish(applications_with_evidences)
             end
-            pvc_logger.info("********************************* end submitting pvc requests *********************************") if applications_with_evidences.length % 100 == 0
+            pvc_logger.info("*************** end submitting pvc process, captured #{applications_with_evidences.length} applications ***********************") 
 
           end
 
