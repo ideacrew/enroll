@@ -71,12 +71,20 @@ module BenefitSponsors
         Settings.aca.employer_has_sic_field
       end
 
-      def ivl_osse_eligibility_is_enabled?
-        EnrollRegistry.feature_enabled?(:ivl_osse_eligibility)
+      def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+        if year >= 2021
+          EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+        else
+          false
+        end
       end
 
-      def shop_osse_eligibility_is_enabled?
-        EnrollRegistry.feature_enabled?(:shop_osse_eligibility)
+      def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+        if year >= 2021
+          EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+        else
+          false
+        end
       end
 
       def osse_eligibility_history_is_enabled?

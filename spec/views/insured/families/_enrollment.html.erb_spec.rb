@@ -160,7 +160,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         product: product,
         employee_role: employee_role,
         census_employee: census_employee,
-        effective_on: Date.new(2015,8,10),
+        effective_on: TimeKeeper.date_of_record,
         updated_at: DateTime.now,
         created_at: DateTime.now,
         kind: "employer_sponsored",
@@ -226,6 +226,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+      allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_ivl_osse_subsidy_#{TimeKeeper.date_of_record.year}").and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_subsidy_#{TimeKeeper.date_of_record.year}").and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -256,7 +259,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the plan start" do
       expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match(/#{Date.new(2015,8,10)}/)
+      expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
     it "should not disable the Make Changes button" do
@@ -265,7 +268,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the Plan Start" do
       expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match(/#{Date.new(2015,8,10)}/)
+      expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
     it "should display effective date when terminated enrollment" do
@@ -602,8 +605,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "osse_eligibility is present" do
 
       before do
-        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(true)
-        allow(view).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_ivl_osse_subsidy_#{TimeKeeper.date_of_record.year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_subsidy_#{TimeKeeper.date_of_record.year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -615,7 +619,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "osse_eligibility is not present" do
 
       before do
-        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_ivl_osse_subsidy_#{TimeKeeper.date_of_record.year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_subsidy_#{TimeKeeper.date_of_record.year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 

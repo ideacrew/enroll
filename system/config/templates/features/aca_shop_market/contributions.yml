@@ -513,6 +513,16 @@ registry:
     - :enroll_app
     - :aca_shop_market
     - :benefit_market_catalog
+    - :catalog_2021
+    - :osse_eligibility_criteria
+    features:
+        - key: :aca_shop_osse_subsidy_2021
+          item: :aca_shop_osse_subsidy_2021
+          is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2021_IS_ENABLED'] || false %>
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
     - :catalog_2022
     - :osse_eligibility_criteria
     features:
@@ -538,6 +548,9 @@ registry:
       - key: :employer_metal_level_products_restricted_2022
         item: 'employer_metal_level_products'
         is_enabled: false
+      - key: :aca_shop_osse_subsidy_2022
+        item: :aca_shop_osse_subsidy_2022
+        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_shop_market
@@ -567,3 +580,6 @@ registry:
       - key: :employer_metal_level_products_restricted_2023
         item: 'employer_metal_level_products'
         is_enabled: true
+      - key: :aca_shop_osse_subsidy_2023
+        item: :aca_shop_osse_subsidy_2023
+        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
