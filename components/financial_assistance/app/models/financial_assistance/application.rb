@@ -592,16 +592,14 @@ module FinancialAssistance
 
     def is_transferrable?
       self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || has_non_magi_medicaid_eligible?(applicant) || applicant.is_medicare_eligible || is_eligible_for_non_magi_reasons?(applicant)
+        return false if !FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer) && non_magi_referral?(applicant)
+
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
       end
     end
 
-    def has_non_magi_medicaid_eligible?(applicant)
-      FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible) ? applicant.is_non_magi_medicaid_eligible : false
-    end
-
-    def is_eligible_for_non_magi_reasons?(applicant)
-      FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons) ? applicant.is_eligible_for_non_magi_reasons : false
+    def non_magi_referral?(applicant)
+      self.full_medicaid_determination || applicant.is_non_magi_medicaid_eligible || applicant.is_eligible_for_non_magi_reasons
     end
 
     def has_mec_check?
