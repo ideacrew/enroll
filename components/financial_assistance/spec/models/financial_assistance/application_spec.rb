@@ -1916,13 +1916,33 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'is_transferrable?' do
     context 'non_magi_transfer feature disabled' do
       before do
-        application.update(full_medicaid_determination: true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
       end
 
-      it 'should return false if applicant is non magi medicaid eligible' do
-        expect(application.full_medicaid_determination).to eq(true)
-        expect(application.is_transferrable?).to eq(false)
+      context 'non-MAGI eligible referral' do
+        before do
+          application.applicants.first.update(is_non_magi_medicaid_eligible: true)
+        end
+
+        context 'full medicaid determination requested' do
+          before do
+            application.update(full_medicaid_determination: true)
+          end
+
+          it 'should return true' do
+            expect(application.is_transferrable?).to eq(true)
+          end
+        end
+
+        context 'full medicaid determination NOT requested' do
+          before do
+            application.update(full_medicaid_determination: false)
+          end
+
+          it 'should return false' do
+            expect(application.is_transferrable?).to eq(false)
+          end
+        end
       end
     end
   end
