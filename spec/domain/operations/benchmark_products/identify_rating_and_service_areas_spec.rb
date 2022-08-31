@@ -17,11 +17,11 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas do
             members: [
               {
                 family_member_id: family_member1.id,
-                relationship_kind: 'self'
+                relationship_with_primary: 'self'
               },
               {
                 family_member_id: family_member2.id,
-                relationship_kind: 'spouse'
+                relationship_with_primary: 'spouse'
               }
             ]
           }

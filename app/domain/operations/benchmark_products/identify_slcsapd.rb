@@ -5,18 +5,17 @@ module Operations
     # This Operation is used to identify the second lowest cost standalone dental plan.
     class IdentifySlcsapd
       include Dry::Monads[:result, :do]
-      include FloatHelper
 
+      # find all dental products
+      #   Pediatric-only dental plans are offered in ME
+      #   These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people 19+
+      # Calculate the cost of each available dental plan for all members of the APTC household
+      #   Compare the portion of dental plan costs that cover EHB for all plans that cover all members of the APTC household
+      # Identify the second lowest cost standalone dental plan (SLCSADP)
+      # add dental information to household
       def call(params)
         # params = { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
 
-        # find all dental products
-        #   Pediatric-only dental plans are offered in ME in 2022.
-        #   These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people 19+
-        # Calculate the cost of each available dental plan for all members of the APTC household
-        #   Compare the portion of dental plan costs that cover EHB for all plans that cover all members of the APTC household
-        # Identify the second lowest cost standalone dental plan (SLCSADP)
-        # add dental information to household
         dental_products = yield fetch_dental_products(params)
         product_to_ehb_premium_hash = yield calculate_ehb_premiums(dental_products)
         product, ehb_premium = yield identify_slcsadp(product_to_ehb_premium_hash)
@@ -32,7 +31,7 @@ module Operations
         household[:dental_product_id] = product.id
         household[:dental_rating_method] = product.rating_method
         household[:dental_ehb] = product.ehb
-        household[:total_dental_benchmark_ehb_premium] = float_fix(ehb_premium)
+        household[:household_dental_benchmark_ehb_premium] = ehb_premium
 
         Success(household)
       end
@@ -95,11 +94,11 @@ module Operations
       end
 
       def total_premium(dental_product)
-        child_members = @members.select { |member| member[:relationship_kind] == 'child' }
+        child_members = @members.select { |member| member[:relationship_with_primary] == 'child' }
 
         members = if child_members.count > 3
                     eligible_children = child_thhms.sort_by { |k| k[:age_on_effective_date] }.last(3)
-                    eligible_children + @members.reject { |member| member[:relationship_kind] == 'child' }
+                    eligible_children + @members.reject { |member| member[:relationship_with_primary] == 'child' }
                   else
                     @members
                   end
@@ -115,7 +114,7 @@ module Operations
       end
 
       def family_tier_value
-        if @members.select { |member| member[:relationship_kind] == 'spouse' }
+        if @members.select { |member| member[:relationship_with_primary] == 'spouse' }
           couple_tier_value
         else
           primary_tier_value
@@ -142,14 +141,3 @@ module Operations
     end
   end
 end
-
-# Questions:
-#   1. How to determine if a Silver Health Plan covers Pediatric Dental Costs?
-#     If the QHP mapped to the silver plan covers 'Dental Check-Up for Children', 'Basic Dental Care - Child', and 'Major Dental Care - Child' benefits, then Silver Health Plan covers Pediatric Dental Costs
-#   2. How to identify Pediatric-only dental plans?
-#     If the QHP of the dental plan child_only_offering is set to 'Allows Child-Only', then the Dental Plan is considered Pediatric-only dental plan
-#   3. How to determine if a Plan is Age rated or Family rated?
-#     If rating_method of the Dental Plan is 'Age-Based Rates' then the plan is Age rated and the plan is Family Rated if rating_method is 'Family-Tier Rates'
-#   4. How to calculate the total_dental_ehb_premium for Age rated, Family rated?
-#     If Age rating, then the premium_tuples has the costs per age.
-#     If Family rating, then the qhp_premium_tables has costs based on who are shopping for enrollment.

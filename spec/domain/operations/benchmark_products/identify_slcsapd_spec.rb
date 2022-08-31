@@ -4,6 +4,11 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
 
 RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  include_context 'family with 2 family members with county_zip, rating_area & service_area'
   include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
 
   describe '#call' do
@@ -17,11 +22,11 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
             members: [
               {
                 family_member_id: family_member1.id,
-                relationship_kind: 'self'
+                relationship_with_primary: 'self'
               },
               {
                 family_member_id: family_member2.id,
-                relationship_kind: 'spouse'
+                relationship_with_primary: 'spouse'
               }
             ]
           }
@@ -53,7 +58,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
         expect(@result.success[:dental_ehb]).not_to be_nil
-        expect(@result.success[:total_dental_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
 
@@ -71,7 +76,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
         expect(@result.success[:dental_ehb]).not_to be_nil
-        expect(@result.success[:total_dental_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
 

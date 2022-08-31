@@ -12,7 +12,7 @@ RSpec.describe Entities::BenchmarkProducts::BenchmarkProduct, dbclean: :after_ea
         rating_area_id: BSON::ObjectId.new,
         exchange_provided_code: 'R-ME001',
         service_area_ids: [BSON::ObjectId.new],
-        group_benchmark_ehb_premium: 200.90,
+        household_group_benchmark_ehb_premium: 200.90,
         households: [
           {
             type_of_household: 'adult_only',
@@ -20,12 +20,12 @@ RSpec.describe Entities::BenchmarkProducts::BenchmarkProduct, dbclean: :after_ea
             health_product_hios_id: '123',
             health_product_id: BSON::ObjectId.new,
             health_ehb: 0.99,
-            total_health_benchmark_ehb_premium: 200.90,
+            household_health_benchmark_ehb_premium: 200.90,
             health_product_covers_pediatric_dental_costs: true,
             members: [
               {
                 family_member_id: BSON::ObjectId.new,
-                relationship_kind: 'self',
+                relationship_with_primary: 'self',
                 date_of_birth: TimeKeeper.date_of_record - 30.years,
                 age_on_effective_date: 30
               }
