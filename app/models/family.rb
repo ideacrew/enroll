@@ -49,7 +49,6 @@ class Family
 
   belongs_to  :person, optional: true
   has_many :hbx_enrollments
-  has_many :tax_household_groups
 
   # Collection of insured:  employees, consumers, residents
 

@@ -64,6 +64,12 @@ module Operations
           evidence_states: evidence_states
         }
 
+        if values[:eligibility_item].key == 'aptc_csr_credit'
+          subject = GlobalID::Locator.locate(values[:subject])
+          grants = build_csr_grants(subject.family, values[:effective_date]).success
+          eligibility_state.merge!(grants: grants)
+        end
+
         if evidence_states.present?
           eligibility_state.merge!(
             {
@@ -75,6 +81,10 @@ module Operations
         end
 
         Success(eligibility_state)
+      end
+
+      def build_csr_grants(family, effective_date)
+        Operations::Eligibilities::BuildGrant.new.call(family: family, type: 'CsrAdjustmentGrant', effective_date: effective_date)
       end
 
       def fetch_document_status(evidence_states)

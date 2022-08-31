@@ -30,7 +30,7 @@ module Eligibilities
 
     def csr_by_year(year)
       eligibility_state = eligibility_states.where(eligibility_item_key: 'aptc_csr_credit').first
-      grant = eligibility_state.grants.where(key: 'csr_grant', year: year).first
+      grant = eligibility_state.grants.where(key: 'CsrAdjustmentGrant', year: year).first
 
       grant&.value
     end
