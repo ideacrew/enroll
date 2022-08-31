@@ -4,7 +4,7 @@
   - if !hbx_enrollment.predecessor_enrollment_id.blank?
     %previous_policy_id
       %id= hbx_enrollment.parent_enrollment.hbx_id
-  - if hbx_enrollment.broker_agency_account
+  - if hbx_enrollment.broker_agency_account_for_edi
     = render :partial => "events/shared/broker", :object => hbx_enrollment, as: :hbx_enrollment
   %enrollees
     = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }

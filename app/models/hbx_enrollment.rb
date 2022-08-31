@@ -1354,6 +1354,13 @@ class HbxEnrollment
     select_applicable_broker_account(family.broker_agency_accounts.unscoped)
   end
 
+  def broker_agency_account_for_edi
+    return unless broker_agency_account.present?
+    writing_agent = broker_agency_account.writing_agent
+    return if writing_agent&.imported?
+    broker_agency_account if writing_agent&.npn&.scan(/\D/)&.empty?
+  end
+
   def time_of_purchase
     return submitted_at unless submitted_at.blank?
     updated_at

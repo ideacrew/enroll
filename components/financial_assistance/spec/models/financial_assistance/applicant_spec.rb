@@ -537,6 +537,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                                      })
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:no_ssn_reason_dropdown).and_return(false)
       end
 
       context 'pregnancy_due_on_required feature disabled' do
@@ -572,6 +573,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:no_ssn_reason_dropdown).and_return(false)
       end
 
       context 'is_enrolled_on_medicaid feature disabled' do
@@ -615,6 +617,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:no_ssn_reason_dropdown).and_return(false)
       end
 
       context 'has living_outside_state feature disabled' do
@@ -758,6 +761,23 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(applicant.applicant_validation_complete?).to eq false
         end
       end
+
+      context 'applicant applying for coverage and ssn is not applied for while no ssn reason dropdown is enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:no_ssn_reason_dropdown).and_return(true)
+        end
+
+        it 'should return false if non_ssn_apply_reason is not given' do
+          applicant.update_attributes!(ssn: nil, no_ssn: '1', is_ssn_applied: false, is_applying_coverage: true)
+          expect(applicant.applicant_validation_complete?).to eq false
+        end
+
+        it 'should return true if non_ssn_apply_reason is given' do
+          applicant.update_attributes!(ssn: nil, no_ssn: '1', is_ssn_applied: false, is_applying_coverage: true, non_ssn_apply_reason: 'test reason')
+          expect(applicant.applicant_validation_complete?).to eq true
+        end
+      end
     end
 
     context 'is_physically_disabled' do
@@ -772,6 +792,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:unemployment_income).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:pregnancy_due_on_required).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:question_required).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:no_ssn_reason_dropdown).and_return(false)
       end
 
       context 'question_required feature disabled' do
