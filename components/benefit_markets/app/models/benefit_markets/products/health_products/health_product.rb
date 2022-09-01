@@ -54,6 +54,22 @@ module BenefitMarkets
       index({ "active_period.min": 1, "active_period.max": 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 }, {name: "health_products_a_period_market_c_kind_nationwide_name_index"})
       index({ csr_variant_id: 1}, {sparse: true, name: "product_health_products_csr_variant_index"})
 
+      index(
+        {
+          "metal_level_kind" => 1,
+          "service_area_id" => 1,
+          "application_period.min" => 1,
+          "application_period.max" => 1,
+          "benefit_market_kind" => 1,
+          "premium_tables.rating_area_id" => 1,
+          "premium_tables.effective_period.min" => 1,
+          "premium_tables.effective_period.max" => 1
+        },
+        {
+          name: "health_products_premium_tables_for_benchmark_premiums_search_index"
+        }
+      )
+
       scope :standard_plans,      ->{ where(is_standard_plan: true) }
 
       scope :ppo_plans,           ->{ where(health_plan_kind: :ppo) }
