@@ -1,4 +1,4 @@
-- osse_eligible = @enrollment.is_shop? && shop_osse_eligibility_is_enabled?(@enrollment.effective_on.year)
+- osse_eligible = @enrollment.is_shop? && @enrollment.eligible_child_care_subsidy > 0
 .table-border.table-responsive
   table.table.table-striped
     thead
@@ -20,9 +20,13 @@
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency (member_enrollment = @member_group.group_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == member.id }).product_price)
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.sponsor_contribution)
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.employee_cost)
-          - if osse_eligible
+          - if osse_eligible && member.is_subscriber?
             td.text-right = l10n("osse_subsidy_title_shortname") 
-            td.text-center = '$0.00'
+            td.text-center = @enrollment.composite_rated? ? "--" : (number_to_currency @enrollment.eligible_child_care_subsidy)
+          - elsif osse_eligible
+            td.text-right
+            td.text-center
+          - else
       tr.gray-row
         td.ext-right.capital colspan="3"
           strong Totals
@@ -35,7 +39,7 @@
         - if osse_eligible
           td.text-right
           td.text-center
-            strong = '$0.00'
+            strong = (number_to_currency @enrollment.eligible_child_care_subsidy)
       tr
         td.text-right colspan=(osse_eligible ? "7" : "5") Your coverage start date :
         td
