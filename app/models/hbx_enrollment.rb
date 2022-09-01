@@ -107,6 +107,9 @@ class HbxEnrollment
   field :aggregate_aptc_amount, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
+  # OSSE childcare subsidy
+  field :eligible_child_care_subsidy, type: Money, default: 0.0
+
   field :effective_on, type: Date
   field :terminated_on, type: Date
   field :terminate_reason, type: String
@@ -305,6 +308,7 @@ class HbxEnrollment
   index({"effective_on" => 1})
   index({"terminated_on" => 1}, { sparse: true })
   index({"applied_aptc_amount" => 1})
+  index({"eligible_child_care_subsidy" => 1})
 
 
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
@@ -1191,6 +1195,10 @@ class HbxEnrollment
 
   def subscriber
     hbx_enrollment_members.detect(&:is_subscriber)
+  end
+
+  def primary_hbx_enrollment_member
+    hbx_enrollment_members.detect{ |hem| hem.family_member.is_primary_applicant? }
   end
 
   def applicant_ids
@@ -2509,7 +2517,8 @@ class HbxEnrollment
       member_enrollments: group_enrollment_members,
       rate_schedule_date: sponsored_benefit.rate_schedule_date,
       rating_area: rating_area.exchange_provided_code,
-      sponsor_contribution_prohibited: is_cobra_status?
+      sponsor_contribution_prohibited: is_cobra_status?,
+      osse_childcare_subsidy: eligible_child_care_subsidy
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,

@@ -6,7 +6,8 @@ module BenefitSponsors
                   :product_cost_total, :benefit_sponsor,
                   :sponsor_contribution_total, :member_enrollments, :group_id,
                   :rating_area,
-                  :rate_schedule_date, :sponsor_contribution_prohibited
+                  :rate_schedule_date, :sponsor_contribution_prohibited,
+                  :osse_childcare_subsidy
 
     def initialize(opts = {})
       @group_id                   = nil
@@ -22,6 +23,7 @@ module BenefitSponsors
       @member_enrollments         = []
       @rate_schedule_date = nil
       @rating_area = nil
+      @osse_childcare_subsidy = nil
       super(opts)
     end
 
@@ -41,6 +43,7 @@ module BenefitSponsors
         product: new_product,
         rate_schedule_date: @rate_schedule_date,
         rating_area: @rating_area,
+        osse_childcare_subsidy: osse_childcare_subsidy,
         member_enrollments: member_enrollments.map(&:clone_for_coverage),
         sponsor_contribution_prohibited: @sponsor_contribution_prohibited
       })
