@@ -154,8 +154,8 @@
     <div class="col-xs-12 vertically-aligned-row">
       <div>
       </div>
-      <div class="enrollment-type info vertical-align-top">
-        <% if (hbx_enrollment.is_shop? && shop_osse_eligibility_is_enabled?) || (hbx_enrollment.is_ivl_by_kind? && ivl_osse_eligibility_is_enabled?) %> 
+    <div class="enrollment-type info vertical-align-top">
+        <% if (hbx_enrollment.is_shop? && shop_osse_eligibility_is_enabled?(hbx_enrollment.effective_on.year)) || (hbx_enrollment.is_ivl_by_kind? && ivl_osse_eligibility_is_enabled?(hbx_enrollment.effective_on.year)) %> 
           <p>
             <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
             <%='$0.00'%>/<%= l10n("month").to_s.downcase %>
