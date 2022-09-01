@@ -16,7 +16,7 @@ Feature: Start a new Financial Assistance Application
     Given the MEC check feature configuration is enabled
     And the consumer has received a successful MEC check response
     When a consumer visits the Get Help Paying for coverage page
-    Then they should see the MedicaidCurrently Enrolled warning text
+    Then they should see the Medicaid Currently Enrolled warning text
    
   Scenario: A consumer enters tax information for an application's applicant
     Given the consumer has started a financial assistance application
