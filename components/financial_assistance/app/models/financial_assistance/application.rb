@@ -1363,6 +1363,10 @@ module FinancialAssistance
       applicants.eligible_for_non_magi_reasons
     end
 
+    def applicants_applying_coverage
+      applicants.applying_coverage
+    end
+
     private
 
     # If MemberA is parent to MemberB,

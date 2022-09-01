@@ -154,6 +154,7 @@ Then(/^the user will navigate to the Eligibility Results page and will find Medi
   expect(page.has_css?(IvlIapEligibilityResults.medicaid_or_chip_heading)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.medicaid_or_chip_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.all_medicaid_next_steps_continue_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
