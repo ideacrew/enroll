@@ -13,7 +13,7 @@ module Subscribers
         employer = employee_role.employer_profile
         person = employee_role.person
 
-        subscriber_logger.info "on_employee_role_created, employee_role: #{person.full_name} employer: #{employer.legal_name} fein: #{employer.fein}"
+        subscriber_logger.info "on_employee_role_created, employee_role: #{person&.full_name} employer: #{employer&.legal_name} fein: #{employer.fein}"
         subscriber_logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
         logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
 
@@ -21,7 +21,7 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "EmployeeRoleSubscriber, employee_role: #{person.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        subscriber_logger.info "EmployeeRoleSubscriber, employee_role: #{person&.full_name}, employer: #{employer&.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
         logger.info "EmployeeRoleSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
@@ -37,6 +37,7 @@ module Subscribers
 
         census_employee.osse_eligible_applications.each do |benefit_application|
           employer = benefit_application.employer_profile
+
           result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
             {
               subject_gid: employee_role.to_global_id,
@@ -47,7 +48,7 @@ module Subscribers
           )
 
           if result.success?
-            subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, employee: #{person.full_name} processed successfully"
+            subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, employee: #{person&.full_name} processed successfully"
             logger.info "on_employee_role_created CensusEmployeeSubscriber: acked, SuccessResult: #{result.success}"
             eligibility = employee_role.eligibilities.build(result.success.to_h)
             eligibility.save!
@@ -59,8 +60,8 @@ module Subscribers
               when Dry::Validation::Result
                 result.failure.errors.to_h
               end
-            subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, employee: #{person.full_name}"
-            logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{person.full_name}, employer fein: #{employer.fein}"
+            subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, employee: #{person&.full_name}"
+            logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{person&.full_name}, employer fein: #{employer.fein}"
           end
         end
       end
