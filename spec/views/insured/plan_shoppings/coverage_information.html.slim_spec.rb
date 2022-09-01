@@ -29,7 +29,11 @@ describe "insured/plan_shoppings/_coverage_information.html.slim", dbclean: :aft
   end
 
   it "should display osse amount if the enrollment has an osse subsidy" do
+    binding.irb
+    enrollment.update_attributes!(eligible_child_care_subsidy: 10.0)
+    allow(enrollment).to receive(:composite_rated?).and_return(false)
     render "insured/plan_shoppings/coverage_information", enrollment: enrollment
+    expect(rendered).to have_selector('td', text: 10.0)
     expect(rendered).to have_content(l10n("osse_subsidy_title_shortname"))
   end
 
