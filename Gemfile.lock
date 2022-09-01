@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 4daebf47ebc3df52cad0602cddd7bb47fba575d5
-  branch: async_resources_for_er_osse_eligibility
+  revision: 8e2649dfd89776b01ca5efd16766f7edd61f2a02
+  branch: trunk
   specs:
     aca_entities (0.10.0)
       deep_merge
