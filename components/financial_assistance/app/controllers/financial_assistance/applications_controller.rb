@@ -148,7 +148,7 @@ module FinancialAssistance
       @applicants = @application.active_applicants if @application.present?
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       @has_outstanding_local_mec_evidence = has_outstanding_local_mec_evidence?(@application) if EnrollRegistry.feature_enabled?(:mec_check)
-      @shop_coverage = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? shop_enrollments_exist?(@application) : nil
+      @shop_coverage =  shop_enrollments_exist?(@application) if EnrollRegistry.feature_enabled?(:shop_coverage_check)
 
       unless @application.valid_relations?
         redirect_to application_relationships_path(@application)
@@ -299,7 +299,7 @@ module FinancialAssistance
     private
 
     def has_outstanding_local_mec_evidence?(application)
-      application.applicants.any? {|applicant| Eligibilities::Evidence::OUTSTANDING_STATES.include?(applicant.local_mec_evidence.aasm_state)}
+      application.applicants.any? {|applicant| Eligibilities::Evidence::OUTSTANDING_STATES.include?(applicant&.local_mec_evidence&.aasm_state)}
     end
 
     def shop_enrollments_exist?(application)
