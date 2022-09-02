@@ -439,6 +439,19 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       hbx_enrollment.reload
       expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq previous_coverage.hbx_enrollment_members.first.coverage_start_on
     end
+
+    it "should redirect to the group selection page if enrollment effective date doesn't match product dates" do
+      product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      sign_in(user)
+      get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id}
+      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id))
+    end
+
+    it "should render thank you page if enrollment effective date doesn't match product dates" do
+      sign_in(user)
+      get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id}
+      expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
+    end
   end
 
   context "GET print_waiver", :dbclean => :around_each do
