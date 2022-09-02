@@ -1306,4 +1306,88 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
   end
+
+  describe 'callbacks' do
+    context '.publish_employee_created' do
+      let(:census_employee) do
+        build(
+          :benefit_sponsors_census_employee,
+          employer_profile: employer_profile,
+          benefit_sponsorship: employer_profile.active_benefit_sponsorship
+        )
+      end
+
+      it 'should call publish_employee_created' do
+        expect(census_employee).to receive(:publish_employee_created)
+        census_employee.save!
+      end
+    end
+  end
+
+  describe '.osse_eligible?' do
+    include_context 'setup initial benefit application'
+
+    let(:ce_aasm_state) { 'eligible' }
+    let(:cobra_begin_date) { nil }
+    let(:census_employee) do
+      create(
+        :benefit_sponsors_census_employee,
+        employer_profile: employer_profile,
+        aasm_state: ce_aasm_state,
+        cobra_begin_date: cobra_begin_date,
+        benefit_sponsorship: employer_profile.active_benefit_sponsorship
+      )
+    end
+
+    context 'when census employee is in cobra state' do
+      let(:ce_aasm_state) { 'cobra_eligible' }
+      let(:cobra_begin_date) { TimeKeeper.date_of_record }
+
+      it { expect(census_employee.osse_eligible?).to be_falsey }
+    end
+
+    context 'when census employee is in terminated state' do
+      let(:employment_terminated_on) { TimeKeeper.date_of_record.prev_day }
+      before { census_employee.terminate_employment!(employment_terminated_on) }
+
+      it { expect(census_employee.aasm_state).to eq('employment_terminated') }
+      it { expect(census_employee.reload.osse_eligible?).to be_falsey }
+    end
+
+    context 'when census employee is active and is not osse eligible' do
+      let!(:active_benefit_group_assignment) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_group_assignment,
+          benefit_group: benefit_package,
+          census_employee: census_employee,
+          start_on: benefit_package.start_on,
+          end_on: benefit_package.end_on
+        )
+      end
+
+      it { expect(census_employee.osse_eligible?).to be_falsey }
+
+    end
+
+    context 'when census employee is active and is osse eligible' do
+      let(:aasm_state) { :enrollment_open }
+      let!(:active_benefit_group_assignment) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_group_assignment,
+          benefit_group: benefit_package,
+          census_employee: census_employee,
+          start_on: benefit_package.start_on,
+          end_on: benefit_package.end_on
+        )
+      end
+
+      let(:eligibility) { build(:eligibility, :with_subject, :with_evidences) }
+      let!(:add_eligibility) do
+        benefit_sponsorship.eligibilities << eligibility
+        benefit_sponsorship.save!
+      end
+
+      it { expect(census_employee.osse_eligible?).to be_truthy }
+    end
+  end
 end

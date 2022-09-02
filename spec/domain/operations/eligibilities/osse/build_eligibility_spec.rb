@@ -2,6 +2,8 @@
 
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
                type: :model,
@@ -33,15 +35,47 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
   end
 
   context 'when required attributes passed' do
+    context 'when subject is benefit sponsorship' do
 
-    it 'should be success' do
-      result = subject.call(required_params)
-      expect(result.success?).to be_truthy
+      it 'should be success' do
+        result = subject.call(required_params)
+        expect(result.success?).to be_truthy
+      end
+
+      it 'should create eligibility' do
+        result = subject.call(required_params)
+        expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
+      end
     end
 
-    it 'should create eligibility' do
-      result = subject.call(required_params)
-      expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
+    context 'when subject is employee role' do
+      let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month.next_month}
+
+      include_context 'setup benefit market with market catalogs and product packages'
+      include_context 'setup initial benefit application'
+
+      let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+      let(:family) { person.primary_family }
+      let!(:census_employee) do
+        ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+        ce.update_attributes!(employee_role_id: person.employee_roles[0].id)
+        person.employee_roles[0].update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id, employer_profile_id: nil)
+        ce
+      end
+
+      let(:employee_role) { person.employee_roles[0] }
+
+      let(:subject_ref) { employee_role.to_global_id }
+
+      it 'should be success' do
+        result = subject.call(required_params)
+        expect(result.success?).to be_truthy
+      end
+
+      it 'should create eligibility' do
+        result = subject.call(required_params)
+        expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
+      end
     end
   end
 

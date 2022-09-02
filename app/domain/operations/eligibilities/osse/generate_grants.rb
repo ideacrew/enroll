@@ -96,6 +96,8 @@ module Operations
         end
 
         def market_kind
+          return 'aca_shop' if subject.market_kind == 'shop'
+
           subject.market_kind
         end
 

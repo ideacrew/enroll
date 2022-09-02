@@ -23,4 +23,18 @@ FactoryBot.define do
       end
     end
   end
+
+  factory :osse_evidence, :class => 'Eligibilities::Osse::Evidence' do
+    title { 'Osse Eligibility Evidence' }
+    description { 'Osse Eligibility' }
+    key { :osse_subsidy }
+    is_satisfied { true }
+
+    trait :with_eligibility do
+      after(:build) do |evidence, _evaluator|
+        eligibility ||= evidence.eligibility
+        eligibility { create(:eligibility)} unless eligibility.present?
+      end
+    end
+  end
 end

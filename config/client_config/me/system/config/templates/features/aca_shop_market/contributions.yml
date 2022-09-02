@@ -548,6 +548,16 @@ registry:
       - key: :employer_metal_level_products_restricted_2022
         item: 'employer_metal_level_products'
         is_enabled: false
+      - key: :aca_shop_employee_role_osse_subsidy_2022
+        item: :osse_eligibility_criterion
+        is_enabled: false
+        settings:
+        - key: :grants_offered
+          item:
+            - :osse_subsidy_2022
+      - key: :osse_subsidy_2022
+        item: osse_subsidy_2022
+        is_enabled: false
       - key: :aca_shop_osse_subsidy_2022
         item: :aca_shop_osse_subsidy_2022
         is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
@@ -580,7 +590,16 @@ registry:
       - key: :employer_metal_level_products_restricted_2023
         item: 'employer_metal_level_products'
         is_enabled: false
+      - key: :aca_shop_employee_role_osse_subsidy_2023
+        item: :osse_eligibility_criterion
+        is_enabled: false
+        settings:
+        - key: :grants_offered
+          item:
+            - :osse_subsidy_2023
+      - key: :osse_subsidy_2023
+        item: osse_subsidy_2023
+        is_enabled: false
       - key: :aca_shop_osse_subsidy_2023
         item: :aca_shop_osse_subsidy_2023
         is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
- 
