@@ -5,7 +5,9 @@
         <h1 data-cuke='eligibility_results' class='dir'><b><%= l10n("faa.results.eligibility_results") %></b></h1>
 
         <% @application.eligibility_determinations.each_with_index do |ed, i| %>
-          <h3 data-cuke='tax_household' class='mt-10'><b><%= l10n("faa.results.tax_household", thh_number: i.next) %></b></h3>
+          <% if ed.applicants.applying_coverage.present? %>
+            <h3 data-cuke='tax_household' class='mt-10'><b><%= l10n("faa.results.tax_household", thh_number: i.next) %></b></h3>
+          <% end %>
 
           <!-- Start: Section for APTC/CSR Applicants -->
           <% aptc_applicants = ed.aptc_applicants %>

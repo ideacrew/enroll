@@ -192,3 +192,11 @@ Then(/^the user will navigate to the Eligibility Results page and will find Inel
   expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
+
+And(/^the application has non-applicants with no determination$/) do
+  setup_non_applicants_with_no_determination(application)
+end
+
+Then(/^the user will navigate to the Eligibility Results page and should not see tax household heading$/) do
+  expect(page.has_css?(IvlIapEligibilityResults.tax_household)).to eq false
+end
