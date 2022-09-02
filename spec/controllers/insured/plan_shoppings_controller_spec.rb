@@ -441,6 +441,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "should redirect to the group selection page if enrollment effective date doesn't match product dates" do
+      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(false)
+      hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
       product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
       sign_in(user)
       get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id}
