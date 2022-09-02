@@ -653,7 +653,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           covered_members_first_names: [],
           eligible_child_care_subsidy: 0
         )
-      end  
+      end
 
       before do
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
