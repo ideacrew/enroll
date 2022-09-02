@@ -7,10 +7,10 @@
         th scope="col" = l10n("relationship")
         th scope="col" = l10n("age")
         th.text-right scope="col" = l10n("premium")
-        th.text-right width="50" scope="col" = l10n("employer_contribution")
-        th.text-right width="50" scope="col" = l10n("you_pay")
         - if osse_eligible
           th.text-nowrap.text-center colspan="2" scope="colgroup" = l10n("program_assistance")
+        th.text-right width="50" scope="col" = l10n("employer_contribution")
+        th.text-right width="50" scope="col" = l10n("you_pay")
     tbody
       - @enrollment.hbx_enrollment_members.each do |member|
         tr
@@ -18,8 +18,6 @@
           td = member.primary_relationship
           td = dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob)
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency (member_enrollment = @member_group.group_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == member.id }).product_price)
-          td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.sponsor_contribution)
-          td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.employee_cost)
           - if osse_eligible && member.is_subscriber?
             td.text-right = l10n("osse_subsidy_title_shortname") 
             td.text-center = @enrollment.composite_rated? ? "--" : (number_to_currency @enrollment.eligible_child_care_subsidy)
@@ -27,19 +25,21 @@
             td.text-right
             td.text-center
           - else
+          td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.sponsor_contribution)
+          td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency member_enrollment.employee_cost)
       tr.gray-row
         td.ext-right.capital colspan="3"
           strong Totals
         td.text-right
           strong = number_to_currency(@member_group.group_enrollment.product_cost_total)
-        td.text-right
-          strong = number_to_currency(@member_group.group_enrollment.sponsor_contribution_total)
-        td.text-right
-          strong = number_to_currency(@member_group.group_enrollment.employee_cost_total)
         - if osse_eligible
           td.text-right
           td.text-center
             strong = (number_to_currency @enrollment.eligible_child_care_subsidy)
+        td.text-right
+          strong = number_to_currency(@member_group.group_enrollment.sponsor_contribution_total)
+        td.text-right
+          strong = number_to_currency(@member_group.group_enrollment.employee_cost_total)
       tr
         td.text-right colspan=(osse_eligible ? "7" : "5") Your coverage start date :
         td
