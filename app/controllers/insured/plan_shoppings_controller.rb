@@ -246,17 +246,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def show_shop(hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
 
-    @osse_childcare_subsidy = nil
-    # if @hbx_enrollment.census_employee&.osse_eligible?(effective_on)
-    lcsp = BenefitMarkets::Products::Product.by_year(@hbx_enrollment.effective_on.year).where(hios_id: '94506DC0350030-01').first
-    sponsored_cost_calculator_lcsp = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-    @member_groups_lcsp = sponsored_cost_calculator_lcsp.groups_for_products([lcsp])
-    # update to pull employee
-    # hbx_enrollment.family.primary_applicant
-    subscriber_member_enrollment_for_lcsp = @member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == @hbx_enrollment.primary_hbx_enrollment_member.id.to_s }
-    @osse_childcare_subsidy = BigDecimal.new(subscriber_member_enrollment_for_lcsp&.product_price&.to_s).round(2)
-    # end
-    @hbx_enrollment.update_attributes(eligible_child_care_subsidy: @osse_childcare_subsidy)
+    @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []

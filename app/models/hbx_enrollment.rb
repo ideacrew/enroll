@@ -2707,6 +2707,24 @@ class HbxEnrollment
     workflow_state_transitions.order(created_at: :desc).first
   end
 
+
+  def update_osse_childcare_subsidy
+    return unless census_employee&.osse_eligible? #(effective_on)
+
+    hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_on.year}"].item
+    lcsp = BenefitMarkets::Products::Product.by_year(effective_on.year).where(hios_id: hios_id).first
+    return if lcsp.nil?
+
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
+    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
+
+    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == primary_hbx_enrollment_member.id.to_s }
+    return if member_enrollment.nil?
+
+    osse_childcare_subsidy = BigDecimal.new(member_enrollment&.product_price&.to_s).round(2)
+    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
