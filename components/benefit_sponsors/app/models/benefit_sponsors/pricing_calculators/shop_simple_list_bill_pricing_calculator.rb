@@ -52,14 +52,15 @@ module BenefitSponsors
           @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
         end
-      end
 
-      def apply_member_subsidies(member, member_price)
-        if member.is_primary_member? && @eligible_child_care_subsidy.present?
-          member_price = BigDecimal.new((member_price - @eligible_child_care_subsidy).to_s).round(2)
-          member_price < 0.01 ? 0.00 : member_price
+        def apply_member_subsidies(member, member_price)
+          if member.is_primary_member? && @eligible_child_care_subsidy.present?
+            member_price = BigDecimal.new((member_price - @eligible_child_care_subsidy).to_s).round(2)
+            member_price < 0.01 ? 0.00 : member_price
+          else
+            member_price
+          end
         end
-        member_price
       end
 
       def initialize
