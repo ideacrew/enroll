@@ -2518,7 +2518,7 @@ class HbxEnrollment
       rate_schedule_date: sponsored_benefit.rate_schedule_date,
       rating_area: rating_area.exchange_provided_code,
       sponsor_contribution_prohibited: is_cobra_status?,
-      osse_childcare_subsidy: eligible_child_care_subsidy
+      eligible_child_care_subsidy: eligible_child_care_subsidy
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,

@@ -22,7 +22,7 @@ module BenefitSponsors
           @previous_product = r_coverage.previous_product
           @discount_kid_count = 0
           @sponsored_benefit = sponsored_benefit
-          @osse_childcare_subsidy = r_coverage.osse_childcare_subsidy
+          @eligible_child_care_subsidy = r_coverage.eligible_child_care_subsidy
         end
         # rubocop:enable Metrics/ParameterLists
 
@@ -47,17 +47,19 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          member_price_after_subsidy =
-            if @osse_childcare_subsidy.present?
-              price = BigDecimal.new(member_price.to_s).round(2) - BigDecimal.new(@osse_childcare_subsidy.to_s).round(2)
-              price < 0.01 ? 0.00 : price
-            else
-              BigDecimal.new(member_price.to_s).round(2)
-            end
-          @member_totals[member.member_id] = member_price_after_subsidy
-          @total = BigDecimal.new((@total + member_price_after_subsidy).to_s).round(2)
+          member_price = apply_member_subsidies(member, member_price)
+          @member_totals[member.member_id] = BigDecimal.new(member_price.to_s).round(2)
+          @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
         end
+      end
+
+      def apply_member_subsidies(member, member_price)
+        if member.is_primary_member? && @eligible_child_care_subsidy.present?
+          member_price = BigDecimal.new((member_price - @eligible_child_care_subsidy).to_s).round(2)
+          member_price < 0.01 ? 0.00 : member_price
+        end
+        member_price
       end
 
       def initialize
