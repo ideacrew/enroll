@@ -240,6 +240,25 @@ module FinancialAssistance
       end
       application.update_attributes!(aasm_state: 'determined')
     end
+
+    def setup_non_applicants_with_no_determination(application)
+      coverage_year = TimeKeeper.date_of_record.year
+      application.eligibility_determinations.create!(
+        max_aptc: 0.00,
+        is_eligibility_determined: true,
+        effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+        determined_at: TimeKeeper.datetime_of_record - 30.days,
+        source: 'Faa'
+      ).save!
+
+      application.applicants.each do |applicant|
+        applicant.update_attributes!(
+          is_applying_coverage: false,
+          eligibility_determination_id: application.eligibility_determinations.first.id
+        )
+      end
+      application.update_attributes!(aasm_state: 'determined')
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

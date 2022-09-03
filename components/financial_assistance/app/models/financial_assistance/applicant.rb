@@ -364,6 +364,7 @@ module FinancialAssistance
     scope :csr_73_87_or_94,               -> { where(:csr_percent_as_integer.in => [94, 87, 73]) }
     scope :csr_100,                       -> { where(csr_percent_as_integer: 100) }
     scope :csr_nal,                       -> { where(csr_percent_as_integer: -1) }
+    scope :applying_coverage,             -> { where(is_applying_coverage: true) }
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?

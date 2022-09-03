@@ -1981,4 +1981,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(application.applicants_with_non_magi_reasons).to match([applicant2])
     end
   end
+
+  describe '#applicants_applying_coverage' do
+    it 'returns only eligible_for_non_magi_reasons applicants' do
+      applicant2.update_attributes!(is_applying_coverage: false)
+      applicant3.update_attributes!(is_applying_coverage: false)
+      expect(application.applicants_applying_coverage).to match([applicant1])
+    end
+  end
 end

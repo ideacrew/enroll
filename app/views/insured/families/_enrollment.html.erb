@@ -155,10 +155,10 @@
       <div>
       </div>
     <div class="enrollment-type info vertical-align-top">
-        <% if (hbx_enrollment.is_shop? && shop_osse_eligibility_is_enabled?(hbx_enrollment.effective_on.year)) || (hbx_enrollment.is_ivl_by_kind? && ivl_osse_eligibility_is_enabled?(hbx_enrollment.effective_on.year)) %> 
+        <% if hbx_enrollment.is_shop? && (hbx_enrollment.eligible_child_care_subsidy > 0) %> 
           <p>
             <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
-            <%='$0.00'%>/<%= l10n("month").to_s.downcase %>
+            <%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%>/<%= l10n("month").to_s.downcase %>
           </p>
         <% else %>
           &nbsp;

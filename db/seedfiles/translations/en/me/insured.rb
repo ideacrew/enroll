@@ -400,6 +400,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.age' => "Age",
   :'en.employer_contribution' => "Employer Contribution",
   :'en.you_pay' => "You Pay",
+  :'en.program_assistance' => "Program Assistance",
   :'en.plan_details' => "Plan Details",
   :'en.insured.plan_shoppings.help_me_sign_up_options' => "Help me Sign Up Options",
   :'en.insured.plan_shoppings.help_from_a_broker' => "Help from an Expert",
