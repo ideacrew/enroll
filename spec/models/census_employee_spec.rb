@@ -1338,12 +1338,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         benefit_sponsorship: employer_profile.active_benefit_sponsorship
       )
     end
+    let(:effective_on) { initial_application.start_on }
 
     context 'when census employee is in cobra state' do
       let(:ce_aasm_state) { 'cobra_eligible' }
       let(:cobra_begin_date) { TimeKeeper.date_of_record }
 
-      it { expect(census_employee.osse_eligible?).to be_falsey }
+      it { expect(census_employee.osse_eligible?(effective_on)).to be_falsey }
     end
 
     context 'when census employee is in terminated state' do
@@ -1351,7 +1352,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       before { census_employee.terminate_employment!(employment_terminated_on) }
 
       it { expect(census_employee.aasm_state).to eq('employment_terminated') }
-      it { expect(census_employee.reload.osse_eligible?).to be_falsey }
+      it { expect(census_employee.reload.osse_eligible?(effective_on)).to be_falsey }
     end
 
     context 'when census employee is active and is not osse eligible' do
@@ -1365,7 +1366,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         )
       end
 
-      it { expect(census_employee.osse_eligible?).to be_falsey }
+      it { expect(census_employee.osse_eligible?(effective_on)).to be_falsey }
 
     end
 
@@ -1387,7 +1388,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         benefit_sponsorship.save!
       end
 
-      it { expect(census_employee.osse_eligible?).to be_truthy }
+      it { expect(census_employee.osse_eligible?(effective_on)).to be_truthy }
     end
   end
 end
