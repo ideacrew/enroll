@@ -5726,12 +5726,13 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   end
 
   let(:hios_id) { EnrollRegistry["lowest_cost_silver_product_#{effective_on.year}"].item }
-  let!(:lcsp) {
-    create(:benefit_markets_products_health_products_health_product,
+  let!(:lcsp) do
+    create(
+      :benefit_markets_products_health_products_health_product,
       application_period: (effective_on.beginning_of_year..effective_on.end_of_year),
       hios_id: hios_id
     )
-  }
+  end
   let(:age) { person.age_on(effective_on) }
   let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
   let(:premium) { 214.85 }
