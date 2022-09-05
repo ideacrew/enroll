@@ -54,8 +54,8 @@ module BenefitSponsors
         end
 
         def apply_member_subsidies(member, member_price)
-          if member.is_primary_member? && @eligible_child_care_subsidy.present?
-            member_price = BigDecimal((member_price - @eligible_child_care_subsidy.to_f).to_s).round(2)
+          if @product.kind.to_s == 'health' && member.is_primary_member? && @eligible_child_care_subsidy.present?
+            member_price = BigDecimal((member_price - @eligible_child_care_subsidy.to_f).to_s).round(2).to_f
             member_price < 0.01 ? 0.00 : member_price
           else
             member_price

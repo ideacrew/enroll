@@ -5693,6 +5693,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   end
   let(:employee_role) { census_employee.employee_role.reload }
   let(:effective_on) { initial_application.start_on.to_date }
+  let(:coverage_kind) { "health" }
 
   let(:shop_enrollment) do
     FactoryBot.create(
@@ -5700,7 +5701,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
       :shop,
       :with_enrollment_members,
       :with_product,
-      coverage_kind: "health",
+      coverage_kind: coverage_kind,
       family: person.primary_family,
       employee_role: employee_role,
       effective_on: effective_on,
@@ -5747,6 +5748,14 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
     it 'should update OSSE subsidy' do
       expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(premium)
     end
+
+    context 'when enrollment is dental' do
+      let(:coverage_kind) { :dental }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
+    end
   end
 
   context 'when employee is not eligible for OSSE' do
@@ -5758,6 +5767,14 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
     it 'should not update OSSE subsidy' do
       expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+    end
+
+    context 'when enrollment is dental' do
+      let(:coverage_kind) { :dental }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
     end
   end
 end
