@@ -23,7 +23,7 @@ module BenefitSponsors
       @member_enrollments         = []
       @rate_schedule_date = nil
       @rating_area = nil
-      @eligible_child_care_subsidy = nil
+      @eligible_child_care_subsidy = 0.00
       super(opts)
     end
 

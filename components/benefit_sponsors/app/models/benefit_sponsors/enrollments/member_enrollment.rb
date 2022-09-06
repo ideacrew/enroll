@@ -24,5 +24,9 @@ module BenefitSponsors
     def employee_cost
       product_price - eligible_child_care_subsidy - sponsor_contribution
     end
+
+    def product_price_after_subsidy
+      product_price - eligible_child_care_subsidy
+    end
   end
 end
