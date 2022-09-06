@@ -3,7 +3,7 @@ module BenefitSponsors
     include ActiveModel::Model
 
     attr_accessor :coverage_start_on, :product, :previous_product,
-                  :product_cost_total, :benefit_sponsor,
+                  :product_cost_total, :product_cost_total_with_subsidy, :benefit_sponsor,
                   :sponsor_contribution_total, :member_enrollments, :group_id,
                   :rating_area,
                   :rate_schedule_date, :sponsor_contribution_prohibited,
@@ -50,7 +50,7 @@ module BenefitSponsors
     end
 
     def employee_cost_total
-      product_cost_total - sponsor_contribution_total
+      product_cost_total_with_subsidy - sponsor_contribution_total
     end
 
     def as_json(params = {})

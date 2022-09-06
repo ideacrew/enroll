@@ -17,6 +17,7 @@ module BenefitSponsors
           @coverage_start_on = r_coverage.coverage_start_on
           @rating_area = r_coverage.rating_area
           @level_map = l_map
+          @eligible_child_care_subsidy = r_coverage.eligible_child_care_subsidy
           @product = r_coverage.product
           @previous_product = r_coverage.previous_product
           @is_contribution_prohibited = contribution_banhammered
@@ -42,7 +43,7 @@ module BenefitSponsors
           ref_rate = reference_rate_for(member)
           c_percent = integerize_percent(c_factor)
           ref_contribution = (ref_rate * c_percent)/100.00
-          BigDecimal.new([member_price,ref_contribution].min.to_s).round(2)
+          BigDecimal([member_price - @eligible_child_care_subsidy.to_f, ref_contribution].min.to_s).round(2)
         end
 
         def reference_rate_for(member)

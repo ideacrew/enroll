@@ -153,13 +153,13 @@ module BenefitSponsors
 
         it "calculates the total" do
           result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          expect(result_entry.group_enrollment.product_cost_total).to eq(200.00)
+          expect(result_entry.group_enrollment.product_cost_total).to eq(300.00)
         end
 
         it "calculates the correct employee cost" do
           result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
           member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
-          expect(member_entry.product_price).to eq(100.00)
+          expect(member_entry.product_price).to eq(200.00)
         end
 
         it "calculates the correct spouse cost" do
@@ -364,13 +364,13 @@ module BenefitSponsors
 
       it "calculates the total" do
         result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-        expect(result_entry.group_enrollment.product_cost_total).to eq(375.00)
+        expect(result_entry.group_enrollment.product_cost_total).to eq(475.00)
       end
 
       it "calculates the correct employee cost" do
         result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
         member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
-        expect(member_entry.product_price).to eq(100.00)
+        expect(member_entry.product_price).to eq(200.00)
       end
 
       it "calculates the correct spouse cost" do
