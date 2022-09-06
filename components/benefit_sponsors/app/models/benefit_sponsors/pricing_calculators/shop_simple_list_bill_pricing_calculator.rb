@@ -4,7 +4,7 @@ module BenefitSponsors
       class CalculatorState
         include Acapi::Notifiers
         attr_reader :total
-        attr_reader :member_totals
+        attr_reader :member_totals, :member_subsidies
 
         # rubocop:disable Metrics/ParameterLists
         def initialize(p_calculator, product, p_model, p_unit_map, r_coverage, c_eligibility_dates, sponsored_benefit = nil)
@@ -14,6 +14,7 @@ module BenefitSponsors
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
           @total = 0.00
           @member_totals = Hash.new
+          @member_subsidies = Hash.new
           @rate_schedule_date = r_coverage.rate_schedule_date
           @eligibility_dates = c_eligibility_dates
           @coverage_start_date = r_coverage.coverage_start_on
@@ -47,18 +48,17 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          member_price = apply_member_subsidies(member, member_price)
-          @member_totals[member.member_id] = BigDecimal.new(member_price.to_s).round(2)
-          @total = BigDecimal.new((@total + member_price).to_s).round(2)
+          @member_subsidies[member.member_id] = calc_member_sibsidy(member, member_price)
+          @member_totals[member.member_id] = BigDecimal(member_price.to_s).round(2)
+          @total = BigDecimal((@total + member_price).to_s).round(2)
           self
         end
 
-        def apply_member_subsidies(member, member_price)
+        def calc_member_sibsidy(member, member_price)
           if @product.kind.to_s == 'health' && member.is_primary_member? && @eligible_child_care_subsidy.present?
-            member_price = BigDecimal((member_price - @eligible_child_care_subsidy.to_f).to_s).round(2).to_f
-            member_price < 0.01 ? 0.00 : member_price
+            @eligible_child_care_subsidy.to_f
           else
-            member_price
+            0.00
           end
         end
       end
@@ -96,7 +96,7 @@ module BenefitSponsors
           calc.add(mem)
         end
         benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
-          m_en.product_price = calc_results.member_totals[m_en.member_id]
+          m_en.product_price = (calc_results.member_totals[m_en.member_id] - calc_results.member_subsidies[m_en.member_id])
         end
         benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
         benefit_roster_entry
