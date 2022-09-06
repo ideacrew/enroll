@@ -214,12 +214,29 @@ function applyListeners() {
   }
 
   $('#naturalization_doc_type').change(function () {
-    showOnly($(this).val());
+    var value = $(this).val()
+    showOnly(value);
+    verifyAlienNumber(value)
   });
 
   $('#immigration_doc_type').change(function () {
     showOnly($(this).val());
   });
+}
+// Added check per issue 99108 
+function verifyAlienNumber(value) {
+  // Checks that element exist since it's dynamically added when changing selectic
+  var existCondition = setInterval(function() {
+    var input = $('#person_consumer_role_vlp_documents_attributes_0_alien_number');
+    if (input.length) {
+      if (!value) {
+        input.removeAttr('required')
+      } else {
+        input.attr('required', true)
+      }
+       clearInterval(existCondition);
+    }
+   }, 100); // check every 100ms until element exist
 }
 
 var PersonValidations = (function (window, undefined) {
