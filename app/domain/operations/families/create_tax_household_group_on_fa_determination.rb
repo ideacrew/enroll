@@ -44,7 +44,7 @@ module Operations
         family = find_family(application_entity).success
         return Success(family) if application_entity.tax_households.map(&:aptc_csr_eligible_members).blank?
 
-        th_group_params = tax_household_group_params(family, application_entity)
+        th_group_params = tax_household_group_params(application_entity)
         th_group = family.tax_household_groups.build(th_group_params)
         th_group.save!
         family.save!
@@ -73,7 +73,7 @@ module Operations
         end
       end
 
-      def tax_household_params(family, application_entity)
+      def tax_household_params(application_entity)
         fa_application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
         return [] unless fa_application
 
@@ -88,14 +88,14 @@ module Operations
         end
       end
 
-      def tax_household_group_params(family, application_entity)
+      def tax_household_group_params(application_entity)
         {
           source: 'Faa',
           application_id: application_entity.hbx_id,
           start_on: application_entity.tax_households.first.effective_on,
           end_on: nil,
           assistance_year: application_entity.assistance_year,
-          tax_households: tax_household_params(family, application_entity)
+          tax_households: tax_household_params(application_entity)
         }
       end
     end
