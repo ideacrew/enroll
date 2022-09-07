@@ -1502,8 +1502,8 @@ class HbxEnrollment
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= product
 
-    if is_an_existing_plan?(new_plan)
-      plan_selection = PlanSelection.new(self, new_plan)
+    plan_selection = PlanSelection.new(self, new_plan)    
+    if plan_selection.existing_coverage.present?
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
   end
