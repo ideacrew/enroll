@@ -189,6 +189,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
       allow(cost_calculator).to receive(:groups_for_products).with([product]).and_return([member_group])
+      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(true)
     end
 
     it "returns http success" do
