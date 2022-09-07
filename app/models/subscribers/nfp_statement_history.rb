@@ -20,7 +20,7 @@ module Subscribers
       eid = stringed_key_payload['employer_id']
       response = JSON.parse(json_body)
       begin
-        organization = BenefitSponsors::Organizations::Organization.where("hbx_id" => eid).first
+        organization = ::BenefitSponsors::Organizations::Organization.where("hbx_id" => eid).first
         benefit_sponsorship = organization.benefit_sponsorships.first
 
         if organization&.employer_profile
@@ -59,7 +59,7 @@ module Subscribers
 
     def update_current_statement_activities(params, benefit_sponsorship_account)
       params.each do |line|
-        csa = BenefitSponsors::BenefitSponsorships::CurrentStatementActivity.new
+        csa = ::BenefitSponsors::BenefitSponsorships::CurrentStatementActivity.new
         csa.description = line["description"]
         csa.name = line["name"]
         csa.amount = line["amount"]
@@ -75,7 +75,7 @@ module Subscribers
 
     def update_financial_transactions(params, benefit_sponsorship_account)
       params.each do |payment|
-        ft = BenefitSponsors::BenefitSponsorships::FinancialTransaction.new
+        ft = ::BenefitSponsors::BenefitSponsorships::FinancialTransaction.new
         ft.paid_on = payment["paid_on"]
         ft.reference_id = payment["reference_id"]
         ft.method_kind = payment["method_kind"]

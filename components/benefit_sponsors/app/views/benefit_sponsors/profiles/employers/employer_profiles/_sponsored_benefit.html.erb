@@ -21,6 +21,9 @@
         <th>
           <header>Type</header>
         </th>
+         <th>
+          <header><%= l10n('standard_plan') %></header>
+        </th>
         <th>
           <header>Metal Level</header>
         </th>
@@ -42,6 +45,11 @@
         <td>
           <p>
             <%= sponsored_benefit.reference_product.product_type.to_s.upcase %>
+          </p>
+        </td>
+        <td>
+          <p>
+            <%= sponsored_benefit.reference_product.is_standard_plan ? l10n('yes') : sponsored_benefit.reference_product.is_standard_plan == false ? l10n('no') : "N/A" %>
           </p>
         </td>
         <td>

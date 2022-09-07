@@ -443,8 +443,8 @@ Given(/^the consumer has received a successful MEC check response$/) do
   consumer.person.mec_check_response = "Success"
 end
 
-Given(/an applicant has local mec evidence/) do
-  application.active_applicants.first.update_attributes!(local_mec_evidence: FactoryBot.build(:evidence))
+Given(/an applicant has outstanding local mec evidence/) do
+  application.active_applicants.first.update_attributes!(local_mec_evidence: FactoryBot.build(:evidence, key: 'local_mec', aasm_state: 'outstanding'))
   application.active_applicants.first.save!
 end
 
@@ -550,8 +550,8 @@ Then(/the "Send To OFI" button will be disabled and the user will see the button
   )
 end
 
-Then(/^they should see the MedicaidCurrently Enrolled warning text$/) do
-  expect(page).to have_content(l10n('faa.mc_success')[0,62])
+Then(/^they should see the Medicaid Currently Enrolled warning text$/) do
+  expect(page).to have_selector('#mec-check-response')
   expect(page).to have_content(l10n('faa.mc_continue'))
 end
 
