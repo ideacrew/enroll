@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 8f9d2037c65481f8784489a0a13dee8285f6e57b
-  branch: 183011971_mthh_domain_models
+  revision: f746fcf3529b7af6beb5185de04fe92121333580
+  branch: trunk
   specs:
     aca_entities (0.10.0)
       deep_merge
