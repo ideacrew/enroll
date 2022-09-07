@@ -5,7 +5,6 @@ require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gatew
 
 #FinancialAssistance::Operations::Applications::Pvc::SubmitPvcRequest.new.call(applications_per_event:1, assistance_year:2022)
 RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcRequest, dbclean: :after_each do
-# RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
@@ -95,7 +94,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcRe
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new }
+  let(:obj)  { FinancialAssistance::Operations::Applications::Pvc::SubmitPvcRequest.new }
 
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)

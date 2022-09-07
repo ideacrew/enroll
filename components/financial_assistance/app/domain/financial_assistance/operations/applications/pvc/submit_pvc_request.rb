@@ -10,11 +10,14 @@ module FinancialAssistance
       module Pvc
         # operation to manually trigger pvc events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
+
         class SubmitPvcRequest
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging
 
+          #@ todo document parameters
+          # document the default behaviour of CSR
           def call(params)
             start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
             values = yield validate(params)
@@ -32,13 +35,22 @@ module FinancialAssistance
             errors = []
             errors << 'applications_per_event ref missing' unless params[:applications_per_event]
             errors << 'assistance_year ref missing' unless params[:assistance_year]
+            # errors << 'csr_l ref missing' unless params[:csr_list]
+            # @ convert the array list to a constant
+            params[:csr_list] = ["02", "04", "05", "06"] if params[:csr_list].blank?
 
             errors.empty? ? Success(params) : Failure(errors)
           end
 
           def find_families(params)
-            family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
-            Family.where(:_id.in => family_ids).all
+
+            #family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
+            #family_ids = Family.with_all_verifications.by_enrollment_individual_market.periodic_verifiable.include_csrs
+
+            # family_ids = FinancialAssistance::Application.where(assistance_year: params[:assistance_year]).is_aptc_or_csr_eligible.enrolled_in_healthplan.csr_included(["02", "04", "05", "06"]).distinct(:family_id)
+            
+            Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list])
+            # @todo change to send and event with this
           end
 
           def fetch_application(family, assistance_year)
