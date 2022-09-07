@@ -10,7 +10,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
       log_payload(subscriber_logger, logger, payload)
 
-      add_fa_eligibility_determination(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -21,11 +21,15 @@ module Subscribers
     private
 
     # Creates tax_household_groups and its accociations for a Family with Financial Assistance Application's Eligibility Determination
-    def add_fa_eligibility_determination(subscriber_logger, payload)
+    def create_tax_household_group(subscriber_logger, payload)
       result = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(payload)
-      log_info(subscriber_logger, result, 'add_fa_eligibility_determination')
+      log_info(subscriber_logger, result, 'create_tax_household_group_on_fa_determination')
+      if result.success?
+        family = result.success.family
+        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
+      end
     rescue StandardError => e
-      log_error(subscriber_logger, nil, :add_fa_eligibility_determination, e)
+      log_error(subscriber_logger, nil, :create_tax_household_group_on_fa_determination, e)
     end
 
     def log_info(subscriber_logger, result, operation)
