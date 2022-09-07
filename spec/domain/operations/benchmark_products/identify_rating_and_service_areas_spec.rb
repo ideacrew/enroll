@@ -14,6 +14,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas do
         exchange_provided_code: rating_area.exchange_provided_code,
         households: [
           {
+            household_id: 'a12bs6dbs1',
             members: [
               {
                 family_member_id: family_member1.id,

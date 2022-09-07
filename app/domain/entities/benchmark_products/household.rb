@@ -3,7 +3,7 @@
 module Entities
   module BenchmarkProducts
     class Household < Dry::Struct
-
+      attribute :household_id, Types::String.meta(omittable: false)
       attribute :type_of_household, Types::BenchmarkProductsHouseholdType.optional.meta(omittable: true)
       attribute :household_benchmark_ehb_premium, ::AcaEntities::Types::Money.optional.meta(omittable: true)
       attribute :health_product_hios_id, Types::String.optional.meta(omittable: true)

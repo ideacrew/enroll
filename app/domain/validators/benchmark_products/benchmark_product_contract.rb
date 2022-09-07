@@ -15,6 +15,7 @@ module Validators
         optional(:household_group_benchmark_ehb_premium).maybe(::AcaEntities::Types::Money)
 
         required(:households).array(:hash) do
+          required(:household_id).filled(:string)
           optional(:type_of_household).maybe(Types::BenchmarkProductsHouseholdType)
           optional(:household_benchmark_ehb_premium).maybe(::AcaEntities::Types::Money)
           optional(:health_product_hios_id).maybe(Types::String)
