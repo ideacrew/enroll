@@ -726,5 +726,5 @@ registry:
       - key: :osse_eligibility_history
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
       - key: :enrollment_product_date_match
-        is_enabled: true
+        is_enabled: false
 
