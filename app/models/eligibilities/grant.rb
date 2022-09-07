@@ -10,7 +10,7 @@ module Eligibilities
 
     field :title, type: String
     field :key, type: String
-    field :value, type: Float
+    field :value, type: String
     field :start_on, type: Date
     field :end_on, type: Date
     field :assistance_year, type: Integer

@@ -334,7 +334,6 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
           let(:slcsp_info) do
             OpenStruct.new(
-              success?: true,
               households: [OpenStruct.new(
                 household_id: aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: benchmark_premium,

@@ -29,7 +29,7 @@ module Operations
       end
 
       def find_csr_value(values)
-        @subjects = values[:family].eligibility_determination.subjects.where(:gid.in => values[:family_member_ids])
+        @subjects = values[:family].eligibility_determination.subjects.select { |subject| values[:family_member_ids].include? subject.gid.split('/').last }
 
         @csr_hash = @subjects.inject({}) do |result, subject|
           result[subject.gid] = subject.csr_by_year(values[:year])
@@ -48,7 +48,7 @@ module Operations
       end
 
       def handle_native_american_csr
-        return if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+        return unless FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
 
         @subjects.each do |subject|
           @csr_hash[subject.gid] = 'csr_limited' if subject.person.indian_tribe_member

@@ -41,15 +41,28 @@ RSpec.describe Operations::PremiumCredits::FindAll, dbclean: :after_each do
 
   context 'valid params' do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:group_premium_credits) { FactoryBot.create_list(:group_premium_credit, 2, family: family)}
+
+    let!(:eligibility_determination) do
+      determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+      determination.grants.create(
+        key: "AdvancePremiumAdjustmentGrant",
+        value: 500.00,
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        end_on: TimeKeeper.date_of_record.end_of_year,
+        assistance_year: TimeKeeper.date_of_record.year,
+        member_ids: family.family_members.map(&:id)
+      )
+
+      determination
+    end
 
     let(:params) do
-      { family: family, year: TimeKeeper.date_of_record.year, kind: 'aptc_csr' }
+      { family: family, year: TimeKeeper.date_of_record.year, kind: 'AdvancePremiumAdjustmentGrant' }
     end
 
     it 'returns success & all group premium credits' do
       expect(result.success?).to eq true
-      expect(result.value!.size).to eq 2
+      expect(result.value!.size).to eq 1
     end
   end
 end
