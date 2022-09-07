@@ -36,49 +36,84 @@ module Operations
       end
 
       def not_eligible?
-        result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'aptc_grant' })
+        result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
 
         return true if result.failure?
 
         @aptc_grants = result.value!
 
-        return true if @aptc_grants.blank?
-        return true if (@aptc_grants.map(&:member_ids).flatten.uniq & enrolled_family_member_ids).blank?
+        @current_enrolled_aptc_grants = @aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
+
+        return true if @current_enrolled_aptc_grants.blank?
 
         false
       end
 
       def available_aptc
-        available_aptc_hash.values.sum - utilized_aptc
-        # aptc = available_aptc_hash.values.sum - utilized_aptc
+        @current_enrolled_aptc_grants.reduce(0.0) do |sum, aptc_grant|
+          expected_contribution = monthly_expected_contribution(aptc_grant)
+          benchmark_premium = total_monthly_benchmark_premium(aptc_grant)
 
-        # [aptc, @hbx_enrollment.total_ehb_premium].min
+          value = benchmark_premium - expected_contribution
+
+          persist_tax_household_enrollment(aptc_grant)
+
+          sum += (value < 0) ? 0.0 : value
+          sum
+        end
+      end
+
+      def persist_tax_household_enrollment(aptc_grant)
+        th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: aptc_grant.tax_household_id)
+
+        th_enrollment.update_attributes(
+          household_benchmark_ehb_premium: benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }.household_benchmark_ehb_premium,
+          assistance_year: @effective_on.year,
+          enrollment_id: @hbx_enrollment.id,
+          tax_household_id: aptc_grant.tax_household_id
+        )
+
+        tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).first
+        tax_household = tax_household_group.tax_households.where(id: aptc_grant.tax_household_id).first
+
+        hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
+        tax_household_members = tax_household.tax_household_members
+
+        (aptc_grant.member_ids & @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)).each do |family_member_id|
+          hbx_enrollment_member_id = hbx_enrollment_members.where(applicant_id: family_member_id).first&.id
+          tax_household_member_id = tax_household_members.where(applicant_id: family_member_id).first&.id
+          th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
+            hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
+            tax_household_member_id: tax_household_member_id&.to_s
+          )
+        end
       end
 
       def utilized_aptc
-        return 0.0 if active_enrollments.blank?
+        coinciding_enrollments.sum(&:applied_premium_credit).to_f
+      end
 
+      def monthly_expected_contribution(aptc_grant)
+        return aptc_grant.value if coinciding_enrollments.blank?
+
+        th_enrollments = TaxHouseholdEnrollment.where(:enrollment_id.in => coinciding_enrollments.map(&:id), tax_household_id: aptc_grant.tax_household_id)
+
+        value = aptc_grant.value - th_enrollments.sum(&:household_benchmark_ehb_premium).to_f
+
+        value > 0.0 ? value : 0.0
+      end
+
+      def total_monthly_benchmark_premium(aptc_grant)
+        benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }.household_benchmark_ehb_premium
+        # (aptc_grant.member_ids & enrolled_family_member_ids).sum { |member_id| benchmark_premiums[member_id.to_s][:premium] }
+      end
+
+      def coinciding_enrollments
         @hbx_enrollment.generate_hbx_signature
 
         active_enrollments.reject do |previous_enrollment|
           previous_enrollment.generate_hbx_signature
           previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature
-        end.sum(&:applied_premium_credit).to_f
-      end
-
-      def available_aptc_hash
-        @aptc_grants.where(:member_ids.in => enrolled_family_member_ids).inject({}) do |result, aptc_grant|
-          available_aptc = current_max_aptc_hash[aptc_grant.id] - benchmark_premium_of_non_enrolling(aptc_grant)
-          available_aptc = (available_aptc > 0.0) ? available_aptc : 0.0
-          result[aptc_grant.id] = available_aptc
-          result
-        end
-      end
-
-      def current_max_aptc_hash
-        @aptc_grants.where(:member_ids.in => enrolled_family_member_ids).inject({}) do |result, aptc_grant|
-          result[aptc_grant.id] = aptc_grant.value
-          result
         end
       end
 
@@ -86,34 +121,134 @@ module Operations
         @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
       end
 
-      def aptc_eligible_non_enrolled_family_members_without_active_enrollment(aptc_grant)
-        aptc_eligible_non_enrolled_family_member_ids = aptc_grant.member_ids - enrolled_family_member_ids
-
-        return aptc_eligible_non_enrolled_family_member_ids if active_enrollments.blank?
-
-        aptc_eligible_non_enrolled_family_member_ids - active_enrollments.map(&:hbx_enrollment_members).flatten.map(&:applicant_id).uniq
-      end
-
       def active_enrollments
         @active_enrollments ||= @family.active_household.hbx_enrollments.enrolled.individual_market
       end
 
-      def benchmark_premium_of_non_enrolling(aptc_grant)
-        aptc_eligible_non_enrolled_family_members_without_active_enrollment(aptc_grant).reduce(0) do |_sum, member_id|
-          # TODO: use benchmark_premiums method instead of instance variable.
-          @benchmark_premiums[member_id][:premium]
-        end
-      end
-
       def benchmark_premiums
-        # We're going to persist these values.
-        # We're going to mock for the time being.
+        return @benchmark_premiums if defined? @benchmark_premiums
 
-        @benchmark_premiums = @family.family_members.inject({}) do |result, family_member|
-          result[family_member.id] = { premium: 0.0 }
+        households_hash = @current_enrolled_aptc_grants.inject([]) do |result, aptc_grant|
+          members_hash = (aptc_grant.member_ids & enrolled_family_member_ids).inject([]) do |member_result, member_id|
+            family_member = FamilyMember.find(member_id)
+
+            member_result << {
+              family_member_id: member_id,
+              relationship_with_primary: family_member.primary_relationship
+            }
+
+            member_result
+          end
+
+          result << {
+            household_id: aptc_grant.tax_household_id.to_s,
+            members: members_hash
+          }
           result
         end
+
+        payload = {
+          family_id: @family.id,
+          effective_date: @effective_on,
+          households: households_hash
+        }
+
+        result = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
+
+        raise "IdentifySlcspWithPediatricDentalCosts raised an error - #{result.failure}" unless result.success?
+
+        @benchmark_premiums = result.value!
       end
     end
   end
 end
+
+# SampleInput:
+#   {
+#     family_id: family.id,
+#     effective_date: start_of_year,
+#     households: [
+#       {
+#         hbx_id: 1,
+#         members: [
+#           {
+#             family_member_id: family_member1.id,
+#             relationship_with_primary: 'self'
+#           }
+#         ]
+#       },
+#       {
+#         hbx_id: 2,
+#         members: [
+#           {
+#             family_member_id: family_member2.id,
+#             relationship_with_primary: 'spouse'
+#           }
+#         ]
+#       }
+#     ]
+#   }
+
+# SampleOutput:
+#   {
+#     family_id: BSON::ObjectId('630d11ab5b4dc05da6ed850d'),
+#     effective_date: "2022-01-01",
+#     primary_rating_address_id: BSON::ObjectId('630d11ab5b4dc05da6ed84ef'),
+#     rating_area_id: BSON::ObjectId('630d11aa5b4dc05da6ed8337'),
+#     exchange_provided_code: "R-ME001",
+#     service_area_ids: [BSON::ObjectId('630d11aa5b4dc05da6ed8338')],
+#     household_group_benchmark_ehb_premium: 0.66e2,
+#     households: [
+#       {
+#         hbx_id: 1,
+#         type_of_household: "child_only",
+#         household_benchmark_ehb_premium: 0.34e2,
+#         health_product_hios_id: "48396ME0860011",
+#         health_product_id: BSON::ObjectId('630d11aa5b4dc05da6ed83c6'),
+#         health_ehb: 0.1e1,
+#         household_health_benchmark_ehb_premium: 0.17e2,
+#         health_product_covers_pediatric_dental_costs: false,
+#         dental_product_hios_id: "48396ME0860005",
+#         dental_product_id: BSON::ObjectId('630d11aa5b4dc05da6ed849e'),
+#         dental_rating_method: "Age-Based Rates",
+#         dental_ehb: 0.1e1,
+#         household_dental_benchmark_ehb_premium: 0.17e2,
+#         members: [
+#           {
+#             family_member_id: BSON::ObjectId('630d11ab5b4dc05da6ed850a'),
+#             relationship_with_primary: "self",
+#             date_of_birth: "2005-01-01",
+#             age_on_effective_date: 17
+#           }
+#         ]
+#       },
+#       {
+#         hbx_id: 2,
+#         type_of_household: "child_only",
+#         household_benchmark_ehb_premium: 0.32e2,
+#         health_product_hios_id: "48396ME0860011",
+#         health_product_id: BSON::ObjectId('630d11aa5b4dc05da6ed83c6'),
+#         health_ehb: 0.1e1,
+#         household_health_benchmark_ehb_premium: 0.16e2,
+#         health_product_covers_pediatric_dental_costs: false,
+#         dental_product_hios_id: "48396ME0860005",
+#         dental_product_id: BSON::ObjectId('630d11aa5b4dc05da6ed849e'),
+#         dental_rating_method: "Age-Based Rates",
+#         dental_ehb: 0.1e1,
+#         household_dental_benchmark_ehb_premium: 0.16e2,
+#         members: [
+#           {
+#             family_member_id: BSON::ObjectId('630d11ab5b4dc05da6ed8532'),
+#             relationship_with_primary: "spouse",
+#             date_of_birth: "2006-01-01",
+#             age_on_effective_date: 16
+#           }
+#         ]
+#       }
+#     ]
+#   }
+
+#::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts
+
+
+

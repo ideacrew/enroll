@@ -27,7 +27,7 @@ module Operations
       end
 
       def find_all(values)
-        grants = values[:family].eligibility_determination&.grants&.where(key: values[:kind], year: values[:year])
+        grants = values[:family].eligibility_determination&.grants&.where(key: values[:kind], assistance_year: values[:year])
 
         Success(grants)
       end

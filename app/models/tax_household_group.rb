@@ -12,6 +12,7 @@ class TaxHouseholdGroup
   field :aasm_state, type: String
 
   embeds_many :tax_households
+  embedded_in :family
 
   index({application_id:  1})
 end

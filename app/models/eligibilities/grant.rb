@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Eligibilities
+  # Stores Tax household level information for APTC & csr value for CSR type grants.
   class Grant
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -13,7 +14,7 @@ module Eligibilities
     field :start_on, type: Date
     field :end_on, type: Date
     field :assistance_year, type: Integer
-    field :members, type: Array
+    field :member_ids, type: Array
     field :tax_household_group_id, type: String
     field :tax_household_id, type: String
 
