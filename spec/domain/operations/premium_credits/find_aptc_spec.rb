@@ -149,7 +149,15 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           OpenStruct.new(
             households: [OpenStruct.new(
               household_id: aptc_grant.tax_household_id,
-              household_benchmark_ehb_premium: benchmark_premium
+              household_benchmark_ehb_premium: benchmark_premium,
+              members: family.family_members.collect do |fm|
+                OpenStruct.new(
+                  family_member_id: fm.id.to_s,
+                  relationship_with_primary: fm.primary_relationship,
+                  date_of_birth: fm.dob,
+                  age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                )
+              end
             )]
           )
         end
@@ -181,8 +189,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             TaxHouseholdEnrollment.create(
               enrollment_id: prev_enrollment.id,
               tax_household_id: aptc_grant.tax_household_id,
-              household_benchmark_ehb_premium: 500.00,
-              assistance_year: TimeKeeper.date_of_record.year
+              household_benchmark_ehb_premium: 500.00
             )
           end
 
@@ -330,7 +337,15 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               success?: true,
               households: [OpenStruct.new(
                 household_id: aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: benchmark_premium
+                household_benchmark_ehb_premium: benchmark_premium,
+                members: family.family_members.collect do |fm|
+                  OpenStruct.new(
+                    family_member_id: fm.id.to_s,
+                    relationship_with_primary: fm.primary_relationship,
+                    date_of_birth: fm.dob,
+                    age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                  )
+                end
               )]
             )
           end
@@ -371,8 +386,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               TaxHouseholdEnrollment.create(
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: 320.00,
-                assistance_year: TimeKeeper.date_of_record.year
+                household_benchmark_ehb_premium: 320.00
               )
             end
 
@@ -413,10 +427,17 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
           let(:slcsp_info) do
             OpenStruct.new(
-              success?: true,
               households: [OpenStruct.new(
                 household_id: aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: benchmark_premium
+                household_benchmark_ehb_premium: benchmark_premium,
+                members: family.family_members.collect do |fm|
+                  OpenStruct.new(
+                    family_member_id: fm.id.to_s,
+                    relationship_with_primary: fm.primary_relationship,
+                    date_of_birth: fm.dob,
+                    age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                  )
+                end
               )]
             )
           end
@@ -458,8 +479,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               TaxHouseholdEnrollment.create(
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: 1100.00,
-                assistance_year: TimeKeeper.date_of_record.year
+                household_benchmark_ehb_premium: 1100.00
               )
             end
 
@@ -503,8 +523,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               TaxHouseholdEnrollment.create(
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: 1100.00,
-                assistance_year: TimeKeeper.date_of_record.year
+                household_benchmark_ehb_premium: 1100.00
               )
             end
 
@@ -512,8 +531,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               TaxHouseholdEnrollment.create(
                 enrollment_id: prev_enrollmen2.id,
                 tax_household_id: aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: 1130.00,
-                assistance_year: TimeKeeper.date_of_record.year
+                household_benchmark_ehb_premium: 1130.00
               )
             end
 
@@ -600,11 +618,27 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               households: [
                 OpenStruct.new(
                   household_id: primary_aptc_grant.tax_household_id,
-                  household_benchmark_ehb_premium: primary_benchmark_premium
+                  household_benchmark_ehb_premium: primary_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
                 ),
                 OpenStruct.new(
                   household_id: dependents_aptc_grant.tax_household_id,
-                  household_benchmark_ehb_premium: dependents_benchmark_premium
+                  household_benchmark_ehb_premium: dependents_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
                 )
               ]
             )
@@ -655,11 +689,27 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               households: [
                 OpenStruct.new(
                   household_id: primary_aptc_grant.tax_household_id,
-                  household_benchmark_ehb_premium: primary_benchmark_premium
+                  household_benchmark_ehb_premium: primary_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
                 ),
                 OpenStruct.new(
                   household_id: dependents_aptc_grant.tax_household_id,
-                  household_benchmark_ehb_premium: dependents_benchmark_premium
+                  household_benchmark_ehb_premium: dependents_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
                 )
               ]
             )
@@ -727,11 +777,27 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 households: [
                   OpenStruct.new(
                     household_id: primary_aptc_grant.tax_household_id,
-                    household_benchmark_ehb_premium: primary_benchmark_premium
+                    household_benchmark_ehb_premium: primary_benchmark_premium,
+                    members: family.family_members.collect do |fm|
+                      OpenStruct.new(
+                        family_member_id: fm.id.to_s,
+                        relationship_with_primary: fm.primary_relationship,
+                        date_of_birth: fm.dob,
+                        age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                      )
+                    end
                   ),
                   OpenStruct.new(
                     household_id: dependents_aptc_grant.tax_household_id,
-                    household_benchmark_ehb_premium: dependent2_benchmark_premium
+                    household_benchmark_ehb_premium: dependent2_benchmark_premium,
+                    members: family.family_members.collect do |fm|
+                      OpenStruct.new(
+                        family_member_id: fm.id.to_s,
+                        relationship_with_primary: fm.primary_relationship,
+                        date_of_birth: fm.dob,
+                        age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                      )
+                    end
                   )
                 ]
               )
@@ -756,7 +822,15 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 households: [
                   OpenStruct.new(
                     household_id: dependents_aptc_grant.tax_household_id,
-                    household_benchmark_ehb_premium: dependent1_benchmark_premium
+                    household_benchmark_ehb_premium: dependent1_benchmark_premium,
+                    members: family.family_members.collect do |fm|
+                      OpenStruct.new(
+                        family_member_id: fm.id.to_s,
+                        relationship_with_primary: fm.primary_relationship,
+                        date_of_birth: fm.dob,
+                        age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                      )
+                    end
                   )
                 ]
               )
@@ -775,8 +849,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               TaxHouseholdEnrollment.create(
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: primary_aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: primary_benchmark_premium,
-                assistance_year: TimeKeeper.date_of_record.year
+                household_benchmark_ehb_premium: primary_benchmark_premium
               )
             end
 
@@ -784,8 +857,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               TaxHouseholdEnrollment.create(
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: dependents_aptc_grant.tax_household_id,
-                household_benchmark_ehb_premium: dependent2_benchmark_premium,
-                assistance_year: TimeKeeper.date_of_record.year
+                household_benchmark_ehb_premium: dependent2_benchmark_premium
               )
             end
 

@@ -6,7 +6,9 @@ class TaxHouseholdMemberEnrollmentMember
 
   field :hbx_enrollment_member_id, type: BSON::ObjectId
   field :tax_household_member_id, type: BSON::ObjectId
-  field :member_ehb_benchmark_health_premium, type: Money
-  field :member_ehb_benchmark_health_premium, type: Money
+  field :age_on_effective_date, type: Integer
+  field :family_member_id, type: BSON::ObjectId
+  field :relationship_with_primary, type: String
+  field :date_of_birth, type: Date
 
 end

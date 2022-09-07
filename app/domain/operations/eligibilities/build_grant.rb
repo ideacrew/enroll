@@ -15,7 +15,7 @@ module Operations
 
         Success(grants)
       end
-  
+
       private
 
       def validate(params)
@@ -28,9 +28,9 @@ module Operations
       end
 
       def latest_tax_household_group_per_year(values)
-        values[:family]&.tax_household_groups.where(
+        values[:family].tax_household_groups.where(
           :start_on.lte => values[:effective_date]
-        ).group_by(&:assistance_year).collect do |year, th_group|
+        ).group_by(&:assistance_year).collect do |_year, th_group|
           th_group.max_by(&:start_on)
         end.compact
       end
@@ -65,7 +65,7 @@ module Operations
             :start_on => th_group.start_on,
             :end_on => th_group.end_on,
             :assistance_year => th_group.assistance_year,
-            :member_ids => [family_member.id],
+            :member_ids => [family_member.id]
           }
         end.compact
       end
@@ -78,12 +78,12 @@ module Operations
           when 'AdvancePremiumAdjustmentGrant'
             create_aptc_grants(th_group)
           when 'CsrAdjustmentGrant'
-            create_csr_grants(th_group, values[:family_member])            
+            create_csr_grants(th_group, values[:family_member])
           else
             []
           end
         end.flatten.compact
- 
+
         Success(grants)
       end
     end

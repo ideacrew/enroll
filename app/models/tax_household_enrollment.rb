@@ -8,10 +8,10 @@ class TaxHouseholdEnrollment
   field :tax_household_id, type: BSON::ObjectId
   field :household_benchmark_ehb_premium, type: Money
   field :health_product_hios_id, type: String
-  field :health_product_hios_id, type: String
+  field :dental_product_hios_id, type: String
   field :household_health_benchmark_ehb_premium, type: Money
   field :household_dental_benchmark_ehb_premium, type: Money
 
-  embeds_many :tax_household_member_enrollment_member
+  embeds_many :tax_household_members_enrollment_members, class_name: "::TaxHouseholdMemberEnrollmentMember", cascade_callbacks: true
 
 end

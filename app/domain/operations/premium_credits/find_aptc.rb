@@ -65,26 +65,40 @@ module Operations
 
       def persist_tax_household_enrollment(aptc_grant)
         th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: aptc_grant.tax_household_id)
+        household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }
 
-        th_enrollment.update_attributes(
-          household_benchmark_ehb_premium: benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }.household_benchmark_ehb_premium,
-          assistance_year: @effective_on.year,
-          enrollment_id: @hbx_enrollment.id,
-          tax_household_id: aptc_grant.tax_household_id
+        th_enrollment.update!(
+          household_benchmark_ehb_premium: household_info.household_benchmark_ehb_premium,
+          health_product_hios_id: household_info.health_product_hios_id,
+          dental_product_hios_id: household_info.dental_product_hios_id,
+          household_health_benchmark_ehb_premium: household_info.household_health_benchmark_ehb_premium,
+          household_dental_benchmark_ehb_premium: household_info.household_dental_benchmark_ehb_premium
         )
 
+        persist_tax_household_members_enrollment_members(aptc_grant, th_enrollment, household_info)
+      end
+
+      def persist_tax_household_members_enrollment_members(aptc_grant, th_enrollment, household_info)
         tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).first
         tax_household = tax_household_group.tax_households.where(id: aptc_grant.tax_household_id).first
-
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members
 
         (aptc_grant.member_ids & @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)).each do |family_member_id|
           hbx_enrollment_member_id = hbx_enrollment_members.where(applicant_id: family_member_id).first&.id
           tax_household_member_id = tax_household_members.where(applicant_id: family_member_id).first&.id
-          th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
+          member_info = household_info.members.find {|member| member[:family_member_id].to_s == family_member_id.to_s }
+
+          th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
             hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
             tax_household_member_id: tax_household_member_id&.to_s
+          )
+
+          th_member_enr_member.update!(
+            family_member_id: family_member_id,
+            age_on_effective_date: member_info.age_on_effective_date,
+            relationship_with_primary: member_info.relationship_with_primary,
+            date_of_birth: member_info.date_of_birth
           )
         end
       end
