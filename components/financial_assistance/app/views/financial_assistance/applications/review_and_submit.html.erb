@@ -6,7 +6,7 @@
       pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
 
       <% if FinancialAssistanceRegistry[:coverage_check_banners].enabled? %>
-        <% if @local_mec_evidence %> 
+        <% if @has_outstanding_local_mec_evidence %>
           <div id="mec-check-response">
             <%= render partial: 'financial_assistance/applications/mec_check_results' %>
           </div>

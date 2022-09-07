@@ -41,6 +41,8 @@ class CensusEmployee < CensusMember
   include Insured::FamiliesHelper
   include BenefitSponsors::ModelEvents::CensusEmployee
   include Ssn
+  include GlobalID::Identification
+  include EventSource::Command
 
   require 'roo'
 
@@ -117,6 +119,10 @@ class CensusEmployee < CensusMember
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
+
+  after_save do |document|
+    publish_employee_created if document._id_changed?
+  end
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events]
 
@@ -652,6 +658,18 @@ class CensusEmployee < CensusMember
 
   def most_recent_expired_benefit_application
     benefit_sponsorship.most_recent_expired_benefit_application
+  end
+
+  def publish_employee_created
+    publish_event('created', { employee_global_id: self.to_global_id.to_s })
+  end
+
+  def publish_event(event, payload)
+    event = event("events.benefit_sponsors.census_employee.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for census_employee: #{self.id} event due to #{e.backtrace}" }
   end
 
   # DEPRECATE IF POSSIBLE
@@ -1740,6 +1758,23 @@ class CensusEmployee < CensusMember
         }
       }
     )
+  end
+
+  def osse_eligible?
+    return false if COBRA_STATES.include?(aasm_state)
+    return false if EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
+
+    osse_eligible_applications.present?
+  end
+
+  def osse_eligible_applications
+    active_assignment = active_benefit_group_assignment(earliest_eligible_date)
+    assignments = [active_assignment, renewal_benefit_group_assignment].compact
+    assignments.collect do |assignment|
+      benefit_application = assignment&.benefit_package&.benefit_application
+      next unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(benefit_application&.aasm_state)
+      benefit_application if benefit_application.osse_eligible?
+    end.compact
   end
 
   private

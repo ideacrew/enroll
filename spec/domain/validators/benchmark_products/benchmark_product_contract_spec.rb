@@ -43,10 +43,36 @@ RSpec.describe Validators::BenchmarkProducts::BenchmarkProductContract,  dbclean
     end
 
     context 'invalid params' do
-      it 'fails validation' do
-        result = subject.call({})
-        expect(result.failure?).to be_truthy
-        expect(result.errors.to_h).not_to be_empty
+      context 'no params' do
+        it 'fails validation' do
+          result = subject.call({})
+          expect(result.failure?).to be_truthy
+          expect(result.errors.to_h).not_to be_empty
+        end
+      end
+
+      context 'invalid relationship_kind' do
+        let(:invalid_params) do
+          params[:households].first[:members].first[:relationship_with_primary] = 'test'
+          params
+        end
+
+        it 'fails validation' do
+          result = subject.call(invalid_params)
+          expect(result.errors.to_h[:households][0][:members][0][:relationship_with_primary]).to include(/must be one of:/)
+        end
+      end
+
+      context 'invalid relationship_kind' do
+        let(:invalid_params) do
+          params[:households].first[:members].first[:relationship_with_primary] = 1287
+          params
+        end
+
+        it 'fails validation' do
+          result = subject.call(invalid_params)
+          expect(result.errors.to_h[:households][0][:members][0][:relationship_with_primary]).to include('must be a string')
+        end
       end
     end
   end
