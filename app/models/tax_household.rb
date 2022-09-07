@@ -27,8 +27,8 @@ class TaxHousehold
 
   field :yearly_expected_contribution, type: Money, default: 0.00
   field :max_aptc, type: Money
-  field :monthly_expected_contribution, type: Money
-  field :determination_id, type: BSON::ObjectId
+  # field :monthly_expected_contribution, type: Money
+  field :eligibility_determination_hbx_id, type: BSON::ObjectId
 
   embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
