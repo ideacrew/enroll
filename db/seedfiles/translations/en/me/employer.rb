@@ -16,7 +16,7 @@ EMPLOYER_TRANSLATIONS = {
   :'en.employers.plan_years.benefit_package.select_your_plan_offering' => "Select Your Plan Offering",
   :'en.employers.plan_years.benefit_package.select_your_plan_offering.content' => "Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.",
   :'en.employers.plan_years.benefit_package.select_your_reference_plan' => "Select Your Reference Plan",
-  :'en.employers.plan_years.benefit_package.select_your_reference_plan.content' => "Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.",
+  :'en.employers.plan_years.benefit_package.select_your_reference_plan.content' => "Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. You can choose a Standard plan which covers many in-network medical services without having to meet the deductible first. After you select your reference plan, scroll down to review your costs.",
   :'en.employers.plan_years.benefit_package.contributions.offered' =>  "You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees' families.",
   :'en.employers.plan_years.benefit_package.contributions.employer_contribution' =>  "Employers are required to contribute at least %{aca_shop_market_employer_contribution_percent_minimum} of the premium costs for employees based on the reference plan selected, except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute.",
   :'en.employers.plan_years.benefit_package.employee_cost_button' => "Employee Details Costs",
@@ -31,5 +31,6 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_eligibility_question' => 'Does this business qualify for OSSE subsidies?',
   :'en.eligibility_history' => 'View eligibility history',
   :'en.osse_subsidy_title' => 'Healthcare4Childcare (HC4CC) Program',
-  :'en.osse_subsidy_title_shortname' => 'HC4CC'
+  :'en.osse_subsidy_title_shortname' => 'HC4CC',
+  :'en.standard_plan' => 'Standard Plan'
 }.freeze
