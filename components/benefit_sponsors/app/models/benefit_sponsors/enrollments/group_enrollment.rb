@@ -3,10 +3,11 @@ module BenefitSponsors
     include ActiveModel::Model
 
     attr_accessor :coverage_start_on, :product, :previous_product,
-                  :product_cost_total, :benefit_sponsor,
+                  :product_cost_total, :product_cost_total_with_subsidy, :benefit_sponsor,
                   :sponsor_contribution_total, :member_enrollments, :group_id,
                   :rating_area,
-                  :rate_schedule_date, :sponsor_contribution_prohibited
+                  :rate_schedule_date, :sponsor_contribution_prohibited,
+                  :eligible_child_care_subsidy
 
     def initialize(opts = {})
       @group_id                   = nil
@@ -22,6 +23,7 @@ module BenefitSponsors
       @member_enrollments         = []
       @rate_schedule_date = nil
       @rating_area = nil
+      @eligible_child_care_subsidy = 0.00
       super(opts)
     end
 
@@ -41,13 +43,14 @@ module BenefitSponsors
         product: new_product,
         rate_schedule_date: @rate_schedule_date,
         rating_area: @rating_area,
+        eligible_child_care_subsidy: eligible_child_care_subsidy,
         member_enrollments: member_enrollments.map(&:clone_for_coverage),
         sponsor_contribution_prohibited: @sponsor_contribution_prohibited
       })
     end
 
     def employee_cost_total
-      product_cost_total - sponsor_contribution_total
+      product_cost_total_with_subsidy - sponsor_contribution_total
     end
 
     def as_json(params = {})

@@ -33,7 +33,6 @@ module Subscribers
         census_employee = employee_role.census_employee
 
         return unless census_employee
-        return unless census_employee&.osse_eligible?
 
         census_employee.osse_eligible_applications.each do |benefit_application|
           employer = benefit_application.employer_profile

@@ -245,7 +245,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show_shop(hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
-
+    @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []
@@ -259,6 +259,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products

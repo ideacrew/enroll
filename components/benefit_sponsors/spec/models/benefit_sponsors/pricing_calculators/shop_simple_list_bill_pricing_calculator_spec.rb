@@ -21,6 +21,7 @@ module BenefitSponsors
         dob: employee_dob
       )
     end
+    let(:eligible_child_care_subsidy) { 0.00 }
 
     let(:group_enrollment) do
       BenefitSponsors::Enrollments::GroupEnrollment.new(
@@ -29,7 +30,8 @@ module BenefitSponsors
         coverage_start_on: coverage_start_date,
         previous_product: nil,
         product: product,
-        rating_area: "MA1"
+        rating_area: "MA1",
+        eligible_child_care_subsidy: eligible_child_care_subsidy
       )
     end
 
@@ -53,6 +55,7 @@ module BenefitSponsors
     let(:employee_age) { 27 }
 
     let(:product) { double(id: "some_product_id", kind: "health") }
+    let(:eligible_child_care_subsidy) { 100.00 }
 
     let(:coverage_start_date) { Date.new(2018, 1, 1) }
     let(:rate_schedule_date) { Date.new(2018, 1, 1) }
@@ -418,6 +421,7 @@ module BenefitSponsors
     - a dental product
     " do
       let(:product) { double(id: "some_product_id", kind: "dental") }
+      let(:eligible_child_care_subsidy) { 100.00 }
 
       let(:pricing_units) { [employee_pricing_unit, spouse_pricing_unit, dependent_pricing_unit] }
 
