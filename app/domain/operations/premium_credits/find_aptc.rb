@@ -103,23 +103,18 @@ module Operations
         end
       end
 
-      def utilized_aptc
-        coinciding_enrollments.sum(&:applied_premium_credit).to_f
-      end
-
       def monthly_expected_contribution(aptc_grant)
-        return aptc_grant.value if coinciding_enrollments.blank?
+        return aptc_grant.value.to_f if coinciding_enrollments.blank?
 
         th_enrollments = TaxHouseholdEnrollment.where(:enrollment_id.in => coinciding_enrollments.map(&:id), tax_household_id: aptc_grant.tax_household_id)
 
-        value = aptc_grant.value - th_enrollments.sum(&:household_benchmark_ehb_premium).to_f
+        value = aptc_grant.value.to_f - th_enrollments.sum(&:household_benchmark_ehb_premium).to_f
 
         value > 0.0 ? value : 0.0
       end
 
       def total_monthly_benchmark_premium(aptc_grant)
         benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }.household_benchmark_ehb_premium
-        # (aptc_grant.member_ids & enrolled_family_member_ids).sum { |member_id| benchmark_premiums[member_id.to_s][:premium] }
       end
 
       def coinciding_enrollments

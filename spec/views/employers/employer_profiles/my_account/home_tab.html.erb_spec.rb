@@ -249,6 +249,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
             name: "rspec-name",
             product_type: "rspec-product",
             metal_level: "Rspec-level",
+            is_standard_plan: false,
             issuer_profile: double("BenefitSponsors::Organizations::IssuerProfile", legal_name: "rspec_legal_name"))
 
     end

@@ -5,20 +5,9 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
   let(:result) { subject.call(params) }
 
   context 'invalid params' do
-    context 'missing group_premium_credits' do
+    context 'missing family_member_ids' do
       let(:params) do
-        { group_premium_credits: nil }
-      end
-
-      it 'returns failure' do
-        expect(result.failure?).to eq true
-        expect(result.failure).to eq('Invalid params. missing group_premium_credits')
-      end
-    end
-
-    context 'missing year' do
-      let(:params) do
-        { group_premium_credits: [GroupPremiumCredit.new] }
+        { family_member_ids: nil }
       end
 
       it 'returns failure' do
@@ -26,22 +15,60 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
         expect(result.failure).to eq('Missing family member ids')
       end
     end
+
+    context 'missing family' do
+      let(:params) do
+        { family_member_ids: [BSON::ObjectId.new] }
+      end
+
+      it 'returns failure' do
+        expect(result.failure?).to eq true
+        expect(result.failure).to eq('Missing family')
+      end
+    end
+
+    context 'missing year' do
+      let(:params) do
+        { family_member_ids: [BSON::ObjectId.new], family: Family.new }
+      end
+
+      it 'returns failure' do
+        expect(result.failure?).to eq true
+        expect(result.failure).to eq('Missing year')
+      end
+    end
   end
 
   context 'valid params' do
-    let(:person) { FactoryBot.create(:person)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-    let!(:group_premium_credit1) { FactoryBot.create(:group_premium_credit, family: family)}
-    let!(:group_premium_credit2) { FactoryBot.create(:group_premium_credit, family: family)}
 
-    let(:group_premium_credits) do
-      result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: TimeKeeper.date_of_record.year, kind: 'aptc_csr' })
-      result.value!
+    let!(:eligibility_determination) do
+      determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+      family.family_members.each do |family_member|
+        subject = determination.subjects.create(
+          gid: "gid://enroll/FamilyMember/#{family_member.id}",
+          is_primary: family_member.is_primary_applicant,
+          person_id: family_member.person.id
+        )
+
+        state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+        state.grants.create(
+          key: "CsrAdjustmentGrant",
+          value: 'csr_0',
+          start_on: TimeKeeper.date_of_record.beginning_of_year,
+          end_on: TimeKeeper.date_of_record.end_of_year,
+          assistance_year: TimeKeeper.date_of_record.year,
+          member_ids: family.family_members.map(&:id)
+        )
+      end
+
+      determination
     end
 
 
     let(:params) do
-      { group_premium_credits: group_premium_credits, family_member_ids: family.family_members.map(&:id) }
+      { family_member_ids: [family.primary_applicant.id.to_s], family: family, year: TimeKeeper.date_of_record.year }
     end
 
     it 'returns success' do
@@ -50,45 +77,14 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
     end
 
     context 'indian_tribe_member' do
-      let(:person) { FactoryBot.create(:person, indian_tribe_member: true)}
 
-      context 'is_ia_eligible' do
-        let!(:member_premium_credits1) do
-          [family.primary_applicant].collect do |family_member|
-            FactoryBot.create(:member_premium_credit, group_premium_credit: group_premium_credit1, is_ia_eligible: true, family_member_id: family_member.id, kind: 'csr', value: '73')
-          end
-        end
-
-        let!(:member_premium_credits2) do
-          (family.family_members - [family.primary_applicant]).collect do |family_member|
-            FactoryBot.create(:member_premium_credit, group_premium_credit: group_premium_credit2, is_ia_eligible: true, family_member_id: family_member.id, kind: 'csr', value: '73')
-          end
-        end
-
-        it 'returns csr_limited' do
-          expect(result.success?).to eq true
-          expect(result.value!).to eq 'csr_limited'
-        end
+      before do
+        allow(person).to receive(:indian_tribe_member).and_return true
       end
 
-      context 'non is_ia_eligible' do
-
-        let!(:member_premium_credits1) do
-          [family.primary_applicant].collect do |family_member|
-            FactoryBot.create(:member_premium_credit, group_premium_credit: group_premium_credit1, is_ia_eligible: false, family_member_id: family_member.id, kind: 'csr', value: '73')
-          end
-        end
-
-        let!(:member_premium_credits2) do
-          (family.family_members - [family.primary_applicant]).collect do |family_member|
-            FactoryBot.create(:member_premium_credit, group_premium_credit: group_premium_credit2, is_ia_eligible: false, family_member_id: family_member.id, kind: 'csr', value: '73')
-          end
-        end
-
-        it 'returns csr_0' do
-          expect(result.success?).to eq true
-          expect(result.value!).to eq 'csr_0'
-        end
+      it 'returns csr_limited' do
+        expect(result.success?).to eq true
+        expect(result.value!).to eq 'csr_limited'
       end
     end
   end
