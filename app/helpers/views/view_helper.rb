@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Views
   # view helpers
   module ViewHelper
