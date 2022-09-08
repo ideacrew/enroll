@@ -19,6 +19,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         exchange_provided_code: rating_area.exchange_provided_code,
         households: [
           {
+            household_id: 'a12bs6dbs1',
             members: [
               {
                 family_member_id: family_member1.id,
@@ -41,6 +42,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         exchange_provided_code: rating_area.exchange_provided_code,
         households: [
           {
+            household_id: 'a12bs6dbs1',
             members: [
               {
                 family_member_id: family_member1.id,
@@ -49,6 +51,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
             ]
           },
           {
+            household_id: 'a12bs6dbs2',
             members: [
               {
                 family_member_id: family_member2.id,

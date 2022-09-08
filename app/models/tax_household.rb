@@ -25,6 +25,7 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
+  # New set of fields to support MultiTaxHousehold functionality and new business logic on how to calculate aptc(available)
   field :yearly_expected_contribution, type: Money, default: 0.00
   field :max_aptc, type: Money
   # field :monthly_expected_contribution, type: Money
