@@ -1760,11 +1760,11 @@ class CensusEmployee < CensusMember
     )
   end
 
-  def osse_eligible?
+  def osse_eligible?(effective_on)
     return false if COBRA_STATES.include?(aasm_state)
     return false if EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
 
-    osse_eligible_applications.present?
+    osse_eligible_applications.any? { |benefit_application| benefit_application.effective_period.cover?(effective_on) }
   end
 
   def osse_eligible_applications
