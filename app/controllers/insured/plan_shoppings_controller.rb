@@ -124,8 +124,14 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     dependents_with_existing_coverage(@enrollment) if @market_kind == 'individual' && EnrollRegistry.feature_enabled?(:existing_coverage_warning)
     #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
-    respond_to do |format|
-      format.html { render 'thankyou.html.erb' }
+
+    if EnrollRegistry.feature_enabled?(:enrollment_product_date_match) || (@plan.present? && @plan.application_period.cover?(@enrollment.effective_on))
+      respond_to do |format|
+        format.html { render 'thankyou.html.erb' }
+      end
+    else
+      flash[:error] = "Your selected plan is unavailable for #{@enrollment.effective_on.year}. Please select another plan"
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: @enrollment.id)
     end
   end
 
