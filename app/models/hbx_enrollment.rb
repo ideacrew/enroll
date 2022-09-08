@@ -520,6 +520,10 @@ class HbxEnrollment
     end
   end
 
+  def has_child_care_subsidy?
+    self.eligible_child_care_subsidy > 0
+  end
+
   def benefit_group
     return @benefit_group if defined? @benefit_group
     return nil if benefit_group_id.blank?
