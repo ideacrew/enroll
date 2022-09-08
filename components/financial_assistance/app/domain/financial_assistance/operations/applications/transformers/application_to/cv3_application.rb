@@ -772,6 +772,9 @@ module FinancialAssistance
                 # TODO: get rid-off the HBX ID generate statement after testing.
                 result << {hbx_id: (determination.hbx_assigned_id || FinancialAssistance::HbxIdGenerator.generate_member_id).to_s,
                            max_aptc: determination.max_aptc,
+                           yearly_expected_contribution: determination.yearly_expected_contribution,
+                           effective_on: determination.effective_starting_on,
+                           determined_on: determination.determined_at,
                            is_insurance_assistance_eligible: insurance_assistance_eligible_for(determination),
                            annual_tax_household_income: BigDecimal((determination.aptc_csr_annual_household_income || 0).to_s),
                            tax_household_members: get_thh_member(determination, application)}

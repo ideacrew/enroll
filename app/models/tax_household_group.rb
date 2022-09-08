@@ -18,6 +18,7 @@ class TaxHouseholdGroup
 
   field :hbx_id, type: String
 
+  validates_presence_of :start_on
   validates :source,
             allow_blank: false,
             inclusion: { in: SOURCE_KINDS,
@@ -28,7 +29,7 @@ class TaxHouseholdGroup
 
   before_save :generate_hbx_id
 
-  index({application_id:  1})
+  index({ application_id:  1 })
   index({ effective_ending_on:  1 })
   index({ assistance_year:  1 })
 

@@ -34,7 +34,7 @@ module Subscribers
 
     def log_info(subscriber_logger, result, operation)
       if result.success?
-        subscriber_logger.info "#{operation} success for family with primary hbx_id: #{result.success.primary_person.hbx_id}"
+        subscriber_logger.info "#{operation} success for family with hbx_id: #{result.success.family.hbx_assigned_id}"
       else
         subscriber_logger.info "#{operation} failure for given payload. Failure: #{result}"
       end
