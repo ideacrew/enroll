@@ -13,8 +13,8 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
   def process_inactive_thhs_of_household(family, inactive_thhs_of_household)
     inactive_thhs_of_household.group_by(&:group_by_year).each do |_year, thhs_by_year|
-      thhs_by_year.group_by{ |thh| thh.created_at.to_date }.each do |_year, thhs_by_created_on|
-        family = build_thhg_thhs_and_thhms(family, thhs_by_created_on)
+      thhs_by_year.group_by{ |thh| thh.latest_eligibility_determination&.determined_at&.to_date }.each do |_year, thhs_by_determined_on|
+        family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on)
       end
     end
     family
