@@ -2,7 +2,7 @@
 
 FinancialAssistance::Engine.routes.draw do
   if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list)
-    get "/applications", controller: 'applications', action: 'index_updated'
+    get "/applications", controller: 'applications', action: 'index_with_filter'
   else
     get "/applications", controller: 'applications', action: 'index'
   end

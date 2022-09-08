@@ -1,11 +1,12 @@
 <div aria-labelledby="aria-labelledby" class="tab-pane fade in active" id="home">
-  <div class="container" class="mt-2">
+  <!-- overriding margin top to account for extra padding added in layout from extra 'container' div, fixing layout is out of scope so modifying here as a stopgap -->
+  <div class="container" style="margin-top: 0 !important;">
     <div class="row">
       <div class="col-md-2">
         <%= render 'ui-components/v1/navs/families_navigation' %>
       </div>
       <div class="col-md-10">
-        <h1 class="darkblue no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
+        <h1 class="no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
         <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
 
         <div style="display:flex; justify-content: space-between; padding: 10px 0px;">
@@ -37,7 +38,7 @@
                 <td class="text-nowrap">
                   <%= application.hbx_id %>
                   <% if application.hbx_id == @recent_determined_hbx_id %>
-                    <span class="bg-primary current-app-label"><%= l10n('current') %></span> 
+                    <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span> 
                   <% end %>
                 </td>
                 <td><%= application_state_for_display(application) %></td>
@@ -72,7 +73,7 @@
               <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
             <% end %>
           <% end %>
-        </div>
+          </div>
         
       </div>
     </div>
@@ -112,6 +113,3 @@
     $("#start_new_app").submit();
   }
 </script>
-
-<!-- due to time constraints, including all FAA styles manually. Ideally styling & layout structure should be refactored -->
-<%= stylesheet_link_tag "financial_assistance/application", :media => "all" %>
