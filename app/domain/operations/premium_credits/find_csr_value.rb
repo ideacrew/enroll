@@ -51,7 +51,7 @@ module Operations
         return unless FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
 
         @subjects.each do |subject|
-          @csr_hash[subject.gid.split('/').last] = 'csr_limited' if subject.person.indian_tribe_member
+          @csr_hash[subject.gid.split('/').last] = 'limited' if subject.person.indian_tribe_member
         end
 
         family_members_with_ai_an = @subjects.map(&:person).select(&:indian_tribe_member).map(&:id).map(&:to_s)
@@ -59,16 +59,18 @@ module Operations
         @subjects = @subjects.reject { |subject| family_members_with_ai_an.include? subject.person_id.to_s }
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def retrieve_csr(csr_values)
         return 'csr_0' if csr_values.include?('0')
         return 'csr_0' if csr_values.include?('limited') && (csr_values.include?('73') || csr_values.include?('87') || csr_values.include?('94'))
-        return 'csr_limited' if csr_values.include?('csr_limited')
+        return 'csr_limited' if csr_values.include?('limited')
         return 'csr_73' if csr_values.include?('73')
         return 'csr_87' if csr_values.include?('87')
         return 'csr_94' if csr_values.include?('94')
         return 'csr_100' if csr_values.include?('100')
         'csr_0'
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
     end
   end
 end
