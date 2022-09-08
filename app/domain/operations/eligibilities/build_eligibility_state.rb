@@ -84,7 +84,12 @@ module Operations
       end
 
       def build_csr_grants(family_member, effective_date)
-        Operations::Eligibilities::BuildGrant.new.call(family_member: family_member, type: 'CsrAdjustmentGrant', effective_date: effective_date)
+        Operations::Eligibilities::BuildGrant.new.call(
+          family_member: family_member,
+          family: family_member.family,
+          type: 'CsrAdjustmentGrant',
+          effective_date: effective_date
+        )
       end
 
       def fetch_document_status(evidence_states)

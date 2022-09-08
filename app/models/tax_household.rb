@@ -109,7 +109,7 @@ class TaxHousehold
   end
 
   def monthly_expected_contribution
-    yearly_expected_contribution/12.0
+    yearly_expected_contribution / 12.0
   end
 
   def aptc_members

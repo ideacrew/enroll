@@ -519,7 +519,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def aptc_grants(family, year)
     return @aptc_grants if defined? @aptc_grants
 
-    result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: year, kind: 'aptc_grant' })
+    result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: year, kind: 'AdvancePremiumAdjustmentGrant' })
     @aptc_grants = result.value! if result.success?
   end
 

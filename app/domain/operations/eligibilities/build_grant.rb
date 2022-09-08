@@ -29,7 +29,7 @@ module Operations
 
       def latest_tax_household_group_per_year(values)
         values[:family].tax_household_groups.group_by(&:assistance_year).collect do |_year, th_group|
-          th_group.order_by(:created_at => 'desc').max_by(&:start_on)
+          th_group.max_by(&:created_at)
         end.compact
       end
 
@@ -38,7 +38,7 @@ module Operations
           {
             :title => 'aptc_grant',
             :key => 'AdvancePremiumAdjustmentGrant',
-            :value => tax_household.monthly_expected_contribution&.to_f,
+            :value => tax_household.monthly_expected_contribution&.to_s,
             :start_on => th_group.start_on,
             :end_on => th_group.end_on,
             :assistance_year => th_group.assistance_year,
@@ -59,11 +59,11 @@ module Operations
           {
             :title => 'csr_grant',
             :key => 'CsrAdjustmentGrant',
-            :value => member.csr_percent_as_integer.to_f,
+            :value => member.csr_percent_as_integer.to_s,
             :start_on => th_group.start_on,
             :end_on => th_group.end_on,
             :assistance_year => th_group.assistance_year,
-            :member_ids => [family_member.id]
+            :member_ids => [family_member.id.to_s]
           }
         end.compact
       end
