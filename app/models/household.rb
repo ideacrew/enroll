@@ -18,7 +18,7 @@ class Household
   field :is_active, type: Boolean, default: true
 
   has_many :hbx_enrollments
-  embeds_many :tax_households
+  embeds_many :tax_households, cascade_callbacks: true
   embeds_many :coverage_households, cascade_callbacks: true
 
   accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
