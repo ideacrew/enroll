@@ -321,12 +321,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
 
       it "when enrollment kind is shop" do
+        allow_any_instance_of(PlanSelection).to receive(:existing_coverage).and_return(nil)
         sign_in(user)
         get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: "shop"}
         expect(assigns(:dependent_members)).to eq nil
       end
 
       it "when existing_coverage_warning setting is on is false & market kind is shop" do
+        allow_any_instance_of(PlanSelection).to receive(:existing_coverage).and_return(nil)
         EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(false)
         sign_in(user)
         get :thankyou, params: {id: "id", plan_id: "plan_id"}
