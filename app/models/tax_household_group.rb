@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Persistence class to group TaxHouseholds on each financial assistance determination.
 class TaxHouseholdGroup
   include Mongoid::Document
   include Mongoid::Timestamps

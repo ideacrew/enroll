@@ -25,10 +25,10 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     start_on = thhs_of_household.pluck(:effective_starting_on).compact.first
     effective_ending_on = thhs_of_household.pluck(:effective_ending_on).compact.first
     end_on = if effective_ending_on.present? && (effective_ending_on <= start_on)
-      start_on
-    else
-      effective_ending_on
-    end
+               start_on
+             else
+               effective_ending_on
+             end
 
     thhg = family.tax_household_groups.build
     thhg.source = thhs_of_household.map(&:latest_eligibility_determination).flat_map(&:source).compact.first
@@ -36,7 +36,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     thhg.end_on = end_on
     thhg.assistance_year = start_on&.year
     thhg.determined_on = thhs_of_household.map(&:latest_eligibility_determination).flat_map(&:determined_at).compact.first
-    thhg = build_ths_and_thhms(thhs_of_household, thhg)
+    build_ths_and_thhms(thhs_of_household, thhg)
     family
   end
 
@@ -44,10 +44,10 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def build_ths_and_thhms(thhs_of_household, thhg)
     thhs_of_household.each do |thh|
       effective_ending_on = if thh.effective_ending_on.present? && (thh.effective_ending_on <= thh.effective_starting_on)
-        thh.effective_starting_on
-      else
-        thh.effective_ending_on
-      end
+                              thh.effective_starting_on
+                            else
+                              thh.effective_ending_on
+                            end
 
       thh_params = {
         effective_starting_on: thh.effective_starting_on,
@@ -60,7 +60,6 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       new_thh = thhg.tax_households.build(thh_params)
       build_thhms(thh.tax_household_members, new_thh)
     end
-    thhg
   end
 
   # Builds tax_household_members for a given tax_household
