@@ -32,15 +32,15 @@ module Operations
         @subjects = values[:family].eligibility_determination.subjects.select { |subject| values[:family_member_ids].include? subject.gid.split('/').last }
 
         @csr_hash = @subjects.inject({}) do |result, subject|
-          result[subject.gid] = subject.csr_by_year(values[:year])
+          result[subject.gid.split('/').last] = subject.csr_by_year(values[:year])
           result
         end
 
         any_member_ia_not_eligible = values[:family_member_ids].any? { |family_member_id| @csr_hash[family_member_id].nil? }
 
-        csr_values = @csr_hash.values.uniq
-
         handle_native_american_csr
+
+        csr_values = @csr_hash.values.uniq
 
         csr_value = (any_member_ia_not_eligible || csr_values.blank?) ? 'csr_0' : retrieve_csr(csr_values)
 
@@ -51,17 +51,18 @@ module Operations
         return unless FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
 
         @subjects.each do |subject|
-          @csr_hash[subject.gid] = 'csr_limited' if subject.person.indian_tribe_member
+          @csr_hash[subject.gid.split('/').last] = 'csr_limited' if subject.person.indian_tribe_member
         end
 
-        family_members_with_ai_an = @subjects.map(&:person).select(&:indian_tribe_member).map(&:gid)
+        family_members_with_ai_an = @subjects.map(&:person).select(&:indian_tribe_member).map(&:id).map(&:to_s)
 
-        @subjects = @subjects.reject { |subject| family_members_with_ai_an.include? subject.gid }
+        @subjects = @subjects.reject { |subject| family_members_with_ai_an.include? subject.person_id.to_s }
       end
 
       def retrieve_csr(csr_values)
         return 'csr_0' if csr_values.include?('0')
         return 'csr_0' if csr_values.include?('limited') && (csr_values.include?('73') || csr_values.include?('87') || csr_values.include?('94'))
+        return 'csr_limited' if csr_values.include?('csr_limited')
         return 'csr_73' if csr_values.include?('73')
         return 'csr_87' if csr_values.include?('87')
         return 'csr_94' if csr_values.include?('94')

@@ -55,7 +55,7 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
         state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
         state.grants.create(
           key: "CsrAdjustmentGrant",
-          value: 'csr_0',
+          value: '0',
           start_on: TimeKeeper.date_of_record.beginning_of_year,
           end_on: TimeKeeper.date_of_record.end_of_year,
           assistance_year: TimeKeeper.date_of_record.year,
@@ -77,10 +77,7 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
     end
 
     context 'indian_tribe_member' do
-
-      before do
-        allow(person).to receive(:indian_tribe_member).and_return true
-      end
+      let(:person) { FactoryBot.create(:person, :with_consumer_role, tribal_id: BSON::ObjectId.new) }
 
       it 'returns csr_limited' do
         expect(result.success?).to eq true
