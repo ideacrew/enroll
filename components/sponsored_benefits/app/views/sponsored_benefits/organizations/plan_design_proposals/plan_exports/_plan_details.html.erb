@@ -45,6 +45,7 @@
           <th>Carrier</th>
           <th>Type</th>
           <th>Metal Level</th>
+          <th><%= l10n('standard_plan') %></th>
           <th>Offering By</th>
         </tr>
         <tbody>
@@ -53,6 +54,7 @@
             <td><%= @plan.carrier_profile.legal_name %></td>
             <td><%= @plan.plan_type.upcase %></td>
             <td><%= @plan.metal_level.capitalize %></td>
+            <td><%= display_standard_plan(@plan) %></td>
             <td><%= Settings.plan_option_titles.send(@benefit_group.plan_option_kind.to_sym) %></td>
           </tr>
         </tbody>
