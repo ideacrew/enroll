@@ -27,7 +27,7 @@ module BenefitSponsors
             c_factor = contribution_factor_for(member)
             c_amount = calc_contribution_amount_for(member, c_factor)
             @member_contributions[member.member_id] = c_amount 
-            @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
+            @total_contribution = BigDecimal((@total_contribution + c_amount).to_s).round(2)
           else
             @member_contributions[member.member_id] = 0.00
           end
@@ -37,12 +37,12 @@ module BenefitSponsors
         def calc_contribution_amount_for(member, c_factor)
           member_price = @member_prices[member.member_id]
           if (member_price < 0.01) || (c_factor == 0)
-            return BigDecimal.new("0.00")
+            return BigDecimal("0.00")
           end
           ref_rate = reference_rate_for(member)
           c_percent = integerize_percent(c_factor)
           ref_contribution = (ref_rate * c_percent)/100.00
-          BigDecimal.new([member_price,ref_contribution].min.to_s).round(2)
+          BigDecimal([member_price, ref_contribution].min.to_s).round(2)
         end
 
         def reference_rate_for(member)
@@ -70,7 +70,7 @@ module BenefitSponsors
         end
 
         def integerize_percent(cont_percent)
-          BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
+          BigDecimal((cont_percent * 100.00).to_s).round(0).to_i
         end
       end
 
@@ -97,7 +97,7 @@ module BenefitSponsors
         end
         member_pricing = {}
         roster_coverage.member_enrollments.each do |m_en|
-          member_pricing[m_en.member_id] = m_en.product_price
+          member_pricing[m_en.member_id] = m_en.product_price_after_subsidy
         end
         state = CalculatorState.new(
           contribution_model,

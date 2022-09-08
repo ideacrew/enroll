@@ -24,9 +24,14 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb", dbclean: :after_each do
   let(:cobra_begin_date) { Date.new(2016,2,1) }
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id,product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
 
-  let(:decorated_hbx_enrollment) {
-    BenefitSponsors::Enrollments::GroupEnrollment.new(sponsor_contribution_total:BigDecimal(200),product_cost_total:BigDecimal(300),member_enrollments:[member_enrollment])
-  }
+  let(:decorated_hbx_enrollment) do
+    BenefitSponsors::Enrollments::GroupEnrollment.new(
+      sponsor_contribution_total: BigDecimal(200),
+      product_cost_total: BigDecimal(300),
+      product_cost_total_with_subsidy: BigDecimal(200),
+      member_enrollments: [member_enrollment]
+    )
+  end
 
   before :each do
     allow(hbx_enrollment).to receive(:broker_agency_account).and_return(nil)

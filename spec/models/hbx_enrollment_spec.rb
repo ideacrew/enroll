@@ -5673,4 +5673,108 @@ describe '.reset_dates_on_previously_covered_members' do
       expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
     end
   end
+
+
+end
+
+describe 'update_osse_childcare_subsidy', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+
+  include_context "setup initial benefit application"
+
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let(:employee_role) { census_employee.employee_role.reload }
+  let(:effective_on) { initial_application.start_on.to_date }
+  let(:coverage_kind) { "health" }
+
+  let(:shop_enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      :shop,
+      :with_enrollment_members,
+      :with_product,
+      coverage_kind: coverage_kind,
+      family: person.primary_family,
+      employee_role: employee_role,
+      effective_on: effective_on,
+      aasm_state: 'shopping',
+      rating_area: rating_area,
+      hbx_enrollment_members: [hbx_enrollment_member],
+      benefit_sponsorship_id: benefit_sponsorship.id,
+      sponsored_benefit_package_id: current_benefit_package.id,
+      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
+    )
+  end
+
+  let(:hbx_enrollment_member) do
+    FactoryBot.build(
+      :hbx_enrollment_member,
+      is_subscriber: true,
+      applicant_id: family.primary_family_member.id,
+      coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
+      eligibility_date: TimeKeeper.date_of_record.beginning_of_month
+    )
+  end
+
+  let(:hios_id) { EnrollRegistry["lowest_cost_silver_product_#{effective_on.year}"].item }
+  let!(:lcsp) do
+    create(
+      :benefit_markets_products_health_products_health_product,
+      application_period: (effective_on.beginning_of_year..effective_on.end_of_year),
+      hios_id: hios_id
+    )
+  end
+  let(:age) { person.age_on(effective_on) }
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
+  let(:premium) { 214.85 }
+
+  context 'whem employee is eligible for OSSE' do
+    before do
+      allow_any_instance_of(CensusEmployee).to receive(:osse_eligible?).and_return(true)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
+      shop_enrollment.update_osse_childcare_subsidy
+    end
+
+    it 'should update OSSE subsidy' do
+      expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(premium)
+    end
+
+    context 'when enrollment is dental' do
+      let(:coverage_kind) { :dental }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
+    end
+  end
+
+  context 'when employee is not eligible for OSSE' do
+    before do
+      allow_any_instance_of(CensusEmployee).to receive(:osse_eligible?).and_return(false)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
+      shop_enrollment.update_osse_childcare_subsidy
+    end
+
+    it 'should not update OSSE subsidy' do
+      expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+    end
+
+    context 'when enrollment is dental' do
+      let(:coverage_kind) { :dental }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
+    end
+  end
 end
