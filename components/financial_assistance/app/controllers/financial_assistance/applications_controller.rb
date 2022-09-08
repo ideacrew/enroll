@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_application, :except => [:index, :index_updated, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
@@ -29,7 +29,10 @@ module FinancialAssistance
       determined_apps = @filtered_applications.where(:aasm_state => "determined")
       @recent_determined_hbx_id = determined_apps.where(:assistance_year => determined_apps.map(&:assistance_year).max).desc(:submitted_at).first&.hbx_id
 
-      render :index_updated if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list)
+    end
+
+    def index_updated
+
     end
 
     def new
