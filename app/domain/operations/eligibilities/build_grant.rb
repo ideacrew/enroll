@@ -28,10 +28,8 @@ module Operations
       end
 
       def latest_tax_household_group_per_year(values)
-        values[:family].tax_household_groups.where(
-          :start_on.lte => values[:effective_date]
-        ).group_by(&:assistance_year).collect do |_year, th_group|
-          th_group.max_by(&:start_on)
+        values[:family].tax_household_groups.group_by(&:assistance_year).collect do |_year, th_group|
+          th_group.order_by(:created_at => 'desc').max_by(&:start_on)
         end.compact
       end
 

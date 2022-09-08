@@ -108,6 +108,10 @@ class TaxHousehold
     end
   end
 
+  def monthly_expected_contribution
+    yearly_expected_contribution/12.0
+  end
+
   def aptc_members
     tax_household_members.find_all(&:is_ia_eligible?)
   end
