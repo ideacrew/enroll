@@ -3025,25 +3025,6 @@ end
       hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
     end
   end
-#TODO: fix me when ivl plans refactored to products
-# describe HbxEnrollment, dbclean: :after_all do
-#   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
-#   let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-#   let!(:plan100) { FactoryBot.create(:plan) }
-#
-#   describe "is_an_existing_plan?" do
-#     context "for checking if a new plan is similar to the given enr's plan " do
-#       it "should return true as the compared plan has similar hios_id and same active year" do
-#         expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
-#       end
-#
-#       it "should return false as the compared plan has a different hios_id" do
-#         expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
-#       end
-#     end
-#   end
-# end
-
 
 describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }

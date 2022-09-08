@@ -1491,14 +1491,6 @@ class HbxEnrollment
     end
   end
 
-  def is_an_existing_plan?(new_plan)
-    if is_shop?
-      family.currently_enrolled_product_ids(self).include?(new_plan.id)
-    else
-      family.currently_enrolled_products(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
-    end
-  end
-
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= product
 
