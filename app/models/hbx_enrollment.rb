@@ -1829,7 +1829,8 @@ class HbxEnrollment
   end
 
   def covered_members_first_names
-    hbx_enrollment_members.inject([]) do |names, member|
+    enrollment_members = hbx_enrollment_members.sort_by { |a| a.is_subscriber ? 0 : 1 }
+    enrollment_members.inject([]) do |names, member|
       names << member.person.first_name
     end
   end

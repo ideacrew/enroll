@@ -5658,6 +5658,77 @@ describe '.reset_dates_on_previously_covered_members' do
 
 end
 
+describe '.covered_members_first_names' do
+  let!(:person1) do
+    FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                      first_name: 'primary', last_name: 'test30', gender: 'male')
+  end
+
+  let!(:person2) do
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                               first_name: 'dependent', last_name: 'test30', gender: 'male')
+    person1.ensure_relationship_with(person, 'child')
+    person
+  end
+
+  let!(:family) do
+    FactoryBot.create(:family, :with_primary_family_member, person: person1)
+  end
+
+  let!(:dependent_family_member) do
+    FactoryBot.create(:family_member, family: family, person: person2)
+  end
+
+  let(:household) { FactoryBot.create(:household, family: family) }
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year}
+  let(:new_effective_on) { Date.new(effective_on.year, 6, 1) }
+
+  context 'when primary is the subscriber' do
+    let!(:active_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        kind: "individual",
+                        coverage_kind: "health",
+                        product: product,
+                        aasm_state: 'coverage_selected',
+                        effective_on: effective_on,
+                        hbx_enrollment_members: [
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: true),
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: dependent_family_member.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: false)
+                        ])
+    end
+
+    it 'should list primary first in the array' do
+      names = active_enrollment.covered_members_first_names
+      expect(names).to eq ["primary", "dependent"]
+    end
+  end
+
+  context 'when dependent is the subscriber' do
+    let!(:active_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        kind: "individual",
+                        coverage_kind: "health",
+                        product: product,
+                        aasm_state: 'coverage_selected',
+                        effective_on: effective_on,
+                        hbx_enrollment_members: [
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: false),
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: dependent_family_member.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: true)
+                        ])
+    end
+
+    it 'should list dependent first in the array' do
+      names = active_enrollment.covered_members_first_names
+      expect(names).to eq ["dependent", "primary"]
+    end
+  end
+end
+
 describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   include_context "setup benefit market with market catalogs and product packages"
   let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
