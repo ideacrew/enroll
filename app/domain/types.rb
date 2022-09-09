@@ -13,4 +13,7 @@ module Types
   QLEKREASONS = Types::Coercible::String.enum(*REASONS)
 
   RidpEventKinds = Types::Coercible::String.enum('primary', 'secondary')
+
+  # Benchmark Products Household Type
+  BenchmarkProductsHouseholdType = Types::Coercible::String.enum('adult_only', 'adult_and_child', 'child_only')
 end

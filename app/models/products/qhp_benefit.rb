@@ -29,4 +29,9 @@ class Products::QhpBenefit
 
   # validates_inclusion_of :benefit_type_code, :is_ehb, :is_state_mandate
 
+  # Scopes
+  scope :child_dental_checkup, ->{ where(benefit_type_code: 'Dental Check-Up for Children', is_benefit_covered: 'Covered') }
+  scope :child_basic_dental, ->{ where(benefit_type_code: 'Basic Dental Care - Child', is_benefit_covered: 'Covered') }
+  scope :child_major_dental, ->{ where(benefit_type_code: 'Major Dental Care - Child', is_benefit_covered: 'Covered') }
+
 end

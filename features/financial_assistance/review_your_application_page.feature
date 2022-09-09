@@ -80,9 +80,9 @@ Feature: Review your application page functionality
     Given the mec check feature is enabled
     Given the coverage check banners feature is enabled
     Given the user will navigate to the FAA Household Info page
-    And an applicant has local mec evidence
+    And an applicant has outstanding local mec evidence
     When the user clicks CONTINUE
-    Then they should see the MedicaidCurrently Enrolled warning text
+    Then they should see the Medicaid Currently Enrolled warning text
 
   Scenario: The user navigates to the review and submit page with applicant shop coverage
     Given the shop coverage check feature is enabled

@@ -104,6 +104,7 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
                             effective_on: Date.today.next_month.beginning_of_month,
                             determined_on: Date.today,
                             annual_tax_household_income: 16_000.0,
+                            yearly_expected_contribution: 1_672.20,
                             csr_annual_income_limit: 142_912_000.0,
                             :hbx_id => "12345",
                             :is_insurance_assistance_eligible => "Yes",

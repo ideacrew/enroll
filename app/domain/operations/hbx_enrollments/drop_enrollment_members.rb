@@ -55,12 +55,12 @@ module Operations
 
         new_enrollment.check_for_subscriber
         updates_for_subscriber_drop unless check_subscriber_drop
-        new_enrollment.select_coverage! if new_enrollment.may_select_coverage?
-        update_member_effective_dates
-        return Failure('Failed to save dropped member enrollment') unless new_enrollment.persisted?
+        return Failure('Failed to save dropped member enrollment') unless new_enrollment.save
 
+        update_member_effective_dates
         terminate_base_enrollment
         update_household_applied_aptc if base_enrollment.applied_aptc_amount > 0
+        new_enrollment.select_coverage! if new_enrollment.may_select_coverage?
         notify_trading_partner(params)
 
         dropped_member_info = []
@@ -96,10 +96,10 @@ module Operations
 
       def update_member_effective_dates
         new_enrollment.hbx_enrollment_members.each do |member|
-          if check_subscriber_drop
-            member.update_attributes(eligibility_date: new_enrollment.effective_on)
-          else
+          if base_enrollment.product.is_same_plan_by_hios_id_and_active_year?(new_enrollment.product)
             member.update_attributes(eligibility_date: new_enrollment.effective_on, coverage_start_on: new_enrollment.effective_on)
+          else
+            member.update_attributes(eligibility_date: new_enrollment.effective_on)
           end
         end
       end

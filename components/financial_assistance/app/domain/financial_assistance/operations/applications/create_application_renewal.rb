@@ -79,7 +79,10 @@ module FinancialAssistance
           Try() do
             ::FinancialAssistance::Operations::Applications::Copy.new
           end.bind do |renewal_application_factory|
-            renewal_application = renewal_application_factory.call(application_id: application.id).success
+            copied_result = renewal_application_factory.call(application_id: application.id)
+            return copied_result if copied_result.failure?
+            renewal_application = copied_result.success
+
             family_members_changed = renewal_application_factory.family_members_changed
             calculated_renewal_base_year = calculate_renewal_base_year(application)
 

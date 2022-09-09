@@ -69,9 +69,9 @@ namespace :new_model do
       puts "Creating Rating areas for new model #{year}" unless Rails.env.test?
       ::BenefitMarkets::Locations::RatingArea.find_or_create_by!({
                                                                    active_year: args[:year],
-                                                                   exchange_provided_code: 'R-DC001',
+                                                                   exchange_provided_code: EnrollRegistry[:exchange_provided_code].item,
                                                                    county_zip_ids: [],
-                                                                   covered_states: ['DC']
+                                                                   covered_states: [EnrollRegistry[:enroll_app].setting(:state_abbreviation)&.item]
                                                                  })
     end
   end
@@ -85,8 +85,8 @@ namespace :new_model do
         issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
           ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
                                                                         active_year: args[:year],
-                                                                        issuer_provided_code: "DCS001",
-                                                                        covered_states: ["DC"],
+                                                                        issuer_provided_code: EnrollRegistry[:issuer_provided_code].item,
+                                                                        covered_states: [EnrollRegistry[:enroll_app].setting(:state_abbreviation)&.item],
                                                                         county_zip_ids: [],
                                                                         issuer_profile_id: issuer_profile.id,
                                                                         issuer_hios_id: issuer_hios_id,
@@ -110,7 +110,7 @@ namespace :new_model do
         issuer_profile_id: product.issuer_profile_id
       ).first
 
-      next if ::BenefitMarkets::Products::Product.by_year(2022).where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind).present?
+      next if ::BenefitMarkets::Products::Product.by_year(mock_year).where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind).present?
 
       new_product = product.dup
       new_product.application_period = (product.application_period.min + 1.year..product.application_period.max + 1.year)

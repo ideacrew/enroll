@@ -1,6 +1,8 @@
 namespace :load do
   task :dc_benefit_market_catalog, [:year] => :environment do |task, args|
 
+    health_product_kinds = [:metal_level, :single_product, :single_issuer]
+    dental_product_kinds = [:multi_product, :single_issuer]
     market_kinds = []
     market_kinds << :aca_shop if EnrollRegistry.feature_enabled?(:aca_shop_market)
     market_kinds << :fehb if EnrollRegistry.feature_enabled?(:fehb_market)
@@ -41,57 +43,21 @@ namespace :load do
       puts "Creating Product Packages..." unless Rails.env.test?
 
       [:health, :dental].each do |product_kind|
+        (health_product_kinds + dental_product_kinds).uniq.each do |package_kind|
+          if (product_kind.to_s == 'health' && health_product_kinds.include?(package_kind.to_sym)) || (product_kind.to_s == 'dental' && dental_product_kinds.include?(package_kind.to_sym))
+            puts "Creating #{package_kind} Product Packages for #{product_kind}"
 
-        puts "Creating #{product_kind.to_s} Product Packages..."
-        product_package = benefit_market_catalog.product_packages.new({
-                                                                          benefit_kind: kind, product_kind: product_kind, title: 'Single Issuer',
-                                                                          package_kind: :single_issuer,
-                                                                          application_period: benefit_market_catalog.application_period,
-                                                                          contribution_model: contribution_model,
-                                                                          pricing_model: pricing_model
-                                                                      })
+            product_package = benefit_market_catalog.product_packages.where(benefit_kind: kind, product_kind: product_kind, package_kind: package_kind).first_or_create
+            product_package.title = package_kind.to_s.titleize,
+            product_package.application_period = benefit_market_catalog.application_period,
+            product_package.contribution_model = contribution_model,
+            product_package.pricing_model = pricing_model
 
-        product_package.products = products_for(product_package, calender_year)
-        product_package.save! if product_package.valid? && product_package.products.present?
-
-        if product_kind.to_s == "health"
-          product_package = benefit_market_catalog.product_packages.new({
-                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Metal Level',
-                                                                            package_kind: :metal_level,
-                                                                            application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: contribution_model,
-                                                                            pricing_model: pricing_model
-                                                                        })
-
-          product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid? && product_package.products.present?
-
-          product_package = benefit_market_catalog.product_packages.new({
-                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
-                                                                            package_kind: :single_product,
-                                                                            application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: contribution_model,
-                                                                            pricing_model: pricing_model
-                                                                        })
-
-          product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid? && product_package.products.present?
-        end
-
-        if product_kind.to_s == "dental"
-          product_package = benefit_market_catalog.product_packages.new({
-                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Multi Product',
-                                                                            package_kind: :multi_product,
-                                                                            application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: contribution_model,
-                                                                            pricing_model: pricing_model
-                                                                        })
-
-          product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid? && product_package.products.present?
+            product_package.products = products_for(product_package, calender_year)
+            product_package.save! if product_package.valid? && product_package.products.present?
+          end
         end
       end
-
     end
   end
 end

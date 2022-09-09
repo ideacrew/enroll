@@ -12,6 +12,7 @@ Feature: Employee hired during renewal period
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
+    And EnrollRegistry enrollment_product_date_match feature is enabled
     And there is an employer ABC Widgets
     And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
     And this employer offering 0.75 contribution to Employee

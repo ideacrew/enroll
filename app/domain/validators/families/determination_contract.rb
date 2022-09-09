@@ -13,6 +13,8 @@ module Validators
         required(:csr_annual_income_limit).filled(:hash)
         required(:determined_at).filled(:date)
 
+        optional(:yearly_expected_contribution).maybe(:hash)
+
         before(:value_coercer) do |result|
           result_hash = result.to_h
           other_params = {}
