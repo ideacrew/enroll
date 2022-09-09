@@ -109,6 +109,8 @@ class TaxHousehold
   end
 
   def monthly_expected_contribution
+    return 0.0 unless yearly_expected_contribution
+
     yearly_expected_contribution / 12.0
   end
 

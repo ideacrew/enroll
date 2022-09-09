@@ -35,6 +35,8 @@ module Operations
 
       def create_aptc_grants(th_group)
         th_group.tax_households.collect do |tax_household|
+          next if tax_household.aptc_members.blank?
+
           {
             :title => 'aptc_grant',
             :key => 'AdvancePremiumAdjustmentGrant',
@@ -42,7 +44,7 @@ module Operations
             :start_on => th_group.start_on,
             :end_on => th_group.end_on,
             :assistance_year => th_group.assistance_year,
-            :member_ids => tax_household.tax_household_members.map{|member| member.applicant_id.to_s},
+            :member_ids => tax_household.aptc_members.map{|member| member.applicant_id.to_s},
             :tax_household_group_id => th_group.id.to_s,
             :tax_household_id => tax_household.id.to_s
           }
@@ -50,7 +52,7 @@ module Operations
       end
 
       def create_csr_grants(th_group, family_member)
-        members = th_group.tax_households.where("tax_household_members.applicant_id" => family_member.id).flat_map(&:tax_household_members).collect do |tax_household_member|
+        members = th_group.tax_households.where("tax_household_members.applicant_id" => family_member.id).flat_map(&:aptc_members).collect do |tax_household_member|
           next unless tax_household_member.applicant_id == family_member.id
           tax_household_member
         end.compact

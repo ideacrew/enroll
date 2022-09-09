@@ -82,6 +82,7 @@ module Operations
           {
             eligibility_determination_hbx_id: ed.hbx_assigned_id,
             yearly_expected_contribution: ed.yearly_expected_contribution,
+            effective_starting_on: ed.effective_starting_on,
             max_aptc: ed.max_aptc,
             tax_household_members: tax_household_member_params(fa_application, ed)
           }
