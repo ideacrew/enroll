@@ -26,12 +26,19 @@ module Operations
         end
       end
 
+      def deactivate_tax_households(th_group, end_on)
+        th_group.tax_households.each do |thh|
+          thh.update!(effective_ending_on: end_on)
+        end
+      end
+
       def deactivate(values)
         tax_household_groups = values[:family].tax_household_groups.active.by_year(values[:new_effective_date].year)
         return Success('No Active Tax Household Groups to deactivate') if tax_household_groups.blank?
 
         tax_household_groups.each do |th_group|
           new_end_date = values[:new_effective_date] > th_group.start_on ? (values[:new_effective_date] - 1.day) : th_group.start_on
+          deactivate_tax_households(th_group, new_end_date)
           th_group.update!(end_on: new_end_date)
         end
         values[:family].save!

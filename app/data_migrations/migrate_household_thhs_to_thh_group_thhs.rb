@@ -97,7 +97,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         family = process_inactive_thhs_of_household(family, inactive_thhs_of_household)
 
         if family.save
-          logger.info "----- Successfully created PremiumCredits for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+          logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
         else
           logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
         end
