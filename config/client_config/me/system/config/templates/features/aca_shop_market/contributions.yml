@@ -561,6 +561,9 @@ registry:
       - key: :aca_shop_osse_subsidy_2022
         item: :aca_shop_osse_subsidy_2022
         is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
+      - key: :lowest_cost_silver_product_2022
+        item: '94506DC0350030-01'
+        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_shop_market
@@ -602,4 +605,7 @@ registry:
         is_enabled: false
       - key: :aca_shop_osse_subsidy_2023
         item: :aca_shop_osse_subsidy_2023
+        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
+      - key: :lowest_cost_silver_product_2023
+        item: '94506DC0350030-01'
         is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
