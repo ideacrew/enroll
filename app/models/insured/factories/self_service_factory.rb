@@ -95,8 +95,8 @@ module Insured
         @invalid_family_member_ids << (all_family_member_ids | reinstatement_family_member_ids) - (all_family_member_ids & reinstatement_family_member_ids)
       end
 
-      def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
-        applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
+      def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount, age_as_of_coverage_start: false)
+        applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount, age_as_of_coverage_start: age_as_of_coverage_start)
         cost_decorator = UnassistedPlanCostDecorator.new(reinstatement.product, reinstatement, applied_aptc_amount)
         reinstatement.hbx_enrollment_members.each do |enrollment_member|
           member_aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
@@ -123,10 +123,10 @@ module Insured
         reinstatement.update_attributes!(elected_aptc_pct: (cd_total_aptc / max_applicable_aptc), applied_aptc_amount: cd_total_aptc, aggregate_aptc_amount: max_applicable_aptc)
       end
 
-      def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
+      def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount, age_as_of_coverage_start: false)
         applicable_aptc = fetch_applicable_aptc(new_enrollment, applied_aptc_amount, new_enrollment.effective_on)
         eli_fac_obj = ::Factories::EligibilityFactory.new(new_enrollment.id, new_enrollment.effective_on)
-        eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc)
+        eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc, age_as_of_coverage_start: age_as_of_coverage_start)
       end
 
       def self.fetch_applicable_aptc(new_enrollment, selected_aptc, effective_on, excluding_enrollment_id = nil)
