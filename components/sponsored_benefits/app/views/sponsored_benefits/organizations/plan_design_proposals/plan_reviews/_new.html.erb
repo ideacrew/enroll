@@ -27,6 +27,7 @@
               <th class="th-gray">Carrier</th>
               <th class="th-gray">Type</th>
               <th class="th-gray">Metal Level</th>
+              <th class="th-gray"><%= l10n('standard_plans') %></th>
               <th class="th-gray">Plans By</th>
             </tr>
             <tr class="borderless">
@@ -34,6 +35,7 @@
               <td><%= @plan.carrier_profile.legal_name %></td>
               <td><%= @plan.plan_type.upcase %></td>
               <td><%= @plan.metal_level.capitalize %></td>
+               <td><%= display_standard_plan(@plan) %></td>
               <td><%= @benefit_group.plan_option_kind.humanize %></td>
             </tr>
           </tbody>
