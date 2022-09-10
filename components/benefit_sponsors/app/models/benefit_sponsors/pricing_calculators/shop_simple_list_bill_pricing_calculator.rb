@@ -106,7 +106,7 @@ module BenefitSponsors
           m_en.eligible_child_care_subsidy = (calc_results.member_subsidies[m_en.member_id])
         end
         benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
-        benefit_roster_entry.group_enrollment.product_cost_total_with_subsidy = calc_results.total_after_subsidy
+        benefit_roster_entry.group_enrollment.product_cost_total_after_subsidy = calc_results.total_after_subsidy
         benefit_roster_entry
       end
 
