@@ -8,15 +8,16 @@ module Subscribers
 
       subscribe(:on_created) do |delivery_info, _metadata, response|
         logger.info '-' * 100
+
         payload = JSON.parse(response, :symbolize_names => true)
         employee_role = GlobalID::Locator.locate(payload[:employee_role_global_id])
+
         employer = employee_role.employer_profile
         person = employee_role.person
 
         subscriber_logger.info "on_employee_role_created, employee_role: #{person&.full_name} employer: #{employer&.legal_name} fein: #{employer.fein}"
         subscriber_logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
         logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
-
         create_employee_osse_eligibility(employee_role)
 
         ack(delivery_info.delivery_tag)
@@ -33,6 +34,7 @@ module Subscribers
         census_employee = employee_role.census_employee
 
         return unless census_employee
+        return if census_employee.is_cobra_status?
 
         census_employee.osse_eligible_applications.each do |benefit_application|
           employer = benefit_application.employer_profile
