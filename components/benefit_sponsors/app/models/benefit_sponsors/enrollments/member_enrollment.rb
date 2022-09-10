@@ -22,11 +22,11 @@ module BenefitSponsors
     end
 
     def employee_cost
-      product_price - eligible_child_care_subsidy - sponsor_contribution
+      [(product_price_after_subsidy - sponsor_contribution), 0.00].max
     end
 
     def product_price_after_subsidy
-      product_price - eligible_child_care_subsidy
+      [(product_price - eligible_child_care_subsidy), 0.00].max
     end
   end
 end
