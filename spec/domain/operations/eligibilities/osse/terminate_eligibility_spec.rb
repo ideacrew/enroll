@@ -36,6 +36,8 @@ RSpec.describe ::Operations::Eligibilities::Osse::TerminateEligibility,
     }
   end
 
+  let(:latest_osee_evidence) { eligibility.evidences.by_key(:osse_subsidy).last }
+
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
@@ -49,9 +51,10 @@ RSpec.describe ::Operations::Eligibilities::Osse::TerminateEligibility,
       end
 
       it 'should terminate eligibility' do
+        subject.call(required_params)
         eligibility.reload
         expect(eligibility.end_on).to eq(termination_date)
-        expect(eligibility.evidences.first.is_satisfied).to be_falsey
+        expect(latest_osee_evidence.is_satisfied).to be_falsey
       end
     end
 
@@ -89,7 +92,7 @@ RSpec.describe ::Operations::Eligibilities::Osse::TerminateEligibility,
         subject.call(required_params)
         eligibility.reload
         expect(eligibility.end_on).to eq(termination_date)
-        expect(eligibility.evidences.first.is_satisfied).to be_falsey
+        expect(latest_osee_evidence.is_satisfied).to be_falsey
       end
     end
   end

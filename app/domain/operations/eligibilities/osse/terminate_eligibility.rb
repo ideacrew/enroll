@@ -40,12 +40,13 @@ module Operations
 
           eligibilities = subject_instance.eligibilities.where(:'evidences.key' => evidence_key)
           eligibilities.each do |eligibility|
-            evidence = eligibility.evidences.by_key(evidence_key).last
-            next unless evidence
+            evidence = eligibility.evidences.new
+            evidence.title = "#{evidence_key.to_s.titleize} Evidence"
+            evidence.key = evidence_key
+            evidence.is_satisfied = false
+            evidence.save!
 
             eligibility.end_on = termination_date if update_end_on?(eligibility, termination_date)
-            evidence.is_satisfied = false
-            evidence.save! if evidence.changed?
             eligibility.save! if eligibility.changed?
           end
           Success('Eligibilities have been terminated')
