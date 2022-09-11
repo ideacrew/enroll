@@ -138,7 +138,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_aptc_amount
+    return [@elected_aptc, total_ehb_premium].min if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
     return @elected_aptc if family_tier_eligible?
+
     result = members.reduce(0.00) do |sum, member|
       (sum + aptc_amount(member))
     end
