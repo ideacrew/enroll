@@ -776,6 +776,11 @@ end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   include Dry::Monads[:result, :do]
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+  
   context "with :filtered_application_list on" do
 
     before do
