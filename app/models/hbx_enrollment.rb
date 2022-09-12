@@ -567,9 +567,16 @@ class HbxEnrollment
   end
 
   def has_at_least_one_aptc_eligible_member?(year)
-    tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
-    return false if tax_households.blank?
-    tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+      return false if result.failure?
+      aptc_grants = result.value!
+      aptc_grants.present?
+    else
+      tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
+      return false if tax_households.blank?
+      tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
+    end
   end
 
   class << self
