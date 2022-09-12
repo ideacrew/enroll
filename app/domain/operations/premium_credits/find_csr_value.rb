@@ -53,10 +53,6 @@ module Operations
         @subjects.each do |subject|
           @csr_hash[subject.gid.split('/').last] = 'limited' if subject.person.indian_tribe_member
         end
-
-        family_members_with_ai_an = @subjects.map(&:person).select(&:indian_tribe_member).map(&:id).map(&:to_s)
-
-        @subjects = @subjects.reject { |subject| family_members_with_ai_an.include? subject.person_id.to_s }
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity

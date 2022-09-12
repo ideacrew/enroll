@@ -149,7 +149,7 @@ class BenefitCoveragePeriod
   #
   # @param hbx_enrollment_members [ Array ] the list of enrolling members
   # @param coverage_kind [ String ] the benefit type.  Only 'health' is currently supported
-  # @param group_member_premium_credit [ GroupMemberPremiumCredit ] if eligible for financial assistance
+  # @param tax_household [ TaxHousehold ] if eligible for financial assistance
   #
   # @return [ Array<Plan> ] the list of eligible products
 
