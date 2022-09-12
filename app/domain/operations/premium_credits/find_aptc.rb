@@ -36,14 +36,13 @@ module Operations
       end
 
       def not_eligible?
-        result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+        return true if @hbx_enrollment.dental?
 
+        result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
         return true if result.failure?
 
         @aptc_grants = result.value!
-
         @current_enrolled_aptc_grants = @aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
-
         return true if @current_enrolled_aptc_grants.blank?
 
         false
@@ -122,7 +121,7 @@ module Operations
 
         active_enrollments.reject do |previous_enrollment|
           previous_enrollment.generate_hbx_signature
-          previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature
+          !previous_enrollment.product.can_use_aptc? || (previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature)
         end
       end
 
