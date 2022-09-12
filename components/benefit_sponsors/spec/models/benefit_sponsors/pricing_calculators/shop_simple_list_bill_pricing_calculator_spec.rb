@@ -151,21 +151,55 @@ module BenefitSponsors
             ).and_return(100.00)
         end
 
-        it "calculates the total" do
-          result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          expect(result_entry.group_enrollment.product_cost_total).to eq(300.00)
+        context 'when employee is not eligibile for osse subsidy' do
+          let(:eligible_child_care_subsidy) { 0.00 }
+
+          it "calculates the total" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            expect(result_entry.group_enrollment.product_cost_total).to eq(300.00)
+            expect(result_entry.group_enrollment.product_cost_total_after_subsidy).to eq(300.00) # total employee pays after subsidy
+          end
+
+          it "calculates the correct employee cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
+            expect(member_entry.product_price).to eq(200.00)
+            expect(member_entry.product_price_after_subsidy).to eq(200.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
+          end
+
+          it "calculates the correct spouse cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == spouse_member_id }
+            expect(member_entry.product_price).to eq(100.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
+          end
         end
 
-        it "calculates the correct employee cost" do
-          result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
-          expect(member_entry.product_price).to eq(200.00)
-        end
+        context 'when subsidy + employer_contribution > product_price' do
+          let(:eligible_child_care_subsidy) { 400.00 }
 
-        it "calculates the correct spouse cost" do
-          result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == spouse_member_id }
-          expect(member_entry.product_price).to eq(100.00)
+          it "calculates the total" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            expect(result_entry.group_enrollment.product_cost_total).to eq(300.00) # total
+            expect(result_entry.group_enrollment.product_cost_total_after_subsidy).to eq(100.00) # total employee pays after subsidy
+          end
+
+          it "calculates the correct employee cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
+            expect(member_entry.employee_cost).to eq(0.00)
+            expect(member_entry.product_price).to eq(200.00)
+            expect(member_entry.product_price_after_subsidy).to eq(0.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(400.00)
+          end
+
+          it "calculates the correct spouse cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == spouse_member_id }
+            expect(member_entry.employee_cost).to eq(100.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
+          end
         end
       end
     end
