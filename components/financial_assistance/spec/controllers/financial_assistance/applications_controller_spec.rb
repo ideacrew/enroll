@@ -799,11 +799,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         before(:each) do
           sign_in user
         end
-    
+
         it 'succeeds' do
           get '/financial_assistance/applications'
           expect(response).to render_template(:index_with_filter)
-        end 
+        end
       end
     end
   end
