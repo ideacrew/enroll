@@ -232,7 +232,8 @@
               <% end %>
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
                 <% if hbx_enrollment.product.present? %>
-                  <% carrier = hbx_enrollment.product.carrier_profile&.legal_name&.downcase&.gsub(' ', '_') %>
+                  <% legal_name = hbx_enrollment.product.carrier_profile&.legal_name %>
+                  <% carrier = fetch_issuer_name(legal_name) %>
                   <% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>
                     <% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:enrollment_tile).item %>
                       <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
