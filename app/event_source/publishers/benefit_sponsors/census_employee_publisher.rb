@@ -8,6 +8,7 @@ module Publishers
 
       # This event is to publish census employee created
       register_event 'created'
+      register_event 'terminated'
     end
   end
 end

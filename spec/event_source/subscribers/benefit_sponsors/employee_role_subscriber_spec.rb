@@ -47,7 +47,8 @@ RSpec.describe Subscribers::BenefitSponsors::EmployeeRoleSubscriber,
                    })
   end
 
-  let(:params) {valid_params}
+  let(:census_attrs) {{aasm_state: 'eligible'}}
+  let(:params) { valid_params.merge(census_attrs) }
   let(:hired_on) { current_effective_date - 2.months }
   let(:initial_census_employee) {CensusEmployee.create(**params)}
   let(:valid_employee_role) {FactoryBot.build(:benefit_sponsors_employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile)}
@@ -130,6 +131,27 @@ RSpec.describe Subscribers::BenefitSponsors::EmployeeRoleSubscriber,
         valid_employee_role.reload
         expect(valid_employee_role.eligibilities).to be_blank
       end
+    end
+  end
+
+  context 'cobra employee' do
+
+    let(:census_attrs) {{aasm_state: 'cobra_eligible', cobra_begin_date: Date.today.beginning_of_month}}
+
+    it 'should not create osse eligibility' do
+      valid_employee_role.reload
+      expect(valid_employee_role.eligibilities).to be_blank
+      expect_any_instance_of(described_class).to receive(:create_employee_osse_eligibility).with(valid_employee_role).and_raise("eligibility create failed!!")
+
+      queue_proxy.on_receive_message(
+        described_class,
+        delivery_info,
+        {},
+        payload
+      )
+
+      valid_employee_role.reload
+      expect(valid_employee_role.eligibilities).to be_blank
     end
   end
 end
