@@ -820,11 +820,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         per
       end
       let!(:family_member_4) { FactoryBot.create(:family_member, person: person4, family: family)}
-    
       let(:family_id) { family.id}
       let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
       let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
-    
 
       describe "GET /applications" do
         before(:each) do
