@@ -780,7 +780,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   before :all do
     DatabaseCleaner.clean
   end
-  
+
   context "with :filtered_application_list on" do
 
     before do
