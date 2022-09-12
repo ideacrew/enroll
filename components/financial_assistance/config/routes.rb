@@ -3,11 +3,11 @@
 FinancialAssistance::Engine.routes.draw do
   if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list)
     get "/applications", controller: 'applications', action: 'index_with_filter'
-  else
-    get "/applications", controller: 'applications', action: 'index'
+    feature_flagged_exceptions = [:index]
   end
 
-  resources :applications, except: [:index] do
+  resources :applications, except: feature_flagged_exceptions do
+  # resources :applications do
     get :copy, on: :member
     put :step, on: :member
     put ':step/:step', on: :member, action: 'step'
