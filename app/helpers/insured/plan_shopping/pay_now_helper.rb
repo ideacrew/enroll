@@ -13,12 +13,14 @@ module Insured
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
-        "Northeast Delta Dental" => "https://www.nedelta.com/Home"
+        "Northeast Delta Dental" => "https://www.nedelta.com/Home",
+        "Taro Health Plan of Maine, Inc." => "https://uatthi.onlineinsight.com/ebpp/eapp/paynow"
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
-        @issuer_key = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        carrier_name = hbx_enrollment&.product&.issuer_profile&.legal_name
+        @issuer_key = fetch_issuer_name(carrier_name)
         return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
         rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
         return false unless rr_feature_enabled == true
@@ -29,7 +31,8 @@ module Insured
       # rubocop:enable Metrics/CyclomaticComplexity
 
       def issuer_key(enrollment)
-        enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        carrier_key = enrollment&.product&.issuer_profile&.legal_name
+        fetch_issuer_name(carrier_key)
       end
 
       def can_pay_now?(hbx_enrollment)
@@ -52,7 +55,7 @@ module Insured
       def has_any_previous_enrollments?(hbx_enrollment)
         all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          enr.product.issuer_profile.legal_name.downcase&.gsub(' ', '_') == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+          fetch_issuer_name(enr.product.issuer_profile.legal_name) == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
         end
         enrollments = all_carrier_enrollments - hbx_enrollment.to_a
         enrollments.present? ? true : false
@@ -74,7 +77,7 @@ module Insured
       end
 
       def carrier_paynow_enabled(issuer)
-        issuer = issuer.downcase&.gsub(' ', '_')
+        issuer = fetch_issuer_name(issuer)
         issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
       end
 
@@ -83,13 +86,13 @@ module Insured
       end
 
       def carrier_long_name(issuer)
-        issuer_key = issuer.downcase&.gsub(' ', '_')
+        issuer_key = fetch_issuer_name(issuer)
         carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
       end
 
       def pay_now_url(issuer_name)
         if carrier_paynow_enabled(issuer_name)
-          issuer_name = issuer_name.downcase&.gsub(' ', '_')
+          issuer_name = fetch_issuer_name(issuer_name)
           SamlInformation.send("#{issuer_name}_pay_now_url")
         else
           "https://"
@@ -98,7 +101,7 @@ module Insured
 
       def pay_now_relay_state(issuer_name)
         if carrier_paynow_enabled(issuer_name)
-          issuer_name = issuer_name.downcase&.gsub(' ', '_')
+          issuer_name = fetch_issuer_name(issuer_name)
           SamlInformation.send("#{issuer_name}_pay_now_relay_state")
         else
           "https://"
@@ -111,6 +114,11 @@ module Insured
         rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
         return false unless rr_feature&.enabled?
         rr_feature.setting(:enrollment_tile)&.item
+      end
+
+      def fetch_issuer_name(issuer_name)
+        carrier_legal_name = issuer_name&.downcase
+        carrier_legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
       end
     end
   end
