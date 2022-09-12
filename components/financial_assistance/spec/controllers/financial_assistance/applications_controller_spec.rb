@@ -782,9 +782,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "with :filtered_application_list on" do
+    let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
+    let!(:user) { FactoryBot.create(:user, :person => person1) }
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
+      allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:set_current_person).and_return(person)
       Rails.application.reload_routes!
 
     end
@@ -796,33 +799,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     describe 'Feature flagged endpoints', type: :request do
-      let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
-      let!(:user) { FactoryBot.create(:user, :person => person1) }
-      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
-      let!(:person2) do
-        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years)
-        person1.ensure_relationship_with(per, 'spouse')
-        person1.save!
-        per
-      end
-      let!(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
-      let!(:person3) do
-        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years)
-        person1.ensure_relationship_with(per, 'child')
-        person1.save!
-        per
-      end
-      let!(:family_member_3) { FactoryBot.create(:family_member, person: person3, family: family)}
-      let!(:person4) do
-        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 10.years)
-        person1.ensure_relationship_with(per, 'child')
-        person1.save!
-        per
-      end
-      let!(:family_member_4) { FactoryBot.create(:family_member, person: person4, family: family)}
-      let(:family_id) { family.id}
-      let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
-      let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
       describe "GET /applications" do
         before(:each) do
