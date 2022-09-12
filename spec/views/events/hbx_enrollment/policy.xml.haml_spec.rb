@@ -28,7 +28,7 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb", dbclean: :after_each do
     BenefitSponsors::Enrollments::GroupEnrollment.new(
       sponsor_contribution_total: BigDecimal(200),
       product_cost_total: BigDecimal(300),
-      product_cost_total_with_subsidy: BigDecimal(200),
+      product_cost_total_after_subsidy: BigDecimal(200),
       member_enrollments: [member_enrollment]
     )
   end

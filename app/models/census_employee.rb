@@ -664,6 +664,10 @@ class CensusEmployee < CensusMember
     publish_event('created', { employee_global_id: self.to_global_id.to_s })
   end
 
+  def publish_terminated_event
+    publish_event('terminated', { employee_global_id: self.to_global_id.to_s })
+  end
+
   def publish_event(event, payload)
     event = event("events.benefit_sponsors.census_employee.#{event}", attributes: payload)
 
@@ -1378,7 +1382,7 @@ class CensusEmployee < CensusMember
     state :newly_designated_linked
     state :cobra_termination_pending
     state :employee_termination_pending
-    state :employment_terminated
+    state :employment_terminated, after: :publish_terminated_event
     state :cobra_terminated
     state :rehired
 
@@ -1768,8 +1772,7 @@ class CensusEmployee < CensusMember
   end
 
   def osse_eligible_applications
-    active_assignment = active_benefit_group_assignment(earliest_eligible_date)
-    assignments = [active_assignment, renewal_benefit_group_assignment].compact
+    assignments = [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
     assignments.collect do |assignment|
       benefit_application = assignment&.benefit_package&.benefit_application
       next unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(benefit_application&.aasm_state)
