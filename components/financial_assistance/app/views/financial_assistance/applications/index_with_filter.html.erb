@@ -25,10 +25,10 @@
             <thead class="form-heading">
               <tr>
                 <th class="form-heading"><%= l10n('id').upcase %></th>
+                <th class="form-heading"><%= l10n('year').upcase %></th>
                 <th class="form-heading"><%= l10n('status').upcase %></th>
                 <th class="form-heading"><%= l10n('started_on').upcase %></th>
                 <th class="form-heading"><%= l10n('submitted_on').upcase %></th>
-                <th class="form-heading"><%= l10n('year').upcase %></th>
                 <th class="form-heading"><%= l10n('actions').upcase %></th>
               </tr>
             </thead>
@@ -41,10 +41,10 @@
                     <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span> 
                   <% end %>
                 </td>
+                <td><%= application.assistance_year %></td>
                 <td><%= application_state_for_display(application) %></td>
                 <td><%= to_est application.created_at %></td>
                 <td><%= to_est application.submitted_at %></td>
-                <td><%= application.assistance_year %></td>
                 <% dropdown = [
                     ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
                     ['Copy to New Application', copy_application_path(application), (application.is_draft? || application.is_closed? || (application.imported? ? !current_user.has_hbx_staff_role? : false)) ? 'disabled' : 'static'],
