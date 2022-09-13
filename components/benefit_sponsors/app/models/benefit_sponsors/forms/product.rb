@@ -11,6 +11,7 @@ module BenefitSponsors
       attribute :metal_level_kind, String
       attribute :network_information, String
       attribute :network, String
+      attribute :is_standard_plan, Boolean
 
     end
   end

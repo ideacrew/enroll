@@ -29,7 +29,7 @@
           small = plan_carrier.legal_name
       .col-md-3
         .price-wrapper.pull-right
-          h2.no-buffer.plan-premium = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
+          h2.no-buffer.plan-premium = number_to_currency(member_enrollment.employee_cost_total)
           small 
             = l10n("month")
     br
