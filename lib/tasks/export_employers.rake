@@ -69,6 +69,7 @@ namespace :employers do
         profile.entity_kind,
         profile.profile_source,
         benefit_sponsorship.aasm_state,
+        benefit_sponsorship.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record).present?,
         general_agency_account.try(:general_agency_profile).try(:legal_name),
         general_agency_account.try(:general_agency_profile).try(:fein),
         general_agency_account.try(:start_on),
@@ -109,6 +110,7 @@ namespace :employers do
         package.try(:end_on),
         package.try(:open_enrollment_start_on),
         package.try(:open_enrollment_end_on),
+        application.try(:osse_eligible?),
         application.try(:fte_count),
         application.try(:pte_count),
         application.try(:msp_count),
@@ -125,7 +127,7 @@ namespace :employers do
 
     CSV.open(file_name, "w") do |csv|
 
-      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer_profile.profile_source employer.status ga_fein ga_agency_name ga_start_on
+      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer_profile.profile_source employer.status employer_profile.osse_eligible? ga_fein ga_agency_name ga_start_on
                                 office_location.is_primary office_location.address.address_1 office_location.address.address_2
                                 office_location.address.city office_location.address.state office_location.address.zip mailing_location.address_1 mailing_location.address_2 mailing_location.city mailing_location.state mailing_location.zip
                                 office_location.phone.full_phone_number staff.name staff.phone staff.email
@@ -133,7 +135,7 @@ namespace :employers do
                                 offered benefit_group.title benefit_group.plan_option_kind
                                 benefit_group.carrier_for_elected_plan benefit_group.metal_level_for_elected_plan benefit_group.single_plan_type?
                                 benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
-                                plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on
+                                plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on plan_year.osse_eligible?
                                 plan_year.fte_count plan_year.pte_count plan_year.msp_count plan_year.status plan_year.publish_date broker_agency_account.corporate_npn broker_agency_account.legal_name
                                 broker.name broker.npn broker.assigned_on flexible_contributions_enabled)
       csv << headers

@@ -3,7 +3,7 @@
 <% first_payment = carrier_paynow_enabled(carrier) && past_effective_on?(hbx_enrollment) %>
 <% plan_shopping = carrier_paynow_enabled(carrier) && source == "Plan Shopping"  %>
 <% url = first_payment || plan_shopping ? pay_now_url(carrier) : carrier_url(carrier) %>
-<% carrier_key = carrier_paynow_enabled(carrier) ? carrier.downcase.gsub(' ', '_') : "other" %>
+<% carrier_key = carrier_paynow_enabled(carrier) ? fetch_issuer_name(carrier) : "other" %>
 <% translation_key = is_kaiser_translation_key?(carrier_key) %>
 <div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
   <div class="modal-dialog" role="document">

@@ -39,9 +39,11 @@
           tr
             td.benefit-group-heading Metal Level
             td.benefit-group-heading Plans By
+            td.benefit-group-heading = l10n('standard_plan')
           tr
             td = sb.reference_product.metal_level.titleize
             td = selected_benefit_plan(sb.product_package_kind)
+            td = (sb.reference_product.is_standard_plan ? l10n('yes') : sb.reference_product.is_standard_plan == false ? l10n('no') : "N/A")
             / Health plan collapsible: start
         .collapse id="collapse#{sb.id.to_s}"
           = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }

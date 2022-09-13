@@ -107,6 +107,9 @@ class HbxEnrollment
   field :aggregate_aptc_amount, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
+  # OSSE childcare subsidy
+  field :eligible_child_care_subsidy, type: Money, default: 0.0
+
   field :effective_on, type: Date
   field :terminated_on, type: Date
   field :terminate_reason, type: String
@@ -305,6 +308,7 @@ class HbxEnrollment
   index({"effective_on" => 1})
   index({"terminated_on" => 1}, { sparse: true })
   index({"applied_aptc_amount" => 1})
+  index({"eligible_child_care_subsidy" => 1})
 
 
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
@@ -1193,6 +1197,10 @@ class HbxEnrollment
     hbx_enrollment_members.detect(&:is_subscriber)
   end
 
+  def primary_hbx_enrollment_member
+    hbx_enrollment_members.detect{ |hem| hem.family_member.is_primary_applicant? }
+  end
+
   def applicant_ids
     hbx_enrollment_members.pluck(:applicant_id)
   end
@@ -1488,21 +1496,12 @@ class HbxEnrollment
     end
   end
 
-  def is_an_existing_plan?(new_plan)
-    if is_shop?
-      family.currently_enrolled_product_ids(self).include?(new_plan.id)
-    else
-      family.currently_enrolled_products(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
-    end
-  end
-
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= product
 
-    if is_an_existing_plan?(new_plan)
-      plan_selection = PlanSelection.new(self, new_plan)
-      self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
-    end
+    plan_selection = PlanSelection.new(self, new_plan)
+    return unless plan_selection.existing_coverage.present?
+    self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
   end
 
   def display_make_changes_for_ivl?
@@ -1830,7 +1829,8 @@ class HbxEnrollment
   end
 
   def covered_members_first_names
-    hbx_enrollment_members.inject([]) do |names, member|
+    enrollment_members = hbx_enrollment_members.sort_by { |a| a.is_subscriber ? 0 : 1 }
+    enrollment_members.inject([]) do |names, member|
       names << member.person.first_name
     end
   end
@@ -2509,7 +2509,8 @@ class HbxEnrollment
       member_enrollments: group_enrollment_members,
       rate_schedule_date: sponsored_benefit.rate_schedule_date,
       rating_area: rating_area.exchange_provided_code,
-      sponsor_contribution_prohibited: is_cobra_status?
+      sponsor_contribution_prohibited: is_cobra_status?,
+      eligible_child_care_subsidy: eligible_child_care_subsidy
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,
@@ -2696,6 +2697,24 @@ class HbxEnrollment
 
   def latest_wfst
     workflow_state_transitions.order(created_at: :desc).first
+  end
+
+  def update_osse_childcare_subsidy
+    return if coverage_kind.to_s == 'dental'
+    return unless census_employee&.osse_eligible?(effective_on)
+
+    hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_on.year}"].item
+    lcsp = BenefitMarkets::Products::Product.by_year(effective_on.year).where(hios_id: hios_id).first
+    return if lcsp.nil?
+
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
+    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
+
+    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == primary_hbx_enrollment_member.id.to_s }
+    return if member_enrollment.nil?
+
+    osse_childcare_subsidy = BigDecimal(member_enrollment&.product_price&.to_s).round(2)
+    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
   private

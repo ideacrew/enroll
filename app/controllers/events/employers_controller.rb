@@ -7,7 +7,7 @@ module Events
       headers = (properties.headers || {}).stringify_keys
       employer_id = headers["employer_id"]
       plan_year_id = headers["plan_year_id"].present? ? headers["plan_year_id"].to_s : nil
-      employer_org = BenefitSponsors::Organizations::Organization.employer_by_hbx_id(employer_id).first
+      employer_org = ::BenefitSponsors::Organizations::Organization.employer_by_hbx_id(employer_id).first
       manual_gen = headers["manual_gen"].present? && (headers["manual_gen"] == "true" || headers["manual_gen"] == true) ? true : false
       if !employer_org.nil?
         employer = employer_org.employer_profile

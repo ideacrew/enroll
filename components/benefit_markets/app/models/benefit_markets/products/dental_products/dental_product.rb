@@ -27,6 +27,20 @@ module BenefitMarkets
                 presence: true,
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
+      index(
+        {
+          "service_area_id" => 1,
+          "application_period.min" => 1,
+          "application_period.max" => 1,
+          "benefit_market_kind" => 1,
+          "premium_tables.rating_area_id" => 1,
+          "premium_tables.effective_period.min" => 1,
+          "premium_tables.effective_period.max" => 1
+        },
+        {
+          name: "dental_products_premium_tables_for_benchmark_premiums_search_index"
+        }
+      )
 
       alias_method :is_standard_plan?, :is_standard_plan
 

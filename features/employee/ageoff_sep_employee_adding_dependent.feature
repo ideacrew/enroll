@@ -6,6 +6,7 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
+    And EnrollRegistry enrollment_product_date_match feature is enabled
     And there is an employer AB Widgets
     And AB Widgets employer has a staff role
     And renewal employer AB Widgets has active and renewal enrollment_open benefit applications
