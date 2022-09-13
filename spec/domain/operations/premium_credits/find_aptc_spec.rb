@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
+  before do
+    DatabaseCleaner.clean
+  end
 
   let(:result) { subject.call(params) }
 
@@ -43,7 +46,14 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let(:person) { FactoryBot.create(:person) }
         let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
         let!(:eligibility_determination) { family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-        let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_shopping, :with_enrollment_members, enrollment_members: family.family_members, family: family)}
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: family.family_members,
+                            family: family)
+        end
 
         it 'returns zero available aptc' do
           expect(result.success?).to eq true
@@ -54,7 +64,14 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
       context 'when enrolled members does not have a aptc grants' do
         let(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
         let(:person) { FactoryBot.create(:person) }
-        let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_shopping, :with_enrollment_members, enrollment_members: [family.primary_applicant], family: family)}
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: [family.primary_applicant],
+                            family: family)
+        end
         let(:non_primary_fm) { family.family_members.detect { |family_member| !family_member.is_primary_applicant? && family_member.is_active? } }
         let!(:eligibility_determination) do
           determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
@@ -139,6 +156,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let(:hbx_enrollment) do
           FactoryBot.create(:hbx_enrollment,
                             :individual_shopping,
+                            :with_silver_health_product,
                             :with_enrollment_members,
                             enrollment_members: [primary_applicant],
                             family: family)
@@ -179,6 +197,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let!(:prev_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: [primary_applicant],
                               family: family,
@@ -197,6 +216,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let!(:hbx_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: dependents,
                               family: family)
@@ -233,6 +253,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let!(:hbx_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: dependents,
                               family: family)
@@ -250,6 +271,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let!(:prev_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: family.family_members,
                               family: family,
@@ -283,6 +305,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: family.family_members,
                                 family: family,
@@ -300,6 +323,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [family.primary_applicant],
                                 family: family,
@@ -317,6 +341,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: dependents,
                                 family: family,
@@ -358,6 +383,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: dependents,
                                 family: family)
@@ -375,6 +401,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:prev_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: dependents,
                                 family: family,
@@ -393,6 +420,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
                                 family: family)
@@ -451,6 +479,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
                                 family: family)
@@ -468,6 +497,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:prev_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
                                 family: family,
@@ -486,6 +516,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[0]],
                                 family: family)
@@ -502,6 +533,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:prev_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
                                 family: family,
@@ -512,6 +544,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:prev_enrollmen2) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[0]],
                                 family: family,
@@ -538,6 +571,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[1]],
                                 family: family)
@@ -651,6 +685,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:hbx_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: family.family_members,
                               family: family)
@@ -725,6 +760,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let!(:prev_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: [primary_applicant],
                               family: family,
@@ -734,6 +770,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:hbx_enrollment) do
             FactoryBot.create(:hbx_enrollment,
                               :individual_shopping,
+                              :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: dependents,
                               family: family)
@@ -806,6 +843,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant, dependents[1]],
                                 family: family)
@@ -840,6 +878,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let!(:prev_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant, dependents[1]],
                                 family: family,
@@ -865,6 +904,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             let(:hbx_enrollment) do
               FactoryBot.create(:hbx_enrollment,
                                 :individual_shopping,
+                                :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[0]],
                                 family: family)
