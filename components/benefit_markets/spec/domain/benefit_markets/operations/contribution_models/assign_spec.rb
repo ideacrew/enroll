@@ -3,6 +3,7 @@
 require "rails_helper"
 
 RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
 
   let!(:site) do
     FactoryBot.create(
@@ -195,9 +196,18 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
     }
   end
 
-  let(:enrollment_eligibility_initial)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas) }
+  let(:osse_min_employer_contribution) { false }
+  let(:enrollment_eligibility_initial) do
+    double(
+      effective_date: effective_date,
+      market_kind: market_kind,
+      benefit_application_kind: :initial,
+      service_areas: service_areas,
+      benefit_sponsorship_id: BSON::ObjectId.new,
+      osse_min_employer_contribution: osse_min_employer_contribution
+    )
+  end
   let(:params)                 {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility_initial }}
-
 
   context 'sending required parameters' do
     it 'should assign ContributionModel for initial' do
@@ -207,10 +217,31 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
 
       expect(key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
     end
+
+    context 'when employer does not have relaxed rules, but osse eligible' do
+      let(:osse_min_employer_contribution) { true }
+
+      it 'should assign ContributionModel for osse initial employer' do
+        result = subject.call(params)
+        expect(result.success?).to be_truthy
+        key = result.success[:product_package_values][:assigned_contribution_model].key
+
+        expect(key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
+      end
+    end
   end
 
   context 'sending required parameters' do
-    let(:enrollment_eligibility_renewal)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :renewal, service_areas: service_areas) }
+    let(:enrollment_eligibility_renewal) do
+      double(
+        effective_date: effective_date,
+        market_kind: market_kind,
+        benefit_application_kind: :renewal,
+        service_areas: service_areas,
+        benefit_sponsorship_id: BSON::ObjectId.new,
+        osse_min_employer_contribution: false
+      )
+    end
     let(:params)                          {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility_renewal }}
 
     it 'should assign ContributionModel for renewal' do

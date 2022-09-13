@@ -399,6 +399,13 @@ module BenefitSponsors
                 end
               end
             end
+
+            context "publishes event when open enrollment begins" do
+              it "should call publish_enrollment_open_event" do
+                expect(benefit_application).to receive(:publish_enrollment_open_event)
+                benefit_application.begin_open_enrollment!
+              end
+            end
           end
 
           context 'revert reverse_enrollment_eligibility' do
@@ -1514,6 +1521,30 @@ module BenefitSponsors
               expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(application.start_on)
             end
           end
+        end
+      end
+
+      describe '.osse_eligible?' do
+        let!(:benefit_application) do
+          create(
+            :benefit_sponsors_benefit_application,
+            :with_benefit_package,
+            benefit_sponsorship: benefit_sponsorship
+          )
+        end
+
+        context 'when sponsor is osse eligible' do
+          let(:eligibility) { build(:eligibility, :with_subject, :with_evidences) }
+          let!(:add_eligibility) do
+            benefit_sponsorship.eligibilities << eligibility
+            benefit_sponsorship.save!
+          end
+
+          it { expect(benefit_application.osse_eligible?).to be_truthy }
+        end
+
+        context 'when sponsor is not osse eligible' do
+          it { expect(benefit_application.osse_eligible?).to be_falsey }
         end
       end
     end

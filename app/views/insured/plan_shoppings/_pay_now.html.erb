@@ -1,5 +1,5 @@
 <% if hbx_enrollment.product.present? %>
-	<% carrier = hbx_enrollment.product.carrier_profile&.legal_name&.downcase&.gsub(' ', '_') %>
+	<% carrier = fetch_issuer_name(hbx_enrollment.product.carrier_profile&.legal_name) %>
 	<% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>
 		<% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:plan_shopping).item %>
 			<% if show_pay_now?(source, hbx_enrollment) %>

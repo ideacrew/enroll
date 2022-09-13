@@ -364,6 +364,7 @@ module FinancialAssistance
     scope :csr_73_87_or_94,               -> { where(:csr_percent_as_integer.in => [94, 87, 73]) }
     scope :csr_100,                       -> { where(csr_percent_as_integer: 100) }
     scope :csr_nal,                       -> { where(csr_percent_as_integer: -1) }
+    scope :applying_coverage,             -> { where(is_applying_coverage: true) }
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
@@ -819,6 +820,7 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
+      questions_array << (non_ssn_apply_reason == "" ? nil : non_ssn_apply_reason) if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) && is_ssn_applied == false && is_applying_coverage
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
@@ -829,6 +831,7 @@ module FinancialAssistance
         questions_array << pregnancy_end_on
         questions_array << is_enrolled_on_medicaid if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
       end
+
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end

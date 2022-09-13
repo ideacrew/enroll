@@ -124,8 +124,14 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     dependents_with_existing_coverage(@enrollment) if @market_kind == 'individual' && EnrollRegistry.feature_enabled?(:existing_coverage_warning)
     #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
-    respond_to do |format|
-      format.html { render 'thankyou.html.erb' }
+
+    if EnrollRegistry.feature_enabled?(:enrollment_product_date_match) || (@plan.present? && @plan.application_period.cover?(@enrollment.effective_on))
+      respond_to do |format|
+        format.html { render 'thankyou.html.erb' }
+      end
+    else
+      flash[:error] = "Your selected plan is unavailable for #{@enrollment.effective_on.year}. Please select another plan"
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: @enrollment.id)
     end
   end
 
@@ -245,7 +251,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show_shop(hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
-
+    @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []
@@ -259,6 +265,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products

@@ -7,13 +7,16 @@ module BenefitSponsors
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
     include ::BenefitSponsors::Employers::EmployerHelper
-
+    include EventSource::Command
+    include GlobalID::Identification
     include AASM
 
     embedded_in :benefit_sponsorship,
                 class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
                 inverse_of: :benefit_applications
 
+    EMPLOYEE_MINIMUM_COUNT = 1
+    EMPLOYEE_MAXIMUM_COUNT = 50
     APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
     APPLICATION_DRAFT_STATES      = [:draft, :imported] + APPLICATION_EXCEPTION_STATES.freeze
     APPLICATION_APPROVED_STATES   = [:approved].freeze
@@ -860,7 +863,7 @@ module BenefitSponsors
       ## End optional states for exception processing
 
       # TODO: send_employee_invites - needs to be moved to observer pattern.
-      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
+      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites, :publish_enrollment_open_event] # Approved application has entered open enrollment period
       state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
       state :binder_paid            # made binder payment - used by initial applications only
@@ -1227,7 +1230,68 @@ module BenefitSponsors
       [:canceled, :retroactive_canceled].include?(aasm_state)
     end
 
+    def eligibility_for(evidence_key)
+      benefit_sponsorship.eligibility_for(evidence_key, start_on)
+    end
+
+    def grant_value_for(evidence_key, grant_type)
+      eligibility = eligibility_for(evidence_key)
+      grant = eligibility&.grant_for(grant_type)
+      grant&.value
+    end
+
+    def validate_minimum_participation_rule
+      if (value = grant_value_for(:osse_subsidy, :minimum_participation_rule))
+        return value.run
+      end
+
+      enrollment_ratio >= employee_participation_ratio_minimum
+    end
+
+    def validate_minimum_employer_contribution_rule
+      if (value = grant_value_for(:osse_subsidy, :all_contribution_levels_min_met))
+        value.run
+      elsif benefit_packages.map(&:sponsored_benefits).flatten.present?
+        if effective_period.min.month == 1
+          true
+        else
+          all_contributions = benefit_packages.collect(&:sorted_composite_tier_contributions)
+          all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+        end
+      else
+        false
+      end
+    end
+
+    def validate_fte_count
+      if (value = grant_value_for(:osse_subsidy, :benefit_application_fte_count))
+        value.run
+      elsif is_renewing?
+        true
+      else
+        fte_count >= EMPLOYEE_MINIMUM_COUNT && fte_count < EMPLOYEE_MAXIMUM_COUNT
+      end
+    end
+
+    def osse_eligible?
+      eligibility_for(:osse_subsidy).present?
+    end
+
     private
+
+    # We may have to send actual payload hash along with the event. since external systems will not have access for enroll records.
+    # Build a standard payload schema for applications that includes employer information
+    def publish_enrollment_open_event
+      publish_event('open_enrollment_began', { application_global_id: self.to_global_id.to_s })
+    end
+
+    def publish_event(event, payload)
+      event = event("events.benefit_sponsors.benefit_application.#{event}", attributes: payload)
+
+      event.success.publish if event.success?
+    rescue StandardError => e
+      Rails.logger.error { "Couldn't publish #{event} for benefit_application: #{self.id} event due to #{e.backtrace}" }
+    end
 
     def can_retroactive_cancel?
       start_on <= TimeKeeper.date_of_record
