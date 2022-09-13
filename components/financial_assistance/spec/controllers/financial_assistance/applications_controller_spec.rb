@@ -782,18 +782,19 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "with :filtered_application_list on" do
-    let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
-    let!(:user) { FactoryBot.create(:user, :person => person1) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, first_name: "test1") }
+    let(:user) { FactoryBot.create(:user, :person => person) }
+
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
-      allow(ApplicationController).to receive(:set_current_person).and_return(:person1)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_call_original
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_call_original
       Rails.application.reload_routes!
     end
 
     after do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_call_original
-      allow(ApplicationController).to receive(:set_current_person).and_call_original
       Rails.application.reload_routes!
     end
 
@@ -801,7 +802,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       describe "GET /applications" do
         before(:each) do
-          sign_in user
+          sign_in(user)
         end
 
         it 'succeeds' do
