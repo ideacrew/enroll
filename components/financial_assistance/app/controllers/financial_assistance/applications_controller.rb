@@ -221,8 +221,8 @@ module FinancialAssistance
     end
 
     def transfer_direction(application)
-      'In' unless application.transfer_id.nil?
-      'Out' if application.account_transferred
+      return 'In' unless application.transfer_id.nil?
+      return 'Out' if application.account_transferred
     end
 
     def transfer_reason(application)
