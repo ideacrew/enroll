@@ -84,13 +84,12 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
     end
   end
 
-  context 'when verification type in pending' do
-
+  shared_examples_for 'pending verification type' do |status|
     let(:evidence_item) { eligibility_item.evidence_items.detect{|evidence_item| evidence_item.key == 'social_security_number'} }
 
     before do
       person1.verification_types.each do |verification_type|
-        verification_type.validation_status = 'pending' if verification_type.type_name == "Social Security Number"
+        verification_type.validation_status = status if verification_type.type_name == "Social Security Number"
         verification_type.save!
       end
     end
@@ -99,12 +98,15 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
       subject.call
       expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
       evidence = subject.evidence[evidence_item.key.to_sym]
-      expect(evidence[:status]).to eq 'pending'
+      expect(evidence[:status]).to eq status
       expect(evidence[:is_satisfied]).to be_truthy
       expect(evidence[:verification_outstanding]).to be_falsey
       expect(evidence[:due_on]).to be_nil
     end
   end
+
+  it_behaves_like 'pending verification type', 'pending'
+  it_behaves_like 'pending verification type', 'negative_response_received'
 
   shared_examples_for 'outstanding verification type' do |status|
     let(:evidence_item) { eligibility_item.evidence_items.detect{|evidence_item| evidence_item.key == 'citizenship'} }

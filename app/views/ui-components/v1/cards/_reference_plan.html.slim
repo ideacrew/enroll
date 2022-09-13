@@ -18,11 +18,13 @@
             th Type
             th Carrier
             th Metal Level
+            th = l10n('standard_plan')
             th Network
           tr
             td #{f.object.reference_product.plan_kind}
             td #{f.object.reference_product.issuer_name}
             td #{f.object.reference_product.metal_level_kind}
+            td #{f.object.reference_product.is_standard_plan ? l10n('yes') : f.object.reference_product.is_standard_plan == false ? l10n('no') : 'N/A' }
             td #{f.object.reference_product.network}
     .row
       h4.pl-1 Your Estimated Monthly Cost

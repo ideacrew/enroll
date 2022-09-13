@@ -70,6 +70,10 @@ class IvlIapEligibilityResults
     "[data-cuke='next_steps']"
   end
 
+  def self.all_medicaid_next_steps_continue_text
+    "[data-cuke='all_medicaid_next_steps_continue_text']"
+  end
+
   def self.next_steps_text
     "[data-cuke='next_steps_text']"
   end

@@ -18,6 +18,7 @@ module Validators
           result = ::Operations::BrokerRole::Find.new.call(values[:broker_role_id])
           key.failure(text: 'invalid broker_role_id', error: result.failure) if result&.failure?
           key.failure(text: 'missing benefit_sponsors_broker_agency_profile_id in broker role', error: result) if result&.success&.benefit_sponsors_broker_agency_profile_id.blank?
+          key.failure(text: 'Cant Hire Broker with imported state', error: result) if result&.success&.imported?
         end
       end
 

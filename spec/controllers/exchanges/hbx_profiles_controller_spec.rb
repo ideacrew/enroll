@@ -1183,9 +1183,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
     let(:consumer_role) { FactoryBot.create(:consumer_role) }
 
+    let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual) }
     let!(:enrollment) do
       hbx_enrollment = FactoryBot.create(:hbx_enrollment,
-                                         :with_product,
+                                         product: product2,
                                          family: family,
                                          household: family.active_household,
                                          hbx_enrollment_members: [hbx_enrollment_member1, hbx_enrollment_member2, hbx_enrollment_member3],

@@ -1393,6 +1393,42 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
+  describe "broker agency account for EDI" do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    let(:hire_broker) {family.hire_broker_agency(writing_agent.id)}
+    let(:subject) {HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, family: family)}
+
+    before(:each) do
+      family.hire_broker_agency(writing_agent.id)
+      family.reload
+      family.broker_agency_accounts.first.update_attributes(start_on: TimeKeeper.date_of_record - 1.day)
+    end
+
+    context "family with imported broker agency assignment" do
+      it "should not return broker agency account" do
+        writing_agent.update_attributes(aasm_state: 'imported')
+        expect(subject.broker_agency_account_for_edi).to eq nil
+      end
+    end
+
+    context "family with broker assistor assignment" do
+      it "should not return broker agency account" do
+        writing_agent.npn = 'SMECDOA08'
+        writing_agent.save(validate: false)
+        expect(subject.broker_agency_account_for_edi).to eq nil
+      end
+    end
+
+    context "family with active broker assignment" do
+      it "should return broker agency account" do
+        expect(subject.broker_agency_account_for_edi.writing_agent.npn).to eq writing_agent.npn
+      end
+    end
+  end
+
   describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'", dbclean: :around_each do
     subject {HbxEnrollment.new({:enrollment_kind => "special_enrollment"})}
 
@@ -2989,25 +3025,6 @@ end
       hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
     end
   end
-#TODO: fix me when ivl plans refactored to products
-# describe HbxEnrollment, dbclean: :after_all do
-#   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
-#   let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-#   let!(:plan100) { FactoryBot.create(:plan) }
-#
-#   describe "is_an_existing_plan?" do
-#     context "for checking if a new plan is similar to the given enr's plan " do
-#       it "should return true as the compared plan has similar hios_id and same active year" do
-#         expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
-#       end
-#
-#       it "should return false as the compared plan has a different hios_id" do
-#         expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
-#       end
-#     end
-#   end
-# end
-
 
 describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
@@ -5635,6 +5652,181 @@ describe '.reset_dates_on_previously_covered_members' do
 
       expect(primary_enrollment_member.reload.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
+    end
+  end
+
+
+end
+
+describe '.covered_members_first_names' do
+  let!(:person1) do
+    FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                      first_name: 'primary', last_name: 'test30', gender: 'male')
+  end
+
+  let!(:person2) do
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
+                               first_name: 'dependent', last_name: 'test30', gender: 'male')
+    person1.ensure_relationship_with(person, 'child')
+    person
+  end
+
+  let!(:family) do
+    FactoryBot.create(:family, :with_primary_family_member, person: person1)
+  end
+
+  let!(:dependent_family_member) do
+    FactoryBot.create(:family_member, family: family, person: person2)
+  end
+
+  let(:household) { FactoryBot.create(:household, family: family) }
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year}
+  let(:new_effective_on) { Date.new(effective_on.year, 6, 1) }
+
+  context 'when primary is the subscriber' do
+    let!(:active_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        kind: "individual",
+                        coverage_kind: "health",
+                        product: product,
+                        aasm_state: 'coverage_selected',
+                        effective_on: effective_on,
+                        hbx_enrollment_members: [
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: true),
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: dependent_family_member.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: false)
+                        ])
+    end
+
+    it 'should list primary first in the array' do
+      names = active_enrollment.covered_members_first_names
+      expect(names).to eq ["primary", "dependent"]
+    end
+  end
+
+  context 'when dependent is the subscriber' do
+    let!(:active_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        kind: "individual",
+                        coverage_kind: "health",
+                        product: product,
+                        aasm_state: 'coverage_selected',
+                        effective_on: effective_on,
+                        hbx_enrollment_members: [
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: false),
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: dependent_family_member.id, eligibility_date: new_effective_on, coverage_start_on: new_effective_on, is_subscriber: true)
+                        ])
+    end
+
+    it 'should list dependent first in the array' do
+      names = active_enrollment.covered_members_first_names
+      expect(names).to eq ["dependent", "primary"]
+    end
+  end
+end
+
+describe 'update_osse_childcare_subsidy', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+
+  include_context "setup initial benefit application"
+
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let(:employee_role) { census_employee.employee_role.reload }
+  let(:effective_on) { initial_application.start_on.to_date }
+  let(:coverage_kind) { "health" }
+
+  let(:shop_enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      :shop,
+      :with_enrollment_members,
+      :with_product,
+      coverage_kind: coverage_kind,
+      family: person.primary_family,
+      employee_role: employee_role,
+      effective_on: effective_on,
+      aasm_state: 'shopping',
+      rating_area: rating_area,
+      hbx_enrollment_members: [hbx_enrollment_member],
+      benefit_sponsorship_id: benefit_sponsorship.id,
+      sponsored_benefit_package_id: current_benefit_package.id,
+      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
+    )
+  end
+
+  let(:hbx_enrollment_member) do
+    FactoryBot.build(
+      :hbx_enrollment_member,
+      is_subscriber: true,
+      applicant_id: family.primary_family_member.id,
+      coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
+      eligibility_date: TimeKeeper.date_of_record.beginning_of_month
+    )
+  end
+
+  let(:hios_id) { EnrollRegistry["lowest_cost_silver_product_#{effective_on.year}"].item }
+  let!(:lcsp) do
+    create(
+      :benefit_markets_products_health_products_health_product,
+      application_period: (effective_on.beginning_of_year..effective_on.end_of_year),
+      hios_id: hios_id
+    )
+  end
+  let(:age) { person.age_on(effective_on) }
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
+  let(:premium) { 214.85 }
+
+  context 'whem employee is eligible for OSSE' do
+    before do
+      allow_any_instance_of(CensusEmployee).to receive(:osse_eligible?).and_return(true)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
+      shop_enrollment.update_osse_childcare_subsidy
+    end
+
+    it 'should update OSSE subsidy' do
+      expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(premium)
+    end
+
+    context 'when enrollment is dental' do
+      let(:coverage_kind) { :dental }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
+    end
+  end
+
+  context 'when employee is not eligible for OSSE' do
+    before do
+      allow_any_instance_of(CensusEmployee).to receive(:osse_eligible?).and_return(false)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
+      shop_enrollment.update_osse_childcare_subsidy
+    end
+
+    it 'should not update OSSE subsidy' do
+      expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+    end
+
+    context 'when enrollment is dental' do
+      let(:coverage_kind) { :dental }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
     end
   end
 end
