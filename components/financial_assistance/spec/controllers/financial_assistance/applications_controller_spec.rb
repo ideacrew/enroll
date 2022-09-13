@@ -787,13 +787,13 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
-      allow(FinancialAssistance::ApplicationController).to receive(:set_current_person).and_return(:person1)
+      allow(ApplicationController).to receive(:set_current_person).and_return(:person1)
       Rails.application.reload_routes!
     end
 
     after do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_call_original
-      allow(FinancialAssistance::ApplicationController).to receive(:set_current_person).and_call_original
+      allow(ApplicationController).to receive(:set_current_person).and_call_original
       Rails.application.reload_routes!
     end
 
