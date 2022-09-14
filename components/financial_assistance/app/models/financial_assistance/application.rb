@@ -1026,7 +1026,7 @@ module FinancialAssistance
         return
       end
 
-      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!)
+      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!.to_h)
 
       unless determination.success?
         Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
