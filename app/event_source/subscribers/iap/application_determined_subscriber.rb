@@ -5,8 +5,8 @@ module Subscribers
   class FamilyRrvDeterminationSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.fdsh.verifications']
 
-    subscribe(:on_enroll_fdsh_verifications) do |delivery_info, _metadata, response|
-      subscriber_logger = subscriber_logger_for(:on_enroll_fdsh_verifications)
+    subscribe(:on_magi_medicaid_application_determined) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_magi_medicaid_application_determined)
       payload = JSON.parse(response, symbolize_names: true)
       log_payload(subscriber_logger, logger, payload)
 
@@ -15,7 +15,7 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      log_error(subscriber_logger, logger, :on_enroll_fdsh_verifications, e)
+      log_error(subscriber_logger, logger, :on_magi_medicaid_application_determined, e)
       ack(delivery_info.delivery_tag)
     end
 
