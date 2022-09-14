@@ -74,9 +74,11 @@ module Eligibilities
       # TODO: returns other classes in the future
       #
       def grant_value_klass
-        return unless subject[:klass] == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
-
-        'Eligibilities::Osse::BenefitSponsorshipOssePolicy'
+        if subject[:klass] == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
+          'Eligibilities::Osse::BenefitSponsorshipOssePolicy'
+        else
+          'Eligibilities::Osse::Value'
+        end
       end
 
       def grant_for(value)
