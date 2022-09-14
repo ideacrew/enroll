@@ -11,5 +11,6 @@ module Publishers
     register_event 'third_verifications_reminder'
     register_event 'fourth_verifications_reminder'
     register_event 'enrollment_saved'
+    register_event 'coverage_selected'
   end
 end
