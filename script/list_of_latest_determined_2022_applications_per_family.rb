@@ -22,7 +22,7 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
         eds_info
       end
 
-      csv << [primary_person_hbx_id, application.hbx_id, application.assistance_year, application.aasm_state, tax_households]
+      csv << [primary_person_hbx_id, application.hbx_id, application.assistance_year, application.aasm_state, tax_households.to_json]
     else
       csv << [primary_person_hbx_id, 'No 2022 Application', 'N/A', 'N/A', 'N/A', 'N/A']
     end
