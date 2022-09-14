@@ -1015,11 +1015,11 @@ module FinancialAssistance
       cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
 
       unless cv3_application.success?
-        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{result.failure}" }
+        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{cv3_application.failure}" }
         return
       end
 
-      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.value!)
+      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
 
       unless initializer.success?
         Rails.logger.error { "Failed while initializing application: #{self.hbx_id}, Error: #{initializer.failure}" }
