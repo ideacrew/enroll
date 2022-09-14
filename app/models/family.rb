@@ -168,15 +168,17 @@ class Family
     :"households.tax_households.effective_ending_on" => nil ).and(
     :"households.tax_households.effective_starting_on".gte => Date.new(assistance_year).beginning_of_year).and(
     :"households.tax_households.effective_starting_on".lte => Date.new(assistance_year).end_of_year)
-}                                
+}                    
+
   scope :using_aptc_csr_assistance,      ->{where( :"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
 
-  # scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).and(plan_includes_csrs(csr_list)).distinct(:family_id) }
-  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).and(plan_includes_csrs(csr_list)) }
+  #scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).and(plan_includes_csrs(csr_list)).distinct(:id) }
+                                                                                    # Family.all_active_assistance_receiving_for_assistance_year(2022).plan_includes_csrs([100, 73, 87, 94]).distinct(:id)
+  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
 
   # @todo verify dental plans will not be on the list (may be 01) alternative: plan.health_plan
   # scope :plan_includes_csrs,            ->(csr_list){ where(:"_id".in => HbxEnrollment.where(:plan.csr_variant_id => {"$in" => csr_list } ) }
-  scope :plan_includes_csrs,            ->(csr_list){ any_in( "households.tax_households.eligibility_determinations.csr_percent_as_integer": csr_list )  }
+  scope :plan_includes_csrs,            ->(csr_list){ any_in( "households.tax_households.tax_household_members.csr_percent_as_integer": csr_list )  }
   # :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES },
 
   scope :all_aptc_hbx_enrollments,      ->{ where(:"_id".in => HbxEnrollment.where(:"applied_aptc_amount.cents".gt => 0).distinct(:family_id)) }

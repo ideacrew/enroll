@@ -15,7 +15,8 @@ module FinancialAssistance
           include EventSource::Command
           include EventSource::Logging
 
-          PVC_CSR_LIST = ["02", "04", "05", "06"].freeze
+          # "02", "04", "05", "06" are already converted
+          PVC_CSR_LIST = [100, 73, 87, 94].freeze
   
           # @param [Int] applications_per_event
           # @param [Int] assistance_year
@@ -42,7 +43,7 @@ module FinancialAssistance
 
           def find_families(params)
             # family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
-            family_ids = Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list])
+            family_ids = Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
             Success(family_ids)
           end
 
