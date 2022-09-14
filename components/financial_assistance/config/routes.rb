@@ -7,7 +7,6 @@ FinancialAssistance::Engine.routes.draw do
   end
 
   resources :applications, except: feature_flagged_exceptions do
-  # resources :applications do
     get :copy, on: :member
     put :step, on: :member
     put ':step/:step', on: :member, action: 'step'
