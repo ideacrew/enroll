@@ -7,7 +7,7 @@ require 'aca_entities/magi_medicaid/libraries/iap_library'
 module FinancialAssistance
   module Operations
     module Applications
-      module Rrv
+      module Pvc
         # operation to manually trigger pvc events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
         class SubmitPvcSet
@@ -23,10 +23,10 @@ module FinancialAssistance
           # @return [ Success ] Job successfully completed
           def call(params)
             values = yield validate(params)
-            families = find_families(values)
+            families = yield find_families(values)
             submit(params, families)
 
-            Success('Successfully Submitted RRV Set')
+            Success('Successfully Submitted PVC Set')
           end
 
           private
@@ -36,13 +36,14 @@ module FinancialAssistance
             errors << 'applications_per_event ref missing' unless params[:applications_per_event]
             errors << 'assistance_year ref missing' unless params[:assistance_year]
             params[:csr_list] = PVC_CSR_LIST if params[:csr_list].blank?
-
+            p params
             errors.empty? ? Success(params) : Failure(errors)
           end
 
           def find_families(params)
             # family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
-            Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list])
+            family_ids = Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list])
+            Success(family_ids)
           end
 
           def submit(params, families)
@@ -60,6 +61,7 @@ module FinancialAssistance
           end
 
           def build_event(payload)
+            #events.fdsh.evidences.periodic_verification_confirmation
             event('events.iap.applications.request_family_pvc_determination', attributes: payload)
           end
 

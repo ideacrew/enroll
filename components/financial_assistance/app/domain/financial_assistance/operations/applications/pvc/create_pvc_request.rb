@@ -7,10 +7,10 @@ require 'aca_entities/magi_medicaid/libraries/iap_library'
 module FinancialAssistance
   module Operations
     module Applications
-      module Rrv
-        # operation to manually trigger rrv events.
+      module Pvc
+        # operation to manually trigger pvc events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
-        class CreateRrvRequest
+        class CreatePvcRequest
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging
@@ -54,7 +54,7 @@ module FinancialAssistance
           def collect_applications_from_families(params)
             applications_with_evidences = []
             count = 0
-            rrv_logger = Logger.new("#{Rails.root}/log/rrv_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+            pvc_logger = Logger.new("#{Rails.root}/log/pvc_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
             params[:families].no_timeout.each do |family|
               determined_application = fetch_application(family, params[:assistance_year])
@@ -64,9 +64,9 @@ module FinancialAssistance
               cv3_application = transform_and_construct(family, params[:assistance_year])
               applications_with_evidences << cv3_application.to_h
               count += 1
-              rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
+              pvc_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
             rescue StandardError => e
-              rrv_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
+              pvc_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
 
             applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Applications for given families")
@@ -79,7 +79,7 @@ module FinancialAssistance
           def publish(event)
             event.publish
 
-            Success("Successfully published the rrv payload")
+            Success("Successfully published the pvc payload")
           end
         end
       end

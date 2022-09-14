@@ -171,7 +171,8 @@ class Family
 }                                
   scope :using_aptc_csr_assistance,      ->{where( :"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
 
-  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).and(plan_includes_csrs(csr_list)).distinct(:family_id) }
+  # scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).and(plan_includes_csrs(csr_list)).distinct(:family_id) }
+  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).and(plan_includes_csrs(csr_list)) }
 
   # @todo verify dental plans will not be on the list (may be 01) alternative: plan.health_plan
   # scope :plan_includes_csrs,            ->(csr_list){ where(:"_id".in => HbxEnrollment.where(:plan.csr_variant_id => {"$in" => csr_list } ) }
