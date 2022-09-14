@@ -10,7 +10,8 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
       log_payload(subscriber_logger, logger, payload)
 
-      create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      # Moving this to aasm state after event.
+      # create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e

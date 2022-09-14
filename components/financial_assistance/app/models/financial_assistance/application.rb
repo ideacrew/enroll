@@ -868,7 +868,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
+      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories, :create_tax_household_groups] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1007,6 +1007,36 @@ module FinancialAssistance
       ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+    end
+
+    def create_tax_household_groups
+      return unless predecessor_id.blank? && (can_trigger_fdsh_calls? || is_local_mec_checkable?)
+
+      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
+
+      unless cv3_application.success?
+        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{result.failure}" }
+        return
+      end
+
+      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.value!)
+
+      unless initializer.success?
+        Rails.logger.error { "Failed while initializing application: #{self.hbx_id}, Error: #{initializer.failure}" }
+        return
+      end
+
+      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!)
+
+      unless determination.success?
+        Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
+        return
+      end
+
+      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family, effective_date: TimeKeeper.date_of_record)
+      Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
+    rescue StandardError => e
+      Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def trigger_local_mec
