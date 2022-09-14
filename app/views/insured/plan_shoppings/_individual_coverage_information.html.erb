@@ -47,7 +47,7 @@
       <tr class="gray-row">
         <td colspan="3" class="text-left capital"><strong><%= l10n("totals") %></strong></td>
         <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
-        <%if osse_eligible %>
+        <% if osse_eligible %>
           <td></td>
           <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></strong></td>
         <% end %>
