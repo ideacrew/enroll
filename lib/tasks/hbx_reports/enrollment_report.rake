@@ -36,13 +36,6 @@ namespace :reports do
       end
     end
 
-    def broker_assisted(enr, person)
-      broker_role = person&.user.present? ? (person.broker_role || person.active_broker_staff_roles) : nil
-      return "No" if broker_role.present?
-
-      enr.writing_agent_id.present? ? "Yes" : "No"
-    end
-
     def ethnicity_status(ethnicity)
       return "unknown" if ethnicity.blank?
 
@@ -117,7 +110,7 @@ namespace :reports do
                   per.ethnicity,
                   ethnicity_status(per.ethnicity),
                   per.citizen_status,
-                  broker_assisted(enr, primary_person)
+                  family.current_broker_agency&.writing_agent.present? ? "Yes" : "No"
                 ]
               end
             end

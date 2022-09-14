@@ -140,6 +140,16 @@ javascript:
     localStorage.setItem("title",selectedTitle);
   }
 
+  function displayStandardPlan(standardPlan) {
+    if (standardPlan == true || standardPlan == "true") {
+      return "Yes"
+    } else if (standardPlan == false || standardPlan == "false") {
+      return "No"
+    } else {
+      return "N/A"
+    }
+  }
+
   function setCircle(element) {
 		var items = document.querySelectorAll('#metal-level-select ul li')
 	
@@ -212,8 +222,10 @@ javascript:
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
               <span class="plan-label">Network:</span> <span class="rp-plan-info">${plan.network}</span><br>
+              <span class="plan-label">#{l10n('standard_plan')}:</span> <span class="rp-plan-info">${displayStandardPlan(plan.is_standard_plan)}</span><br>
+              
               <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}" data-plan-id="${plan.id}">View Summary</span><br>
-              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.product_type}" data-network="${plan.network}">
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-standard-plan="${plan.is_standard_plan}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.product_type}" data-network="${plan.network}">
               <span class="checkmark"></span>
             </label>
           </div>
@@ -278,9 +290,12 @@ javascript:
     carrierName = options.carrierName || element.dataset.planCarrier;
     planType = options.planType || element.dataset.planType;
     network = options.network || element.dataset.network;
+    standardPlanOption = options.standardPlan || element.dataset.planStandardPlan
+    standardPlan = displayStandardPlan(standardPlanOption)
     referencePlanID = options.referencePlanID || element.id;
     sponsoredBenefitId = options.sponsoredBenefitId;
     showFormButtons();
+    //((options.standardPlan || element.dataset.planStandardPlan) == 'true') ? "Yes" : ((options.standardPlan || element.dataset.planStandardPlan) == 'false') ? "No" : "N/A"
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
 
@@ -289,6 +304,7 @@ javascript:
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
     document.getElementById('rpNetwork').append(network);
+    document.getElementById('rpStandardPlan').append(standardPlan);
     document.getElementById('planOfferingsTitle').innerHTML = '';
     document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
     calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
@@ -649,7 +665,8 @@ javascript:
         carrierName: "#{@benefit_package_form.sponsored_benefits.first.reference_product.issuer_name}",
         planType: "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}",
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}",
-        network: "#{@benefit_package_form.sponsored_benefits.first.reference_product.network}"
+        network: "#{@benefit_package_form.sponsored_benefits.first.reference_product.network}",
+        standardPlan: "#{@benefit_package_form.sponsored_benefits.first.reference_product.network}"
       });
     });
 
