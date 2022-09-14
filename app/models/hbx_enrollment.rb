@@ -520,6 +520,15 @@ class HbxEnrollment
     end
   end
 
+  def has_premium_credits?
+    has_child_care_subsidy? || has_aptc? || is_shop?
+  end
+
+  def has_aptc?
+    return false if is_shop?
+    self.applied_aptc_amount > 0
+  end
+
   def has_child_care_subsidy?
     self.eligible_child_care_subsidy > 0
   end
