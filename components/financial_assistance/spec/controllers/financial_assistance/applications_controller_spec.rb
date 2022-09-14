@@ -235,23 +235,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       applications = FinancialAssistance::Application.where(family_id: family_id)
       expect(assigns(:applications)).to match_array(applications.to_a)
     end
-
-    # context "with :filtered_application_list on" do
-    #   before do
-    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
-    #   end
-
-    #   it "should display applications in order", dbclean: :after_each do
-    #     get :index
-    #     expect(assigns(:filtered_applications).first[:created_at]).to be > assigns(:filtered_applications).last[:created_at]
-    #   end
-
-    #   it "should filter applications by year", dbclean: :after_each do
-    #     get :index, params: { filter: { year: Date.today.year } }
-    #     expect(assigns(:filtered_applications).count).to eq(1)
-    #   end
-    # end
-
   end
 
   context "GET new" do
