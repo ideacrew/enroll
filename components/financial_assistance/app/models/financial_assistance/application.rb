@@ -994,6 +994,8 @@ module FinancialAssistance
       active_applicants.each do |applicant|
         applicant.update_evidence_histories(assistance_evidences)
       end
+    rescue StandardError => e
+      Rails.logger.error { "FAA update_evidence_histories error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def can_trigger_fdsh_calls?
@@ -1691,6 +1693,8 @@ module FinancialAssistance
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
         # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
+    rescue StandardError => e
+      Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def create_income_verification(applicant)
