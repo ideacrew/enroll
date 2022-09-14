@@ -17,6 +17,10 @@ class ConsumerRole
   include EventSource::Command
 
   embedded_in :person
+
+  has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
+                           as: :eligibility
+
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx curam)
   NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
@@ -286,6 +290,22 @@ class ConsumerRole
     visitor.visit(self)
   end
 
+  def create_eligibility(eligibility_params)
+    eligibility_result = build_eligibility(eligibility_params)
+    save_eligibility(eligibility_result) if eligibility_result.success?
+    eligibility_result
+  end
+
+  def save_eligibility(eligibility_result)
+    eligibility = self.eligibilities.build(eligibility_result.success.to_h)
+    eligibility.save!
+  end
+
+  def build_eligibility(eligibility_params)
+    ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
+      eligibility_params.merge(subject_gid: self.to_global_id)
+    )
+  end
 
   def ssn_or_no_ssn
     errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'
@@ -975,6 +995,7 @@ class ConsumerRole
   end
 
   private
+
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
   end
