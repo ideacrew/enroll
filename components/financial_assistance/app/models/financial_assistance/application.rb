@@ -1010,6 +1010,7 @@ module FinancialAssistance
     end
 
     def create_tax_household_groups
+      return if Rails.env.test?
       return unless predecessor_id.blank? && (can_trigger_fdsh_calls? || is_local_mec_checkable?)
 
       cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
