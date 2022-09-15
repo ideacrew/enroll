@@ -4,17 +4,12 @@ Feature: Send users to draft application created by account transfer after RIDP
     Given the FAA feature configuration is enabled
     And EnrollRegistry tobacco_user_field feature is enabled
     And Individual has draft application that was created by account transfer
-    # Given Individual has not signed up as an HBX user
-    # ^^^rewrite this b/c we need to match new User to ATP'd Person in db
-    # When Individual visits the Insured portal outside of open enrollment
     When Individual visits the Consumer portal during open enrollment
-    # ^^^which one?
     And Individual creates a new HBX account
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
     And Individual clicks on continue
-    # Then Individual sees form to enter personal information
     And Individual fills out the personal information form
     And Individual clicks on continue
 
@@ -27,4 +22,3 @@ Scenario: New insured user chooses I Agree on Auth and Consent Page and Continue
     And an Experian Error screen appears for the consumer
     And the user clicks the Continue Application button
     Then the user should see the application Family Information page for the existing draft 
-    # Then the consumer will navigate to the Cost Savings page

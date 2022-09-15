@@ -1,11 +1,7 @@
 #frozen_string_literal: true
 
 Given(/Individual has draft application that was created by account transfer/) do
-    # create_family_faa_application('draft')
     @user = FactoryBot.create(:user)
-    # @user.identity_response_code = 'acc'
-    # @user.identity_final_decision_code = "acc"
-    # @user.save
     @person = FactoryBot.create(:person, :with_consumer_role, user: user)
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
     @application = FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family.id, effective_date: TimeKeeper.date_of_record, transfer_id: 'SBM_123')
