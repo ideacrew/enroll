@@ -98,6 +98,8 @@ module Operations
       def add_health_information_to_household(params, product, health_ehb_premium, health_with_ped_ehb_premium)
         household = params[:household_params]
         household[:health_product_hios_id] = product.hios_id
+        household[:health_product_title] = product.title
+        household[:health_product_csr_variant_id] = product.csr_variant_id
         household[:health_product_id] = product.id
         household[:health_ehb] = product.ehb
         household[:household_health_benchmark_ehb_premium] = health_ehb_premium
