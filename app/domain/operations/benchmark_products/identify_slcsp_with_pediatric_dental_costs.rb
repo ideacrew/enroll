@@ -19,6 +19,7 @@ module Operations
         benchmark_product_model = yield identify_slcsapd(family, benchmark_product_model)
         benchmark_product_model = yield identify_slcsp(family, benchmark_product_model)
         benchmark_product_model = yield calculate_household_group_benchmark_ehb_premium(benchmark_product_model)
+        _created                = yield persist_calculation(params, benchmark_product_model)
 
         Success(benchmark_product_model)
       end
@@ -80,6 +81,19 @@ module Operations
         bpm_params.merge!({ household_group_benchmark_ehb_premium: household_group_benchmark_ehb_premium })
 
         validate(bpm_params)
+      end
+
+      def persist_calculation(params, benchmark_product_model)
+        begin
+          ::BenchmarkProduct.create(
+            request_payload: params.to_json,
+            response_payload: benchmark_product_model.to_h.to_json
+          )
+        rescue StandardError => e
+          Rails.logger.error { "BenchmarkModel Creation Error - #{e}" }
+        end
+
+        Success()
       end
     end
   end
