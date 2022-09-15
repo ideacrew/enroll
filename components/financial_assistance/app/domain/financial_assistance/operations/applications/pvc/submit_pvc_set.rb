@@ -24,11 +24,11 @@ module FinancialAssistance
           # @param [Array] csr_list
           # @return [ Success ] Job successfully completed
           def call(params)
-            start_time = getProcessStartTime
+            start_time = process_start_time
             values = yield validate(params)
             families = find_families(values)
             submit(params, families)
-            end_time = getProcessEndTimeFormatted(start_time)
+            end_time = process_end_time_formatted(start_time)
             logger.info "Successfully submitted #{families.count} families for PVC in #{end_time}"
             Success("Successfully Submitted PVC Set")
           end

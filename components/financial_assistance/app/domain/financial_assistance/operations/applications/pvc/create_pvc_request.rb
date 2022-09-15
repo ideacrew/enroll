@@ -17,15 +17,14 @@ module FinancialAssistance
           include FinancialAssistance::JobsHelper
 
           def call(params)
-            start_time = getProcessStartTime
-
+            start_time = process_start_time
             values = yield validate(params)
             applications = yield collect_applications_from_families(values)
             event = yield build_event(applications)
             result = yield publish(event)
-            end_time = getProcessEndTimeFormatted(start_time)
+            end_time = process_end_time_formatted(start_time)
             logger.info "Successfully created PVC request for #{params[:families].count} families for PVC in #{end_time}"
-            Success(result )
+            Success(result)
           end
 
           private
