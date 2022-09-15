@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 FinancialAssistance::Engine.routes.draw do
-  resources :applications do
+  if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list)
+    get "/applications", controller: 'applications', action: 'index_with_filter'
+    feature_flagged_exceptions = [:index]
+  end
+
+  resources :applications, except: feature_flagged_exceptions do
     get :copy, on: :member
     put :step, on: :member
     put ':step/:step', on: :member, action: 'step'

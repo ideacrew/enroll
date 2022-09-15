@@ -153,7 +153,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.negative_income" => "Negative Income",
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
   "en.faa.send_to_external_verification" => "Send to OFI",
-  "en.faa.sent_to_external_verification" => "Sent to OFI",
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
@@ -177,8 +176,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
   # FAA start new application page
-  "en.faa.cost_savings_applications" => "Cost Savings Applications",
-  "en.faa.cost_savings_applications_desc" => "If you started or completed an application for premium reductions, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.",
+  "en.faa.cost_savings_applications" => "Applications",
+  "en.faa.cost_savings_applications_desc" => "If you started or completed an application for financial assistance, it will be listed below. To update an application, find your current application and select 'Copy to new application'. If the status says it's a draft, that means you haven't submitted that application yet.",
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
   "en.faa.cancel" => "Cancel",
@@ -236,6 +235,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.go_to_my_account" => "Go to my account",
   "en.faa.results.medicaid_eligible_next_steps" => "Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:",
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
-  "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan."
+  "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
+  "en.faa.verification.documents" => "Financial Assistance Documents"
 }.freeze
 # rubocop:enable Layout/LineLength

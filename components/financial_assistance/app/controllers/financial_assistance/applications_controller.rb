@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
@@ -23,8 +23,12 @@ module FinancialAssistance
     # DO NOT include applications from other families.
     def index
       @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
+    end
+
+    def index_with_filter
+      @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
       @filtered_applications = params.dig(:filter, :year).present? && !params.dig(:filter, :year).nil? ? @applications.where(:assistance_year => params[:filter][:year]) : @applications
-      @filtered_applications = @filtered_applications.desc(:created_at) if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list)
+      @filtered_applications = @filtered_applications.desc(:created_at)
 
       determined_apps = @filtered_applications.where(:aasm_state => "determined")
       @recent_determined_hbx_id = determined_apps.where(:assistance_year => determined_apps.map(&:assistance_year).max).desc(:submitted_at).first&.hbx_id
