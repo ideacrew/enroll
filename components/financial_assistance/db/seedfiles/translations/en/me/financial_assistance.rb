@@ -187,6 +187,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.end_date_warning" => "<strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.",
   "en.faa.not_applicable_abbreviation" => "N/A",
   # Transfer History
+  "en.faa.transfer_history.column_header.transfer_id" => "Transfer Id",
+  "en.faa.transfer_history.column_header.in_out_bound" => "In/Out Bound",
+  "en.faa.transfer_history.column_header.timestamp" => "Timestamp",
+  "en.faa.transfer_history.column_header.reason" => "Reason",
+  "en.faa.transfer_history.column_header.source" => "Source",
   "en.faa.transfer_history" => "Transfer History",
   "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   "en.faa.no_history_available" => "No history available.",
