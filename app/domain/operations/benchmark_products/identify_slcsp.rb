@@ -35,6 +35,7 @@ module Operations
 
         query = {
           metal_level_kind: :silver,
+          csr_variant_id: '01',
           :service_area_id.in => service_area_ids,
           :'application_period.min'.lte => @effective_date,
           :'application_period.max'.gte => @effective_date,
