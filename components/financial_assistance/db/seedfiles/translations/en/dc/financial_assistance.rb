@@ -171,6 +171,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
   # FAA start new application page
+  "en.faa.cost_savings_nav" => "Cost Savings",
   "en.faa.cost_savings_applications" => "Cost Savings Applications",
   "en.faa.cost_savings_applications_desc" => "If you started or completed an application for premium reductions, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.",
   "en.faa.start_new_application" => "Start New Application",
