@@ -1,3 +1,4 @@
+<% osse_eligible = (@enrollment.eligible_child_care_subsidy > 0) %>
 <% calculate = (defined? calculate) ? calculate : true %>
 <% family_tier_eligible = @enrollment.product&.family_based_rating? %>
 <div class="table-border table-responsive">
@@ -8,6 +9,9 @@
         <th><%= l10n("relationship") %></th>
         <th><%= l10n("age") %></th>
         <th class="text-right"><%= l10n("premium") %></th>
+        <% if osse_eligible %>
+          <th class="text-right" colspan="2" scope="colgroup"><%=l10n("premium_discount") %></th>
+        <% end %>
         <th class="text-right"><%= l10n("APTC_amount") %> <span><i class='fa fa-question-circle' data-toggle="tooltip" title="<%= l10n('APTC_amount_title_info') %>"></i></span></th>
         <th class="text-right" width="50"><%= l10n("you_pay") %></th>
       </tr>
@@ -24,17 +28,29 @@
             <td> -- </td>
           <% end %>
           <% if calculate %>
+            <% if osse_eligible %>
+              <td class="text-right"><%= l10n("osse_subsidy_title_shortname") %></td>
+              <td class="text-right"><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></td>
+            <% end %>
             <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
             <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
           <% else %>
+            <% if osse_eligible %>
+              <td class="text-right"><%= l10n("osse_subsidy_title_shortname") %></td>
+              <td class="text-right"><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></td>
+            <% end %>
             <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
             <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
           <% end %>
         </tr>
       <% end %>
       <tr class="gray-row">
-        <td colspan="3" class="text-right capital"><strong><%= l10n("totals") %></strong></td>
+        <td colspan="3" class="text-left capital"><strong><%= l10n("totals") %></strong></td>
         <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+        <% if osse_eligible %>
+          <td></td>
+          <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></strong></td>
+        <% end %>
         <% if calculate %>
           <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
           <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
@@ -44,7 +60,7 @@
         <% end %>
       </tr>
       <tr>
-        <td colspan="5" class="text-right"><%= l10n("your_coverage_start_date") %> :</td>
+        <td colspan=<%= osse_eligible ? "7" : "5" %> class="text-right"><%= l10n("your_coverage_start_date") %> :</td>
         <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
       </tr>
     </tbody>
