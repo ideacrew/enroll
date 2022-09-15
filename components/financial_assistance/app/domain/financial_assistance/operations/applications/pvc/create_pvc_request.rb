@@ -14,14 +14,18 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging
+          include FinancialAssistance::JobsHelper
 
           def call(params)
+            start_time = getProcessStartTime
+
             values = yield validate(params)
             applications = yield collect_applications_from_families(values)
             event = yield build_event(applications)
             result = yield publish(event)
-
-            Success(result)
+            end_time = getProcessEndTimeFormatted(start_time)
+            logger.info "Successfully created PVC request for #{params[:families].count} families for PVC in #{end_time}"
+            Success(result )
           end
 
           private
@@ -46,11 +50,6 @@ module FinancialAssistance
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!).value!
           end
 
-          def is_aptc_or_csr_eligible?(application)
-            eligibility = application.eligibility_determinations.max_by(&:determined_at)
-            eligibility.present? && (eligibility.is_aptc_eligible? || eligibility.is_csr_eligible?)
-          end
-
           def collect_applications_from_families(params)
             applications_with_evidences = []
             count = 0
@@ -58,22 +57,20 @@ module FinancialAssistance
 
             params[:families].no_timeout.each do |family|
               determined_application = fetch_application(family, params[:assistance_year])
-              next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
-
               determined_application.create_rrv_evidences
               cv3_application = transform_and_construct(family, params[:assistance_year])
               applications_with_evidences << cv3_application.to_h
               count += 1
               pvc_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
             rescue StandardError => e
-              pvc_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
+              pvc_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id}/family_id #{family.id}/year #{params[:assistance_year]} due to #{e.inspect}")
             end
 
             applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Applications for given families")
           end
 
           def build_event(payload)
-            event('events.iap.applications.magi_medicaid_application_renewal_assistance_eligible', attributes: { applications: payload })
+            event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { applications: payload })
           end
 
           def publish(event)

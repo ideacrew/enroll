@@ -14,6 +14,7 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include EventSource::Command
           include EventSource::Logging
+          include FinancialAssistance::JobsHelper
 
           # "02", "04", "05", "06" are already converted
           PVC_CSR_LIST = [100, 73, 87, 94].freeze
@@ -23,11 +24,13 @@ module FinancialAssistance
           # @param [Array] csr_list
           # @return [ Success ] Job successfully completed
           def call(params)
+            start_time = getProcessStartTime
             values = yield validate(params)
-            families = yield find_families(values)
+            families = find_families(values)
             submit(params, families)
-
-            Success('Successfully Submitted PVC Set')
+            end_time = getProcessEndTimeFormatted(start_time)
+            logger.info "Successfully submitted #{families.count} families for PVC in #{end_time}"
+            Success("Successfully Submitted PVC Set")
           end
 
           private
@@ -37,14 +40,12 @@ module FinancialAssistance
             errors << 'applications_per_event ref missing' unless params[:applications_per_event]
             errors << 'assistance_year ref missing' unless params[:assistance_year]
             params[:csr_list] = PVC_CSR_LIST if params[:csr_list].blank?
-            p params
             errors.empty? ? Success(params) : Failure(errors)
           end
 
           def find_families(params)
-            # family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
             family_ids = Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
-            Success(family_ids)
+            Family.where(:_id.in => family_ids).all
           end
 
           def submit(params, families)
@@ -62,7 +63,6 @@ module FinancialAssistance
           end
 
           def build_event(payload)
-            #events.fdsh.evidences.periodic_verification_confirmation
             event('events.iap.applications.request_family_pvc_determination', attributes: payload)
           end
 
