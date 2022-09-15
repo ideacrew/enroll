@@ -1011,6 +1011,7 @@ module FinancialAssistance
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
+    # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
       Rails.logger.error {"**** started create_tax_household_groups *****"}
       return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
@@ -1052,6 +1053,7 @@ module FinancialAssistance
       Rails.logger.error {"**** error StandardError *****"}
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
+    # rubocop:enable Metrics/AbcSize
 
     def trigger_local_mec
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
