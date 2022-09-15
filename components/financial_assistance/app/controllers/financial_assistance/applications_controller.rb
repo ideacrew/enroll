@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_application, :except => [:index, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
@@ -23,8 +23,12 @@ module FinancialAssistance
     # DO NOT include applications from other families.
     def index
       @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
+    end
+
+    def index_with_filter
+      @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
       @filtered_applications = params.dig(:filter, :year).present? && !params.dig(:filter, :year).nil? ? @applications.where(:assistance_year => params[:filter][:year]) : @applications
-      @filtered_applications = @filtered_applications.desc(:created_at) if FinancialAssistanceRegistry.feature_enabled?(:filtered_application_list)
+      @filtered_applications = @filtered_applications.desc(:created_at)
 
       determined_apps = @filtered_applications.where(:aasm_state => "determined")
       @recent_determined_hbx_id = determined_apps.where(:assistance_year => determined_apps.map(&:assistance_year).max).desc(:submitted_at).first&.hbx_id
@@ -147,8 +151,8 @@ module FinancialAssistance
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
-      @local_mec_evidence = EnrollRegistry.feature_enabled?(:mec_check) ? local_mec_evidence_exists?(@application) : nil
-      @shop_coverage = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? shop_enrollments_exist?(@application) : nil
+      @has_outstanding_local_mec_evidence = has_outstanding_local_mec_evidence?(@application) if EnrollRegistry.feature_enabled?(:mec_check)
+      @shop_coverage = shop_enrollments_exist?(@application) if EnrollRegistry.feature_enabled?(:shop_coverage_check)
 
       unless @application.valid_relations?
         redirect_to application_relationships_path(@application)
@@ -221,8 +225,8 @@ module FinancialAssistance
     end
 
     def transfer_direction(application)
-      'In' unless application.transfer_id.nil?
-      'Out' if application.account_transferred
+      return 'In' unless application.transfer_id.nil?
+      return 'Out' if application.account_transferred
     end
 
     def transfer_reason(application)
@@ -298,8 +302,8 @@ module FinancialAssistance
 
     private
 
-    def local_mec_evidence_exists?(application)
-      application.applicants.detect{|a| !a.local_mec_evidence.nil?}.present?
+    def has_outstanding_local_mec_evidence?(application)
+      application.applicants.any? {|applicant| Eligibilities::Evidence::OUTSTANDING_STATES.include?(applicant&.local_mec_evidence&.aasm_state)}
     end
 
     def shop_enrollments_exist?(application)

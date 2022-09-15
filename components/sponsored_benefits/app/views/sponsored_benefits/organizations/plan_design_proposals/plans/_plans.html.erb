@@ -24,6 +24,7 @@
           <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
           <span class="plan-label">Carrier: </span><span><%= carriers_cache[plan.carrier_profile_id] %></span><br>
           <span class="plan-label">Level: </span><span><%= plan.metal_level.titleize %></span><br>
+          <span class="plan-label"><%=l10n('standard_plan')%>: </span><span><%= display_standard_plan(plan) %></span><br>
           <span>
             <%= render partial: "shared/network_data", locals: {plan: plan} %>
           </span>

@@ -40,7 +40,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       is_shop?: true,
       employee_role: double("EmployeeRole"),
       composite_rated?: true,
-      product: product
+      product: product,
+      eligible_child_care_subsidy: 0.0
     )
   end
 

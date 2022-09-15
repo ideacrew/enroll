@@ -21,6 +21,7 @@ module BenefitSponsors
         dob: employee_dob
       )
     end
+    let(:eligible_child_care_subsidy) { 0.00 }
 
     let(:group_enrollment) do
       BenefitSponsors::Enrollments::GroupEnrollment.new(
@@ -29,7 +30,8 @@ module BenefitSponsors
         coverage_start_on: coverage_start_date,
         previous_product: nil,
         product: product,
-        rating_area: "MA1"
+        rating_area: "MA1",
+        eligible_child_care_subsidy: eligible_child_care_subsidy
       )
     end
 
@@ -53,6 +55,7 @@ module BenefitSponsors
     let(:employee_age) { 27 }
 
     let(:product) { double(id: "some_product_id", kind: "health") }
+    let(:eligible_child_care_subsidy) { 100.00 }
 
     let(:coverage_start_date) { Date.new(2018, 1, 1) }
     let(:rate_schedule_date) { Date.new(2018, 1, 1) }
@@ -148,21 +151,55 @@ module BenefitSponsors
             ).and_return(100.00)
         end
 
-        it "calculates the total" do
-          result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          expect(result_entry.group_enrollment.product_cost_total).to eq(300.00)
+        context 'when employee is not eligibile for osse subsidy' do
+          let(:eligible_child_care_subsidy) { 0.00 }
+
+          it "calculates the total" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            expect(result_entry.group_enrollment.product_cost_total).to eq(300.00)
+            expect(result_entry.group_enrollment.product_cost_total_after_subsidy).to eq(300.00) # total employee pays after subsidy
+          end
+
+          it "calculates the correct employee cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
+            expect(member_entry.product_price).to eq(200.00)
+            expect(member_entry.product_price_after_subsidy).to eq(200.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
+          end
+
+          it "calculates the correct spouse cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == spouse_member_id }
+            expect(member_entry.product_price).to eq(100.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
+          end
         end
 
-        it "calculates the correct employee cost" do
-          result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
-          expect(member_entry.product_price).to eq(200.00)
-        end
+        context 'when subsidy + employer_contribution > product_price' do
+          let(:eligible_child_care_subsidy) { 400.00 }
 
-        it "calculates the correct spouse cost" do
-          result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-          member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == spouse_member_id }
-          expect(member_entry.product_price).to eq(100.00)
+          it "calculates the total" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            expect(result_entry.group_enrollment.product_cost_total).to eq(300.00) # total
+            expect(result_entry.group_enrollment.product_cost_total_after_subsidy).to eq(100.00) # total employee pays after subsidy
+          end
+
+          it "calculates the correct employee cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == employee_member_id }
+            expect(member_entry.employee_cost).to eq(0.00)
+            expect(member_entry.product_price).to eq(200.00)
+            expect(member_entry.product_price_after_subsidy).to eq(0.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(400.00)
+          end
+
+          it "calculates the correct spouse cost" do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == spouse_member_id }
+            expect(member_entry.employee_cost).to eq(100.00)
+            expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
+          end
         end
       end
     end
@@ -418,6 +455,7 @@ module BenefitSponsors
     - a dental product
     " do
       let(:product) { double(id: "some_product_id", kind: "dental") }
+      let(:eligible_child_care_subsidy) { 100.00 }
 
       let(:pricing_units) { [employee_pricing_unit, spouse_pricing_unit, dependent_pricing_unit] }
 

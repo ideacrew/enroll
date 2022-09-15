@@ -86,7 +86,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role: nil,
         future_enrollment_termination_date: "",
         :is_ivl_actively_outstanding? => false,
-        covered_members_first_names: []
+        covered_members_first_names: [],
+        :eligible_child_care_subsidy => 0
       )
     end
 
@@ -160,7 +161,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         product: product,
         employee_role: employee_role,
         census_employee: census_employee,
-        effective_on: Date.new(2015,8,10),
+        effective_on: TimeKeeper.date_of_record,
         updated_at: DateTime.now,
         created_at: DateTime.now,
         kind: "employer_sponsored",
@@ -180,7 +181,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: future_enrollment_termination_date,
-        covered_members_first_names: []
+        covered_members_first_names: [],
+        eligible_child_care_subsidy: 0
       )
     end
 
@@ -226,6 +228,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -256,7 +259,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the plan start" do
       expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match(/#{Date.new(2015,8,10)}/)
+      expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
     it "should not disable the Make Changes button" do
@@ -265,7 +268,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the Plan Start" do
       expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match(/#{Date.new(2015,8,10)}/)
+      expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
     it "should display effective date when terminated enrollment" do
@@ -515,7 +518,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         future_enrollment_termination_date: "",
         covered_members_first_names: [],
         :renewing_waived? => false,
-        :parent_enrollment => nil
+        :parent_enrollment => nil,
+        :eligible_child_care_subsidy => 0
       )
     end
 
@@ -586,7 +590,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role: nil,
         future_enrollment_termination_date: "",
         :is_ivl_actively_outstanding? => false,
-        covered_members_first_names: []
+        covered_members_first_names: [],
+        eligible_child_care_subsidy: 1
       )
     end
 
@@ -599,11 +604,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
     end
+
     context "osse_eligibility is present" do
 
       before do
-        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(true)
-        allow(view).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -614,13 +618,49 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     context "osse_eligibility is not present" do
 
+      let(:hbx_enrollment) do
+        instance_double(
+          HbxEnrollment,
+          id: "hbxenrollmentid",
+          family: family,
+          hbx_id: "hbxenrollmenthbxid",
+          enroll_step: 1,
+          aasm_state: "coverage_selected",
+          product: product,
+          employee_role: employee_role,
+          census_employee: census_employee,
+          effective_on: 1.month.ago.to_date,
+          updated_at: DateTime.now,
+          created_at: DateTime.now,
+          kind: "employer_sponsored",
+          is_coverage_waived?: false,
+          coverage_year: 2018,
+          employer_profile: employer_profile,
+          coverage_terminated?: false,
+          coverage_canceled?: false,
+          coverage_kind: "dental",
+          coverage_termination_pending?: true,
+          coverage_expired?: false,
+          total_premium: 200.00,
+          terminated_on: TimeKeeper.date_of_record.next_month.end_of_month,
+          total_employer_contribution: 100.00,
+          total_employee_cost: 100.00,
+          benefit_group: nil,
+          consumer_role_id: nil,
+          consumer_role: nil,
+          future_enrollment_termination_date: "",
+          :is_ivl_actively_outstanding? => false,
+          covered_members_first_names: [],
+          eligible_child_care_subsidy: 0
+        )
+      end
+
       before do
-        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it "should not display osse amount" do
-        expect(view).to_not have_content(l10n('hc44cc_premium_discount'))
+        expect(rendered).to_not have_content(l10n('hc44cc_premium_discount'))
       end
     end
   end
