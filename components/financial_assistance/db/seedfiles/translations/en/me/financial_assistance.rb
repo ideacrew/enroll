@@ -176,6 +176,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
   # FAA start new application page
+  "en.faa.cost_savings_nav" => "Applications",
   "en.faa.cost_savings_applications" => "Applications",
   "en.faa.cost_savings_applications_desc" => "If you started or completed an application for financial assistance, it will be listed below. To update an application, find your current application and select 'Copy to new application'. If the status says it's a draft, that means you haven't submitted that application yet.",
   "en.faa.start_new_application" => "Start New Application",
