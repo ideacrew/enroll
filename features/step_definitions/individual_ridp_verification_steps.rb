@@ -158,7 +158,7 @@ end
 
 When(/^Experian is unable to verify Identity for the consumer$/) do
   expect(page).to have_content('Identity')
-  expect(page).to have_content('Application')
+  # expect(page).to have_content('Application')
 end
 
 When(/^an Experian Error screen appears for the consumer$/) do
