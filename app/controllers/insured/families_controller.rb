@@ -139,6 +139,15 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
   end
 
+  def healthcare_for_childcare_program
+    @form = ::Forms::HealthcareForChildcareProgramForm.new
+    @form.load_consumer(@person)
+  end
+
+  def update_osse_eligibility
+    #@form.submit
+  end
+
   def verification
     @family_members = @person.primary_family.has_active_consumer_family_members
   end
