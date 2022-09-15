@@ -28,9 +28,13 @@ EMPLOYER_TRANSLATIONS = {
   :'en.employers.registration.state' => 'State *',
   :'en.employers.registration.zip' => 'Zip *',
   :'en.osse_eligibility_description' => "Licensed child development centers and homes and their employees are eligible for premium reductions. Eligibility is applied to an initial or renewal plan year when the plan year is created.",
+  :'en.osse_ivl_description' => "Certain consumers & their dependents are eligible for premium reductions. Eligibility is applied to an initial or renewal enrollment when an Admin grants OSSE eligibility to consumers.",
   :'en.osse_eligibility_question' => 'Does this business qualify for OSSE subsidies?',
+  :'en.osse_eligibility_ivl_question' => 'Does this consumer qualify for Osse subsides?',
   :'en.eligibility_history' => 'View eligibility history',
   :'en.osse_subsidy_title' => 'Healthcare4Childcare (HC4CC) Program',
+  :'en.eligibility_history' => 'View eligibility history',
+  :'en.osse_eligibility' => 'HC4CC Eligibility',
   :'en.osse_subsidy_title_shortname' => 'HC4CC',
   :'en.standard_plan' => 'Standard Plan'
 }.freeze
