@@ -229,14 +229,17 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
+      allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     context "internationalization" do
       let(:file_location) { "app/views/insured/families/_enrollment.html.erb"}
       it "should have all expected translations" do
-        expect(translations_in_erb_tags_present?(file_location)).to eq(true)
-        expect(translations_outside_erb_tags_present?(file_location)).to eq(true)
+        if hbx_enrollment.eligible_child_care_subsidy > 0
+          expect(translations_in_erb_tags_present?(file_location)).to eq(true)
+          expect(translations_outside_erb_tags_present?(file_location)).to eq(true)
+        end
       end
     end
 
@@ -618,7 +621,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     context "osse_eligibility is not present" do
 
-      let(:hbx_enrollment) do
+      let(:hbx_enrollment1) do
         instance_double(
           HbxEnrollment,
           id: "hbxenrollmentid",
@@ -656,7 +659,15 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       before do
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        allow(hbx_enrollment1).to receive(:is_reinstated_enrollment?).and_return(false)
+        allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
+        allow(hbx_enrollment1).to receive(:kind).and_return('employer_sponsored')
+        allow(hbx_enrollment1).to receive(:is_ivl_by_kind?).and_return(false)
+        allow(hbx_enrollment1).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
+        allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
+        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it "should not display osse amount" do
