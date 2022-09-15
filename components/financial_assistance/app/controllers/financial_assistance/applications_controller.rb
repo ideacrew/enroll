@@ -213,7 +213,7 @@ module FinancialAssistance
       @transfers = []
       if @application.account_transferred || !@application.transfer_id.nil?
         @transfers << {
-          transfer_id: @application.transfer_id,
+          transfer_id: @application.transfer_id || 'n/a',
           direction: transfer_direction(@application),
           timestamp: @application.transferred_at,
           reason: transfer_reason(@application),
