@@ -314,7 +314,7 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'healthcare_for_childcare_program'
         get 'healthcare_for_childcare_program_form'
-        put 'update_osse_eligibility'
+        put 'update_healthcare_for_childcare_program_eligibility'
         get 'brokers'
         get 'verification'
         get 'upload_application'
