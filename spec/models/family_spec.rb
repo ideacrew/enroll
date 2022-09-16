@@ -1325,6 +1325,65 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 end
 
+
+describe '.add_eligibility' do
+
+  context 'given family with multiple dependents' do
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:spouse) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:child1) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:child2) { FactoryBot.create(:person, :with_consumer_role) }
+
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary)}
+    let!(:family_member_spouse) { FactoryBot.create(:family_member, person: spouse, family: family)}
+    let!(:family_member_child1) { FactoryBot.create(:family_member, person: child1, family: family)}
+    let!(:family_member_child2) { FactoryBot.create(:family_member, person: child2, family: family, is_active: false)}
+
+    context 'it should create eligibility for active family members' do
+      let(:valid_params) do
+        {
+          evidence_key: :osse_subsidy,
+          evidence_value: true,
+          effective_date: TimeKeeper.date_of_record.next_year.beginning_of_year
+        }
+      end
+
+      before do
+        family.add_eligibility(valid_params)
+      end
+
+      def verify_active_family_members
+        family.active_family_members.each do |fm|
+          consumer_role = fm.person.consumer_role
+          yield(consumer_role)
+        end
+      end
+
+      it 'should create eligibility for active family members' do
+        expect(primary.consumer_role.eligibilities).to be_present
+        expect(spouse.consumer_role.eligibilities).to be_present
+        expect(child1.consumer_role.eligibilities).to be_present
+        expect(child2.consumer_role.eligibilities).not_to be_present
+      end
+
+      it 'should create eligibility with given effective date' do
+        verify_active_family_members do |consumer_role|
+          expect(consumer_role.eligibilities.count).to eq 1
+          expect(consumer_role.eligibilities.first.start_on).to eq valid_params[:effective_date]
+        end
+      end
+
+      it 'should create eligibility with evidence' do
+        verify_active_family_members do |consumer_role|
+          eligibility = consumer_role.eligibilities.first
+          expect(eligibility.evidences.by_key(valid_params[:evidence_key]).count).to eq 1
+          expect(eligibility.evidences.by_key(valid_params[:evidence_key]).first.is_satisfied).to eq valid_params[:evidence_value]
+        end
+      end
+    end
+  end
+end
+
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }

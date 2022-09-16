@@ -418,6 +418,23 @@ class Family
     family_members.detect { |family_member| family_member.is_consent_applicant? && family_member.is_active? }
   end
 
+  # Create eligibility for the active family members
+  #
+  # @param [ Hash ] eligibility_params The options to create eligibility.
+  #                 eligibility_params include evidence_key, evidence_value, effective_date
+  # @param [ String ] market_kind arket kind for the eligibility.
+  #
+  # @return [ AcaEntities::Eligibilities::Osse::Eligibility ] the eligibility entity monad
+  def add_eligibility(eligibility_params, market_kind = 'individual')
+    return Failure("Unable to process #{market_kind}") unless market_kind == 'individual'
+
+    active_family_members.each do |family_member|
+      consumer_role = family_member&.person&.consumer_role
+      next unless consumer_role
+      consumer_role.create_eligibility(eligibility_params)
+    end
+  end
+
   # Get all active {FamilyMember FamilyMembers}
   #
   # @example Who are the active members for this family?
