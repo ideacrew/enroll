@@ -1013,10 +1013,7 @@ module FinancialAssistance
 
     # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
-      Rails.logger.error {"**** started create_tax_household_groups *****"}
       return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-
-      Rails.logger.error {"**** before cv3  *****"}
 
       cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
 
@@ -1025,8 +1022,6 @@ module FinancialAssistance
         return
       end
 
-      Rails.logger.error {"**** started initializer *****"}
-
       initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
 
       unless initializer.success?
@@ -1034,16 +1029,12 @@ module FinancialAssistance
         return
       end
 
-      Rails.logger.error {"**** started determination *****"}
-
       determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!.to_h)
 
       unless determination.success?
         Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
         return
       end
-
-      Rails.logger.error {"**** started family_determination *****"}
 
       family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family, effective_date: TimeKeeper.date_of_record)
       Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
@@ -1054,7 +1045,6 @@ module FinancialAssistance
         Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
       end
     rescue StandardError => e
-      Rails.logger.error {"**** error StandardError *****"}
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
     # rubocop:enable Metrics/AbcSize
@@ -1629,12 +1619,10 @@ module FinancialAssistance
     end
 
     def record_transition
-      Rails.logger.error {"**** started record_transition *****"}
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
         to_state: aasm.to_state
       )
-      Rails.logger.error {"**** ended record_transition *****"}
     end
 
     def verification_update_for_applicants
