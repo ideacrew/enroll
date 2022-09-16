@@ -5756,7 +5756,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
       coverage_kind: coverage_kind,
       family: person.primary_family,
       employee_role: employee_role,
-      effective_on: effective_on,
+      effective_on: (effective_on + 3.months),
       aasm_state: 'shopping',
       rating_area: rating_area,
       hbx_enrollment_members: [hbx_enrollment_member],
