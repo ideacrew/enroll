@@ -86,12 +86,12 @@ module Subscribers
         if enrollment.is_shop?
           enrollment.employee_role
         elsif enrollment.is_coverall?
-          hbx_enrollment_member.person.resident_role
+          person.resident_role
         else
-          hbx_enrollment_member.person.consumer_role
+          person.consumer_role
         end
 
-      eligibility = subject.eligibilities.max_by(&:created_at)
+      subject.eligibilities.max_by(&:created_at)
     end
 
     def redetermine_family_eligibility(payload)
