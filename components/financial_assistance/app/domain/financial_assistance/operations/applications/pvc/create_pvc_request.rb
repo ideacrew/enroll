@@ -37,8 +37,8 @@ module FinancialAssistance
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def fetch_application(family, assistance_year)
-            ::FinancialAssistance::Application.where(assistance_year: assistance_year,
+          def fetch_application(family, year)
+            ::FinancialAssistance::Application.where(assistance_year: year,
                                                      aasm_state: 'determined',
                                                      family_id: family.id).max_by(&:created_at)
           end
