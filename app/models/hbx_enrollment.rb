@@ -2701,7 +2701,7 @@ class HbxEnrollment
 
   def update_osse_childcare_subsidy
     return if coverage_kind.to_s == 'dental'
-    return unless census_employee&.osse_eligible?(effective_on)
+    return unless employee_role&.osse_eligible?(effective_on)
 
     effective_year_for_lcsp = sponsored_benefit_package.start_on.year
     hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item

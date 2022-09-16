@@ -302,6 +302,20 @@ class EmployeeRole
     ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
   end
 
+  def osse_eligible?(start_on)
+    eligibility = eligibility_for(:osse_subsidy, start_on)
+    return false unless eligibility
+
+    evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
+    evidence&.is_satisfied == true
+  end
+
+  def eligibility_for(evidence_key, start_on)
+    eligibilities.by_date(start_on).select do |eligibility|
+      eligibility.evidences.by_key(evidence_key).present?
+    end.max_by(&:created_at)
+  end
+
   class << self
     def klass
       self.to_s.underscore
