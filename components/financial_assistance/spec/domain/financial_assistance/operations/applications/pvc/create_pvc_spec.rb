@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSet, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
@@ -93,9 +93,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSet.new }
+  let(:obj)  { FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest.new }
 
   before do
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
@@ -105,7 +106,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSet).to receive(:new).and_return(obj)
+    allow(FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
     allow(premiums_double).to receive(:failure?).and_return(false)
@@ -117,8 +118,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
     it 'should return success' do
       expect(applicant.income_evidence.present?).to be_falsey
       expect(applicant.non_esi_evidence.present?).to be_falsey
-      result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
+      result = subject.call(families: Family.all, assistance_year: application.assistance_year)
       expect(result).to be_success
+      expect(applicant.reload.income_evidence.present?).to be_truthy
+      expect(applicant.reload.non_esi_evidence.present?).to be_truthy
     end
   end
 
@@ -126,7 +129,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
     applicant.update(is_applying_coverage: false, is_ia_eligible: false)
     expect(applicant.income_evidence.present?).to be_falsey
     expect(applicant.non_esi_evidence.present?).to be_falsey
-    result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
+    result = subject.call(families: Family.all, assistance_year: application.assistance_year)
     expect(result).to be_success
+    expect(applicant.reload.income_evidence.present?).to be_falsey
+    expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end
 end
