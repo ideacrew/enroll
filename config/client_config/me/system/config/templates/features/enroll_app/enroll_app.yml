@@ -542,8 +542,21 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: true
+      - key: :taro_health_plan_of_maine_inc_pay_now
+        is_enabled: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_IS_ENABLED'] || false %>
+        settings:
+          - key: :plan_shopping
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
+          - key: :enrollment_tile
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_ENROLLMENT_TITLE_IS_ENABLED'] || false %>
+          - key: :carriers_long_name
+            item: 'Taro Health Plan of Maine, Inc.'
+          - key: :connect_test
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :embed_xml
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
       - key: :carrier_abbrev_list
-        item: ['CHO', 'HPHC', 'ANTHM', 'NEDD']
+        item: ['CHO', 'HPHC', 'ANTHM', 'NEDD', 'TARO']
         is_enabled: true
   - namespace:
       - :features

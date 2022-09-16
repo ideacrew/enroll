@@ -4,6 +4,7 @@ module Subscribers
   module BenefitSponsors
     # Subscriber will receive payload from EA for events related to census employee
     class CensusEmployeeSubscriber
+      include GlobalID::Identification
       include ::EventSource::Subscriber[amqp: 'enroll.benefit_sponsors.census_employee']
 
       subscribe(:on_created) do |delivery_info, _metadata, response|
@@ -20,6 +21,47 @@ module Subscribers
       rescue StandardError, SystemStackError => e
         subscriber_logger.info "CensusEmployeeSubscriber, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
         logger.info "CensusEmployeeSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        ack(delivery_info.delivery_tag)
+      end
+
+      subscribe(:on_terminated) do |delivery_info, _metadata, response|
+        logger.info '-' * 100
+        payload = JSON.parse(response, :symbolize_names => true)
+        census_employee = GlobalID::Locator.locate(payload[:employee_global_id])
+        employer = census_employee.employer_profile
+        employee_role = census_employee.employee_role
+
+        subscriber_logger.info "on_census_employee_terminated, census_employee: #{census_employee.full_name} employer: #{employer.legal_name} fein: #{employer.fein}"
+        subscriber_logger.info "CensusEmployeeSubscriber on_census_employee_terminated payload: #{payload}"
+        logger.info "CensusEmployeeSubscriber on_census_employee_terminated payload: #{payload}"
+
+
+        result = ::Operations::Eligibilities::Osse::TerminateEligibility.new.call(
+          {
+            subject_gid: employee_role.to_global_id.to_s,
+            evidence_key: :osse_subsidy,
+            termination_date: census_employee.employment_terminated_on
+          }
+        )
+
+        if result.success?
+          subscriber_logger.info "on_census_employee_terminated employer fein: #{employer.fein}, employee: #{census_employee&.full_name} processed successfully"
+          logger.info "on_census_employee_terminated CensusEmployeeSubscriber: acked, SuccessResult: #{result.success}"
+        else
+          errors =
+            case result.failure
+            when Array
+              result.failure
+            when Dry::Validation::Result
+              result.failure.errors.to_h
+            end
+          subscriber_logger.info "on_census_employee_terminated employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, employee: #{person&.full_name}"
+          logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{person&.full_name}, employer fein: #{employer.fein}"
+        end
+        ack(delivery_info.delivery_tag)
+      rescue StandardError, SystemStackError => e
+        subscriber_logger.info "CensusEmployeeSubscriber on_census_employee_terminated, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.info "CensusEmployeeSubscriber on_census_employee_terminated: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 

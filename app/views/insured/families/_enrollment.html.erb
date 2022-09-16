@@ -155,7 +155,7 @@
       <div>
       </div>
     <div class="enrollment-type info vertical-align-top">
-        <% if hbx_enrollment.is_shop? && (hbx_enrollment.eligible_child_care_subsidy > 0) %> 
+        <% if (hbx_enrollment.eligible_child_care_subsidy > 0) || ivl_osse_eligibility_is_enabled? %>
           <p>
             <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
             <%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%>/<%= l10n("month").to_s.downcase %>
@@ -232,7 +232,8 @@
               <% end %>
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
                 <% if hbx_enrollment.product.present? %>
-                  <% carrier = hbx_enrollment.product.carrier_profile&.legal_name&.downcase&.gsub(' ', '_') %>
+                  <% legal_name = hbx_enrollment.product.carrier_profile&.legal_name %>
+                  <% carrier = fetch_issuer_name(legal_name) %>
                   <% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>
                     <% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:enrollment_tile).item %>
                       <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
