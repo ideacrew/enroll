@@ -1325,7 +1325,6 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 end
 
-
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
