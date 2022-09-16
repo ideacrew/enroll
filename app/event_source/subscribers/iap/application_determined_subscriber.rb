@@ -12,6 +12,7 @@ module Subscribers
 
       # Moving this to aasm state after event.
       # create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      # generate_enrollments(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -31,6 +32,21 @@ module Subscribers
       end
     rescue StandardError => e
       log_error(subscriber_logger, nil, :create_tax_household_group_on_fa_determination, e)
+    end
+
+    def generate_enrollments(subscriber_logger, payload)
+      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
+      family_hbx_id = payload[:family_reference][:hbx_id]
+      families = Family.where(hbx_assigned_id: family_hbx_id)
+
+      unless families.count == 1
+        subscriber_logger.info "generate_enrollments failed to find a family, payload: #{payload}"
+        return
+      end
+
+      family = families.first
+
+      Operations::Individual::OnNewDetermination.new.call({family: family, year: payload[:assistance_year]})
     end
 
     def log_info(subscriber_logger, result, operation)

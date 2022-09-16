@@ -51,7 +51,7 @@ module Insured
         )
       end
 
-      def self.update_aptc(enrollment_id, applied_aptc_amount)
+      def self.update_aptc(enrollment_id, applied_aptc_amount, elected_aptc_pct: nil, aggregate_aptc_amount: nil)
         # field :elected_aptc_pct, type: Float, default: 0.0
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
@@ -68,7 +68,12 @@ module Insured
         end
 
         reinstatement.save!
-        update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
+
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          mthh_update_enrollment_for_aptcs(reinstatement, applied_aptc_amount, elected_aptc_pct, aggregate_aptc_amount)
+        else
+          update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
+        end
 
         reinstatement.select_coverage!
       end
@@ -93,6 +98,10 @@ module Insured
         reinstatement_family_member_ids = reinstatement.hbx_enrollment_members.map(&:applicant_id)
 
         @invalid_family_member_ids << (all_family_member_ids | reinstatement_family_member_ids) - (all_family_member_ids & reinstatement_family_member_ids)
+      end
+
+      def self.mthh_update_enrollment_for_aptcs(reinstatement, applied_aptc_amount, elected_aptc_pct, aggregate_aptc_amount)
+        reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount)
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
