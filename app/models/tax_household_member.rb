@@ -117,8 +117,7 @@ class TaxHouseholdMember
     result.success
   end
 
-  def aptc_benchmark_amount(enrollment)
-    date = enrollment.effective_on
+  def aptc_benchmark_amount(enrollment, date = enrollment.effective_on)
     slcsp_id = benchmark_product_details_for(date)[:product_id]
     benchmark_product = BenefitMarkets::Products::Product.find(slcsp_id)
     ehb = benchmark_product.ehb

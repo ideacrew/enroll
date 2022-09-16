@@ -226,9 +226,9 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
         it 'member should have coverage start on as new enrollment effective on' do
           # since checking product hios_id instead of subscriber drop for coverage start on,
-          # member's start on will be the effective date of the old enrollment
+          # member's start on will be the coverage_start_on from the old enrollment
           new_enrollment = family.hbx_enrollments.where(:id.ne => enrollment.id).last
-          expect(new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [enrollment.effective_on]
+          expect(new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [enrollment.effective_on, enrollment.hbx_enrollment_members.first.coverage_start_on]
         end
       end
 
@@ -301,6 +301,24 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
                                                                   "admin_permission" => true}})
             reinstatement = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
             expect(reinstatement.applied_aptc_amount).not_to eq 0.0
+          end
+
+          context 'subscribers birthday is between original coverage_start_on and new enrollment effective_on' do
+            before do
+              dob = hbx_enrollment_member1.person.dob
+              birth_month = (TimeKeeper.date_of_record - 3.months).month
+              hbx_enrollment_member1.person.update_attributes!(dob: Date.new(dob.year, birth_month, dob.day))
+              hbx_enrollment_member2.person.update_attributes!(dob: Date.new(dob.year, birth_month, dob.day + 1))
+              enrollment_2.update_attributes!(effective_on: TimeKeeper.date_of_record - 6.months)
+              subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
+                                                                    "terminate_member_#{hbx_enrollment_member3.id}" => enrollment_2.subscriber.id.to_s,
+                                                                    "admin_permission" => true}})
+              @new_enrollment = family.hbx_enrollments.where(:id.ne => enrollment_2.id).last
+            end
+
+            it 'should calculate based on original coverage_start_on date' do
+              expect(@new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [@new_enrollment.effective_on, enrollment_2.hbx_enrollment_members.first.coverage_start_on]
+            end
           end
         end
 
@@ -401,8 +419,8 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         expect(@new_enrollment.consumer_role_id).not_to eq enrollment.consumer_role_id
       end
 
-      it 'all the enr members should have same coverage and eligibility date as new effective date' do
-        expect(@new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [@new_enrollment.effective_on]
+      it 'members coverage start on should be the same as the old enrollment' do
+        expect(@new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [@new_enrollment.effective_on, enrollment.hbx_enrollment_members.first.coverage_start_on]
       end
     end
 

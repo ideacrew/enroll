@@ -95,13 +95,19 @@ module Operations
       end
 
       def update_member_effective_dates
+        same_product = base_enrollment.product.is_same_plan_by_hios_id_and_active_year?(new_enrollment.product)
         new_enrollment.hbx_enrollment_members.each do |member|
-          if base_enrollment.product.is_same_plan_by_hios_id_and_active_year?(new_enrollment.product)
-            member.update_attributes(eligibility_date: new_enrollment.effective_on, coverage_start_on: new_enrollment.effective_on)
+          if same_product
+            matched_member = match_member_on_enrollment(base_enrollment, member)
+            member.update_attributes(eligibility_date: new_enrollment.effective_on, coverage_start_on: matched_member.coverage_start_on)
           else
             member.update_attributes(eligibility_date: new_enrollment.effective_on)
           end
         end
+      end
+
+      def match_member_on_enrollment(base_enrollment, member)
+        base_enrollment.hbx_enrollment_members.detect{|a| a.hbx_id == member.hbx_id}
       end
 
       def terminate_base_enrollment
@@ -146,7 +152,7 @@ module Operations
         return unless tax_household
 
         applied_aptc = tax_household.monthly_max_aptc(new_enrollment, new_effective_date)
-        ::Insured::Factories::SelfServiceFactory.update_enrollment_for_apcts(new_enrollment, applied_aptc)
+        ::Insured::Factories::SelfServiceFactory.update_enrollment_for_apcts(new_enrollment, applied_aptc, age_as_of_coverage_start: true)
       end
     end
   end
