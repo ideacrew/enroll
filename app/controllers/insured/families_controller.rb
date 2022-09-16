@@ -144,8 +144,9 @@ class Insured::FamiliesController < FamiliesController
     @form.load_consumer(@person)
   end
 
-  def update_osse_eligibility
-    #@form.submit
+  def update_healthcare_for_childcare_program_eligibility
+    form = ::Forms::HealthcareForChildcareProgramForm.new(healthcare_for_childcare_program_params)
+    form.submit
   end
 
   def verification
@@ -374,6 +375,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def healthcare_for_childcare_program_params
+    params.require(:forms_healthcare_for_childcare_program_form).permit(:osse_eligibility)
+  end
 
   def upload_notice_form_enabled?
     redirect_to(root_path, notice: "Upload Notice Form is Disabled") unless EnrollRegistry.feature_enabled?(:show_upload_notices)

@@ -8,11 +8,20 @@ module Forms
     def load_consumer(person)
       @consumer_role = person.consumer_role
       @osse_eligibility = false
-      #@osse_eligibility = consumer_role.eligible_for?(:osse_subsidy, TimeKeeper.date_of_record)
     end
     
     def submit
-      @consumer_role.create_eligibility(eligibility_params)
+      #@consumer_role.create_eligibility(eligibility_params)
+    end
+
+    private
+
+    def eligibility_params
+      {
+        evidence_key: :osse_subsidy,
+        evidence_value: osse_eligibility,
+        effective_date: TimeKeeper.date_of_record
+      }
     end
   end
 end
