@@ -81,6 +81,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         end
 
         it 'should return success with dental and health hios_ids' do
+          expect(::BenchmarkProduct.all.count).to eq(1)
           expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
@@ -104,6 +105,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         end
 
         it 'should return success with dental_hios_id' do
+          expect(::BenchmarkProduct.all.count).to eq(1)
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
           expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
@@ -122,6 +124,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         end
 
         it 'should return success with dental_hios_id' do
+          expect(::BenchmarkProduct.all.count).to eq(1)
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
           expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
@@ -141,6 +144,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
         end
 
         it 'should return success without dental_hios_id' do
+          expect(::BenchmarkProduct.all.count).to eq(1)
           expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
           expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
           expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
@@ -162,6 +166,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
           end
 
           it 'should return success with health_hios_id' do
+            expect(::BenchmarkProduct.all.count).to eq(1)
             expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
             expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
             expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
@@ -178,6 +183,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
           end
 
           it 'should return success with health_hios_id' do
+            expect(::BenchmarkProduct.all.count).to eq(1)
             expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
             expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
             expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
