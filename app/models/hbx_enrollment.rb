@@ -2721,7 +2721,6 @@ class HbxEnrollment
     return unless employee_role&.osse_eligible?(effective_on)
 
     osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
-    BigDecimal(member_enrollment&.product_price&.to_s).round(2)
     update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
