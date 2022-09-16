@@ -2,7 +2,7 @@
 
 module Subscribers
   # Subscriber will receive a CV3Application payload that is triggered from EA(when FA Application transitions to determined state).
-  class FamilyRrvDeterminationSubscriber
+  class ApplicationDeterminedSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.fdsh.verifications']
 
     subscribe(:on_magi_medicaid_application_determined) do |delivery_info, _metadata, response|
