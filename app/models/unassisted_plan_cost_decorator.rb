@@ -151,6 +151,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_employee_cost
+    return (total_premium - total_aptc_amount) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
     if family_tier_eligible?
       cost = (family_tier_total_premium - total_aptc_amount).round(2)
       cost = 0.00 if cost < 0
