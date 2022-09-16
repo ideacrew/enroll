@@ -5792,7 +5792,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
   context 'whem employee is eligible for OSSE' do
     before do
-      allow_any_instance_of(CensusEmployee).to receive(:osse_eligible?).and_return(true)
+      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy
     end
@@ -5812,7 +5812,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
   context 'when employee is not eligible for OSSE' do
     before do
-      allow_any_instance_of(CensusEmployee).to receive(:osse_eligible?).and_return(false)
+      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(false)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy
     end
