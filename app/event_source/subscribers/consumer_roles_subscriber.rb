@@ -6,11 +6,10 @@ module Subscribers
     include ::EventSource::Subscriber[amqp: 'enroll.individual.consumer_roles']
 
     subscribe(:on_enroll_individual_consumer_roles) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles)
       payload = JSON.parse(response, symbolize_names: true)
       subscriber_logger.info "ConsumerRolesSubscriber, response: #{payload}"
       determine_verifications(payload, subscriber_logger)
-      consumer = GlobalID::Locator.locate(payload[:gid])
-      create_consumer_osse_eligibility(consumer)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
