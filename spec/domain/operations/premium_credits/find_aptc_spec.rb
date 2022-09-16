@@ -140,7 +140,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
           determination.grants.create(
             key: "AdvancePremiumAdjustmentGrant",
-            value: monthly_expected_contribution,
+            value: yearly_expected_contribution,
             start_on: TimeKeeper.date_of_record.beginning_of_year,
             end_on: TimeKeeper.date_of_record.end_of_year,
             assistance_year: TimeKeeper.date_of_record.year,
@@ -162,7 +162,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                             family: family)
         end
 
-        let(:monthly_expected_contribution) { 125.00 }
+        let(:yearly_expected_contribution) { 125.00 * 12 }
 
         let(:slcsp_info) do
           OpenStruct.new(
@@ -239,7 +239,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
             determination.grants.create(
               key: "AdvancePremiumAdjustmentGrant",
-              value: monthly_expected_contribution,
+              value: yearly_expected_contribution,
               start_on: TimeKeeper.date_of_record.beginning_of_year,
               end_on: TimeKeeper.date_of_record.end_of_year,
               assistance_year: TimeKeeper.date_of_record.year,
@@ -284,7 +284,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
             determination.grants.create(
               key: "AdvancePremiumAdjustmentGrant",
-              value: monthly_expected_contribution,
+              value: yearly_expected_contribution,
               start_on: TimeKeeper.date_of_record.beginning_of_year,
               end_on: TimeKeeper.date_of_record.end_of_year,
               assistance_year: TimeKeeper.date_of_record.year,
@@ -356,7 +356,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         end
 
         context 'benchmark_premium is less than monthly_expected_contribution' do
-          let(:monthly_expected_contribution) { 375.00 }
+          let(:yearly_expected_contribution) { 375.00 * 12 }
 
           let(:slcsp_info) do
             OpenStruct.new(
@@ -451,7 +451,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:dependent1) { FactoryBot.create(:person) }
           let(:dependent2) { FactoryBot.create(:person) }
 
-          let(:monthly_expected_contribution) { 550.00 }
+          let(:yearly_expected_contribution) { 550.00 * 12 }
 
           let(:slcsp_info) do
             OpenStruct.new(
@@ -487,7 +487,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
             it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
               expect(result.success?).to eq true
-              expect(result.value!).to eq(1100.00 - monthly_expected_contribution)
+              expect(result.value!).to eq(1100.00 - (yearly_expected_contribution / 12))
             end
           end
 
@@ -594,7 +594,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let!(:primary_tax_household_group) do
           eligibility_determination.grants.create(
             key: "AdvancePremiumAdjustmentGrant",
-            value: monthly_expected_contribution1,
+            value: yearly_expected_contribution1,
             start_on: TimeKeeper.date_of_record.beginning_of_year,
             end_on: TimeKeeper.date_of_record.end_of_year,
             assistance_year: TimeKeeper.date_of_record.year,
@@ -606,7 +606,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let!(:dependents_tax_household_group) do
           eligibility_determination.grants.create(
             key: "AdvancePremiumAdjustmentGrant",
-            value: monthly_expected_contribution2,
+            value: yearly_expected_contribution2,
             start_on: TimeKeeper.date_of_record.beginning_of_year,
             end_on: TimeKeeper.date_of_record.end_of_year,
             assistance_year: TimeKeeper.date_of_record.year,
@@ -691,8 +691,8 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               family: family)
           end
 
-          let(:monthly_expected_contribution1) { 375.00 }
-          let(:monthly_expected_contribution2) { 100.00 }
+          let(:yearly_expected_contribution1) { 375.00 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12}
 
           it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
             expect(result.success?).to eq true
@@ -718,7 +718,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:dependent1) { FactoryBot.create(:person) }
           let(:dependent2) { FactoryBot.create(:person) }
 
-          let(:monthly_expected_contribution) { 550.00 }
+          let(:yearly_expected_contribution) { 550.00 * 12 }
 
           let(:slcsp_info) do
             OpenStruct.new(
@@ -754,8 +754,8 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:primary_benchmark_premium) { 450.00 }
           let(:dependents_benchmark_premium) { 583.00 }
 
-          let(:monthly_expected_contribution1) { 343.75 }
-          let(:monthly_expected_contribution2) { 100.00 }
+          let(:yearly_expected_contribution1) { 343.75 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12 }
 
           let!(:prev_enrollment) do
             FactoryBot.create(:hbx_enrollment,
@@ -800,14 +800,14 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:dependent1) { FactoryBot.create(:person) }
           let(:dependent2) { FactoryBot.create(:person) }
 
-          let(:monthly_expected_contribution) { 550.00 }
+          let(:yearly_expected_contribution) { 550.00 * 12 }
 
           let(:primary_benchmark_premium) { 450.00 }
           let(:dependent1_benchmark_premium) { 310.00 }
           let(:dependent2_benchmark_premium) { 260.00 }
 
-          let(:monthly_expected_contribution1) { 343.75 }
-          let(:monthly_expected_contribution2) { 100.00 }
+          let(:yearly_expected_contribution1) { 343.75 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12 }
 
           context 'when primary & dependent2 enrolling' do
             let(:slcsp_info) do

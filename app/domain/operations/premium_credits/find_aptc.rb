@@ -8,6 +8,7 @@ module Operations
     # This operation is to find Max Aptc
     class FindAptc
       include Dry::Monads[:result, :do]
+      include FloatHelper
 
       def call(params)
         values = yield validate(params)
@@ -103,11 +104,12 @@ module Operations
       end
 
       def monthly_expected_contribution(aptc_grant)
-        return aptc_grant.value.to_f if coinciding_enrollments.blank?
+        grant_value = round_down_float_two_decimals(aptc_grant.value) # value is string.
+        return round_down_float_two_decimals(grant_value / 12) if coinciding_enrollments.blank?
 
         th_enrollments = TaxHouseholdEnrollment.where(:enrollment_id.in => coinciding_enrollments.map(&:id), tax_household_id: aptc_grant.tax_household_id)
-
-        value = aptc_grant.value.to_f - th_enrollments.sum(&:household_benchmark_ehb_premium).to_f
+        contribution_met = round_down_float_two_decimals(th_enrollments.sum(&:household_benchmark_ehb_premium) * 12) # Money object to value.
+        value = round_down_float_two_decimals((grant_value - contribution_met) / 12)
 
         value > 0.0 ? value : 0.0
       end

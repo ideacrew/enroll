@@ -40,7 +40,7 @@ module Operations
           {
             :title => 'aptc_grant',
             :key => 'AdvancePremiumAdjustmentGrant',
-            :value => tax_household.monthly_expected_contribution&.to_s,
+            :value => tax_household.yearly_expected_contribution&.to_s,
             :start_on => th_group.start_on,
             :end_on => th_group.end_on,
             :assistance_year => th_group.assistance_year,
