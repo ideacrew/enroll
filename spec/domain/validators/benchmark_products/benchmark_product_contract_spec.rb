@@ -43,6 +43,18 @@ RSpec.describe Validators::BenchmarkProducts::BenchmarkProductContract,  dbclean
       end
     end
 
+    context 'including a domestic_partner' do
+      let(:input_params) do
+        params[:households].first[:members].first[:relationship_with_primary] = 'domestic_partner'
+        params
+      end
+
+      it 'passes validation' do
+        result = subject.call(input_params)
+        expect(result.success?).to be_truthy
+      end
+    end
+
     context 'invalid params' do
       context 'no params' do
         it 'fails validation' do
