@@ -1,4 +1,4 @@
-<% osse_eligible = (@enrollment.eligible_child_care_subsidy > 0) %>
+<% osse_eligible = (@enrollment.eligible_child_care_subsidy > 0) || ivl_osse_eligibility_is_enabled? %>
 <% calculate = (defined? calculate) ? calculate : true %>
 <% family_tier_eligible = @enrollment.product&.family_based_rating? %>
 <div class="table-border table-responsive">
