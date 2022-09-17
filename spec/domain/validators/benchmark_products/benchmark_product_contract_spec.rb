@@ -14,6 +14,7 @@ RSpec.describe Validators::BenchmarkProducts::BenchmarkProductContract,  dbclean
       household_group_benchmark_ehb_premium: 200.90,
       households: [
         {
+          household_id: 'a12bs6dbs1',
           type_of_household: 'adult_only',
           household_benchmark_ehb_premium: 200.90,
           health_product_hios_id: '123',
@@ -38,6 +39,18 @@ RSpec.describe Validators::BenchmarkProducts::BenchmarkProductContract,  dbclean
     context 'valid params' do
       it 'passes validation' do
         result = subject.call(params)
+        expect(result.success?).to be_truthy
+      end
+    end
+
+    context 'including a domestic_partner' do
+      let(:input_params) do
+        params[:households].first[:members].first[:relationship_with_primary] = 'domestic_partner'
+        params
+      end
+
+      it 'passes validation' do
+        result = subject.call(input_params)
         expect(result.success?).to be_truthy
       end
     end
