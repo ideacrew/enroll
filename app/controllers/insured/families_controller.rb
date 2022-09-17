@@ -145,8 +145,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def update_healthcare_for_childcare_program_eligibility
-    form = ::Forms::HealthcareForChildcareProgramForm.new(healthcare_for_childcare_program_params)
-    form.submit
+    form = ::Forms::HealthcareForChildcareProgramForm.new
+    form.load_consumer(@person)
+    form.submit(healthcare_for_childcare_program_params)
+
+    redirect_to(healthcare_for_childcare_program_insured_families_path)
   end
 
   def verification

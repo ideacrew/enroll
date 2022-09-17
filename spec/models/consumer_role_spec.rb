@@ -2004,7 +2004,7 @@ describe 'vlp documents' do
   end
 end
 
-describe '.create_eligibility' do
+describe '.create_or_term_eligibility' do
 
   context 'family members with consumer roles present' do
     let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
@@ -2019,15 +2019,15 @@ describe '.create_eligibility' do
       let(:valid_params) do
         {
           evidence_key: :osse_subsidy,
-          evidence_value: true,
+          evidence_value: 'true',
           effective_date: TimeKeeper.date_of_record.next_year.beginning_of_year
         }
       end
 
       before do
-        primary.consumer_role.create_eligibility(valid_params)
-        spouse.consumer_role.create_eligibility(valid_params)
-        child1.consumer_role.create_eligibility(valid_params)
+        primary.consumer_role.create_or_term_eligibility(valid_params)
+        spouse.consumer_role.create_or_term_eligibility(valid_params)
+        child1.consumer_role.create_or_term_eligibility(valid_params)
       end
 
       def verify_active_family_members
@@ -2054,7 +2054,7 @@ describe '.create_eligibility' do
         verify_active_family_members do |consumer_role|
           eligibility = consumer_role.eligibilities.first
           expect(eligibility.evidences.by_key(valid_params[:evidence_key]).count).to eq 1
-          expect(eligibility.evidences.by_key(valid_params[:evidence_key]).first.is_satisfied).to eq valid_params[:evidence_value]
+          expect(eligibility.evidences.by_key(valid_params[:evidence_key]).first.is_satisfied.to_s).to eq valid_params[:evidence_value]
         end
       end
     end
