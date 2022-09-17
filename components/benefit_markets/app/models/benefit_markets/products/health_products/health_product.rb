@@ -57,6 +57,7 @@ module BenefitMarkets
       index(
         {
           "metal_level_kind" => 1,
+          "csr_variant_id" => 1,
           "service_area_id" => 1,
           "application_period.min" => 1,
           "application_period.max" => 1,

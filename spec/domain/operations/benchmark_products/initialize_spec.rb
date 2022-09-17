@@ -15,6 +15,7 @@ RSpec.describe Operations::BenchmarkProducts::Initialize do
         household_group_benchmark_ehb_premium: 200.90,
         households: [
           {
+            household_id: 'a12bs6dbs1',
             type_of_household: 'adult_only',
             household_benchmark_ehb_premium: 200.90,
             health_product_hios_id: '123',
