@@ -8,7 +8,10 @@ describe UpdateExpectedContributionFor2022ActiveDeterminations, dbclean: :after_
   subject { UpdateExpectedContributionFor2022ActiveDeterminations.new(given_task_name, double(:current_scope => nil)) }
 
   after :all do
-    FileUtils.rm_rf("#{Rails.root}/applications_with_yearly_expected_contributions_for_aptc_households.csv")
+    input_file = "#{Rails.root}/applications_with_yearly_expected_contributions_for_aptc_households.csv"
+    output_file = "#{Rails.root}/list_of_applications_with_updated_expected_contribution.csv"
+    FileUtils.rm_rf(input_file) if File.exist?(input_file)
+    FileUtils.rm_rf(output_file) if File.exist?(output_file)
   end
 
   describe 'given a task name' do
@@ -19,7 +22,7 @@ describe UpdateExpectedContributionFor2022ActiveDeterminations, dbclean: :after_
 
   describe '#migrate' do
     let(:person) { FactoryBot.create(:person) }
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, hbx_assigned_id: '1000') }
     let(:tax_household) { FactoryBot.create(:tax_household, effective_ending_on: nil, household: family.active_household) }
     let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_family_member.id, tax_household: tax_household) }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
@@ -47,6 +50,13 @@ describe UpdateExpectedContributionFor2022ActiveDeterminations, dbclean: :after_
         tax_household.reload
         expect(ed.yearly_expected_contribution).not_to be_zero
         expect(tax_household.yearly_expected_contribution).not_to be_zero
+        expect(
+          CSV.open("#{Rails.root}/list_of_applications_with_updated_expected_contribution.csv", 'r', headers: true).first.to_h
+        ).to eq(
+          { "PrimaryPersonHbxID" => person.hbx_id,
+            "FamilyHbxAssignedId" => family.hbx_assigned_id.to_s,
+            "ApplicationHbxID" => application.hbx_id }
+        )
       end
     end
 
