@@ -2728,6 +2728,7 @@ class HbxEnrollment
     effective_year_for_lcsp = sponsored_benefit_package.start_on.year
     hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
+
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)

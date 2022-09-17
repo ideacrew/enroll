@@ -19,6 +19,10 @@ nav
       li
         = link_to main_app.upload_application_insured_families_path(tab: 'verification') do
           = l10n("upload_paper_application")
+    - if current_user.try(:has_hbx_staff_role?) && ivl_osse_eligibility_is_enabled?
+      li
+        = link_to(main_app.healthcare_for_childcare_program_insured_families_path(tab: 'osse')) do
+          = l10n("osse_eligibility")
     li
       = link_to(main_app.inbox_insured_families_path(tab: 'messages')) do
         = l10n("messages") 
