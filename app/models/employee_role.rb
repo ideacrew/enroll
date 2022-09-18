@@ -305,7 +305,6 @@ class EmployeeRole
   def osse_eligible?(start_on)
     eligibility = eligibility_for(:osse_subsidy, start_on)
     return false unless eligibility
-
     evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
     evidence&.is_satisfied == true
   end

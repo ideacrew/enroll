@@ -1068,6 +1068,11 @@ class HbxEnrollment
     benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
   end
 
+  def publish_select_coverage_events
+    publish_coverage_selected_event
+    trigger_enrollment_notice
+  end
+
   def trigger_enrollment_notice
     return if is_shop?
 
@@ -2055,7 +2060,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :trigger_enrollment_notice] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -2695,6 +2700,18 @@ class HbxEnrollment
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 
+  def publish_event(event, payload)
+    event = event("events.individual.enrollments.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for enrollment: #{self.id} event due to #{e.backtrace}" }
+  end
+
+  def publish_coverage_selected_event
+    publish_event('coverage_selected', { enrollment_global_id: self.to_global_id.to_s })
+  end
+
   def latest_wfst
     workflow_state_transitions.order(created_at: :desc).first
   end
@@ -2703,19 +2720,24 @@ class HbxEnrollment
     return if coverage_kind.to_s == 'dental'
     return unless employee_role&.osse_eligible?(effective_on)
 
+    osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
+    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
+  end
+
+  def osse_subsidy_for_member(hbx_enrollment_member)
     effective_year_for_lcsp = sponsored_benefit_package.start_on.year
     hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
+
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
     member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
 
-    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == primary_hbx_enrollment_member.id.to_s }
+    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
     return if member_enrollment.nil?
 
-    osse_childcare_subsidy = BigDecimal(member_enrollment&.product_price&.to_s).round(2)
-    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
+    BigDecimal(member_enrollment&.product_price&.to_s).round(2)
   end
 
   private
