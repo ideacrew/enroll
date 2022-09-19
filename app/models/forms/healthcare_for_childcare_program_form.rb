@@ -21,7 +21,7 @@ module Forms
 
     private
 
-    def consumer_osse_eligible?(date = TimeKeeper.date_of_record)
+    def consumer_osse_eligible?(date = ::TimeKeeper.date_of_record)
       @consumer_role.osse_eligible?(date)
     end
 
@@ -29,7 +29,7 @@ module Forms
       {
         evidence_key: :osse_subsidy,
         evidence_value: @osse_eligibility,
-        effective_date: TimeKeeper.date_of_record
+        effective_date: ::TimeKeeper.date_of_record
       }
     end
   end
