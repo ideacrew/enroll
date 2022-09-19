@@ -186,7 +186,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it "should match with the applicant's fpl_amount" do
-      expect(@file_content[1][16]).to eql(applicant.magi_as_percentage_of_fpl.to_f)
+      expect(@file_content[1][16]).to eql(applicant.magi_as_percentage_of_fpl.to_s)
     end
   end
 
