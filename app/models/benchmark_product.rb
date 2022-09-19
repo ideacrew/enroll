@@ -6,6 +6,8 @@ class BenchmarkProduct
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  field :family_id, type: BSON::ObjectId
+
   # Request Payload that is sent to Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts in JSON format
   field :request_payload, type: String
 

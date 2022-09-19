@@ -764,6 +764,41 @@ describe "#benefit_package", dbclean: :around_each do
   end
 end
 
+describe '.osse_eligible?' do
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:person) { FactoryBot.create(:person, :with_employee_role) }
+  let(:employee_role) { person.employee_roles.first }
+
+  let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: start_on) }
+  let!(:eligibility) do
+    employee_role.eligibilities << ee_elig
+    employee_role.save!
+    employee_role.eligibilities.first
+  end
+
+  let(:start_on)  { TimeKeeper.date_of_record }
+  let(:effective_on) { start_on }
+
+  context 'when employee has active osse eligibility for a give effective date' do
+    it { expect(employee_role.osse_eligible?(effective_on)).to be_truthy }
+  end
+
+  context 'when employee does not have active osse eligibility for a give effective date' do
+    let(:effective_on) { start_on.prev_day }
+    it { expect(employee_role.osse_eligible?(effective_on)).to be_falsey }
+  end
+
+  context 'when osse eligibility is terminated' do
+    let(:ee_elig) do
+      eligibility = build(:eligibility, :with_subject, start_on: start_on)
+      eligibility.evidences << build(:osse_evidence, is_satisfied: false)
+      eligibility
+    end
+
+    it { expect(employee_role.osse_eligible?(effective_on)).to be_falsey }
+  end
+end
+
 describe EmployeeRole do
 
   context 'is_dental_offered?', dbclean: :around_each do
