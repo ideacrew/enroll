@@ -33,7 +33,7 @@ module Operations
 
         return Success(0.0) if not_eligible?
 
-        Success(available_aptc)
+        Success(available_aptc.round)
       end
 
       def not_eligible?
@@ -109,11 +109,11 @@ module Operations
 
       def monthly_expected_contribution(aptc_grant)
         grant_value = round_down_float_two_decimals(aptc_grant.value) # value is string.
-        return round_down_float_two_decimals(grant_value / 12) if coinciding_enrollments.blank?
+        return (grant_value / 12) if coinciding_enrollments.blank?
 
         th_enrollments = TaxHouseholdEnrollment.where(:enrollment_id.in => coinciding_enrollments.map(&:id), tax_household_id: aptc_grant.tax_household_id)
         contribution_met = round_down_float_two_decimals(th_enrollments.sum(&:household_benchmark_ehb_premium) * 12) # Money object to value.
-        value = round_down_float_two_decimals((grant_value - contribution_met) / 12)
+        value = (grant_value - contribution_met) / 12
 
         value > 0.0 ? value : 0.0
       end

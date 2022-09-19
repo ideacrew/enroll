@@ -201,7 +201,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :with_enrollment_members,
                               enrollment_members: [primary_applicant],
                               family: family,
-                              applied_premium_credit: 375.00,
+                              applied_aptc_amount: 375.00,
                               aasm_state: 'coverage_selected')
           end
 
@@ -230,7 +230,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
           it 'returns benchmark premiums when monthly_expected_contribution is met' do
             expect(result.success?).to eq true
-            expect(result.value!).to eq 600.00
+            expect(result.value!).to eq 600.00 - prev_enrollment.applied_aptc_amount.to_f
           end
         end
 
@@ -275,7 +275,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :with_enrollment_members,
                               enrollment_members: family.family_members,
                               family: family,
-                              applied_premium_credit: 975.00,
+                              applied_aptc_amount: 975.00,
                               aasm_state: 'coverage_terminated',
                               effective_on: TimeKeeper.date_of_record - 1.months)
           end
@@ -405,7 +405,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_enrollment_members,
                                 enrollment_members: dependents,
                                 family: family,
-                                applied_premium_credit: 0.00,
+                                applied_aptc_amount: 0.00,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -501,7 +501,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
                                 family: family,
-                                applied_premium_credit: 550.00,
+                                applied_aptc_amount: 550.00,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -524,7 +524,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
             it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
               expect(result.success?).to eq true
-              expect(result.value!).to eq 1130.00
+              expect(result.value!).to eq 1130.00 - prev_enrollment.applied_aptc_amount.to_f
             end
           end
 
@@ -537,7 +537,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
                                 family: family,
-                                applied_premium_credit: 550.00,
+                                applied_aptc_amount: 550.00,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -548,7 +548,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[0]],
                                 family: family,
-                                applied_premium_credit: 1130.00,
+                                applied_aptc_amount: 1130.00,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -579,7 +579,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
             it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
               expect(result.success?).to eq true
-              expect(result.value!).to eq 320.00
+              expect(result.value!).to eq 0.0
             end
           end
         end
@@ -851,7 +851,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
             it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
               expect(result.success?).to eq true
-              expect(result.value!).to eq(106.25 + 160.00)
+              expect(result.value!).to eq((106.25 + 160.00).round)
             end
           end
 
