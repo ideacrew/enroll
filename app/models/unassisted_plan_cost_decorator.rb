@@ -32,10 +32,6 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     member.age_on_effective_date
   end
 
-  def is_child_subscriber(member)
-    if member
-  end
-
   def ordered_children
     @ordered_children ||= begin
       non_spouse_or_subscribers = members.reject do |m|
