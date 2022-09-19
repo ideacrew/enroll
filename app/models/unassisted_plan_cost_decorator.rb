@@ -32,10 +32,14 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     member.age_on_effective_date
   end
 
+  def is_child_subscriber(member)
+    if member
+  end
+
   def ordered_children
     @ordered_children ||= begin
       non_spouse_or_subscribers = members.reject do |m|
-        (m.is_subscriber? && m.primary_relationship != 'child') || DISCOUNT_EXEMPT_RELATIONSHIPS.include?(m.primary_relationship)
+        (m.is_subscriber? && (m.primary_relationship? && m.primary_relationship != 'child')) || DISCOUNT_EXEMPT_RELATIONSHIPS.include?(m.primary_relationship)
       end
       not_too_old = non_spouse_or_subscribers.select do |mem|
         age_of(mem) <= child_age_limit
