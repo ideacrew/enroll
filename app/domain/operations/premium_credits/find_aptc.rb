@@ -54,7 +54,7 @@ module Operations
           expected_contribution = monthly_expected_contribution(aptc_grant)
           benchmark_premium = total_monthly_benchmark_premium(aptc_grant)
 
-          value = benchmark_premium - expected_contribution
+          value = benchmark_premium - expected_contribution - utilized_aptc
 
           persist_tax_household_enrollment(aptc_grant)
 
@@ -103,6 +103,10 @@ module Operations
         end
       end
 
+      def utilized_aptc
+        round_down_float_two_decimals(coinciding_enrollments.sum(&:applied_aptc_amount))
+      end
+
       def monthly_expected_contribution(aptc_grant)
         grant_value = round_down_float_two_decimals(aptc_grant.value) # value is string.
         return round_down_float_two_decimals(grant_value / 12) if coinciding_enrollments.blank?
@@ -119,12 +123,25 @@ module Operations
       end
 
       def coinciding_enrollments
+        return @coinciding_enrollments if defined? @coinciding_enrollments
+
         @hbx_enrollment.generate_hbx_signature
 
-        active_enrollments.reject do |previous_enrollment|
+        is_primary_enrolling = is_primary_enrolling?(@hbx_enrollment)
+
+        @coinciding_enrollments = active_enrollments.reject do |previous_enrollment|
           previous_enrollment.generate_hbx_signature
-          !previous_enrollment.product.can_use_aptc? || (previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature)
+          !previous_enrollment.product.can_use_aptc? || (previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature) || (is_primary_enrolling && primary_reenrolling?(previous_enrollment))
         end
+      end
+
+      def primary_reenrolling?(previous_enrollment)
+        return false unless is_primary_enrolling?(previous_enrollment)
+        true
+      end
+
+      def is_primary_enrolling?(enrollment)
+        enrollment.hbx_enrollment_members.map { |member| member.applicant_id.to_s }.include?(@family.primary_applicant.id.to_s)
       end
 
       def enrolled_family_member_ids
