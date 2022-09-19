@@ -18,7 +18,7 @@ module FinancialAssistance
 
           # "02", "04", "05", "06" are already converted
           PVC_CSR_LIST = [100, 73, 87, 94].freeze
-  
+
           # @param [Int] applications_per_event
           # @param [Int] assistance_year
           # @param [Array] csr_list
