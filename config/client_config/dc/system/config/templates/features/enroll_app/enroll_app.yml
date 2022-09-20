@@ -335,6 +335,9 @@ registry:
       - key: :tobacco_cost
         item: :tobacco_cost
         is_enabled: false
+      - key: :choose_coverage_mdcr_warning
+        item: :choose_coverage_mdcr_warning
+        is_enabled: <%= ENV['CHOOSE_COVERAGE_MDCR_WARNING_IS_ENABLED'] || false %>
       - key: :counties_import
         is_enabled: false
         item: ""
