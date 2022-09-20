@@ -43,7 +43,7 @@ module Operations
           result = ::Operations::PremiumCredits::FindAptc.new.call({
                                                                      hbx_enrollment: enrollment,
                                                                      effective_on: date
-                                                                   }).value!
+                                                                   })
           return result unless result.success?
 
           max_aptc = result.value!
