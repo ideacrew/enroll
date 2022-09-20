@@ -18,7 +18,8 @@ field_names = %w[Primary_HBX_ID
                  Blind
                  Disabled
                  Help_With_Daily_Living
-                 Immigration_Status]
+                 Immigration_Status
+                 FPL_Amount]
 
 logger_field_names = %w[id Backtrace]
 
@@ -51,8 +52,9 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         is_disabled = applicant.is_physically_disabled
         need_help_with_daily_living = applicant.has_daily_living_help
         immigration_status = applicant.citizen_status&.humanize&.downcase&.gsub("us", "US")
+        fpl_amount = applicant.magi_as_percentage_of_fpl
         report_csv << [application&.primary_applicant&.person_hbx_id, application.hbx_id, age, uqhp_eligble, aptc, max_aptc, csr_percent, medicaid_eligible,
-                       non_magi_medicaid_eligible, is_totally_ineligible, application.submitted_at, application.full_medicaid_determination, is_blind, is_disabled, need_help_with_daily_living, immigration_status]
+                       non_magi_medicaid_eligible, is_totally_ineligible, application.submitted_at, application.full_medicaid_determination, is_blind, is_disabled, need_help_with_daily_living, immigration_status, fpl_amount]
       end
     rescue StandardError => e
       logger_csv << [application.id, e.backtrace[0..5].join('\n')]

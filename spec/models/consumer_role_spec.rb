@@ -2004,4 +2004,61 @@ describe 'vlp documents' do
   end
 end
 
+describe '.create_or_term_eligibility' do
+
+  context 'family members with consumer roles present' do
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:spouse) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:child1) { FactoryBot.create(:person, :with_consumer_role) }
+
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary)}
+    let!(:family_member_spouse) { FactoryBot.create(:family_member, person: spouse, family: family)}
+    let!(:family_member_child1) { FactoryBot.create(:family_member, person: child1, family: family)}
+
+    context 'it should create eligibility for active family members' do
+      let(:valid_params) do
+        {
+          evidence_key: :osse_subsidy,
+          evidence_value: 'true',
+          effective_date: TimeKeeper.date_of_record.next_year.beginning_of_year
+        }
+      end
+
+      before do
+        primary.consumer_role.create_or_term_eligibility(valid_params)
+        spouse.consumer_role.create_or_term_eligibility(valid_params)
+        child1.consumer_role.create_or_term_eligibility(valid_params)
+      end
+
+      def verify_active_family_members
+        family.active_family_members.each do |fm|
+          consumer_role = fm.person.consumer_role
+          yield(consumer_role)
+        end
+      end
+
+      it 'should create eligibility for active family members' do
+        expect(primary.consumer_role.eligibilities).to be_present
+        expect(spouse.consumer_role.eligibilities).to be_present
+        expect(child1.consumer_role.eligibilities).to be_present
+      end
+
+      it 'should create eligibility with given effective date' do
+        verify_active_family_members do |consumer_role|
+          expect(consumer_role.eligibilities.count).to eq 1
+          expect(consumer_role.eligibilities.first.start_on).to eq valid_params[:effective_date]
+        end
+      end
+
+      it 'should create eligibility with evidence' do
+        verify_active_family_members do |consumer_role|
+          eligibility = consumer_role.eligibilities.first
+          expect(eligibility.evidences.by_key(valid_params[:evidence_key]).count).to eq 1
+          expect(eligibility.evidences.by_key(valid_params[:evidence_key]).first.is_satisfied.to_s).to eq valid_params[:evidence_value]
+        end
+      end
+    end
+  end
+end
+
 # rubocop:enable Metrics/ParameterLists

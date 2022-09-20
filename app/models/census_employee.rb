@@ -1764,15 +1764,8 @@ class CensusEmployee < CensusMember
     )
   end
 
-  def osse_eligible?(effective_on)
-    return false if COBRA_STATES.include?(aasm_state)
-    return false if EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
-
-    osse_eligible_applications.any? { |benefit_application| benefit_application.effective_period.cover?(effective_on) }
-  end
-
   def osse_eligible_applications
-    assignments = [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
+    assignments = [active_benefit_group_assignment, renewal_benefit_group_assignment, off_cycle_benefit_group_assignment].compact
     assignments.collect do |assignment|
       benefit_application = assignment&.benefit_package&.benefit_application
       next unless (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:approved]).include?(benefit_application&.aasm_state)

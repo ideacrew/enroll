@@ -1,0 +1,922 @@
+# frozen_string_literal: true
+
+RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
+  before do
+    DatabaseCleaner.clean
+  end
+
+  let(:result) { subject.call(params) }
+
+  context 'invalid params' do
+    context 'missing hbx_enrollment' do
+      let(:params) do
+        { hbx_enrollment: nil }
+      end
+
+      it 'returns failure' do
+        expect(result.failure?).to eq true
+        expect(result.failure).to eq('Invalid params. hbx_enrollment should be an instance of Hbx Enrollment')
+      end
+    end
+
+    context 'missing effective_on' do
+      let(:params) do
+        { hbx_enrollment: HbxEnrollment.new }
+      end
+
+      it 'returns failure' do
+        expect(result.failure?).to eq true
+        expect(result.failure).to eq('Missing effective_on')
+      end
+    end
+  end
+
+  context 'valid params' do
+    before do
+      allow(hbx_enrollment).to receive(:total_ehb_premium).and_return 2000.00
+    end
+
+    let(:params) do
+      { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on }
+    end
+
+    context 'not eligible for aptc' do
+      context 'without no aptc grants for family' do
+
+        let(:person) { FactoryBot.create(:person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+        let!(:eligibility_determination) { family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: family.family_members,
+                            family: family)
+        end
+
+        it 'returns zero available aptc' do
+          expect(result.success?).to eq true
+          expect(result.value!).to eq 0.0
+        end
+      end
+
+      context 'when enrolled members does not have a aptc grants' do
+        let(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
+        let(:person) { FactoryBot.create(:person) }
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: [family.primary_applicant],
+                            family: family)
+        end
+        let(:non_primary_fm) { family.family_members.detect { |family_member| !family_member.is_primary_applicant? && family_member.is_active? } }
+        let!(:eligibility_determination) do
+          determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+          determination.grants.create(
+            key: "AdvancePremiumAdjustmentGrant",
+            value: 1200.0,
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            assistance_year: TimeKeeper.date_of_record.year,
+            member_ids: [non_primary_fm.id]
+          )
+
+          determination
+        end
+
+        it 'returns zero available aptc' do
+          expect(result.success?).to eq true
+          expect(result.value!).to eq 0.0
+        end
+      end
+    end
+
+    context 'eligible for aptc' do
+      let(:family) do
+        family = FactoryBot.build(:family, person: primary)
+        family.family_members = [
+          FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+          FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent)
+        ]
+
+        family.person.person_relationships.push PersonRelationship.new(relative_id: dependent.id, kind: 'spouse')
+        family.save
+        family
+      end
+
+      let(:dependent) { FactoryBot.create(:person) }
+      let(:primary) { FactoryBot.create(:person) }
+      let(:primary_applicant) { family.primary_applicant }
+      let(:dependents) { family.dependents }
+
+      context 'with single tax household group' do
+        before do
+          allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+            double('IdentifySlcspWithPediatricDentalCosts',
+                   call: double(:value! => slcsp_info, :success? => true))
+          )
+        end
+
+        let(:tax_household_group) do
+          family.tax_household_groups.create!(
+            assistance_year: TimeKeeper.date_of_record.year,
+            source: 'Admin',
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            tax_households: [
+              FactoryBot.build(:tax_household, household: family.active_household)
+            ]
+          )
+        end
+
+        let(:tax_household) do
+          tax_household_group.tax_households.first
+        end
+
+        let(:eligibility_determination) do
+          determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+          determination.grants.create(
+            key: "AdvancePremiumAdjustmentGrant",
+            value: yearly_expected_contribution,
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            assistance_year: TimeKeeper.date_of_record.year,
+            member_ids: family.family_members.map(&:id).map(&:to_s),
+            tax_household_id: tax_household.id
+          )
+
+          determination
+        end
+
+        let(:aptc_grant) { eligibility_determination.grants.first }
+
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: [primary_applicant],
+                            family: family)
+        end
+
+        let(:yearly_expected_contribution) { 125.00 * 12 }
+
+        let(:slcsp_info) do
+          OpenStruct.new(
+            households: [OpenStruct.new(
+              household_id: aptc_grant.tax_household_id,
+              household_benchmark_ehb_premium: benchmark_premium,
+              members: family.family_members.collect do |fm|
+                OpenStruct.new(
+                  family_member_id: fm.id.to_s,
+                  relationship_with_primary: fm.primary_relationship,
+                  date_of_birth: fm.dob,
+                  age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                )
+              end
+            )]
+          )
+        end
+
+        let(:primary_bp) { 500.00 }
+        let(:dependent_bp) { 600.00 }
+
+        context 'without any coinciding enrollments' do
+          let(:benchmark_premium) { primary_bp }
+
+          it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 375.00
+          end
+        end
+
+        context 'with coinciding enrollments' do
+          let!(:prev_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: [primary_applicant],
+                              family: family,
+                              applied_aptc_amount: 375.00,
+                              aasm_state: 'coverage_selected')
+          end
+
+          let!(:tax_household_enrollment) do
+            TaxHouseholdEnrollment.create(
+              enrollment_id: prev_enrollment.id,
+              tax_household_id: aptc_grant.tax_household_id,
+              household_benchmark_ehb_premium: 500.00
+            )
+          end
+
+          let!(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: dependents,
+                              family: family)
+          end
+
+          let(:benchmark_premium) { dependent_bp }
+
+          let(:params) do
+            { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on }
+          end
+
+          it 'returns benchmark premiums when monthly_expected_contribution is met' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 600.00 - prev_enrollment.applied_aptc_amount.to_f
+          end
+        end
+
+        context 'when a member is not eligible for aptc in a family and enrolling seperately' do
+          let!(:eligibility_determination) do
+            determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+            determination.grants.create(
+              key: "AdvancePremiumAdjustmentGrant",
+              value: yearly_expected_contribution,
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              end_on: TimeKeeper.date_of_record.end_of_year,
+              assistance_year: TimeKeeper.date_of_record.year,
+              member_ids: [family.primary_applicant.id.to_s],
+              tax_household_id: tax_household.id
+            )
+
+            determination
+          end
+
+          let!(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: dependents,
+                              family: family)
+          end
+
+          let(:benchmark_premium) { dependent_bp }
+
+          it 'returns 0$ for aptc' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 0.00
+          end
+        end
+
+        context 'with coinciding enrollments after application redetermination & dependent is non applicant' do
+          let!(:prev_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: family.family_members,
+                              family: family,
+                              applied_aptc_amount: 975.00,
+                              aasm_state: 'coverage_terminated',
+                              effective_on: TimeKeeper.date_of_record - 1.months)
+          end
+
+          let!(:eligibility_determination) do
+            determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+            determination.grants.create(
+              key: "AdvancePremiumAdjustmentGrant",
+              value: yearly_expected_contribution,
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              end_on: TimeKeeper.date_of_record.end_of_year,
+              assistance_year: TimeKeeper.date_of_record.year,
+              member_ids: [family.primary_applicant.id.to_s],
+              tax_household_id: tax_household.id
+            )
+
+            determination
+          end
+
+          let(:params) do
+            { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on }
+          end
+
+          context 'when both members enrolling' do
+            let(:benchmark_premium) { primary_bp }
+
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: family.family_members,
+                                family: family,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month)
+            end
+
+            it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 375.00
+            end
+          end
+
+          context 'when only primary is enrolling' do
+            let(:benchmark_premium) { primary_bp }
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [family.primary_applicant],
+                                family: family,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month)
+            end
+
+            it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 375.00
+            end
+          end
+
+          context 'when only dependent is enrolling' do
+            let(:benchmark_premium) { dependent_bp }
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: dependents,
+                                family: family,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month)
+            end
+
+            it 'returns 0$ as aptc' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 0.00
+            end
+          end
+        end
+
+        context 'benchmark_premium is less than monthly_expected_contribution' do
+          let(:yearly_expected_contribution) { 375.00 * 12 }
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [OpenStruct.new(
+                household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: benchmark_premium,
+                members: family.family_members.collect do |fm|
+                  OpenStruct.new(
+                    family_member_id: fm.id.to_s,
+                    relationship_with_primary: fm.primary_relationship,
+                    date_of_birth: fm.dob,
+                    age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                  )
+                end
+              )]
+            )
+          end
+
+          let(:primary_bp) { 1100.00 }
+          let(:dependent_bp) { 320.00 }
+
+          context 'when dependent is enrolling' do
+            let(:benchmark_premium) { dependent_bp }
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: dependents,
+                                family: family)
+            end
+
+            it 'returns 0$ as available aptc' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 0.00
+            end
+          end
+
+          context 'when primary is enrolling with a coinciding dependent enrollment' do
+            let(:benchmark_premium) { primary_bp }
+
+            let!(:prev_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: dependents,
+                                family: family,
+                                applied_aptc_amount: 0.00,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let!(:tax_household_enrollment) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollment.id,
+                tax_household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: 320.00
+              )
+            end
+
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant],
+                                family: family)
+            end
+
+            it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 1045.00
+            end
+          end
+        end
+
+        context 'three members enrolling in different plans' do
+          let(:family) do
+            family = FactoryBot.build(:family, person: primary)
+            family.family_members = [
+              FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent1),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent2)
+            ]
+
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent1.id, kind: 'spouse')
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent2.id, kind: 'child')
+            family.save
+            family
+          end
+
+          let(:dependent1) { FactoryBot.create(:person) }
+          let(:dependent2) { FactoryBot.create(:person) }
+
+          let(:yearly_expected_contribution) { 550.00 * 12 }
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [OpenStruct.new(
+                household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: benchmark_premium,
+                members: family.family_members.collect do |fm|
+                  OpenStruct.new(
+                    family_member_id: fm.id.to_s,
+                    relationship_with_primary: fm.primary_relationship,
+                    date_of_birth: fm.dob,
+                    age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                  )
+                end
+              )]
+            )
+          end
+
+          let(:primary_bp) { 1100.00 }
+          let(:dependent1_bp) { 1130.00 }
+          let(:dependent2_bp) { 320.00 }
+
+          context 'when primary is enrolling with no active enrollments' do
+            let(:benchmark_premium) { primary_bp }
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant],
+                                family: family)
+            end
+
+            it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq(1100.00 - (yearly_expected_contribution / 12))
+            end
+          end
+
+          context 'when dependent1 is enrolling with existing enrollment from primary' do
+            let(:benchmark_premium) { dependent1_bp }
+
+            let!(:prev_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant],
+                                family: family,
+                                applied_aptc_amount: 550.00,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let!(:tax_household_enrollment) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollment.id,
+                tax_household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: 1100.00
+              )
+            end
+
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [dependents[0]],
+                                family: family)
+            end
+
+            it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 1130.00 - prev_enrollment.applied_aptc_amount.to_f
+            end
+          end
+
+          context 'when dependent2 is enrolling with existing enrollment from primary' do
+            let(:benchmark_premium) { dependent2_bp }
+            let!(:prev_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant],
+                                family: family,
+                                applied_aptc_amount: 550.00,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let!(:prev_enrollmen2) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [dependents[0]],
+                                family: family,
+                                applied_aptc_amount: 1130.00,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let!(:tax_household_enrollment) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollment.id,
+                tax_household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: 1100.00
+              )
+            end
+
+            let!(:tax_household_enrollment) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollmen2.id,
+                tax_household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: 1130.00
+              )
+            end
+
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [dependents[1]],
+                                family: family)
+            end
+
+            it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 0.0
+            end
+          end
+        end
+      end
+
+      context 'with multiple tax household groups' do
+        let!(:eligibility_determination) do
+          determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+          determination
+        end
+
+        let!(:primary_tax_household_group) do
+          eligibility_determination.grants.create(
+            key: "AdvancePremiumAdjustmentGrant",
+            value: yearly_expected_contribution1,
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            assistance_year: TimeKeeper.date_of_record.year,
+            member_ids: [primary_applicant.id.to_s],
+            tax_household_id: primary_tax_household.id
+          )
+        end
+
+        let!(:dependents_tax_household_group) do
+          eligibility_determination.grants.create(
+            key: "AdvancePremiumAdjustmentGrant",
+            value: yearly_expected_contribution2,
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            assistance_year: TimeKeeper.date_of_record.year,
+            member_ids: dependents.map(&:id).map(&:to_s),
+            tax_household_id: dependents_tax_household.id
+          )
+        end
+
+        let(:tax_household_group) do
+          family.tax_household_groups.create!(
+            assistance_year: TimeKeeper.date_of_record.year,
+            source: 'Admin',
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            tax_households: [
+              FactoryBot.build(:tax_household, household: family.active_household),
+              FactoryBot.build(:tax_household, household: family.active_household)
+            ]
+          )
+        end
+
+        let(:primary_tax_household) do
+          tax_household_group.tax_households.first
+        end
+
+        let(:dependents_tax_household) do
+          tax_household_group.tax_households.second
+        end
+
+        let(:primary_aptc_grant) { eligibility_determination.reload.grants.first }
+        let(:dependents_aptc_grant) { eligibility_determination.reload.grants.second }
+
+        before do
+          allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+            double('IdentifySlcspWithPediatricDentalCosts',
+                   call: double(:value! => slcsp_info, :success? => true))
+          )
+        end
+
+        context 'without coinciding enrollments' do
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [
+                OpenStruct.new(
+                  household_id: primary_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: primary_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                ),
+                OpenStruct.new(
+                  household_id: dependents_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: dependents_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                )
+              ]
+            )
+          end
+
+          let(:primary_benchmark_premium) { 1100.00 }
+          let(:dependents_benchmark_premium) { 320.00 }
+
+          let(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: family.family_members,
+                              family: family)
+          end
+
+          let(:yearly_expected_contribution1) { 375.00 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12}
+
+          it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq(725.00 + 220.00)
+          end
+        end
+
+        context 'with coinciding enrollments' do
+          let(:family) do
+            family = FactoryBot.build(:family, person: primary)
+            family.family_members = [
+              FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent1),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent2)
+            ]
+
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent1.id, kind: 'spouse')
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent2.id, kind: 'child')
+            family.save
+            family
+          end
+
+          let(:dependent1) { FactoryBot.create(:person) }
+          let(:dependent2) { FactoryBot.create(:person) }
+
+          let(:yearly_expected_contribution) { 550.00 * 12 }
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [
+                OpenStruct.new(
+                  household_id: primary_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: primary_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                ),
+                OpenStruct.new(
+                  household_id: dependents_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: dependents_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                )
+              ]
+            )
+          end
+
+          let(:primary_benchmark_premium) { 450.00 }
+          let(:dependents_benchmark_premium) { 583.00 }
+
+          let(:yearly_expected_contribution1) { 343.75 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12 }
+
+          let!(:prev_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: [primary_applicant],
+                              family: family,
+                              aasm_state: 'coverage_selected')
+          end
+
+          let(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              enrollment_members: dependents,
+                              family: family)
+          end
+
+          it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 483.00
+          end
+        end
+
+        context 'shopping with mixed tax households' do
+          let(:family) do
+            family = FactoryBot.build(:family, person: primary)
+            family.family_members = [
+              FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent1),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent2)
+            ]
+
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent1.id, kind: 'spouse')
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent2.id, kind: 'child')
+            family.save
+            family
+          end
+
+          let(:dependent1) { FactoryBot.create(:person) }
+          let(:dependent2) { FactoryBot.create(:person) }
+
+          let(:yearly_expected_contribution) { 550.00 * 12 }
+
+          let(:primary_benchmark_premium) { 450.00 }
+          let(:dependent1_benchmark_premium) { 310.00 }
+          let(:dependent2_benchmark_premium) { 260.00 }
+
+          let(:yearly_expected_contribution1) { 343.75 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12 }
+
+          context 'when primary & dependent2 enrolling' do
+            let(:slcsp_info) do
+              OpenStruct.new(
+                households: [
+                  OpenStruct.new(
+                    household_id: primary_aptc_grant.tax_household_id,
+                    household_benchmark_ehb_premium: primary_benchmark_premium,
+                    members: family.family_members.collect do |fm|
+                      OpenStruct.new(
+                        family_member_id: fm.id.to_s,
+                        relationship_with_primary: fm.primary_relationship,
+                        date_of_birth: fm.dob,
+                        age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                      )
+                    end
+                  ),
+                  OpenStruct.new(
+                    household_id: dependents_aptc_grant.tax_household_id,
+                    household_benchmark_ehb_premium: dependent2_benchmark_premium,
+                    members: family.family_members.collect do |fm|
+                      OpenStruct.new(
+                        family_member_id: fm.id.to_s,
+                        relationship_with_primary: fm.primary_relationship,
+                        date_of_birth: fm.dob,
+                        age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                      )
+                    end
+                  )
+                ]
+              )
+            end
+            let(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant, dependents[1]],
+                                family: family)
+            end
+
+            it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq((106.25 + 160.00).round)
+            end
+          end
+
+          context 'when dependent1 is enrolling with coinciding enrollment' do
+            let(:slcsp_info) do
+              OpenStruct.new(
+                households: [
+                  OpenStruct.new(
+                    household_id: dependents_aptc_grant.tax_household_id,
+                    household_benchmark_ehb_premium: dependent1_benchmark_premium,
+                    members: family.family_members.collect do |fm|
+                      OpenStruct.new(
+                        family_member_id: fm.id.to_s,
+                        relationship_with_primary: fm.primary_relationship,
+                        date_of_birth: fm.dob,
+                        age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                      )
+                    end
+                  )
+                ]
+              )
+            end
+
+            let!(:prev_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant, dependents[1]],
+                                family: family,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let!(:tax_household_enrollment1) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollment.id,
+                tax_household_id: primary_aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: primary_benchmark_premium
+              )
+            end
+
+            let!(:tax_household_enrollment2) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollment.id,
+                tax_household_id: dependents_aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: dependent2_benchmark_premium
+              )
+            end
+
+            let(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [dependents[0]],
+                                family: family)
+            end
+
+            it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 310.00
+            end
+          end
+        end
+      end
+    end
+  end
+end

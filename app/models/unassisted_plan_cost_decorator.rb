@@ -3,7 +3,7 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   include FloatHelper
 
-  attr_reader :hbx_enrollment, :elected_aptc, :tax_household, :child_age_limit
+  attr_reader :hbx_enrollment, :elected_aptc, :child_age_limit
 
   DISCOUNT_EXEMPT_RELATIONSHIPS = [
     "spouse",
@@ -11,11 +11,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     "life_partner"
   ].freeze
 
-  def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
+  def initialize(plan, hbx_enrollment, elected_aptc = 0, _tax_household = nil)
     super(plan)
     @hbx_enrollment = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
-    @tax_household = tax_household
     @child_age_limit = EnrollRegistry[:enroll_app].setting(:child_age_limit).item
     @can_round_cents = can_round_cents?
   end
@@ -139,7 +138,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_aptc_amount
+    return [@elected_aptc, total_ehb_premium].min if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
     return @elected_aptc if family_tier_eligible?
+
     result = members.reduce(0.00) do |sum, member|
       (sum + aptc_amount(member))
     end
@@ -150,6 +151,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_employee_cost
+    return (total_premium - total_aptc_amount) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
     if family_tier_eligible?
       cost = (family_tier_total_premium - total_aptc_amount).round(2)
       cost = 0.00 if cost < 0
