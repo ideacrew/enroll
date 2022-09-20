@@ -41,7 +41,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
         age_of(mem) <= child_age_limit
       end
       not_too_old.sort_by { |m| age_of(m) }.reverse
-    end 
+    end
   end
 
   def child_index(member)
