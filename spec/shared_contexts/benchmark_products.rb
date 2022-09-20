@@ -52,7 +52,7 @@ RSpec.shared_context '3 dental products with different rating_methods, different
       health_pro.premium_tables.each do |pre_t|
         pre_t.update_attributes(rating_area_id: rating_area.id)
         next if index.zero?
-        cost = index == 1 ? 600.00 : 500.00
+        cost = index == 1 ? 600.00 : 590.00
         pre_t.premium_tuples.each do |pt|
           pt.update_attributes(cost: cost)
         end
