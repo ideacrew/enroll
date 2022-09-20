@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe "_families_navigation.html.slim", :type => :view, dbclean: :after_each  do
@@ -36,7 +38,7 @@ RSpec.describe "_families_navigation.html.slim", :type => :view, dbclean: :after
       end
     end
 
-    context "login as an admin, but the person's consumer role is nil" do
+    context "login as an admin, but the consumer does not have a consumer role" do
       before do
         sign_in(user)
         person.consumer_role = nil
