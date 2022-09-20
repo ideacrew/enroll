@@ -12,6 +12,7 @@ module Eligibilities
 
     embedded_in :subject, class_name: "::Eligibilities::Subject"
     embeds_many :evidence_states, class_name: "::Eligibilities::EvidenceState", cascade_callbacks: true
+    embeds_many :grants, class_name: "::Eligibilities::Grant", cascade_callbacks: true
 
     field :eligibility_item_key, type: String
     field :document_status, type: String
@@ -19,6 +20,6 @@ module Eligibilities
     field :earliest_due_date, type: Date
     field :determined_at, type: DateTime
 
-    accepts_nested_attributes_for :evidence_states
+    accepts_nested_attributes_for :evidence_states, :grants
   end
 end
