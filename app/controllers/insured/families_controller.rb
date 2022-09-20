@@ -139,6 +139,19 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
   end
 
+  def healthcare_for_childcare_program
+    @form = ::Forms::HealthcareForChildcareProgramForm.new
+    @form.load_consumer(@person)
+  end
+
+  def update_healthcare_for_childcare_program_eligibility
+    form = ::Forms::HealthcareForChildcareProgramForm.new
+    form.load_consumer(@person)
+    form.submit(healthcare_for_childcare_program_params)
+
+    redirect_to(healthcare_for_childcare_program_insured_families_path)
+  end
+
   def verification
     @family_members = @person.primary_family.has_active_consumer_family_members
   end
@@ -365,6 +378,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def healthcare_for_childcare_program_params
+    params.require(:forms_healthcare_for_childcare_program_form).permit(:osse_eligibility)
+  end
 
   def upload_notice_form_enabled?
     redirect_to(root_path, notice: "Upload Notice Form is Disabled") unless EnrollRegistry.feature_enabled?(:show_upload_notices)

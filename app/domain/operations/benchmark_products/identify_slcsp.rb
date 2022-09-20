@@ -35,6 +35,7 @@ module Operations
 
         query = {
           metal_level_kind: :silver,
+          csr_variant_id: '01',
           :service_area_id.in => service_area_ids,
           :'application_period.min'.lte => @effective_date,
           :'application_period.max'.gte => @effective_date,
@@ -97,6 +98,8 @@ module Operations
       def add_health_information_to_household(params, product, health_ehb_premium, health_with_ped_ehb_premium)
         household = params[:household_params]
         household[:health_product_hios_id] = product.hios_id
+        household[:health_product_title] = product.title
+        household[:health_product_csr_variant_id] = product.csr_variant_id
         household[:health_product_id] = product.id
         household[:health_ehb] = product.ehb
         household[:household_health_benchmark_ehb_premium] = health_ehb_premium

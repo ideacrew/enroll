@@ -40,7 +40,7 @@ class UpdateExpectedContributionFor2022ActiveDeterminations < MongoidMigrationTa
         family = application.family
         thhs_information = JSON.parse(row['AptcHouseholdsWithYearlyExpectedContribution'])
         add_expected_contribution(thhs_information, application, family)
-        csv << [row['ApplicationHbxID'], family.hbx_assigned_id]
+        csv << [family.primary_person.hbx_id, family.hbx_assigned_id, row['ApplicationHbxID']]
       rescue StandardError => e
         puts "Unable to process ApplicationHbxID: #{row['ApplicationHbxID']}, message: #{e.message}, backtrace: #{e.backtrace}"
       end
@@ -48,7 +48,7 @@ class UpdateExpectedContributionFor2022ActiveDeterminations < MongoidMigrationTa
   end
 
   def migrate
-    field_names = %w[ApplicationHbxID FamilyHbxAssignedId]
+    field_names = %w[PrimaryPersonHbxID FamilyHbxAssignedId ApplicationHbxID]
     file_name = "#{Rails.root}/list_of_applications_with_updated_expected_contribution.csv"
     source_file = "#{Rails.root}/applications_with_yearly_expected_contributions_for_aptc_households.csv"
 

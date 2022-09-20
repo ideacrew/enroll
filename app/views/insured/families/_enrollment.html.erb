@@ -155,7 +155,7 @@
       <div>
       </div>
     <div class="enrollment-type info vertical-align-top">
-        <% if (hbx_enrollment.eligible_child_care_subsidy > 0) %>
+        <% if (hbx_enrollment.eligible_child_care_subsidy > 0) || ivl_osse_eligibility_is_enabled? %>
           <p>
             <label><strong><%= l10n("hc44cc_premium_discount") %>:</strong></label>
             <%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%>/<%= l10n("month").to_s.downcase %>

@@ -28,6 +28,7 @@ module Operations
 
       def add_dental_information_to_household(household, product, ehb_premium)
         household[:dental_product_hios_id] = product.hios_id
+        household[:dental_product_title] = product.title
         household[:dental_product_id] = product.id
         household[:dental_rating_method] = product.rating_method
         household[:dental_ehb] = product.ehb
