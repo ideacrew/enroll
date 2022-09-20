@@ -19,8 +19,8 @@ module FinancialAssistance
           validated_params       = yield validate_input_params(params)
           latest_application     = yield find_latest_application(validated_params)
           renewal_draft_app      = yield renew_application(latest_application, validated_params)
-          event                  = yield build_event(renewal_draft_app)
-          publish(event)
+          # event                  = yield build_event(renewal_draft_app)
+          # publish(event)
 
           Success(renewal_draft_app)
         end
