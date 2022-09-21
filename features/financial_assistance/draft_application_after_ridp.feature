@@ -3,6 +3,7 @@ Feature: Send users to draft application created by account transfer after RIDP
   Background: Individual RIDP Verification process    
     Given the FAA feature configuration is enabled
     And EnrollRegistry tobacco_user_field feature is enabled
+    And FAA draft_application_after_ridp feature is enabled
     And Individual has draft application that was created by account transfer
     When Individual visits the Consumer portal during open enrollment
     And Individual creates a new HBX account

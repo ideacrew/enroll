@@ -22,7 +22,7 @@ Then(/Individual fills out the personal information form/) do
   end
 
 And(/the user clicks the Continue Application button/) do
-    click_link "Continue"
+    click_link "Continue Application"
 end
 
 Then(/the user should see the application Family Information page for the existing draft/) do

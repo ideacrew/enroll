@@ -117,6 +117,13 @@ module Insured
       @verification_transaction_id = params[:verification_transaction_id]
       @person = Person.find(params[:person_id]) if params[:person_id].present?
       @person.consumer_role.move_identity_documents_to_outstanding
+      @application = if FinancialAssistanceRegistry.feature_enabled?(:draft_application_after_ridp)
+                       family = Family.where(:"family_members.person_id" => @person.id).detect do |family| 
+                         primary = family.family_members.detect(&:is_primary_applicant)
+                         primary.person_id == @person.id
+                       end
+                       FinancialAssistance::Application.where(family_id: family.id, aasm_state: draft, account_transferred: true).first
+                     end
       render "failed_validation"
     end
 
