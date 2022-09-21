@@ -19,6 +19,24 @@ module Forms
       @consumer_role.create_or_term_eligibility(eligibility_params)
     end
 
+    class << self
+      def build_forms_for(family)
+        family.active_family_members.inject({}) do |forms, family_member|
+          form = self.new
+          form.load_consumer(family_member.person)
+          forms[family_member.person] = form
+          forms
+        end
+      end
+
+      def submit_with(params)
+        person = Person.find(params[:person_id])
+        form = self.new
+        form.load_consumer(person)
+        form.submit(params)
+      end
+    end
+
     private
 
     def consumer_osse_eligible?(date = ::TimeKeeper.date_of_record)
