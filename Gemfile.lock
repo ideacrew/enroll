@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 81ed88a5fedd4e4cb0d66216c10fbf30df7a54aa
-  branch: trunk
+  revision: 15c903cb648932f287803b4845d383139c76384b
+  branch: ivl_renewals_determination_event
   specs:
     aca_entities (0.10.0)
       deep_merge
