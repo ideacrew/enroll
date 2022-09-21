@@ -41,7 +41,7 @@ describe Events::SsaVerificationRequestsController do
       expect(person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.action).to eq "SSA Hub Request"
     end
 
-    it "stores reference to event_request document" do
+    xit "stores reference to event_request document" do
       expect(person.consumer_role.lawful_presence_determination.ssa_requests.first.id).to eq BSON::ObjectId.from_string(
           person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.event_request_record_id)
     end
