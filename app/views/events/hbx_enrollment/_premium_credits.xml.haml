@@ -1,0 +1,13 @@
+%premium_credits
+  - if hbx_enrollment.has_aptc?
+    %premium_credit
+      %kind= "urn:openhbx:terms:v1:premium_credit_kind#aptc"
+      %value= (hbx_enrollment.applied_aptc_amount).round(2)
+  - if hbx_enrollment.has_child_care_subsidy?
+    %premium_credit
+      %kind= "urn:dc0:terms:v1:premium_credit_kind#osse"
+      %value= (hbx_enrollment.eligible_child_care_subsidy).round(2)
+  - if hbx_enrollment.is_shop?
+    %premium_credit
+      %kind= "urn:openhbx:terms:v1:premium_credit_kind#shop_contribution"
+      %value= (hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total).round(2)
