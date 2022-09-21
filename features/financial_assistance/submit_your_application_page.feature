@@ -12,6 +12,7 @@ Feature: This is the final review page before submiting an application
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
 
+  @flaky
   Scenario: Submit button is disabled when a required checkbox is not checked and name is not signed
     Given a required question is not answered
     And the user has not signed their name

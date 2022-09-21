@@ -26,7 +26,6 @@ module Subscribers
 
     private
 
-
     def subscriber_logger_for(event)
       Logger.new(
         "#{Rails.root}/log/#{event}_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"

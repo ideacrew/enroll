@@ -54,7 +54,8 @@ describe 'daily_faa_submission_report' do
       gender: person.gender,
       dob: person.dob,
       encrypted_ssn: person.encrypted_ssn,
-      eligibility_determination_id: eligibility_determination.id
+      eligibility_determination_id: eligibility_determination.id,
+      magi_as_percentage_of_fpl: 1.3
     )
   end
   let!(:applicant2) do
@@ -73,7 +74,8 @@ describe 'daily_faa_submission_report' do
       gender: person2.gender,
       dob: person2.dob,
       encrypted_ssn: person.encrypted_ssn,
-      eligibility_determination_id: eligibility_determination2.id
+      eligibility_determination_id: eligibility_determination2.id,
+      magi_as_percentage_of_fpl: 1.3
     )
   end
   let!(:applicants) { [applicant, applicant2] }
@@ -98,6 +100,7 @@ describe 'daily_faa_submission_report' do
         Disabled
         Help_With_Daily_Living
         Immigration_Status
+        FPL_Amount
     ]
   end
 
@@ -180,6 +183,10 @@ describe 'daily_faa_submission_report' do
     it 'should match with the applicant immigration status' do
       immigration_status = primary_applicant.citizen_status&.humanize&.downcase&.gsub("us", "US")
       expect(@file_content[1][15]).to eq(immigration_status)
+    end
+
+    it "should match with the applicant's fpl_amount" do
+      expect(@file_content[1][16]).to eql(applicant.magi_as_percentage_of_fpl.to_s)
     end
   end
 

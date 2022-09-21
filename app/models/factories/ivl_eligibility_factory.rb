@@ -12,9 +12,9 @@ module Factories
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
-    def fetch_member_level_applicable_aptcs(total_aptc)
+    def fetch_member_level_applicable_aptcs(total_aptc, age_as_of_coverage_start: false)
       thh_members = enrollment_aptc_members(shopping_tax_members)
-      benchmark_hash = enrollment_eligible_benchmark_hash(thh_members, @enrollment)
+      benchmark_hash = enrollment_eligible_benchmark_hash(thh_members, @enrollment, age_as_of_coverage_start: age_as_of_coverage_start)
       total = benchmark_hash.values.sum
       ratio_hash = {}
       benchmark_hash.each do |member_id, benchmark_value|
@@ -147,9 +147,11 @@ module Factories
       aptc_thhms.select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) && thhm.is_ia_eligible? }
     end
 
-    def enrollment_eligible_benchmark_hash(thhms, enrollment)
+    def enrollment_eligible_benchmark_hash(thhms, enrollment, age_as_of_coverage_start: false)
       thhms.inject({}) do |benchmark_hash, thhm|
-        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.aptc_benchmark_amount(enrollment) })
+        enr_member = enrollment.hbx_enrollment_members.select{|hem| hem.person.hbx_id == thhm.person.hbx_id}.first
+        date_for_age_on = age_as_of_coverage_start ? enr_member.coverage_start_on : enrollment.effective_on
+        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.aptc_benchmark_amount(enrollment, date_for_age_on) })
       end
     end
 
