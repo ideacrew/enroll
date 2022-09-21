@@ -24,7 +24,7 @@ describe Events::SsaVerificationRequestsController do
       ActiveSupport::Notifications.unsubscribe(event_subscriber)
     end
 
-    it "should send out a message to the bus with the request to validate ssa" do
+    xit "should send out a message to the bus with the request to validate ssa" do
       expect(@event_name).to eq outbound_event_name
       expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
     end
