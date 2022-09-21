@@ -50,17 +50,20 @@ module Operations
       end
 
       def available_aptc
-        @current_enrolled_aptc_grants.reduce(0.0) do |sum, aptc_grant|
+        max_aptc = @current_enrolled_aptc_grants.reduce(0.0) do |sum, aptc_grant|
           expected_contribution = monthly_expected_contribution(aptc_grant)
           benchmark_premium = total_monthly_benchmark_premium(aptc_grant)
 
-          value = benchmark_premium - expected_contribution - utilized_aptc
+          value = benchmark_premium - expected_contribution
 
           persist_tax_household_enrollment(aptc_grant)
 
           sum += (value < 0) ? 0.0 : value
           sum
         end
+
+        available_aptc = max_aptc - utilized_aptc
+        (available_aptc < 0) ? 0.0 : available_aptc
       end
 
       def persist_tax_household_enrollment(aptc_grant)

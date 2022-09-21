@@ -591,7 +591,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           determination
         end
 
-        let!(:primary_tax_household_group) do
+        let(:primary_grant) do
           eligibility_determination.grants.create(
             key: "AdvancePremiumAdjustmentGrant",
             value: yearly_expected_contribution1,
@@ -603,7 +603,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           )
         end
 
-        let!(:dependents_tax_household_group) do
+        let(:dependents_grant) do
           eligibility_determination.grants.create(
             key: "AdvancePremiumAdjustmentGrant",
             value: yearly_expected_contribution2,
@@ -640,6 +640,8 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let(:dependents_aptc_grant) { eligibility_determination.reload.grants.second }
 
         before do
+          primary_grant
+          dependents_grant
           allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
             double('IdentifySlcspWithPediatricDentalCosts',
                    call: double(:value! => slcsp_info, :success? => true))
@@ -913,6 +915,159 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
               expect(result.success?).to eq true
               expect(result.value!).to eq 310.00
+            end
+          end
+        end
+
+        context 'shopping with mixed tax households with primary not re-enrolling' do
+          let(:primary_grant) do
+            eligibility_determination.grants.create(
+              key: "AdvancePremiumAdjustmentGrant",
+              value: yearly_expected_contribution1,
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              end_on: TimeKeeper.date_of_record.end_of_year,
+              assistance_year: TimeKeeper.date_of_record.year,
+              member_ids: [primary_applicant.id.to_s, dependents.first.id.to_s],
+              tax_household_id: primary_tax_household.id
+            )
+          end
+
+          let(:dependents_grant) do
+            eligibility_determination.grants.create(
+              key: "AdvancePremiumAdjustmentGrant",
+              value: yearly_expected_contribution2,
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              end_on: TimeKeeper.date_of_record.end_of_year,
+              assistance_year: TimeKeeper.date_of_record.year,
+              member_ids: [dependents.second.id.to_s],
+              tax_household_id: dependents_tax_household.id
+            )
+          end
+
+          let(:family) do
+            family = FactoryBot.build(:family, person: primary)
+            family.family_members = [
+              FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent1),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent2)
+            ]
+
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent1.id, kind: 'spouse')
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent2.id, kind: 'child')
+            family.save
+            family
+          end
+
+          let(:dependent1) { FactoryBot.create(:person) }
+          let(:dependent2) { FactoryBot.create(:person) }
+
+          let(:yearly_expected_contribution) { 550.00 * 12 }
+
+          let(:prev_slcsp_info) do
+            OpenStruct.new(
+              households: [
+                OpenStruct.new(
+                  household_id: primary_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: primary_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                ),
+                OpenStruct.new(
+                  household_id: dependents_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: dependent2_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                )
+              ]
+            )
+          end
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [
+                OpenStruct.new(
+                  household_id: primary_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: dependent1_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                ),
+                OpenStruct.new(
+                  household_id: dependents_aptc_grant.tax_household_id,
+                  household_benchmark_ehb_premium: dependent2_benchmark_premium,
+                  members: family.family_members.collect do |fm|
+                    OpenStruct.new(
+                      family_member_id: fm.id.to_s,
+                      relationship_with_primary: fm.primary_relationship,
+                      date_of_birth: fm.dob,
+                      age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                    )
+                  end
+                )
+              ]
+            )
+          end
+
+          let(:primary_benchmark_premium) { 500.00 }
+          let(:dependent1_benchmark_premium) { 450.00 }
+          let(:dependent2_benchmark_premium) { 350.00 }
+
+          let(:yearly_expected_contribution1) { 300.00 * 12 }
+          let(:yearly_expected_contribution2) { 100.00 * 12 }
+
+          context 'with coinciding enrollment' do
+            let!(:prev_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: [primary_applicant, dependents[1]],
+                                family: family,
+                                applied_aptc_amount: 450.00,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                enrollment_members: dependents,
+                                family: family)
+            end
+
+            before do
+              allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+                double('IdentifySlcspWithPediatricDentalCosts',
+                       call: double(:value! => prev_slcsp_info, :success? => true)),
+                double('IdentifySlcspWithPediatricDentalCosts',
+                       call: double(:value! => slcsp_info, :success? => true))
+              )
+            end
+
+            it 'returns sum of difference of benchmark premiums and monthly_expected_contribution as total available aptc of all tax household groups' do
+              prev_result = Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: prev_enrollment, effective_on: prev_enrollment.effective_on })
+              expect(prev_result.success?).to eq true
+              expect(prev_result.value!).to eq 450
+              expect(result.success?).to eq true
+              expect(result.value!).to eq(800.00 - prev_enrollment.applied_aptc_amount.to_f)
             end
           end
         end
