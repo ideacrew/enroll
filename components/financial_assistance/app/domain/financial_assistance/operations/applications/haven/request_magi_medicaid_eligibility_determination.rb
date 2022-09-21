@@ -35,8 +35,7 @@ module FinancialAssistance
 
           def renew_application(application)
             if application.have_permission_to_renew?
-              if application.may_submit?
-                application.submit!
+              if application.present?
                 request_result = request_determination(application)
                 application.set_magi_medicaid_eligibility_request_errored! if request_result.failure?
                 request_result
@@ -53,6 +52,9 @@ module FinancialAssistance
 
           def request_determination(application)
             if is_haven_determination_enabled?
+              Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}") unless application.may_submit?
+              application.submit
+              application.save
               ::FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: application.id)
             elsif is_medicaid_gateway_determination_enabled?
               ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)

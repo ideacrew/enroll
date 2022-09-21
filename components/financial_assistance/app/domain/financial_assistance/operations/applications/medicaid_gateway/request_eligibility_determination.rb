@@ -20,6 +20,7 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(application_id:)
             application    = yield find_application(application_id)
+            application    = yield submit_application(application)
             application    = yield validate(application)
             payload_param  = yield construct_payload(application)
             payload_value  = yield validate_payload(payload_param)
@@ -37,6 +38,13 @@ module FinancialAssistance
             Success(application)
           rescue Mongoid::Errors::DocumentNotFound
             Failure("Unable to find Application with ID #{application_id}.")
+          end
+
+          def submit_application(application)
+            return  Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}") unless application.may_submit?
+            application.submit
+            return Success(application) if application.save!
+            Failure("Unable to save the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
           end
 
           def validate(application)
