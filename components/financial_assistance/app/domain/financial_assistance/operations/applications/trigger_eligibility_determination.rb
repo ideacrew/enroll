@@ -7,6 +7,7 @@ module FinancialAssistance
   module Operations
     module Applications
         # This class will query all distinct app_ids with renwal draft applications and trigger eligibility_determination renewal events
+        # Syntax: FinancialAssistance::Operations::Applications::TriggerEligibilityDetermination.new.call({renewal_year: 2023})
       class TriggerEligibilityDetermination
         include Dry::Monads[:result, :do, :try]
         include EventSource::Command

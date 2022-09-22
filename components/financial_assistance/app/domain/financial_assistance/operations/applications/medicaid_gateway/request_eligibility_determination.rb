@@ -41,6 +41,7 @@ module FinancialAssistance
           end
 
           def submit_application(application)
+            return Success(application) if application.submitted?
             return  Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}") unless application.may_submit?
             application.submit
             return Success(application) if application.save!
