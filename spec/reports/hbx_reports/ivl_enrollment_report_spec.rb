@@ -27,6 +27,7 @@ describe IvlEnrollmentReport, dbclean: :after_each do
       end
     end
   end
+
   after(:all) do
     FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report"])
   end
