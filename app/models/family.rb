@@ -22,6 +22,7 @@ class Family
   include RemoveFamilyMember
   include CrmGateway::FamilyConcern
   include GlobalID::Identification
+  include EventSource::Command
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
