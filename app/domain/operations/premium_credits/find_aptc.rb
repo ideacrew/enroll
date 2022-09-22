@@ -69,7 +69,7 @@ module Operations
       end
 
       def current_benchmark_premium(aptc_grant)
-        benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }.household_benchmark_ehb_premium
+        benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }&.household_benchmark_ehb_premium || 0.0
       end
 
       def persist_tax_household_enrollment(aptc_grant, total_benchmark_premium)
@@ -189,6 +189,8 @@ module Operations
 
             member_result
           end
+
+          next result if members_hash.blank?
 
           result << {
             household_id: aptc_grant.tax_household_id.to_s,
