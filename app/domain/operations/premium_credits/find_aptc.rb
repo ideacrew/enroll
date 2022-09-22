@@ -77,7 +77,7 @@ module Operations
         household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }
 
         th_enrollment.update!(
-          household_benchmark_ehb_premium: household_info.household_benchmark_ehb_premium,
+          household_benchmark_ehb_premium: (household_info&.household_benchmark_ehb_premium || 0.0),
           health_product_hios_id: household_info.health_product_hios_id,
           dental_product_hios_id: household_info.dental_product_hios_id,
           household_health_benchmark_ehb_premium: household_info.household_health_benchmark_ehb_premium,
