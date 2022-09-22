@@ -944,7 +944,7 @@ class Family
 
   def notify_broker_update_on_impacted_enrollments_to_edi(broker_role_id)
     return false unless EnrollRegistry.feature_enabled?(:send_broker_hired_event_to_edi) ||
-      EnrollRegistry.feature_enabled?(:send_broker_fired_event_to_edi)
+                        EnrollRegistry.feature_enabled?(:send_broker_fired_event_to_edi)
 
     enrollments.each do |enr|
       enr.notify_of_broker_update(broker_role_id)
@@ -963,7 +963,6 @@ class Family
 
     publish_broker_fired_event(terminate_params)
   end
-
 
   def publish_broker_fired_event(terminate_params)
     event = event('events.family.brokers.broker_fired', attributes: terminate_params)

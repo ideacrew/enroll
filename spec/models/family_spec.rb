@@ -303,7 +303,7 @@ describe Family, type: :model, dbclean: :around_each do
 
     context "send broker events to edi if feature is disabled" do
       before do
-        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(false )
+        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(false)
         EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(false)
       end
 

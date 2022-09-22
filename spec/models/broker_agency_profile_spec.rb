@@ -224,9 +224,9 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
                                                                                            start_on: Time.now,
                                                                                            is_active: true)
       family2.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                            writing_agent_id: writing_agent.id,
-                                                                                            start_on: Time.now,
-                                                                                            is_active: true)
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
       expect(broker_agency_profile.families.count).to be(2)
     end
 
@@ -247,9 +247,9 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
 
     it "should find both consumers and employees" do
       family2.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                                   writing_agent_id: writing_agent.id,
-                                                                                                   start_on: Time.now,
-                                                                                                   is_active: true)
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
       allow(Person).to receive(:where).and_return([person])
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:primary_family).and_return(family1)
