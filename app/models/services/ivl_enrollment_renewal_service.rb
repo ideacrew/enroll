@@ -12,9 +12,14 @@ module Services
     def assign(aptc_values)
       raise 'Provide aptc values {applied_aptc:, max_aptc:}' if aptc_values_missing?(aptc_values)
 
-      applied_aptc_amt = calculate_applicable_aptc(aptc_values)
-      @hbx_enrollment.applied_aptc_amount = applied_aptc_amt.round(2)
-      @hbx_enrollment.elected_aptc_pct = applied_aptc_amt / aptc_values[:max_aptc].to_f
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        @hbx_enrollment.applied_aptc_amount = aptc_values[:applied_aptc]
+        @hbx_enrollment.elected_aptc_pct = aptc_values[:applied_percentage]
+      else
+        applied_aptc_amt = calculate_applicable_aptc(aptc_values)
+        @hbx_enrollment.applied_aptc_amount = applied_aptc_amt.round(2)
+        @hbx_enrollment.elected_aptc_pct = applied_aptc_amt / aptc_values[:max_aptc].to_f
+      end
 
       @hbx_enrollment
     end
