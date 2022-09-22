@@ -43,7 +43,12 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     let!(:thhm12) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th1, is_medicaid_chip_eligible: true) }
     let!(:ed1) { FactoryBot.create(:eligibility_determination, tax_household: th1) }
 
-    let!(:th2) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
+    let!(:th2) do
+      FactoryBot.create(:tax_household,
+                        household: family.active_household,
+                        yearly_expected_contribution: 3100.50,
+                        effective_ending_on: nil)
+    end
     let!(:thhm21) { FactoryBot.create(:tax_household_member, applicant_id: fm1.id, tax_household: th2, is_totally_ineligible: true) }
     let!(:thhm22) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2, is_medicaid_chip_eligible: true) }
     let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 0.00) }
@@ -56,6 +61,8 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs.count).to eq(2)
         expect(thhgs.first.tax_households.count).to eq(1)
         expect(thhgs[1].tax_households.count).to eq(1)
+        expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+        expect(thhgs[1].tax_households.first.yearly_expected_contribution).to eq(th1.yearly_expected_contribution)
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(thhgs[1].tax_households.first.tax_household_members.count).to eq(2)
       end
