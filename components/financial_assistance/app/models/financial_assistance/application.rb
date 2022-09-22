@@ -1319,26 +1319,19 @@ module FinancialAssistance
     # Case1: Missing address - No address objects at all
     # Case2: Primary applicant should have a valid address
     def applicants_have_valid_addresses?
-      applicants.all?{|applicant| applicant.addresses.where(:kind.in => ['home', 'mailing']).present?} && primary_applicant.has_valid_address?
+      addresses_valid = applicants.all?{|applicant| applicant.addresses.where(:kind.in => ['home', 'mailing']).present?} && primary_applicant.has_valid_address?
+      self.errors[:base] << 'You must have a valid addresses for every applicant.' unless addresses_valid
+      addresses_valid
+    end
+
+    def application_attributes_valid?
+      return true if renewal_draft?
+
+      self.valid?(:submission)
     end
 
     def is_application_valid?
-      application_attributes_validity = self.valid?(:submission) ? true : false
-
-      relationships_validity = if relationships_complete?
-                                 true
-                               else
-                                 false
-                               end
-
-      if applicants_have_valid_addresses?
-        addresses_validity = true
-      else
-        self.errors[:base] << 'You must have a valid addresses for every applicant.'
-        addresses_validity = false
-      end
-
-      application_attributes_validity && relationships_validity && addresses_validity
+      application_attributes_valid? && relationships_complete? && applicants_have_valid_addresses?
     end
 
     # rubocop:disable Lint/EmptyRescueClause
@@ -1601,13 +1594,11 @@ module FinancialAssistance
 
     def application_submission_validity
       # Mandatory Fields before submission
-      validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified, :parent_living_out_of_home_terms
+      required_attributes_valid = validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified, :parent_living_out_of_home_terms
       # User must agree with terms of service check boxes before submission
-      validates_acceptance_of :medicaid_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
-    end
+      terms_attributes_valid = validates_acceptance_of :medicaid_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
 
-    def before_attestation_validity
-      validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
+      required_attributes_valid && terms_attributes_valid
     end
 
     def is_application_ready_for_attestation?

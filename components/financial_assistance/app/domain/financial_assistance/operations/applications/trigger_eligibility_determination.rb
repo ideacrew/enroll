@@ -13,7 +13,7 @@ module FinancialAssistance
         include EventSource::Command
 
         def call(params)
-          app_ids = yield find_families(params[:renewal_year])
+          app_ids = yield find_renewal_draft(params[:renewal_year])
           app_ids = yield generate_renewal_events(params[:renewal_year], app_ids)
 
           Success(app_ids)
@@ -21,7 +21,7 @@ module FinancialAssistance
 
         private
 
-        def find_families(renewal_year)
+        def find_renewal_draft(renewal_year)
           Success(::FinancialAssistance::Application.by_year(renewal_year).where(aasm_state: "renewal_draft").pluck(:id))
         end
 
