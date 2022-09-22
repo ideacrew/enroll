@@ -87,7 +87,10 @@ describe BrokerRole, dbclean: :around_each do
         employer_profile.broker_agency_accounts.create(broker_agency_profile: broker_agency_profile, writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
         employer_profile.hire_general_agency(general_agency_profile, broker_role.id, start_on = TimeKeeper.datetime_of_record)
         employer_profile.save!
-        family.hire_broker_agency(broker_role.id)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: broker_role.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
       end
 
       it "should have employer" do
