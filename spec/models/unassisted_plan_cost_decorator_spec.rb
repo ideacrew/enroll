@@ -204,6 +204,25 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
         end
       end
 
+      context "should have correct total_employee_cost" do
+        let(:plan_cost_decorator) { UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10) }
+
+        it "if multi taxhousehold feature is disabled" do
+          total_cost = hbx_enrollment10.hbx_enrollment_members.collect do |member|
+            plan_cost_decorator.employee_cost_for(member).round(2)
+          end.compact.sum.round(2)
+
+          expect(plan_cost_decorator.total_employee_cost).to eq total_cost
+        end
+
+        it "if multi taxhousehold feature is enabled" do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          total_premium = plan_cost_decorator.total_premium
+          total_aptc_amount = plan_cost_decorator.total_aptc_amount
+          expect(plan_cost_decorator.total_employee_cost).to eq(total_premium - total_aptc_amount)
+        end
+      end
+
       context 'employee_cost_for member' do
         context 'when premium for member is zero and large family factor is zero' do
           before :each do

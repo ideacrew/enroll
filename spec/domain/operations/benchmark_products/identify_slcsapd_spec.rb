@@ -63,10 +63,33 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
       end
     end
 
-    context 'type_of_household: adult_and_child' do
+    context 'type_of_household: child_only' do
       before do
         household_params = @benchmark_product_model.households.first.to_h
         household_params.merge!({ type_of_household: 'child_only' })
+        @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
+          { family: family, benchmark_product_model: @benchmark_product_model, household_params: household_params }
+        )
+      end
+
+      it 'return success with dental information' do
+        expect(@result.success[:dental_product_hios_id]).not_to be_nil
+        expect(@result.success[:dental_product_id]).not_to be_nil
+        expect(@result.success[:dental_rating_method]).not_to be_nil
+        expect(@result.success[:dental_ehb]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
+      end
+    end
+
+    context 'with all Family-Tier Rates' do
+      before do
+        ::BenefitMarkets::Products::DentalProducts::DentalProduct.each do |dental|
+          dental.update_attributes!(rating_method: 'Family-Tier Rates')
+        end
+        household_params = @benchmark_product_model.households.first.to_h
+        household_params.merge!({ type_of_household: 'child_only' })
+        household_params[:members][0][:relationship_with_primary] = 'child'
+        household_params[:members][1][:relationship_with_primary] = 'child'
         @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: household_params }
         )

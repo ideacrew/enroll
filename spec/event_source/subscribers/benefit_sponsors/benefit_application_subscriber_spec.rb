@@ -72,6 +72,10 @@ RSpec.describe Subscribers::BenefitSponsors::BenefitApplicationSubscriber,
   context 'with payload' do
 
     context 'on success' do
+      before do
+        allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
+      end
+
       it 'should receive ack' do
         expect(channel).to receive(:ack)
         queue_proxy.on_receive_message(
