@@ -5,9 +5,7 @@ module Subscribers
   class EligibilityDeterminationTriggeredSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.iap.applications.renewals']
 
-    subscribe(
-      :on_eligibility_determination_triggered
-    ) do |delivery_info, _metadata, response|
+    subscribe(:on_eligibility_determination_triggered) do |delivery_info, _metadata, response|
       logger.info '-' * 100
 
       payload = JSON.parse(response, symbolize_names: true)
@@ -18,10 +16,9 @@ module Subscribers
         )
       subscriber_logger.info "EligibilityDeterminationTriggeredSubscriber, response: #{payload}"
 
-      logger.info "EligibilityDeterminationTriggeredSubscriber on_submit_renewal_draft payload: #{payload}"
+      logger.info "EligibilityDeterminationTriggeredSubscriber processing submission and determination of the payload: #{payload}"
 
       result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: payload[:application_id])
-
 
       if result.success?
         subscriber_logger.info "EligibilityDeterminationTriggeredSubscriber, success: app_hbx_id: #{result.success.hbx_id}"

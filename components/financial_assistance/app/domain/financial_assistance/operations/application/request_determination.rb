@@ -19,6 +19,7 @@ module FinancialAssistance
         def call(application_id:)
           application    = yield find_application(application_id)
           application    = yield validate(application)
+          application    = yield submit_application(application)
           payload_param  = yield construct_payload(application)
           payload_value  = yield validate_payload(payload_param, application)
           payload        = yield publish(payload_value, application)
@@ -36,9 +37,17 @@ module FinancialAssistance
           Failure("Unable to find Application with ID #{application_id}.")
         end
 
+        def submit_application(application)
+          application.submit
+          return Success(application) if application.save
+          Failure("Unable to save the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
+        rescue StandardError => e
+          Failure("Rescued submission failure for the application id: #{application.id} | backtrace: #{e}")
+        end
+
         def validate(application)
-          return Success(application) if application.submitted?
-          Failure("Application is in #{application.aasm_state} state. Please submit application.")
+          return Success(application) if application.may_submit?
+          Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
         end
 
         def construct_payload(application)

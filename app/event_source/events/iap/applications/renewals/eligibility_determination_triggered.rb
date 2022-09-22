@@ -4,7 +4,7 @@ module Events
   module Iap
     module Applications
       module Renewals
-        # This class will register event 'application_renewal_request_created'
+        # This class will register event 'eligibility_determination_triggered'
         class EligibilityDeterminationTriggered < EventSource::Event
           publisher_path 'publishers.eligibility_determination_triggered_publisher'
 

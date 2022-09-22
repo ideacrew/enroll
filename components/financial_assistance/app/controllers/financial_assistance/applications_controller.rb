@@ -67,8 +67,7 @@ module FinancialAssistance
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
               return
             end
-            if @application.complete? && @application.may_submit?
-              @application.submit!
+            if @application.complete?
               publish_result = determination_request_class.new.call(application_id: @application.id)
               if publish_result.success?
                 redirect_to wait_for_eligibility_response_application_path(@application)
