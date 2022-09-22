@@ -20,12 +20,12 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(application_id:)
             application    = yield find_application(application_id)
-            application    = yield submit_application(application)
             application    = yield validate(application)
+            application    = yield submit_application(application)
             payload_param  = yield construct_payload(application)
             payload_value  = yield validate_payload(payload_param)
             _application   = yield update_application(application, payload_value)
-            payload        = yield publish(payload_value)
+            payload        = yield publish_event(payload_value)
 
             Success(payload)
           end
@@ -41,16 +41,16 @@ module FinancialAssistance
           end
 
           def submit_application(application)
-            return Success(application) if application.submitted?
-            return  Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}") unless application.may_submit?
             application.submit
-            return Success(application) if application.save!
+            return Success(application) if application.save
             Failure("Unable to save the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
+          rescue StandardError => e
+            Failure("Submission failed for the application id: #{application.id} | backtrace: #{e}")
           end
 
           def validate(application)
-            return Success(application) if application.submitted?
-            Failure("Application is in #{application.aasm_state} state. Please submit application.")
+            return Success(application) if application.may_submit?
+            Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
           end
 
           def construct_payload(application)
@@ -69,7 +69,7 @@ module FinancialAssistance
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
           end
 
-          def publish(payload)
+          def publish_event(payload)
             FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(
               payload: payload.to_h,
               event_name: 'determine_eligibility'

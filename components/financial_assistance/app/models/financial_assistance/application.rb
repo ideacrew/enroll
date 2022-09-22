@@ -1324,14 +1324,14 @@ module FinancialAssistance
       addresses_valid
     end
 
-    def application_attributes_valid?
+    def required_attributes_valid?
       return true if renewal_draft?
 
       self.valid?(:submission)
     end
 
     def is_application_valid?
-      application_attributes_valid? && relationships_complete? && applicants_have_valid_addresses?
+      required_attributes_valid? && relationships_complete? && applicants_have_valid_addresses?
     end
 
     # rubocop:disable Lint/EmptyRescueClause
@@ -1594,11 +1594,17 @@ module FinancialAssistance
 
     def application_submission_validity
       # Mandatory Fields before submission
-      required_attributes_valid = validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified, :parent_living_out_of_home_terms
+      required_attributes_valid = validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state
+
+      required_boolean_attributes_valid = validates_inclusion_of :is_ridp_verified, :parent_living_out_of_home_terms, in: [true, false]
       # User must agree with terms of service check boxes before submission
       terms_attributes_valid = validates_acceptance_of :medicaid_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
 
-      required_attributes_valid && terms_attributes_valid
+      required_attributes_valid && required_boolean_attributes_valid && terms_attributes_valid
+    end
+
+    def before_attestation_validity
+      validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
     end
 
     def is_application_ready_for_attestation?
