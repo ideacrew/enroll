@@ -89,6 +89,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary)
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
