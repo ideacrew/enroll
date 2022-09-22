@@ -15,6 +15,7 @@ class HbxEnrollment
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
   include EventSource::Command
+  include ::Employers::EmployerHelper
 
   belongs_to :household
   # Override attribute accessor as well
@@ -2742,8 +2743,11 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
+    effective_year = sponsored_benefit_package.start_on.year
+
     return if coverage_kind.to_s == 'dental'
     return unless employee_role&.osse_eligible?(effective_on)
+    return unless shop_osse_eligibility_is_enabled?(effective_year)
 
     osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)

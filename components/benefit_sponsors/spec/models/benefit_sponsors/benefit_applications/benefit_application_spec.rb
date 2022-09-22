@@ -1546,6 +1546,20 @@ module BenefitSponsors
         context 'when sponsor is not osse eligible' do
           it { expect(benefit_application.osse_eligible?).to be_falsey }
         end
+
+        context 'when sponsor is not osse eligible in a given year' do
+          before do
+            allow(benefit_application).to receive(:shop_osse_eligibility_is_enabled?).and_return(false)
+          end
+
+          let(:eligibility) { build(:eligibility, :with_subject, :with_evidences) }
+          let!(:add_eligibility) do
+            benefit_sponsorship.eligibilities << eligibility
+            benefit_sponsorship.save!
+          end
+
+          it { expect(benefit_application.osse_eligible?).to be_falsey }
+        end
       end
     end
 
