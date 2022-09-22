@@ -52,9 +52,8 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       thh_params = {
         effective_starting_on: thh.effective_starting_on,
         effective_ending_on: effective_ending_on,
-        max_aptc: thh.latest_eligibility_determination.max_aptc
-        # monthly_expected_contribution: ,
-        # determination_id: ,
+        max_aptc: thh.latest_eligibility_determination.max_aptc,
+        yearly_expected_contribution: thh.yearly_expected_contribution
       }
 
       new_thh = thhg.tax_households.build(thh_params)

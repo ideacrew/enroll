@@ -141,6 +141,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'dotenv-rails'
   gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
