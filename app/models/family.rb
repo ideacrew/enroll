@@ -931,7 +931,26 @@ class Family
                     broker_role_id: broker_role_id,
                     start_date: TimeKeeper.datetime_local,
                     current_broker_account_id: current_broker_agency&.id }
-    ::Operations::Families::HireBrokerAgency.new.call(hire_params)
+
+    publish_broker_hired_event(hire_params)
+  end
+
+  def publish_broker_hired_event(hire_params)
+    event = event('events.family.brokers.broker_hired', attributes: hire_params)
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish broker hired event due to #{e.backtrace}" }
+  end
+
+  def notify_broker_update_on_impacted_enrollments_to_edi(broker_role_id)
+    return false unless EnrollRegistry.feature_enabled?(:send_broker_hired_event_to_edi) ||
+      EnrollRegistry.feature_enabled?(:send_broker_fired_event_to_edi)
+
+    enrollments.each do |enr|
+      enr.notify_of_broker_update(broker_role_id)
+    end
+
+    true
   end
 
   # Terminate the active Broker agency for this family
@@ -941,7 +960,16 @@ class Family
     terminate_params = { family_id: id,
                          terminate_date: terminate_on,
                          broker_account_id: current_broker_agency&.id }
-    ::Operations::Families::TerminateBrokerAgency.new.call(terminate_params)
+
+    publish_broker_fired_event(terminate_params)
+  end
+
+
+  def publish_broker_fired_event(terminate_params)
+    event = event('events.family.brokers.broker_fired', attributes: terminate_params)
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish broker fired event due to #{e.backtrace}" }
   end
 
   # Get the active {BrokerAgencyAccount} account for this family. New Individual market enrollments will include this

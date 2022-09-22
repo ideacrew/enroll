@@ -336,6 +336,7 @@ class HbxEnrollment
   scope :non_enrolled,        ->{ where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
   scope :enrolled_and_terminated,->{ where(:aasm_state.in => ENROLLED_STATUSES + TERMINATED_STATUSES) }
+  scope :terminated,          ->{ where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending"]) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
@@ -1975,6 +1976,23 @@ class HbxEnrollment
             "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#initial",
             "is_trading_partner_publishable" => publish_to_carrier
         }
+    )
+  end
+
+  def notify_of_broker_update(broker_id)
+    return if is_shop?
+    return if %w[coverage_canceled coverage_expired].include?(aasm_state)
+    return if aasm_state == "coverage_terminated" && terminated_on <= TimeKeeper.date_of_record
+
+    config = Rails.application.config.acapi
+    notify(
+      "acapi.info.events.family.broker_update",
+      {
+        :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+        "hbx_enrollment_id" => self.hbx_id,
+        "new_broker_id" => broker_id,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
     )
   end
 
