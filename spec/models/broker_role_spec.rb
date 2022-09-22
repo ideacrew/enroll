@@ -97,7 +97,7 @@ describe BrokerRole, dbclean: :around_each do
         expect(employer_profile.active_broker.id).to eq broker_role.person.id
       end
 
-      it "should remove broker from GA, Employer, and families when decertified" do
+      it "should remove broker from GA, Employer when decertified" do
         expect(employer_profile.active_broker.id).to eq broker_role.person.id
         expect(employer_profile.active_general_agency_account.aasm_state).to eq "active"
         # Spec Uses Old model broker_agency_profile_id on broker factory data, which we are currently not using.
@@ -106,7 +106,26 @@ describe BrokerRole, dbclean: :around_each do
         broker_role.decertify!
         expect(EmployerProfile.find(employer_profile.id).active_broker).to eq nil
         expect(EmployerProfile.find(employer_profile.id).active_general_agency_account).to eq nil
-        expect(Family.find(family.id).current_broker_agency).to eq nil
+      end
+    end
+
+    context "decertify" do
+      let(:person) { FactoryBot.create(:person)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                      aasm_state: "active") }
+
+      before do
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
+      end
+
+      it "should trigger broker fired event on a family" do
+        expect_any_instance_of(Events::Family::Brokers::BrokerFired).to receive(:publish)
+        writing_agent.decertify!
       end
     end
 
