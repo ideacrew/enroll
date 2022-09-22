@@ -113,8 +113,11 @@ describe BrokerRole, dbclean: :around_each do
       let(:person) { FactoryBot.create(:person)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                      aasm_state: "active") }
+      let(:writing_agent)  do
+        FactoryBot.create(:broker_role,
+                          benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                          aasm_state: "active")
+      end
 
       before do
         family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
