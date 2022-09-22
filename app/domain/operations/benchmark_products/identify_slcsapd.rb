@@ -42,7 +42,8 @@ module Operations
         @exchange_provided_code = params[:benchmark_product_model].exchange_provided_code
         service_area_ids = params[:benchmark_product_model].service_area_ids
         @effective_date = params[:benchmark_product_model].effective_date
-        @members = params[:household_params][:members]
+        members = params[:household_params][:members]
+        @child_members = members.select { |member| member[:relationship_with_primary] == 'child' }
 
         query = {
           :service_area_id.in => service_area_ids,
@@ -84,24 +85,22 @@ module Operations
 
       def group_ehb_premium(dental_product)
         group_premium = if dental_product.family_based_rating?
-          # 'Family-Tier Rates'
+                          # 'Family-Tier Rates'
                           family_tier_total_premium(dental_product)
                         else
-          # 'Age-Based Rates'
+                          # 'Age-Based Rates'
                           total_premium(dental_product)
                         end
 
         (group_premium * dental_product.ehb).round(2)
       end
 
+      # Pediatric Dental Premiums should only be calculated for Child Members.
       def total_premium(dental_product)
-        child_members = @members.select { |member| member[:relationship_with_primary] == 'child' }
-
-        members = if child_members.count > 3
-                    eligible_children = child_thhms.sort_by { |k| k[:age_on_effective_date] }.last(3)
-                    eligible_children + @members.reject { |member| member[:relationship_with_primary] == 'child' }
+        members = if @child_members.count > 3
+                    child_thhms.sort_by { |k| k[:age_on_effective_date] }.last(3)
                   else
-                    @members
+                    @child_members
                   end
 
         members.reduce(0.00) do |sum, member|
@@ -111,29 +110,19 @@ module Operations
 
       def family_tier_total_premium(dental_product)
         qhp = ::Products::Qhp.where(standard_component_id: dental_product.hios_base_id, active_year: dental_product.active_year).first
-        qhp.qhp_premium_tables.where(rate_area_id: @exchange_provided_code).first&.send(family_tier_value)
+        qhp.qhp_premium_tables.where(rate_area_id: @exchange_provided_code).first&.send(primary_tier_value)
       end
 
-      def family_tier_value
-        if @members.select { |member| member[:relationship_with_primary] == 'spouse' }
-          couple_tier_value
-        else
-          primary_tier_value
-        end
-      end
-
-      def couple_tier_value
-        return 'couple_enrollee_one_dependent' if @members.size == 3
-        return 'couple_enrollee_two_dependent' if @members.size == 4
-        return 'couple_enrollee_many_dependent' if @members.size > 4
-        'couple_enrollee'
-      end
-
+      # The maximum is for 3 children so we return premium for primary_enrollee_two_dependent.
       def primary_tier_value
-        return 'primary_enrollee_one_dependent' if @members.size == 2
-        return 'primary_enrollee_two_dependent' if @members.size == 3
-        return 'primary_enrollee_many_dependent' if @members.size > 3
-        'primary_enrollee'
+        case @child_members.count
+        when 1
+          'primary_enrollee'
+        when 2
+          'primary_enrollee_one_dependent'
+        else
+          'primary_enrollee_two_dependent'
+        end
       end
 
       def identify_slcsadp(product_to_ehb_premium_hash)
