@@ -229,7 +229,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
-      allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -666,7 +665,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         allow(hbx_enrollment1).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
-        allow(view).to receive(:ivl_osse_eligibility_is_enabled?).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 
