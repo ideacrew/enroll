@@ -5,10 +5,9 @@ class HbxEnrollment
   include Mongoid::Timestamps
 
   ENROLLED_STATUSES = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified coverage_reinstated].freeze
-  RENEWAL_STATUSES    = %w(auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
-    auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
-    renewing_contingent_enrolled
-  )
+  RENEWAL_STATUSES = %w[auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
+                        auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
+                        renewing_contingent_enrolled].freeze
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
@@ -82,6 +81,6 @@ class HbxEnrollment
 
   embeds_many :hbx_enrollment_members
 
-  scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
+  scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES)}
 
 end
