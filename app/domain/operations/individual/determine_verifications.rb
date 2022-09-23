@@ -28,18 +28,28 @@ module Operations
         return Failure('person not found') if person.blank?
         return Failure('person not applying for coverage') unless person.is_applying_coverage
 
-        attrs = OpenStruct.new({
-                                 :determined_at => Time.now,
-                                 :vlp_authority => 'hbx'
-                               })
+        if can_update_consumer_role?(person)
+          update_consumer_role(consumer_role, person)
+        else
+          Failure("ConsumerRole with person_hbx_id: #{person.hbx_id} is not enrolled to trigger hub calls")
+        end
+      rescue StandardError => e
+        Failure("Error - #{e}")
+      end
+
+      def can_update_consumer_role?(person)
+        EnrollRegistry.feature_enabled?(:trigger_verifications_before_enrollment_purchase) ||
+          person.families.any? {|f| f.person_has_an_active_enrollment?(person) }
+      end
+
+      def update_consumer_role(consumer_role, person)
+        attrs = OpenStruct.new({:determined_at => Time.now, :vlp_authority => 'hbx'})
 
         consumer_role.revert!(attrs)
         consumer_role.coverage_purchased_no_residency!(attrs)
         consumer_role.trigger_residency! if can_trigger_residency?(person)
         consumer_role.person.save!
         Success("Successfully triggered Hub Calls for ConsumerRole with person_hbx_id: #{person.hbx_id}")
-      rescue StandardError => e
-        Failure("Error - #{e}")
       end
 
       def can_trigger_residency?(person)
