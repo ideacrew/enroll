@@ -58,7 +58,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_hios_id]).not_to be_nil
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
-        expect(@result.success[:dental_ehb]).not_to be_nil
+        expect(@result.success[:dental_ehb_apportionment_for_pediatric_dental]).not_to be_nil
         expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_hios_id]).not_to be_nil
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
-        expect(@result.success[:dental_ehb]).not_to be_nil
+        expect(@result.success[:dental_ehb_apportionment_for_pediatric_dental]).not_to be_nil
         expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
@@ -99,7 +99,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_product_hios_id]).not_to be_nil
         expect(@result.success[:dental_product_id]).not_to be_nil
         expect(@result.success[:dental_rating_method]).not_to be_nil
-        expect(@result.success[:dental_ehb]).not_to be_nil
+        expect(@result.success[:dental_ehb_apportionment_for_pediatric_dental]).not_to be_nil
         expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
       end
     end
