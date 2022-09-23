@@ -101,6 +101,8 @@ module Operations
           tax_household_member_id = tax_household_members.where(applicant_id: family_member_id).first&.id
           member_info = household_info.members.find {|member| member[:family_member_id].to_s == family_member_id.to_s }
 
+          next if member_info.blank?
+
           th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
             hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
             tax_household_member_id: tax_household_member_id&.to_s
