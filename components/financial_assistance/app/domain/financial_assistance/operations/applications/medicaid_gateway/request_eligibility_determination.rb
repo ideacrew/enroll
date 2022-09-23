@@ -20,8 +20,8 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(application_id:)
             application    = yield find_application(application_id)
-            application    = yield validate(application)
-            application    = yield submit_application(application)
+            # application    = yield validate(application)
+            # application    = yield submit_application(application)
             payload_param  = yield construct_payload(application)
             payload_value  = yield validate_payload(payload_param)
             _application   = yield update_application(application, payload_value)
@@ -54,7 +54,11 @@ module FinancialAssistance
           end
 
           def construct_payload(application)
-            FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+            if application.submitted?
+              FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+            else
+              Failure("application is in draft state for the application id: #{application.id}")
+            end
           rescue StandardError => e
             Failure(e)
           end
