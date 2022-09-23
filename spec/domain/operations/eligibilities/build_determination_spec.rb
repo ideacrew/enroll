@@ -108,7 +108,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
   let(:subjects) { family.family_members.map(&:to_global_id) }
 
   let(:required_params) do
-    { subjects: subjects, effective_date: effective_date }
+    { subjects: subjects, effective_date: effective_date, family: family }
   end
 
   before do
@@ -144,6 +144,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       {
         subjects: subjects,
         effective_date: effective_date,
+        family: family,
         eligibility_items_requested: eligibility_items_requested
       }
     end
@@ -167,6 +168,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       {
         subjects: subjects,
         effective_date: effective_date,
+        family: family,
         eligibility_items_requested: eligibility_items_requested
       }
     end

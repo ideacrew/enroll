@@ -15,6 +15,7 @@ class HbxEnrollment
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
   include EventSource::Command
+  include ::Employers::EmployerHelper
 
   belongs_to :household
   # Override attribute accessor as well
@@ -520,6 +521,19 @@ class HbxEnrollment
     end
   end
 
+  def has_premium_credits?
+    has_child_care_subsidy? || has_aptc? || is_shop?
+  end
+
+  def has_aptc?
+    return false if is_shop?
+    self.applied_aptc_amount > 0
+  end
+
+  def has_child_care_subsidy?
+    self.eligible_child_care_subsidy > 0
+  end
+
   def benefit_group
     return @benefit_group if defined? @benefit_group
     return nil if benefit_group_id.blank?
@@ -567,9 +581,16 @@ class HbxEnrollment
   end
 
   def has_at_least_one_aptc_eligible_member?(year)
-    tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
-    return false if tax_households.blank?
-    tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+      return false if result.failure?
+      aptc_grants = result.value!
+      aptc_grants.present?
+    else
+      tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
+      return false if tax_households.blank?
+      tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
+    end
   end
 
   class << self
@@ -1518,7 +1539,7 @@ class HbxEnrollment
       (family.is_under_ivl_open_enrollment? && effective_on >= benefit_coverage_period.start_on))
   end
 
-  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, apply_aptc: nil)
     qhp_plan ||= product
 
     if self.is_shop?
@@ -1532,7 +1553,7 @@ class HbxEnrollment
       end
     else
       if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc)
       else
         UnassistedPlanCostDecorator.new(qhp_plan, self)
       end
@@ -1549,8 +1570,13 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, nil, market)
+    else
+      tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
+      elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
+    end
+
     filtered_elected_plans(elected_plans, coverage_kind).collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -2717,8 +2743,11 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
+    effective_year = sponsored_benefit_package.start_on.year
+
     return if coverage_kind.to_s == 'dental'
     return unless employee_role&.osse_eligible?(effective_on)
+    return unless shop_osse_eligibility_is_enabled?(effective_year)
 
     osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)

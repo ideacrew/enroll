@@ -4,6 +4,7 @@ module Operations
   module BenchmarkProducts
     # This class is to identify SLCSP with Pediatric Dental Costs for a group of family_members & effective date.
     # This class considers rating address of primary person of the given family to determine available products and their ratings.
+    # All the members of the request payload should be eligible for InsuranceAssistance(APTC)
     class IdentifySlcspWithPediatricDentalCosts
       include Dry::Monads[:result, :do]
 

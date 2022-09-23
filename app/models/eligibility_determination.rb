@@ -144,6 +144,7 @@ private
   end
 
   def apply_aptc_aggregate
+    return if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
     # EnrollRegistry[:apply_aggregate_to_enrollment] {{eligibility_determination: self}}
     # TODO: Refactor below code to make use of updated Operation call pattern.
     primary_person = family.primary_person

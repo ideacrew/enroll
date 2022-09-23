@@ -7,8 +7,6 @@ module Eligibilities
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    ELIGIBILITY_KEYS = [:income_evidence, :esi_evidence, :non_esi_evidence, :aces_evidence].freeze
-
     embeds_many :evidence_items
 
     field :key, type: Symbol

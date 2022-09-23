@@ -1,77 +1,95 @@
 <% @coverage_household.valid_coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
+
+  <% @show_residency_alert = false %>
+  <% benefit_type = (@change_plan == "change_plan" && @hbx_enrollment.present?) ? @hbx_enrollment.coverage_kind : nil %>
+  <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
+    <% current_employee_role = @hbx_enrollment.employee_role %>
+  <% end %>
+  <% if @adapter.can_shop_shop?(@person) %>
+    <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), (@effective_on_date || @new_effective_on), @qle) %>
+  <% end %>
+  <% if (@adapter.can_shop_individual?(@person)) || (@adapter.can_shop_resident?(@person)) %>
+    <%
+      is_ivl_coverage, rule, errors=@fm_hash[family_member.id]
+      @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
+      errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
+    %>
+  <% end %>
+  <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
+
   <div class="module group-selection-table">
-    <div class="table-responsive table-border" style="background-color: #fff">
-      <% @show_residency_alert = false %>
-      <table class="table table-condensed group-selection-tbl">
+    <div class="table-responsive table-border">
+      <table class="table table-condensed">
         <tbody>
-          <% benefit_type = (@change_plan == "change_plan" && @hbx_enrollment.present?) ? @hbx_enrollment.coverage_kind : nil %>
-          <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
-            <% current_employee_role = @hbx_enrollment.employee_role %>
-          <% end %>
-
-          <% if @adapter.can_shop_shop?(@person) %>
-            <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), (@effective_on_date || @new_effective_on), @qle) %>
-          <% end %>
-          <% if (@adapter.can_shop_individual?(@person)) || (@adapter.can_shop_resident?(@person)) %>
-            <%
-              is_ivl_coverage, rule, errors=@fm_hash[family_member.id]
-              @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
-              errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
-            %>
-          <% end %>
-
-          <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
-
           <tr class='<%= @adapter.class_for_ineligible_row(family_member, is_ivl_coverage, (@effective_on_date || @new_effective_on), @qle) %>'>
             <td style="padding: 0">
-              <div class="row <%= 'row-form-wrapper' if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %> no-buffer">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 top-buffer pb-1" style='width: 0;'>
-                  <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
-                </div>
-                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 top-buffer pb-1">
-                  <%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %>
-                </div>
-
-                <% @person.active_employee_roles.each do |employee_role| %>
-
-                  <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on), @qle) %>
-
-                  <div class='<%= "top-buffer health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></div>
-                  <div class='<%= "top-buffer dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
+                <% if EnrollRegistry.feature_enabled?(:choose_coverage_mdcr_warning) %>
+                  <!-- Once the :choose_coverage_mdcr_warning feature has passed UAT for DC, 
+                  the 'if/else' block can be removed and the content of the 'else' can be entirely deleted.
+                  The content of the 'if' is refactored and updated design of the 'else'.-->
+                  <div class="coverage-selection-block row-form-wrapper">
+                    <div class="coverage-chbx">
+                      <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
+                    </div>
+                    <div class="coverage-name-and-errors"> 
+                      <span class="coverage-message-row"><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name.upcase} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></span>
+                      <% @person.active_employee_roles.each do |employee_role| %>
+                        <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on), @qle) %>
+                        <div class='text-dk-grey <%= "health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></div>
+                        <div class='text-dk-grey <%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
+                      <% end %>
+                      <div class="ivl_errors text-dk-grey">
+                        <% errors.each do |error| %>
+                          <div><%= error %></div>
+                        <% end%>
+                      </div>
+                    </div>
+                  </div>
+                <% else %>
+                  <div class="row <%= 'row-form-wrapper' if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %> no-buffer">
+                    <div class="col-xs-1 top-buffer pb-1" style='width: 0;'>
+                      <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
+                    </div>
+                    <div class="col-sm-5 col-xs-12 top-buffer pb-1">
+                      <%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %>
+                    </div>
+                    <% @person.active_employee_roles.each do |employee_role| %>
+                      <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on), @qle) %>
+                      <div class='<%= "top-buffer health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></div>
+                      <div class='<%= "top-buffer dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
+                    <% end %>
+                    <div class="ivl_errors top-buffer">
+                      <% if errors.present? %>
+                        <div><%= raw(errors.join(', '))%></div>
+                      <% end%>
+                    </div>
+                  </div>
                 <% end %>
-
-                <div class="ivl_errors top-buffer">
-                 <% if errors.present? %>
-                   <div><%= raw(errors.join(', '))%></div>
-                 <% end%>
-                </div>
-              </div>
 
               <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
                 <div class="row row-form-wrapper no-buffer tobacco_user_container">
-                  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-buffer pb-1">
+                  <div class="col-sm-6 col-xs-12 top-buffer pb-1">
                     <label class="required no-pd"><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>
                   </div>
                   <% member = @latest_enrollment.hbx_enrollment_members.where(applicant_id: family_member.id).first if @latest_enrollment %>
-                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 top-buffer pb-1">
-                    <input class=" " id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use == 'Y' %>>
+                  <div class="col-xs-2 top-buffer pb-1">
+                    <input id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use == 'Y' %>>
                     <label class="radio-label" for="is_tobacco_user_Y_<%= index %>"><span>Yes</span></label>
                   </div>
-                  <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1 top-buffer pb-1">
-                    <input class=" " id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use != 'Y' %>>
-                    <label class="radio-label" for="is_tobacco_user_N_<%= index %>" ><span>No</span></label>
+                  <div class="col-md-2 col-xs-1 top-buffer pb-1">
+                    <input id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use != 'Y' %>>
+                    <label class="radio-label" for="is_tobacco_user_N_<%= index %>"><span>No</span></label>
                   </div>
                 </div>
               <% end %>
+
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
-      <br>
-    <% end%>
   </div>
+
 <% end %>
 
 <script>
