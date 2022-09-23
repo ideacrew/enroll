@@ -190,6 +190,8 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           it 'returns zero $' do
             expect(result.success?).to eq true
             expect(result.value!).to eq 0
+            expect(TaxHouseholdEnrollment.all.size).to eq 1
+            expect(TaxHouseholdEnrollment.all.first.tax_household_members_enrollment_members.size).to eq 0
           end
         end
 
