@@ -1036,11 +1036,11 @@ module FinancialAssistance
         return
       end
 
-      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family, effective_date: TimeKeeper.date_of_record)
+      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
       Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
 
       if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
-        on_new_determination = Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
+        on_new_determination = Operations::Individual::OnNewDetermination.new.call({family: self.family.reload, year: self.effective_date.year})
 
         Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
       end
