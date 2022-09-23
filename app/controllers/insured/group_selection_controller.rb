@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
   include Config::SiteConcern
+  include L10nHelper
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
@@ -11,6 +12,7 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     set_admin_bookmark_url
+
     @adapter.disable_market_kinds(params) do |disabled_market_kind|
       @disable_market_kind = disabled_market_kind
     end
@@ -19,20 +21,23 @@ class Insured::GroupSelectionController < ApplicationController
       @mc_market_kind = market_kind
       @mc_coverage_kind = coverage_kind
     end
+
     @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |derived_employee_role|
       @employee_role = derived_employee_role
     end
+
     @market_kind = @adapter.select_market(params)
     @resident = @adapter.possible_resident_person
+
     if @adapter.can_ivl_shop?(params)
       if @adapter.if_changing_ivl?(params)
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = @adapter.previous_hbx_enrollment
         pre_hbx.update_attributes!(changing: true) if pre_hbx.present?
       end
-
       @benefit = @adapter.ivl_benefit
     end
+
     @qle = @adapter.is_qle?
 
     insure_hbx_enrollment_for_shop_qle_flow
@@ -233,6 +238,12 @@ class Insured::GroupSelectionController < ApplicationController
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person
     incarcerated = person.is_consumer_role_active? && family_member.is_applying_coverage && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
+
+    if EnrollRegistry.feature_enabled?(:choose_coverage_mdcr_warning)
+      is_eligible_for_mdcr = @family.households&.first&.tax_households&.first&.tax_household_members&.where(applicant_id: family_member.id)&.first&.is_medicaid_chip_eligible
+      errors << l10n("insured.group_selection.mdcr_eligible_warning") if is_eligible_for_mdcr
+    end
+
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
