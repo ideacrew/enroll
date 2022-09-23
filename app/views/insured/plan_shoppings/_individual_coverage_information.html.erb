@@ -29,19 +29,25 @@
           <% end %>
           <% if calculate %>
             <% if osse_eligible %>
-              <td class="text-right"><%= l10n("osse_subsidy_title_shortname") %></td>
-              <td class="text-right"><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></td>
+              <td class="text-right"></td>
+              <td class="text-right"></td>
+              <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+              <td class="text-right"><%= number_to_currency(0.00) %></td>
+            <% else %>
+              <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+              <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
             <% end %>
-            <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
-            <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
           <% else %>
             <% if osse_eligible %>
-              <td class="text-right"><%= l10n("osse_subsidy_title_shortname") %></td>
-              <td class="text-right"><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></td>
+              <td class="text-right"></td>
+              <td class="text-right"></td>
+              <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+              <td class="text-right"><%= number_to_currency(0.00) %></td>
+            <% else %>
+              <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+              <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
             <% end %>
-            <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
-            <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
-          <% end %>
+           <% end %>
         </tr>
       <% end %>
       <tr class="gray-row">
@@ -49,14 +55,14 @@
         <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
         <% if osse_eligible %>
           <td></td>
-          <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
         <% end %>
         <% if calculate %>
           <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost - @enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
         <% else %>
           <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium - @enrollment.applied_aptc_amount.to_f) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
         <% end %>
       </tr>
       <tr>
