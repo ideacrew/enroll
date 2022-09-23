@@ -187,7 +187,7 @@ class Family
 
   scope :using_aptc_csr_assistance,      ->{where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
 
-  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
+  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
 
   # @todo verify dental plans will not be on the list (may be 01) alternative: plan.health_plan
   scope :plan_includes_csrs,            ->(csr_list){any_in("households.tax_households.tax_household_members.csr_percent_as_integer": csr_list)}
@@ -231,6 +231,7 @@ class Family
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrolled_and_enrolling_enrollments,->{  where(:"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES))}
+  scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }  # rubocop:disable Style/SymbolLiteral
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
