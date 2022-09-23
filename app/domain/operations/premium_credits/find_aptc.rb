@@ -177,7 +177,7 @@ module Operations
 
       def coinciding_family_members
         return @coinciding_family_members if defined? @coinciding_family_members
-        @coinciding_family_members = coinciding_enrollments.map(&:hbx_enrollment_members).map(&:to_s).uniq
+        @coinciding_family_members = coinciding_enrollments.map(&:hbx_enrollment_members).flatten.map(&:applicant_id).map(&:to_s).uniq
       end
 
       def benchmark_premiums
