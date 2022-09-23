@@ -184,6 +184,15 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let(:primary_bp) { 500.00 }
         let(:dependent_bp) { 600.00 }
 
+        context 'when benchmark_premium is nil' do
+          let(:benchmark_premium) { nil }
+
+          it 'returns zero $' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 0
+          end
+        end
+
         context 'without any coinciding enrollments' do
           let(:benchmark_premium) { primary_bp }
 
