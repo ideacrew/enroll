@@ -69,12 +69,13 @@ module Operations
       end
 
       def current_benchmark_premium(aptc_grant)
+        return 0.0 if benchmark_premiums.blank?
         round_down_float_two_decimals(benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }&.household_benchmark_ehb_premium || 0.0)
       end
 
       def persist_tax_household_enrollment(aptc_grant, available_max_aptc)
         th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: aptc_grant.tax_household_id)
-        household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }
+        household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id } if benchmark_premiums.present?
 
         th_enrollment.update!(
           household_benchmark_ehb_premium: (household_info&.household_benchmark_ehb_premium || 0.0),
@@ -136,10 +137,6 @@ module Operations
       def monthly_expected_contribution(aptc_grant)
         grant_value = round_down_float_two_decimals(aptc_grant.value) # value is string.
         (grant_value / 12)
-      end
-
-      def total_monthly_benchmark_premium(aptc_grant)
-        benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }.household_benchmark_ehb_premium
       end
 
       def coinciding_enrollments
@@ -204,6 +201,8 @@ module Operations
           }
           result
         end
+
+        return nil if households_hash.blank?
 
         payload = {
           family_id: @family.id,
