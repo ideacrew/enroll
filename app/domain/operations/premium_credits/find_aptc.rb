@@ -78,10 +78,10 @@ module Operations
 
         th_enrollment.update!(
           household_benchmark_ehb_premium: (household_info&.household_benchmark_ehb_premium || 0.0),
-          health_product_hios_id: household_info.health_product_hios_id,
-          dental_product_hios_id: household_info.dental_product_hios_id,
-          household_health_benchmark_ehb_premium: household_info.household_health_benchmark_ehb_premium,
-          household_dental_benchmark_ehb_premium: household_info.household_dental_benchmark_ehb_premium,
+          health_product_hios_id: household_info&.health_product_hios_id,
+          dental_product_hios_id: household_info&.dental_product_hios_id,
+          household_health_benchmark_ehb_premium: household_info&.household_health_benchmark_ehb_premium,
+          household_dental_benchmark_ehb_premium: household_info&.household_dental_benchmark_ehb_premium,
           total_benchmark_premium: total_benchmark_premium
         )
 
@@ -89,6 +89,7 @@ module Operations
       end
 
       def persist_tax_household_members_enrollment_members(aptc_grant, th_enrollment, household_info)
+        return if household_info.blank?
         tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).first
         tax_household = tax_household_group.tax_households.where(id: aptc_grant.tax_household_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
@@ -117,6 +118,7 @@ module Operations
         coinciding_enrollments.reduce(0.0) do |sum, previous_enrollment|
           pct = previous_enrollment.elected_aptc_pct > 0.0 ? previous_enrollment.elected_aptc_pct : default_applied_aptc_percentage
           th_enrollment = TaxHouseholdEnrollment.where(enrollment_id: previous_enrollment.id, tax_household_id: aptc_grant.tax_household_id).first
+          next sum if th_enrollment.blank?
           value = (round_down_float_two_decimals(th_enrollment.total_benchmark_premium) - (round_down_float_two_decimals(aptc_grant.value) / 12)) * pct
 
           sum += (value > 0.0 ? value : 0.0)
@@ -148,7 +150,10 @@ module Operations
 
         @coinciding_enrollments = active_enrollments.reject do |previous_enrollment|
           previous_enrollment.generate_hbx_signature
-          !previous_enrollment.product.can_use_aptc? || (previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature) || (is_primary_enrolling && primary_reenrolling?(previous_enrollment))
+
+          !previous_enrollment.product.can_use_aptc? ||
+            (previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature) ||
+            (is_primary_enrolling && primary_reenrolling?(previous_enrollment))
         end
       end
 
