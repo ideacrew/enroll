@@ -140,14 +140,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def healthcare_for_childcare_program
-    @form = ::Forms::HealthcareForChildcareProgramForm.new
-    @form.load_consumer(@person)
+    @childcare_forms = ::Forms::HealthcareForChildcareProgramForm.build_forms_for(@person.primary_family)
   end
 
   def update_healthcare_for_childcare_program_eligibility
-    form = ::Forms::HealthcareForChildcareProgramForm.new
-    form.load_consumer(@person)
-    form.submit(healthcare_for_childcare_program_params)
+    ::Forms::HealthcareForChildcareProgramForm.submit_with(healthcare_for_childcare_program_params)
 
     redirect_to(healthcare_for_childcare_program_insured_families_path)
   end
@@ -380,7 +377,7 @@ class Insured::FamiliesController < FamiliesController
   private
 
   def healthcare_for_childcare_program_params
-    params.require(:forms_healthcare_for_childcare_program_form).permit(:osse_eligibility)
+    params.require(:forms_healthcare_for_childcare_program_form).permit(:osse_eligibility, :person_id)
   end
 
   def upload_notice_form_enabled?
