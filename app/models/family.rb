@@ -172,7 +172,7 @@ class Family
 
   scope :using_aptc_csr_assistance,      ->{where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
 
-  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ unscoped.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
+  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
 
   # @todo verify dental plans will not be on the list (may be 01) alternative: plan.health_plan
   scope :plan_includes_csrs,            ->(csr_list){any_in("households.tax_households.tax_household_members.csr_percent_as_integer": csr_list)}
@@ -205,6 +205,7 @@ class Family
   scope :all_with_plan_shopping, -> { all_with_hbx_enrollments }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.enrolled_statuses.distinct(:family_id)) }
+  scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }  # rubocop:disable Style/SymbolLiteral
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.by_writing_agent_id(broker_id).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_group_ids,   ->(benefit_group_ids) { where(:"_id".in => HbxEnrollment.by_benefit_group_ids(benefit_group_ids).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_sponsorship_id, ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.by_benefit_sponsorship_id(benefit_sponsorship_id).distinct(:family_id))}
