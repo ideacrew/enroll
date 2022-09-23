@@ -231,7 +231,7 @@ class Family
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrolled_and_enrolling_enrollments,->{  where(:"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES))}
-  scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }
+  scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }  # rubocop:disable Style/SymbolLiteral
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
