@@ -57,11 +57,6 @@ module Subscribers
       end
     end
 
-    # application = FinancialAssistance::Application.by_hbx_id("1816903").first
-    # application.aasm_state = "submitted"
-    # application.save!
-    # application.determine!
-
     def log_error(subscriber_logger, logger, name, err)
       logger.info "#{name} Error raised when processing given payload message: #{err}, backtrace: #{err.backtrace.join('\n')}" if logger.present?
       subscriber_logger.info "#{name} Error raised when processing given payload message: #{err}, backtrace: #{err.backtrace.join('\n')}"
