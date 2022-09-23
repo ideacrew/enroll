@@ -211,7 +211,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               enrollment_id: prev_enrollment.id,
               tax_household_id: aptc_grant.tax_household_id,
               household_benchmark_ehb_premium: 500.00,
-              total_benchmark_premium: 500.00
+              available_max_aptc: 375.00
             )
           end
 
@@ -418,7 +418,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: 320.00,
-                total_benchmark_premium: 320.0
+                available_max_aptc: 0.0
               )
             end
 
@@ -507,7 +507,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 elected_aptc_pct: 1.0,
                                 enrollment_members: [primary_applicant],
                                 family: family,
-                                applied_aptc_amount: 1100.00,
+                                applied_aptc_amount: 550.00,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -516,7 +516,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: 1100.00,
-                total_benchmark_premium: 1100.0
+                available_max_aptc: 550.0
               )
             end
 
@@ -565,7 +565,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: 550.00,
-                total_benchmark_premium: 550.0
+                available_max_aptc: 550.0
               )
             end
 
@@ -574,7 +574,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 enrollment_id: prev_enrollment2.id,
                 tax_household_id: aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: 1130.00,
-                total_benchmark_premium: (1130.0 + 550.0)
+                available_max_aptc: 1130.0
               )
             end
 
@@ -589,7 +589,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
             it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
               expect(result.success?).to eq true
-              expect(result.value!).to eq 490
+              expect(result.value!).to eq 0
             end
           end
         end
@@ -782,7 +782,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               enrollment_id: prev_enrollment.id,
               tax_household_id: primary_grant.tax_household_id,
               household_benchmark_ehb_premium: 320.00,
-              total_benchmark_premium: 320.0
+              available_max_aptc: 106.25
             )
           end
 
@@ -901,7 +901,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: primary_aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: primary_benchmark_premium,
-                total_benchmark_premium: primary_benchmark_premium
+                available_max_aptc: 106.25
               )
             end
 
@@ -910,7 +910,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                 enrollment_id: prev_enrollment.id,
                 tax_household_id: dependents_aptc_grant.tax_household_id,
                 household_benchmark_ehb_premium: dependent2_benchmark_premium,
-                total_benchmark_premium: dependent2_benchmark_premium
+                available_max_aptc: 160
               )
             end
 

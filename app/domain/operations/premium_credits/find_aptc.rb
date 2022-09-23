@@ -56,7 +56,7 @@ module Operations
 
           value = total_benchmark_premium - expected_contribution - utilized_aptc(aptc_grant)
 
-          persist_tax_household_enrollment(aptc_grant, total_benchmark_premium)
+          persist_tax_household_enrollment(aptc_grant, value)
 
           sum += (value < 0) ? 0.0 : value
           sum
@@ -69,10 +69,10 @@ module Operations
       end
 
       def current_benchmark_premium(aptc_grant)
-        benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }&.household_benchmark_ehb_premium || 0.0
+        round_down_float_two_decimals(benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }&.household_benchmark_ehb_premium || 0.0)
       end
 
-      def persist_tax_household_enrollment(aptc_grant, total_benchmark_premium)
+      def persist_tax_household_enrollment(aptc_grant, available_max_aptc)
         th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: aptc_grant.tax_household_id)
         household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id }
 
@@ -82,7 +82,7 @@ module Operations
           dental_product_hios_id: household_info&.dental_product_hios_id,
           household_health_benchmark_ehb_premium: household_info&.household_health_benchmark_ehb_premium,
           household_dental_benchmark_ehb_premium: household_info&.household_dental_benchmark_ehb_premium,
-          total_benchmark_premium: total_benchmark_premium
+          available_max_aptc: available_max_aptc
         )
 
         persist_tax_household_members_enrollment_members(aptc_grant, th_enrollment, household_info)
@@ -119,7 +119,8 @@ module Operations
           pct = previous_enrollment.elected_aptc_pct > 0.0 ? previous_enrollment.elected_aptc_pct : default_applied_aptc_percentage
           th_enrollment = TaxHouseholdEnrollment.where(enrollment_id: previous_enrollment.id, tax_household_id: aptc_grant.tax_household_id).first
           next sum if th_enrollment.blank?
-          value = (round_down_float_two_decimals(th_enrollment.total_benchmark_premium) - (round_down_float_two_decimals(aptc_grant.value) / 12)) * pct
+          # value = (round_down_float_two_decimals(th_enrollment.total_benchmark_premium) - (round_down_float_two_decimals(aptc_grant.value) / 12)) * pct
+          value = round_down_float_two_decimals(th_enrollment.available_max_aptc) * pct
 
           sum += (value > 0.0 ? value : 0.0)
           sum
