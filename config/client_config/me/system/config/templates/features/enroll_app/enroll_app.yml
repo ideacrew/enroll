@@ -399,6 +399,9 @@ registry:
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: true
+      - key: :market_type_hidden
+        item: :market_type_hidden
+        is_enabled: <%= ENV['MARKET_TYPE_HIDDEN_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
