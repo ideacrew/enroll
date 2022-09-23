@@ -36,7 +36,7 @@
                 </div>
                 <div>
                   <p>
-                    <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
+                    <label><%= l10n("premium_you_pay") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
                     <label class="bullet-separator">&nbsp;ID:</label> <strong><%= hbx_enrollment[:hbx_id] %></strong>
                     <br>
                   </p>
@@ -56,8 +56,12 @@
                     <strong><%= hbx_enrollment[:effective_on] %></strong>
                   </p>
                 </div>
-                <label class="bullet-separator">&nbsp;Tax credit amount:</label>
+                <label class="bullet-separator">Tax credit amount:</label>
                 <strong>$<%= hbx_enrollment.applied_aptc_amount %></strong>
+                <% if (hbx_enrollment.eligible_child_care_subsidy > 0) %>
+                  <label class="bullet-separator"><%= l10n("hc44cc_premium_discount") %>:</label>
+                  <strong><%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%></strong>
+                <% end %>
               </div>
               <div class="col-xs-4">
                 <div class="family-plan-selection">

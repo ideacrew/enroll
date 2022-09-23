@@ -46,7 +46,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
     coverage_kind: "dental",
     external_enrollment: false )
   }
-  let(:decorated_hbx_enrollment) { double(member_enrollments:[member_enrollment], product_cost_total:'',sponsor_contribution_total:'') }
+  let(:decorated_hbx_enrollment) { double(member_enrollments: [member_enrollment], product_cost_total: '', sponsor_contribution_total: '', employee_cost_total: 100.00) }
   let(:user) { FactoryBot.create(:user) }
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
   let(:benefit_package) { double(is_congress: false) } #FIX ME: remove this when is_congress attribute added to benefit package
@@ -82,6 +82,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
       allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
       allow(hbx_enrollment).to receive(:benefit_group).and_return(current_benefit_package)
       allow(group_enrollment).to receive(:member_enrollments).and_return([member_enrollment])
+      allow(group_enrollment).to receive(:employee_cost_total).and_return(100.00)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_package)
     end
 
