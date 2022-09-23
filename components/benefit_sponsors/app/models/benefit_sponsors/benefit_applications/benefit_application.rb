@@ -10,6 +10,7 @@ module BenefitSponsors
     include EventSource::Command
     include GlobalID::Identification
     include AASM
+    include ::BenefitSponsors::Employers::EmployerHelper
 
     embedded_in :benefit_sponsorship,
                 class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
@@ -1274,7 +1275,7 @@ module BenefitSponsors
     end
 
     def osse_eligible?
-      eligibility_for(:osse_subsidy).present?
+      eligibility_for(:osse_subsidy).present? && shop_osse_eligibility_is_enabled?(start_on.year)
     end
 
     private

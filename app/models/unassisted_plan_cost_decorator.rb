@@ -33,10 +33,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def ordered_children
     @ordered_children ||= begin
-      non_spouse_or_subscribers = members.reject do |m|
-        m.is_subscriber? || DISCOUNT_EXEMPT_RELATIONSHIPS.include?(m.primary_relationship)
+      non_spouse_or_child_subscribers = members.reject do |m|
+        (m.is_subscriber? && m.primary_relationship != 'child') || DISCOUNT_EXEMPT_RELATIONSHIPS.include?(m.primary_relationship)
       end
-      not_too_old = non_spouse_or_subscribers.select do |mem|
+      not_too_old = non_spouse_or_child_subscribers.select do |mem|
         age_of(mem) <= child_age_limit
       end
       not_too_old.sort_by { |m| age_of(m) }.reverse
