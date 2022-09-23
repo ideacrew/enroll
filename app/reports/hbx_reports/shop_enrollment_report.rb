@@ -34,7 +34,9 @@ class ShopEnrollmentReport < MongoidMigrationTask
     shop_headers = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Plan Year Start', 'Plan Year State', 'Employer State',
                     'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage End', 'Coverage Kind', 'Enrollment State', 
                     'Subscriber HBXID', 'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Premium Subtotal', 
-                    'ER Contribution', 'Applied APTC Amount', 'Total Responsible Amount', 'Family Size', 'Enrollment Reason', 'In Glue']
+                    'ER Contribution', 'Applied APTC Amount', 'Total Responsible Amount', 'Family Size', 'Enrollment Reason', 'In Glue',
+                    "Policy Plan Name", "Enrollee's Hbx Ids", "Enrollee's DOBs", "Member Coverage Start Date", "Member Coverage End Date",
+                    "Osse Eligible", "Monthly Subsidy Amount", "Employee Contribution"]
     file_name = "#{Rails.root}/hbx_report/shop_enrollment_report.csv"
 
     rating_area_cache = get_rating_areas
@@ -89,6 +91,9 @@ class ShopEnrollmentReport < MongoidMigrationTask
               last_name = subscriber.last_name
             end
             in_glue = glue_list.include?(id) if glue_list.present?
+            enrollees_hbx_ids = hbx_enrollment.hbx_enrollment_members.map(&:hbx_id).join(', ')
+            enrollees_dob = hbx_enrollment.hbx_enrollment_members.map { |member| member.person.dob }.join(', ')
+            osse_eligible = (hbx_enrollment.eligible_child_care_subsidy > 0 ? "Yes" : "No")
             csv << [
               employer_profile.hbx_id, employer_profile.fein, employer_profile.legal_name,
               plan_year_start, plan_year.aasm_state, plan_year.benefit_sponsorship.aasm_state,
@@ -99,7 +104,10 @@ class ShopEnrollmentReport < MongoidMigrationTask
               calculator.total_premium, calculator.total_employer_contribution, hbx_enrollment.applied_aptc_amount, calculator.total_employee_cost,
               hbx_enrollment.hbx_enrollment_members.size,
               enrollment_reason,
-              in_glue]
+              in_glue, hbx_enrollment.product.title, enrollees_hbx_ids, enrollees_dob,
+              hbx_enrollment.primary_hbx_enrollment_member.coverage_start_on,
+              hbx_enrollment.primary_hbx_enrollment_member.coverage_end_on, osse_eligible, hbx_enrollment.eligible_child_care_subsidy, calculator.total_employee_cost
+            ]
           rescue StandardError => e
             @logger = Logger.new("#{Rails.root}/log/shop_enrollment_report_error.log")
             (@logger.error { "Could not add the hbx_enrollment's information on to the CSV for eg_id:#{id}, subscriber_hbx_id:#{subscriber_hbx_id}, #{e.inspect}" }) unless Rails.env.test?

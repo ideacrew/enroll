@@ -335,6 +335,9 @@ registry:
       - key: :tobacco_cost
         item: :tobacco_cost
         is_enabled: false
+      - key: :choose_coverage_mdcr_warning
+        item: :choose_coverage_mdcr_warning
+        is_enabled: <%= ENV['CHOOSE_COVERAGE_MDCR_WARNING_IS_ENABLED'] || false %>
       - key: :counties_import
         is_enabled: false
         item: ""
@@ -649,6 +652,9 @@ registry:
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
         is_enabled: true
+      - key: :trigger_verifications_before_enrollment_purchase
+        item: trigger_verifications_before_enrollment_purchase
+        is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
       - key: :saml_info_keys
         is_enabled: true
         settings:

@@ -4,6 +4,7 @@ module Operations
   module BenchmarkProducts
     # This class is to identify SLCSP with Pediatric Dental Costs for a group of family_members & effective date.
     # This class considers rating address of primary person of the given family to determine available products and their ratings.
+    # All the members of the request payload should be eligible for InsuranceAssistance(APTC)
     class IdentifySlcspWithPediatricDentalCosts
       include Dry::Monads[:result, :do]
 
@@ -18,6 +19,7 @@ module Operations
         benchmark_product_model = yield identify_slcsapd(family, benchmark_product_model)
         benchmark_product_model = yield identify_slcsp(family, benchmark_product_model)
         benchmark_product_model = yield calculate_household_group_benchmark_ehb_premium(benchmark_product_model)
+        _created                = yield persist_calculation(family, params, benchmark_product_model)
 
         Success(benchmark_product_model)
       end
@@ -79,6 +81,20 @@ module Operations
         bpm_params.merge!({ household_group_benchmark_ehb_premium: household_group_benchmark_ehb_premium })
 
         validate(bpm_params)
+      end
+
+      def persist_calculation(family, params, benchmark_product_model)
+        begin
+          ::BenchmarkProduct.create(
+            family_id: family.id,
+            request_payload: params.to_json,
+            response_payload: benchmark_product_model.to_h.to_json
+          )
+        rescue StandardError => e
+          Rails.logger.error { "BenchmarkModel Creation Error - #{e}" }
+        end
+
+        Success()
       end
     end
   end

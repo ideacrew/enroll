@@ -34,7 +34,8 @@ module Operations
       def validate(params)
         errors = []
         errors << 'subject ref missing' unless params[:subjects]
-        errors << 'evidence ref missing' unless params[:effective_date]
+        errors << 'effective_date ref missing' unless params[:effective_date]
+        errors << 'family ref missing' unless params[:family]
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -45,10 +46,7 @@ module Operations
         eligibility_items =
           eligibility_item_keys.collect do |eligibility_item_key|
             next unless EnrollRegistry[eligibility_item_key].enabled?
-            eligibility_item_result =
-              Operations::EligibilityItems::Find.new.call(
-                eligibility_item_key: eligibility_item_key
-              )
+            eligibility_item_result = Operations::EligibilityItems::Find.new.call(eligibility_item_key: eligibility_item_key)
             eligibility_item_result.success if eligibility_item_result.success?
           end.compact
 
@@ -85,9 +83,12 @@ module Operations
           end
           .reduce(:merge)
 
+        grants = build_aptc_grants(values[:family], values[:effective_date]).success
+
         determination = {
           effective_date: values[:effective_date],
-          subjects: subjects
+          subjects: subjects,
+          grants: grants
         }
 
         Success(
@@ -97,6 +98,10 @@ module Operations
             outstanding_verification_document_status: outstanding_verification_document_status_for_determination(determination)
           )
         )
+      end
+
+      def build_aptc_grants(family, effective_date)
+        Operations::Eligibilities::BuildGrant.new.call(family: family, type: 'AdvancePremiumAdjustmentGrant', effective_date: effective_date)
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity

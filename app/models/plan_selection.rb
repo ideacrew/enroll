@@ -14,17 +14,10 @@ class PlanSelection
     hbx_enrollment.may_select_coverage?
   end
 
-  def can_apply_aptc?(shopping_tax_household, elected_aptc)
-    return false if hbx_enrollment.is_shop?
-    shopping_tax_household.present? && elected_aptc > 0 && plan.can_use_aptc?
-  end
-
-  def apply_aptc_if_needed(shopping_tax_household, elected_aptc, max_aptc)
-    if can_apply_aptc?(shopping_tax_household, elected_aptc)
-      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, elected_aptc, shopping_tax_household)
-      hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
-      hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc/max_aptc)
-    end
+  def apply_aptc_if_needed(elected_aptc, max_aptc)
+    decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, elected_aptc)
+    hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
+    hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc / max_aptc)
   end
 
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT

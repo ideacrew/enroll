@@ -57,6 +57,7 @@ class Family
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
+  embeds_many :tax_household_groups, cascade_callbacks: true
   # embeds_many :broker_agency_accounts #depricated
   embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount", cascade_callbacks: true
   embeds_many :general_agency_accounts
@@ -161,6 +162,21 @@ class Family
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
+  # @todo figure it out if is using csr_percent_as_integer index
+  scope :all_active_assistance_receiving_for_assistance_year, lambda { |assistance_year|
+    using_aptc_csr_assistance.order(:"households.tax_households.eligibility_determinations.determined_at".desc)
+                             .and(:"households.tax_households.effective_ending_on" => nil)
+                             .and(:"households.tax_households.effective_starting_on".gte => Date.new(assistance_year).beginning_of_year)
+                             .and(:"households.tax_households.effective_starting_on".lte => Date.new(assistance_year).end_of_year)
+  }
+
+  scope :using_aptc_csr_assistance,      ->{where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
+
+  scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
+
+  # @todo verify dental plans will not be on the list (may be 01) alternative: plan.health_plan
+  scope :plan_includes_csrs,            ->(csr_list){any_in("households.tax_households.tax_household_members.csr_percent_as_integer": csr_list)}
+
   scope :all_aptc_hbx_enrollments,      ->{ where(:"_id".in => HbxEnrollment.where(:"applied_aptc_amount.cents".gt => 0).distinct(:family_id)) }
   scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
 
@@ -189,6 +205,7 @@ class Family
   scope :all_with_plan_shopping, -> { all_with_hbx_enrollments }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.enrolled_statuses.distinct(:family_id)) }
+  scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }  # rubocop:disable Style/SymbolLiteral
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.by_writing_agent_id(broker_id).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_group_ids,   ->(benefit_group_ids) { where(:"_id".in => HbxEnrollment.by_benefit_group_ids(benefit_group_ids).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_sponsorship_id, ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.by_benefit_sponsorship_id(benefit_sponsorship_id).distinct(:family_id))}

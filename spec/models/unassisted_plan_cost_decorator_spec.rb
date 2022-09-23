@@ -16,7 +16,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let(:consumer_role) { ConsumerRole.new }
     let(:rating_address) { FactoryBot.build(:address) }
     let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five], consumer_role: consumer_role, rating_area: rating_area)}
-    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self", tobacco_use: nil, is_subscriber?: true)}
+    let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self", tobacco_use: nil, is_subscriber?: true, primary_relationship: "self")}
     let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, employee_relationship: "spouse", tobacco_use: nil, is_subscriber?: false, primary_relationship: "spouse")}
     let!(:one)             {double("one", dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
     let!(:two)             {double("two", dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child", tobacco_use: nil, is_subscriber?: false, primary_relationship: "child")}
@@ -201,6 +201,25 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           it 'should return the aptc amount of the member from individual member aptc hash' do
             expect(@upcd_2.aptc_amount(hbx_enrollment_member1)).to eq @upcd_2.all_members_aptc[hbx_enrollment_member1.applicant_id.to_s]
           end
+        end
+      end
+
+      context "should have correct total_employee_cost" do
+        let(:plan_cost_decorator) { UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10) }
+
+        it "if multi taxhousehold feature is disabled" do
+          total_cost = hbx_enrollment10.hbx_enrollment_members.collect do |member|
+            plan_cost_decorator.employee_cost_for(member).round(2)
+          end.compact.sum.round(2)
+
+          expect(plan_cost_decorator.total_employee_cost).to eq total_cost
+        end
+
+        it "if multi taxhousehold feature is enabled" do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          total_premium = plan_cost_decorator.total_premium
+          total_aptc_amount = plan_cost_decorator.total_aptc_amount
+          expect(plan_cost_decorator.total_employee_cost).to eq(total_premium - total_aptc_amount)
         end
       end
 

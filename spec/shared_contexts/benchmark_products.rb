@@ -43,6 +43,7 @@ RSpec.shared_context '3 dental products with different rating_methods, different
       health_pro = FactoryBot.create(
         :benefit_markets_products_health_products_health_product,
         :silver,
+        csr_variant_id: '01',
         hios_id: hios_id,
         hios_base_id: hios_id,
         service_area_id: service_area.id,
@@ -51,7 +52,7 @@ RSpec.shared_context '3 dental products with different rating_methods, different
       health_pro.premium_tables.each do |pre_t|
         pre_t.update_attributes(rating_area_id: rating_area.id)
         next if index.zero?
-        cost = index == 1 ? 600.00 : 500.00
+        cost = index == 1 ? 600.00 : 590.00
         pre_t.premium_tuples.each do |pt|
           pt.update_attributes(cost: cost)
         end
@@ -83,7 +84,7 @@ RSpec.shared_context '3 dental products with different rating_methods, different
         hios_base_id: hios_id,
         rating_method: rating_method,
         service_area_id: service_area.id,
-        ehb: 1.0
+        ehb_apportionment_for_pediatric_dental: 1.0
       )
       dental_pro.premium_tables.each do |pre_t|
         pre_t.update_attributes(rating_area_id: rating_area.id)

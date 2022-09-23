@@ -115,6 +115,8 @@ registry:
         is_enabled: true
       - key: :out_of_state_primary
         is_enabled: false
+      - key: :temporary_configuration_enable_multi_tax_household_feature
+        is_enabled: <%= ENV['TEMPORARY_CONFIGURATION_OF_MULTI_TAX_HOUSEHOLD_FEATURE_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
