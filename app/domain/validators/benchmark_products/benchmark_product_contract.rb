@@ -29,7 +29,7 @@ module Validators
           optional(:dental_product_title).maybe(Types::String)
           optional(:dental_product_id).maybe(Types::Bson)
           optional(:dental_rating_method).maybe(Types::String)
-          optional(:dental_ehb).maybe(::AcaEntities::Types::Money)
+          optional(:dental_ehb_apportionment_for_pediatric_dental).maybe(::AcaEntities::Types::Money)
           optional(:household_dental_benchmark_ehb_premium).maybe(::AcaEntities::Types::Money)
           required(:members).array(:hash) do
             required(:family_member_id).filled(Types::Bson)

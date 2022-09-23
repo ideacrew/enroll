@@ -121,6 +121,7 @@ class ProductBuilder
     else
       {
         dental_plan_kind: @qhp.plan_type.downcase,
+        ehb_apportionment_for_pediatric_dental: @qhp.ehb_apportionment_for_pediatric_dental.presence || 1.0,
         dental_level: @qhp.metal_level.downcase,
         product_package_kinds: [:multi_product, :single_issuer]
       }
