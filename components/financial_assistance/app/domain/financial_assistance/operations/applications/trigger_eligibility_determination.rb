@@ -22,7 +22,7 @@ module FinancialAssistance
         private
 
         def find_renewal_draft(renewal_year)
-          Success(::FinancialAssistance::Application.by_year(renewal_year).where(aasm_state: "renewal_draft").pluck(:id))
+          Success(::FinancialAssistance::Application.by_year(renewal_year).where(aasm_state: "submitted").pluck(:id))
         end
 
         # rubocop:disable Style/MultilineBlockChain
