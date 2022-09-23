@@ -5,6 +5,9 @@ require File.join(Rails.root, 'app', 'data_migrations', 'update_minimum_contribu
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 describe UpdateMinimumContributionFactorOnContributionUnit, dbclean: :after_each do
+  before :all do
+    DatabaseCleaner.clean
+  end
 
   let(:given_task_name) { "update_minimum_contribution_factor_on_contribution_unit" }
   subject { UpdateMinimumContributionFactorOnContributionUnit.new(given_task_name, double(:current_scope => nil)) }

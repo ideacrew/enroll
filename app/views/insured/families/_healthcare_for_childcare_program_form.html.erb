@@ -1,10 +1,11 @@
 <div class="mt-2">
-  <% person.primary_family.family_members.each do |family_member| %>
-  <h4><%=family_member.person.full_name %></h4>
-    <%= form_for(@form, url: update_healthcare_for_childcare_program_eligibility_insured_families_path, :enctype =>"multipart/form-data", method: :put) do |f| %>
+  <% @childcare_forms.each do |person, form| %>
+  <h4><%= person.full_name %></h4>
+    <%= form_for(form, url: update_healthcare_for_childcare_program_eligibility_insured_families_path, :enctype =>"multipart/form-data", method: :put) do |f| %>
+      <%= f.hidden_field :person_id, value: person.id %>
       <div class="row no-buffer vertically-aligned-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 15px; background-color: #fff;">
         <div class="form-check-label"><%= l10n('osse_eligibility_ivl_question') %></div>
-        <div class="form-checkform-check-inline col-md-2 col-xs-12 form-group form-group-lg">
+          <div class="form-checkform-check-inline col-md-2 col-xs-12 form-group form-group-lg">
             <label style="accent-color: #007bc4;">
             <%= f.radio_button :osse_eligibility, true, class: "n-radio", disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) %>
               </label>

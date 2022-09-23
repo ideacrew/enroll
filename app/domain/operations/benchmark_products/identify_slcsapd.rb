@@ -31,7 +31,7 @@ module Operations
         household[:dental_product_title] = product.title
         household[:dental_product_id] = product.id
         household[:dental_rating_method] = product.rating_method
-        household[:dental_ehb] = product.ehb
+        household[:dental_ehb_apportionment_for_pediatric_dental] = product.ehb_apportionment_for_pediatric_dental
         household[:household_dental_benchmark_ehb_premium] = ehb_premium
 
         Success(household)
@@ -92,7 +92,7 @@ module Operations
                           total_premium(dental_product)
                         end
 
-        (group_premium * dental_product.ehb).round(2)
+        (group_premium * dental_product.ehb_apportionment_for_pediatric_dental).round(2)
       end
 
       # Pediatric Dental Premiums should only be calculated for Child Members.

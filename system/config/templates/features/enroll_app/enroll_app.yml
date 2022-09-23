@@ -652,6 +652,9 @@ registry:
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
         is_enabled: true
+      - key: :trigger_verifications_before_enrollment_purchase
+        item: trigger_verifications_before_enrollment_purchase
+        is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
       - key: :saml_info_keys
         is_enabled: true
         settings:
