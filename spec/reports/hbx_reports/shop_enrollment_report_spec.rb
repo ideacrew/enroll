@@ -22,9 +22,11 @@ describe ShopEnrollmentReport do
 
       CSV.foreach(@file, :headers => true) do |csv|
         expect(csv).to eq ['Employer ID', 'Employer FEIN', 'Employer Name', 'Plan Year Start', 'Plan Year State', 'Employer State',
-                           'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage End', 'Coverage Kind', 'Enrollment State', 
-                           'Subscriber HBXID', 'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Premium Subtotal', 
-                           'ER Contribution', 'Applied APTC Amount', 'Total Responsible Amount', 'Family Size', 'Enrollment Reason', 'In Glue']
+                          'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage End', 'Coverage Kind', 'Enrollment State', 
+                          'Subscriber HBXID', 'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Premium Subtotal', 
+                          'ER Contribution', 'Applied APTC Amount', 'Total Responsible Amount', 'Family Size', 'Enrollment Reason', 'In Glue', 
+                          "Policy Plan Name", "Enrollee's Hbx Ids", "Enrollee's DOBs", "Member Coverage Start Date", "Member Coverage End Date", 
+                          "Osse Eligible", "Monthly Subsidy Amount", "Employee Contribution"]
       end
     end
   end
