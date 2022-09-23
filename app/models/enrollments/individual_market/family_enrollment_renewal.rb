@@ -67,6 +67,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def can_renew_assisted_product?(renewal_enrollment)
     return false unless @assisted
+    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) # If assisted, this is good to renew as assisted product.
 
     tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
     members = tax_household.tax_household_members

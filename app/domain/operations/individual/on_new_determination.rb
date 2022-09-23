@@ -58,7 +58,6 @@ module Operations
             aggregate_aptc_amount: max_aptc
           }
 
-
           ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
         end
         Success("Aggregate amount applied on to enrollments")
