@@ -6,6 +6,9 @@
         <th>Relationship</th>
         <th>Age</th>
         <th>Premium</th>
+        <% if (enrollment.eligible_child_care_subsidy > 0) %>
+          <th><%= l10n("hc44cc_premium_discount") %></th>
+        <% end %>
         <th>Employer Contribution</th>
         <th>You Pay</th>
       </tr>
@@ -20,8 +23,9 @@
         <%# TODO %>
         <% member_enrollment = group_enrollment.member_enrollments.detect {|member_enrollment| member_enrollment.member_id == member.id} %>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.product_price.to_f) %></td>
+        <td></td>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.sponsor_contribution.to_f) %></td>
-        <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.product_price.to_f - member_enrollment.sponsor_contribution.to_f) %></td>
+        <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.employee_cost.to_f) %></td>
       </tr>
       <% end %>
       <tr class="gray-row">
@@ -33,11 +37,16 @@
         <td>
           <strong><%= number_to_currency(group_enrollment.product_cost_total.to_f) %></strong>
         </td>
+        <% if (enrollment.eligible_child_care_subsidy > 0) %>
+          <td>
+            <strong><%= number_to_currency(group_enrollment.eligible_child_care_subsidy.to_f) %></strong>
+          </td>
+        <% end %>
         <td>
           <strong><%= number_to_currency(group_enrollment.sponsor_contribution_total.to_f) %></strong>
         </td>
         <td>
-          <strong><%= number_to_currency(group_enrollment.product_cost_total.to_f - group_enrollment.sponsor_contribution_total.to_f ) %></strong>
+          <strong><%= number_to_currency(group_enrollment.employee_cost_total.to_f) %></strong>
         </td>
       </tr>
     </tbody>
