@@ -3,6 +3,15 @@ registry:
   - namespace:
     - :enroll_app
     - :aca_individual_market
+    - :catalog
+    - :osse_eligibility_criteria
+    features:
+        - key: :aca_ivl_osse_subsidy
+          item: :aca_ivl_osse_subsidy
+          is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
+  - namespace:
+    - :enroll_app
+    - :aca_individual_market
     - :catalog_2021
     - :osse_eligibility_criteria
     features:
