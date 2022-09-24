@@ -166,6 +166,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
   context "GET thankyou", :dbclean => :around_each do
     let(:member_group) { double("MEMBERGROUP")}
+    let(:product_delegator) { double }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -182,7 +183,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:employee_role).and_return(double)
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return false
       allow(hbx_enrollment).to receive(:can_select_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(hbx_enrollment).to receive(:build_plan_premium).and_return(product_delegator)
+      allow(product_delegator).to receive(:total_childcare_subsidy_amount).and_return(0.00)
+      allow(hbx_enrollment).to receive(:update).and_return(true)
       allow(hbx_enrollment).to receive(:set_special_enrollment_period).and_return(true)
       allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)

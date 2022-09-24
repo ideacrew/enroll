@@ -269,10 +269,21 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
         allow(hbx_enrollment_double).to receive(:total_premium).and_return(400.00)
         allow(hbx_enrollment_double).to receive(:total_ehb_premium).and_return(140.00)
         allow(hbx_enrollment_double).to receive(:applied_aptc_amount).and_return(150.00)
+        allow(hbx_enrollment_double).to receive(:eligible_child_care_subsidy).and_return(0.00)
       end
 
       it "shows total employee cost" do
         expect(helper.current_premium(hbx_enrollment_double)).to eq(260.00)
+      end
+
+      context 'when childcare subsidy present' do
+        before do
+          allow(hbx_enrollment_double).to receive(:eligible_child_care_subsidy).and_return(260.00)
+        end
+
+        it "shows zero total employee cost" do
+          expect(helper.current_premium(hbx_enrollment_double)).to eq(0.00)
+        end
       end
     end
   end

@@ -151,10 +151,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_employee_cost
-    return (total_premium - total_aptc_amount) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    return (total_premium - total_aptc_amount - total_childcare_subsidy_amount) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
     if family_tier_eligible?
-      cost = (family_tier_total_premium - total_aptc_amount).round(2)
+      cost = (family_tier_total_premium - total_aptc_amount - total_childcare_subsidy_amount).round(2)
       cost = 0.00 if cost < 0
       return cost
     end
@@ -175,6 +175,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     result = mem_premium * __getobj__.ehb
     return result unless EnrollRegistry.feature_enabled?(:total_minimum_responsibility)
     (mem_premium - result >= 1) ? result : (mem_premium - 1)
+  end
+
+  def total_childcare_subsidy_amount
+    return 0.00 if kind == :dental
+    return 0.00 if members.none?(&:osse_eligible_on_effective_date?)
+    total_premium - total_aptc_amount
   end
 
   private
