@@ -71,8 +71,10 @@ module Operations
         case qnc_code
         when 'Y'
           true
-        else
+        when 'N'
           false
+        else
+          consumer_role.person.eligible_immigration_status
         end
       end
 

@@ -1834,4 +1834,58 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe 'qualified_non_citizen' do
+    context 'when qnc is false on applicant' do
+      before do
+        applicant.update!(qualified_non_citizen: false)
+        result = subject.call(application.reload)
+        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @applicant_entity = entity_init.success.applicants.first
+      end
+
+      it 'should include qualified_non_citizen in payload' do
+        expect(@applicant_entity.qualified_non_citizen).to eq(false)
+      end
+    end
+
+    context 'when qnc is true on applicant' do
+      before do
+        applicant.update!(qualified_non_citizen: true)
+        result = subject.call(application.reload)
+        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @applicant_entity = entity_init.success.applicants.first
+      end
+
+      it 'should include qualified_non_citizen in payload' do
+        expect(@applicant_entity.qualified_non_citizen).to eq(true)
+      end
+    end
+
+    context 'when qnc is nil on applicant' do
+      it 'should include qualified_non_citizen in payload' do
+        applicant.update!(qualified_non_citizen: nil)
+        result = subject.call(application.reload)
+        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        applicant_entity = entity_init.success.applicants.first
+        expect(applicant_entity.qualified_non_citizen).to eq(false)
+      end
+
+      it 'should return true if applicant is alien_lawfully_present ' do
+        applicant.update!(qualified_non_citizen: nil, citizen_status: 'alien_lawfully_present')
+        result = subject.call(application.reload)
+        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        applicant_entity = entity_init.success.applicants.first
+        expect(applicant_entity.qualified_non_citizen).to eq(true)
+      end
+
+      it 'should return true if applicant is us_citizen ' do
+        applicant.update!(qualified_non_citizen: nil, citizen_status: 'us_citizen')
+        result = subject.call(application.reload)
+        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        applicant_entity = entity_init.success.applicants.first
+        expect(applicant_entity.qualified_non_citizen).to eq(false)
+      end
+    end
+  end
 end
