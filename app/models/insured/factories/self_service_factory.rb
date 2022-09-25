@@ -51,7 +51,7 @@ module Insured
         )
       end
 
-      def self.update_aptc(enrollment_id, applied_aptc_amount, elected_aptc_pct: nil, aggregate_aptc_amount: nil)
+      def self.update_aptc(enrollment_id, applied_aptc_amount, exclude_enrollments_list: nil)
         # field :elected_aptc_pct, type: Float, default: 0.0
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
@@ -70,7 +70,10 @@ module Insured
         reinstatement.save!
 
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          mthh_update_enrollment_for_aptcs(reinstatement, applied_aptc_amount, elected_aptc_pct, aggregate_aptc_amount)
+          default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+          elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
+
+          mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, exclude_enrollments_list)
         else
           update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
         end
@@ -100,7 +103,17 @@ module Insured
         @invalid_family_member_ids << (all_family_member_ids | reinstatement_family_member_ids) - (all_family_member_ids & reinstatement_family_member_ids)
       end
 
-      def self.mthh_update_enrollment_for_aptcs(reinstatement, applied_aptc_amount, elected_aptc_pct, aggregate_aptc_amount)
+      def self.mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, exclude_enrollments_list)
+        result = ::Operations::PremiumCredits::FindAptc.new.call({
+                                                                   hbx_enrollment: reinstatement,
+                                                                   effective_on: new_effective_date,
+                                                                   exclude_enrollments_list: exclude_enrollments_list
+                                                                 })
+        return result unless result.success?
+
+        aggregate_aptc_amount = result.value!
+        applied_aptc_amount = float_fix(aggregate_aptc_amount * elected_aptc_pct)
+
         reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount)
       end
 
