@@ -237,13 +237,26 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
           let(:benchmark_premium) { dependent_bp }
 
-          let(:params) do
-            { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on }
+          context 'when not excluding any enrollments' do
+            let(:params) do
+              { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on }
+            end
+
+            it 'returns benchmark premiums when monthly_expected_contribution is met' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 600.00
+            end
           end
 
-          it 'returns benchmark premiums when monthly_expected_contribution is met' do
-            expect(result.success?).to eq true
-            expect(result.value!).to eq 600.00
+          context 'when excluding any enrollments' do
+            let(:params) do
+              { hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on, exclude_enrollments_list: [prev_enrollment.hbx_id] }
+            end
+
+            it 'returns benchmark premiums when monthly_expected_contribution is met' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 475.00
+            end
           end
         end
 

@@ -29,6 +29,7 @@ module Operations
       def find_max_available_aptc(values)
         @hbx_enrollment = values[:hbx_enrollment]
         @effective_on = values[:effective_on]
+        @exclude_enrollments_list = values[:exclude_enrollments_list] || []
         @family = @hbx_enrollment.family
 
         return Success(0.0) if not_eligible?
@@ -152,6 +153,7 @@ module Operations
           previous_enrollment.generate_hbx_signature
 
           !previous_enrollment.product.can_use_aptc? ||
+            @exclude_enrollments_list.include?(previous_enrollment.hbx_id) ||
             (previous_enrollment.enrollment_signature == @hbx_enrollment.enrollment_signature) ||
             (is_primary_enrolling && primary_reenrolling?(previous_enrollment))
         end
