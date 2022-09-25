@@ -283,6 +283,33 @@ module Insured
         family.save!
       end
 
+      describe 'when multi tax household enabled' do
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+          allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+            double(
+              call: double(
+                success?: true,
+                value!: max_aptc
+              )
+            )
+          )
+        end
+
+        let(:max_aptc) { 1200.0 }
+
+        it 'returns new enrollment with newly determined aptc' do
+          subject.update_aptc(enrollment.id, nil)
+          enrollment.reload
+          expect(enrollment.aasm_state).to eq 'coverage_canceled'
+          new_enrollment = family.reload.active_household.hbx_enrollments.last
+          expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+          expect(new_enrollment.elected_aptc_pct).to eq(0.85)
+          expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+        end
+      end
+
       describe "update enrollment for renewing enrollments" do
         it 'should return the updated enrollment' do
           subject.update_aptc(enrollment.id, 1000)
