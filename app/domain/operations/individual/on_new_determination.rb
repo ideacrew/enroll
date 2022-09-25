@@ -33,16 +33,18 @@ module Operations
         enrollment_list = enrollments.reject do |enrollment|
           enrollment.product.blank? || enrollment.product.metal_level_kind == :catastrophic
         end
-        enrollment_list.present? ? Success(enrollment_list) : Failure('Cannot find any enrollments with Non-Catastrophic Plan.')
+        enrollment_list.present? ? Success(enrollment_list.sort_by(&:created_at)) : Failure('Cannot find any enrollments with Non-Catastrophic Plan.')
       end
 
       def generate_enrollments(enrollments)
+        exclude_enrollments_list = enrollments.map(&:hbx_id)
         enrollments.each do |enrollment|
           date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
 
           result = ::Operations::PremiumCredits::FindAptc.new.call({
                                                                      hbx_enrollment: enrollment,
-                                                                     effective_on: date
+                                                                     effective_on: date,
+                                                                     exclude_enrollments_list: exclude_enrollments_list
                                                                    })
           return result unless result.success?
 
