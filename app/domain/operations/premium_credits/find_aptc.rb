@@ -173,7 +173,7 @@ module Operations
       end
 
       def active_enrollments
-        @active_enrollments ||= @family.active_household.hbx_enrollments.enrolled.individual_market
+        @active_enrollments ||= @family.active_household.hbx_enrollments.enrolled.individual_market.where(:effective_on => {:"$gte" => @effective_on.beginning_of_year, :"$lte" => @effective_on.end_of_year})
       end
 
       def coinciding_family_members
