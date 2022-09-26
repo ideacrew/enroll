@@ -59,8 +59,12 @@
                 <label class="bullet-separator">Tax credit amount:</label>
                 <strong>$<%= hbx_enrollment.applied_aptc_amount %></strong>
                 <% if (hbx_enrollment.eligible_child_care_subsidy > 0) %>
-                  <label class="bullet-separator"><%= l10n("hc44cc_premium_discount") %>:</label>
-                  <strong><%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%></strong>
+                  <div>
+                    <p>
+                      <label class="bullet-separator"><%= l10n("hc44cc_premium_discount") %>:</label>
+                      <strong><%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%></strong>
+                    </p>
+                  </div>
                 <% end %>
               </div>
               <div class="col-xs-4">
