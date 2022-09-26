@@ -1819,7 +1819,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         end
 
         before do
-          EnrollRegistry[:use_defaults_for_qnc_and_five_year_bar_data].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
           result = subject.call(application.reload)
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @applicant_entity = entity_init.success.applicants.first
@@ -1841,7 +1841,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         end
 
         before do
-          EnrollRegistry[:use_defaults_for_qnc_and_five_year_bar_data].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
           result = subject.call(application.reload)
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @applicant_entity = entity_init.success.applicants.first
@@ -1858,7 +1858,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   describe 'qualified_non_citizen' do
     context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
-        EnrollRegistry[:use_defaults_for_qnc_and_five_year_bar_data].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
       end
 
       context 'when qnc is false on applicant' do
@@ -1916,7 +1916,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
-        EnrollRegistry[:use_defaults_for_qnc_and_five_year_bar_data].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
         applicant.update!(qualified_non_citizen: false)
         result = subject.call(application.reload)
         entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
