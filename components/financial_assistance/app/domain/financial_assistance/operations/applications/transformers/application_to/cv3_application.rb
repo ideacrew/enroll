@@ -129,6 +129,11 @@ module FinancialAssistance
               AcaEntities::Operations::Encryption::Encrypt.new.call({value: value}).value!
             end
 
+            def applicant_qnc_code(applicant)
+              return applicant.qualified_non_citizen if applicant.qualified_non_citizen.present?
+              applicant.eligible_immigration_status ? true : false
+            end
+
             # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
             def applicants(application, benchmark_premiums)
@@ -149,7 +154,7 @@ module FinancialAssistance
                            is_applying_coverage: applicant.is_applying_coverage.present?,
                            five_year_bar_applies: applicant.five_year_bar_applies.present?,
                            five_year_bar_met: applicant.five_year_bar_met.present?,
-                           qualified_non_citizen: applicant.qualified_non_citizen.present?,
+                           qualified_non_citizen: applicant_qnc_code(applicant),
                            is_consent_applicant: applicant.is_consent_applicant.present?,
                            vlp_document: vlp_document(applicant),
                            family_member_reference: {family_member_hbx_id: applicant.person_hbx_id.to_s,

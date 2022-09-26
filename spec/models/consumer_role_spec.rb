@@ -2015,6 +2015,8 @@ describe '.create_or_term_eligibility' do
     let!(:family_member_spouse) { FactoryBot.create(:family_member, person: spouse, family: family)}
     let!(:family_member_child1) { FactoryBot.create(:family_member, person: child1, family: family)}
 
+    let(:osse_eligible_members) { [primary, child1] }
+
     context 'it should create eligibility for active family members' do
       let(:valid_params) do
         {
@@ -2025,21 +2027,22 @@ describe '.create_or_term_eligibility' do
       end
 
       before do
-        primary.consumer_role.create_or_term_eligibility(valid_params)
-        spouse.consumer_role.create_or_term_eligibility(valid_params)
-        child1.consumer_role.create_or_term_eligibility(valid_params)
+        osse_eligible_members.each do |person|
+          person.consumer_role.create_or_term_eligibility(valid_params)
+        end
       end
 
       def verify_active_family_members
         family.active_family_members.each do |fm|
+          next if osse_eligible_members.exclude?(fm.person)
           consumer_role = fm.person.consumer_role
           yield(consumer_role)
         end
       end
 
-      it 'should create eligibility for active family members' do
+      it 'should create eligibility for primary and child only' do
         expect(primary.consumer_role.eligibilities).to be_present
-        expect(spouse.consumer_role.eligibilities).to be_present
+        expect(spouse.consumer_role.eligibilities).to be_blank
         expect(child1.consumer_role.eligibilities).to be_present
       end
 

@@ -79,6 +79,12 @@ class HbxEnrollmentMember
     @age_on_effective_date = age
   end
 
+  def osse_eligible_on_effective_date?
+    return false unless coverage_start_on.present?
+
+    person&.consumer_role&.osse_eligible?(coverage_start_on)
+  end
+
   def tobacco_use_value_for_edi
     case tobacco_use
     when 'Y'

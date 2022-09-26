@@ -114,11 +114,11 @@ module ApplicationHelper
 
   #Shopping enrollment family premium (plan shopping page)
   # rubocop:disable Style/OptionalBooleanParameter
-  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc = true)
-    return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
+  def shopping_group_premium(plan_cost, plan_ehb_cost, subsidy_amount, can_use_aptc = true)
+    return (plan_cost - subsidy_amount).round(2) unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
 
     aptc_amount = session['elected_aptc'].to_f
-    cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min)
+    cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min - subsidy_amount)
     cost > 0 ? cost.round(2) : 0
   end
   # rubocop:enable Style/OptionalBooleanParameter

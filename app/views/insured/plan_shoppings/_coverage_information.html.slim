@@ -8,7 +8,7 @@
         th scope="col" = l10n("age")
         th.text-right scope="col" = l10n("premium")
         - if osse_eligible
-          th.text-nowrap.text-center colspan="2" scope="colgroup" = l10n("premium_discount")
+          th.text-nowrap.text-center colspan="2" scope="colgroup" = l10n("hc44cc_discount")
         th.text-right width="50" scope="col" = l10n("employer_contribution")
         th.text-right width="50" scope="col" = l10n("you_pay")
     tbody
@@ -18,10 +18,7 @@
           td = member.primary_relationship
           td = dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob)
           td.text-right = @enrollment.composite_rated? ? "--" : (number_to_currency (member_enrollment = @member_group.group_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == member.id }).product_price)
-          - if osse_eligible && member.is_subscriber?
-            td.text-right = l10n("osse_subsidy_title_shortname") 
-            td.text-center = @enrollment.composite_rated? ? "--" : (number_to_currency @enrollment.eligible_child_care_subsidy)
-          - elsif osse_eligible
+          - if osse_eligible
             td.text-right
             td.text-center
           - else
