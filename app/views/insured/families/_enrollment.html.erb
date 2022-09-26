@@ -121,7 +121,7 @@
     <% end %>
     
     <div class="col-xs-12 vertically-aligned-row">
-      <% if EnrollRegistry.feature_enabled?(:market_type_hidden)%>
+      <% if !EnrollRegistry.feature_enabled?(:hide_enrollment_market_type) %>
         <div class="enrollment-type info">
           <p class="mb-0">
             <strong><%= l10n("market_type") %>: </strong>
