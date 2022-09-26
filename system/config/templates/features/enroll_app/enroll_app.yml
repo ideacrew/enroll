@@ -377,6 +377,9 @@ registry:
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: false
+      - key: :hide_enrollment_market_type
+        item: :hide_enrollment_market_type
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_MARKET_TYPE'] || false %>
   - namespace:
       - :pay_now_feature
     features:
