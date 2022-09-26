@@ -20,6 +20,8 @@ module Subscribers
         logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
         create_employee_osse_eligibility(employee_role)
 
+        subscriber_logger.info "out of create method: #{payload}"
+        logger.info "out of create method: #{payload}"
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
         subscriber_logger.info "EmployeeRoleSubscriber, employee_role: #{person&.full_name}, employer: #{employer&.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
@@ -30,14 +32,21 @@ module Subscribers
       private
 
       def create_employee_osse_eligibility(employee_role)
+        subscriber_logger.info "entered create method"
+        logger.info "entered create method"
         person = employee_role.person
         census_employee = employee_role.census_employee
 
         return unless census_employee
         return if census_employee.is_cobra_status?
 
+        subscriber_logger.info "entered create method - before loop"
+        logger.info "entered create method - before loop"
         census_employee.osse_eligible_applications.each do |benefit_application|
           employer = benefit_application.employer_profile
+
+          subscriber_logger.info "processing benefit application - #{benefit_application.id}, employer: #{employer.legal_name}"
+          logger.info "processing benefit application - #{benefit_application.id}, employer: #{employer.legal_name}"
 
           result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
             {
@@ -47,6 +56,9 @@ module Subscribers
               effective_date: benefit_application.start_on.to_date
             }
           )
+
+          subscriber_logger.info "operation done #{result} - #{benefit_application.id}, employer: #{employer.legal_name}"
+          logger.info "operation done #{result} - #{benefit_application.id}, employer: #{employer.legal_name}"
 
           if result.success?
             subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, employee: #{person&.full_name} processed successfully"
