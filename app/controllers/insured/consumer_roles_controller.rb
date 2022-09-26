@@ -161,6 +161,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to search_insured_consumer_role_index_path
       return
     end
+    binding.irb
     @person&.primary_family&.create_dep_consumer_role
     is_assisted = session["individual_assistance_path"]
     role_for_user = is_assisted ? "assisted_individual" : "individual"

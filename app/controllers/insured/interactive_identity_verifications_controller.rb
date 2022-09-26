@@ -40,7 +40,6 @@ module Insured
           primary = family.family_members.detect(&:is_primary_applicant)
           primary.person_id == @person.id
         end
-        binding.irb
         FinancialAssistance::Application.where(family_id: family.id, aasm_state: 'draft', account_transferred: true).first
       end
       render "failed_validation"

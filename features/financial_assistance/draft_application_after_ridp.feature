@@ -9,7 +9,7 @@ Feature: Send users to draft application created by account transfer after RIDP
     And Individual creates a new HBX account
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
-    When user registers as an individual
+    When user registers as an individual with personal info matching the account transfer
     And Individual clicks on continue
     And Individual fills out the personal information form
     And Individual clicks on continue

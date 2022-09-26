@@ -2,10 +2,20 @@
 
 Given(/Individual has draft application that was created by account transfer/) do
     @user = FactoryBot.create(:user)
-    @person = FactoryBot.create(:person, :with_consumer_role, user: user)
+    @person = FactoryBot.create(:person, :with_consumer_role, user: user, first_name: 'Peter', last_name: 'Griffin')
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
     @application = FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family.id, effective_date: TimeKeeper.date_of_record, transfer_id: 'SBM_123')
 end
+
+When(/^user registers as an individual with personal info matching the account transfer$/) do
+    fill_in IvlPersonalInformation.first_name, with: @person.first_name
+    fill_in IvlPersonalInformation.last_name, with: @person.last_name
+    fill_in IvlPersonalInformation.dob, with: @person.dob.to_s
+    fill_in IvlPersonalInformation.ssn, with: @person.ssn.insert(3, '-').insert(6, '-')
+    find(IvlPersonalInformation.male_radiobtn).click
+    find(IvlPersonalInformation.need_coverage_yes).click
+    find(IvlPersonalInformation.continue_btn).click
+  end
 
 Then(/Individual fills out the personal information form/) do
     find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
