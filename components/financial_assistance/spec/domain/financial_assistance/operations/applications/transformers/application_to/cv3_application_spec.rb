@@ -1810,81 +1810,121 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   describe 'five_year_bar_applies, five_year_bar_met' do
-    context 'for five_year_bar information' do
-      let!(:update_applicant) do
-        applicant.five_year_bar_applies = true
-        applicant.five_year_bar_met = true
-        applicant.qualified_non_citizen = false
-        applicant.save!
-      end
+    context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
+      context 'for five_year_bar information' do
+        let!(:update_applicant) do
+          applicant.five_year_bar_applies = true
+          applicant.five_year_bar_met = true
+          applicant.save!
+        end
 
-      before do
-        result = subject.call(application.reload)
-        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
-        @applicant_entity = entity_init.success.applicants.first
-      end
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          @applicant_entity = entity_init.success.applicants.first
+        end
 
-      it 'should include five_year_bar info in the result payload' do
-        expect(@applicant_entity.five_year_bar_applies).to eq(true)
-        expect(@applicant_entity.five_year_bar_met).to eq(true)
+        it 'should include five_year_bar info in the result payload' do
+          expect(@applicant_entity.five_year_bar_applies).to eq(true)
+          expect(@applicant_entity.five_year_bar_met).to eq(true)
+        end
       end
+    end
 
-      it 'should include qualified_non_citizen in payload' do
-        expect(@applicant_entity.qualified_non_citizen).to eq(false)
+    context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
+      context 'for five_year_bar information' do
+        let!(:update_applicant) do
+          applicant.five_year_bar_applies = true
+          applicant.five_year_bar_met = true
+          applicant.save!
+        end
+
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          @applicant_entity = entity_init.success.applicants.first
+        end
+
+        it 'should include five_year_bar info in the result payload' do
+          expect(@applicant_entity.five_year_bar_applies).to eq(false)
+          expect(@applicant_entity.five_year_bar_met).to eq(false)
+        end
       end
     end
   end
 
   describe 'qualified_non_citizen' do
-    context 'when qnc is false on applicant' do
+    context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
+      end
+
+      context 'when qnc is false on applicant' do
+        before do
+          applicant.update!(qualified_non_citizen: false)
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          @applicant_entity = entity_init.success.applicants.first
+        end
+
+        it 'should include qualified_non_citizen in payload' do
+          expect(@applicant_entity.qualified_non_citizen).to eq(false)
+        end
+      end
+
+      context 'when qnc is true on applicant' do
+        before do
+          applicant.update!(qualified_non_citizen: true)
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          @applicant_entity = entity_init.success.applicants.first
+        end
+
+        it 'should include qualified_non_citizen in payload' do
+          expect(@applicant_entity.qualified_non_citizen).to eq(true)
+        end
+      end
+
+      context 'when qnc is nil on applicant' do
+        it 'should include qualified_non_citizen in payload' do
+          applicant.update!(qualified_non_citizen: nil)
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          applicant_entity = entity_init.success.applicants.first
+          expect(applicant_entity.qualified_non_citizen).to eq(false)
+        end
+
+        it 'should return true if applicant is alien_lawfully_present ' do
+          applicant.update!(qualified_non_citizen: nil, citizen_status: 'alien_lawfully_present')
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          applicant_entity = entity_init.success.applicants.first
+          expect(applicant_entity.qualified_non_citizen).to eq(true)
+        end
+
+        it 'should return true if applicant is us_citizen ' do
+          applicant.update!(qualified_non_citizen: nil, citizen_status: 'us_citizen')
+          result = subject.call(application.reload)
+          entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+          applicant_entity = entity_init.success.applicants.first
+          expect(applicant_entity.qualified_non_citizen).to eq(false)
+        end
+      end
+    end
+
+    context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
         applicant.update!(qualified_non_citizen: false)
         result = subject.call(application.reload)
         entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @applicant_entity = entity_init.success.applicants.first
       end
 
-      it 'should include qualified_non_citizen in payload' do
-        expect(@applicant_entity.qualified_non_citizen).to eq(false)
-      end
-    end
-
-    context 'when qnc is true on applicant' do
-      before do
-        applicant.update!(qualified_non_citizen: true)
-        result = subject.call(application.reload)
-        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
-        @applicant_entity = entity_init.success.applicants.first
-      end
-
-      it 'should include qualified_non_citizen in payload' do
+      it 'should include qualified_non_citizen in payload and defaults to true' do
         expect(@applicant_entity.qualified_non_citizen).to eq(true)
-      end
-    end
-
-    context 'when qnc is nil on applicant' do
-      it 'should include qualified_non_citizen in payload' do
-        applicant.update!(qualified_non_citizen: nil)
-        result = subject.call(application.reload)
-        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
-        applicant_entity = entity_init.success.applicants.first
-        expect(applicant_entity.qualified_non_citizen).to eq(false)
-      end
-
-      it 'should return true if applicant is alien_lawfully_present ' do
-        applicant.update!(qualified_non_citizen: nil, citizen_status: 'alien_lawfully_present')
-        result = subject.call(application.reload)
-        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
-        applicant_entity = entity_init.success.applicants.first
-        expect(applicant_entity.qualified_non_citizen).to eq(true)
-      end
-
-      it 'should return true if applicant is us_citizen ' do
-        applicant.update!(qualified_non_citizen: nil, citizen_status: 'us_citizen')
-        result = subject.call(application.reload)
-        entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
-        applicant_entity = entity_init.success.applicants.first
-        expect(applicant_entity.qualified_non_citizen).to eq(false)
       end
     end
   end
