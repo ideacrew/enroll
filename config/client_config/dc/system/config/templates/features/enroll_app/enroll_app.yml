@@ -377,6 +377,9 @@ registry:
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: false
+      - key: :hide_enrollment_market_type
+        item: :hide_enrollment_market_type
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_MARKET_TYPE'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -655,6 +658,9 @@ registry:
       - key: :trigger_verifications_before_enrollment_purchase
         item: trigger_verifications_before_enrollment_purchase
         is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
+      - key: :use_defaults_for_qnc_and_five_year_bar_data
+        item: use_defaults_for_qnc_and_five_year_bar_data
+        is_enabled: <%= ENV['USE_DEFAULTS_FOR_QNC_AND_FIVE_YEAR_BAR_DATA_IS_ENABLED'] || true %>
       - key: :saml_info_keys
         is_enabled: true
         settings:

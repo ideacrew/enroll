@@ -119,19 +119,23 @@
         </div>
       </div>
     <% end %>
+    
     <div class="col-xs-12 vertically-aligned-row">
-      <div class="enrollment-type info">
-        <p class="mb-0">
-          <strong><%= l10n("market_type") %>: </strong>
-          <%= show_market_name_by_enrollment hbx_enrollment %>
-        </p>
-      </div>
+      <% if !EnrollRegistry.feature_enabled?(:hide_enrollment_market_type) %>
+        <div class="enrollment-type info">
+          <p class="mb-0">
+            <strong><%= l10n("market_type") %>: </strong>
+            <%= show_market_name_by_enrollment hbx_enrollment %>
+          </p>
+        </div>
+      <% end %>
       <% if hbx_enrollment.is_reinstated_enrollment?%>
-          <div class="enrollment-effective info vertical-align-top">
-            <strong> <%= l10n("reinstated_enrollment") %></strong>
-          </div>
-      <%end%>
+        <div class="enrollment-effective info vertical-align-top">
+          <strong> <%= l10n("reinstated_enrollment") %></strong>
+        </div>
+      <% end %>
     </div>
+    
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
         <p>
