@@ -74,6 +74,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
       BenefitMarkets::Locations::CountyZip.delete_all
       BenefitMarkets::Locations::RatingArea.delete_all
       products
+      EnrollRegistry[:use_defaults_for_qnc_and_five_year_bar_data].feature.stub(:is_enabled).and_return(false)
     end
 
     it 'should return payload' do
