@@ -95,4 +95,45 @@ describe HbxEnrollmentMember, dbclean: :around_each do
       expect(subject.full_name).to eq person.full_name
     end
   end
+
+  context 'osse_eligible_on_effective_date?' do
+
+    let(:consumer_role) { create(:consumer_role, person: person) }
+    let(:person) { enrollment_member.person }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:enrollment) { create(:hbx_enrollment, family: family, household: family.active_household, effective_on: effective_on)}
+    let(:enrollment_member) { create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: enrollment, coverage_start_on: effective_on) }
+    let(:effective_on) { TimeKeeper.date_of_record }
+    let(:start_on) { TimeKeeper.date_of_record }
+    let(:osse_eligible) { true }
+
+    before do
+      allow(enrollment_member).to receive(:ivl_osse_eligibility_is_enabled?).and_return(osse_eligible)
+    end
+
+    context 'when consumer is osse eligible' do
+      let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: start_on) }
+      let!(:eligibility) do
+        consumer_role.eligibilities << ee_elig
+        consumer_role.save!
+        consumer_role.eligibilities.first
+      end
+
+      context 'when osse is enabled for the given year' do
+        it { expect(enrollment_member.osse_eligible_on_effective_date?).to be_truthy }
+      end
+
+      context 'when osse is disabled for the given year' do
+        let(:osse_eligible) { false }
+
+        it { expect(enrollment_member.osse_eligible_on_effective_date?).to be_falsey }
+      end
+    end
+
+    context 'when consumer is not osse eligible' do
+      context 'when osse is enabled for the given year' do
+        it { expect(enrollment_member.osse_eligible_on_effective_date?).to be_falsey }
+      end
+    end
+  end
 end
