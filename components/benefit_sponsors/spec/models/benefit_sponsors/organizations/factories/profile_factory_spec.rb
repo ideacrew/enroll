@@ -326,6 +326,7 @@ module BenefitSponsors
                 {
                   :contact_method => "electronic_only",
                   :id => employer_profile.id,
+                  :osse_eligibility => 'true',
                   :office_locations_attributes =>
                   {
                     0 =>
@@ -379,6 +380,13 @@ module BenefitSponsors
           plan_design_organization.reload
           expect(abc_organization.legal_name).to eq plan_design_organization.legal_name
           expect(abc_organization.dba).to eq plan_design_organization.dba
+        end
+
+        context ".build_osse_eligibility" do
+       
+          it "should build eligibilities" do
+            expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
+          end
         end
       end
 

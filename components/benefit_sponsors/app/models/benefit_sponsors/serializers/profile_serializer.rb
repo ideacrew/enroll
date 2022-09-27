@@ -21,7 +21,6 @@ module BenefitSponsors
       attribute :home_page, if: :is_broker_or_general_agency?
       attribute :accept_new_clients, if: :is_broker_or_general_agency?
       attribute :languages_spoken, if: :is_broker_or_general_agency?
-      attribute :osse_eligibility
 
       has_many :office_locations, serializer: ::BenefitSponsors::Serializers::OfficeLocationSerializer
       has_one :inbox, serializer: ::BenefitSponsors::Serializers::InboxSerializer
