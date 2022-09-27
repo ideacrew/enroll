@@ -22,7 +22,6 @@ module FinancialAssistance
             application             = yield find_application(params[:application_id])
             application             = yield validate(application, params[:action])
             application             = yield submit_application(application, params[:action])
-            persisted_application   = yield find_application(application.id)
             payload_param           = yield construct_payload(persisted_application)
             payload_value           = yield validate_payload(payload_param)
             _application            = yield update_application(persisted_application, payload_value)
