@@ -8,7 +8,7 @@ module Operations
 
       # find all dental products
       #   Pediatric-only dental plans are offered in ME
-      #   These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people 19+
+      #   These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people aged 19 or above
       # Calculate the cost of each available dental plan for all members of the APTC household
       #   Compare the portion of dental plan costs that cover EHB for all plans that cover all members of the APTC household
       # Identify the second lowest cost standalone dental plan (SLCSADP)
@@ -60,7 +60,7 @@ module Operations
         }
 
         # Pediatric-only dental plans are offered in ME.
-        # These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people 19+
+        # These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people aged 19 or above
         # type_of_household can be 'adult_only', 'adult_and_child' or 'child_only'
         products = if params[:household_params][:type_of_household] == 'child_only'
                      ::BenefitMarkets::Products::DentalProducts::DentalProduct.where(query)
