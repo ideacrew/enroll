@@ -55,11 +55,11 @@ module BenefitSponsors
         end
 
         def self.verify_false(value)
-          value == false || value == "false"
+          [false, "false"].include?(value)
         end
 
         def self.verify_true(value)
-          value == true || value == "true"
+          [false, "false"].include?(value)
         end
 
         def self.osse_eligibility_params(benefit_sponsorship, osse_eligibility)

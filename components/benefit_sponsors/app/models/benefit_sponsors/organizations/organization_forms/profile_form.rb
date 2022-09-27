@@ -5,7 +5,6 @@ module BenefitSponsors
       include ActiveModel::Validations
       include Config::AcaHelper
 
-      
       attr_accessor :osse_eligibility
 
       attribute :id, String
@@ -44,7 +43,7 @@ module BenefitSponsors
       validate :validate_routing_information, if: :is_broker_profile?
       validates_presence_of :referred_reason, if: :is_referred_by_other?
 
-      def initialize(params={})
+      def initialize(params = {})
         @osse_eligibility = params[:osse_eligibility] || false
         super(params)
       end

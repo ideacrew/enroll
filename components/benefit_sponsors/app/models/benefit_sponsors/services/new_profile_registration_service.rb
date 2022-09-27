@@ -31,13 +31,13 @@ module BenefitSponsors
         attributes_to_form_params(organization, staff_roles)
       end
 
-      def attributes_to_form_params(obj, staff_roles=nil)
+      def attributes_to_form_params(obj, staff_roles = nil)
         {
-          :"profile_type" => profile_type,
-          :"profile_id" => profile_id,
-          :"staff_roles" => staff_role_params(staff_roles),
-          :"organization" => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
-            :"profile" => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash.merge(:osse_eligibility => osse_eligibility(obj))
+          :profile_type => profile_type,
+          :profile_id => profile_id,
+          :staff_roles => staff_role_params(staff_roles),
+          :organization => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
+            :profile => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash.merge(:osse_eligibility => osse_eligibility(obj))
           )
         }
       end
@@ -100,8 +100,9 @@ module BenefitSponsors
       def profiles_form_to_params(profile)
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
           result[index_val] = sanitize_params(profile_attributes(form)).merge({
-            :office_locations_attributes =>  office_locations_form_to_params(form.office_locations), :osse_eligibility => form.osse_eligibility
-          })
+                                                                                :office_locations_attributes => office_locations_form_to_params(form.office_locations),
+                                                                                :osse_eligibility => form.osse_eligibility
+                                                                              })
           result
         end
       end

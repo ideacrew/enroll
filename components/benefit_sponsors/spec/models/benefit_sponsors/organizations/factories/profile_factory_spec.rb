@@ -383,7 +383,6 @@ module BenefitSponsors
         end
 
         context ".build_osse_eligibility" do
-       
           it "should build eligibilities" do
             expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
           end
