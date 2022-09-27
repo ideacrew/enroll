@@ -125,7 +125,6 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             assistance_year: TimeKeeper.date_of_record.year,
             source: 'Admin',
             start_on: TimeKeeper.date_of_record.beginning_of_year,
-            end_on: TimeKeeper.date_of_record.end_of_year,
             tax_households: [
               FactoryBot.build(:tax_household, household: family.active_household)
             ]
@@ -184,10 +183,11 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let(:primary_bp) { 500.00 }
         let(:dependent_bp) { 600.00 }
 
-        context 'when benchmark_premium is nil' do
+        context 'when benchmark_premium & household_info is nil' do
           let(:benchmark_premium) { nil }
 
           it 'returns zero $' do
+            aptc_grant.update_attribute(:tax_household_id, BSON::ObjectId.new)
             expect(result.success?).to eq true
             expect(result.value!).to eq 0
             expect(TaxHouseholdEnrollment.all.size).to eq 1
@@ -654,7 +654,6 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             assistance_year: TimeKeeper.date_of_record.year,
             source: 'Admin',
             start_on: TimeKeeper.date_of_record.beginning_of_year,
-            end_on: TimeKeeper.date_of_record.end_of_year,
             tax_households: [
               FactoryBot.build(:tax_household, household: family.active_household),
               FactoryBot.build(:tax_household, household: family.active_household)
@@ -1145,7 +1144,6 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         assistance_year: TimeKeeper.date_of_record.year,
         source: 'Admin',
         start_on: TimeKeeper.date_of_record.beginning_of_year,
-        end_on: TimeKeeper.date_of_record.end_of_year,
         tax_households: [
           FactoryBot.build(:tax_household, household: family.active_household),
           FactoryBot.build(:tax_household, household: family.active_household)
