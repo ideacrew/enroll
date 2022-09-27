@@ -5,7 +5,7 @@ module Forms
   class HealthcareForChildcareProgramForm
     include ActiveModel::Model
 
-    attr_accessor :osse_eligibility
+    attr_accessor :osse_eligibility, :role
 
     def load_eligibility(person)
       @role = if person.has_active_resident_role?

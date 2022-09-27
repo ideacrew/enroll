@@ -26,15 +26,17 @@ module ChildcareSubsidyConcern
         return if eligibility_params[:evidence_value] == 'true'
         terminate_eligibility(eligibility_params)
       elsif eligibility_params[:evidence_value] == 'true'
-        eligibility_result = build_eligibility(eligibility_params)
-        save_eligibility(eligibility_result) if eligibility_result.success?
-        eligibility_result
+        create_eligibility(eligibility_params)
       end
     end
 
-    def save_eligibility(eligibility_result)
-      eligibility = self.eligibilities.build(eligibility_result.success.to_h)
-      eligibility.save!
+    def create_eligibility(eligibility_params)
+      eligibility_result = build_eligibility(eligibility_params)
+      if eligibility_result.success?
+        eligibility = self.eligibilities.build(eligibility_result.success.to_h)
+        eligibility.save!
+      end
+      eligibility_result
     end
 
     def build_eligibility(eligibility_params)
