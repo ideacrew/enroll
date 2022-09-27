@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
+  include FloatHelper
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
@@ -13,7 +14,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     @dependent_age_off = false
 
     begin
+      set_csr_value
       renewal_enrollment = clone_enrollment
+      populate_aptc_hash(renewal_enrollment)
 
       can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: renewal_enrollment})
 
@@ -21,7 +24,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
       save_renewal_enrollment(renewal_enrollment)
       # elected aptc should be the minimun between applied_aptc and EHB premium.
-      renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted
+      renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present?
 
       if is_dependent_dropped?
         renewal_enrollment.aasm_state = 'coverage_selected'
@@ -65,14 +68,78 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     (can_renew_assisted_product?(renewal_enrollment) ? assisted_renewal_product : renewal_product)
   end
 
+  def set_csr_value
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    csr_op = ::Operations::PremiumCredits::FindCsrValue.new.call({
+                                                                   family: enrollment.family,
+                                                                   year: renewal_coverage_start.year,
+                                                                   family_member_ids: enrolled_family_member_ids
+                                                                 })
+    return unless csr_op.success?
+
+    @aptc_values[:csr_amt] = fetch_csr_percent(csr_op.value!)
+  end
+
+  def populate_aptc_hash(renewal_enrollment)
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    aptc_op = ::Operations::PremiumCredits::FindAptc.new.call({
+                                                                hbx_enrollment: renewal_enrollment,
+                                                                effective_on: renewal_enrollment.effective_on
+                                                              })
+    return unless aptc_op.success?
+
+    max_aptc = aptc_op.value!
+    default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+    applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
+    applied_aptc = float_fix(max_aptc * applied_percentage)
+
+    @aptc_values.merge!({
+                          applied_percentage: applied_percentage,
+                          applied_aptc: applied_aptc,
+                          aggregate_aptc: max_aptc
+                        })
+  end
+
   def can_renew_assisted_product?(renewal_enrollment)
+    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) && is_mthh_assisted?
     return false unless @assisted
-    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) # If assisted, this is good to renew as assisted product.
 
     tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
     members = tax_household.tax_household_members
     enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
     enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
+  end
+
+  def is_mthh_assisted?
+    return false if current_enrolled_aptc_grants.blank?
+    true
+  end
+
+  def current_enrolled_aptc_grants
+    premium_credits = ::Operations::PremiumCredits::FindAll.new.call({ family: enrollment.family, year: renewal_coverage_start.year, kind: 'AdvancePremiumAdjustmentGrant' })
+    return [] if premium_credits.failure?
+
+    aptc_grants = premium_credits.value!
+    return [] if aptc_grants.blank?
+
+    aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
+  end
+
+  def enrolled_family_member_ids
+    enrollment.hbx_enrollment_members.map(&:applicant_id)
+  end
+
+  def fetch_csr_percent(csr_kind)
+    {
+      "csr_0" => 0,
+      "csr_limited" => 'limited',
+      'csr_100' => 100,
+      "csr_94" => 94,
+      "csr_87" => 87,
+      "csr_73" => 73
+    }.stringify_keys[csr_kind] || 0
   end
 
   def assisted_enrollment(renewal_enrollment)

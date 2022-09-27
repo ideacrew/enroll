@@ -11,4 +11,5 @@ class TaxHouseholdMemberEnrollmentMember
   field :relationship_with_primary, type: String
   field :date_of_birth, type: Date
 
+  embedded_in :tax_household_enrollment, class_name: "::TaxHouseholdEnrollment"
 end

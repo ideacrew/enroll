@@ -19,9 +19,9 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     end
   end
 
-  describe 'changing tax household member csr percent' do
+  describe 'migrate household thhs to tax_household_group thhs' do
     let(:system_date) { TimeKeeper.date_of_record }
-    let!(:person) { FactoryBot.create(:person) }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:person2) do
       per2 = FactoryBot.create(:person)
       person.ensure_relationship_with(per2, 'spouse')
@@ -31,17 +31,6 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let!(:fm1) { family.primary_applicant }
     let!(:fm2) { FactoryBot.create(:family_member, family: family, person: person2) }
-    let!(:th1) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: Date.new(system_date.year, 7, 31)) }
-    let!(:thhm11) do
-      FactoryBot.create(:tax_household_member,
-                        applicant_id: fm1.id,
-                        tax_household: th1,
-                        is_ia_eligible: true,
-                        csr_percent_as_integer: 73,
-                        csr_eligibility_kind: 'csr_73')
-    end
-    let!(:thhm12) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th1, is_medicaid_chip_eligible: true) }
-    let!(:ed1) { FactoryBot.create(:eligibility_determination, tax_household: th1) }
 
     let!(:th2) do
       FactoryBot.create(:tax_household,
@@ -49,11 +38,22 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
                         yearly_expected_contribution: 3100.50,
                         effective_ending_on: nil)
     end
-    let!(:thhm21) { FactoryBot.create(:tax_household_member, applicant_id: fm1.id, tax_household: th2, is_totally_ineligible: true) }
-    let!(:thhm22) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2, is_medicaid_chip_eligible: true) }
-    let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 0.00) }
+    let!(:thhm21) { FactoryBot.create(:tax_household_member, applicant_id: fm1.id, tax_household: th2) }
+    let!(:thhm22) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2) }
+    let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 200.00) }
 
-    context 'valid family' do
+    context 'with active and inactive thhs with all ia_eligible members' do
+      let!(:th1) { FactoryBot.create(:tax_household, household: family.active_household) }
+      let!(:thhm11) do
+        FactoryBot.create(:tax_household_member,
+                          applicant_id: fm1.id,
+                          tax_household: th1,
+                          csr_percent_as_integer: 73,
+                          csr_eligibility_kind: 'csr_73')
+      end
+      let!(:thhm12) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th1) }
+      let!(:ed1) { FactoryBot.create(:eligibility_determination, tax_household: th1) }
+
       before { subject.migrate }
 
       it 'should create TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
@@ -65,6 +65,42 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs[1].tax_households.first.yearly_expected_contribution).to eq(th1.yearly_expected_contribution)
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(thhgs[1].tax_households.first.tax_household_members.count).to eq(2)
+        expect(family.reload.eligibility_determination.grants.count).not_to be_zero
+        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+      end
+    end
+
+    context 'with only active thhs with all ia_eligible members' do
+      before { subject.migrate }
+
+      it 'should create TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
+        thhgs = family.reload.tax_household_groups
+        expect(thhgs.count).to eq(1)
+        expect(thhgs.first.tax_households.count).to eq(1)
+        expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+        expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
+        expect(family.reload.eligibility_determination.grants.count).not_to be_zero
+        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+      end
+    end
+
+    context 'with only active thhs with all members ineligible for insurance assistance' do
+      before do
+        thhm21.update_attributes!(is_ia_eligible: false, is_medicaid_chip_eligible: true)
+        thhm22.update_attributes!(is_ia_eligible: false, is_medicaid_chip_eligible: true)
+        ed2.update_attributes(max_aptc: 0.0)
+        subject.migrate
+      end
+
+      it 'should create TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
+        thhgs = family.reload.tax_household_groups
+        expect(thhgs.count).to eq(1)
+        expect(thhgs.first.tax_households.count).to eq(1)
+        expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+        expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
+        # Should not create any Aptc or Csr Grants as no APTC members.
+        expect(family.reload.eligibility_determination.grants.count).to be_zero
+        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).to be_nil
       end
     end
 

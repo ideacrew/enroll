@@ -28,7 +28,7 @@ module Operations
       end
 
       def latest_tax_household_group_per_year(values)
-        values[:family].tax_household_groups.group_by(&:assistance_year).collect do |_year, th_group|
+        values[:family].tax_household_groups.active.group_by(&:assistance_year).collect do |_year, th_group|
           th_group.max_by(&:created_at)
         end.compact
       end

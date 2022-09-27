@@ -44,7 +44,7 @@ module Operations
         return true if result.failure?
 
         @aptc_grants = result.value!
-        @current_enrolled_aptc_grants = @aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
+        @current_enrolled_aptc_grants = @aptc_grants&.where(:member_ids.in => enrolled_family_member_ids)
         return true if @current_enrolled_aptc_grants.blank?
 
         false

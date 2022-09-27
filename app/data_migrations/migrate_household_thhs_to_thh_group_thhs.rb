@@ -90,13 +90,18 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         end
 
         active_thhs_of_household = family.active_household.tax_households.active_tax_household
-        family = process_active_thhs_of_household(family, active_thhs_of_household)
+        family = process_active_thhs_of_household(family, active_thhs_of_household) if active_thhs_of_household.present?
 
         inactive_thhs_of_household = family.active_household.tax_households.where(:effective_ending_on.ne => nil)
-        family = process_inactive_thhs_of_household(family, inactive_thhs_of_household)
-
+        family = process_inactive_thhs_of_household(family, inactive_thhs_of_household) if inactive_thhs_of_household.present?
         if family.save
           logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+          determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record)
+          if determination.success?
+            logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+          else
+            logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+          end
         else
           logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
         end
