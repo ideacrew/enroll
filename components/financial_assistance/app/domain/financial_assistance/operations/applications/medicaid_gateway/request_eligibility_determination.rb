@@ -18,14 +18,15 @@ module FinancialAssistance
           # @param [Hash] opts The options to request eligibility determination from MedicaidGateway system
           # @option opts [BSON::ObjectId] :application_id id ofFinancialAssistance::Application
           # @return [Dry::Monads::Result]
-          def call(application_id:)
-            application    = yield find_application(application_id)
-            # application    = yield validate(application)
-            # application    = yield submit_application(application)
-            payload_param  = yield construct_payload(application)
-            payload_value  = yield validate_payload(payload_param)
-            _application   = yield update_application(application, payload_value)
-            payload        = yield publish_event(payload_value)
+          def call(params)
+            application             = yield find_application(params[:application_id])
+            application             = yield validate(application, params[:action])
+            application             = yield submit_application(application, params[:action])
+            persisted_application   = yield find_application(application.id)
+            payload_param           = yield construct_payload(persisted_application)
+            payload_value           = yield validate_payload(payload_param)
+            _application            = yield update_application(persisted_application, payload_value)
+            payload                 = yield publish_event(payload_value)
 
             Success(payload)
           end
