@@ -29,7 +29,7 @@ module Operations
       end
 
       def find_csr_value(values)
-        @subjects = values[:family].eligibility_determination.subjects.select { |subject| values[:family_member_ids].include? subject.gid.split('/').last }
+        @subjects = values[:family].eligibility_determination&.subjects&.select { |subject| values[:family_member_ids].include? subject.gid.split('/').last } || []
 
         @csr_hash = @subjects.inject({}) do |result, subject|
           result[subject.gid.split('/').last] = subject.csr_by_year(values[:year])

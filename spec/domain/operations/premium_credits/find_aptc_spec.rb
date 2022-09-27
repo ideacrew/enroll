@@ -41,6 +41,24 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
     end
 
     context 'not eligible for aptc' do
+      context 'with no eligibility_determination' do
+        let(:person) { FactoryBot.create(:person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: family.family_members,
+                            family: family)
+        end
+
+        it 'returns zero available aptc' do
+          expect(result.success?).to eq true
+          expect(result.value!).to eq 0.0
+        end
+      end
+
       context 'without no aptc grants for family' do
 
         let(:person) { FactoryBot.create(:person) }

@@ -15,6 +15,7 @@ module Services
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         @hbx_enrollment.applied_aptc_amount = aptc_values[:applied_aptc]
         @hbx_enrollment.elected_aptc_pct = aptc_values[:applied_percentage]
+        @hbx_enrollment.aggregate_aptc_amount = aptc_values[:aggregate_aptc]
       else
         applied_aptc_amt = calculate_applicable_aptc(aptc_values)
         @hbx_enrollment.applied_aptc_amount = applied_aptc_amt.round(2)
