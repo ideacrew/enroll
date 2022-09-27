@@ -7,6 +7,7 @@ class HbxEnrollmentMember
   include ApplicationHelper
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
+  include Config::AcaHelper
 
   embedded_in :hbx_enrollment
 
@@ -81,6 +82,7 @@ class HbxEnrollmentMember
 
   def osse_eligible_on_effective_date?
     return false unless coverage_start_on.present?
+    return false unless ivl_osse_eligibility_is_enabled?(coverage_start_on.year)
 
     person&.consumer_role&.osse_eligible?(coverage_start_on)
   end
