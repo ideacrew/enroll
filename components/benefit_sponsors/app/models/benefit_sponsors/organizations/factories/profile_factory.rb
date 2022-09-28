@@ -144,7 +144,7 @@ module BenefitSponsors
           address.changed_attributes.include?("zip") || address.changed_attributes.include?("county") || address.changed_attributes.include?("state")
         end
 
-        def save(attributes)
+        def save(attributes)       
           return self unless match_or_create_person
           existing_org = get_existing_organization unless is_broker_profile?
           return self if organization_validity_failed?(existing_org)
@@ -234,7 +234,7 @@ module BenefitSponsors
         end
 
         def profile_attributes(attrs = {})
-          attrs[:profiles_attributes][0] if attrs[:profiles_attributes].present?
+          attrs[:profiles_attributes][0].except!(:osse_eligibility) if attrs[:profiles_attributes].present?
         end
 
         def staff_role_attributes(attrs = {})
