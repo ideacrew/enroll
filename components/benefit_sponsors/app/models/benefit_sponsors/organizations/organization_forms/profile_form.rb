@@ -5,6 +5,8 @@ module BenefitSponsors
       include ActiveModel::Validations
       include Config::AcaHelper
 
+      attr_accessor :osse_eligibility
+
       attribute :id, String
       attribute :market_kind, Symbol
       attribute :is_benefit_sponsorship_eligible, String
@@ -28,7 +30,6 @@ module BenefitSponsors
       attribute :referred_by, String
       attribute :referred_reason, String
       attribute :referred_by_options, Array
-      attribute :osse_eligibility, Boolean, :default => false
 
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
@@ -41,6 +42,11 @@ module BenefitSponsors
       validate :validate_profile_office_locations
       validate :validate_routing_information, if: :is_broker_profile?
       validates_presence_of :referred_reason, if: :is_referred_by_other?
+
+      def initialize(params = {})
+        @osse_eligibility = params[:osse_eligibility] || false
+        super(params)
+      end
 
       def persisted?
         false
