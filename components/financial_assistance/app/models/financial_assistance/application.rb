@@ -872,6 +872,10 @@ module FinancialAssistance
         transitions from: :submitted, to: :determined
       end
 
+      event :determine_renewal, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea] do
+        transitions from: :submitted, to: :determined
+      end
+
       event :terminate, :after => :record_transition do
         transitions from: [:submitted, :determined, :determination_response_error],
                     to: :terminated
