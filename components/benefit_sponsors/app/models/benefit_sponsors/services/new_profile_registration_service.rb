@@ -31,15 +31,20 @@ module BenefitSponsors
         attributes_to_form_params(organization, staff_roles)
       end
 
-      def attributes_to_form_params(obj, staff_roles=nil)
+      def attributes_to_form_params(obj, staff_roles = nil)
         {
-          :"profile_type" => profile_type,
-          :"profile_id" => profile_id,
-          :"staff_roles" => staff_role_params(staff_roles),
-          :"organization" => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
-            :"profile" => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash
+          :profile_type => profile_type,
+          :profile_id => profile_id,
+          :staff_roles => staff_role_params(staff_roles),
+          :organization => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
+            :profile => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash.merge(:osse_eligibility => osse_eligibility(obj))
           )
         }
+      end
+
+      def osse_eligibility(object)
+        return false unless object.active_benefit_sponsorship
+        object.active_benefit_sponsorship.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record).present?
       end
 
       def load_form_metadata(form)
@@ -95,8 +100,9 @@ module BenefitSponsors
       def profiles_form_to_params(profile)
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
           result[index_val] = sanitize_params(profile_attributes(form)).merge({
-            :office_locations_attributes =>  office_locations_form_to_params(form.office_locations)
-          })
+                                                                                :office_locations_attributes => office_locations_form_to_params(form.office_locations),
+                                                                                :osse_eligibility => form.osse_eligibility
+                                                                              })
           result
         end
       end
@@ -140,7 +146,7 @@ module BenefitSponsors
           if is_cca_sponsor_profile?
             form.attributes.slice(:contact_method, :id, :sic_code, :referred_by, :referred_reason)
           else
-            form.attributes.slice(:contact_method, :id, :osse_eligibility)
+            form.attributes.slice(:contact_method, :id)
           end
         end
       end
