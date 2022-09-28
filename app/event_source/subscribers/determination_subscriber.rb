@@ -17,7 +17,7 @@ module Subscribers
       logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
 
       payload = JSON.parse(response, symbolize_names: true)
-      application = FinancialAssistance::Operations::Application::FindByHbxId::new.call(payload[:hbx_id]).success
+      application = FinancialAssistance::Operations::Application::FindByHbxId.new.call(payload[:hbx_id]).success
 
       result =
         if application&.predecessor_id

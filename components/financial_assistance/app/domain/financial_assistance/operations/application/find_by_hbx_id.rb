@@ -11,9 +11,9 @@ module FinancialAssistance
       class FindByHbxId
         send(:include, Dry::Monads[:result, :do])
 
-        def call(application_hbx_id:)
+        def call(application_hbx_id)
           value = yield validate(application_hbx_id)
-          result = yield fetch_app(value)
+          result = yield find(value)
 
           Success(result)
         end

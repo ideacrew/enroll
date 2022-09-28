@@ -34,7 +34,7 @@ module FinancialAssistance
 
               logger.info 'Started publish_generate_draft_renewals process'
               logger.info "Total number of applications with assistance_year: #{renewal_year.pred} are #{family_ids.count}"
-              ["6331d4bf9a68116f24f98f49"].each_with_index do |family_id, index|
+              family_ids.each_with_index do |family_id, index|
                 # EventSource Publishing
                 params = { payload: { index: index, family_id: family_id.to_s, renewal_year: renewal_year }, event_name: 'renewal_requested' }
 
