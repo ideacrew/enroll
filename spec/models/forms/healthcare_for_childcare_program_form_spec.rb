@@ -15,6 +15,11 @@ describe Forms::HealthcareForChildcareProgramForm do
       }
     end
 
+    before do
+      allow(::EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    end
+
     context 'with consumer role' do
       let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
 
@@ -83,15 +88,22 @@ describe Forms::HealthcareForChildcareProgramForm do
       }
     end
 
+    let(:start_on) { ::TimeKeeper.date_of_record }
+
+    before do
+      allow(::EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    end
+
     context 'when osse_eligibility selected YES' do
       let(:osse_eligibility) { 'true' }
 
       it 'should create osse eligibility' do
-        expect(primary.consumer_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_falsey
+        expect(primary.consumer_role.osse_eligible?(start_on)).to be_falsey
         described_class.submit_with(params)
 
         primary.reload
-        expect(primary.consumer_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_truthy
+        expect(primary.consumer_role.osse_eligible?(start_on)).to be_truthy
       end
     end
 
@@ -102,14 +114,14 @@ describe Forms::HealthcareForChildcareProgramForm do
         primary.consumer_role.create_eligibility({
                                                    evidence_key: :osse_subsidy,
                                                    evidence_value: true,
-                                                   effective_date: ::TimeKeeper.date_of_record
+                                                   effective_date: start_on
                                                  })
       end
 
       it 'should terminate osse eligibility' do
-        expect(primary.consumer_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_truthy
+        expect(primary.consumer_role.osse_eligible?(start_on)).to be_truthy
         described_class.submit_with(params)
-        expect(primary.consumer_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_falsey
+        expect(primary.consumer_role.osse_eligible?(start_on)).to be_falsey
       end
     end
 
@@ -118,14 +130,14 @@ describe Forms::HealthcareForChildcareProgramForm do
       let(:osse_eligibility) { 'true' }
 
       it 'should create eligibility with resident role' do
-        expect(primary.consumer_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_falsey
-        expect(primary.resident_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_falsey
+        expect(primary.consumer_role.osse_eligible?(start_on)).to be_falsey
+        expect(primary.resident_role.osse_eligible?(start_on)).to be_falsey
 
         described_class.submit_with(params)
 
         primary.reload
-        expect(primary.consumer_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_falsey
-        expect(primary.resident_role.osse_eligible?(::TimeKeeper.date_of_record)).to be_truthy
+        expect(primary.consumer_role.osse_eligible?(start_on)).to be_falsey
+        expect(primary.resident_role.osse_eligible?(start_on)).to be_truthy
       end
     end
   end
