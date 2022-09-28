@@ -17,8 +17,14 @@ module Subscribers
       logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
 
       payload = JSON.parse(response, symbolize_names: true)
+      application = FinancialAssistance::Operations::Application::FindByHbxId::new.call(payload[:hbx_id]).success
+
       result =
-        FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+        if application&.predecessor_id
+          ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
+        else
+          FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+        end
 
       if result.success?
         logger.info "DeterminationSubscriber: acked with success: #{result.success}"

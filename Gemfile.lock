@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 14d6e60c5d92d2c4603242ee0dda05af0a210f59
+  revision: 8f6a4442f8fc5ac96c034f1941d31f9ea3a47628
   branch: ivl_renewals_determination_event
   specs:
     aca_entities (0.10.0)
@@ -560,7 +560,7 @@ GEM
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffaker (2.18.0)
-    ffi (1.15.5)
+    ffi (1.9.25)
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
     forgery (0.7.0)
@@ -720,7 +720,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.21)
+    oj (3.13.11)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
