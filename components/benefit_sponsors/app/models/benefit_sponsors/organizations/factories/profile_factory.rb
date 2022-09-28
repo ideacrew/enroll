@@ -144,7 +144,7 @@ module BenefitSponsors
           address.changed_attributes.include?("zip") || address.changed_attributes.include?("county") || address.changed_attributes.include?("state")
         end
 
-        def save(attributes)       
+        def save(attributes)
           return self unless match_or_create_person
           existing_org = get_existing_organization unless is_broker_profile?
           return self if organization_validity_failed?(existing_org)
