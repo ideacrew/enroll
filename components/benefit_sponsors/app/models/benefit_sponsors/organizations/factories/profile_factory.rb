@@ -25,6 +25,8 @@ module BenefitSponsors
 
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
+          osse_eligibility = attributes[:organization][:profiles_attributes][0][:osse_eligibility]
+          build_osse_eligibility(organization, osse_eligibility)
           organization.assign_attributes(sanitize_organization_params_for_update(attributes[:organization]))
           organization.update_benefit_sponsorship(organization.employer_profile) if is_employer_profile? && address_changed?(organization.employer_profile)
           factory_obj.update_representative(attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
@@ -36,6 +38,37 @@ module BenefitSponsors
                       false
                     end
           factory_obj
+        end
+
+        def self.build_osse_eligibility(organization, osse_eligibility)
+          benefit_sponsorship = organization.active_benefit_sponsorship
+          osse_eligibility_present = benefit_sponsorship.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record).present?
+          if (osse_eligibility_present && verify_false(osse_eligibility)) || (!osse_eligibility_present && verify_true(osse_eligibility))
+            result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
+            if result.success?
+              eligibility = benefit_sponsorship.eligibilities.build(result.success.to_h)
+              eligibility.save!
+            end
+          end
+        rescue StandardError => e
+          Rails.logger.error { "error building osse eligibility due to: #{e.message}" }
+        end
+
+        def self.verify_false(value)
+          [false, "false"].include?(value)
+        end
+
+        def self.verify_true(value)
+          [true, "true"].include?(value)
+        end
+
+        def self.osse_eligibility_params(benefit_sponsorship, osse_eligibility)
+          {
+            subject_gid: benefit_sponsorship.to_global_id,
+            evidence_key: :osse_subsidy,
+            evidence_value: osse_eligibility,
+            effective_date: TimeKeeper.date_of_record
+          }
         end
 
         def self.update_plan_design_organization(organization)
@@ -201,7 +234,7 @@ module BenefitSponsors
         end
 
         def profile_attributes(attrs = {})
-          attrs[:profiles_attributes][0] if attrs[:profiles_attributes].present?
+          attrs[:profiles_attributes][0].except!(:osse_eligibility) if attrs[:profiles_attributes].present?
         end
 
         def staff_role_attributes(attrs = {})
@@ -209,7 +242,7 @@ module BenefitSponsors
         end
 
         def self.sanitize_organization_params_for_update(attrs = {})
-          attrs[:profiles_attributes][0].except!(:referred_by, :referred_reason)
+          attrs[:profiles_attributes][0].except!(:referred_by, :referred_reason, :osse_eligibility)
           attrs
         end
 

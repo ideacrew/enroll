@@ -39,6 +39,20 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
     end
   end
 
+  context 'without eligibility_determination' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+    let(:params) do
+      { family_member_ids: [family.primary_applicant.id.to_s], family: family, year: TimeKeeper.date_of_record.year }
+    end
+
+    it 'returns success' do
+      expect(result.success?).to eq true
+      expect(result.value!).to eq 'csr_0'
+    end
+  end
+
   context 'valid params' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
