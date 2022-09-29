@@ -92,6 +92,17 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyTypeOfHousehold do
           ).to eq('adult_and_child')
         end
       end
+
+      context 'both members are aged 19' do
+        let(:family_member1_age) { 19 }
+        let(:family_member2_age) { 19 }
+
+        it 'should return entity object' do
+          expect(
+            subject.call(params).success[1].households.first.type_of_household
+          ).to eq('adult_only')
+        end
+      end
     end
 
     context 'invalid params' do
