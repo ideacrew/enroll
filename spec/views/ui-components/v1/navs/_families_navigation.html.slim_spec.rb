@@ -4,9 +4,11 @@ require 'rails_helper'
 
 RSpec.describe "_families_navigation.html.slim", :type => :view, dbclean: :after_each  do
   let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_family)}
+  let(:person2) {FactoryBot.create(:person, :with_resident_role, :with_family)}
   let(:hbx_staff) {FactoryBot.create(:person, :with_hbx_staff_role)}
   let(:user) {FactoryBot.create(:user, person: hbx_staff)}
   let(:user1) {FactoryBot.create(:user, person: person)}
+  let(:user2) {FactoryBot.create(:user, person: person2)}
 
   describe "osse content" do
     before do
@@ -48,6 +50,18 @@ RSpec.describe "_families_navigation.html.slim", :type => :view, dbclean: :after
 
       it "should not display hc4cc text" do
         expect(rendered).to_not include(l10n("osse_eligibility"))
+      end
+    end
+
+    context "login as an admin, and the consumer has a resident_role" do
+      before do
+        assign(:person, person2)
+        sign_in(user)
+        render "ui-components/v1/navs/families_navigation.html.slim"
+      end
+
+      it "should display hc4cc text" do
+        expect(rendered).to include(l10n("osse_eligibility"))
       end
     end
   end
