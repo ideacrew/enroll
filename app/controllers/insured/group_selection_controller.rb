@@ -225,10 +225,10 @@ class Insured::GroupSelectionController < ApplicationController
     return unless @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)
 
     role = if family_member.person.is_consumer_role_active?
-            family_member.person.consumer_role
-          elsif family_member.person.is_resident_role_active?
-            family_member.person.resident_role
-          end
+             family_member.person.consumer_role
+           elsif family_member.person.is_resident_role_active?
+             family_member.person.resident_role
+           end
     family_member_ids = @family.family_members.active.map(&:id)
 
     market_kind = @market_kind == "shop" ? "shop" : get_ivl_market_kind(@person)
