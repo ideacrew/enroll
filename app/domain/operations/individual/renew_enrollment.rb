@@ -49,47 +49,9 @@ module Operations
 
       def fetch_eligibility_values(enrollment, effective_on)
         return Success({}) unless enrollment.is_health_enrollment?
+        return Success({}) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
         family = enrollment.family
-
-        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          premium_credits = ::Operations::PremiumCredits::FindAll.new.call({ family: enrollment.family, year: effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
-          return Success({}) if premium_credits.failure?
-
-          aptc_grants = premium_credits.value!
-          enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id)
-          current_enrolled_aptc_grants = aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
-          return Success({}) if current_enrolled_aptc_grants.blank?
-
-          aptc_op = ::Operations::PremiumCredits::FindAptc.new.call({
-                                                                      hbx_enrollment: enrollment,
-                                                                      effective_on: effective_on
-                                                                    })
-          return Success({}) unless aptc_op.success?
-
-          csr_op = ::Operations::PremiumCredits::FindCsrValue.new.call({
-                                                                         family: enrollment.family,
-                                                                         year: effective_on.year,
-                                                                         family_member_ids: enrolled_family_member_ids
-                                                                       })
-          return Success({}) unless csr_op.success?
-
-          car_value = fetch_csr_percent(csr_op.value!)
-          max_aptc = aptc_op.value!
-          default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-          applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          applied_aptc = float_fix(max_aptc * applied_percentage)
-
-          data = {
-            applied_percentage: applied_percentage,
-            applied_aptc: applied_aptc,
-            max_aptc: max_aptc,
-            csr_amt: car_value
-          }
-
-          return Success(data)
-        end
-
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
           max_aptc = tax_household.current_max_aptc.to_f
@@ -117,17 +79,6 @@ module Operations
         else
           Failure('Unable to renew the enrollment')
         end
-      end
-
-      def fetch_csr_percent(csr_kind)
-        {
-          "csr_0" => 0,
-          "csr_limited" => 'limited',
-          'csr_100' => 100,
-          "csr_94" => 94,
-          "csr_87" => 87,
-          "csr_73" => 73
-        }.stringify_keys[csr_kind] || 0
       end
     end
   end

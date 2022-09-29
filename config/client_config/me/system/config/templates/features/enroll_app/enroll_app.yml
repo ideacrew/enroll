@@ -387,18 +387,21 @@ registry:
             item: ''
       - key: :ivl_enrollment_renewal_begin_date
         item: :enrollment_renewal_date
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :ivl_enrollment_renewal_begin_effective_day
-            item: 24
+            item: 1
           - key: :ivl_enrollment_renewal_begin_effective_month
-            item: 10
+            item: 11
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
         is_enabled: true
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: true
+      - key: :hide_enrollment_market_type
+        item: :hide_enrollment_market_type
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_MARKET_TYPE'] || false %>
   - namespace:
       - :pay_now_feature
     features:

@@ -96,4 +96,15 @@ RSpec.describe ::Operations::Eligibilities::BuildGrant, type: :model, dbclean: :
       expect(result.success.count).to eq 1
     end
   end
+
+  context 'when there are no active tax household groups' do
+    let(:is_ia_eligible_1) { true }
+    let(:is_ia_eligible_2) { true }
+
+    it 'should not return any grants' do
+      family.tax_household_groups.each { |thhg| thhg.update_attribute(:end_on, tax_household_group_params[:start_on]) }
+      result = subject.call(family: family.reload, type: 'AdvancePremiumAdjustmentGrant', effective_date: TimeKeeper.date_of_record)
+      expect(result.success).to be_empty
+    end
+  end
 end
