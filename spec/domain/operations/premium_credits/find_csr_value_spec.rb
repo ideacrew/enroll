@@ -44,7 +44,7 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
     let(:params) do
-      { family_member_ids: [family.primary_applicant.id.to_s], family: family, year: TimeKeeper.date_of_record.year }
+      { family_member_ids: [family.primary_applicant.id], family: family, year: TimeKeeper.date_of_record.year }
     end
 
     it 'returns success' do
