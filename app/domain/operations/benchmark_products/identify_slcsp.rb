@@ -78,16 +78,20 @@ module Operations
                   end
 
         members_premium = members.reduce(0.00) do |sum, member|
-          (sum + (::BenefitMarkets::Products::ProductRateCache.lookup_rate(health_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA')).round(2)).round(2)
+          (sum + member_ehb_premium(health_product, member)).round(2)
         end
 
-        health_only_members_ehb_premium = BigDecimal((members_premium * health_product.ehb).round(2).to_s)
+        health_only_members_ehb_premium = BigDecimal(members_premium.to_s)
 
         if check_slcsapd_enabled?(@household, benchmark_product_model) && !health_product.covers_pediatric_dental?
           [health_only_members_ehb_premium, health_only_members_ehb_premium + @household[:household_dental_benchmark_ehb_premium]]
         else
           [health_only_members_ehb_premium, health_only_members_ehb_premium]
         end
+      end
+
+      def member_ehb_premium(health_product, member)
+        (::BenefitMarkets::Products::ProductRateCache.lookup_rate(health_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA') * health_product.ehb).round(2)
       end
 
       def identify_slcsp(product_to_ehb_premium_hash)

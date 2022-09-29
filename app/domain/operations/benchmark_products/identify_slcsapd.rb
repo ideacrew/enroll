@@ -84,15 +84,17 @@ module Operations
       end
 
       def group_ehb_premium(dental_product)
-        group_premium = if dental_product.family_based_rating?
-                          # 'Family-Tier Rates'
-                          family_tier_total_premium(dental_product)
-                        else
-                          # 'Age-Based Rates'
-                          total_premium(dental_product)
-                        end
+        if dental_product.family_based_rating?
+          # 'Family-Tier Rates'
+          family_tier_total_premium(dental_product)
+        else
+          # 'Age-Based Rates'
+          total_premium(dental_product)
+        end
+      end
 
-        (group_premium * dental_product.ehb_apportionment_for_pediatric_dental).round(2)
+      def member_ehb_premium(dental_product, member)
+        (::BenefitMarkets::Products::ProductRateCache.lookup_rate(dental_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA') * dental_product.ehb_apportionment_for_pediatric_dental).round(2)
       end
 
       # Pediatric Dental Premiums should only be calculated for Child Members.
@@ -103,14 +105,17 @@ module Operations
                     @child_members
                   end
 
-        members.reduce(0.00) do |sum, member|
-          (sum + (::BenefitMarkets::Products::ProductRateCache.lookup_rate(dental_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA')).round(2)).round(2)
+        members_premium = members.reduce(0.00) do |sum, member|
+          (sum + member_ehb_premium(dental_product, member)).round(2)
         end
+
+        BigDecimal(members_premium.round(2).to_s)
       end
 
       def family_tier_total_premium(dental_product)
         qhp = ::Products::Qhp.where(standard_component_id: dental_product.hios_base_id, active_year: dental_product.active_year).first
-        qhp.qhp_premium_tables.where(rate_area_id: @exchange_provided_code).first&.send(primary_tier_value)
+        family_premium = qhp.qhp_premium_tables.where(rate_area_id: @exchange_provided_code).first&.send(primary_tier_value)
+        BigDecimal((family_premium * dental_product.ehb_apportionment_for_pediatric_dental).round(2).to_s)
       end
 
       # The maximum is for 3 children so we return premium for primary_enrollee_two_dependent.
