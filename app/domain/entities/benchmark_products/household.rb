@@ -17,7 +17,7 @@ module Entities
       attribute :dental_product_title, Types::String.optional.meta(omittable: true)
       attribute :dental_product_id, Types::Bson.optional.meta(omittable: true)
       attribute :dental_rating_method, Types::String.optional.meta(omittable: true)
-      attribute :dental_ehb, ::AcaEntities::Types::Money.optional.meta(omittable: true)
+      attribute :dental_ehb_apportionment_for_pediatric_dental, ::AcaEntities::Types::Money.optional.meta(omittable: true)
       attribute :household_dental_benchmark_ehb_premium, ::AcaEntities::Types::Money.optional.meta(omittable: true)
       attribute :members, Types::Array.of(Entities::BenchmarkProducts::Member).meta(omittable: false)
     end

@@ -98,6 +98,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
+      @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
       # Used for determing whether or not to show the extended APTC message
       @any_aptc_present = @enrollment.hbx_enrollment_members.any? { |member| @plan.aptc_amount(member) > 0 } if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message)
     end
@@ -336,9 +337,19 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
-    if @tax_household.present?
-      if is_eligibility_determined_and_not_csr_0?(@person, @tax_household)
+
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      aptc_grants(@hbx_enrollment.family, @hbx_enrollment.effective_on.year) if @person.present?
+    else
+      begin
+        @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year)
+      rescue StandardError => e
+        log("#{e.message}; person_id: #{@person.id}")
+      end
+    end
+    if @tax_household.present? || @aptc_grants.present?
+      entity = @tax_household || @aptc_grants
+      if is_eligibility_determined_and_not_csr_0?(entity)
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -398,8 +409,22 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_0?(person, tax_household)
-    valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
+  def is_eligibility_determined_and_not_csr_0?(entity)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      enrolled_family_member_ids = @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
+      csr_op = ::Operations::PremiumCredits::FindCsrValue.new.call({
+                                                                     family: @hbx_enrollment.family,
+                                                                     year: @hbx_enrollment.effective_on.year,
+                                                                     family_member_ids: enrolled_family_member_ids
+                                                                   })
+
+      return false unless csr_op.success?
+
+      valid_csr_eligibility_kind = csr_op.value!
+    else
+      valid_csr_eligibility_kind = entity.valid_csr_kind(@hbx_enrollment)
+    end
+
     (EligibilityDetermination::CSR_KINDS.include? valid_csr_eligibility_kind.to_s) && (valid_csr_eligibility_kind.to_s != 'csr_0')
   end
 

@@ -8,7 +8,7 @@ module Operations
 
       # find all dental products
       #   Pediatric-only dental plans are offered in ME
-      #   These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people 19+
+      #   These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people aged 19 or above
       # Calculate the cost of each available dental plan for all members of the APTC household
       #   Compare the portion of dental plan costs that cover EHB for all plans that cover all members of the APTC household
       # Identify the second lowest cost standalone dental plan (SLCSADP)
@@ -31,7 +31,7 @@ module Operations
         household[:dental_product_title] = product.title
         household[:dental_product_id] = product.id
         household[:dental_rating_method] = product.rating_method
-        household[:dental_ehb] = product.ehb
+        household[:dental_ehb_apportionment_for_pediatric_dental] = product.ehb_apportionment_for_pediatric_dental
         household[:household_dental_benchmark_ehb_premium] = ehb_premium
 
         Success(household)
@@ -60,7 +60,7 @@ module Operations
         }
 
         # Pediatric-only dental plans are offered in ME.
-        # These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people 19+
+        # These plans should not be taken into account when identifying the SLCSADP if the APTC household includes people aged 19 or above
         # type_of_household can be 'adult_only', 'adult_and_child' or 'child_only'
         products = if params[:household_params][:type_of_household] == 'child_only'
                      ::BenefitMarkets::Products::DentalProducts::DentalProduct.where(query)
@@ -84,15 +84,17 @@ module Operations
       end
 
       def group_ehb_premium(dental_product)
-        group_premium = if dental_product.family_based_rating?
-                          # 'Family-Tier Rates'
-                          family_tier_total_premium(dental_product)
-                        else
-                          # 'Age-Based Rates'
-                          total_premium(dental_product)
-                        end
+        if dental_product.family_based_rating?
+          # 'Family-Tier Rates'
+          family_tier_total_premium(dental_product)
+        else
+          # 'Age-Based Rates'
+          total_premium(dental_product)
+        end
+      end
 
-        (group_premium * dental_product.ehb).round(2)
+      def member_ehb_premium(dental_product, member)
+        (::BenefitMarkets::Products::ProductRateCache.lookup_rate(dental_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA') * dental_product.ehb_apportionment_for_pediatric_dental).round(2)
       end
 
       # Pediatric Dental Premiums should only be calculated for Child Members.
@@ -103,14 +105,17 @@ module Operations
                     @child_members
                   end
 
-        members.reduce(0.00) do |sum, member|
-          (sum + (::BenefitMarkets::Products::ProductRateCache.lookup_rate(dental_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA')).round(2)).round(2)
+        members_premium = members.reduce(0.00) do |sum, member|
+          (sum + member_ehb_premium(dental_product, member)).round(2)
         end
+
+        BigDecimal(members_premium.round(2).to_s)
       end
 
       def family_tier_total_premium(dental_product)
         qhp = ::Products::Qhp.where(standard_component_id: dental_product.hios_base_id, active_year: dental_product.active_year).first
-        qhp.qhp_premium_tables.where(rate_area_id: @exchange_provided_code).first&.send(primary_tier_value)
+        family_premium = qhp.qhp_premium_tables.where(rate_area_id: @exchange_provided_code).first&.send(primary_tier_value)
+        BigDecimal((family_premium * dental_product.ehb_apportionment_for_pediatric_dental).round(2).to_s)
       end
 
       # The maximum is for 3 children so we return premium for primary_enrollee_two_dependent.

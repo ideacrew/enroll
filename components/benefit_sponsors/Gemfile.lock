@@ -1,4 +1,21 @@
 GIT
+  remote: https://github.com/ideacrew/aca_entities.git
+  revision: eb810cecd106bb4f203997c0eaf395864f32d624
+  branch: trunk
+  specs:
+    aca_entities (0.10.0)
+      deep_merge
+      dry-monads (~> 1.2)
+      dry-struct (~> 1.0)
+      dry-transformer (~> 0.1.1)
+      dry-types (~> 1.0)
+      dry-validation (~> 1.2)
+      iso_country_codes
+      nokogiri-happymapper
+      oj (~> 3.11)
+      rbnacl (~> 7.1)
+
+GIT
   remote: https://github.com/ideacrew/acapi.git
   revision: e10f9ab0a454f861916a986986daa9e055798fde
   branch: trunk
@@ -310,6 +327,7 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-types (~> 1.5)
       ice_nine (~> 0.11)
+    dry-transformer (0.1.1)
     dry-types (1.5.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
@@ -351,7 +369,7 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday_middleware (1.1.0)
       faraday (~> 1.0)
-    ffi (1.15.3)
+    ffi (1.15.5)
     forgery (0.7.0)
     fugit (1.5.1)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -379,6 +397,7 @@ GEM
     interactor-rails (2.2.1)
       interactor (~> 3.0)
       rails (>= 4.2)
+    iso_country_codes (0.7.8)
     jaro_winkler (1.5.4)
     jsonapi-renderer (0.2.2)
     kaminari (0.17.0)
@@ -446,6 +465,8 @@ GEM
     nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
+    nokogiri-happymapper (0.8.1)
+      nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
     oj (3.13.4)
@@ -503,6 +524,8 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbnacl (7.1.1)
+      ffi
     redcarpet (3.4.0)
     redis (4.4.0)
     redis-namespace (1.8.1)
@@ -580,7 +603,7 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.7)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
-    sassc (2.2.1)
+    sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
       railties (>= 4.0.0)
@@ -657,6 +680,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aca_entities!
   acapi!
   benefit_markets!
   benefit_sponsors!
@@ -681,4 +705,4 @@ DEPENDENCIES
   webpacker (~> 4.0.2)
 
 BUNDLED WITH
-   2.2.12
+   2.3.16

@@ -72,19 +72,11 @@ module BenefitSponsors
       end
 
       def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-        if year >= 2021
-          EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
-        else
-          false
-        end
+        EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
       end
 
       def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-        if year >= 2021
-          EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
-        else
-          false
-        end
+        EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
       end
 
       def osse_eligibility_history_is_enabled?

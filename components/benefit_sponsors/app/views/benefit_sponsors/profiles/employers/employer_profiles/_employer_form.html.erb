@@ -120,7 +120,7 @@
             </div>
           <% end %>
           </div>
-          <% if shop_osse_eligibility_is_enabled? && pundit_allow(HbxProfile, :can_view_osse_eligibility?) %>
+          <% if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && pundit_allow(HbxProfile, :can_view_osse_eligibility?) %>
             <div class="mt-2">
               <h2><%=l10n('osse_subsidy_title')%></h2>
               <p><%=l10n('osse_eligibility_description')%></p>

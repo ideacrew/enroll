@@ -12,7 +12,8 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
     let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
-    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: @product, consumer_role_id: person.consumer_role.id)}
+    let(:eligible_child_care_subsidy) { 0.00 }
+    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: @product, consumer_role_id: person.consumer_role.id, eligible_child_care_subsidy: eligible_child_care_subsidy)}
     let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
@@ -52,8 +53,22 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
 
     it "should show the correct Premium" do
       dollar_amount = number_to_currency(SpecHelperClassesForViews::InsuredFamiliesHelperSlugForGroupSelectionTermination.current_premium(enrollment), precision: 2)
-      expect(rendered).to match /Premium/
+      expect(rendered).to match(/Premium You Pay/)
       expect(rendered).to include dollar_amount
+    end
+
+    context 'when osse premium discount > 0' do
+      let(:eligible_child_care_subsidy) { 123.78 }
+      it "should show the osse Premium discount" do
+        expect(rendered).to match(/HC4CC Premium Discount/)
+        expect(rendered).to have_content(eligible_child_care_subsidy)
+      end
+    end
+
+    context 'when osse premium discount is 0.00' do
+      it "should not show the osse Premium discount" do
+        expect(rendered).not_to match(/HC4CC Premium Discount/)
+      end
     end
 
     it "should show Cancel Plan button" do

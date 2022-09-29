@@ -33,31 +33,17 @@ module Operations
         enrollment_list = enrollments.reject do |enrollment|
           enrollment.product.blank? || enrollment.product.metal_level_kind == :catastrophic
         end
-        enrollment_list.present? ? Success(enrollment_list) : Failure('Cannot find any enrollments with Non-Catastrophic Plan.')
+        enrollment_list.present? ? Success(enrollment_list.sort_by(&:created_at)) : Failure('Cannot find any enrollments with Non-Catastrophic Plan.')
       end
 
       def generate_enrollments(enrollments)
+        exclude_enrollments_list = enrollments.map(&:hbx_id)
         enrollments.each do |enrollment|
-          date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
-
-          result = ::Operations::PremiumCredits::FindAptc.new.call({
-                                                                     hbx_enrollment: enrollment,
-                                                                     effective_on: date
-                                                                   })
-          return result unless result.success?
-
-          max_aptc = result.value!
-          default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-          applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          applied_aptc = float_fix(max_aptc * applied_percentage)
 
           attrs = {
             enrollment_id: enrollment.id,
-            elected_aptc_pct: applied_percentage,
-            aptc_applied_total: applied_aptc,
-            aggregate_aptc_amount: max_aptc
+            exclude_enrollments_list: exclude_enrollments_list
           }
-
 
           ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
         end

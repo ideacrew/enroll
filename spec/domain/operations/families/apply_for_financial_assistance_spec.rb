@@ -192,4 +192,41 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
       expect(@result.success.first[:qualified_non_citizen]).to eq(false)
     end
   end
+
+  describe 'qualified non citizen information' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, :with_ssn) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+    it "qualified_non_citizenship_result is 'N'" do
+      person.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'N')
+      result = subject.call(family_id: family.id)
+      expect(result.success.first[:qualified_non_citizen]).to eq(false)
+    end
+
+    it "qualified_non_citizenship_result is 'Y'" do
+      person.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'Y')
+      result = subject.call(family_id: family.id)
+      expect(result.success.first[:qualified_non_citizen]).to eq(true)
+    end
+
+    it "qualified_non_citizenship_result is nil" do
+      person.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: nil)
+      result = subject.call(family_id: family.id)
+      expect(result.success.first[:qualified_non_citizen]).to eq(nil)
+    end
+
+    context 'qualified_non_citizenship_result is nil' do
+      it 'returns true if person is a alien_lawfully_present' do
+        person.consumer_role.update!(citizen_status: 'alien_lawfully_present')
+        result = subject.call(family_id: family.id)
+        expect(result.success.first[:qualified_non_citizen]).to eq(true)
+      end
+
+      it 'returns nil if person is a us_citizen' do
+        person.consumer_role.update!(citizen_status: 'us_citizen')
+        result = subject.call(family_id: family.id)
+        expect(result.success.first[:qualified_non_citizen]).to eq(nil)
+      end
+    end
+  end
 end
