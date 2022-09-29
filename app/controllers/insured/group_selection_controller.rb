@@ -240,11 +240,15 @@ class Insured::GroupSelectionController < ApplicationController
     incarcerated = person.is_consumer_role_active? && family_member.is_applying_coverage && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
 
     if EnrollRegistry.feature_enabled?(:choose_coverage_mdcr_warning)
-      is_eligible_for_mdcr = @family.households&.first&.tax_households&.first&.tax_household_members&.where(applicant_id: family_member.id)&.first&.is_medicaid_chip_eligible
+      is_eligible_for_mdcr = family_member_eligible_for_mdcr(family_member)
       errors << l10n("insured.group_selection.mdcr_eligible_warning") if is_eligible_for_mdcr
     end
 
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
+  end
+
+  def family_member_eligible_for_mdcr(family_member)
+    @family.households&.first&.tax_households&.first&.tax_household_members&.where(applicant_id: family_member.id)&.first&.is_medicaid_chip_eligible
   end
 
   def permitted_group_selection_params
