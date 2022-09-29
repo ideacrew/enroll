@@ -868,7 +868,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
+      event :determine, :after => [:record_transition, :create_tax_household_groups, :apply_aggregate_to_enrollment, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1015,6 +1015,16 @@ module FinancialAssistance
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
+    def apply_aggregate_to_enrollment
+      # should be disabled for renewals
+      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
+      on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
+
+      Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
+    rescue StandardError => e
+      Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+    end
+
     # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
       return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
@@ -1043,11 +1053,6 @@ module FinancialAssistance
       family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
       Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
 
-      if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
-        on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family.reload, year: self.effective_date.year})
-
-        Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
-      end
     rescue StandardError => e
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
