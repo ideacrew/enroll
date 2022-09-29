@@ -62,7 +62,8 @@
           <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost - @enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
         <% else %>
           <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
+          <% responsible_amount = @plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f %>
+          <td class="text-right"><strong><%= number_to_currency((responsible_amount < 1 ? 0.00 : responsible_amount)) %></strong></td>
         <% end %>
       </tr>
       <tr>
