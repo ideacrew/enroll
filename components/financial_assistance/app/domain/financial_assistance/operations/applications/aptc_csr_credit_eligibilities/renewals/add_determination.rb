@@ -142,11 +142,15 @@ module FinancialAssistance
                 else
                   :mixed_determination
                 end
-              event_key = "determined_#{event_name}"
+              event_key = "notice.determined_#{event_name}"
 
-              ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call({payload: application_payload.to_h, event_name: event_key.to_s})
+              event_to_publish =  event("events.applications.aptc_csr_credits.renewals.#{event_key}", attributes: application_payload.to_h)
+              event_to_publish.success.publish
 
-              Success({ event: event_key, payload: application_payload.to_h })
+              Success("Successfully published the payload for event: #{event_key}")
+
+              # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call({payload: application_payload.to_h, event_name: event_key.to_s})
+              # Success({ event: event_key, payload: application_payload.to_h })
             end
           end
         end
