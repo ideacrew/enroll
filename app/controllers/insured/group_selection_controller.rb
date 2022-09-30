@@ -247,10 +247,6 @@ class Insured::GroupSelectionController < ApplicationController
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
-  def family_member_eligible_for_mdcr(family_member)
-    @family.households&.first&.tax_households&.first&.tax_household_members&.where(applicant_id: family_member.id)&.first&.is_medicaid_chip_eligible
-  end
-
   def permitted_group_selection_params
     params.permit(
       :change_plan, :consumer_role_id, :market_kind, :qle_id,
