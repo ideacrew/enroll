@@ -13,7 +13,7 @@ module FinancialAssistance
             include Dry::Monads[:result, :do, :try]
             include EventSource::Command
 
-            REGISTERED_EVENTS = %w[renewal_requested.all renewed determination_submission_requested.all determination_requested determination_added determination_notice_requested determined_magi_medicaid_eligible].freeze
+            REGISTERED_EVENTS = %w[renewal.requested renewed determination_submission.requested determination_requested determination_added determination_notice_requested determined_magi_medicaid_eligible].freeze
 
             def call(params)
               payload = yield validate_input_params(params)

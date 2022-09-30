@@ -4,14 +4,13 @@ module Publishers
   module Applications
     module AptcCsrCredits
       module Renewals
-    # Publisher will send request payload to medicaid gateway for determinations
-          class DeterminationSubmissionRequestedPublisher
-            include ::EventSource::Publisher[amqp: 'enroll.applications.aptc_csr_credits.renewals.determination_submission_requested']
+        # Publisher will send request to EA for application submissions and determinations
+        class DeterminationSubmissionRequestedPublisher
+          include ::EventSource::Publisher[amqp: 'enroll.applications.aptc_csr_credits.renewals.determination_submission']
 
-            # This event is to generate renewal draft applications
-            register_event 'all'
-          end
+          register_event 'requested'
         end
+      end
     end
   end
 end

@@ -4,10 +4,10 @@ module Events
   module Applications
     module AptcCsrCredits
       module Renewals
-        module RenewalRequested
+        module DeterminationSubmission
         # This class will register event 'application_renewal_request_created'
-          class All < EventSource::Event
-            publisher_path 'publishers.applications.aptc_csr_credits.renewals.renewal_requested_publisher'
+          class Requested < EventSource::Event
+            publisher_path 'publishers.applications.aptc_csr_credits.renewals.determination_submission_requested_publisher'
 
           end
         end
