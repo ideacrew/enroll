@@ -36,7 +36,7 @@ module Operations
           result
         end
 
-        any_member_ia_not_eligible = values[:family_member_ids].any? { |family_member_id| @csr_hash[family_member_id].nil? }
+        any_member_ia_not_eligible = values[:family_member_ids].any? { |family_member_id| @csr_hash[family_member_id.to_s].nil? }
 
         handle_native_american_csr
 
