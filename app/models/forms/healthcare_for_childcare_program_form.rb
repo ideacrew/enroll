@@ -44,7 +44,7 @@ module Forms
     private
 
     def person_osse_eligible?(date = ::TimeKeeper.date_of_record)
-      @role.osse_eligible?(date)
+      @role.is_osse_eligibility_satisfied?(date)
     end
 
     def eligibility_params

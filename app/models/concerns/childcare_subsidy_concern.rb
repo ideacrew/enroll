@@ -9,15 +9,20 @@ module ChildcareSubsidyConcern
                              as: :eligibility
 
     def osse_eligible?(start_on)
-      return false unless osse_feature_enabled?
+      return false unless osse_feature_enabled_for?(start_on.year)
+
+      is_osse_eligibility_satisfied?(start_on)
+    end
+
+    def is_osse_eligibility_satisfied?(start_on)
       eligibility = eligibility_for(:osse_subsidy, start_on)
       return false unless eligibility
       evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
       evidence&.is_satisfied == true
     end
 
-    def osse_feature_enabled?
-      ::EnrollRegistry.feature?("aca_ivl_osse_subsidy") && ::EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy")
+    def osse_feature_enabled_for?(year)
+      ::EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && ::EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
     end
 
     def eligibility_for(evidence_key, start_on)
