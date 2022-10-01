@@ -3094,7 +3094,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
 
     let(:enrollment)    do
-      FactoryBot.create(:hbx_enrollment,
+      FactoryBot.create(:hbx_enrollment, :with_health_product,
                         family: family,
                         coverage_kind: "health",
                         effective_on: TimeKeeper.date_of_record.last_year.beginning_of_year,
@@ -3142,7 +3142,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
       let(:consumer_role) { person.consumer_role }
       let(:ivl_enrollment)    {
-        FactoryBot.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment, :with_health_product,
                            family: ivl_family,
                            household: ivl_family.latest_household,
                            coverage_kind: "health",
@@ -3294,7 +3294,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       let(:ivl_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment, :with_health_product,
                           family: ivl_family,
                           household: ivl_family.latest_household,
                           coverage_kind: "health",
@@ -3390,7 +3390,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       let(:ivl_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment, :with_health_product,
                           family: ivl_family,
                           household: ivl_family.latest_household,
                           coverage_kind: "health",

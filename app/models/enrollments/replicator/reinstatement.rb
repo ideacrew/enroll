@@ -157,6 +157,7 @@ module Enrollments
         shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def extract_csr_kind
         shopping_family_members_ids = base_enrollment.hbx_enrollment_members.map(&:applicant_id)
 
@@ -178,6 +179,7 @@ module Enrollments
           tax_household&.eligibile_csr_kind(base_enrollment.hbx_enrollment_members.map(&:applicant_id))
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def product_id_csr_variant(base_enrollment)
         eligible_csr = extract_csr_kind
