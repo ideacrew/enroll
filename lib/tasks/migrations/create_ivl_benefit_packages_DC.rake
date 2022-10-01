@@ -1,62 +1,68 @@
+# This rake is not for mock plans
+
 namespace :import do
-  desc "Create 2023 benefit coverage period and packages with products"
-  task :create_2023_ivl_packages_DC  => :environment do
-    puts "::: Creating 2023 IVL packages :::" unless Rails.env.test?
+  desc "Create current year benefit coverage period and packages with products"
+  task :create_ivl_benefit_packages_DC  => :environment do
+    puts "::: Creating IVL packages :::" unless Rails.env.test?
 
     # BenefitPackages - HBX 2023
     hbx = HbxProfile.current_hbx
     puts 'No current HBX present' if hbx.blank?
     abort if hbx.blank?
 
+    raise "please pass year" unless ENV['year'].present?
+
+    year = ENV['year'].to_i
+
     # Second lowest cost silver plan
     slcs_products = BenefitMarkets::Products::Product.where(hios_id: "94506DC0390006-01")
-    slcsp_2023 =  slcs_products.select{|a| a.active_year == 2023}.first
+    current_slcsp =  slcs_products.select{|a| a.active_year == year}.first
     # check if benefit package is present for 2023
-    bc_period_2023 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2023 }.first
+    current_period_bc = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == year }.first
 
-    puts 'No slcsp_2023 present' if slcsp_2023.blank?
-    abort if slcsp_2023.blank?
+    puts 'No current_slcsp present' if current_slcsp.blank?
+    abort if current_slcsp.blank?
 
-    if bc_period_2023.present?
-      bc_period_2023.slcsp = slcsp_2023.id
-      bc_period_2023.slcsp_id = slcsp_2023.id
+    if current_period_bc.present?
+      current_period_bc.slcsp = current_slcsp.id
+      current_period_bc.slcsp_id = current_slcsp.id
     else
       # create benefit package and benefit_coverage_period for 2023
-      bc_period_2022 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2022 }.first
-      bc_period_2023 = bc_period_2022.clone
-      bc_period_2023.title = "Individual Market Benefits 2023"
-      bc_period_2023.start_on = bc_period_2022.start_on + 1.year
-      bc_period_2023.end_on = bc_period_2022.end_on + 1.year
+      previous_period_bc = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == year.pred }.first
+      current_period_bc = previous_period_bc.clone
+      current_period_bc.title = "Individual Market Benefits #{year}"
+      current_period_bc.start_on = previous_period_bc.start_on + 1.year
+      current_period_bc.end_on = previous_period_bc.end_on + 1.year
 
       # if we need to change these dates after running this rake task in test or prod environments,
       # we should write a separate script.
-      bc_period_2023.open_enrollment_start_on = Date.new(2022,11,1)
-      bc_period_2023.open_enrollment_end_on = Date.new(2023,1,31)
+      current_period_bc.open_enrollment_start_on = Date.new(year.pred,11,1)
+      current_period_bc.open_enrollment_end_on = Date.new(year,1,31)
 
-      bc_period_2023.slcsp = slcsp_2023.id
-      bc_period_2023.slcsp_id = slcsp_2023.id
+      current_period_bc.slcsp = current_slcsp.id
+      current_period_bc.slcsp_id = current_slcsp.id
 
       bs = hbx.benefit_sponsorship
-      bs.benefit_coverage_periods << bc_period_2023
+      bs.benefit_coverage_periods << current_period_bc
       unless bs.save
         puts 'unable to save benefits sponsorship'
         abort
       end
     end
 
-    ivl_products = BenefitMarkets::Products::Product.by_year(2023).aca_individual_market.with_premium_tables
+    ivl_products = BenefitMarkets::Products::Product.by_year(year).aca_individual_market.with_premium_tables
     puts 'no ivl product present' if ivl_products.blank?
     abort if ivl_products.blank?
 
-    ivl_health_plans_2023         = ivl_products.where( kind: "health", hios_id: /-01$/ ).not_in(metal_level_kind: "catastrophic").pluck(:_id)
-    ivl_dental_plans_2023         = ivl_products.where( kind: "dental").pluck(:_id)
-    ivl_and_cat_health_plans_2023 = ivl_products.where( kind: "health", hios_id: /-01$/ ).pluck(:_id)
+    current_ivl_health_plans         = ivl_products.where( kind: "health", hios_id: /-01$/ ).not_in(metal_level_kind: "catastrophic").pluck(:_id)
+    current_ivl_dental_plans         = ivl_products.where( kind: "dental").pluck(:_id)
+    current_ivl_and_cat_health_plans = ivl_products.where( kind: "health", hios_id: /-01$/ ).pluck(:_id)
 
 
     individual_health_benefit_package = BenefitPackage.new(
-        title: "individual_health_benefits_2023",
+        title: "individual_health_benefits_#{year}",
         elected_premium_credit_strategy: "unassisted",
-        benefit_ids:          ivl_health_plans_2023,
+        benefit_ids:          current_ivl_health_plans,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -71,9 +77,9 @@ namespace :import do
     )
 
     individual_dental_benefit_package = BenefitPackage.new(
-        title: "individual_dental_benefits_2023",
+        title: "individual_dental_benefits_#{year}",
         elected_premium_credit_strategy: "unassisted",
-        benefit_ids:          ivl_dental_plans_2023,
+        benefit_ids:          current_ivl_dental_plans,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -88,9 +94,9 @@ namespace :import do
     )
 
     individual_catastrophic_health_benefit_package = BenefitPackage.new(
-        title: "catastrophic_health_benefits_2023",
+        title: "catastrophic_health_benefits_#{year}",
         elected_premium_credit_strategy: "unassisted",
-        benefit_ids:          ivl_and_cat_health_plans_2023,
+        benefit_ids:          current_ivl_and_cat_health_plans,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -105,9 +111,9 @@ namespace :import do
     )
 
     native_american_health_benefit_package = BenefitPackage.new(
-        title: "native_american_health_benefits_2023",
+        title: "native_american_health_benefits_#{year}",
         elected_premium_credit_strategy: "unassisted",
-        benefit_ids:          ivl_health_plans_2023,
+        benefit_ids:          current_ivl_health_plans,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -122,9 +128,9 @@ namespace :import do
     )
 
     native_american_dental_benefit_package = BenefitPackage.new(
-        title: "native_american_dental_benefits_2023",
+        title: "native_american_dental_benefits_#{year}",
         elected_premium_credit_strategy: "unassisted",
-        benefit_ids:          ivl_dental_plans_2023,
+        benefit_ids:          current_ivl_dental_plans,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["any"],
@@ -138,7 +144,7 @@ namespace :import do
         )
     )
 
-    ivl_health_plans_2023_for_csr_0 = ivl_products.where(
+    current_ivl_health_plans_for_csr_0 = ivl_products.where(
         "$and" => [
             { :kind => "health"},
             {"$or" => [
@@ -149,19 +155,19 @@ namespace :import do
         ]
     ).pluck(:_id)
 
-    ivl_health_plans_2023_for_csr_100 = ivl_products.where(
+    current_ivl_health_plans_for_csr_100 = ivl_products.where(
       "$and" => [{ :kind => 'health'},
                  {"$or" => [{:metal_level_kind.in => %w[platinum gold bronze], hios_id: /-02$/ },
                             {:metal_level_kind => 'silver', hios_id: /-02$/ }]}]
     ).pluck(:_id)
 
-    ivl_health_plans_2023_for_csr_limited = ivl_products.where(
+    current_ivl_health_plans_for_csr_limited = ivl_products.where(
       "$and" => [{ :kind => 'health'},
                  {"$or" => [{:metal_level_kind.in => %w[platinum gold bronze], hios_id: /-03$/ },
                             {:metal_level_kind => 'silver', hios_id: /-03$/ }]}]
     ).pluck(:_id)
 
-    ivl_health_plans_2023_for_csr_94 = ivl_products.where(
+    current_ivl_health_plans_for_csr_94 = ivl_products.where(
         "$and" => [
             { :kind => "health"},
             {"$or" => [
@@ -171,7 +177,7 @@ namespace :import do
             }
         ]
     ).pluck(:_id)
-    ivl_health_plans_2023_for_csr_87 = ivl_products.where(
+    current_ivl_health_plans_for_csr_87 = ivl_products.where(
         "$and" => [
             { :kind => "health"},
             {"$or" => [
@@ -182,7 +188,7 @@ namespace :import do
         ]
     ).pluck(:_id)
 
-    ivl_health_plans_2023_for_csr_73 = ivl_products.where(
+    current_ivl_health_plans_for_csr_73 = ivl_products.where(
         "$and" => [
             { :kind => "health"},
             {"$or" => [
@@ -194,9 +200,9 @@ namespace :import do
     ).pluck(:_id)
 
     individual_health_benefit_package_for_csr_100 = BenefitPackage.new(
-        title: "individual_health_benefits_csr_100_2023",
+        title: "individual_health_benefits_csr_100_#{year}",
         elected_premium_credit_strategy: "allocated_lump_sum_credit",
-        benefit_ids:          ivl_health_plans_2023_for_csr_100,
+        benefit_ids:          current_ivl_health_plans_for_csr_100,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -212,9 +218,9 @@ namespace :import do
     )
 
     individual_health_benefit_package_for_csr_0 = BenefitPackage.new(
-      title: 'individual_health_benefits_csr_0_2023',
+      title: 'individual_health_benefits_csr_0_#{year}',
       elected_premium_credit_strategy: 'allocated_lump_sum_credit',
-      benefit_ids:          ivl_health_plans_2023_for_csr_0,
+      benefit_ids:          current_ivl_health_plans_for_csr_0,
       benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
         market_places:        ['individual'],
         enrollment_periods:   ['open_enrollment', 'special_enrollment'],
@@ -230,9 +236,9 @@ namespace :import do
     )
 
     individual_health_benefit_package_for_csr_limited = BenefitPackage.new(
-      title: 'individual_health_benefits_csr_limited_2023',
+      title: 'individual_health_benefits_csr_limited_#{year}',
       elected_premium_credit_strategy: 'allocated_lump_sum_credit',
-      benefit_ids:          ivl_health_plans_2023_for_csr_limited,
+      benefit_ids:          current_ivl_health_plans_for_csr_limited,
       benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
         market_places:        ['individual'],
         enrollment_periods:   ['open_enrollment', 'special_enrollment'],
@@ -248,9 +254,9 @@ namespace :import do
     )
 
     individual_health_benefit_package_for_csr_94 = BenefitPackage.new(
-        title: "individual_health_benefits_csr_94_2023",
+        title: "individual_health_benefits_csr_94_#{year}",
         elected_premium_credit_strategy: "allocated_lump_sum_credit",
-        benefit_ids:          ivl_health_plans_2023_for_csr_94,
+        benefit_ids:          current_ivl_health_plans_for_csr_94,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -266,9 +272,9 @@ namespace :import do
     )
 
     individual_health_benefit_package_for_csr_87 = BenefitPackage.new(
-        title: "individual_health_benefits_csr_87_2023",
+        title: "individual_health_benefits_csr_87_#{year}",
         elected_premium_credit_strategy: "allocated_lump_sum_credit",
-        benefit_ids:          ivl_health_plans_2023_for_csr_87,
+        benefit_ids:          current_ivl_health_plans_for_csr_87,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -284,9 +290,9 @@ namespace :import do
     )
 
     individual_health_benefit_package_for_csr_73 = BenefitPackage.new(
-        title: "individual_health_benefits_csr_73_2023",
+        title: "individual_health_benefits_csr_73_#{year}",
         elected_premium_credit_strategy: "allocated_lump_sum_credit",
-        benefit_ids:          ivl_health_plans_2023_for_csr_73,
+        benefit_ids:          current_ivl_health_plans_for_csr_73,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
@@ -301,7 +307,7 @@ namespace :import do
         )
     )
 
-    bc_period_2023.benefit_packages = [
+    current_period_bc.benefit_packages = [
         individual_health_benefit_package,
         individual_dental_benefit_package,
         individual_catastrophic_health_benefit_package,
@@ -315,6 +321,6 @@ namespace :import do
       individual_health_benefit_package_for_csr_limited
     ]
 
-    bc_period_2023.save!
+    current_period_bc.save!
   end
 end
