@@ -3164,6 +3164,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       it "when feature enabled reinstate_nonpayment_ivl_enrollment, reset termination reason on reinstate" do
+        consumer_role.update!(aasm_state: 'fully_verified')
         members = FactoryBot.build(:hbx_enrollment_member,
                                    applicant_id: ivl_family.primary_family_member.id,
                                    hbx_enrollment: ivl_enrollment, is_subscriber: true,
