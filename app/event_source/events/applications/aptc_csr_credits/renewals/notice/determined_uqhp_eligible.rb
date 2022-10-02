@@ -5,7 +5,7 @@ module Events
     module AptcCsrCredits
       module Renewals
         module Notice
-          class DeterminedUqhpeligible < EventSource::Event
+          class DeterminedUqhpEligible < EventSource::Event
             publisher_path 'publishers.applications.aptc_csr_credits.renewals.notice_publisher'
           end
         end
