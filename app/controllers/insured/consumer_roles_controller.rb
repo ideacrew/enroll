@@ -231,7 +231,9 @@ class Insured::ConsumerRolesController < ApplicationController
                                       else
                                         insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
                                       end
+          draft_application_url = financial_assistance.application_checklist_application_path(id: draft_application.id) if draft_application
           redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          redirect_path =  draft_application_url if draft_application_url
           redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
         else
@@ -289,6 +291,8 @@ class Insured::ConsumerRolesController < ApplicationController
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
       set_current_person
+      draft_application = @person.primary_family&.draft_financial_assistance_application
+      redirect_to financial_assistance.edit_application_path(id: draft_application.id) if draft_application
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
