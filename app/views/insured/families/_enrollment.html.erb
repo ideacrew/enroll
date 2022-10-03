@@ -6,7 +6,8 @@
 <% # This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
    # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
    #  initially_hidden_enrollment class. %>
-<% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
+<% show_all ||= false %>
+<% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) || show_all %>
 <% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""%>
 
 <div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">

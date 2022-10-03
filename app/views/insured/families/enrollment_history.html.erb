@@ -1,0 +1,26 @@
+<% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+<% end %>
+<div id='account-detail'>
+  <div class="my-account-page">
+    <h1 class="heading-text mt-0"><%= l10n("Enrollment_History") %></h1>
+  </div>
+
+  <div class="row" style="margin-top: 0;">
+    <div class="col-md-8">
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <% enrollments = @all_hbx_enrollments_for_admin %>
+      <% else %>
+        <% enrollments = @hbx_enrollments %>
+      <% end %>
+      <% enrollments.group_by  { |enrollment| enrollment.effective_on.year }.each do |year, yearly_enrollments| %>
+        <h2 style="margin-top: 0;"><%= year %></h2>
+        <%= render partial: "enrollment",
+                 :collection => yearly_enrollments,
+                 :as => :hbx_enrollment,
+                 locals: { read_only: false, show_all: true } %>
+      <% end %>
+      
+    </div>
+  </div>
+</div>
