@@ -62,11 +62,6 @@ module FinancialAssistance
 
             # rubocop:disable Style/MultilineBlockChain
             def create_renewal_draft_application(application, validated_params)
-              # Directly using Application Factory instead of ApplicationService as
-              # ApplicationService is quering for latest submitted application(submitted_at) and
-              # then creating a new application using the latest submitted application.
-              # In our context we want to create new application from the existing application
-              # that is sent from this Operation.
               Try() do
                 ::FinancialAssistance::Operations::Applications::Copy.new
               end.bind do |renewal_application_factory|

@@ -20,7 +20,7 @@ module FinancialAssistance
           include EventSource::Command
 
           # Update this constant with new events that are added/registered in ::Publishers::ApplicationPublisher
-          REGISTERED_EVENTS = %w[determine_eligibility application_renewal_request_created submit_renewal_draft eligibility_determination_triggered].freeze
+          REGISTERED_EVENTS = %w[determine_eligibility application_renewal_request_created submit_renewal_draft].freeze
 
           def call(params)
             payload = yield validate_input_params(params)
@@ -45,7 +45,7 @@ module FinancialAssistance
           end
 
           def build_event(payload)
-            if @event_name == 'application_renewal_request_created' || @event_name == 'eligibility_determination_triggered'
+            if @event_name == 'application_renewal_request_created'
               event("events.iap.applications.renewals.#{@event_name}", attributes: payload)
             else
               event("events.iap.applications.#{@event_name}", attributes: payload)
