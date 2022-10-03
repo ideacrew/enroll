@@ -240,7 +240,7 @@ registry:
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: false
           - key: :medicaid_agency_phone
-            item: "(855) 532-5465"
+            item: "(202) 727-5355"
           - key: :verifiable_immigration_statuses
             item: false
           - key: :appeal_link
