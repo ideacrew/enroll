@@ -142,18 +142,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         expect(@result).to be_success
       end
     end
-
-    context 'eligibility_determination_triggered' do
-      before do
-        application.update_attributes!(aasm_state: "determined")
-        params = { payload: { application_hbx_id: application.hbx_id }, event_name: 'eligibility_determination_triggered' }
-        @result = subject.call(params)
-      end
-
-      it 'should return success' do
-        expect(@result).to be_success
-      end
-    end
   end
 
   context 'failure' do
@@ -226,7 +214,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"application_renewal_request_created\", \"submit_renewal_draft\", \"eligibility_determination_triggered\"]")
+          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"application_renewal_request_created\", \"submit_renewal_draft\"]")
         end
       end
     end
