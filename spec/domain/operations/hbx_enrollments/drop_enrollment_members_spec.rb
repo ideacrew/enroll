@@ -317,7 +317,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
             end
 
             it 'should calculate based on original coverage_start_on date' do
-              expect(@new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [@new_enrollment.effective_on, enrollment_2.hbx_enrollment_members.first.coverage_start_on]
+              expect(@new_enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on).flatten.uniq).to eq [@new_enrollment.effective_on, enrollment_2.hbx_enrollment_members.first.coverage_start_on].uniq
             end
           end
         end
