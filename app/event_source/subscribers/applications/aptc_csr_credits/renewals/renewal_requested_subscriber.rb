@@ -7,21 +7,21 @@ module Subscribers
     # Subscriber will receive request payload from EA to generate a renewal draft application
         class RenewalRequestedSubscriber
           # include EventSource::Logging
-          include ::EventSource::Subscriber[amqp: 'enroll.applications.aptc_csr_credits.renewals.renewal_requested']
+          include ::EventSource::Subscriber[amqp: 'enroll.applications.aptc_csr_credits.renewals.renewal']
 
-          subscribe(:on_enroll_applications_aptc_csr_credits_renewals_renewal_requested) do |delivery_info, _metadata, response|
-            logger.debug "invoked on_enroll_applications_aptc_csr_credits_renewals_renewal_requested with #{delivery_info}"
+          subscribe(:on_enroll_applications_aptc_csr_credits_renewals_renewal) do |delivery_info, _metadata, response|
+            logger.debug "invoked on_enroll_applications_aptc_csr_credits_renewals_renewal with #{delivery_info}"
                       #   logger.info '-' * 100
 
             payload = JSON.parse(response, symbolize_names: true)
 
             subscriber_logger =
               Logger.new(
-                "#{Rails.root}/log/on_enroll_applications_aptc_csr_credits_renewals_renewal_requested_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+                "#{Rails.root}/log/on_enroll_applications_aptc_csr_credits_renewals_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
               )
             subscriber_logger.info "RenewalRequestSubscriber, response: #{payload}"
 
-            logger.info "RenewalRequestSubscriber on_enroll_applications_aptc_csr_credits_renewals_renewal_requested payload: #{payload}"
+            logger.info "RenewalRequestSubscriber on_enroll_applications_aptc_csr_credits_renewals_renewal payload: #{payload}"
             result =
               ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::Renew.new.call(payload)
 
