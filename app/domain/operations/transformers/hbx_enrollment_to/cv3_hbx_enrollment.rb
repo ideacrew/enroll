@@ -44,6 +44,9 @@ module Operations
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.special_enrollment_period
 
           Success(payload)
+        rescue StandardError => e
+          puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
+          Rails.logger.error "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
         end
         # rubocop:enable Metrics/CyclomaticComplexity
 
