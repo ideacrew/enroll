@@ -4,6 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/magi_medicaid/libraries/iap_library'
 
+# rubocop:disable Metrics/CyclomaticComplexity
 module FinancialAssistance
   module Operations
     module Applications
@@ -22,7 +23,7 @@ module FinancialAssistance
               application_entity = yield initialize_application_entity(params)
               application = yield find_application(application_entity)
               yield update_application(application, application_entity)
-              persisted_application = yield find_application(application_entity)
+              _persisted_application = yield find_application(application_entity)
               # application_event_result = yield publish_application_event(persisted_application)
               notice_event_result = yield publish_notice_event(application_entity)
 
@@ -144,7 +145,7 @@ module FinancialAssistance
                 end
               event_key = "notice.determined_#{event_name}"
 
-              event_to_publish =  event("events.applications.aptc_csr_credits.renewals.#{event_key}", attributes: application_payload.to_h)
+              event_to_publish = event("events.applications.aptc_csr_credits.renewals.#{event_key}", attributes: application_payload.to_h)
               event_to_publish.success.publish
 
               Success("Successfully published the payload for event: #{event_key}")
@@ -158,3 +159,4 @@ module FinancialAssistance
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity

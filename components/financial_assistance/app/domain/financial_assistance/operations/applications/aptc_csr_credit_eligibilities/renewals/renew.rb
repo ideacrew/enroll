@@ -97,21 +97,19 @@ module FinancialAssistance
               application.calculate_renewal_base_year
             end
 
-            # rubocop:disable Style/MultilineBlockChain
-            def generate_renewed_event(application, renewal_year)
-              params = { payload: { application_id: application.id.to_s, renewal_year: renewal_year }, event_name: 'renewed' }
+            def generate_renewed_event(_application, _renewal_year)
+  # { payload: { application_id: application.id.to_s, renewal_year: renewal_year }, event_name: 'renewed' }
               Success("")
-              # Try do
-              #   ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call(params)
-              # end.bind do |result|
-              #   if result.success?
-              #     Success("#{result.success} for application id: #{application.id}")
-              #   else
-              #     Failure(result.failure)
-              #   end
-              # end
+  # Try do
+  #   ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call(params)
+  # end.bind do |result|
+  #   if result.success?
+  #     Success("#{result.success} for application id: #{application.id}")
+  #   else
+  #     Failure(result.failure)
+  #   end
+  # end
             end
-            # rubocop:enable Style/MultilineBlockChain
           end
         end
       end
