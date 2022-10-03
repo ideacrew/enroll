@@ -9,6 +9,7 @@ module FinancialAssistance
     module Applications
       module AptcCsrCreditEligibilities
         module Renewals
+          # This class submit's the application send it to medicaid gateway for determination.
           class SubmitDeterminationRequest
             include Dry::Monads[:result, :do, :try]
             include Acapi::Notifiers
