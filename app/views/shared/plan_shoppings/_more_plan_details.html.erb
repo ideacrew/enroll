@@ -1,5 +1,5 @@
 <div class="module shopping-data">
-  <% if EnrollRegistry.feature_enabled?(:go_to_plan_compare_link) %>
+  <% if EnrollRegistry.feature_enabled?(:go_to_plan_compare_link) && @coverage_kind == 'health' %>
     <%= link_to l10n("go_to_plan_compare") , "", class: "btn green-background fifteen-px-bottom-margin", data: {toggle: "modal", target: "#plan_match_redirection"} %>
     <br>
   <% end %>
