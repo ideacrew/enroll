@@ -3094,7 +3094,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
 
     let(:enrollment)    do
-      FactoryBot.create(:hbx_enrollment,
+      FactoryBot.create(:hbx_enrollment, :with_health_product,
                         family: family,
                         coverage_kind: "health",
                         effective_on: TimeKeeper.date_of_record.last_year.beginning_of_year,
@@ -3142,7 +3142,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
       let(:consumer_role) { person.consumer_role }
       let(:ivl_enrollment)    {
-        FactoryBot.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment, :with_health_product,
                            family: ivl_family,
                            household: ivl_family.latest_household,
                            coverage_kind: "health",
@@ -3164,6 +3164,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       it "when feature enabled reinstate_nonpayment_ivl_enrollment, reset termination reason on reinstate" do
+        consumer_role.update!(aasm_state: 'fully_verified')
         members = FactoryBot.build(:hbx_enrollment_member,
                                    applicant_id: ivl_family.primary_family_member.id,
                                    hbx_enrollment: ivl_enrollment, is_subscriber: true,
@@ -3294,7 +3295,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       let(:ivl_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment, :with_health_product,
                           family: ivl_family,
                           household: ivl_family.latest_household,
                           coverage_kind: "health",
@@ -3390,7 +3391,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
 
       let(:ivl_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment, :with_health_product,
                           family: ivl_family,
                           household: ivl_family.latest_household,
                           coverage_kind: "health",

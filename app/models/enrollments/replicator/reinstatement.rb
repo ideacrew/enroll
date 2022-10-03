@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Enrollments
   module Replicator
     class Reinstatement
@@ -86,11 +88,7 @@ module Enrollments
       end
 
       def can_be_reinstated?
-        if reinstate_under_renewal_py?
-          if !renewal_plan_offered_by_er?(reinstatement_plan)
-            raise "Unable to reinstate enrollment: your Employer Sponsored Benefits no longer offerring the plan (#{reinstatement_plan.name})."
-          end
-        end
+        raise "Unable to reinstate enrollment: your Employer Sponsored Benefits no longer offerring the plan (#{reinstatement_plan.name})." if reinstate_under_renewal_py? && !renewal_plan_offered_by_er?(reinstatement_plan)
         true
       end
 
@@ -154,14 +152,42 @@ module Enrollments
         }
       end
 
+      def all_american_indian_members(shopping_family_members_ids)
+        shopping_family_members = base_enrollment.family.family_members.where(:id.in => shopping_family_members_ids)
+        shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
+      end
+
+      # rubocop:disable Metrics/CyclomaticComplexity
+      def extract_csr_kind
+        shopping_family_members_ids = base_enrollment.hbx_enrollment_members.map(&:applicant_id)
+
+        if EnrollRegistry.feature_enabled?(:native_american_csr) && all_american_indian_members(shopping_family_members_ids)
+          'csr_limited'
+        elsif EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          subjects = base_enrollment.family.eligibility_determination&.subjects
+          if subjects&.where(:"eligibility_states.eligibility_item_key" => 'aptc_csr_credit').present?
+            result = ::Operations::PremiumCredits::FindCsrValue.new.call({
+                                                                           family: @base_enrollment.family,
+                                                                           year: @year,
+                                                                           family_member_ids: shopping_family_members_ids
+                                                                         })
+
+            result.value! if result.success?
+          end
+        else
+          tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(@year)
+          tax_household&.eligibile_csr_kind(base_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        end
+      end
+      # rubocop:enable Metrics/CyclomaticComplexity
+
       def product_id_csr_variant(base_enrollment)
-        tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(@year)
-        base_enrollment_product_id = base_enrollment.product_id
-        return base_enrollment_product_id unless tax_household.present?
-        eligible_csr = tax_household.eligibile_csr_kind(base_enrollment.hbx_enrollment_members.map(&:applicant_id))
+        eligible_csr = extract_csr_kind
+        return base_enrollment.product_id unless eligible_csr.present?
+
         csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[eligible_csr]
         products = ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(@year).where({:hios_id => "#{base_enrollment.product.hios_base_id}-#{csr_variant}"})
-        products.count >= 1 ? products.last.id : base_enrollment_product_id
+        products.count >= 1 ? products.last.id : base_enrollment.product_id
       end
 
       def common_params
@@ -197,11 +223,11 @@ module Enrollments
           member = latest_enrollment.hbx_enrollment_members.where(applicant_id: hbx_enrollment_member.applicant_id).first
           tobacco_use = member&.tobacco_use || 'N'
           members << HbxEnrollmentMember.new({
-                                                 applicant_id: hbx_enrollment_member.applicant_id,
-                                                 eligibility_date: new_effective_date,
-                                                 coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
-                                                 is_subscriber: hbx_enrollment_member.is_subscriber,
-                                                 tobacco_use: tobacco_use
+                                               applicant_id: hbx_enrollment_member.applicant_id,
+                                               eligibility_date: new_effective_date,
+                                               coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
+                                               is_subscriber: hbx_enrollment_member.is_subscriber,
+                                               tobacco_use: tobacco_use
                                              })
         end
       end
