@@ -145,12 +145,14 @@ function updatePlanCost(elected_aptc) {
     var plan = plans[i];
     var premium = parseFloat($(plan).data('plan-metal-premium'));
     var ehb_premium = parseFloat($(plan).data('plan-metal-ehb-premium'));
+    var childcare_subsidy = parseFloat($(plan).data('plan-childcare-subsidy'));
 
     if ($(plan).data('can-use-aptc') == true){
-      var premium_resp_amt = premium - Math.min.apply(null, [elected_amount, ehb_premium]);
+      var premium_resp_amt = premium - Math.min.apply(null, [elected_amount, ehb_premium]) - childcare_subsidy;
     } else {
-      var premium_resp_amt = premium;
+      var premium_resp_amt = premium - childcare_subsidy;
     }
+
     if (premium_resp_amt < 0) {
       premium_resp_amt = 0;
     }

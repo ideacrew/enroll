@@ -235,23 +235,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       applications = FinancialAssistance::Application.where(family_id: family_id)
       expect(assigns(:applications)).to match_array(applications.to_a)
     end
-
-    context "with :filtered_application_list on" do
-      before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
-      end
-
-      it "should display applications in order", dbclean: :after_each do
-        get :index
-        expect(assigns(:filtered_applications).first[:created_at]).to be > assigns(:filtered_applications).last[:created_at]
-      end
-
-      it "should filter applications by year", dbclean: :after_each do
-        get :index, params: { filter: { year: Date.today.year } }
-        expect(assigns(:filtered_applications).count).to eq(1)
-      end
-    end
-
   end
 
   context "GET new" do
@@ -772,6 +755,47 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
   end
+end
+
+RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
+  include Dry::Monads[:result, :do]
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  context "with :filtered_application_list on" do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, first_name: "test1") }
+    let(:user) { FactoryBot.create(:user, :person => person) }
+
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_call_original
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_call_original
+      Rails.application.reload_routes!
+    end
+
+    after do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_call_original
+      Rails.application.reload_routes!
+    end
+
+    describe 'Feature flagged endpoints', type: :request do
+
+      describe "GET /applications" do
+        before(:each) do
+          sign_in(user)
+        end
+
+        it 'succeeds' do
+          get '/financial_assistance/applications'
+          expect(response).to render_template(:index_with_filter)
+        end
+      end
+    end
+  end
+
 end
 
 def setup_faa_data

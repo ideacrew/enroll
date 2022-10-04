@@ -15,6 +15,7 @@ class HbxEnrollment
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
   include EventSource::Command
+  include ::Employers::EmployerHelper
 
   belongs_to :household
   # Override attribute accessor as well
@@ -106,6 +107,9 @@ class HbxEnrollment
   field :applied_aptc_amount, type: Money, default: 0.0
   field :aggregate_aptc_amount, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
+
+  # OSSE childcare subsidy
+  field :eligible_child_care_subsidy, type: Money, default: 0.0
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
@@ -305,6 +309,7 @@ class HbxEnrollment
   index({"effective_on" => 1})
   index({"terminated_on" => 1}, { sparse: true })
   index({"applied_aptc_amount" => 1})
+  index({"eligible_child_care_subsidy" => 1})
 
 
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
@@ -516,6 +521,19 @@ class HbxEnrollment
     end
   end
 
+  def has_premium_credits?
+    has_child_care_subsidy? || has_aptc? || is_shop?
+  end
+
+  def has_aptc?
+    return false if is_shop?
+    self.applied_aptc_amount > 0
+  end
+
+  def has_child_care_subsidy?
+    self.eligible_child_care_subsidy > 0
+  end
+
   def benefit_group
     return @benefit_group if defined? @benefit_group
     return nil if benefit_group_id.blank?
@@ -563,9 +581,16 @@ class HbxEnrollment
   end
 
   def has_at_least_one_aptc_eligible_member?(year)
-    tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
-    return false if tax_households.blank?
-    tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+      return false if result.failure?
+      aptc_grants = result.value!
+      aptc_grants.present?
+    else
+      tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
+      return false if tax_households.blank?
+      tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
+    end
   end
 
   class << self
@@ -1064,6 +1089,11 @@ class HbxEnrollment
     benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
   end
 
+  def publish_select_coverage_events
+    publish_coverage_selected_event
+    trigger_enrollment_notice
+  end
+
   def trigger_enrollment_notice
     return if is_shop?
 
@@ -1191,6 +1221,10 @@ class HbxEnrollment
 
   def subscriber
     hbx_enrollment_members.detect(&:is_subscriber)
+  end
+
+  def primary_hbx_enrollment_member
+    hbx_enrollment_members.detect{ |hem| hem.family_member.is_primary_applicant? }
   end
 
   def applicant_ids
@@ -1488,21 +1522,12 @@ class HbxEnrollment
     end
   end
 
-  def is_an_existing_plan?(new_plan)
-    if is_shop?
-      family.currently_enrolled_product_ids(self).include?(new_plan.id)
-    else
-      family.currently_enrolled_products(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
-    end
-  end
-
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= product
 
-    if is_an_existing_plan?(new_plan)
-      plan_selection = PlanSelection.new(self, new_plan)
-      self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
-    end
+    plan_selection = PlanSelection.new(self, new_plan)
+    return unless plan_selection.existing_coverage.present?
+    self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
   end
 
   def display_make_changes_for_ivl?
@@ -1514,7 +1539,7 @@ class HbxEnrollment
       (family.is_under_ivl_open_enrollment? && effective_on >= benefit_coverage_period.start_on))
   end
 
-  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, apply_aptc: nil)
     qhp_plan ||= product
 
     if self.is_shop?
@@ -1528,7 +1553,7 @@ class HbxEnrollment
       end
     else
       if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc)
       else
         UnassistedPlanCostDecorator.new(qhp_plan, self)
       end
@@ -1545,8 +1570,13 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, nil, market)
+    else
+      tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
+      elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
+    end
+
     filtered_elected_plans(elected_plans, coverage_kind).collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -1830,7 +1860,8 @@ class HbxEnrollment
   end
 
   def covered_members_first_names
-    hbx_enrollment_members.inject([]) do |names, member|
+    enrollment_members = hbx_enrollment_members.sort_by { |a| a.is_subscriber ? 0 : 1 }
+    enrollment_members.inject([]) do |names, member|
       names << member.person.first_name
     end
   end
@@ -2055,7 +2086,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :trigger_enrollment_notice] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -2509,7 +2540,8 @@ class HbxEnrollment
       member_enrollments: group_enrollment_members,
       rate_schedule_date: sponsored_benefit.rate_schedule_date,
       rating_area: rating_area.exchange_provided_code,
-      sponsor_contribution_prohibited: is_cobra_status?
+      sponsor_contribution_prohibited: is_cobra_status?,
+      eligible_child_care_subsidy: eligible_child_care_subsidy
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,
@@ -2694,8 +2726,47 @@ class HbxEnrollment
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
 
+  def publish_event(event, payload)
+    event = event("events.individual.enrollments.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for enrollment: #{self.id} event due to #{e.backtrace}" }
+  end
+
+  def publish_coverage_selected_event
+    publish_event('coverage_selected', { enrollment_global_id: self.to_global_id.to_s })
+  end
+
   def latest_wfst
     workflow_state_transitions.order(created_at: :desc).first
+  end
+
+  def update_osse_childcare_subsidy
+    effective_year = sponsored_benefit_package.start_on.year
+
+    return if coverage_kind.to_s == 'dental'
+    return unless employee_role&.osse_eligible?(effective_on)
+    return unless shop_osse_eligibility_is_enabled?(effective_year)
+
+    osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
+    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
+  end
+
+  def osse_subsidy_for_member(hbx_enrollment_member)
+    effective_year_for_lcsp = sponsored_benefit_package.start_on.year
+    hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
+    lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
+
+    return if lcsp.nil?
+
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
+    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
+
+    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
+    return if member_enrollment.nil?
+
+    BigDecimal(member_enrollment&.product_price&.to_s).round(2)
   end
 
   private

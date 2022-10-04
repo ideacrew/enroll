@@ -591,17 +591,19 @@ module FinancialAssistance
     end
 
     def is_transferrable?
-      self.applicants.any? do |applicant|
-        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || has_non_magi_medicaid_eligible?(applicant) || applicant.is_medicare_eligible || is_eligible_for_non_magi_reasons?(applicant)
+      unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer)
+        # legally required to send application for full assessment if consumer requests it
+        return true if full_medicaid_determination
+        # otherwise block transfer if any applicant is eligible for non-MAGI reasons
+        return false if has_non_magi_referrals?
+      end
+      applicants.any? do |applicant|
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
       end
     end
 
-    def has_non_magi_medicaid_eligible?(applicant)
-      FinancialAssistanceRegistry.feature_enabled?(:non_magi_medicaid_eligible) ? applicant.is_non_magi_medicaid_eligible : false
-    end
-
-    def is_eligible_for_non_magi_reasons?(applicant)
-      FinancialAssistanceRegistry.feature_enabled?(:eligible_for_non_magi_reasons) ? applicant.is_eligible_for_non_magi_reasons : false
+    def has_non_magi_referrals?
+      applicants.any? {|applicant| applicant.is_non_magi_medicaid_eligible || applicant.is_eligible_for_non_magi_reasons}
     end
 
     def has_mec_check?
@@ -866,7 +868,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
+      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
         transitions from: :submitted, to: :determined
       end
 
@@ -992,6 +994,8 @@ module FinancialAssistance
       active_applicants.each do |applicant|
         applicant.update_evidence_histories(assistance_evidences)
       end
+    rescue StandardError => e
+      Rails.logger.error { "FAA update_evidence_histories error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def can_trigger_fdsh_calls?
@@ -1006,6 +1010,44 @@ module FinancialAssistance
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
+
+    # rubocop:disable Metrics/AbcSize
+    def create_tax_household_groups
+      return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
+
+      unless cv3_application.success?
+        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{cv3_application.failure}" }
+        return
+      end
+
+      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
+
+      unless initializer.success?
+        Rails.logger.error { "Failed while initializing application: #{self.hbx_id}, Error: #{initializer.failure}" }
+        return
+      end
+
+      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!.to_h)
+
+      unless determination.success?
+        Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
+        return
+      end
+
+      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
+      Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
+
+      if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
+        on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family.reload, year: self.effective_date.year})
+
+        Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
+      end
+    rescue StandardError => e
+      Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+    end
+    # rubocop:enable Metrics/AbcSize
 
     def trigger_local_mec
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
@@ -1361,6 +1403,10 @@ module FinancialAssistance
       applicants.eligible_for_non_magi_reasons
     end
 
+    def applicants_applying_coverage
+      applicants.applying_coverage
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1655,6 +1701,8 @@ module FinancialAssistance
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
         # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
+    rescue StandardError => e
+      Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def create_income_verification(applicant)

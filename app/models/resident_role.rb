@@ -6,6 +6,8 @@ class ResidentRole
   include SetCurrentUser
   include Mongoid::Attributes::Dynamic
   include Mongoid::History::Trackable
+  include GlobalID::Identification
+  include ChildcareSubsidyConcern
 
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 

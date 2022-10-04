@@ -51,7 +51,7 @@ module Insured
         )
       end
 
-      def self.update_aptc(enrollment_id, applied_aptc_amount)
+      def self.update_aptc(enrollment_id, applied_aptc_amount, exclude_enrollments_list: nil, elected_aptc_pct: nil)
         # field :elected_aptc_pct, type: Float, default: 0.0
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
@@ -68,7 +68,17 @@ module Insured
         end
 
         reinstatement.save!
-        update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
+
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          if elected_aptc_pct.to_f <= 0.0
+            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+            elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
+          end
+
+          mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct.to_f, exclude_enrollments_list)
+        else
+          update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
+        end
 
         reinstatement.select_coverage!
       end
@@ -95,8 +105,23 @@ module Insured
         @invalid_family_member_ids << (all_family_member_ids | reinstatement_family_member_ids) - (all_family_member_ids & reinstatement_family_member_ids)
       end
 
-      def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
-        applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
+      def self.mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, exclude_enrollments_list)
+        result = ::Operations::PremiumCredits::FindAptc.new.call({
+                                                                   hbx_enrollment: reinstatement,
+                                                                   effective_on: new_effective_date,
+                                                                   exclude_enrollments_list: exclude_enrollments_list
+                                                                 })
+        return result unless result.success?
+
+        aggregate_aptc_amount = result.value!
+
+        applied_aptc_amount = float_fix(aggregate_aptc_amount * elected_aptc_pct)
+
+        reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount)
+      end
+
+      def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount, age_as_of_coverage_start: false)
+        applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount, age_as_of_coverage_start: age_as_of_coverage_start)
         cost_decorator = UnassistedPlanCostDecorator.new(reinstatement.product, reinstatement, applied_aptc_amount)
         reinstatement.hbx_enrollment_members.each do |enrollment_member|
           member_aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
@@ -123,10 +148,10 @@ module Insured
         reinstatement.update_attributes!(elected_aptc_pct: (cd_total_aptc / max_applicable_aptc), applied_aptc_amount: cd_total_aptc, aggregate_aptc_amount: max_applicable_aptc)
       end
 
-      def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
+      def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount, age_as_of_coverage_start: false)
         applicable_aptc = fetch_applicable_aptc(new_enrollment, applied_aptc_amount, new_enrollment.effective_on)
         eli_fac_obj = ::Factories::EligibilityFactory.new(new_enrollment.id, new_enrollment.effective_on)
-        eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc)
+        eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc, age_as_of_coverage_start: age_as_of_coverage_start)
       end
 
       def self.fetch_applicable_aptc(new_enrollment, selected_aptc, effective_on, excluding_enrollment_id = nil)
@@ -171,8 +196,12 @@ module Insured
       end
 
       def calculate_max_applicable_aptc(enrollment, new_effective_on)
-        selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
-        Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: new_effective_on}).value!
+        else
+          selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
+          Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
+        end
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime, current_enrollment_effective_on)

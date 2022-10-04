@@ -15,8 +15,10 @@ class ConsumerRole
   include GlobalID::Identification
   include L10nHelper
   include EventSource::Command
+  include ChildcareSubsidyConcern
 
   embedded_in :person
+
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx curam)
   NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
@@ -285,7 +287,6 @@ class ConsumerRole
   def accept(visitor)
     visitor.visit(self)
   end
-
 
   def ssn_or_no_ssn
     errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'
@@ -975,6 +976,7 @@ class ConsumerRole
   end
 
   private
+
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
   end

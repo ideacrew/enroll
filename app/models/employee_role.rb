@@ -6,10 +6,15 @@ class EmployeeRole
   include BenefitSponsors::ModelEvents::EmployeeRole
   include BenefitSponsors::Concerns::Observable
   include Mongoid::History::Trackable
+  include EventSource::Command
+  include GlobalID::Identification
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
 
   embedded_in :person
+
+  has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
+                           as: :eligibility
 
   field :employer_profile_id, type: BSON::ObjectId
   field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId
@@ -54,6 +59,20 @@ class EmployeeRole
 
   after_create :notify_on_create
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_employee_role_events]
+
+  after_create :publish_employee_role_created
+
+  def publish_employee_role_created
+    publish_event('created', { employee_role_global_id: self.to_global_id.to_s })
+  end
+
+  def publish_event(event, payload)
+    event = event("events.benefit_sponsors.employee_role.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for employee_role: #{self.id} event due to #{e.backtrace}" }
+  end
 
   # hacky fix for nested attributes
   # TODO: remove this when it is no longer needed
@@ -281,6 +300,19 @@ class EmployeeRole
 
   def can_receive_electronic_communication?
     ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+  end
+
+  def osse_eligible?(start_on)
+    eligibility = eligibility_for(:osse_subsidy, start_on)
+    return false unless eligibility
+    evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
+    evidence&.is_satisfied == true
+  end
+
+  def eligibility_for(evidence_key, start_on)
+    eligibilities.by_date(start_on).select do |eligibility|
+      eligibility.evidences.by_key(evidence_key).present?
+    end.max_by(&:created_at)
   end
 
   class << self

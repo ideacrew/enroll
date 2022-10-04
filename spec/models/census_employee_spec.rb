@@ -1306,4 +1306,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
   end
+
+  describe 'callbacks' do
+    context '.publish_employee_created' do
+      let(:census_employee) do
+        build(
+          :benefit_sponsors_census_employee,
+          employer_profile: employer_profile,
+          benefit_sponsorship: employer_profile.active_benefit_sponsorship
+        )
+      end
+
+      it 'should call publish_employee_created' do
+        expect(census_employee).to receive(:publish_employee_created)
+        census_employee.save!
+      end
+    end
+  end
 end

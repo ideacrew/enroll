@@ -166,6 +166,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
   context "GET thankyou", :dbclean => :around_each do
     let(:member_group) { double("MEMBERGROUP")}
+    let(:product_delegator) { double }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -182,13 +183,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:employee_role).and_return(double)
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return false
       allow(hbx_enrollment).to receive(:can_select_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(hbx_enrollment).to receive(:build_plan_premium).and_return(product_delegator)
+      allow(product_delegator).to receive(:total_childcare_subsidy_amount).and_return(0.00)
+      allow(hbx_enrollment).to receive(:update).and_return(true)
       allow(hbx_enrollment).to receive(:set_special_enrollment_period).and_return(true)
       allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
       allow(cost_calculator).to receive(:groups_for_products).with([product]).and_return([member_group])
+      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(true)
     end
 
     it "returns http success" do
@@ -320,12 +324,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
 
       it "when enrollment kind is shop" do
+        allow_any_instance_of(PlanSelection).to receive(:existing_coverage).and_return(nil)
         sign_in(user)
         get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: "shop"}
         expect(assigns(:dependent_members)).to eq nil
       end
 
       it "when existing_coverage_warning setting is on is false & market kind is shop" do
+        allow_any_instance_of(PlanSelection).to receive(:existing_coverage).and_return(nil)
         EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(false)
         sign_in(user)
         get :thankyou, params: {id: "id", plan_id: "plan_id"}
@@ -438,6 +444,30 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       get :thankyou, params: { id: hbx_enrollment.id, plan_id: product.id }
       hbx_enrollment.reload
       expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq previous_coverage.hbx_enrollment_members.first.coverage_start_on
+    end
+
+    it "should redirect to the group selection page if IVL enrollment effective date doesn't match product dates" do
+      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(false)
+      hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
+      product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      sign_in(user)
+      get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id, market_kind: 'individual'}
+      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id))
+    end
+
+    it "should render thank you page if SHOP enrollment effective date doesn't match product dates" do
+      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(false)
+      hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
+      product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      sign_in(user)
+      get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id, market_kind: 'shop'}
+      expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
+    end
+
+    it "should render thank you page if enrollment effective date doesn't match product dates" do
+      sign_in(user)
+      get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id}
+      expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
     end
   end
 

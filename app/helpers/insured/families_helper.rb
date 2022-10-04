@@ -27,10 +27,8 @@ module Insured::FamiliesHelper
     begin
       if hbx_enrollment.is_shop?
         hbx_enrollment.total_employee_cost
-      elsif hbx_enrollment.kind == 'coverall'
-        hbx_enrollment.total_premium
       else
-        cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min)
+        cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min - hbx_enrollment.eligible_child_care_subsidy.to_f)
         cost > 0 ? cost.round(2) : 0
       end
     rescue Exception => e

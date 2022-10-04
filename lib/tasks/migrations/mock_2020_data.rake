@@ -124,6 +124,33 @@ namespace :new_model do
 
       new_product.save
     end
+
+    ::Plan.by_active_year(previous_year).each do |plan|
+      new_service_area = ::BenefitMarkets::Locations::ServiceArea.where(
+        active_year: mock_year,
+        issuer_profile_id: plan.carrier_profile_id
+      ).first
+
+      next if ::Plan.where(active_year: mock_year, hios_id: plan.hios_id, market: plan.market).present?
+
+      new_plan = plan.dup
+      new_plan.active_year = mock_year
+      new_plan.service_area_id =
+        if new_service_area.nil?
+          site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
+          "#{site_key.upcase}S002"
+        else
+          new_service_area.issuer_provided_code
+        end
+
+      new_plan.premium_tables.each do |new_premium_table|
+        new_premium_table.start_on = new_premium_table.start_on.next_year
+        new_premium_table.end_on = new_premium_table.end_on.next_year
+        new_premium_table.rating_area = rating_area.exchange_provided_code
+      end
+
+      new_plan.save
+    end
   end
 
   desc "rating factors"

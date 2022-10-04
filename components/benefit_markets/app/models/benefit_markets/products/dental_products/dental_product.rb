@@ -17,6 +17,10 @@ module BenefitMarkets
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Float,    default: 0.0
 
+      # The ehb_premium for SecondLowestDentalProduct is members_premium * ehb_apportionment_for_pediatric_dental.
+      # Ehb Apportionment For Pediatric Dental.
+      field :ehb_apportionment_for_pediatric_dental, type: Float
+
       belongs_to  :renewal_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::DentalProducts::DentalProduct",
@@ -27,6 +31,20 @@ module BenefitMarkets
                 presence: true,
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
+      index(
+        {
+          "service_area_id" => 1,
+          "application_period.min" => 1,
+          "application_period.max" => 1,
+          "benefit_market_kind" => 1,
+          "premium_tables.rating_area_id" => 1,
+          "premium_tables.effective_period.min" => 1,
+          "premium_tables.effective_period.max" => 1
+        },
+        {
+          name: "dental_products_premium_tables_for_benchmark_premiums_search_index"
+        }
+      )
 
       alias_method :is_standard_plan?, :is_standard_plan
 

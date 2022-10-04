@@ -171,6 +171,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.evidence_type_non_esi" => "Coverage from another program",
   "en.faa.evidence_type_income" => "Income",
   # FAA start new application page
+  "en.faa.cost_savings_nav" => "Cost Savings",
   "en.faa.cost_savings_applications" => "Cost Savings Applications",
   "en.faa.cost_savings_applications_desc" => "If you started or completed an application for premium reductions, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.",
   "en.faa.start_new_application" => "Start New Application",
@@ -181,6 +182,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.end_date_warning" => "<strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.",
   "en.faa.not_applicable_abbreviation" => "N/A",
   # Transfer History
+  "en.faa.transfer_history.column_header.transfer_id" => "Transfer Id",
+  "en.faa.transfer_history.column_header.in_out_bound" => "In/Out Bound",
+  "en.faa.transfer_history.column_header.timestamp" => "Timestamp",
+  "en.faa.transfer_history.column_header.reason" => "Reason",
+  "en.faa.transfer_history.column_header.source" => "Source",
   "en.faa.transfer_history" => "Transfer History",
   "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   "en.faa.no_history_available" => "No history available.",
@@ -216,6 +222,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.totally_ineligible_heading" => "Does Not Qualify",
   "en.faa.results.totally_ineligible_text" => "These people likely don't qualify for %{medicaid_or_chip_program_short_name}, and don't qualify to enroll in an insurance plan through %{short_name}.",
   "en.faa.results.next_steps" => 'Next Steps',
+  "en.faa.results.all_medicaid_next_steps_continue_text" => "MaineCare coverage is free. If you would like to enroll and pay full price for an insurance plan through %{short_name}, select “CONTINUE” to see if you are eligible to select a plan or make changes to your current plan.",
   "en.faa.results.next_steps_text" => "If you’re already enrolled in a %{short_name} plan, you’re finished! You’ll see any updates applied to your plan in a minute or two. Select “Return to Account Home“.",
   "en.faa.results.return_to_account_home" => 'Return to Account Home',
   "en.faa.results.continue_text" => "Select “CONTINUE” to see if you are eligible to select a new plan or make changes to your current plan.",
@@ -224,6 +231,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.go_to_my_account" => "Go to my account",
   "en.faa.results.medicaid_eligible_next_steps" => "Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:",
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
-  "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan."
+  "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
+  "en.faa.verification.documents" => "Cost Savings Documents"
 }.freeze
 # rubocop:enable Layout/LineLength

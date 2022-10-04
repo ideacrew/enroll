@@ -222,6 +222,7 @@ class QhpBuilder
               metal_level: parse_metal_level,
               market: parse_market,
               ehb: @qhp.ehb_percent_premium,
+              ehb_apportionment_for_pediatric_dental: fetch_ehb_apportionment_for_pediatric_dental,
               carrier_profile_id: carrier_profile_id,
               coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
               dental_level: @dental_metal_level,
@@ -272,6 +273,7 @@ class QhpBuilder
               }.merge(shared_attributes))
             else
               new_product = ::BenefitMarkets::Products::DentalProducts::DentalProduct.new({
+                ehb_apportionment_for_pediatric_dental: fetch_ehb_apportionment_for_pediatric_dental,
                 product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
               }.merge(shared_attributes))
             end
@@ -284,6 +286,10 @@ class QhpBuilder
         end
       end
     end
+  end
+
+  def fetch_ehb_apportionment_for_pediatric_dental
+    @qhp.ehb_apportionment_for_pediatric_dental.present? ? @qhp.ehb_apportionment_for_pediatric_dental : 1.0
   end
 
   def set_ehb

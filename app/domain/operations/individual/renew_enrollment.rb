@@ -49,6 +49,7 @@ module Operations
 
       def fetch_eligibility_values(enrollment, effective_on)
         return Success({}) unless enrollment.is_health_enrollment?
+        return Success({}) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)

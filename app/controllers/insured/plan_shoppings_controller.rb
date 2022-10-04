@@ -15,6 +15,7 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :validate_rating_address, only: [:show]
 
   def checkout
+    @enrollment = HbxEnrollment.find(params.require(:id))
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
     if plan_selection.employee_is_shopping_before_hire?
@@ -35,7 +36,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
-    plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
+    plan_selection.apply_aptc_if_needed(@elected_aptc, @max_aptc) if can_apply_aptc?(plan_selection.plan)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
@@ -52,15 +53,13 @@ class Insured::PlanShoppingsController < ApplicationController
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
     else
-
-      @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
     if @enrollment.is_shop?
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
     else
-      @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+      @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc)
     end
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
@@ -98,7 +97,8 @@ class Insured::PlanShoppingsController < ApplicationController
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
-      @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+      @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
+      @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
       # Used for determing whether or not to show the extended APTC message
       @any_aptc_present = @enrollment.hbx_enrollment_members.any? { |member| @plan.aptc_amount(member) > 0 } if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message)
     end
@@ -124,8 +124,14 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     dependents_with_existing_coverage(@enrollment) if @market_kind == 'individual' && EnrollRegistry.feature_enabled?(:existing_coverage_warning)
     #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
-    respond_to do |format|
-      format.html { render 'thankyou.html.erb' }
+
+    if EnrollRegistry.feature_enabled?(:enrollment_product_date_match) || (@plan.present? && @plan.application_period.cover?(@enrollment.effective_on)) || @market_kind == 'shop'
+      respond_to do |format|
+        format.html { render 'thankyou.html.erb' }
+      end
+    else
+      flash[:error] = "Your selected plan is unavailable for #{@enrollment.effective_on.year}. Please select another plan"
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: @enrollment.id)
     end
   end
 
@@ -194,18 +200,28 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_eligibility_data
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      @grants = aptc_grants(@person.primary_family, @hbx_enrollment.effective_on.year)
+      @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: @hbx_enrollment, effective_on: @hbx_enrollment.effective_on}).value!
       @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
       session[:max_aptc] = @max_aptc
       default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
       @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
+      @tax_household = @grants
     else
-      session[:max_aptc] = 0
-      session[:elected_aptc] = 0
+      shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+
+      if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
+        @tax_household = shopping_tax_household
+        @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+        @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
+        session[:max_aptc] = @max_aptc
+        default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+        @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
+      else
+        session[:max_aptc] = 0
+        session[:elected_aptc] = 0
+      end
     end
   end
 
@@ -245,7 +261,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show_shop(hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
-
+    @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []
@@ -259,6 +275,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products
@@ -320,9 +337,19 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
-    if @tax_household.present?
-      if is_eligibility_determined_and_not_csr_0?(@person, @tax_household)
+
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      aptc_grants(@hbx_enrollment.family, @hbx_enrollment.effective_on.year) if @person.present?
+    else
+      begin
+        @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year)
+      rescue StandardError => e
+        log("#{e.message}; person_id: #{@person.id}")
+      end
+    end
+    if @tax_household.present? || @aptc_grants.present?
+      entity = @tax_household || @aptc_grants
+      if is_eligibility_determined_and_not_csr_0?(entity)
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -382,8 +409,22 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_0?(person, tax_household)
-    valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
+  def is_eligibility_determined_and_not_csr_0?(entity)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      enrolled_family_member_ids = @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
+      csr_op = ::Operations::PremiumCredits::FindCsrValue.new.call({
+                                                                     family: @hbx_enrollment.family,
+                                                                     year: @hbx_enrollment.effective_on.year,
+                                                                     family_member_ids: enrolled_family_member_ids
+                                                                   })
+
+      return false unless csr_op.success?
+
+      valid_csr_eligibility_kind = csr_op.value!
+    else
+      valid_csr_eligibility_kind = entity.valid_csr_kind(@hbx_enrollment)
+    end
+
     (EligibilityDetermination::CSR_KINDS.include? valid_csr_eligibility_kind.to_s) && (valid_csr_eligibility_kind.to_s != 'csr_0')
   end
 
@@ -483,18 +524,38 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def get_aptc_info_from_session(hbx_enrollment)
-    @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
-    if @shopping_tax_household.present?
+    # TODO: This can be removed once we get rid of temporary config.
+    # rubocop:disable Style/IfInsideElse
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      aptc_grants(@person.primary_family, hbx_enrollment.effective_on.year) if @person.present?
+    else
+      @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
+    end
+    if @shopping_tax_household.present? || @aptc_grants.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f
     else
       @max_aptc = 0
       @elected_aptc = 0
     end
+    # rubocop:enable Style/IfInsideElse
+  end
+
+  def aptc_grants(family, year)
+    return @aptc_grants if defined? @aptc_grants
+
+    result = ::Operations::PremiumCredits::FindAll.new.call({ family: family, year: year, kind: 'AdvancePremiumAdjustmentGrant' })
+    @aptc_grants = result.value! if result.success?
   end
 
   def can_apply_aptc?(plan)
-    @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+    return false if @enrollment.is_shop?
+
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      @aptc_grants.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+    else
+      @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+    end
   end
 
   def set_elected_aptc_by_params(elected_aptc)

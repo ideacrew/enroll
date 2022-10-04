@@ -7,6 +7,7 @@ class HbxEnrollmentMember
   include ApplicationHelper
   include Eligibilities::Visitors::Visitable
   include GlobalID::Identification
+  include Config::AcaHelper
 
   embedded_in :hbx_enrollment
 
@@ -77,6 +78,21 @@ class HbxEnrollmentMember
 
     age = calculate_age(coverage_start_on,dob)
     @age_on_effective_date = age
+  end
+
+  def osse_eligible_on_effective_date?
+    return false unless coverage_start_on.present?
+    return false unless ivl_osse_eligibility_is_enabled?(coverage_start_on.year)
+
+    role_for_subsidy&.osse_eligible?(coverage_start_on)
+  end
+
+  def role_for_subsidy
+    if person.has_active_resident_role?
+      person.resident_role
+    elsif person.has_active_consumer_role?
+      person.consumer_role
+    end
   end
 
   def tobacco_use_value_for_edi

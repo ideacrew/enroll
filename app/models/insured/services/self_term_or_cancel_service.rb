@@ -12,7 +12,8 @@ module Insured
         @term_or_cancel = attrs[:term_or_cancel]
         @elected_aptc_pct = attrs[:elected_aptc_pct]
         @selected_aptc = attrs[:aptc_applied_total]
-        @factory_class  = ::Insured::Factories::SelfServiceFactory
+        @factory_class = ::Insured::Factories::SelfServiceFactory
+        @exclude_enrollments_list = attrs[:exclude_enrollments_list]
       end
 
       def find
@@ -29,7 +30,7 @@ module Insured
       end
 
       def update_aptc
-        @factory_class.update_aptc(@enrollment_id, @selected_aptc.to_f)
+        @factory_class.update_aptc(@enrollment_id, @selected_aptc.to_f, exclude_enrollments_list: @exclude_enrollments_list, elected_aptc_pct: @elected_aptc_pct.to_f)
       end
 
       def attributes_to_form_params(attrs)

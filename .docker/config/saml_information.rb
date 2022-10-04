@@ -68,7 +68,10 @@ class SamlInformation
     'harvard_pilgrim_health_care_pay_now_relay_state',
     'community_health_options_pay_now_url',
     'community_health_options_pay_now_audience',
-    'community_health_options_pay_now_relay_state'
+    'community_health_options_pay_now_relay_state',
+    'taro_health_plan_of_maine_inc_pay_now_url',
+    'taro_health_plan_of_maine_inc_pay_now_audience',
+    'taro_health_plan_of_maine_inc_pay_now_relay_state'
   ].freeze
 
   attr_reader :config

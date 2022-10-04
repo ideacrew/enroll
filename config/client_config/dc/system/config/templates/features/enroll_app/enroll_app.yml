@@ -240,7 +240,7 @@ registry:
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: false
           - key: :medicaid_agency_phone
-            item: "(855) 532-5465"
+            item: "(202) 727-5355"
           - key: :verifiable_immigration_statuses
             item: false
           - key: :appeal_link
@@ -335,6 +335,9 @@ registry:
       - key: :tobacco_cost
         item: :tobacco_cost
         is_enabled: false
+      - key: :choose_coverage_mdcr_warning
+        item: :choose_coverage_mdcr_warning
+        is_enabled: <%= ENV['CHOOSE_COVERAGE_MDCR_WARNING_IS_ENABLED'] || false %>
       - key: :counties_import
         is_enabled: false
         item: ""
@@ -374,6 +377,9 @@ registry:
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: false
+      - key: :hide_enrollment_market_type
+        item: :hide_enrollment_market_type
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_MARKET_TYPE'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -520,6 +526,19 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: false
+      - key: :taro_health_plan_of_maine_inc_pay_now
+        is_enabled: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_IS_ENABLED'] || false %>
+        settings:
+          - key: :plan_shopping
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
+          - key: :enrollment_tile
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_ENROLLMENT_TITLE_IS_ENABLED'] || false %>
+          - key: :carriers_long_name
+            item: 'Taro Health Plan of Maine, Inc.'
+          - key: :connect_test
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :embed_xml
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
       - key: :carrier_abbrev_list
         item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
         is_enabled: true
@@ -636,6 +655,12 @@ registry:
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
         is_enabled: true
+      - key: :trigger_verifications_before_enrollment_purchase
+        item: trigger_verifications_before_enrollment_purchase
+        is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
+      - key: :use_defaults_for_qnc_and_five_year_bar_data
+        item: use_defaults_for_qnc_and_five_year_bar_data
+        is_enabled: <%= ENV['USE_DEFAULTS_FOR_QNC_AND_FIVE_YEAR_BAR_DATA_IS_ENABLED'] || true %>
       - key: :saml_info_keys
         is_enabled: true
         settings:
@@ -725,9 +750,6 @@ registry:
         is_enabled: true
       - key: :osse_eligibility_history
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
+      - key: :enrollment_product_date_match
+        is_enabled: false
 
-      - key: :ivl_osse_eligibility
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
-      - key: :shop_osse_eligibility
-        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
-      

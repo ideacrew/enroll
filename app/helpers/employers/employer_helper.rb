@@ -324,12 +324,12 @@ module Employers::EmployerHelper
     Settings.aca.employer_has_sic_field
   end
 
-  def ivl_osse_eligibility_is_enabled?
-    EnrollRegistry.feature_enabled?(:ivl_osse_eligibility)
+  def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+    EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
   end
 
-  def shop_osse_eligibility_is_enabled?
-    EnrollRegistry.feature_enabled?(:shop_osse_eligibility)
+  def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+    EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
   end
 
   def osse_eligibility_history_is_enabled?

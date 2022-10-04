@@ -515,7 +515,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe 'shopping_group_premium' do
     it 'should return cost without session' do
-      expect(helper.shopping_group_premium(100, 98.44)).to eq 100
+      expect(helper.shopping_group_premium(100, 98.44, 0.00)).to eq 100
     end
 
     context 'with session' do
@@ -525,24 +525,48 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
 
       it 'when ehb_premium > aptc_amount' do
-        expect(helper.shopping_group_premium(200, 196.88)).to eq(100)
+        expect(helper.shopping_group_premium(200, 196.88, 0.00)).to eq(100)
       end
 
       it 'when ehb_premium < aptc_amount' do
-        expect(helper.shopping_group_premium(100, 98.44)).to eq(1.56)
+        expect(helper.shopping_group_premium(100, 98.44, 0.00)).to eq(1.56)
       end
 
       it 'should return rounded plan cost value' do
         session['elected_aptc'] = nil
-        expect(helper.shopping_group_premium(520.48, 512.360512)).to eq 520.48
+        expect(helper.shopping_group_premium(520.48, 512.360512, 0.00)).to eq 520.48
       end
 
       it 'when can_use_aptc is false' do
-        expect(helper.shopping_group_premium(100, 98.44, false)).to eq 100
+        expect(helper.shopping_group_premium(100, 98.44, 0.00, false)).to eq 100
       end
 
       it 'when can_use_aptc is true' do
-        expect(helper.shopping_group_premium(100, 98.44, true)).to eq 1.56
+        expect(helper.shopping_group_premium(100, 98.44, 0.00, true)).to eq 1.56
+      end
+
+      context 'with osse subsidy' do
+
+        it 'when ehb_premium > aptc_amount' do
+          expect(helper.shopping_group_premium(200, 196.88, 100)).to eq(0)
+        end
+
+        it 'when ehb_premium < aptc_amount' do
+          expect(helper.shopping_group_premium(100, 98.44, 1.56)).to eq(0)
+        end
+
+        it 'should return rounded plan cost value' do
+          session['elected_aptc'] = nil
+          expect(helper.shopping_group_premium(520.48, 512.360512, 520.48)).to eq(0)
+        end
+
+        it 'when can_use_aptc is false' do
+          expect(helper.shopping_group_premium(100, 98.44, 100, false)).to eq(0)
+        end
+
+        it 'when can_use_aptc is true' do
+          expect(helper.shopping_group_premium(100, 98.44, 1.56, true)).to eq(0)
+        end
       end
     end
   end

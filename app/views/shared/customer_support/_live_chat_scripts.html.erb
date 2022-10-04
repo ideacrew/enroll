@@ -53,70 +53,25 @@
             id: 'cx_webchat_form_firstname',
             name: 'firstname',
             maxlength: '100',
-            placeholder: 'Required',
+            placeholder: 'Optional',
             label: 'First Name',
             validateWhileTyping: false, // default is false
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input) {
-                if (input.val()) return true;
-                else return false;
-              }
-              return false;
-            },
           },
           {
             id: 'cx_webchat_form_lastname',
             name: 'lastname',
             maxlength: '100',
-            placeholder: 'Required',
+            placeholder: 'Optional',
             label: 'Last Name',
             validateWhileTyping: false, // default is false
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input) {
-                if (input.val()) return true;
-                else return false;
-              }
-              return false;
-            },
           },
           {
             id: 'cx_webchat_form_email',
             name: 'email',
             maxlength: '100',
-            placeholder: 'Required',
+            placeholder: 'Optional',
             label: 'Email',
             validateWhileTyping: false, // default is false
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input) {
-                if (input.val()) return true;
-                else return false;
-              }
-              return false;
-            },
           },
           {
             id: 'cx_webchat_form_phoneNumber',
@@ -126,22 +81,14 @@
             label: 'Phone Number',
           },
           {
-            id: 'cx_webchat_form_coverMeID',
-            name: 'coverMeID',
-            maxlength: '100',
-            placeholder: 'Optional',
-            label: 'CoverME.gov ID',
-          },
-          {
             id: 'cx_webchat_form_customselect',
             name: 'customselect',
-            placeholder: 'Required',
+            placeholder: 'Optional',
             label: 'Topic',
             type: 'select',
-            required: 'Please select an option',
             options: [
               {
-                text: 'Required',
+                text: 'Optional',
                 hidden: 'hidden',
                 value: 'na',
               },
@@ -163,25 +110,6 @@
               },
             ],
 
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input != undefined) {
-                if (
-                  document.getElementById('cx_webchat_form_customselect')
-                    .value != 'na'
-                )
-                  return true;
-                else return false;
-              }
-              return false;
-            },
             wrapper:
               '<tr><th>{label}</th><td>{input}</td></tr>' /* input row wrapper */,
           },

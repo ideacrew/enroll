@@ -364,4 +364,8 @@ module Config::AcaHelper
   def aca_default_dental_plan_option
     Settings.aca.default_dental_option_kind
   end
+
+  def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+    EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+  end
 end

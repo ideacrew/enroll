@@ -287,7 +287,8 @@ module BenefitSponsors
           plan_kind: reference_product.health_plan_kind,
           metal_level_kind: reference_product.metal_level,
           network_information: reference_product.network_information,
-          network: reference_product.network
+          network: reference_product.network,
+          is_standard_plan: reference_product.is_standard_plan
         })
       end
 

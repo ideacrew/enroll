@@ -43,6 +43,7 @@ describe UnassistedPlanCostDecorator, "given:
       {
         age_on_effective_date: 50,
         is_subscriber?: true,
+        primary_relationship: "self",
         tobacco_use: nil
       }
     )
