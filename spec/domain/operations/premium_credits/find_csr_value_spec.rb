@@ -69,7 +69,7 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
         state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
         state.grants.create(
           key: "CsrAdjustmentGrant",
-          value: '0',
+          value: '87',
           start_on: TimeKeeper.date_of_record.beginning_of_year,
           end_on: TimeKeeper.date_of_record.end_of_year,
           assistance_year: TimeKeeper.date_of_record.year,
@@ -82,12 +82,12 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
 
 
     let(:params) do
-      { family_member_ids: [family.primary_applicant.id.to_s], family: family, year: TimeKeeper.date_of_record.year }
+      { family_member_ids: [family.primary_applicant.id], family: family, year: TimeKeeper.date_of_record.year }
     end
 
     it 'returns success' do
       expect(result.success?).to eq true
-      expect(result.value!).to eq 'csr_0'
+      expect(result.value!).to eq 'csr_87'
     end
 
     context 'indian_tribe_member' do

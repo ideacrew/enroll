@@ -10,6 +10,11 @@ module ChildcareSubsidyConcern
 
     def osse_eligible?(start_on)
       return false unless osse_feature_enabled_for?(start_on.year)
+
+      is_osse_eligibility_satisfied?(start_on)
+    end
+
+    def is_osse_eligibility_satisfied?(start_on)
       eligibility = eligibility_for(:osse_subsidy, start_on)
       return false unless eligibility
       evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
@@ -27,7 +32,7 @@ module ChildcareSubsidyConcern
     end
 
     def create_or_term_eligibility(eligibility_params)
-      if osse_eligible?(eligibility_params[:effective_date])
+      if is_osse_eligibility_satisfied?(eligibility_params[:effective_date])
         return if eligibility_params[:evidence_value] == 'true'
         terminate_eligibility(eligibility_params)
       elsif eligibility_params[:evidence_value] == 'true'

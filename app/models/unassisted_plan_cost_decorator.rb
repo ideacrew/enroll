@@ -178,9 +178,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_childcare_subsidy_amount
-    return 0.00 if kind == :dental
-    return 0.00 if members.none?(&:osse_eligible_on_effective_date?)
+    return 0.00 unless ivl_osse_eligible?
     total_premium - total_aptc_amount
+  end
+
+  def ivl_osse_eligible?
+    hbx_enrollment.ivl_osse_eligible?
   end
 
   private

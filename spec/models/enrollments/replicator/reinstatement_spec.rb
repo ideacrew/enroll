@@ -343,4 +343,104 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
       end
     end
   end
+
+  describe "extract_csr_kind",  dbclean: :around_each do
+    let(:person) {FactoryBot.create(:person)}
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(Time.current.year,1,1)) }
+    let(:c1) {FactoryBot.create(:consumer_role)}
+    let(:c2) {FactoryBot.create(:consumer_role)}
+    let(:r1) {FactoryBot.create(:resident_role)}
+    let(:r2) {FactoryBot.create(:resident_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+    let(:family_members) { family.family_members.where(is_primary_applicant: false).to_a }
+    let(:household) { family.active_household }
+    let(:member1) { FactoryBot.build(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, family_member: family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members.first.id) }
+    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id)}
+    let(:hbx_enrollment) do
+      enr = FactoryBot.create(:hbx_enrollment, kind: "individual", effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true, family: family)
+      hbx_enrollment_member = FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: true).first.id, hbx_enrollment: enr)
+      hbx_enrollment_member1 = FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: false).first.id, hbx_enrollment: enr)
+      enr.hbx_enrollment_members << hbx_enrollment_member << hbx_enrollment_member1
+      enr
+    end
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
+    let!(:tax_household_member1) { tax_household.tax_household_members.build(applicant_id: family.family_members.where(is_primary_applicant: true).first.id, csr_percent_as_integer: 87, is_ia_eligible: true) }
+    let!(:tax_household_member2) { tax_household.tax_household_members.build(applicant_id: family.family_members.where(is_primary_applicant: false).first.id, csr_percent_as_integer: 100, is_ia_eligible: true) }
+
+    context "native_american_csr feature enabled and all are indian tribes" do
+      before do
+        EnrollRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+        tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
+        tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
+      end
+
+      it "should return csr_limited" do
+        reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
+        expect(reinstatement.extract_csr_kind).to eq 'csr_limited'
+      end
+    end
+
+    context "native_american_csr feature disabled" do
+      before do
+        EnrollRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should not return csr_limited" do
+        reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
+        expect(reinstatement.extract_csr_kind).not_to eq 'csr_limited'
+      end
+
+      context "when temporary_configuration_enable_multi_tax_household_feature is disabled" do
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+        end
+
+        it "should return csr_87" do
+          reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
+          expect(reinstatement.extract_csr_kind).to eq 'csr_87'
+        end
+      end
+
+      context "when temporary_configuration_enable_multi_tax_household_feature is enabled" do
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it "should return nil with no eligibility determination" do
+          reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
+          expect(reinstatement.extract_csr_kind).to eq nil
+        end
+
+        context "with eligibility determination" do
+          let!(:eligibility_determination) do
+            determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+            family.family_members.each do |family_member|
+              subject = determination.subjects.create(
+                gid: "gid://enroll/FamilyMember/#{family_member.id}",
+                is_primary: family_member.is_primary_applicant,
+                person_id: family_member.person.id
+              )
+
+              state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+              state.grants.create(
+                key: "CsrAdjustmentGrant",
+                value: '87',
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family.family_members.map(&:id)
+              )
+            end
+
+            determination
+          end
+
+          it "should return csr_87" do
+            reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
+            expect(reinstatement.extract_csr_kind).to eq 'csr_87'
+          end
+        end
+      end
+    end
+  end
 end
