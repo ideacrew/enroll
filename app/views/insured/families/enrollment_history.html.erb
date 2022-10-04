@@ -13,14 +13,17 @@
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
-      <% enrollments.each do |year, yearly_enrollments| %>
-        <h2 style="margin-top: 0;"><%= year %></h2>
-        <%= render partial: "enrollment",
-                 :collection => yearly_enrollments,
-                 :as => :hbx_enrollment,
-                 locals: { read_only: false, show_all: true } %>
+      <% if enrollments&.any? %>
+        <% enrollments.group_by  { |enrollment| enrollment.effective_on.year }.each do |year, yearly_enrollments| %>
+          <h2 style="margin-top: 0;"><%= year %></h2>
+          <%= render partial: "enrollment",
+                   :collection => yearly_enrollments,
+                   :as => :hbx_enrollment,
+                   locals: { read_only: false, show_all: true } %>
+        <% end %>
+      <% else %>
+         <%= l10n("No_current_or_past_enrollments").humanize %>.
       <% end %>
-      
     </div>
   </div>
 </div>
