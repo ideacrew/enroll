@@ -14,7 +14,7 @@
         <% enrollments = @hbx_enrollments %>
       <% end %>
       <% if enrollments&.any? %>
-        <% enrollments.group_by  { |enrollment| enrollment.effective_on.year }.each do |year, yearly_enrollments| %>
+        <% enrollments.group_by  { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
           <h2 style="margin-top: 0;"><%= year %></h2>
           <%= render partial: "enrollment",
                    :collection => yearly_enrollments,

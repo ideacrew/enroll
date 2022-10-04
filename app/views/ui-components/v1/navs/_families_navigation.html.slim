@@ -2,6 +2,10 @@ nav
   ul#uic-families-right-menu
     li
       = link_to l10n("my_site_short_name", site_short_name: site_short_name), main_app.family_account_path(tab: 'home')
+    - if EnrollRegistry.feature_enabled?(:enrollment_history_page)
+      li
+        = link_to main_app.enrollment_history_insured_families_path do
+          = l10n("enrollments")
     - if display_my_broker?(@person, @employee_role) && display_broker_info_for_consumer
       li
         = link_to l10n("my_broker"), main_app.brokers_insured_families_path(tab: l10n("brokers_tab"))
@@ -15,10 +19,6 @@ nav
       li
         = link_to financial_assistance.applications_path(tab: 'cost_savings') do
           = l10n("faa.cost_savings_nav")
-    - if EnrollRegistry.feature_enabled?(:enrollment_history_page)
-      li
-        = link_to main_app.enrollment_history_insured_families_path do
-          = l10n("enrollment_history")
     - if current_user.has_hbx_staff_role? && has_active_resident_members?(@family_members)
       li
         = link_to main_app.upload_application_insured_families_path(tab: 'verification') do
