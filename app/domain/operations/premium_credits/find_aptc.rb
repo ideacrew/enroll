@@ -120,11 +120,9 @@ module Operations
 
       def utilized_aptc(aptc_grant)
         coinciding_enrollments.reduce(0.0) do |sum, previous_enrollment|
-          pct = previous_enrollment.elected_aptc_pct > 0.0 ? previous_enrollment.elected_aptc_pct : default_applied_aptc_percentage
           th_enrollment = TaxHouseholdEnrollment.where(enrollment_id: previous_enrollment.id, tax_household_id: aptc_grant.tax_household_id).first
           next sum if th_enrollment.blank?
-          # value = (round_down_float_two_decimals(th_enrollment.total_benchmark_premium) - (round_down_float_two_decimals(aptc_grant.value) / 12)) * pct
-          value = round_down_float_two_decimals(th_enrollment.available_max_aptc) * pct
+          value = round_down_float_two_decimals(th_enrollment.available_max_aptc)
 
           sum += (value > 0.0 ? value : 0.0)
           sum

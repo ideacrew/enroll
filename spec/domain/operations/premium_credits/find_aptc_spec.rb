@@ -1289,7 +1289,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           :individual_shopping,
                           :with_silver_health_product,
                           :with_enrollment_members,
-                          elected_aptc_pct: 1.0,
+                          elected_aptc_pct: 0.9,
                           enrollment_members: ([primary_applicant] + [family.dependents.select { |dependent| [dependent_b.id, dependent_d.id].include? dependent.person_id }]).flatten,
                           family: family,
                           aasm_state: 'coverage_selected')
@@ -1300,7 +1300,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           :individual_shopping,
                           :with_silver_health_product,
                           :with_enrollment_members,
-                          elected_aptc_pct: 1.0,
+                          elected_aptc_pct: 0.85,
                           enrollment_members: family.dependents.select { |dependent| [dependent_b.id, dependent_c.id, dependent_d.id].include? dependent.person_id },
                           family: family,
                           aasm_state: 'coverage_selected')

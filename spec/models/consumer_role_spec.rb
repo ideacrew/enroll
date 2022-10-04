@@ -2061,6 +2061,29 @@ describe '.create_or_term_eligibility' do
         end
       end
     end
+
+    context 'it should term eligibility' do
+      let(:consumer_role) { primary.consumer_role }
+      let(:consumer_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
+      let!(:eligibility) do
+        consumer_role.eligibilities << consumer_elig
+        consumer_role.save!
+        consumer_role.eligibilities.first
+      end
+
+      let(:valid_params) do
+        {
+          evidence_key: :osse_subsidy,
+          evidence_value: 'false',
+          effective_date: TimeKeeper.date_of_record
+        }
+      end
+
+      before { consumer_role.create_or_term_eligibility(valid_params) }
+
+      it { expect(eligibility.reload.end_on).to eq(TimeKeeper.date_of_record) }
+      it { expect(consumer_role.reload.osse_eligible?(TimeKeeper.date_of_record)).to be_falsey }
+    end
   end
 end
 
