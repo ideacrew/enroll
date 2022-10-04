@@ -142,6 +142,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.i_understand_evaluation_3" => "",
   "en.faa.anyone_found_eligible_1" => "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, ",
   "en.faa.anyone_found_eligible_2" => "legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. ",
+  "en.faa.anyone_found_eligible_3" => "",
   "en.faa.parent_living_outside_of_home_1" => "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
