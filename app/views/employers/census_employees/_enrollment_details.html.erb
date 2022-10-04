@@ -23,7 +23,11 @@
         <%# TODO %>
         <% member_enrollment = group_enrollment.member_enrollments.detect {|member_enrollment| member_enrollment.member_id == member.id} %>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.product_price.to_f) %></td>
-        <td></td>
+        <% if (enrollment.eligible_child_care_subsidy > 0) && member.is_subscriber? %>
+          <td>
+            <strong><%= number_to_currency(group_enrollment.eligible_child_care_subsidy.to_f) %></strong>
+          </td>
+        <% end %>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.sponsor_contribution.to_f) %></td>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.employee_cost.to_f) %></td>
       </tr>
