@@ -11,6 +11,7 @@ class TaxHouseholdEnrollment
   field :dental_product_hios_id, type: String
   field :household_health_benchmark_ehb_premium, type: Money
   field :household_dental_benchmark_ehb_premium, type: Money
+  field :applied_aptc, type: Money
   field :available_max_aptc, type: Money
 
   embeds_many :tax_household_members_enrollment_members, class_name: "::TaxHouseholdMemberEnrollmentMember", cascade_callbacks: true
