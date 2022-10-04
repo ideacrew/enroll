@@ -2742,6 +2742,12 @@ class HbxEnrollment
     workflow_state_transitions.order(created_at: :desc).first
   end
 
+  def ivl_osse_eligible?
+    return false if is_shop? || dental?
+
+    hbx_enrollment_members.any?(&:osse_eligible_on_effective_date?)
+  end
+
   def update_osse_childcare_subsidy
     effective_year = sponsored_benefit_package.start_on.year
 
