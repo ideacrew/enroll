@@ -145,17 +145,22 @@ function updatePlanCost(elected_aptc) {
     var plan = plans[i];
     var premium = parseFloat($(plan).data('plan-metal-premium'));
     var ehb_premium = parseFloat($(plan).data('plan-metal-ehb-premium'));
-    var childcare_subsidy = parseFloat($(plan).data('plan-childcare-subsidy'));
+    var childcare_subsidy_eligible = $(plan).data('plan-childcare-subsidy-eligible');
 
-    if ($(plan).data('can-use-aptc') == true){
-      var premium_resp_amt = premium - Math.min.apply(null, [elected_amount, ehb_premium]) - childcare_subsidy;
+    if (childcare_subsidy_eligible == true) {
+      var premium_resp_amt = 0;
     } else {
-      var premium_resp_amt = premium - childcare_subsidy;
+      if ($(plan).data('can-use-aptc') == true){
+        var premium_resp_amt = premium - Math.min.apply(null, [elected_amount, ehb_premium]);
+      } else {
+        var premium_resp_amt = premium;
+      }
+
+      if (premium_resp_amt < 0) {
+        premium_resp_amt = 0;
+      }
     }
 
-    if (premium_resp_amt < 0) {
-      premium_resp_amt = 0;
-    }
     premium_resp_amt = premium_resp_amt.toFixed(2);
     $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
   };
