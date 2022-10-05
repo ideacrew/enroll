@@ -107,6 +107,10 @@ jobs:
         with:
           bundler-cache: true
           rubygems: latest
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
           working-directory: 'components/benefit_sponsors'
       - uses: actions/setup-node@v3
         with:
@@ -134,10 +138,10 @@ jobs:
       - name: yarn install
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      # - name: run webpack
-      #   run: |
-      #     bundle config path vendor/bundle
-      #     NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: run webpack
+        run: |
+          bundle config path vendor/bundle
+          ./bin/webpack
       - name: test engine
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/benefit_sponsors-split-config.json'
