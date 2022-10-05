@@ -7,7 +7,7 @@
         <th>Age</th>
         <th>Premium</th>
         <% if (enrollment.eligible_child_care_subsidy > 0) %>
-          <th><%= l10n("hc44cc_premium_discount") %></th>
+          <th class="text-nowrap text-center" colspan="2" scope="colgroup"><%= l10n("premium_discount") %></th>
         <% end %>
         <th>Employer Contribution</th>
         <th>You Pay</th>
@@ -23,10 +23,16 @@
         <%# TODO %>
         <% member_enrollment = group_enrollment.member_enrollments.detect {|member_enrollment| member_enrollment.member_id == member.id} %>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.product_price.to_f) %></td>
-        <% if (enrollment.eligible_child_care_subsidy > 0) && member.is_subscriber? %>
-          <td>
-            <strong><%= number_to_currency(group_enrollment.eligible_child_care_subsidy.to_f) %></strong>
-          </td>
+        <% if (enrollment.eligible_child_care_subsidy > 0) %>
+          <% if member.is_subscriber? %>
+            <td class="text-center"><%= l10n("osse_subsidy_title_shortname") %></td>
+            <td class="text-right">
+              <%= number_to_currency(group_enrollment.eligible_child_care_subsidy.to_f) %>
+            </td>
+          <% else %>
+            <td></td>
+            <td></td>
+          <% end %>
         <% end %>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.sponsor_contribution.to_f) %></td>
         <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.employee_cost.to_f) %></td>
@@ -42,7 +48,8 @@
           <strong><%= number_to_currency(group_enrollment.product_cost_total.to_f) %></strong>
         </td>
         <% if (enrollment.eligible_child_care_subsidy > 0) %>
-          <td>
+          <td></td>
+          <td class="text-right">
             <strong><%= number_to_currency(group_enrollment.eligible_child_care_subsidy.to_f) %></strong>
           </td>
         <% end %>
