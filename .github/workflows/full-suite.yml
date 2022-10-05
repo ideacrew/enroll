@@ -19,17 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v3
         with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: bundle install
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
+          bundler-cache: true
+          rubygems: latest
       - name: Run View Linter
         run: |
           git fetch --no-tags --depth=1 origin trunk
@@ -39,6 +31,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore
       - name: Run Brakeman In Components
@@ -64,7 +59,6 @@ jobs:
           ]
     steps:
       - uses: actions/checkout@v3
-      - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -78,24 +72,11 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
-      - name: restore Project Gems
-        uses: actions/cache@v3
+      - uses: ruby/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            v5-${{ matrix.engine-name }}-
-      - name: bundle install
-        run: |
-          gem update --system --quiet --silent
-          bundle config path vendor/bundle
-          bundle install
-          echo switching to ${{ matrix.engine-name }}
-          cd components/${{ matrix.engine-name }}
-          bundle config path ../../vendor/bundle
-          echo testing caching
-          echo installing ${{ matrix.engine-name }} dependencies
-          bundle install
+          working-directory: 'components/${{ matrix.engine-name }}'
+          bundler-cache: true
+          rubygems: latest
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v3
@@ -110,15 +91,12 @@ jobs:
           yarn install
       - name: run webpack
         run: |
-          echo bundle config
-          bundle config path vendor/bundle
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         run: |
           root=`pwd -P`
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
-          bundle config path ../../vendor/bundle
           bundle exec rspec
   benefit-sponsors:
     runs-on: ubuntu-latest
@@ -129,6 +107,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
+          working-directory: 'components/benefit_sponsors'
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -142,22 +124,8 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
-      - name: Restore Project Gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            benefit_sponsors-
-      - name: bundle install
-        run: |
-          gem update --system --quiet --silent
-          bundle config path vendor/bundle
-          bundle install
-          cd components/benefit_sponsors
-          bundle config path ../../vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Install Test Boosters gem
+        run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v3
@@ -211,6 +179,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -224,19 +195,8 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
-      - name: Restore project gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Install Test Boosters gem
+        run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v3
@@ -300,6 +260,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -313,19 +276,8 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '4.2'
-      - name: Restore project gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Install Test Boosters gem
+        run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v3
