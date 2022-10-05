@@ -55,7 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+  let(:obj)  { ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new }
   let(:premiums_hash) do
     {
       [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
@@ -93,7 +93,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-    allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
+    allow(::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
     stub_const('::Operations::Products::Fetch', fetch_double)
