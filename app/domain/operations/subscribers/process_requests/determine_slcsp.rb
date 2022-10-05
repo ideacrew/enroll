@@ -6,6 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Subscribers
     module ProcessRequests
+      # This Operation processes DetemineSlcsp Request and adds benchmark_product to Cv3Application.
       class DetermineSlcsp
         include Dry::Monads[:result, :do]
         include EventSource::Command
@@ -116,7 +117,7 @@ module Operations
 
         def household_members(members)
           members.collect do |member|
-            { applicant_reference: applicant_reference(member), 
+            { applicant_reference: applicant_reference(member),
               relationship_with_primary: member.relationship_with_primary,
               age_on_effective_date: member.age_on_effective_date }
           end
