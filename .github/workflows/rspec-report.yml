@@ -104,13 +104,13 @@ jobs:
       matrix:
         folder:
           [
-            'benefit_markets',
-            'benefit_sponsors',
-            'financial_assistance',
+            # 'benefit_markets',
+            # 'benefit_sponsors',
+            # 'financial_assistance',
             'notifier',
-            'sponsored_benefits',
-            'transport_gateway',
-            'transport_profiles',
+            # 'sponsored_benefits',
+            # 'transport_gateway',
+            # 'transport_profiles',
           ]
     runs-on: ubuntu-latest
     services:
