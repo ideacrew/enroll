@@ -13,28 +13,28 @@ jobs:
       matrix:
         folder:
           [
-            'client_config',
-            'components',
-            'concerns',
+            # 'client_config',
+            # 'components',
+            # 'concerns',
             'controllers',
-            'data_migrations',
-            'domain',
-            'helpers',
-            'interactors',
-            'invoices',
-            'lib',
-            'mailers',
-            'models',
-            'notices',
-            'policies',
-            'reflexes',
-            'requests',
-            'reports',
-            'routing',
-            'script',
-            'test_data',
+            # 'data_migrations',
+            # 'domain',
+            # 'helpers',
+            # 'interactors',
+            # 'invoices',
+            # 'lib',
+            # 'mailers',
+            # 'models',
+            # 'notices',
+            # 'policies',
+            # 'reflexes',
+            # 'requests',
+            # 'reports',
+            # 'routing',
+            # 'script',
+            # 'test_data',
             'views',
-            'workers',
+            # 'workers',
           ]
     runs-on: ubuntu-latest
     steps:
@@ -79,7 +79,8 @@ jobs:
       - name: run webpack
         run: ./bin/webpack
       - name: Run tests
-        run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
+        run: bundle exec rspec spec/${{ matrix.folder }}
+        # run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
