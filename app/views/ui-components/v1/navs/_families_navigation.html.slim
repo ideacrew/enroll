@@ -5,7 +5,7 @@ nav
     - if EnrollRegistry.feature_enabled?(:enrollment_history_page)
       li
         = link_to main_app.enrollment_history_insured_families_path do
-          = l10n("enrollments")
+          = l10n("enrollment_history_nav_label")
     - if display_my_broker?(@person, @employee_role) && display_broker_info_for_consumer
       li
         = link_to l10n("my_broker"), main_app.brokers_insured_families_path(tab: l10n("brokers_tab"))

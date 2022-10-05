@@ -13,13 +13,17 @@
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <strong>Display All Enrollments?</strong>&nbsp;&nbsp;
+        <input type="checkbox" id="display_all_enrollments"> <br>
+      <% end %>
       <% if enrollments&.any? %>
         <% enrollments.group_by  { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
           <h2 style="margin-top: 0;"><%= year %></h2>
           <%= render partial: "enrollment",
                    :collection => yearly_enrollments,
                    :as => :hbx_enrollment,
-                   locals: { read_only: false, show_all: true } %>
+                   locals: { read_only: false } %>
         <% end %>
       <% else %>
          <%= l10n("No_current_or_past_enrollments").humanize %>.
