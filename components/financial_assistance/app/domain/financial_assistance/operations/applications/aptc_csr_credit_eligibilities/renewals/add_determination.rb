@@ -4,7 +4,6 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/magi_medicaid/libraries/iap_library'
 
-# rubocop:disable Metrics/CyclomaticComplexity
 module FinancialAssistance
   module Operations
     module Applications
@@ -23,11 +22,11 @@ module FinancialAssistance
               application_entity = yield initialize_application_entity(params)
               application = yield find_application(application_entity)
               yield update_application(application, application_entity)
-              _persisted_application = yield find_application(application_entity)
+              persisted_application = yield find_application(application_entity)
               # application_event_result = yield publish_application_event(persisted_application)
-              notice_event_result = yield publish_notice_event(application_entity)
+              result = yield request_determination_notice(persisted_application)
 
-              Success(notice_event_result)
+              Success(result)
             end
 
             private
@@ -127,31 +126,8 @@ module FinancialAssistance
             end
 
             # NOTE: this does not follow coding conventions
-            def publish_notice_event(application_payload)
-              peds = application_payload.tax_households.flat_map(&:tax_household_members).map(&:product_eligibility_determination)
-              event_name =
-                if peds.all?(&:is_ia_eligible)
-                  :aptc_eligible
-                elsif peds.all?(&:is_medicaid_chip_eligible)
-                  :medicaid_chip_eligible
-                elsif peds.all?(&:is_totally_ineligible)
-                  :totally_ineligible
-                elsif peds.all?(&:is_magi_medicaid)
-                  :magi_medicaid_eligible
-                elsif peds.all?(&:is_uqhp_eligible)
-                  :uqhp_eligible
-                else
-                  :mixed_determination
-                end
-              event_key = "notice.determined_#{event_name}"
-
-              event_to_publish = event("events.applications.aptc_csr_credits.renewals.#{event_key}", attributes: application_payload.to_h)
-              event_to_publish.success.publish
-
-              Success("Successfully published the payload for event: #{event_key}")
-
-              # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call({payload: application_payload.to_h, event_name: event_key.to_s})
-              # Success({ event: event_key, payload: application_payload.to_h })
+            def request_determination_notice(application)
+              ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::RequestDeterminationNotice.new.call(application.id)
             end
           end
         end
@@ -159,4 +135,3 @@ module FinancialAssistance
     end
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity

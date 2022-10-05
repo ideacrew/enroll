@@ -8,12 +8,13 @@ module FinancialAssistance
     module Applications
       module AptcCsrCreditEligibilities
         module Renewals
-          # Publish class will build event and publish the payload
+          # Publish class will build event and publish the renewal payload
           class PublishRenewalRequest
             include Dry::Monads[:result, :do, :try]
             include EventSource::Command
 
-            REGISTERED_EVENTS = %w[renewal.requested renewed determination_submission.requested determination_requested determination_added determination_notice_requested determined_magi_medicaid_eligible].freeze
+            REGISTERED_EVENTS = %w[renewal.requested renewed determination_submission.requested determination_requested determination_added notice.determined_uqhp_eligible notice.determined_mixed_determination
+                                   notice.determined_magi_medicaid_eligible notice.determined_totally_ineligible notice.determined_medicaid_chip_eligible notice.determined_aptc_eligible].freeze
 
             def call(params)
               payload = yield validate_input_params(params)

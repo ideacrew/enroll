@@ -14,9 +14,9 @@ module FinancialAssistance
             include EventSource::Command
 
             def call(application_id)
-              application = find_application(application_id)
-              application = validate(application)
-              result = generate_determination_notice_event(application)
+              application = yield find_application(application_id)
+              application_entity = yield validate(application)
+              result = yield generate_determination_notice_event(application_entity)
 
               Success(result)
             end
@@ -28,17 +28,23 @@ module FinancialAssistance
 
               Success(application)
             rescue Mongoid::Errors::DocumentNotFound
-              Failure("Unable to find Application with ID #{application_id}.")
+              Failure("RequestDeterminationNotice: Unable to find Application with ID #{application_id}.")
             end
 
             def validate(application)
-              return Success(application) if application.determined?
-              Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
+              if application.determined?
+                parsed_payload = JSON.parse(application.eligibility_response_payload)
+                ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(parsed_payload)
+              else
+                Failure("RequestDeterminationNotice: Unable to send the notice for undetermined application for given application hbx_id: #{application.hbx_id}")
+              end
+            rescue StandardError => e
+              Failure("RequestDeterminationNotice: rescued failure for the given application hbx_id: #{application.hbx_id}, error: #{e.message}")
             end
 
-            # rubocop:disable Metrics/CyclomaticComplexity
-            def generate_determination_notice_event(application)
-              peds = application.applicants.flat_map(&:tax_household_members).map(&:product_eligibility_determination)
+            # rubocop:disable Metrics/CyclomaticComplexity, Style/MultilineBlockChain, Metrics/PerceivedComplexity
+            def generate_determination_notice_event(application_entity)
+              peds = application_entity.tax_households.flat_map(&:tax_household_members).map(&:product_eligibility_determination)
               event_name =
                 if peds.all?(&:is_ia_eligible)
                   :aptc_eligible
@@ -53,14 +59,23 @@ module FinancialAssistance
                 else
                   :mixed_determination
                 end
+              event_key = "notice.determined_#{event_name}"
 
-              payload = application.eligibility_response_payload
+              params = { payload: application_entity.to_h, event_name: event_key }
 
-              Eligibilities::PublishDetermination.new.call(payload, event_name.to_s)
+              Try do
+                ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call(params)
+              end.bind do |result|
+                if result.success?
+                  logger.info "Successfully Published for event determination_submission_requested, with params: #{params}"
+                else
+                  logger.info "Failed to publish for event determination_submission_requested, with params: #{params}, failure: #{result.failure}"
+                end
+              end
 
-              Success({ event: event_name, payload: mm_application })
+              Success("Successfully published the payload for event: #{event_key}")
             end
-            # rubocop:enable Metrics/CyclomaticComplexity
+            # rubocop:enable Metrics/CyclomaticComplexity, Style/MultilineBlockChain, Metrics/PerceivedComplexity
           end
         end
       end

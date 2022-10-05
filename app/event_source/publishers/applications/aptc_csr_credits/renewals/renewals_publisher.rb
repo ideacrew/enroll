@@ -11,7 +11,6 @@ module Publishers
           register_event 'renewed'
           register_event 'determination_requested'
           register_event 'determination_added'
-          register_event 'determination_notice_requested'
         end
       end
     end

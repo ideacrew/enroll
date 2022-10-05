@@ -3,6 +3,8 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
+# rubocop:disable Style/MultilineBlockChain
+
 module FinancialAssistance
   module Operations
     module Applications
@@ -21,9 +23,9 @@ module FinancialAssistance
               validated_params       = yield validate(params)
               latest_application     = yield find_latest_application(validated_params)
               renewal_draft_app      = yield renew_application(latest_application, validated_params)
-              result                 = yield generate_renewed_event(renewal_draft_app, validated_params[:renewal_year])
+              # result                 = yield generate_renewed_event(renewal_draft_app, validated_params[:renewal_year])
 
-              Success(result)
+              Success(renewal_draft_app)
             end
 
             private
@@ -60,7 +62,6 @@ module FinancialAssistance
               application
             end
 
-            # rubocop:disable Style/MultilineBlockChain
             def create_renewal_draft_application(application, validated_params)
               Try() do
                 ::FinancialAssistance::Operations::Applications::Copy.new
@@ -90,29 +91,30 @@ module FinancialAssistance
                 end
               end.to_result
             end
-            # rubocop:enable Style/MultilineBlockChain
 
             def calculate_renewal_base_year(application)
               return application.renewal_base_year if application.renewal_base_year.present?
               application.calculate_renewal_base_year
             end
 
-            def generate_renewed_event(_application, _renewal_year)
-  # { payload: { application_id: application.id.to_s, renewal_year: renewal_year }, event_name: 'renewed' }
-              Success("")
-  # Try do
-  #   ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call(params)
-  # end.bind do |result|
-  #   if result.success?
-  #     Success("#{result.success} for application id: #{application.id}")
-  #   else
-  #     Failure(result.failure)
-  #   end
-  # end
+            def generate_renewed_event(application, renewal_year)
+              params = { payload: { application_id: application.id.to_s, renewal_year: renewal_year }, event_name: 'renewed' }
+
+              Try do
+                ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call(params)
+              end.bind do |result|
+                if result.success?
+                  Success("#{result.success} for application id: #{application.id}")
+                else
+                  Failure(result.failure)
+                end
+              end
             end
+
           end
         end
       end
     end
   end
 end
+# rubocop:enable Style/MultilineBlockChain
