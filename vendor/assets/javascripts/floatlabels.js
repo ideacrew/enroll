@@ -66,7 +66,7 @@
                     'opacity'                       : '0',
                     'font-size'                     : '11px',
                     'font-weight'                   : 'bold',
-                    'color'                         : '#838780'
+                    'color'                         : 'var(--floatlabel-color)'
                 });
                 if( !settings.slideInput ) {                    
                     thisElement.css({ 'padding-top' : this.inputPaddingTop });
@@ -74,8 +74,8 @@
                 thisElement.on('keyup blur change', function( e ) {
                     self.checkValue( e );
                 });
-                thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : '#838780' }); });
-                thisElement.on('focus', function() { thisElement.prev('label').css({ 'color' : '#2996cc' }); });
+                thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : 'var(--floatlabel-color)' }); });
+                thisElement.on('focus', function() { thisElement.prev('label').css({ 'color' : 'var(--floatlabel-onclick-color)' }); });
                 window.setTimeout( function() {
                     self.$label.css( animationCss );
                     self.$element.css( animationCss );
