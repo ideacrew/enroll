@@ -131,7 +131,7 @@ module Operations
         end
 
         def publish_slcsp_determined_response(mm_application)
-          Success event("events.enroll.iap.benchmark_products.slcsp_determined", attributes: mm_application.to_h).value!.publish
+          Success event("events.iap.benchmark_products.slcsp_determined", attributes: mm_application.to_h).value!.publish
         end
       end
     end
