@@ -11,7 +11,6 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas do
       {
         family_id: family.id,
         effective_date: start_of_year,
-        exchange_provided_code: rating_area.exchange_provided_code,
         households: [
           {
             household_id: 'a12bs6dbs1',
