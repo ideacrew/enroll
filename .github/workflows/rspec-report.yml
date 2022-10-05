@@ -12,29 +12,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        folder: [
-            # 'client_config',
-            # 'components',
-            # 'concerns',
+        folder:
+          [
+            'client_config',
+            'components',
+            'concerns',
             'controllers',
-            # 'data_migrations',
-            # 'domain',
-            # 'helpers',
-            # 'interactors',
-            # 'invoices',
-            # 'lib',
-            # 'mailers',
-            # 'models',
-            # 'notices',
-            # 'policies',
-            # 'reflexes',
-            # 'requests',
-            # 'reports',
-            # 'routing',
-            # 'script',
-            # 'test_data',
+            'data_migrations',
+            'domain',
+            'helpers',
+            'interactors',
+            'invoices',
+            'lib',
+            'mailers',
+            'models',
+            'notices',
+            'policies',
+            'reflexes',
+            'requests',
+            'reports',
+            'routing',
+            'script',
+            'test_data',
             'views',
-            # 'workers',
+            'workers',
           ]
     runs-on: ubuntu-latest
     services:
@@ -74,6 +75,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -104,13 +106,13 @@ jobs:
       matrix:
         folder:
           [
-            # 'benefit_markets',
-            # 'benefit_sponsors',
-            # 'financial_assistance',
+            'benefit_markets',
+            'benefit_sponsors',
+            'financial_assistance',
             'notifier',
-            # 'sponsored_benefits',
-            # 'transport_gateway',
-            # 'transport_profiles',
+            'sponsored_benefits',
+            'transport_gateway',
+            'transport_profiles',
           ]
     runs-on: ubuntu-latest
     services:
@@ -150,6 +152,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
