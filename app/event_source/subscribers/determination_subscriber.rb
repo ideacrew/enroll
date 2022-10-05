@@ -17,10 +17,10 @@ module Subscribers
       logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
 
       payload = JSON.parse(response, symbolize_names: true)
-      application_monad = FinancialAssistance::Operations::Application::FindByHbxId.new.call(payload[:hbx_id])
+      applications = ::FinancialAssistance::Application.by_hbx_id(payload[:hbx_id])
 
-      if application_monad.success?
-        workflow_state_transitions = application_monad.success.workflow_state_transitions
+      if applications.present?
+        workflow_state_transitions = applications.first.workflow_state_transitions
 
         result =
           if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
