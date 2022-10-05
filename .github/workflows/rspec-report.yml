@@ -93,8 +93,8 @@ jobs:
       - name: run webpack
         run: ./bin/webpack
       - name: Run tests
-        run: bundle exec rspec spec/${{ matrix.folder }}
-        # run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
+        # run: bundle exec rspec spec/${{ matrix.folder }}
+        run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
