@@ -42,7 +42,6 @@ Feature: Broker quote creation
   
     Examples:
       | contribution_pct |
-      | 0                |
       | 50               |
       | 100              |
 
@@ -60,6 +59,5 @@ Feature: Broker quote creation
     
     Examples:
       | contribution_pct |
-      | 0                |
       | 50               |
       | 100              |
