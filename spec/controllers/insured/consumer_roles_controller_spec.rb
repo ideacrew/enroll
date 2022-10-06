@@ -800,6 +800,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family.id, applicants: [applicant])}
 
         it 'should redirect to draft application edit page' do
+          binding.irb
           edit_application_path = FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last
           get :help_paying_coverage
           expect(response).to have_http_status(:redirect)

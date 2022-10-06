@@ -231,10 +231,7 @@ class Insured::ConsumerRolesController < ApplicationController
                                       else
                                         insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
                                       end
-          draft_application = @person.primary_family&.draft_financial_assistance_application
-          draft_application_url = financial_assistance.edit_application_path(id: draft_application.id) if draft_application
           redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-          redirect_path = draft_application_url if draft_application_url && EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
           redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
         else
@@ -340,10 +337,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage_redirect_path(result)
     ivl_oe_end_date = Settings.aca.individual_market.open_enrollment.end_on
-    draft_application = @person.primary_family&.draft_financial_assistance_application
-
     return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection) && ivl_oe_end_date >= TimeKeeper.date_of_record
-    return financial_assistance.edit_application_path(id: draft_application.id) if draft_application && EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
     financial_assistance.application_checklist_application_path(id: result.success)
   end
 
