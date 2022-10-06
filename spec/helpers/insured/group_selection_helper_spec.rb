@@ -984,4 +984,49 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       expect(helper.class_for_ineligible_row(@member, true).include?("is_primary")).to eq true
     end
   end
+
+  describe "#family_member_eligible_for_mdcr" do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:person2) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:person3) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:family_member) { family.primary_applicant }
+    let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+    let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
+
+    let!(:household) { FactoryBot.create(:household, family: family) }
+
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: household) }
+    let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household, is_medicaid_chip_eligible: true) }
+    let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household, is_medicaid_chip_eligible: false) }
+
+    let!(:tax_household2) { FactoryBot.create(:tax_household, household: household) }
+    let!(:tax_household_member3) { FactoryBot.create(:tax_household_member, applicant_id: family_member3.id, tax_household: tax_household, is_medicaid_chip_eligible: true) }
+
+    before do
+      assign(:family, family)
+      allow(family).to receive(:households).and_return [household]
+    end
+
+    context "when family member is eligible" do
+      it "should return true" do
+        expect(helper.family_member_eligible_for_mdcr(family_member)).to eq true
+      end
+    end
+
+    context "when family member is NOT eligible" do
+      it "should return false" do
+        expect(helper.family_member_eligible_for_mdcr(family_member2)).to eq false
+      end
+    end
+
+    context "when family is multitax" do
+      it "should return true" do
+        expect(helper.family_member_eligible_for_mdcr(family_member3)).to eq true
+      end
+    end
+
+  end
+
 end
