@@ -11,7 +11,7 @@ module Operations
       include EventSource::Command
 
       def call(event_name:, enrollment:)
-        values              = yield validate(event_name, enrollment)
+        _values              = yield validate(event_name, enrollment)
         payload             = yield build_payload(enrollment)
         validated_payload   = yield validate_payload(payload)
         entity              = yield family_entity(validated_payload)
