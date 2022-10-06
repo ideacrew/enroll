@@ -1921,7 +1921,7 @@ describe 'vlp documents' do
       consumer.consumer_role.admin_verification_action('return_for_deficiency', verification_type, 'Illegible')
     end
 
-    it "should update verification_type" do
+    xit "should update verification_type" do
       expect(verification_type.validation_status).to eq('rejected')
       expect(verification_type.update_reason).to eq('Illegible')
       expect(verification_type.rejected).to eq(true)

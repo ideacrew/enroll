@@ -137,15 +137,6 @@
         <h3 data-cuke='next_steps'><b><%= l10n("faa.results.next_steps") %></b></h3>
 
         <% if @application.applicants_applying_coverage.all?(&:is_medicaid_chip_eligible) %>
-          <!-- Green next step box -->
-          <% unless ((action_name == "eligibility_results" || action_name == "review" ) && (params.keys.exclude?"cur")) || @application.applicants.all?(&:is_totally_ineligible) %>
-            <p data-cuke='medicaid_eligible_next_steps'><%= l10n("faa.results.medicaid_eligible_next_steps") %></p>
-            <ul>
-              <li data-cuke='medicaid_eligible_step1'><%= l10n("faa.results.medicaid_eligible_step1") %></li>
-              <li data-cuke='medicaid_eligible_step2'><%= l10n("faa.results.medicaid_eligible_step2") %></li>
-            </ul>
-          <% end %>
-          <!-- End Green next step box -->
           <h5 data-cuke='all_medicaid_next_steps_continue_text'><%= l10n("faa.results.all_medicaid_next_steps_continue_text",
                                                                          short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></h5>
         <% else %>
