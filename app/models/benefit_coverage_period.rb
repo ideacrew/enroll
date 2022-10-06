@@ -195,9 +195,10 @@ class BenefitCoveragePeriod
         resident_role = family_member.person.resident_role if family_member.person.is_resident_role_active?
         rule = if resident_role.nil?
                  InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: attrs[:coverage_kind], family: attrs[:family],
-                                                                        new_effective_on: attrs[:effective_on],  market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids]})
+                                                                        new_effective_on: attrs[:effective_on],  market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids], csr_kind: attrs[:csr_kind]})
                else
-                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: attrs[:coverage_kind], family: attrs[:family], market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids])
+                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: attrs[:coverage_kind], family: attrs[:family], market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids],
+                                                                      csr_kind: attrs[:csr_kind])
                end
         satisfied = false and break unless rule.satisfied?[0]
       end
