@@ -234,7 +234,7 @@ class Insured::ConsumerRolesController < ApplicationController
           draft_application = @person.primary_family&.draft_financial_assistance_application
           draft_application_url = financial_assistance.edit_application_path(id: draft_application.id) if draft_application
           redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-          redirect_path =  draft_application_url if draft_application_url && EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
+          redirect_path = draft_application_url if draft_application_url && EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
           redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
         else
@@ -299,7 +299,6 @@ class Insured::ConsumerRolesController < ApplicationController
 
       draft_application = @person.primary_family&.draft_financial_assistance_application if EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
       redirect_to financial_assistance.edit_application_path(id: draft_application.id) if draft_application.present?
-      # consumer_redirection_path = draft_application_url.present? ? draft_application_url : help_paying_coverage_insured_consumer_role_index_path
     else
       render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
     end

@@ -128,7 +128,7 @@ class HbxIdGenerator
     end
 
     def self.random_uuid
-      SecureRandom.random_number(999999).to_i
+      SecureRandom.uuid.gsub("-","")
     end
 
     def self.generate_application_id
