@@ -12,5 +12,9 @@ module Publishers
     register_event 'fourth_verifications_reminder'
     register_event 'enrollment_saved'
     register_event 'coverage_selected'
+    register_event 'initial_purchase'
+    register_event 'auto_renew'
+    register_event 'terminated'
+
   end
 end
