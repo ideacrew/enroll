@@ -19,6 +19,7 @@ class InsuredEligibleForBenefitRule
     @new_effective_on = options[:new_effective_on]
     @market_kind = options[:market_kind]
     @shopping_family_member_ids = options[:shopping_family_members_ids]
+    @csr_kind = options[:csr_kind]
   end
 
   def setup
@@ -106,11 +107,15 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
-    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
-    return true if tax_household.blank?
-
     cost_sharing = @benefit_package.cost_sharing
-    csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      csr_kind = @csr_kind
+    else
+      tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
+      return true if tax_household.blank?
+
+      csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
+    end
     return true if csr_kind.blank? || cost_sharing.blank?
     csr_kind == cost_sharing
   end

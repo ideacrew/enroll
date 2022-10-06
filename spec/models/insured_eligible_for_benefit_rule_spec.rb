@@ -132,6 +132,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_package_with_current_date_start_on) { FactoryBot.build(:benefit_package) }
 
+    before do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+    end
+
     it "should return true when csr_kind is blank" do
       allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return tax_household
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family, shopping_family_members_ids: mikes_family.family_members.map(&:id))
@@ -157,6 +161,24 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
       rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id))
       expect(rule.is_cost_sharing_satisfied?).to eq false
+    end
+
+    context 'mthh enabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return false when cost_sharing is not equal to csr_kind" do
+        benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
+        rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_73')
+        expect(rule.is_cost_sharing_satisfied?).to eq false
+      end
+
+      it "should return true when cost_sharing is not equal to csr_kind" do
+        benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
+        rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_100')
+        expect(rule.is_cost_sharing_satisfied?).to eq true
+      end
     end
   end
 
