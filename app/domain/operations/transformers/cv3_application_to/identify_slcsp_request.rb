@@ -54,7 +54,10 @@ module Operations
         end
 
         def households(cv3_application)
-          aptc_tax_households = cv3_application.tax_households.select(&:aptc_csr_eligible?)
+          aptc_tax_households = cv3_application.tax_households.select do |thh|
+            thh.aptc_members_aged_below_19(cv3_application.aptc_effective_date).present?
+          end
+
           aptc_tax_households.collect do |tax_household|
             { household_id: tax_household.hbx_id, members: members(tax_household.aptc_csr_eligible_members) }
           end
