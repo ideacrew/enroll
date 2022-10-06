@@ -7,9 +7,13 @@ concurrency:
   group: cucumber-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  RAILS_ENV: 'test'
+
 jobs:
   cucumber-report:
     strategy:
+      fail-fast: false
       matrix:
         feature:
           [
@@ -81,6 +85,8 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
+      - name: run webpack
+        run: ./bin/webpack
       - name: Run tests
         run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
