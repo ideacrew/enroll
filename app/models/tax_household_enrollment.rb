@@ -16,4 +16,11 @@ class TaxHouseholdEnrollment
 
   embeds_many :tax_household_members_enrollment_members, class_name: "::TaxHouseholdMemberEnrollmentMember", cascade_callbacks: true
 
+  def enrollment
+    HbxEnrollment.find(enrollment_id)
+  end
+
+  def tax_household
+    enrollment.family.tax_household_groups.flat_map(&:tax_households).detect{ |th| th.id.to_s == tax_household_id.to_s }
+  end
 end
