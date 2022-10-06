@@ -290,13 +290,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - name: Restore project gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install Test Boosters gem
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
@@ -313,7 +306,7 @@ jobs:
       - name: Run tests
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
-          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
+          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
     runs-on: ubuntu-latest
