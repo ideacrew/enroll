@@ -41,6 +41,7 @@ module Operations
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: transform_households(family.households)) if family.households.present?
+          payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
           failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
           return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
           Success(payload)
@@ -200,6 +201,20 @@ module Operations
           end
         end
 
+        def transform_tax_household_groups(tax_household_groups)
+          tax_household_groups.collect do |th_group|
+            {
+              hbx_id: th_group.hbx_id,
+              assistance_year: th_group.assistance_year,
+              start_on: th_group.start_on,
+              end_on: th_group.end_on,
+              source: th_group.source,
+              application_hbx_id: th_group.application_id,
+              tax_households: transform_tax_households(th_group.tax_households)
+            }
+          end
+        end
+
         def transform_coverage_households(households)
           households.collect do |household|
             {
@@ -221,7 +236,10 @@ module Operations
               effective_starting_on: household.effective_starting_on,
               effective_ending_on: household.effective_ending_on,
               tax_household_members: transform_tax_household_members(household.tax_household_members),
-              eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations)
+              eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations),
+              yearly_expected_contribution: household.yearly_expected_contribution,
+              eligibility_determination_hbx_id: household.eligibility_determination_hbx_id,
+              max_aptc: household.max_aptc
             }
           end
         end
@@ -267,11 +285,27 @@ module Operations
           members.collect do |member|
             {
               family_member_reference: transform_family_member_reference(member),
-              # product_eligibility_determination: member.product_eligibility_determination,
+              product_eligibility_determination: product_eligibility_determination_hash(member),
               is_subscriber: member.is_subscriber,
               reason: member.reason
             }
           end
+        end
+
+        def product_eligibility_determination_hash(member)
+          {
+            is_ia_eligible: member.is_ia_eligible,
+            is_medicaid_chip_eligible: member.is_medicaid_chip_eligible,
+            is_non_magi_medicaid_eligible: member.is_non_magi_medicaid_eligible,
+            is_totally_ineligible: member.is_totally_ineligible,
+            is_without_assistance: member.is_without_assistance,
+            magi_medicaid_monthly_household_income: member.magi_medicaid_monthly_household_income,
+            medicaid_household_size: member.medicaid_household_size,
+            magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit,
+            magi_as_percentage_of_fpl: member.magi_as_percentage_of_fpl,
+            magi_medicaid_category: member.magi_medicaid_category,
+            csr: member.csr_percent_as_integer
+          }
         end
 
         def transform_family_members(family_members)
