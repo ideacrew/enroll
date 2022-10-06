@@ -4,7 +4,7 @@
 class IvlCostSavings
 
   def self.actions_dropdown
-    'button[id="dropdown_for_"]'
+    '.btn.btn-default.dropdown-toggle'
   end
 
   def self.select_copy_to_new_application
@@ -21,5 +21,9 @@ class IvlCostSavings
 
   def self.submit_new_application_btn
     'input[value="Start new application"]'
+  end
+
+  def self.select_transfer_history
+    '.interaction-click-control-transfer-history'
   end
 end

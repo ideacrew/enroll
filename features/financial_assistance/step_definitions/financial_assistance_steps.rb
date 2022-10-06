@@ -403,6 +403,31 @@ And(/^they should be taken back to the application's details page for deduction$
   page.should have_content("Income Adjustments for #{application.applicant.first.first_name}")
 end
 
+
+Given(/^the Transfer history feature configuration is enabled$/) do
+  enable_feature :transfer_history_page, {registry_name: FinancialAssistanceRegistry}
+end
+
+When(/^admin clicks on the Cost Savings link$/) do
+  find_link('Cost Savings', wait: 10).click
+end
+
+When(/^admin clicks on actions dropdown$/) do
+  find(IvlCostSavings.actions_dropdown, wait: 10).click
+end
+
+Then(/^admin should see Transfer history$/) do
+  expect(page).to have_content "Transfer History"
+end
+
+Then(/^Transfer History page should display$/) do
+  expect(page).to have_content('Transfer History')
+end
+
+When(/^admin clicks on Transfer History$/) do
+  find(IvlCostSavings.select_transfer_history).click
+end
+
 Given(/^the primary caretaker question configuration is enabled$/) do
   enable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
 end
