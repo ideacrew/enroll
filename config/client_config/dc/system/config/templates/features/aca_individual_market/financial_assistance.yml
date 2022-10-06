@@ -117,6 +117,9 @@ registry:
         is_enabled: true
       - key: :temporary_configuration_enable_multi_tax_household_feature
         is_enabled: <%= ENV['TEMPORARY_CONFIGURATION_OF_MULTI_TAX_HOUSEHOLD_FEATURE_IS_ENABLED'] || false %>
+      - key: :draft_application_after_ridp
+        item: :draft_application_after_ridp
+        is_enabled: <%= ENV['DRAFT_APPLICATION_AFTER_RIDP_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
