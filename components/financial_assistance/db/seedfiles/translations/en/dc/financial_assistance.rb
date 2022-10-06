@@ -51,7 +51,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligible_for_medicaid" => "These people <span>likely qualify</span> for ",
   "en.faa.eligible_for_medicaid2" => "&#58", # use html character code for colon so l10n helper doesn't break
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
-  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
+  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling District Direct at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
   "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums. The monthly premium reduction is %{reduction_amount} per month </strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
@@ -142,6 +142,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.i_understand_evaluation_3" => "",
   "en.faa.anyone_found_eligible_1" => "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, ",
   "en.faa.anyone_found_eligible_2" => "legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. ",
+  "en.faa.anyone_found_eligible_3" => "",
   "en.faa.parent_living_outside_of_home_1" => "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",

@@ -32,7 +32,7 @@ module ChildcareSubsidyConcern
     end
 
     def create_or_term_eligibility(eligibility_params)
-      if osse_eligible?(eligibility_params[:effective_date])
+      if is_osse_eligibility_satisfied?(eligibility_params[:effective_date])
         return if eligibility_params[:evidence_value] == 'true'
         terminate_eligibility(eligibility_params)
       elsif eligibility_params[:evidence_value] == 'true'

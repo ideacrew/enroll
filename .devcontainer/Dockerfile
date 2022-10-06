@@ -11,7 +11,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends libsodium23
 
 # [Optional] Uncomment this line to install additional gems.
-RUN gem install bundler -v 2.3.16
+RUN gem install bundler -v 2.3.23
 
 RUN gem update --system
 
