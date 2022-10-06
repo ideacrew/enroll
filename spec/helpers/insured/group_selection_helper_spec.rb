@@ -996,7 +996,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
 
     let!(:household) { FactoryBot.create(:household, family: family) }
-  
+
     let!(:tax_household) { FactoryBot.create(:tax_household, household: household) }
     let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household, is_medicaid_chip_eligible: true) }
     let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household, is_medicaid_chip_eligible: false) }
@@ -1005,7 +1005,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     let!(:tax_household_member3) { FactoryBot.create(:tax_household_member, applicant_id: family_member3.id, tax_household: tax_household, is_medicaid_chip_eligible: true) }
 
     before do
-      assign(:"family", family)
+      assign(:family, family)
       allow(family).to receive(:households).and_return [household]
     end
 
