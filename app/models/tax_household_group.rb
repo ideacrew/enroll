@@ -30,7 +30,8 @@ class TaxHouseholdGroup
   before_save :generate_hbx_id
 
   index({ application_id:  1 })
-  index({ effective_ending_on:  1 })
+  index({ start_on:  1 })
+  index({ end_on:  1 })
   index({ assistance_year:  1 })
 
   # Scopes
@@ -41,6 +42,6 @@ class TaxHouseholdGroup
   private
 
   def generate_hbx_id
-    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_tax_household_group_id) if hbx_id.blank?
+    write_attribute(:hbx_id, HbxIdGenerator.generate_tax_household_group_id) if hbx_id.blank?
   end
 end
