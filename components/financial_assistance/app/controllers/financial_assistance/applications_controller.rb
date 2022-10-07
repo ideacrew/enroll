@@ -305,9 +305,9 @@ module FinancialAssistance
 
     def update_application_year
       new_year = params[:application][:assistance_year]
-      if new_year && new_year != @application.assistance_year
-        @application.update_attributes(assistance_year: new_year)
-      end
+
+      @application.update_attributes(assistance_year: new_year) if new_year && new_year != @application.assistance_year
+
       redirect_to application_checklist_application_path(@application)
     end
 
