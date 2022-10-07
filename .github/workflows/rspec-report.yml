@@ -1,6 +1,6 @@
 name: rspec report
 on:
-  # push:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -16,9 +16,11 @@ jobs:
             'controllers',
             'data_migrations',
             'domain',
+            'event_source',
             'helpers',
             'interactors',
             'invoices',
+            'jobs',
             'lib',
             'mailers',
             'models',
