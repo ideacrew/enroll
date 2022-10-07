@@ -46,6 +46,7 @@ module Operations
         def construct_payload(cv3_application)
           payload = {
             family_id: @family.id,
+            application_hbx_id: cv3_application.hbx_id,
             effective_date: cv3_application.aptc_effective_date,
             households: households(cv3_application)
           }

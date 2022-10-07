@@ -20,9 +20,10 @@ module Operations
 
           mm_application           = yield initialize_application(params)
           @family, request_payload = yield construct_request_payload(mm_application)
-          benchmark_product        = yield identify_slcsp(request_payload)
+          benchmark_product        = yield identify_slcsp_with_pediatric_dental_costs(request_payload)
           mm_application           = yield add_benchmark_product_to_application(mm_application, benchmark_product)
-          _published               = yield publish_slcsp_determined_response(mm_application)
+          event                    = yield build_event(mm_application)
+          _published               = yield publish_slcsp_determined_response(event)
 
           Success(mm_application)
         end
@@ -37,7 +38,7 @@ module Operations
           Operations::Transformers::Cv3ApplicationTo::IdentifySlcspRequest.new.call(mm_application)
         end
 
-        def identify_slcsp(request_payload)
+        def identify_slcsp_with_pediatric_dental_costs(request_payload)
           Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(request_payload)
         end
 
@@ -131,8 +132,14 @@ module Operations
             person_hbx_id: family_member.hbx_id }
         end
 
-        def publish_slcsp_determined_response(mm_application)
-          Success event("events.iap.benchmark_products.slcsp_determined", attributes: mm_application.to_h).value!.publish
+        def build_event(mm_application)
+          event('events.iap.benchmark_products.slcsp_determined', attributes: mm_application.to_h)
+        end
+
+        def publish_slcsp_determined_response(event)
+          event.publish
+
+          Success('Successfully published MagiMedicaid Application Entity Hash with Second Lowest Cost Ehb Premium with Pediatric Dental Costs')
         end
       end
     end
