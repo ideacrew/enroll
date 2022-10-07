@@ -797,7 +797,8 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
         let!(:primary) { family.primary_family_member }
         let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, family_member_id: primary.id, person_hbx_id: primary.hbx_id) }
-        let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family.id, applicants: [applicant])}
+        let!(:assistance_year) { FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! }
+        let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', assistance_year: assistance_year, family_id: family.id, applicants: [applicant])}
 
         it 'should redirect to draft application edit page' do
           edit_application_path = FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last
