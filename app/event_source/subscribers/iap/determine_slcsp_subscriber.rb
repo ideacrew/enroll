@@ -12,7 +12,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
       subscriber_logger.info "on_determine_slcsp: payload: #{payload}"
 
-      process_determine_slcsp(subscriber_logger, payload) if !Rails.env.test?
+      process_determine_slcsp(subscriber_logger, payload) unless Rails.env.test?
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -30,11 +30,11 @@ module Subscribers
         subscriber_logger.info "process_determine_slcsp: success: #{result.success}"
       else
         err_messages = if result.failure.is_a?(Dry::Validation::Result)
-          result.failure.errors.to_h
-        else
-          result.failure
-        end
-        subscriber_logger.info "process_determine_slcsp: failure: #{errors}"
+                         result.failure.errors.to_h
+                       else
+                         result.failure
+                       end
+        subscriber_logger.info "process_determine_slcsp: failure: #{err_messages}"
       end
       subscriber_logger.info "process_determine_slcsp: ------- end"
     rescue StandardError => e
