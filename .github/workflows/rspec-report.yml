@@ -101,7 +101,7 @@ jobs:
             'transport_gateway',
             'transport_profiles',
           ]
-    runs-on: ubuntu-latest
+    runs-on: 8-core
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
