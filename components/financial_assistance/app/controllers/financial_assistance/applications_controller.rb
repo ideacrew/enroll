@@ -108,7 +108,8 @@ module FinancialAssistance
       if copy_result.success?
         @application = copy_result.success
         @application.set_assistance_year
-        assistance_year_page = HbxProfile&.current_hbx&.under_open_enrollment? && EnrollRegistry.feature_enabled?(:iap_year_selection)
+        oe_range = (Settings.aca.individual_market.open_enrollment.start_on...Settings.aca.individual_market.open_enrollment.end_on)
+        assistance_year_page = oe_range.include?(TimeKeeper.date_of_record) && EnrollRegistry.feature_enabled?(:iap_year_selection)
         redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
 
         redirect_to redirect_path
