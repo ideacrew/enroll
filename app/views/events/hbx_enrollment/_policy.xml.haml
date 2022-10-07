@@ -31,8 +31,8 @@
       %individual_market
         %is_carrier_to_bill= (hbx_enrollment.has_child_care_subsidy? ? false : true)
         %applied_aptc_amount= (hbx_enrollment.applied_aptc_amount).round(2)
-    %premium_total_amount=  (hbx_enrollment.is_ivl_by_kind? ? hbx_enrollment.total_premium : hbx_enrollment.decorated_hbx_enrollment.product_cost_total).to_f.round(2)
-    %total_responsible_amount= policy_responsible_amount(hbx_enrollment)
+    %premium_total_amount=  (hbx_enrollment.is_ivl_by_kind? ? hbx_enrollment.total_premium: hbx_enrollment.decorated_hbx_enrollment.product_cost_total).to_f.round(2)
+    %total_responsible_amount= (hbx_enrollment.is_ivl_by_kind? ? (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f): (hbx_enrollment.decorated_hbx_enrollment.product_cost_total - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total)).to_f.round(2)
     - if hbx_enrollment.has_premium_credits?
       = render :partial => "events/hbx_enrollment/premium_credits", :locals=> {:hbx_enrollment => hbx_enrollment}
     - if (hbx_enrollment.is_shop? || EnrollRegistry[:enroll_app].setting(:send_rating_area_for_ivl_policy_to_edi).item) && hbx_enrollment.rating_area.present?
