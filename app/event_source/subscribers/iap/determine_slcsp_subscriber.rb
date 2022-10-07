@@ -8,20 +8,42 @@ module Subscribers
     # :on_magi_medicaid_iap_benchmark_products
     # subscribe(:on_magi_medicaid_iap_benchmark_products) do |delivery_info, _metadata, response|
     subscribe(:on_determine_slcsp) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_determine_slcsp)
       payload = JSON.parse(response, symbolize_names: true)
-      logger.debug "on_determine_slcsp: payload: #{payload}"
+      subscriber_logger.info "on_determine_slcsp: payload: #{payload}"
+
+      process_determine_slcsp(subscriber_logger, payload) if !Rails.env.test?
+
+      ack(delivery_info.delivery_tag)
+    rescue StandardError, SystemStackError => e
+      logger.info "on_determine_slcsp: error: #{e} backtrace: #{e.backtrace}"
+      ack(delivery_info.delivery_tag)
+    end
+
+    private
+
+    def process_determine_slcsp(subscriber_logger, payload)
+      subscriber_logger.info "process_determine_slcsp: ------- start"
       result = ::Operations::Subscribers::ProcessRequests::DetermineSlcsp.new.call(payload)
 
       if result.success?
-        logger.debug "on_determine_slcsp: success: #{ap result.success} acked"
+        subscriber_logger.info "process_determine_slcsp: success: #{result.success}"
       else
-        errors = result.failure.errors.to_h
-        logger.debug "on_determine_slcsp: acked (nacked) due to:#{errors}"
+        err_messages = if result.failure.is_a?(Dry::Validation::Result)
+          result.failure.errors.to_h
+        else
+          result.failure
+        end
+        subscriber_logger.info "process_determine_slcsp: failure: #{errors}"
       end
-      ack(delivery_info.delivery_tag)
-    rescue StandardError, SystemStackError => e
-      logger.debug "on_determine_slcsp: error: #{e} backtrace: #{e.backtrace}; acked (nacked)"
-      ack(delivery_info.delivery_tag)
+      subscriber_logger.info "process_determine_slcsp: ------- end"
+    rescue StandardError => e
+      subscriber_logger.info "process_determine_slcsp: error: #{e} backtrace: #{e.backtrace}"
+      subscriber_logger.info "process_determine_slcsp: ------- end"
+    end
+
+    def subscriber_logger_for(event)
+      Logger.new("#{Rails.root}/log/#{event}_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     end
   end
 end
