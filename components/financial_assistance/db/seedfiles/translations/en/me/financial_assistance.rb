@@ -155,11 +155,13 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.send_to_external_verification" => "Send to OFI",
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   # Year Selection page
-  "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
-  "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
+  "en.faa.year_selection_header" => "Which Year Would You Like To Apply For?",
+  "en.faa.year_selection_subheader" => "Select which plan year you would like to apply for and then select CONTINUE.",
+  "en.faa.assitance_year_option1" => "%{year} Open Enrollment",
+  "en.faa.assitance_year_option2" => "%{year} Report a Life Change",
   "en.faa.year_selection_oe_year" => " Open Enrollment",
-  "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
-  "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
+  "en.faa.see_if_you_qualify_1" => "Select to see if you qualify for lower monthly premiums on your %{short_name} insurance plan or %{medicaid_or_chip_program_short_name}.",
+  "en.faa.see_if_you_qualify_2" => "Select if you have experienced a life change and need to update your current enrollment or see if you qualify for lower monthly premiums or %{medicaid_or_chip_program_short_name}",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
