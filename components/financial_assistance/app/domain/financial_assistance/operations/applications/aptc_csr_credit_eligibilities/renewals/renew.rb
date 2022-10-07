@@ -62,6 +62,17 @@ module FinancialAssistance
               application
             end
 
+            # I agree + 5 years
+            ### Copy application via UI — I agree, 5 years to renew
+            ### Copy application via renewal - I agree, -1 years to renew
+            # I disagree + x years
+            ### Copy application via UI - I disagree + x years
+            ### Copy application via renewal - I disagree + (x years - 1)
+            # I agree + <5 years
+            ### Copy application via UI - I agree, 5 years to renew
+            ### Copy application via renewal - I agree + (x years -1)
+
+            # If years to renew is 0, set to income_verification_extension_required
             def create_renewal_draft_application(application, validated_params)
               Try() do
                 ::FinancialAssistance::Operations::Applications::Copy.new
@@ -74,9 +85,9 @@ module FinancialAssistance
                 calculated_renewal_base_year = calculate_renewal_base_year(application)
 
                 renewal_application.assign_attributes(
-                  aasm_state: family_members_changed ? 'applicants_update_required' : 'renewal_draft',
+                  aasm_state: find_aasm_state(application, family_members_changed),
                   assistance_year: validated_params[:renewal_year],
-                  years_to_renew: application.years_to_renew || 0,
+                  years_to_renew: calculate_years_to_renew(application),
                   renewal_base_year: calculated_renewal_base_year,
                   predecessor_id: application.id,
                   full_medicaid_determination: application.full_medicaid_determination,
@@ -90,6 +101,22 @@ module FinancialAssistance
                   Failure("Renewal Application Applicants Update required - #{renewal_application.hbx_id}")
                 end
               end.to_result
+            end
+
+            def find_aasm_state(application, family_members_changed)
+              if application.years_to_renew == 0 || application.years_to_renew.nil?
+                'income_verification_extension_required'
+              else
+                family_members_changed ? 'applicants_update_required' : 'renewal_draft'
+              end
+            end
+
+            def calculate_years_to_renew(application)
+              if application.years_to_renew > 0
+                application.years_to_renew.to_i - 1
+              else
+                application.years_to_renew || 0
+              end
             end
 
             def calculate_renewal_base_year(application)
