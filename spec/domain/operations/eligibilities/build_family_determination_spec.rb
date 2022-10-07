@@ -166,7 +166,7 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
       expect(result.success).to be_a(Eligibilities::Determination)
     end
 
-    it 'should persist eligibility determination' do
+    xit 'should persist eligibility determination' do
       family.reload
       if family.eligibility_determination
         family.eligibility_determination.delete

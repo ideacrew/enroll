@@ -360,9 +360,15 @@ module BenefitSponsors
             }
           }
         end
-        let!(:profile_factory) { profile_factory_class.call(valid_employer_params_update) }
+        let(:profile_factory) { profile_factory_class.call(valid_employer_params_update) }
+        let!(:eligibility) { nil }
+        let(:osse_eligibility) { 'true' }
 
-        before { abc_organization.reload }
+        before do
+          valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => osse_eligibility)
+          profile_factory
+          abc_organization.reload
+        end
 
         it 'should update general organization legal_name' do
           expect(abc_organization.legal_name).to eq new_organization_name
@@ -382,12 +388,25 @@ module BenefitSponsors
           expect(abc_organization.dba).to eq plan_design_organization.dba
         end
 
-        context ".build_osse_eligibility" do
-          before do
-            valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => 'true')
+        context ".create_or_term_osse_eligibility" do
+          context 'create eligibility' do
+            let(:osse_eligibility) { 'true' }
+
+            it "should build eligibilities" do
+              expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
+            end
           end
-          it "should build eligibilities" do
-            expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
+
+          context 'terminate eligibility' do
+            let(:osse_eligibility) { 'false' }
+            let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
+            let!(:eligibility) do
+              benefit_sponsorship.eligibilities << ee_elig
+              benefit_sponsorship.save!
+              benefit_sponsorship.eligibilities.first
+            end
+
+            it { expect(benefit_sponsorship.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
           end
         end
       end
