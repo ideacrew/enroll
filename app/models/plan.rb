@@ -29,6 +29,7 @@ class Plan
   field :abbrev, type: String
   field :provider, type: String
   field :ehb, type: Float, default: 0.0
+  field :ehb_apportionment_for_pediatric_dental, type: Float
 
   field :renewal_plan_id, type: BSON::ObjectId
   field :cat_age_off_renewal_plan_id, type: BSON::ObjectId

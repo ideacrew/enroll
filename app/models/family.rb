@@ -92,6 +92,7 @@ class Family
   index({"households.tax_households.effective_starting_on" => 1})
   index({"households.tax_households.effective_ending_on" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
+  index({"tax_household_groups.tax_households._id" => 1})
 
   index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})

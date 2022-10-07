@@ -3167,7 +3167,7 @@ table.table-bordered.table-bordered {
 #employer .emp-info input[type="text"] {
     height: 48px;
 }
-::-webkit-input-placeholder {font-size: 14px;}
+::-webkit-input-placeholder {font-size: 14px; color: var(--placeholder-color) !important; font-weight: var(--placeholder-font-weight);}
 input[placeholder] {font-size: 14px !important;}
 input:-moz-placeholder {font-size: 14px !important;}
 .form-control:-moz-placeholder { /* Firefox 18- */
@@ -3218,7 +3218,7 @@ a.new-address-btn:hover {
     opacity: 1;
 }
 .label-floatlabel, input[type="text"], input[type="email"] {
-    color: #007bc3;
+    color: var(--input-text-color);
 }
 .rel {
     position: relative;
@@ -3239,7 +3239,7 @@ label {
     color: #999999;
 }
 .radio span {
-    color: #545454;
+    color: var(--form-element-text-color);
     font-size: 11px;
     margin-left: 20px;
 }
@@ -3706,7 +3706,7 @@ ul.list-right-section li {
 }
 ul.list-right-section li a {
     text-decoration: none;
-    color: #858585;
+    color: var(--placeholder-color);
     font-weight: 600;
 }
 ul.list-right-section li a img {
@@ -4252,7 +4252,7 @@ table.table.table-message-wrapper tr th.vtop {
   opacity: 1;
   font-size: 11px;
   font-weight: bold;
-  color: rgb(131, 135, 128);
+  color: var(--floatlabel-color);
   transition: all 0.1s ease-in-out 0s;
 }
 
@@ -4752,7 +4752,7 @@ position: absolute;
   color: #8af;
 }
 .no_ssn {
-  color: #666;
+  color: var(--form-element-text-color);
   font-size: 12px;
 }
 ul.list-qle {

@@ -65,19 +65,19 @@
           <li>
             <% if @current_step.to_i == 1 %>
               <%= link_to find_previous_from_step_one do %>
-                <%= image_tag 'icons/list.png' %>
+                <%# <%= image_tag 'icons/list.png' %> 
                 PREVIOUS
               <% end %>
             <% else %>
               <%= link_to previous_step_for do %>
-                <%= image_tag 'icons/list.png' %>
+                <%# <%= image_tag 'icons/list.png' %> 
                 PREVIOUS
               <% end %>
             <% end %>
           </li>
           <li>
             <a href="#">
-              <%= image_tag 'icons/list.png' %>
+              <%# <%= image_tag 'icons/list.png' %> 
               SAVE &amp; EXIT
             </a>
             <br>
