@@ -745,3 +745,71 @@ describe EventsHelper, "#order_ga_accounts_for_employer_xml" do
     end
   end
 end
+
+describe EventsHelper, "#policy_responsible_amount" do
+
+  subject { EventsHelperSlug.new }
+
+  let(:hbx_enrollment) do
+    instance_double(
+      HbxEnrollment,
+      total_premium: total_premium,
+      is_ivl_by_kind?: is_ivl_by_kind,
+      decorated_hbx_enrollment: decorated_hbx_enrollment,
+      eligible_child_care_subsidy: eligible_child_care_subsidy,
+      applied_aptc_amount: applied_aptc_amount,
+      has_child_care_subsidy?: has_child_care_subsidy
+    )
+  end
+
+  let(:decorated_hbx_enrollment) do
+    double(
+      {
+        sponsor_contribution_total: sponsor_contribution_total,
+        product_cost_total: product_cost_total
+      }
+    )
+  end
+
+  describe "given a IVL policy with OSSE" do
+    let(:is_ivl_by_kind) { true }
+    let(:has_child_care_subsidy) { true }
+    let(:total_premium) { 100.00 }
+    let(:product_cost_total) { total_premium }
+    let(:applied_aptc_amount) { 2.34 }
+    let(:eligible_child_care_subsidy) { 1.23 }
+    let(:sponsor_contribution_total) { 0.00 }
+
+    it "has the correct premium total" do
+      expect(subject.policy_responsible_amount(hbx_enrollment)).to eq 97.66
+    end
+  end
+
+  describe "given a SHOP policy with an OSSE amount" do
+    let(:is_ivl_by_kind) { false }
+    let(:has_child_care_subsidy) { true }
+    let(:total_premium) { 100.00 }
+    let(:product_cost_total) { total_premium }
+    let(:applied_aptc_amount) { 0.00 }
+    let(:eligible_child_care_subsidy) { 1.23 }
+    let(:sponsor_contribution_total) { 2.34 }
+
+    it "has the correct premium total" do
+      expect(subject.policy_responsible_amount(hbx_enrollment)).to eq 96.43
+    end
+  end
+
+  describe "given a SHOP policy with no OSSE amount" do
+    let(:is_ivl_by_kind) { false }
+    let(:has_child_care_subsidy) { false }
+    let(:total_premium) { 100.00 }
+    let(:product_cost_total) { total_premium }
+    let(:applied_aptc_amount) { 0.00 }
+    let(:eligible_child_care_subsidy) { 1.23 }
+    let(:sponsor_contribution_total) { 2.34 }
+
+    it "has the correct premium total" do
+      expect(subject.policy_responsible_amount(hbx_enrollment)).to eq 97.66
+    end
+  end
+end
