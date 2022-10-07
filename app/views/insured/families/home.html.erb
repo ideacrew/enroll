@@ -23,10 +23,13 @@
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
-      <%= render partial: "enrollment",
-                 :collection => enrollments,
-                 :as => :hbx_enrollment,
-                 locals: { read_only: false } %>
+
+      <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+        <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      <% else %>
+        <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      <% end %>
+      
       <%= render partial: 'shop_for_plans_widget' %>
       <% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
       <%= render partial: 'apply_for_medicaid_widget' %>
