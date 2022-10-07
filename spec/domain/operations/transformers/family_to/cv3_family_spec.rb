@@ -143,7 +143,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         is_ia_eligible: true,
         is_medicaid_chip_eligible: true,
         is_subscriber: true,
-        magi_medicaid_monthly_household_income: 50000
+        magi_medicaid_monthly_household_income: 50_000
       )
     end
 
