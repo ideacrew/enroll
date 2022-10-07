@@ -16,6 +16,7 @@ Feature: Employer can view their employees
     Given ABC Widgets employer is on Employee Roster page
     Then employer should not see bulk actions dropdown in DC
 
+  @flaky
   Scenario: Employer views their employees and terminates one employee
     Given employer selects one of their employees on Employee Roster
     When employer should see census employee's details
