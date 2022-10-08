@@ -293,6 +293,9 @@ class Insured::ConsumerRolesController < ApplicationController
       set_admin_bookmark_url
       @transaction_id = params[:id]
       @shop_coverage_result ||= params[:shop_coverage_result]
+
+      draft_application = @person.primary_family&.most_recent_and_draft_financial_assistance_application if EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
+      redirect_to financial_assistance.edit_application_path(id: draft_application.id) if draft_application.present?
     else
       render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
     end

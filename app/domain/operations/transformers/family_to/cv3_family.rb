@@ -237,9 +237,9 @@ module Operations
               effective_ending_on: household.effective_ending_on,
               tax_household_members: transform_tax_household_members(household.tax_household_members),
               eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations),
-              yearly_expected_contribution: household.yearly_expected_contribution,
-              eligibility_determination_hbx_id: household.eligibility_determination_hbx_id,
-              max_aptc: household.max_aptc
+              yearly_expected_contribution: household.yearly_expected_contribution&.to_hash,
+              eligibility_determination_hbx_id: household.eligibility_determination_hbx_id.to_s,
+              max_aptc: household.max_aptc&.to_hash
             }
           end
         end
@@ -299,9 +299,9 @@ module Operations
             is_non_magi_medicaid_eligible: member.is_non_magi_medicaid_eligible,
             is_totally_ineligible: member.is_totally_ineligible,
             is_without_assistance: member.is_without_assistance,
-            magi_medicaid_monthly_household_income: member.magi_medicaid_monthly_household_income,
+            magi_medicaid_monthly_household_income: member.magi_medicaid_monthly_household_income&.to_hash,
             medicaid_household_size: member.medicaid_household_size,
-            magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit,
+            magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit&.to_hash,
             magi_as_percentage_of_fpl: member.magi_as_percentage_of_fpl,
             magi_medicaid_category: member.magi_medicaid_category,
             csr: member.csr_percent_as_integer
