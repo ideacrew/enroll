@@ -28,7 +28,7 @@ module FinancialAssistance
               # Success(::Family.all_active_assistance_receiving_for_assistance_year(renewal_year.pred).all_enrollments.distinct(:id))
 
               family_ids = HbxEnrollment.enrolled.current_year.distinct(:family_id)
-              determined_family_ids = ::FinancialAssistance::Application.by_year(2021).where(:family_id.in => family_ids).distinct(:family_id)
+              determined_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).where(:family_id.in => family_ids).distinct(:family_id)
 
               Success(determined_family_ids)
             end

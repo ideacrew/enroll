@@ -63,13 +63,13 @@ module FinancialAssistance
             end
 
             # I agree + 5 years
-            ### Copy application via UI — I agree, 5 years to renew
+            ### Copy application via UI: I agree, 5 years to renew
             ### Copy application via renewal - I agree, -1 years to renew
             # I disagree + x years
-            ### Copy application via UI - I disagree + x years
+            ### Copy application via UI: I disagree + x years
             ### Copy application via renewal - I disagree + (x years - 1)
             # I agree + <5 years
-            ### Copy application via UI - I agree, 5 years to renew
+            ### Copy application via UI: I agree, 5 years to renew
             ### Copy application via renewal - I agree + (x years -1)
 
             # If years to renew is 0, set to income_verification_extension_required
