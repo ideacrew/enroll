@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module IrsGroups
-    # Publish event on enrollment change
+    # Publish event after find and transform family to cv3 family.
     class BuildSeedRequest
       include Dry::Monads[:result, :do, :try]
       include EventSource::Command

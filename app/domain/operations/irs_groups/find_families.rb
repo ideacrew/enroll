@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module IrsGroups
-    # Publish event on enrollment change
+    # Publish event on finding enrolled family
     class FindFamilies
       include Dry::Monads[:result, :do, :try]
       include EventSource::Command
