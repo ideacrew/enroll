@@ -277,7 +277,8 @@ module Operations
             first_name: member.family_member.person.first_name,
             last_name: member.family_member.person.last_name,
             is_primary_family_member: member.family_member.is_primary_applicant,
-            age: member.family_member.person.age_on(TimeKeeper.date_of_record)
+            age: member.family_member.person.age_on(TimeKeeper.date_of_record),
+            relation_with_primary: member.family_member&.primary_relationship
           }
         end
 
