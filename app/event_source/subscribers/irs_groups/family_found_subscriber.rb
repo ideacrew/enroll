@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Subscribers
-  # Subscriber will receive Enterprise requests like date change
   module IrsGroups
+    # Subscriber will receive family_id to seed irs group request
     class FamilyFoundSubscriber
       include ::EventSource::Subscriber[amqp: 'irs_groups.families']
 

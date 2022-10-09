@@ -22,15 +22,15 @@ module Operations
 
       def validate(params)
         errors = []
-        errors << "start_date #{params[:start_date]} is not a valid Date" unless params[:start_date]&.is_a?(Date)
-        errors << "end_date #{params[:end_date]} is not a valid Date" unless params[:end_date]&.is_a?(Date)
+        errors << "start_date #{params[:start_date]} is not a valid Date" unless params[:start_date].is_a?(Date)
+        errors << "end_date #{params[:end_date]} is not a valid Date" unless params[:end_date].is_a?(Date)
 
         errors.empty? ? Success(params) : Failure(errors)
       end
 
       def enrolled_families_in_date_range(params)
         enrolled_family_ids = HbxEnrollment.by_health.enrolled_and_terminated.by_effective_date_range(params[:start_date], params[:end_date]).distinct(:family_id)
-        enrolled_families = Family.where(:"_id".in => enrolled_family_ids)
+        enrolled_families = Family.where(:_id.in => enrolled_family_ids)
 
         enrolled_families.count > 0 ? Success(enrolled_families) : Failure("No enrolled Families by health in given date range")
       end
