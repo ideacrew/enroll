@@ -309,7 +309,7 @@ module Operations
         def fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info)
           return if slcsp_info == {}
 
-          slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :costs)&.to_money&.to_hash
+          slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :cost)&.to_money&.to_hash
         end
 
         def latest_application_in_tax_household_year(tax_household)
