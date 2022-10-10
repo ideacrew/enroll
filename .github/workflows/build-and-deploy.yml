@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - 'trunk'
+      - 'hotfix-2023-plan-load'
   pull_request:
     branches:
       - 'trunk'
