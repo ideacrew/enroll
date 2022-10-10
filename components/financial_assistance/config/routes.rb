@@ -29,6 +29,7 @@ FinancialAssistance::Engine.routes.draw do
     get 'checklist_pdf', on: :collection, action: 'checklist_pdf', as: 'checklist_pdf'
     put :update_transfer_requested, on: :member
     get :transfer_history, on: :member
+    patch :update_application_year, on: :member
 
     resources :relationships
 
