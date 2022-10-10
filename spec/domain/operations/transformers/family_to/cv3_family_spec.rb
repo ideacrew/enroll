@@ -168,9 +168,9 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   describe '#fetch_slcsp_benchmark_premium_for_member' do
     let(:slcsp_info) do
       {
-        "732020"=>{:health_only_slcsp_premiums=>{:cost=>986.26, :product_id=>BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier=>"732021", :monthly_premium=>986.26}},
-        "732021"=>{:health_only_slcsp_premiums=>{:cost=>986.26, :product_id=>BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier=>"732021", :monthly_premium=>986.26}},
-        "732022"=>{:health_only_slcsp_premiums=>{:cost=>986.26, :product_id=>BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier=>"732022", :monthly_premium=>986.26}}
+        "732020" => {:health_only_slcsp_premiums => {:cost => 986.26, :product_id => BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier => "732021", :monthly_premium => 986.26}},
+        "732021" => {:health_only_slcsp_premiums => {:cost => 986.26, :product_id => BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier => "732021", :monthly_premium => 986.26}},
+        "732022" => {:health_only_slcsp_premiums => {:cost => 986.26, :product_id => BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier => "732022", :monthly_premium => 986.26}}
       }
     end
 
