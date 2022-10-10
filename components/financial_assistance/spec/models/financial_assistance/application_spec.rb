@@ -1959,7 +1959,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         end
 
         it 'should return true' do
-           expect(application.is_transferrable?).to eq(true)
+          expect(application.is_transferrable?).to eq(true)
         end
       end
 
@@ -1973,7 +1973,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         end
 
         it 'should return false' do
-           expect(application.is_transferrable?).to eq(false)
+          expect(application.is_transferrable?).to eq(false)
         end
       end
     end
