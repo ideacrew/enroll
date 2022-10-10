@@ -6,8 +6,9 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   end
 
   let(:aws_env) { ENV['AWS_ENV'] || "qa" }
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:person) {FactoryBot.create(:person)}
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:active_household) {family.active_household}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record, eligibility_date: TimeKeeper.date_of_record) }
   let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
@@ -76,6 +77,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     assign :plan, mock_product
     assign :hbx_enrollment, hbx_enrollment
     assign :member_group, member_group
+    sign_in user
   end
 
   it "should display standard plan indicator" do
@@ -174,10 +176,18 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
   end
 
-  context 'for display of enrollment additional summary' do
+  context 'for display of enrollment additional summary with admin' do
+    let(:hbx_staff_user) { FactoryBot.create(:user, person: hbx_staff_person) }
+    let(:hbx_staff_person) {FactoryBot.create(:person, :with_hbx_staff_role)}
+
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
+      sign_in hbx_staff_user
       render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
     end
 
@@ -203,6 +213,74 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
     it 'should include premium of the enrollment' do
       expect(rendered).to have_content(hbx_enrollment.total_premium)
+    end
+  end
+
+  context 'for display of enrollment additional summary with consumer' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+      allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
+      sign_in user
+      render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
+    end
+
+    it 'should not include enrollment effective_on text' do
+      expect(rendered).to_not have_content(l10n('enrollment.effective_on'))
+    end
+
+    it 'should not include latest transition text' do
+      expect(rendered).to_not have_content(l10n('enrollment.latest_transition'))
+    end
+
+    it 'should not include Product HIOS ID text' do
+      expect(rendered).to_not have_content(l10n('product_hios_id'))
+    end
+
+    it 'should not include RatingArea text' do
+      expect(rendered).to_not have_content(l10n('rating_area.exchange_provided_code'))
+    end
+
+    it 'should not include full name of person' do
+      expect(rendered).to_not have_content(hbx_enrollment_member.person.full_name.titleize)
+    end
+  end
+  context 'for display of enrollment additional summary with broker' do
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+    let(:broker_person) {FactoryBot.create(:person, :with_broker_role)}
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(true)
+      allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
+      sign_in broker_user
+      render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
+    end
+
+    it 'should not include enrollment effective_on text' do
+      expect(rendered).to have_content(l10n('enrollment.effective_on'))
+    end
+
+    it 'should not include latest transition text' do
+      expect(rendered).to have_content(l10n('enrollment.latest_transition'))
+    end
+
+    it 'should not include Product HIOS ID text' do
+      expect(rendered).to have_content(l10n('product_hios_id'))
+    end
+
+    it 'should not include RatingArea text' do
+      expect(rendered).to have_content(l10n('rating_area.exchange_provided_code'))
+    end
+
+    it 'should not include full name of person' do
+      expect(rendered).to have_content(hbx_enrollment_member.person.full_name.titleize)
     end
   end
 end
