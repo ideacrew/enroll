@@ -43,7 +43,7 @@ module Operations
         logger.info("Operation started at #{DateTime.now} ")
         families.no_timeout.each do |family|
           event = event("events.irs_groups.family_found", attributes: {family_id: family.id})
-          event.publish
+          event.success.publish
           counter += 1
           logger.info("published #{counter} out of #{total_families_count}") if counter % 100 == 0
         rescue StandardError => e
