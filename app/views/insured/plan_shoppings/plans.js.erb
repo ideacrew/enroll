@@ -10,11 +10,9 @@ $(document).ready(function(){
     } else {
       elected_pct = parseFloat(elected_aptc) / parseFloat(max_aptc);
     }
-    if (parseFloat($("input[name='elected_pct']").val()) != elected_pct || $("output[name='pct']").text() != elected_pct*100){
-      $("output[name='pct']").text((elected_pct*100).toFixed(0));
-      $("input[name='elected_pct']").val(elected_pct);
-      updatePlanCost(elected_aptc);
-    };
+    $("output[name='pct']").text((elected_pct*100).toFixed(0));
+    $("input[name='elected_pct']").val(elected_pct);
+    updatePlanCost(elected_aptc);
   }
 });
 $('[data-toggle="tooltip"]').tooltip();

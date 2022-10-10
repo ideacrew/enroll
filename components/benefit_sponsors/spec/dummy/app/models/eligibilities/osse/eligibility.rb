@@ -69,11 +69,9 @@ module Eligibilities
       end
 
       #
-      # TODO: returns other classes in the future
+      # hard coded inside engine
       #
       def grant_value_klass
-        return unless subject[:klass] == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
-
         'Eligibilities::Osse::BenefitSponsorshipOssePolicy'
       end
 
