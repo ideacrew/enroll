@@ -11,6 +11,7 @@ module FinancialAssistance
       module AptcCsrCreditEligibilities
         module Renewals
           # This Operation creates a new renewal_draft application from a given family identifier(BSON ID),
+          # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::Renew.new.call({ family_id: "617d5cafcd9621000a5cf7e5", renewal_year: 2023 })
           class Renew
             include Dry::Monads[:result, :do, :try]
             include EventSource::Command
@@ -57,7 +58,7 @@ module FinancialAssistance
             def renew_application(application, validated_params)
               application = create_renewal_draft_application(application, validated_params)
 
-              return Failure("Unable to create renewal application #{application.failure} with #{validated_params}") if application.failure?
+              return Failure("Unable to create renewal application - #{application.failure} with #{validated_params}") if application.failure?
 
               application
             end
@@ -98,7 +99,7 @@ module FinancialAssistance
                 if renewal_application.renewal_draft?
                   Success(renewal_application)
                 else
-                  Failure("Renewal Application Applicants Update required - #{renewal_application.hbx_id}")
+                  Failure("Renewal Application Applicants Update or income_verification_extension required - #{renewal_application.hbx_id}")
                 end
               end.to_result
             end
@@ -112,7 +113,7 @@ module FinancialAssistance
             end
 
             def calculate_years_to_renew(application)
-              if application.years_to_renew > 0
+              if application.years_to_renew.present? && application.years_to_renew > 0
                 application.years_to_renew.to_i - 1
               else
                 application.years_to_renew || 0

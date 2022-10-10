@@ -55,7 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                                          :kind => 'home',
                                          :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
                                          :zip => '20001',
-                                         county: '')]
+                                         county: 'Cumberland')]
       appl.save!
     end
   end
@@ -108,8 +108,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
           end
 
-          it 'should return application with years_to_renew same as previous application' do
-            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew)
+          it 'should return application with years_to_renew - 1 years less than previous year' do
+            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew.to_i - 1)
           end
         end
 
@@ -153,9 +153,31 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
     end
 
-    context 'determined application' do
+    context 'determined application with no years to renew' do
       before do
         application.update_attributes!({ aasm_state: 'determined', years_to_renew: [0, nil].sample })
+        application.reload
+        @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        @renewal_draft_app = @result.success
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_failure
+      end
+
+      it 'should not return application' do
+        expect(@renewal_draft_app).not_to be_a(::FinancialAssistance::Application)
+      end
+
+      it 'should return application in income_verification_extension_required state' do
+        expect(@result.failure).to match(/Unable to create renewal application - Renewal Application Applicants Update or income_verification_extension required/)
+      end
+    end
+
+
+    context 'determined application' do
+      before do
+        application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
@@ -167,14 +189,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
       it 'should return application' do
         expect(@renewal_draft_app).to be_a(::FinancialAssistance::Application)
-      end
-
-      it 'should return application in renewal_draft state' do
-        expect(@renewal_draft_app.renewal_draft?).to be_truthy
-      end
-
-      it 'should return application with predecessor_id' do
-        expect(@renewal_draft_app.predecessor_id).to eq(application.id)
       end
 
       it 'should return application with assistance_year' do
@@ -243,7 +257,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
     context 'imported application' do
       before do
-        application.update_attributes!({ aasm_state: 'imported', years_to_renew: [0, nil].sample })
+        application.update_attributes!({ aasm_state: 'imported', years_to_renew: 4 })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
@@ -284,8 +298,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
           end
 
-          it 'should return application with years_to_renew as zero' do
-            expect(@renewal_draft_app.years_to_renew).to be_zero
+          it 'should return application with years_to_renew as three' do
+            expect(@renewal_draft_app.years_to_renew).to eq 3
           end
         end
 
@@ -329,6 +343,23 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
     end
 
+    context 'imported application with no years to renew' do
+      before do
+        application.update_attributes!({ aasm_state: 'imported', years_to_renew: [0, nil].sample })
+        application.reload
+        @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        @renewal_draft_app = @result.success
+      end
+
+      it 'should return success' do
+        expect(@result).to be_failure
+      end
+
+      it 'should return application' do
+        expect(@result.failure).not_to be_a(::FinancialAssistance::Application)
+      end
+    end
+
     context 'renewal_base_year' do
       before do
         application.update_attributes!({ aasm_state: 'draft', years_to_renew: rand(0..5), is_renewal_authorized: false })
@@ -354,7 +385,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
       let!(:family_11) { FactoryBot.create(:family, :with_primary_family_member, person: person_11)}
       let!(:family_member_12) { FactoryBot.create(:family_member, person: person_12, family: family_11)}
-      let!(:application_11) { FactoryBot.create(:financial_assistance_application, family_id: family_11.id, aasm_state: 'submitted', hbx_id: "111000", effective_date: TimeKeeper.date_of_record) }
+      let!(:application_11) { FactoryBot.create(:financial_assistance_application, family_id: family_11.id, aasm_state: 'submitted', hbx_id: "111000", effective_date: TimeKeeper.date_of_record, years_to_renew: 2) }
       let!(:applicant_11) do
         FactoryBot.create(:applicant,
                           application: application_11,
