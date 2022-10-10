@@ -89,7 +89,7 @@
               - if offers_nationwide_plans? && @plan.provider_directory_url.present?
                 - if @plan.nationwide
                   = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
-  - if EnrollRegistry.feature_enabled?(:display_enr_summary)
+  - if display_enr_summary_is_enabled(@hbx_enrollment)
     .row.plan
       .col-xs-12
         span.h3 data-cuke='enrollment_detail'
