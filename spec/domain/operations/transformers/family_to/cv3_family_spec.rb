@@ -131,7 +131,9 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
     let!(:tax_household) do
       tax_household_group.tax_households.create!(
-        effective_starting_on: TimeKeeper.date_of_record.beginning_of_year
+        effective_starting_on: TimeKeeper.date_of_record.beginning_of_year,
+        yearly_expected_contribution: 100.00,
+        max_aptc: 50.00
       )
     end
 
@@ -140,7 +142,8 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         applicant_id: family.primary_applicant.id,
         is_ia_eligible: true,
         is_medicaid_chip_eligible: true,
-        is_subscriber: true
+        is_subscriber: true,
+        magi_medicaid_monthly_household_income: 50_000
       )
     end
 
@@ -156,7 +159,8 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_tax_household_groups([tax_household_group]) }
 
     it 'should include hbx_enrollments in the hash' do
-      result = AcaEntities::Households::TaxHouseholdGroup.new(subject.first)
+      contract_result = AcaEntities::Contracts::Households::TaxHouseholdGroupContract.new.call(subject.first)
+      result = AcaEntities::Households::TaxHouseholdGroup.new(contract_result.to_h)
       expect(result).to be_a AcaEntities::Households::TaxHouseholdGroup
     end
   end
