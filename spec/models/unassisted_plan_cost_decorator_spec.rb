@@ -8,7 +8,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   let(:premium_table) { double(rating_area: rating_area) }
   let(:premium_tables) { [premium_table] }
   let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health", family_based_rating?: false, premium_tables: premium_tables) }
-  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, family_based_rating?: false, premium_tables: premium_tables) }
+  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, family_based_rating?: false, premium_tables: premium_tables, ehb: 0.996) }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
   let(:area) { EnrollRegistry[:rating_area].settings(:areas).item.first }
   context "rating a large family" do
@@ -82,6 +82,17 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       it "should have the right total premium" do
         expect(plan_cost_decorator.total_premium).to eq [55, 45, 20, 18, 13, 11, 4].sum
+      end
+
+      context 'when total_minimum_responsibility is enabled' do
+        before do
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 0.0}
+          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it "should have the correct member ehb premium" do
+          expect(plan_cost_decorator.member_ehb_premium(five)).to eq 0.00
+        end
       end
     end
   end
