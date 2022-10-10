@@ -369,9 +369,7 @@ module Config::AcaHelper
     EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
   end
 
-  def display_enr_summary_is_enabled?
-    current_person = current_user.person
-    has_broker_role = (current_person.try(:broker_role) || current_person.broker_agency_staff_roles.present?)
-    EnrollRegistry.feature_enabled?(:display_enr_summary) && (has_broker_role || current_user.try(:has_hbx_staff_role?))
+  def display_enr_summary_is_enabled(enrollment)
+    EnrollRegistry.feature_enabled?(:display_enr_summary) && enrollment.hbx_enrollment_members.all? { |member| member.person != current_user.person }
   end
 end
