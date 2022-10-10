@@ -55,7 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                                          :kind => 'home',
                                          :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
                                          :zip => '20001',
-                                         county: '')]
+                                         :county => 'Cumberland')]
       appl.save!
     end
   end
