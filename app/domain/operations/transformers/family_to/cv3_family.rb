@@ -233,9 +233,9 @@ module Operations
               hbx_id: household.hbx_assigned_id.to_s,
               allocated_aptc: household.allocated_aptc.to_hash,
               is_eligibility_determined: household.is_eligibility_determined,
-              effective_starting_on: household.effective_starting_on,
-              effective_ending_on: household.effective_ending_on,
-              tax_household_members: transform_tax_household_members(household.tax_household_members),
+              start_date: household.effective_starting_on,
+              end_date: household.effective_ending_on,
+              tax_household_members: transform_tax_household_members(household),
               eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations),
               yearly_expected_contribution: household.yearly_expected_contribution&.to_hash,
               eligibility_determination_hbx_id: household.eligibility_determination_hbx_id.to_s,
@@ -277,19 +277,54 @@ module Operations
             first_name: member.family_member.person.first_name,
             last_name: member.family_member.person.last_name,
             is_primary_family_member: member.family_member.is_primary_applicant,
-            age: member.family_member.person.age_on(TimeKeeper.date_of_record)
+            age: member.family_member.person.age_on(TimeKeeper.date_of_record),
+            relation_with_primary: member.family_member&.primary_relationship
           }
         end
 
-        def transform_tax_household_members(members)
-          members.collect do |member|
+        def transform_tax_household_members(tax_household)
+          slcsp_info = fetch_slcsp_info(tax_household)
+          application = latest_application_in_tax_household_year(tax_household)
+          tax_household.tax_household_members.collect do |member|
+            person_hbx_id = member.family_member.person.hbx_id
             {
               family_member_reference: transform_family_member_reference(member),
               product_eligibility_determination: product_eligibility_determination_hash(member),
               is_subscriber: member.is_subscriber,
+              tax_filer_status: fetch_tax_filer_status(person_hbx_id, application),
+              slcsp_benchmark_premium: fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info),
               reason: member.reason
             }
           end
+        end
+
+        def fetch_tax_filer_status(person_hbx_id, application)
+          return unless application
+          applicant = application.applicants.where(person_hbx_id: person_hbx_id).first
+          return unless applicant
+
+          applicant.tax_filer_kind
+        end
+
+        def fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info)
+          return if slcsp_info == {}
+
+          slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :costs)&.to_money&.to_hash
+        end
+
+        def latest_application_in_tax_household_year(tax_household)
+          assistance_year = tax_household.effective_starting_on.year
+          ::FinancialAssistance::Application.where(family_id: tax_household.family.id, aasm_state: "determined", assistance_year: assistance_year).max_by(&:created_at)
+        end
+
+        def fetch_slcsp_info(tax_household)
+          effective_date = tax_household.effective_starting_on
+          premiums = ::Operations::Products::Fetch.new.call({family: tax_household.family, effective_date: effective_date})
+          return {} if premiums.failure?
+
+          slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
+          return {} if slcsp_info.failure?
+          slcsp_info.success
         end
 
         def product_eligibility_determination_hash(member)
