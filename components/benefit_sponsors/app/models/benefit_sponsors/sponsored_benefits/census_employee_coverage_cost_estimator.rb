@@ -11,6 +11,7 @@ module BenefitSponsors
         end
       end
 
+      # Calculates child care subsidy for the census employee based on lowest cost silver plan
       class CensusEmployeeSubsidyCalculator
 
         attr_reader :census_employee, :sponsored_benefit
