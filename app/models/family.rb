@@ -466,6 +466,15 @@ class Family
     family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
   end
 
+  def find_family_member_by_person_hbx_id(person_hbx_id)
+    return if person_hbx_id.blank?
+
+    person = Person.by_hbx_id(person_hbx_id).first
+    return if person.blank?
+
+    find_family_member_by_person(person)
+  end
+
   def is_eligible_to_enroll?(options = {})
     current_enrollment_eligibility_reasons(qle: options[:qle]).length > 0
   end
