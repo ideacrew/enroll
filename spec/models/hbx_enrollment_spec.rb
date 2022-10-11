@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
-
-
 
 describe ".propogate_cancel" do
   include_context 'family with previous enrollment for termination and passive renewal'
@@ -242,8 +242,8 @@ describe ".propogate_cancel" do
           let(:coverage_kind) { 'health' }
 
           it 'should not exclude adult & child only offering' do
-          expect(subject.size).to eq 2
-        end
+            expect(subject.size).to eq 2
+          end
         end
 
         context 'for dental product' do
