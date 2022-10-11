@@ -613,35 +613,30 @@ var PersonValidations = (function (window, undefined) {
       $('.contact-method input').each(function (i, el) {
         if ($(el).prop('checked')) {
           isChecked = true;
-        }
-      });
+        }});
       if (isChecked == false) {
-        alert('Warning: You must select at least one contact method.');
+        var alertMsg = 'Warning: You must select at least one contact method.'
+        if($('.contact-method').hasClass('flag-enabled')){
+          alertMsg += ' An additional method must be checked if selecting Text.';
+        }
+        alert(alertMsg);
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if (
-        $(
-          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email'
-        ).prop('checked')
-      ) {
+      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').prop('checked')) {
         if (!$('#person_emails_attributes_0_address').val()) {
-          alert(
-            'You must enter an email address to receive notices and updates by email.'
-          );
+          alert('You must enter an email address to receive notices and updates by email.');
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if (
-        $(
-          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text'
-        ).prop('checked')
-      ) {
+      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text').prop('checked')) {
         if (document.querySelector('.mobile-phone-number').value.length < 1) {
-          alert(
-            'You must enter a mobile phone number to receive notices and updates by text.'
-          );
+          alert('You must enter a mobile phone number to receive notices and updates by text.');
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+        if ($('.contact-method input:checked').length <= 1 && $('.contact-method').hasClass('flag-enabled')){
+          alert('An additional contact method is required if only Text is selected.');
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
