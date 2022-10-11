@@ -32,10 +32,9 @@ Feature: Start a new Financial Assistance Application and answers questions on h
   Scenario: User enters employer sponsored health coverage information (currently have access to coverage)
     Given the user answers yes to currently having access to other health coverage
     And the user checks a employer sponsored health coverage checkbox
+    Then the health plan meets mvs and affordable question should show
     And the user not sure link next to minimum standard value question
     Then the user should be see proper text in the modal popup
-    And the user not sure link next to minimum standard value and afforable question
-    Then the user should be see mvs and affordable text in the modal popup
 
   Scenario: Cancel button functionality (currently have coverage)
     Given the user answers yes to currently having access to other health coverage

@@ -65,7 +65,7 @@
 
     <% if FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
       <div class="row ptb no-buffer row-height">
-        <div class="col-md-6"><%= l10n("Does_this_employer_offer_a_health_plan_that_meets_the_minimum_value_standard_and_is_considered_affordable_for_the_employee_and_family")&.humanize %>?</div>
+        <div class="col-md-6"><%= l10n("health_plan_meets_mvs_and_affordable_question") %></div>
         <div class="col-md-6"><%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) %></div>
       </div>
     <% end %>
