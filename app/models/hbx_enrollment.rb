@@ -2772,7 +2772,10 @@ class HbxEnrollment
     member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
     return if member_enrollment.nil?
 
-    BigDecimal(member_enrollment&.product_price&.to_s).round(2)
+    member_subsidy = BigDecimal(member_enrollment&.product_price&.to_s).round(2)
+
+    return member_subsidy unless member_subsidy > total_premium
+    total_premium
   end
 
   private
