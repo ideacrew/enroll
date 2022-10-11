@@ -311,7 +311,8 @@ class EmployeeRole
 
   def eligibility_for(evidence_key, start_on)
     eligibilities.by_date(start_on).select do |eligibility|
-      eligibility.evidences.by_key(evidence_key).present?
+      el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
+      el&.is_satisfied == true
     end.max_by(&:created_at)
   end
 

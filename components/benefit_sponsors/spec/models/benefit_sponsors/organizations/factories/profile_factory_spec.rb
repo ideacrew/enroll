@@ -361,8 +361,9 @@ module BenefitSponsors
           }
         end
         let(:profile_factory) { profile_factory_class.call(valid_employer_params_update) }
-        let!(:eligibility) { nil }
+        let!(:er_eligibility) { nil }
         let(:osse_eligibility) { 'true' }
+        let!(:ee_eligibility) { nil }
 
         before do
           valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => osse_eligibility)
@@ -399,14 +400,29 @@ module BenefitSponsors
 
           context 'terminate eligibility' do
             let(:osse_eligibility) { 'false' }
-            let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
-            let!(:eligibility) do
-              benefit_sponsorship.eligibilities << ee_elig
+            let(:er_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
+            let!(:er_eligibility) do
+              benefit_sponsorship.eligibilities << er_elig
               benefit_sponsorship.save!
               benefit_sponsorship.eligibilities.first
             end
 
+            let!(:employee_role) { create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+
+            let!(:census_employee) do
+              create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship)
+            end
+
+            let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
+            let!(:ee_eligibility) do
+              census_employee.update_attributes!(employee_role_id: employee_role.id)
+              employee_role.eligibilities << ee_elig
+              employee_role.save!
+              employee_role.eligibilities.first
+            end
+
             it { expect(benefit_sponsorship.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
+            it { expect(employee_role.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
           end
         end
       end
