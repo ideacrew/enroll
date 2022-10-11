@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 Rake.application.rake_require "tasks/update_data_text_notifications"
 Rake::Task.define_task(:environment)
@@ -31,4 +33,3 @@ describe 'update_data:text_only_notification_to_text_and_paper', :dbclean => :ar
     end
   end
 end
-  
