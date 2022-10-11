@@ -151,7 +151,7 @@
       </div>
     </div>
 
-    <% unless insurance_kind == 'health_reimbursement_arrangement' %>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) && insurance_kind != 'health_reimbursement_arrangement' %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
           <span class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %> *</span>

@@ -59,7 +59,7 @@ And(/^the user checks a employer sponsored health coverage checkbox$/) do
 end
 
 Then(/^the health plan meets mvs and affordable question should show$/) do
-  expect(page).to have_content("#{l10n('health_plan_meets_mvs_and_affordable_question')}")
+  expect(page).to have_content(l10n('health_plan_meets_mvs_and_affordable_question')&.to_s)
 end
 
 And(/^the user not sure link next to minimum standard value question$/) do
