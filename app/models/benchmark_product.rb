@@ -8,6 +8,8 @@ class BenchmarkProduct
 
   field :family_id, type: BSON::ObjectId
 
+  field :application_hbx_id, type: String
+
   # Request Payload that is sent to Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts in JSON format
   field :request_payload, type: String
 
@@ -21,5 +23,13 @@ class BenchmarkProduct
 
   def response
     JSON.parse(response_payload, symbolize_names: true)
+  end
+
+  def family
+    Family.where(id: family_id).first
+  end
+
+  def application
+    ::FinancialAssistance::Application.by_hbx_id(application_hbx_id).last
   end
 end

@@ -33,7 +33,7 @@ module Operations
       end
 
       def find_family_member(family_id, family_member_id)
-        @family = Family.where(id: family_id).first
+        @family ||= Family.where(id: family_id).first
         return Failure("Unable to find Family with family_id: #{family_id}") if @family.blank?
 
         family_member = @family.active_family_members.where(id: family_member_id).first
