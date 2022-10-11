@@ -7,6 +7,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And FAA display_medicaid_question feature is enabled
+    And FAA minimum_value_standard_question feature is enabled
     When they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page (health coverage)
     And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
@@ -33,6 +34,8 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the user checks a employer sponsored health coverage checkbox
     And the user not sure link next to minimum standard value question
     Then the user should be see proper text in the modal popup
+    And the user not sure link next to minimum standard value and afforable question
+    Then the user should be see mvs and affordable text in the modal popup
 
   Scenario: Cancel button functionality (currently have coverage)
     Given the user answers yes to currently having access to other health coverage

@@ -58,6 +58,10 @@ And(/^the user checks a employer sponsored health coverage checkbox$/) do
   find(:css, "#insurance_kind[value='employer_sponsored_insurance']").set(true)
 end
 
+Then(/^the health plan meets mvs and affordable question should show$/) do
+  expect(page).to have_xpath("//*[@id='minimum_value_standard_question']")
+end
+
 And(/^the user not sure link next to minimum standard value question$/) do
   find("#is_esi_mec_met_not_sure").click
 end
