@@ -398,10 +398,16 @@ RSpec.describe Operations::Families::CreateTaxHouseholdGroupOnFaDetermination, t
 
   let(:result) { subject.call(response_payload) }
 
-
   it 'should return tax_household_group' do
     expect(result.success?).to be_truthy
     expect(result.success).to be_a(TaxHouseholdGroup)
     expect(family.reload.tax_household_groups.count).to eq 1
+  end
+
+  it 'should always see start date on tax households' do
+    expect(result.success?).to be_truthy
+    family.reload.tax_household_groups.each do |th_group|
+      expect(th_group.tax_households.map(&:effective_starting_on).any?(nil)).to be_falsey
+    end
   end
 end

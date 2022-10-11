@@ -50,6 +50,7 @@ module FinancialAssistance
                                               eligibility_response_payload: application_entity.to_h.to_json })
 
               add_eligibility_determination(application, application_entity)
+              application.save
               application.determine_renewal
 
               return Success('Successfully updated Application object with Full Eligibility Determination') if application.save
