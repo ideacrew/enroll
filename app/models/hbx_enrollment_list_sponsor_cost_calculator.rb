@@ -28,14 +28,16 @@ class HbxEnrollmentListSponsorCostCalculator
     def each
       @hbx_enrollment_id_list.each_slice(200) do |heidl|
         search_criteria(heidl).each do |agg_result|
-
-          people_details = Person.where(:id.in => agg_result['people_ids']).pluck(:id, :dob, :person_relationships, :is_disabled)
-          people_merge = people_details.map do |id, dob, person_relationships, is_disabled|
-            {'_id' => id, 'dob' => dob, 'person_relationships' => person_relationships, 'is_disabled' => is_disabled}.compact
-          end
-
+          people_merge = get_person_details(agg_result['people_ids'])
           yield rosterize_hbx_enrollment(agg_result.merge({"people" => people_merge}))
         end
+      end
+    end
+
+    def get_person_details(people_ids)
+      people_details = Person.where(:id.in => people_ids).pluck(:id, :dob, :person_relationships, :is_disabled)
+      people_details.map do |id, dob, person_relationships, is_disabled|
+        {'_id' => id, 'dob' => dob, 'person_relationships' => person_relationships, 'is_disabled' => is_disabled}.compact
       end
     end
 
@@ -60,7 +62,8 @@ class HbxEnrollmentListSponsorCostCalculator
             "product_id" => "$product_id",
             "kind" => "$kind",
             "coverage_kind" => "$coverage_kind",
-            "employee_role_id" => "$employee_role_id"
+            "employee_role_id" => "$employee_role_id",
+            "eligible_child_care_subsidy" => "$eligible_child_care_subsidy"
           },
           "people_ids" => {
             "$map" => {
@@ -143,7 +146,8 @@ class HbxEnrollmentListSponsorCostCalculator
           coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
           member_enrollments: member_enrollments, 
           rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
-          sponsor_contribution_prohibited: contribution_prohibited
+          sponsor_contribution_prohibited: contribution_prohibited,
+          eligible_child_care_subsidy: enrollment_record["hbx_enrollment"]["eligible_child_care_subsidy"].to_money
         })
       ::BenefitSponsors::Members::MemberGroup.new(
         member_entries,
@@ -165,6 +169,7 @@ class HbxEnrollmentListSponsorCostCalculator
     contribution_model = p_package.contribution_model
     p_calculator = pricing_model.pricing_calculator
     c_calculator = contribution_model.contribution_calculator
+
     price = 0.00
     contribution = 0.00
 #    if hbx_enrollment_ids.count < 1

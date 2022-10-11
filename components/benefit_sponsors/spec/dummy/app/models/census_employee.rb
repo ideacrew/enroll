@@ -14,6 +14,7 @@ class CensusEmployee < CensusMember
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
   EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
+  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -506,6 +507,18 @@ class CensusEmployee < CensusMember
       to_state: aasm.to_state,
       event: aasm.current_event
     )
+  end
+
+  def existing_cobra
+    COBRA_STATES.include? aasm_state
+  end
+
+  def existing_cobra=(cobra)
+    self.aasm_state = 'cobra_eligible' if cobra == 'true'
+  end
+
+  def is_cobra_status?
+    existing_cobra
   end
 
   def active_benefit_group
