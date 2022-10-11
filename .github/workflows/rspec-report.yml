@@ -3,6 +3,9 @@ on:
   # push:
   workflow_dispatch:
 
+env:
+  CLIENT: 'dc'
+
 jobs:
   rspec-report:
     strategy:
@@ -16,9 +19,11 @@ jobs:
             'controllers',
             'data_migrations',
             'domain',
+            'event_source',
             'helpers',
             'interactors',
             'invoices',
+            'jobs',
             'lib',
             'mailers',
             'models',
@@ -34,37 +39,40 @@ jobs:
             'workers',
           ]
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - name: Restore project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -78,7 +86,7 @@ jobs:
       - name: Run tests
         run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.folder }}
           path: ci/rspec/${{ matrix.folder }}-rspec-report.json
@@ -97,24 +105,36 @@ jobs:
             'transport_profiles',
           ]
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -127,7 +147,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -141,7 +161,7 @@ jobs:
       - name: Run tests
         run: bundle exec rspec components/${{ matrix.folder }} --format json --out ci/rspec/components-${{matrix.folder}}-rspec-report.json
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: components-${{ matrix.folder }}
           path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
@@ -152,7 +172,7 @@ jobs:
       - uses: actions/checkout@v3
 
       # Download all artifacts into the provided directory
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: ci/rspec/compressed-reports
 
