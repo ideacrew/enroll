@@ -41,7 +41,7 @@ module FinancialAssistance
               logger.info 'Started publishing renewal_events'
 
               app_ids.each_with_index do |app_id, index|
-                params = { payload: { index: index, application_id: app_id.to_s, renewal_year: params[:renewal_year]}, event_name: 'determination_submission.requested' }
+                params = { payload: { index: index, application_id: app_id.to_s, renewal_year: renewal_year}, event_name: 'determination_submission.requested' }
 
                 Try do
                   ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::PublishRenewalRequest.new.call(params)
