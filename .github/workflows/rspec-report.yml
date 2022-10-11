@@ -38,23 +38,35 @@ jobs:
             'views',
             'workers',
           ]
-    runs-on: ubuntu-20-8core
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
       - name: Restore project gems
         uses: actions/cache@v2
         with:
@@ -101,23 +113,35 @@ jobs:
             'transport_gateway',
             'transport_profiles',
           ]
-    runs-on: linux
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
       - name: Restore project gems
         uses: actions/cache@v2
         with:
