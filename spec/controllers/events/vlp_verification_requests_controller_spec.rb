@@ -35,7 +35,7 @@ describe Events::VlpVerificationRequestsController do
       expect(person.consumer_role.lawful_presence_determination.vlp_requests.count).to be > 0
     end
 
-    it "stores verification history element with proper verification type" do
+    xit "stores verification history element with proper verification type" do
       expect(person.consumer_role.verification_types.by_name("Citizenship").first.type_history_elements.first.action).to eq "DHS Hub Request"
     end
 

@@ -459,13 +459,25 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       before do
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Settings.aca.individual_market.open_enrollment.start_on)
       end
 
-      it 'should copy applicant and redirect to financial assistance application edit path' do
+      it 'should copy applicant and redirect to financial assistance application edit path unless iap_year_selection enabled' do
+        skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
         get :copy, params: { id: application.id }
         existing_app_ids = [application.id, application2.id]
         copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
         expect(response).to redirect_to(edit_application_path(copy_app.id))
+      end
+
+      it 'should copy applicant and redirect to financial assistance assistance year select path if iap_year_selection enabled' do
+        skip "skipped: iap_year_selection not enabled" unless FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
+        get :copy, params: { id: application.id }
+        existing_app_ids = [application.id, application2.id]
+        copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
+        expect(response).to redirect_to(application_year_selection_application_path(copy_app.id))
       end
     end
 
