@@ -525,6 +525,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   applied_aptc: 318.75,
                                                   aggregate_aptc: 375
                                                 })
+              expect(subject.assisted).to eq true
             end
           end
         end
