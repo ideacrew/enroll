@@ -307,6 +307,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal = subject.renew
           expect(renewal.auto_renewing?).to be_truthy
         end
+
+        it 'should trigger enr notice' do
+          expect_any_instance_of(::HbxEnrollment).to receive(:trigger_enrollment_notice)
+          subject.renew
+        end
       end
 
       context "renew coverall product" do

@@ -2078,7 +2078,7 @@ class HbxEnrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
-    event :renew_enrollment, :after => :record_transition do
+    event :renew_enrollment, :after => [:record_transition, :trigger_enrollment_notice] do
       transitions from: :shopping, to: :auto_renewing
     end
 
