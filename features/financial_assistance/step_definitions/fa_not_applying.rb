@@ -39,6 +39,7 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+  fill_in "person_phones_attributes_1_full_phone_number", with: "5555555555"
 
   sleep 5
   find('.btn', text: 'CONTINUE').click
@@ -248,4 +249,22 @@ end
 
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
   expect(page).to have_content("#{l10n('family_information')}")
+end
+
+Given(/Contact method via dropdown feature is NOT enabled/) do
+  disable_feature :contact_method_via_dropdown
+end
+
+Given(/Adtl contact required for text feature is enabled/) do
+  enable_feature :adtl_contact_required_for_text
+end
+
+And(/Individual selects text only as contact option/) do
+  find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').click
+  find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-mail').click
+end
+
+Then(/the user should see an error message warning about text/) do
+  text = page.driver.browser.switch_to.alert.text
+  expect(text).to eq 'An additional contact method is required if only Text is selected.'
 end
