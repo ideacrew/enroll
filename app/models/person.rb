@@ -321,6 +321,8 @@ class Person
   scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending, :rejected] })}
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
 
+  scope :only_text_notifications, -> { where(:'consumer_role.contact_method' => ConsumerRole::CONTACT_METHOD_MAPPING[["Text"]]) }
+
   # People with at least one verification_type in rejected status
   scope :rejected_verification_type, -> { where(:'verification_types.validation_status' => 'rejected') }
 
