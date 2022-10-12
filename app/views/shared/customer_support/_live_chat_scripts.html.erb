@@ -83,12 +83,13 @@
           {
             id: 'cx_webchat_form_customselect',
             name: 'customselect',
-            placeholder: 'Optional',
+            placeholder: 'Required',
             label: 'Topic',
             type: 'select',
+            required: 'Please select an option',
             options: [
               {
-                text: 'Optional',
+                text: 'Required',
                 hidden: 'hidden',
                 value: 'na',
               },
@@ -110,6 +111,25 @@
               },
             ],
 
+            validate: function (
+              event,
+              form,
+              input,
+              label,
+              $,
+              CXBus,
+              Common
+            ) {
+              if (input != undefined) {
+                if (
+                  document.getElementById('cx_webchat_form_customselect')
+                    .value != 'na'
+                )
+                  return true;
+                else return false;
+              }
+              return false;
+            },
             wrapper:
               '<tr><th>{label}</th><td>{input}</td></tr>' /* input row wrapper */,
           },
