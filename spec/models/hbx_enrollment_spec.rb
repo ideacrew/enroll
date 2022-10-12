@@ -589,7 +589,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
   let(:premium) { 214.85 }
 
-  context 'whem employee is eligible for OSSE' do
+  context 'when employee is eligible for OSSE' do
     before do
       allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
       allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
@@ -640,6 +640,23 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
     it 'should not update OSSE subsidy' do
       expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+    end
+  end
+
+  context "when product premium is lower than the lowest cost silver plan" do
+    let(:lcsp_premium) { 220.85 }
+    let(:total_premium) { 218.23 }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    before do
+      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
+      allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(lcsp_premium)
+      allow(shop_enrollment).to receive(:total_premium).and_return(total_premium)
+      shop_enrollment.update_osse_childcare_subsidy
+    end
+
+    it "should have subsidy amount match premium" do
+      expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(total_premium)
     end
   end
 end

@@ -7,9 +7,14 @@ concurrency:
   group: cucumber-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CLIENT: 'dc'
+  RAILS_ENV: 'test'
+
 jobs:
   cucumber-report:
     strategy:
+      fail-fast: false
       matrix:
         feature:
           [
@@ -28,49 +33,52 @@ jobs:
             'plan_shopping',
           ]
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-      - name: Restore project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
       - name: Run tests
         run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
@@ -78,15 +86,15 @@ jobs:
     needs: [cucumber-report]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           path: ci/cucumber/compressed-reports
       - uses: markgoho/analyze-cucumber-report@trunk
         with:
           individual-reports-folder: 'ci/cucumber/compressed-reports'
           output-report: 'cucumber-split-config.json'
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: cucumber-split-config
           path: cucumber-split-config.json
