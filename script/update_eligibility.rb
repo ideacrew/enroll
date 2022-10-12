@@ -14,6 +14,8 @@ field_names = %w(
         message
       )
 
+eligibility_file_name = "#{Rails.root}/eligibilities/#{start_date_of_next_year.year}_THHEligibility.csv"
+
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
 
@@ -22,7 +24,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   not_run = 0
   created_eligibility = 0
 
-  CSV.foreach("pids/#{start_date_of_next_year.year}_THHEligibility.csv") do |row_with_ssn|
+  CSV.foreach(eligibility_file_name) do |row_with_ssn|
     primary_ssn, primary_hbx_id, aptc, date, individual_csr = row_with_ssn
     date ||= start_date_of_next_year.to_s
     effective_date = date.to_date
