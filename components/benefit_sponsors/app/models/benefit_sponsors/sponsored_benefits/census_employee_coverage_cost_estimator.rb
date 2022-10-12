@@ -11,6 +11,52 @@ module BenefitSponsors
         end
       end
 
+      # Calculates child care subsidy for the census employee based on lowest cost silver plan
+      class CensusEmployeeSubsidyCalculator
+
+        attr_reader :census_employee, :sponsored_benefit
+
+        def initialize(census_employee, s_benefit)
+          @census_employee = census_employee
+          @sponsored_benefit = s_benefit
+        end
+
+        def subsidy_amount
+          return 0.0 if census_employee.is_cobra_status?
+          return 0.0 unless benefit_package&.benefit_application&.osse_eligible?
+
+          rate_schedule_date = @sponsored_benefit.rate_schedule_date
+          coverage_age = age_on(census_employee.dob, rate_schedule_date)
+
+          ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
+            lcsp,
+            rate_schedule_date,
+            coverage_age,
+            @sponsored_benefit.recorded_rating_area.exchange_provided_code
+          )
+        end
+
+        def lcsp
+          return @lcsp if defined? @lcsp
+          effective_year_for_lcsp = benefit_package&.start_on&.year
+          hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
+          @lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
+        end
+
+        def age_on(dob, date = TimeKeeper.date_of_record)
+          age = date.year - dob.year
+          if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+            age - 1
+          else
+            age
+          end
+        end
+
+        def benefit_package
+          @sponsored_benefit&.benefit_package
+        end
+      end
+
       class CensusEmployeeMemberGroupMapper
         include Enumerable
 
@@ -68,6 +114,9 @@ module BenefitSponsors
               })
             end
           end
+
+          eligible_childcare_subsidy = CensusEmployeeSubsidyCalculator.new(census_employee, @sponsored_benefit).subsidy_amount
+
           group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
             {
               product: reference_product,
@@ -75,7 +124,8 @@ module BenefitSponsors
               coverage_start_on: coverage_start,
               member_enrollments: member_enrollments,
               rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
-              sponsor_contribution_prohibited: ["cobra_eligible", "cobra_linked", "cobra_termination_pending"].include?(census_employee.aasm_state)
+              sponsor_contribution_prohibited: ["cobra_eligible", "cobra_linked", "cobra_termination_pending"].include?(census_employee.aasm_state),
+              eligible_child_care_subsidy: eligible_childcare_subsidy
             })
           ::BenefitSponsors::Members::MemberGroup.new(
             member_entries,
