@@ -106,7 +106,8 @@ module BenefitMarkets
 
       # QHP should cover all 'Dental Check-Up for Children', 'Basic Dental Care - Child' & 'Major Dental Care - Child'
       def covers_pediatric_dental?
-        benefits = qhp.qhp_benefits
+        benefits = qhp&.qhp_benefits
+        return false if benefits.blank?
         benefits.child_dental_checkup.present? && benefits.child_basic_dental.present? && benefits.child_major_dental.present?
       end
 
