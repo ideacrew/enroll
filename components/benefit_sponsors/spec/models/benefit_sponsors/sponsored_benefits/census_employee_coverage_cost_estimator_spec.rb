@@ -1,4 +1,6 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator::CensusEmployeeMemberGroupMapper, "given:
@@ -11,7 +13,8 @@ module BenefitSponsors
         :id => "census_employee_id",
         :dob => Date.new(1965, 12, 3),
         :census_dependents => [domestic_partner, disabled_child],
-        :aasm_state => "eligible"
+        :aasm_state => "eligible",
+        :is_cobra_status? => true
       })
     end
     let(:domestic_partner) do
@@ -128,6 +131,69 @@ module BenefitSponsors
         it 'should return count for employees_enrolling_and_waiving' do
           expect(@employees_enrolling_and_waiving.count).to eq 5
         end
+      end
+    end
+  end
+
+  RSpec.describe BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator::CensusEmployeeSubsidyCalculator, :dbclean => :after_each do
+
+    include_context "setup benefit market with market catalogs and product packages"
+
+    let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+    include_context "setup initial benefit application"
+
+    let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+    let(:family) { person.primary_family }
+
+    let!(:census_employee) do
+      ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package, aasm_state: employee_status, cobra_begin_date: cobra_begin_date)
+      ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+      person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+      ce
+    end
+
+    let(:employee_status) { 'eligible' }
+    let(:cobra_begin_date) { nil }
+    let(:sponsored_benefit) { current_benefit_package.sponsored_benefits.first }
+
+    context 'when employer not osse eligible' do
+
+      before do
+        allow(initial_application).to receive(:osse_eligible?).and_return(false)
+      end
+
+      it 'should return zero subsidy' do
+        calculator = described_class.new(census_employee, sponsored_benefit)
+        expect(calculator.subsidy_amount).to eq(0.0)
+      end
+    end
+
+    context 'when employee in cobra status' do
+      let(:employee_status) { 'cobra_eligible' }
+      let(:cobra_begin_date) { TimeKeeper.date_of_record }
+
+      it 'should return zero subsidy' do
+        calculator = described_class.new(census_employee, sponsored_benefit)
+        expect(calculator.subsidy_amount).to eq(0.0)
+      end
+    end
+
+    context 'when both employer and employee osse eligible' do
+
+      let(:calculator) { described_class.new(census_employee, sponsored_benefit) }
+      let(:premium) { 245.80 }
+      let(:age) { calculator.age_on(census_employee.dob, sponsored_benefit.rate_schedule_date) }
+      let(:recorded_rating_area) { double(exchange_provided_code: 'DC-001')}
+
+      before do
+        allow(sponsored_benefit).to receive(:recorded_rating_area).and_return(recorded_rating_area)
+        allow(initial_application).to receive(:osse_eligible?).and_return(true)
+        allow(calculator).to receive(:lcsp).and_return(sponsored_benefit.reference_product)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(sponsored_benefit.reference_product, sponsored_benefit.rate_schedule_date, age, recorded_rating_area.exchange_provided_code).and_return(premium)
+      end
+
+      it 'should calculate subsidy amount based on lowest cost silver plan' do
+        expect(calculator.subsidy_amount).to eq(premium)
       end
     end
   end
