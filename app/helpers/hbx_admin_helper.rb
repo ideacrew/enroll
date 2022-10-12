@@ -65,6 +65,12 @@ module HbxAdminHelper
     family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
   end
 
+  def mthh_active_eligibility?(eligible_member_ids, family_member_id)
+    return 'No' if eligible_member_ids.blank?
+
+    eligible_member_ids.include?(family_member_id.to_s) ? 'Yes' : 'No'
+  end
+
   def prior_py_sep?(family, effective_date, market)
     return false if effective_date.blank?
     person = family.primary_person

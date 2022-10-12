@@ -1053,6 +1053,17 @@ class HbxEnrollment
     )
   end
 
+  def update_tax_household_enrollment
+    return if is_shop?
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    TaxHouseholdEnrollment.where(enrollment_id: id).each do |th_enrollment|
+      th_enrollment.update_attributes(applied_aptc: (th_enrollment.available_max_aptc * elected_aptc_pct))
+    end
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+  end
+
   def handle_coverage_selection
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
@@ -2086,7 +2097,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events, :update_tax_household_enrollment] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
