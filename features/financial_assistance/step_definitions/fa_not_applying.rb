@@ -39,7 +39,6 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-  fill_in "person_phones_attributes_1_full_phone_number", with: "5555555555"
 
   sleep 5
   find('.btn', text: 'CONTINUE').click
@@ -259,12 +258,63 @@ Given(/Adtl contact required for text feature is enabled/) do
   enable_feature :adtl_contact_required_for_text
 end
 
-And(/Individual selects text only as contact option/) do
+And(/Individual fills in info required and selects text only as contact option/) do
+  fill_in "person_first_name", with: personal_information[:first_name]
+  fill_in "person_last_name", with: personal_information[:last_name]
+  fill_in "jq_datepicker_ignore_person_dob", with: personal_information[:dob].to_s
+  fill_in "person_ssn", with: personal_information[:ssn]
+  find(:xpath, '//label[@for="radio_male"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+  find('.btn', text: 'CONTINUE').click
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
+  find('.btn', text: 'CONTINUE').click
+  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
+  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "indian_tribe_member_no", "person[indian_tribe_member]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "radio_incarcerated_no", "person[is_incarcerated]", "false")
+  fill_in "person_addresses_attributes_0_address_1", with: personal_information[:address_1]
+  fill_in "person_addresses_attributes_0_address_2", with: personal_information[:address_2]
+  fill_in "person_addresses_attributes_0_city", with: personal_information[:city]
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+  find('#address_info li', :text => 'DC', wait: 5).click
+  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+  fill_in "person_phones_attributes_1_full_phone_number", with: "5555555555"
+  find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').click
+  find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-mail').click
+  find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text').click
+end
+
+And(/Individual fills in info required and selects no contact option/) do
+  fill_in "person_first_name", with: personal_information[:first_name]
+  fill_in "person_last_name", with: personal_information[:last_name]
+  fill_in "jq_datepicker_ignore_person_dob", with: personal_information[:dob].to_s
+  fill_in "person_ssn", with: personal_information[:ssn]
+  find(:xpath, '//label[@for="radio_male"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+  find('.btn', text: 'CONTINUE').click
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
+  find('.btn', text: 'CONTINUE').click
+  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
+  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "indian_tribe_member_no", "person[indian_tribe_member]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "radio_incarcerated_no", "person[is_incarcerated]", "false")
+  fill_in "person_addresses_attributes_0_address_1", with: personal_information[:address_1]
+  fill_in "person_addresses_attributes_0_address_2", with: personal_information[:address_2]
+  fill_in "person_addresses_attributes_0_city", with: personal_information[:city]
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+  find('#address_info li', :text => 'DC', wait: 5).click
+  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+  fill_in "person_phones_attributes_1_full_phone_number", with: "5555555555"
   find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').click
   find('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-mail').click
 end
 
-Then(/the user should see an error message warning about text/) do
+Then(/Individual should see an error message warning about text/) do
   text = page.driver.browser.switch_to.alert.text
   expect(text).to eq 'An additional contact method is required if only Text is selected.'
+end
+
+Then(/Individual should see an error message warning about no contact method/) do
+  text = page.driver.browser.switch_to.alert.text
+  expect(text).to eq 'Warning: You must select at least one contact method. An additional method must be checked if selecting Text.'
 end

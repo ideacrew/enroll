@@ -12,7 +12,15 @@ Feature: UI Validations for Contact Method
         Then Individual creates a new HBX account
         Then Individual should see a successful sign up message
         And Individual sees Your Information page
-        And the primary member has filled mandatory information required
-        And Individual selects text only as contact option
+        And Individual fills in info required and selects text only as contact option
         When Individual clicks on continue
-        Then the user should see an error message warning about text
+        Then Individual should see an error message warning about text
+
+    Scenario: Individual signs up with Text only contact method
+        When Individual visits the Consumer portal during open enrollment
+        Then Individual creates a new HBX account
+        Then Individual should see a successful sign up message
+        And Individual sees Your Information page
+        And Individual fills in info required and selects no contact option
+        When Individual clicks on continue
+        Then Individual should see an error message warning about no contact method
