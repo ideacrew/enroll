@@ -141,6 +141,9 @@
                                                                          short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></h5>
         <% else %>
           <h5 data-cuke='next_steps_text'><%= l10n("faa.results.next_steps_text", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></h5>
+        <% end %>
+
+        <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
           <h5 data-cuke='continue_text'><%= l10n("faa.results.continue_text") %></h5>
         <% end %>
 
