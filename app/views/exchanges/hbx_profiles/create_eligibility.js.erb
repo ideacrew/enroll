@@ -4,7 +4,11 @@ if ( $('tr.child-row:visible').length > 0 ) {
   $('tr.child-row:visible').remove();
 }
 
-if ( $parent_row.next().hasClass('child-row') ) {
+if ( $('tr.child-row-mthh:visible').length > 0 ) {
+  $('tr.child-row-mthh:visible').remove();
+}
+
+if ( $parent_row.next().hasClass('child-row') || $parent_row.next().hasClass('child-row-mthh') ) {
 //
 } 
 else {

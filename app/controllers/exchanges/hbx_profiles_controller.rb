@@ -676,16 +676,58 @@ def employer_poc
   def new_eligibility
     authorize  HbxProfile, :can_add_pdc?
     @person = Person.find(params[:person_id])
+    @family = @person.primary_family
     @element_to_replace_id = params[:family_actions_id]
+    @tax_household_group_data = JSON.parse(params[:tax_household_group_data]) if params[:tax_household_group_data].present?
     respond_to do |format|
       format.js { render "new_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
     end
   end
 
-  def create_eligibility
+  def process_eligibility
     @element_to_replace_id = params[:person][:family_actions_id]
-    family = Person.find(params[:person][:person_id]).primary_family
-    family.active_household.create_new_tax_household(params[:person]) rescue nil
+    @person_id = params[:person][:person_id]
+    @data = params.require(:person).permit(family_members: {}).to_h[:family_members]
+    @tax_household_group_data = @data.inject({}) do |result, fm_hash|
+      fm_info = fm_hash[1]
+      family_member_id = fm_hash[0]
+
+      result[fm_info[:tax_group]] ||= []
+
+      result[fm_info[:tax_group]] << {
+        pdc_type: fm_info[:pdc_type],
+        csr: fm_info[:csr],
+        is_filer: fm_info[:is_filer],
+        member_name: fm_info[:member_name],
+        family_member_id: family_member_id
+      }
+
+      result
+    end
+
+    respond_to do |format|
+      format.js { render "process_eligibility" }
+    end
+  end
+
+  def create_eligibility
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      @element_to_replace_id = params[:tax_household_group][:family_actions_id]
+      family = Person.find(params[:tax_household_group][:person_id]).primary_family
+      ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({
+                                                                     family: family,
+                                                                     th_group_info: params.require(:tax_household_group).permit(
+                                                                       :person_id,
+                                                                       :family_actions_id,
+                                                                       :effective_date,
+                                                                       :tax_households => {}
+                                                                     ).to_h
+                                                                   })
+    else
+      @element_to_replace_id = params[:person][:family_actions_id]
+      family = Person.find(params[:person][:person_id]).primary_family
+      family.active_household.create_new_tax_household(params[:person])
+    end
   end
 
   def eligibility_kinds_hash(value)
