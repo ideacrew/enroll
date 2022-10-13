@@ -671,6 +671,7 @@ module FinancialAssistance
                             start_on: benefit.start_on,
                             end_on: benefit.end_on,
                             submitted_at: benefit.submitted_at,
+                            health_plan_meets_mvs_and_affordable: benefit.health_plan_meets_mvs_and_affordable,
                             hra_kind: get_hra_kind(benefit.hra_type) }
                 result
               end

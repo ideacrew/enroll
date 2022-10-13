@@ -101,6 +101,8 @@ module FinancialAssistance
     field :employer_name, type: String
     field :employer_id, type: String, default: ''
 
+    field :health_plan_meets_mvs_and_affordable, type: Boolean
+
     scope :eligible, -> { where(kind: 'is_eligible')}
     scope :enrolled, -> { where(kind: 'is_enrolled')}
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
@@ -198,7 +200,7 @@ module FinancialAssistance
     end
 
     def duplicate_instance(new_applicant)
-      benefit_params = self.attributes.slice(:title, :esi_covered, :kind, :insurance_kind, :hra_type, :is_employer_sponsored, :is_esi_waiting_period,
+      benefit_params = self.attributes.slice(:title, :esi_covered, :kind, :insurance_kind, :hra_type, :is_employer_sponsored, :is_esi_waiting_period, :health_plan_meets_mvs_and_affordable,
                                              :is_esi_mec_met, :employee_cost, :employee_cost_frequency, :start_on, :end_on, :employer_name, :employer_id)
       new_benefit = new_applicant.benefits.build(benefit_params)
       build_new_employer_address(new_benefit) if employer_address.present?
@@ -233,6 +235,7 @@ module FinancialAssistance
       model_params[:employee_cost_frequency] = nil
       model_params[:is_esi_mec_met] = nil
       model_params[:is_esi_waiting_period] = nil
+      model_params[:health_plan_meets_mvs_and_affordable] = nil
     end
 
     def clean_employer_params_when_not_esi(params)

@@ -27,6 +27,7 @@ class TaxHouseholdMember
   field :is_without_assistance, type: Boolean, default: false
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
   field :csr_eligibility_kind, type: String, default: 'csr_0'
+  field :is_filer, type: Boolean
 
   validate :strictly_boolean
 
