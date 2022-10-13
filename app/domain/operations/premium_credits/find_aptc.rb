@@ -92,8 +92,10 @@ module Operations
 
       def persist_tax_household_members_enrollment_members(aptc_grant, th_enrollment, household_info)
         return if household_info.blank?
-        tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).first
-        tax_household = tax_household_group.tax_households.where(id: aptc_grant.tax_household_id).first
+
+        th_id = BSON::ObjectId.from_string(aptc_grant.tax_household_id.to_s)
+        tax_household_group = @family.tax_household_groups.active.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
+        tax_household = tax_household_group.tax_households.where(_id: th_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members
 
