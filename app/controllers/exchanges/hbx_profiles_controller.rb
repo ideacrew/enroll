@@ -687,7 +687,7 @@ def employer_poc
   def process_eligibility
     @element_to_replace_id = params[:person][:family_actions_id]
     @person_id = params[:person][:person_id]
-    @data = params[:person][:family_members].permit!.to_h
+    @data = params.require(:person).permit(family_members: {}).to_h[:family_members]
     @tax_household_group_data = @data.inject({}) do |result, fm_hash|
       fm_info = fm_hash[1]
       family_member_id = fm_hash[0]
@@ -714,7 +714,15 @@ def employer_poc
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
-      ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({ family: family, th_group_info: params[:tax_household_group].permit!.to_h })
+      ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({
+                                                                     family: family,
+                                                                     th_group_info: params.require(:tax_household_group).permit(
+                                                                       :person_id,
+                                                                       :family_actions_id,
+                                                                       :effective_date,
+                                                                       :tax_households => {}
+                                                                     ).to_h
+                                                                   })
     else
       @element_to_replace_id = params[:person][:family_actions_id]
       family = Person.find(params[:person][:person_id]).primary_family
