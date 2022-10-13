@@ -24,7 +24,7 @@ module Subscribers
 
         result =
           if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
-            ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
+            # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
           else
             FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
           end

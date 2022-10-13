@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 0b7b5d415c2bb316171b44ce2d4df9b97aa354e8
+  revision: 502d8fa53474bf9bdae90c1cb508ff163c03788c
   branch: ivl_renewals_determination_event
   specs:
     aca_entities (0.10.0)
