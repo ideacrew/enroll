@@ -774,10 +774,10 @@ describe EventsHelper, "#policy_responsible_amount" do
   describe "given a IVL policy with OSSE" do
     let(:is_ivl_by_kind) { true }
     let(:has_child_care_subsidy) { true }
-    let(:total_premium) { 100.00 }
+    let(:total_premium) { Money.from_amount(100.00) }
     let(:product_cost_total) { total_premium }
-    let(:applied_aptc_amount) { 2.34 }
-    let(:eligible_child_care_subsidy) { 1.23 }
+    let(:applied_aptc_amount) { Money.from_amount(2.34) }
+    let(:eligible_child_care_subsidy) { Money.from_amount(1.23) }
     let(:sponsor_contribution_total) { 0.00 }
 
     it "has the correct premium total" do
@@ -788,10 +788,10 @@ describe EventsHelper, "#policy_responsible_amount" do
   describe "given a SHOP policy with an OSSE amount" do
     let(:is_ivl_by_kind) { false }
     let(:has_child_care_subsidy) { true }
-    let(:total_premium) { 100.00 }
+    let(:total_premium) { Money.from_amount(100.00) }
     let(:product_cost_total) { total_premium }
-    let(:applied_aptc_amount) { 0.00 }
-    let(:eligible_child_care_subsidy) { 1.23 }
+    let(:applied_aptc_amount) { Money.from_amount(0.00) }
+    let(:eligible_child_care_subsidy) { Money.from_amount(1.23) }
     let(:sponsor_contribution_total) { 2.34 }
 
     it "has the correct premium total" do
@@ -802,10 +802,10 @@ describe EventsHelper, "#policy_responsible_amount" do
   describe "given a SHOP policy with no OSSE amount" do
     let(:is_ivl_by_kind) { false }
     let(:has_child_care_subsidy) { false }
-    let(:total_premium) { 100.00 }
+    let(:total_premium) { Money.from_amount(100.00, "USD") }
     let(:product_cost_total) { total_premium }
-    let(:applied_aptc_amount) { 0.00 }
-    let(:eligible_child_care_subsidy) { 1.23 }
+    let(:applied_aptc_amount) { Money.from_amount(0.00, "USD") }
+    let(:eligible_child_care_subsidy) { Money.from_amount(1.23, "USD") }
     let(:sponsor_contribution_total) { 2.34 }
 
     it "has the correct premium total" do
