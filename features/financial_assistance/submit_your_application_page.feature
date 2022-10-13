@@ -18,6 +18,7 @@ Feature: This is the final review page before submiting an application
     And the user has not signed their name
     Then the submit button will be disabled
 
+  @flaky
   Scenario: Submit button is disabled when required checkboxes are checked but name is not signed
     Given all required questions are answered
     And the user has not signed their name
