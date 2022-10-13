@@ -19,6 +19,56 @@ RSpec.shared_context 'family with 2 family members', :shared_context => :metadat
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
 end
 
+RSpec.shared_context 'family with 5 family members', :shared_context => :metadata do
+  let(:person1_age) { 30 }
+  let(:person2_age) { 16 }
+  let(:person3_age) { 14 }
+  let(:person4_age) { 12 }
+  let(:person5_age) { 2 }
+
+  let(:start_of_year) { TimeKeeper.date_of_record.beginning_of_year }
+  let(:person1) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person1_age.years)
+    per.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
+    per
+  end
+  let(:person2) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person2_age.years)
+    person1.ensure_relationship_with(per, 'child')
+    per
+  end
+  let(:person3) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person3_age.years)
+    person1.ensure_relationship_with(per, 'child')
+    per
+  end
+  let(:person4) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person4_age.years)
+    person1.ensure_relationship_with(per, 'child')
+    per
+  end
+  let(:person5) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person5_age.years)
+    person1.ensure_relationship_with(per, 'child')
+    per
+  end
+
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
+  let(:family_member1) { family.primary_applicant }
+  let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+  let(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
+  let(:family_member4) { FactoryBot.create(:family_member, family: family, person: person4) }
+  let(:family_member5) { FactoryBot.create(:family_member, family: family, person: person5) }
+
+  let!(:county_zip) { ::BenefitMarkets::Locations::CountyZip.create!(county_name: 'York', zip: '04001', state: 'ME') }
+  let!(:rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.create!(active_year: TimeKeeper.date_of_record.year, exchange_provided_code: "R-ME001", county_zip_ids: [county_zip.id])
+  end
+  let!(:service_area) do
+    ::BenefitMarkets::Locations::ServiceArea.create!(active_year: TimeKeeper.date_of_record.year, county_zip_ids: [county_zip.id], issuer_provided_code: "MES002", issuer_profile_id: BSON::ObjectId.new)
+  end
+end
+
 RSpec.shared_context 'family with 2 family members with county_zip, rating_area & service_area', :shared_context => :metadata do
   include_context 'family with 2 family members'
 
