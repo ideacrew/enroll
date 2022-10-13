@@ -115,11 +115,11 @@ module EventsHelper
   # values all the way downstream.
   def policy_responsible_amount(hbx_enrollment)
     if hbx_enrollment.is_ivl_by_kind?
-      BigDecimal((hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f).to_s).round(2)
+      BigDecimal((hbx_enrollment.total_premium.to_f - hbx_enrollment.applied_aptc_amount.to_f).to_s).round(2)
     elsif hbx_enrollment.has_child_care_subsidy?
-      (hbx_enrollment.decorated_hbx_enrollment.product_cost_total - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total - hbx_enrollment.eligible_child_care_subsidy).to_f.round(2)
+      (hbx_enrollment.decorated_hbx_enrollment.product_cost_total.to_f - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total.to_f - hbx_enrollment.eligible_child_care_subsidy.to_f).to_f.round(2)
     else
-      (hbx_enrollment.decorated_hbx_enrollment.product_cost_total - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total).to_f.round(2)
+      (hbx_enrollment.decorated_hbx_enrollment.product_cost_total.to_f - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total.to_f).to_f.round(2)
     end
   end
 end
