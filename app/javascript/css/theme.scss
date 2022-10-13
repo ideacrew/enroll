@@ -1,20 +1,55 @@
 .btn-outline-primary {
-  @include button-outline-variant($alt-blue, $alt-blue, lighten($white, 5%), $alt-blue);
+  color: var(--theme-primary-100, #007bc4);
+  border-color: var(--theme-primary-100, #007bc4);
   font-weight: 600;
   text-transform: capitalize;
+
+  &:hover {
+    background-color: var(--grey-000);
+    color: var(--theme-primary-100, #007bc4);
+  }
+
+  &:not(:disabled):not(:disabled):active {
+    background-color: var(--grey-000);
+    color: var(--theme-primary-100, #007bc4);
+  }
 }
 
 .btn-primary {
-  @include button-variant($red, $red, darken($red, 10%), $red);
   text-transform: uppercase;
   font-weight: 600;
-  border-color: $dark-red;
+  border-color: var(--error-color);
   border-bottom-width: medium;
+  color: var(--grey-000);
+  background-color: var(--error-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--error-shade);
+    border-color: var(--error-color);
+  }
+
+  &:not(:disabled):not(:disabled):active {
+    background-color: var(--error-color);
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 0.2rem var(--error-tint);
+  }
+
+  &:focus {
+    background-color: var(--error-color);
+    box-shadow: 0 0 0 0.2rem var(--error-tint);
+    border-color: var(--error-color);
+  }
+
+  &:disabled {
+    opacity: 0.8;
+    background-color: var(--error-shade);
+    border-color: var(--error-shade);
+  }
 }
 
 .heading-text {
   font-weight: 400;
-  color: $dark-blue;
+  color: var(--theme-primary-100, #007bc4);
 }
 
 .invalid-feedback {
@@ -22,26 +57,26 @@
 }
 
 .login-options {
-  border-left: solid 1px $alt-gray;
+  border-left: solid 1px var(--grey-050);
   min-height: 72px;
 }
 
 .navbar-main {
-  background-color: $white;
-  border-bottom: solid 3px $alt-blue;
+  background-color: var(--grey-000);
+  border-bottom: solid 3px var(--theme-primary-100, #007bc4);
   .navbar-brand {
-    border-right: solid 1px $alt-gray;
+    border-right: solid 1px var(--grey-050);
     img {
       max-height: 40px;
     }
   }
   .portal {
     font-weight: 600;
-    color: $dark-gray !important;
+    color: var(--grey-120) !important;
     font-size: 18px;
   }
   .header-text {
-    color: $alt-gray-2;
+    color: var(--grey-060);
     font-size: 14px;
     text-transform: uppercase;
     font-weight: 600;
@@ -50,41 +85,41 @@
     border: none;
   }
   .fa-phone {
-    color: $alt-blue;
+    color: var(--theme-primary-100, #007bc4);
   }
   .cc-number {
-    color: $dark-gray;
+    color: var(--grey-120);
   }
 }
 
 .sub-text {
   font-weight: 200;
-  color: $dark-blue;
+  color: var(--theme-primary-100, #007bc4);
 }
 
 // This is for conditional styles used only in
 // preprod environment
 .pre_prod_nav_color {
-  color: white !important;
-  background-color: #003260 !important;
+  color: var(--grey-000) !important;
+  background-color: var(--info-color) !important;
 
-   .call-customer-service {
-    color: white !important;
+  .call-customer-service {
+    color: var(--grey-000) !important;
   }
 
-   span a {
-    color: white !important;
+  span a {
+    color: var(--grey-000) !important;
   }
 
-   .header-text {
-    color: white !important;
+  .header-text {
+    color: var(--grey-000) !important;
   }
 
-   span strong {
-    color: white !important;
+  span strong {
+    color: var(--grey-000) !important;
   }
 
-   a.portal {
-    color: white !important;
+  a.portal {
+    color: var(--grey-000) !important;
   }
 }

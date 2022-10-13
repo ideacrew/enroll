@@ -1,3 +1,37 @@
-$theme-colors: (
-  "alt-blue": #007bc4
-);
+:root {
+  // Generic greys
+  --grey-000: hsl(0, 0%, 100%);
+  --grey-010: hsl(30, 20%, 98%);
+  --grey-020: hsl(30, 8%, 95%);
+  --grey-030: hsl(30, 10%, 92%);
+  --grey-040: hsl(30, 6%, 87%);
+  --grey-050: hsl(30, 4%, 82%);
+  --grey-060: hsl(30, 4%, 78%);
+  --grey-090: hsl(30, 2%, 62%);
+  --grey-100: hsl(30, 2%, 52%);
+  --grey-120: hsl(30, 2%, 43%);
+  --grey-130: hsl(30, 2%, 37%);
+  --grey-150: hsl(40, 3%, 23%);
+  --grey-160: hsl(30, 2%, 19%);
+  --grey-190: hsl(30, 3%, 12%);
+
+
+  // Generic colors
+  --info-color: hsl(202, 100%, 27%);
+  --info-tint: #cde5f3;
+  --success-color: hsl(130, 97%, 23%);
+  --success-tint: hsl(130, 61%, 86%);
+  --warning-color: hsl(44, 100%, 45%);
+  --warning-tint: hsl(45, 100%, 85%);
+  --error-shade: hsl(0, 68%, 32%);
+  --error-color: hsl(0, 69%, 38%);
+  --error-tint: hsl(0, 80%, 86%);
+
+  // May be unique colors, but used by all clients
+  --bright-green: hsl(65, 100%, 42%);
+  --orange: hsl(359, 80%, 54%);
+
+
+  // Base layout colors
+  --body-color: var(--grey-010);
+}
