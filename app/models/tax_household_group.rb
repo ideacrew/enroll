@@ -33,6 +33,8 @@ class TaxHouseholdGroup
   index({ start_on:  1 })
   index({ end_on:  1 })
   index({ assistance_year:  1 })
+  index({ :"tax_households._id" => 1 })
+
 
   # Scopes
   scope :by_year,   ->(year) { where(assistance_year: year) }
