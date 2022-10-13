@@ -419,7 +419,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               assistance_year: TimeKeeper.date_of_record.year,
               source: 'Admin',
               start_on: TimeKeeper.date_of_record.beginning_of_year,
-              end_on: TimeKeeper.date_of_record.end_of_year,
               tax_households: [
                 FactoryBot.build(:tax_household, household: family.active_household)
               ]
