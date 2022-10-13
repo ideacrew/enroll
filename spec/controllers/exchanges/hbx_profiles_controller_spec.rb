@@ -693,12 +693,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       }}
     end
 
-    before :each do
+    it "should render create_eligibility if save successful" do
       sign_in(user)
       post :create_eligibility, params: params, xhr: true, format: :js
-    end
-
-    it "should render create_eligibility if save successful" do
       active_household = person.primary_family.active_household
       latest_active_thh = active_household.reload.latest_active_thh
       eligibility_deter = latest_active_thh.eligibility_determinations.first
@@ -713,10 +710,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     context 'mthh enabled' do
-      before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
-      end
-
       let(:family) do
         family = FactoryBot.build(:family, person: primary)
         family.family_members = [
@@ -782,6 +775,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it "should render create_eligibility if save successful" do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        sign_in(user)
+        post :create_eligibility, params: params, xhr: true, format: :js
         eligibility_determination = family.reload.eligibility_determination
         grants = eligibility_determination.grants
 
