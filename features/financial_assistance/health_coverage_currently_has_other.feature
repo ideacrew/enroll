@@ -7,6 +7,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And FAA display_medicaid_question feature is enabled
+    And FAA minimum_value_standard_question feature is enabled
     When they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page (health coverage)
     And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
@@ -31,6 +32,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
   Scenario: User enters employer sponsored health coverage information (currently have access to coverage)
     Given the user answers yes to currently having access to other health coverage
     And the user checks a employer sponsored health coverage checkbox
+    Then the health plan meets mvs and affordable question should show
     And the user not sure link next to minimum standard value question
     Then the user should be see proper text in the modal popup
 
