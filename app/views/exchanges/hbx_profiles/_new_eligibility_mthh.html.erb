@@ -1,0 +1,60 @@
+<div class="container bottom-pd">
+  <%= form_for @person, remote: true, url: process_eligibility_path, method: "post", id: "eligibility_form" do |f| %>
+    <%= f.hidden_field :person_id, value: f.object.id  %>
+    <%= f.hidden_field :family_actions_id, value: "family_actions_#{f.object.primary_family.id.to_s}" %>
+
+    <% family = f.object.primary_family %>
+    <% tax_household_group =  family.tax_household_groups.active.order_by(:"created_at".desc).first %>
+    <% current_eligible_member_ids =  tax_household_group.tax_households.map(&:applicant_ids).flatten.map(&:to_s) if tax_household_group %>
+
+    <h2>Create Eligibility</h2>
+
+    <p>Please fill out all relevant information for each family member and continue to step 2 of 2.</p>
+    <table class="table table-border" id="eligibility_table">
+      <thead>
+        <th>Name</th>
+        <th>DOB</th>
+        <th>HBX ID</th>
+        <th>Current Eligibility</th>
+        <th>Program</th>
+        <th>CSR</th>
+        <th>Tax Group</th>
+        <th>Filer?</th>
+      </thead>
+      <tbody>
+        <% family.active_family_members.each do |family_member| %>
+          <% person = family_member.person %>
+          <% member_name = person.full_name.humanize %>
+          <% member_id = family_member.id.to_s %>
+          <%= hidden_field_tag "person[family_members][#{member_id}][member_name]", member_name %>
+          
+          <tr>
+            <td><h5><%= member_name %></h5></td>
+            <td><h5><%= person.dob %> </h5></td>
+            <td><h5><%= person.hbx_id %></h5></td>
+            <td><%= mthh_active_eligibility?(current_eligible_member_ids, member_id) %></td>
+            <td><%= select_tag "person[family_members][#{member_id}][pdc_type]", options_for_select(TaxHouseholdMember::PDC_TYPES, @tax_household_group_data&.dig(member_id, 'pdc_type')), class: 'form-control required' %></td>
+            <td class="select_person_csr">
+              <%= select_tag "person[family_members][#{member_id}][csr]", options_for_select(csr_percentage_options_for_select, @tax_household_group_data&.dig(member_id, 'csr')), prompt: 'Select one', class: 'form-control required' %>
+            </td>
+            <td class="select_person_tax_group">
+              <%= select_tag "person[family_members][#{member_id}][tax_group]", options_for_select([1, 2, 3, 4], @tax_household_group_data&.dig(member_id, 'tax_group')), prompt: 'Select one', class: 'form-control required' %>
+            </td>
+            <td>
+              <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
+              <label>Yes</label>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="row no-buffer" style="margin-top: 10px;">
+      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+        <%= button_tag 'Cancel', :class => 'btn btn-default', type: 'button', onclick: "$('tr.child-row:visible').remove();" %>
+        <%= submit_tag "Continue To Tax Group Details", :class => "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+

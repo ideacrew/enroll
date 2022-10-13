@@ -113,7 +113,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:person) { double("Person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
-    let(:search_params){{"value"=>""}}
+    let(:search_params){{"value" => ""}}
 
     before :each do
       allow(user).to receive(:person).and_return(person)
@@ -267,7 +267,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       get :configuration
       expect(response).to have_http_status(:success)
-      post :set_date, params: {forms_time_keeper: { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
+      post :set_date, params: {forms_time_keeper: { :date_of_record => TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
       expect(response).to have_http_status(:redirect)
     end
 
@@ -358,7 +358,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "create new organization if params valid" do
-      get :generate_invoice, params: {"employerId"=>[organization.id], ids: [organization.id]}, format: :js, xhr: true
+      get :generate_invoice, params: {"employerId" => [organization.id], ids: [organization.id]}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
       # expect(organization.invoices.size).to eq 1
     end
@@ -394,7 +394,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "renders edit_force_publish" do
         sign_in(user)
-        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id}", :format => 'js'}
         get :edit_force_publish, params: @params, xhr: true
         expect(response).to render_template('edit_force_publish')
         expect(response).to have_http_status(:success)
@@ -432,7 +432,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "renders force_publish" do
         sign_in(user)
-        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id}", :format => 'js'}
         post :force_publish, params: @params, xhr: true
         expect(response).to render_template('force_publish')
         expect(response).to have_http_status(:success)
@@ -531,7 +531,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:person) { double("person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
-    let(:permission) { double("permission", name: "hbx_staff", view_the_configuration_tab: false )}
+    let(:permission) { double("permission", name: "hbx_staff", view_the_configuration_tab: false)}
 
 
     before :each do
@@ -578,15 +578,15 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(Forms::TimeKeeper).to receive(:new).with(timekeeper_form_params).and_return(time_keeper_form)
       allow(time_keeper_form).to receive(:forms_date_of_record).and_return(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       sign_in(user)
-      post :set_date, params: {forms_time_keeper: { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
+      post :set_date, params: {forms_time_keeper: { :date_of_record => TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
       expect(response).to have_http_status(:redirect)
     end
 
     it "sends timekeeper a date and fails because not updateable" do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false, can_submit_time_travel_request: false, name: "hbx_staff", view_the_configuration_tab: false))
       sign_in(user)
-      expect(TimeKeeper).not_to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
-      post :set_date, params: {forms_time_keeper: { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
+      expect(TimeKeeper).not_to receive(:set_date_of_record).with(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
+      post :set_date, params: {forms_time_keeper: { :date_of_record => TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match(/Access not allowed/)
     end
@@ -645,9 +645,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:permission_yes) { FactoryBot.create(:permission, can_add_pdc: true) }
     let(:params) do
       { person_id: person.id,
-         family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
-         format: 'js'
-       }
+        family_actions_id: "family_actions_#{person.primary_family.id}",
+        format: 'js'}
     end
 
     it "should render the new_eligibility partial" do
@@ -678,26 +677,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:reason) { 'Test reason' }
     let(:params) do
       { person: {
-          person_id: person.id,
-          family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
-          max_aptc: max_aptc,
-          csr: csr,
-          effective_date: "2018-04-13",
-          family_members: {
-            "#{person.primary_family.active_family_members.first.person.hbx_id}" => {
-              pdc_type: "is_medicaid_chip_eligible",
-              reason: reason
-            }
-          },
-          "jq_datepicker_ignore_person" => { "effective_date" => "04/13/2018" },
-          format: 'js'
-        }
-      }
+        person_id: person.id,
+        family_actions_id: "family_actions_#{person.primary_family.id}",
+        max_aptc: max_aptc,
+        csr: csr,
+        effective_date: "2018-04-13",
+        family_members: {
+          person.primary_family.active_family_members.first.person.hbx_id.to_s => {
+            pdc_type: "is_medicaid_chip_eligible",
+            reason: reason
+          }
+        },
+        "jq_datepicker_ignore_person" => { "effective_date" => "04/13/2018" },
+        format: 'js'
+      }}
     end
 
     it "should render create_eligibility if save successful" do
       sign_in(user)
-      get :create_eligibility, params: params, xhr: true, format: :js
+      post :create_eligibility, params: params, xhr: true, format: :js
       active_household = person.primary_family.active_household
       latest_active_thh = active_household.reload.latest_active_thh
       eligibility_deter = latest_active_thh.eligibility_determinations.first
@@ -709,6 +707,83 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(tax_household_member.is_medicaid_chip_eligible).to be_truthy
       expect(tax_household_member.is_ia_eligible).to be_falsy
       expect(tax_household_member.reason).to eq(reason)
+    end
+
+    context 'mthh enabled' do
+      let(:family) do
+        family = FactoryBot.build(:family, person: primary)
+        family.family_members = [
+          FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+          FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent1),
+          FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent2)
+        ]
+
+        family.person.person_relationships.push PersonRelationship.new(relative_id: dependent1.id, kind: 'spouse')
+        family.person.person_relationships.push PersonRelationship.new(relative_id: dependent2.id, kind: 'child')
+        family.save
+        family
+      end
+
+      let(:primary_fm) { family.primary_applicant }
+      let(:dependents) { family.dependents }
+
+      let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:dependent1) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:dependent2) { FactoryBot.create(:person, :with_consumer_role) }
+
+      let(:params) do
+        {
+          "tax_household_group" => {
+            "person_id" => primary.id.to_s,
+            "family_actions_id" => "family_actions_#{family.id}",
+            "effective_date" => TimeKeeper.date_of_record.to_s,
+            "tax_households" => {
+              "0" => {
+                "members" => [
+                  {
+                    "pdc_type" => "is_ia_eligible",
+                    "csr" => "100",
+                    "is_filer" => "on",
+                    "member_name" => "Ivl ivl",
+                    "family_member_id" => primary_fm.id.to_s
+                  },
+                  {
+                    "pdc_type" => "is_ia_eligible",
+                    "csr" => "87",
+                    "is_filer" => nil,
+                    "member_name" => "Spouse spouse",
+                    "family_member_id" => dependents[0].id.to_s
+                  }
+                ].to_json,
+                "monthly_expected_contribution" => "400"
+              },
+              "1" => {
+                "members" => [
+                  {
+                    "pdc_type" => "is_ia_eligible",
+                    "csr" => "94",
+                    "is_filer" => "on",
+                    "member_name" => "Child child",
+                    "family_member_id" => dependents[1].id.to_s
+                  }
+                ].to_json,
+                "monthly_expected_contribution" => "300"
+              }
+            }
+          }
+        }
+      end
+
+      it "should render create_eligibility if save successful" do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        sign_in(user)
+        post :create_eligibility, params: params, xhr: true, format: :js
+        eligibility_determination = family.reload.eligibility_determination
+        grants = eligibility_determination.grants
+
+        expect(eligibility_determination.effective_date).to eq TimeKeeper.date_of_record
+        expect(grants.size).to eq 2
+      end
     end
   end
 
@@ -810,17 +885,17 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:organization) { abc_organization }
     let(:hired_on) {TimeKeeper.date_of_record.beginning_of_month}
 
-    let!(:census_employees) {
+    let!(:census_employees) do
       FactoryBot.create :benefit_sponsors_census_employee, :owner, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship
       FactoryBot.create :benefit_sponsors_census_employee, employer_profile: employer_profile, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship
-    }
+    end
 
     let(:ce) {employer_profile.census_employees.non_business_owner.first}
 
-    let(:employee_role) {
+    let(:employee_role) do
       employee_person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name, ssn: valid_ssn, no_ssn: false)
       FactoryBot.create(:benefit_sponsors_employee_role, person: employee_person, census_employee: ce, employer_profile: employer_profile)
-    }
+    end
 
 
     before do
@@ -872,7 +947,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
-      expect(assigns(:dont_update_ssn)). to eq true
+      expect(assigns(:dont_update_ssn)).to eq true
     end
 
     it "cannot update ssn for employee if employer has ssn/tin functionality enabled" do
@@ -892,7 +967,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
-      expect(assigns(:dont_update_ssn)). to eq nil
+      expect(assigns(:dont_update_ssn)).to eq nil
     end
 
     it "can update ssn for employee if employer has ssn/tin functionality disabled" do
@@ -927,7 +1002,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "should get general_agencies" do
         get :general_agency_index, format: :html, xhr: true
-        expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
+        expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by)
       end
     end
 
@@ -984,14 +1059,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let!(:household) { FactoryBot.create(:household, family: family) }
-    let!(:enrollment) {
+    let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         family: family,
                         household: family.active_household,
                         coverage_kind: "health",
                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
-                        aasm_state: 'coverage_termination_pending'
-      )}
+                        aasm_state: 'coverage_termination_pending')
+    end
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
@@ -1015,54 +1090,60 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let!(:household) { FactoryBot.create(:household, family: family) }
     let(:effective_on) {TimeKeeper.date_of_record.beginning_of_year - 1.year}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
-    let(:hbx_en_member1) { FactoryBot.build(:hbx_enrollment_member,
-                                              eligibility_date: effective_on,
-                                              coverage_start_on: effective_on,
-                                              applicant_id: dependents.first.id) }
-    let(:hbx_en_member2) { FactoryBot.build(:hbx_enrollment_member,
-                                          eligibility_date: effective_on + 2.months,
-                                          coverage_start_on: effective_on + 2.months,
-                                          applicant_id: dependents.first.id) }
-    let(:hbx_en_member3) { FactoryBot.build(:hbx_enrollment_member,
-                                      eligibility_date: effective_on + 6.months,
-                                      coverage_start_on: effective_on + 6.months,
-                                      applicant_id: dependents.last.id) }
-    let!(:enrollment1) {
+    let(:hbx_en_member1) do
+      FactoryBot.build(:hbx_enrollment_member,
+                       eligibility_date: effective_on,
+                       coverage_start_on: effective_on,
+                       applicant_id: dependents.first.id)
+    end
+    let(:hbx_en_member2) do
+      FactoryBot.build(:hbx_enrollment_member,
+                       eligibility_date: effective_on + 2.months,
+                       coverage_start_on: effective_on + 2.months,
+                       applicant_id: dependents.first.id)
+    end
+    let(:hbx_en_member3) do
+      FactoryBot.build(:hbx_enrollment_member,
+                       eligibility_date: effective_on + 6.months,
+                       coverage_start_on: effective_on + 6.months,
+                       applicant_id: dependents.last.id)
+    end
+    let!(:enrollment1) do
       FactoryBot.create(:hbx_enrollment,
-                         family: family,
-                         product: product,
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         effective_on: effective_on,
-                         terminated_on: effective_on.next_month.end_of_month,
-                         kind: 'individual',
-                         hbx_enrollment_members: [hbx_en_member1],
-                         aasm_state: 'coverage_terminated'
-      )}
-    let!(:enrollment2) {
+                        family: family,
+                        product: product,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        effective_on: effective_on,
+                        terminated_on: effective_on.next_month.end_of_month,
+                        kind: 'individual',
+                        hbx_enrollment_members: [hbx_en_member1],
+                        aasm_state: 'coverage_terminated')
+    end
+    let!(:enrollment2) do
       FactoryBot.create(:hbx_enrollment,
-                         family: family,
-                         product: product,
-                         kind: 'individual',
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         hbx_enrollment_members: [hbx_en_member2],
-                         effective_on: effective_on + 2.months,
-                         terminated_on: (effective_on + 5.months).end_of_month,
-                         aasm_state: 'coverage_terminated'
-      )}
-    let!(:enrollment3) {
+                        family: family,
+                        product: product,
+                        kind: 'individual',
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        hbx_enrollment_members: [hbx_en_member2],
+                        effective_on: effective_on + 2.months,
+                        terminated_on: (effective_on + 5.months).end_of_month,
+                        aasm_state: 'coverage_terminated')
+    end
+    let!(:enrollment3) do
       FactoryBot.create(:hbx_enrollment,
-                         family: family,
-                         product: product,
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         effective_on: effective_on + 6.months,
-                         terminated_on: effective_on.end_of_year,
-                         kind: 'individual',
-                         hbx_enrollment_members: [hbx_en_member3],
-                         aasm_state: 'coverage_terminated'
-      )}
+                        family: family,
+                        product: product,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        effective_on: effective_on + 6.months,
+                        terminated_on: effective_on.end_of_year,
+                        kind: 'individual',
+                        hbx_enrollment_members: [hbx_en_member3],
+                        aasm_state: 'coverage_terminated')
+    end
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
@@ -1407,16 +1488,16 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let!(:household) { FactoryBot.create(:household, family: family) }
     let(:original_termination_date) { TimeKeeper.date_of_record.next_month.end_of_month }
-    let!(:enrollment) {
+    let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
-                         family: family,
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         kind: 'employer_sponsored',
-                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
-                         terminated_on: original_termination_date,
-                         aasm_state: 'coverage_termination_pending'
-      )}
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        kind: 'employer_sponsored',
+                        effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                        terminated_on: original_termination_date,
+                        aasm_state: 'coverage_termination_pending')
+    end
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
 
@@ -1441,7 +1522,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
             let(:original_termination_date) { TimeKeeper.date_of_record.beginning_of_month }
 
             it "should update enrollment with new end date and notify enrollment" do
-              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated",
+                                                                             {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                              "is_trading_partner_publishable" => false})
               post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: terminated_date}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_terminated"
@@ -1456,7 +1539,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
             let(:terminated_date) { original_termination_date - 1.day }
 
             it "should update enrollment with new end date and notify enrollment" do
-              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated",
+                                                                             {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                              "is_trading_partner_publishable" => false})
               post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: terminated_date.to_s}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_termination_pending"
@@ -1486,7 +1571,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         context "enrollment that already terminated with past date" do
           context "with new past or current termination date" do
             it "should update enrollment with new end date and notify enrollment" do
-              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated",
+                                                                             {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                              "is_trading_partner_publishable" => false})
               post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_terminated"
@@ -1499,7 +1586,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         context "enrollment that already terminated with future date" do
           context "with new future termination date" do
             it "should update enrollment with new end date and notify enrollment" do
-              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated",
+                                                                             {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                              "is_trading_partner_publishable" => false})
               post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_terminated"
@@ -1530,8 +1619,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     before do
       sign_in user
-      allow(Person).to receive(:find).with("#{person.id}").and_return person
-      allow( BenefitSponsors::Organizations::Profile).to receive(:find).with(
+      allow(Person).to receive(:find).with(person.id.to_s).and_return person
+      allow(BenefitSponsors::Organizations::Profile).to receive(:find).with(
         "1234"
       ).and_return(employer_profile)
       allow(employer_profile).to receive(:organization).and_return(organization)
@@ -1548,14 +1637,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it "should populate the row id to instance variable" do
-        expect(assigns(:element_to_replace_id)).to eq "#{family_id}"
+        expect(assigns(:element_to_replace_id)).to eq family_id.to_s
       end
     end
 
     context "when action called through employers datatable" do
 
       before do
-        allow( BenefitSponsors::Organizations::Profile).to receive(:find).with(
+        allow(BenefitSponsors::Organizations::Profile).to receive(:find).with(
           "1234"
         ).and_return(employer_profile)
         allow(employer_profile).to receive(:organization).and_return(organization)
@@ -1575,7 +1664,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it "should populate the row id to instance variable" do
-        expect(assigns(:element_to_replace_id)).to eq "#{employer_id}"
+        expect(assigns(:element_to_replace_id)).to eq employer_id.to_s
       end
     end
   end
@@ -1588,7 +1677,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
     let(:benefit_sponsorship) { double(benefit_applications: benefit_applications) }
-    let(:benefit_applications) { [ double ]}
+    let(:benefit_applications) { [double]}
 
     before :each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -1600,7 +1689,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     context '.oe_extendable_applications' do
-      let(:benefit_applications) { [ double(may_extend_open_enrollment?: true) ]}
+      let(:benefit_applications) { [double(may_extend_open_enrollment?: true)]}
 
       before do
         allow(benefit_sponsorship).to receive(:oe_extendable_benefit_applications).and_return(benefit_applications)
@@ -1615,7 +1704,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     context '.oe_extended_applications' do
-      let(:benefit_applications) { [ double(enrollment_extended?: true) ]}
+      let(:benefit_applications) { [double(enrollment_extended?: true)]}
 
       before do
         allow(benefit_sponsorship).to receive(:oe_extended_applications).and_return(benefit_applications)
@@ -1669,7 +1758,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
     let(:benefit_sponsorship) { double(benefit_applications: benefit_applications) }
-    let(:benefit_applications) { [ double ]}
+    let(:benefit_applications) { [double]}
 
     before :each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -1701,17 +1790,18 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let!(:user)                { FactoryBot.create(:user) }
     let!(:person)              { FactoryBot.create(:person, user: user) }
     let!(:permission)          { FactoryBot.create(:permission, :super_admin) }
-    let!(:hbx_staff_role)      { FactoryBot.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole:permission.name) }
+    let!(:hbx_staff_role)      { FactoryBot.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole: permission.name) }
     let!(:rating_area)         { FactoryBot.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)        { FactoryBot.create_default :benefit_markets_locations_service_area }
     let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
     let!(:benefit_market)      { site.benefit_markets.first }
     let!(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
     let!(:employer_profile)    { organization.employer_profile }
-    let!(:benefit_sponsorship) { bs = employer_profile.add_benefit_sponsorship
-                                bs.save!
-                                bs
-                               }
+    let!(:benefit_sponsorship) do
+      bs = employer_profile.add_benefit_sponsorship
+      bs.save!
+      bs
+    end
     let(:start_on)              { TimeKeeper.date_of_record.beginning_of_month + 2.months }
     let!(:effective_period)     { start_on..start_on.next_year.prev_day }
     let!(:current_benefit_market_catalog) do
@@ -1721,18 +1811,17 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       ).first
     end
     let!(:benefit_application) do
-      create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period:effective_period, aasm_state: :draft)
+      create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :draft)
     end
 
-    let!(:valid_params)   {
+    let!(:valid_params)   do
       { admin_datatable_action: true,
         benefit_sponsorship_id: benefit_sponsorship.id.to_s,
         start_on: effective_period.min,
         end_on: effective_period.max,
         open_enrollment_start_on: start_on.prev_month,
-        open_enrollment_end_on: start_on - 20.days
-      }
-    }
+        open_enrollment_end_on: start_on - 20.days}
+    end
 
     before :each do
       sign_in(user)
@@ -1821,7 +1910,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "renders edit_fein" do
         sign_in(user)
-        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id}", :format => 'js'}
         get :edit_fein, params: @params, xhr: true
         expect(response).to render_template('edit_fein')
         expect(response).to have_http_status(:success)
@@ -1909,7 +1998,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "renders update_fein" do
         sign_in(user)
-        @params = {:organizations_general_organization => {:new_fein => new_valid_fein}, :id => benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{employer_organization.employer_profile.id.to_s}"}
+        @params = {:organizations_general_organization => {:new_fein => new_valid_fein}, :id => benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{employer_organization.employer_profile.id}"}
         post :update_fein, params: @params, xhr: true
         expect(response).to render_template('update_fein')
         expect(response).to have_http_status(:success)
