@@ -163,6 +163,34 @@
         <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {:required => true} %>
       </div>
     </div>
+
+    <% if FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
+    <div class="row row-form-wrapper no-buffer fa-align-elements" id="minimum_value_standard_question">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+        <label class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %> *</label>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :health_plan_meets_mvs_and_affordable, true, class: "required floatlabel", id: "benefit_health_plan_meets_mvs_and_affordable_#{benefit.id}_true", required: true %>
+          <%= f.label "health_plan_meets_mvs_and_affordable_#{benefit.id}", :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :health_plan_meets_mvs_and_affordable, false, class: "required floatlabel", id: "benefit_health_plan_meets_mvs_and_affordable_#{benefit.id}_false" %>
+          <%= f.label "health_plan_meets_mvs_and_affordable_#{benefit.id}", :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+      <div class='col-md-2'>
+        <a href="#health_plan_meets_mvs_and_affordable" data-toggle="modal" data-target="#health_plan_meets_mvs_and_affordable_<%= benefit.id %>" id="health_plan_meets_mvs_and_affordable_not_sure" class="interaction-click-control-not-sure? benefit-support-modal"><%= l10n("Not_sure").humanize %>?</a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "health_plan_meets_mvs_and_affordable", id: "health_plan_meets_mvs_and_affordable_#{benefit.id}"} %>
+      </div>
+    </div>
+    <% end %>
   </div>
 
     <div class="row">

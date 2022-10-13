@@ -125,6 +125,9 @@ registry:
       - key: :draft_application_after_ridp
         item: :draft_application_after_ridp
         is_enabled: <%= ENV['DRAFT_APPLICATION_AFTER_RIDP_IS_ENABLED'] || false %>
+      - key: :minimum_value_standard_question
+        item: :minimum_value_standard_question
+        is_enabled: <%= ENV['ESI_MVS_QUESTION_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
