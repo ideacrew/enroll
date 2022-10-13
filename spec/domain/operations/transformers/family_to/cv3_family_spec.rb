@@ -4,7 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'rails_helper'
 
-RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_each do
+RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around_each do
   let(:primary_applicant) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "732020") }
   let(:dependent1) { FactoryBot.create(:person, hbx_id: "732021") }
   let(:dependent2) { FactoryBot.create(:person, hbx_id: "732022") }
@@ -116,6 +116,71 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :after_
       let(:aasm_state) { 'coverage_selected' }
       it 'should include hbx_enrollments in the hash' do
         expect(subject[0][:hbx_enrollments]).to be_present
+      end
+    end
+  end
+
+  describe '#transform_tax_household_groups' do
+    let!(:tax_household_group) do
+      family.tax_household_groups.create!(
+        assistance_year: TimeKeeper.date_of_record.year,
+        source: 'Admin',
+        start_on: TimeKeeper.date_of_record.beginning_of_year
+      )
+    end
+
+    let!(:tax_household) do
+      tax_household_group.tax_households.create!(
+        effective_starting_on: TimeKeeper.date_of_record.beginning_of_year,
+        yearly_expected_contribution: 100.00,
+        max_aptc: 50.00
+      )
+    end
+
+    let!(:tax_household_member) do
+      tax_household.tax_household_members.create!(
+        applicant_id: family.primary_applicant.id,
+        is_ia_eligible: true,
+        is_medicaid_chip_eligible: true,
+        is_subscriber: true,
+        magi_medicaid_monthly_household_income: 50_000
+      )
+    end
+
+    before do
+      family.person.person_relationships << [
+        PersonRelationship.new(relative_id: primary_applicant.id, kind: 'self'),
+        PersonRelationship.new(relative_id: dependent1.id, kind: 'child'),
+        PersonRelationship.new(relative_id: dependent2.id, kind: 'child')
+      ]
+      family.save!
+    end
+
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_tax_household_groups([tax_household_group]) }
+
+    it 'should include hbx_enrollments in the hash' do
+      contract_result = AcaEntities::Contracts::Households::TaxHouseholdGroupContract.new.call(subject.first)
+      result = AcaEntities::Households::TaxHouseholdGroup.new(contract_result.to_h)
+      expect(result).to be_a AcaEntities::Households::TaxHouseholdGroup
+    end
+  end
+
+  describe '#fetch_slcsp_benchmark_premium_for_member' do
+    let(:slcsp_info) do
+      {
+        "732020" => {:health_only_slcsp_premiums => {:cost => 986.26, :product_id => BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier => "732021", :monthly_premium => 986.26}},
+        "732021" => {:health_only_slcsp_premiums => {:cost => 986.26, :product_id => BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier => "732021", :monthly_premium => 986.26}},
+        "732022" => {:health_only_slcsp_premiums => {:cost => 986.26, :product_id => BSON::ObjectId('615640c688753f0b86eba985'), :member_identifier => "732022", :monthly_premium => 986.26}}
+      }
+    end
+
+    let(:cv3_family) { Operations::Transformers::FamilyTo::Cv3Family.new }
+
+    it 'should return slcsp_info for each family_member' do
+      family.family_members.each do |member|
+        person_hbx_id = member.person.hbx_id
+        member_slcsp_info = cv3_family.fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info)
+        expect(member_slcsp_info).to eq slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :cost)&.to_money&.to_hash
       end
     end
   end

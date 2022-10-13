@@ -139,7 +139,7 @@ Then(/^the user will navigate to the Eligibility Results page and will find APTC
   expect(page.has_css?(IvlIapEligibilityResults.csr_73_87_or_94_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq false
   expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
@@ -172,7 +172,7 @@ Then(/^the user will navigate to the Eligibility Results page and will find UQHP
   expect(page.has_css?(IvlIapEligibilityResults.non_magi_referral_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq false
   expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end
@@ -188,7 +188,7 @@ Then(/^the user will navigate to the Eligibility Results page and will find Inel
   expect(page.has_css?(IvlIapEligibilityResults.totally_ineligible_text)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.next_steps_text)).to eq true
-  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq true
+  expect(page.has_css?(IvlIapEligibilityResults.continue_text)).to eq false
   expect(page.has_css?(IvlIapEligibilityResults.return_to_account_home)).to eq true
   expect(page.has_css?(IvlIapEligibilityResults.your_application_reference_2)).to eq true
 end

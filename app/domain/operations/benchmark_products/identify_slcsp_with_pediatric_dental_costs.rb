@@ -27,6 +27,7 @@ module Operations
       private
 
       def validate(params)
+        @application_hbx_id = params[:application_hbx_id]
         ::Operations::BenchmarkProducts::Initialize.new.call(params)
       end
 
@@ -87,6 +88,7 @@ module Operations
         begin
           ::BenchmarkProduct.create(
             family_id: family.id,
+            application_hbx_id: @application_hbx_id,
             request_payload: params.to_json,
             response_payload: benchmark_product_model.to_h.to_json
           )

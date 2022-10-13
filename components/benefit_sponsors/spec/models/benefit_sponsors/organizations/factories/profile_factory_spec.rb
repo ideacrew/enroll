@@ -360,9 +360,16 @@ module BenefitSponsors
             }
           }
         end
-        let!(:profile_factory) { profile_factory_class.call(valid_employer_params_update) }
+        let(:profile_factory) { profile_factory_class.call(valid_employer_params_update) }
+        let!(:er_eligibility) { nil }
+        let(:osse_eligibility) { 'true' }
+        let!(:ee_eligibility) { nil }
 
-        before { abc_organization.reload }
+        before do
+          valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => osse_eligibility)
+          profile_factory
+          abc_organization.reload
+        end
 
         it 'should update general organization legal_name' do
           expect(abc_organization.legal_name).to eq new_organization_name
@@ -382,12 +389,40 @@ module BenefitSponsors
           expect(abc_organization.dba).to eq plan_design_organization.dba
         end
 
-        context ".build_osse_eligibility" do
-          before do
-            valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => 'true')
+        context ".create_or_term_osse_eligibility" do
+          context 'create eligibility' do
+            let(:osse_eligibility) { 'true' }
+
+            it "should build eligibilities" do
+              expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
+            end
           end
-          it "should build eligibilities" do
-            expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
+
+          context 'terminate eligibility' do
+            let(:osse_eligibility) { 'false' }
+            let(:er_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
+            let!(:er_eligibility) do
+              benefit_sponsorship.eligibilities << er_elig
+              benefit_sponsorship.save!
+              benefit_sponsorship.eligibilities.first
+            end
+
+            let!(:employee_role) { create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+
+            let!(:census_employee) do
+              create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship)
+            end
+
+            let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
+            let!(:ee_eligibility) do
+              census_employee.update_attributes!(employee_role_id: employee_role.id)
+              employee_role.eligibilities << ee_elig
+              employee_role.save!
+              employee_role.eligibilities.first
+            end
+
+            it { expect(benefit_sponsorship.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
+            it { expect(employee_role.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
           end
         end
       end

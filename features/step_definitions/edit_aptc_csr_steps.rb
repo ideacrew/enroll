@@ -12,6 +12,10 @@ When(/^Hbx Admin click Families link$/) do
   wait_for_ajax
 end
 
+And(/^Hbx Admin clicks on a family member$/) do
+  find(".interaction-click-control-#{Person.all_consumer_roles.first.first_name.downcase}-#{Person.all_consumer_roles.first.last_name.downcase}").click
+end
+
 When(/^Hbx Admin clicks Actions button$/) do
   find_all('.dropdown.pull-right', text: 'Actions')[0].click
 end

@@ -266,7 +266,8 @@ module Insured
     end
 
     def family_member_eligible_for_mdcr(family_member)
-      @family.households&.first&.tax_households&.first&.tax_household_members&.where(applicant_id: family_member.id)&.first&.is_medicaid_chip_eligible
+      tmm = @family.households&.first&.tax_households&.map(&:tax_household_members)&.flatten
+      tmm.select {|t| t.applicant_id == family_member.id }&.first&.is_medicaid_chip_eligible
     end
 
     def class_for_ineligible_row(family_member, is_ivl_coverage)

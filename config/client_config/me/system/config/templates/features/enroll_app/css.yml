@@ -137,4 +137,4 @@ registry:
         is_enabled: true
         settings:
           - key: :color
-            item: "#487ba2"
+            item: "#454545"

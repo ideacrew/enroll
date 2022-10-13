@@ -38,6 +38,7 @@ RSpec.describe 'HbxEnrollmentListSponsorCostCalculator', dbclean: :around_each d
   let(:enrollment_kind) {'open_enrollment'}
   let(:special_enrollment_period_id) {nil}
   let(:hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: shop_family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)}
+  let(:child_care_subsidy) { 0.0 }
 
   let!(:shop_enrollment) do
     FactoryBot.create(:hbx_enrollment,
@@ -54,7 +55,8 @@ RSpec.describe 'HbxEnrollmentListSponsorCostCalculator', dbclean: :around_each d
                       employee_role_id: @employee_role.id,
                       benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                       special_enrollment_period_id: special_enrollment_period_id,
-                      hbx_enrollment_members: [hbx_enrollment_member]
+                      hbx_enrollment_members: [hbx_enrollment_member],
+                      eligible_child_care_subsidy: child_care_subsidy
     )
   end
 
@@ -73,5 +75,42 @@ RSpec.describe 'HbxEnrollmentListSponsorCostCalculator', dbclean: :around_each d
   it 'should return enrollment hash' do
     enrollment_details = @group_mapper.search_criteria([shop_enrollment.id])
     expect(enrollment_details.first['people_ids']).to eq [@person.id]
+  end
+
+  describe 'HbxEnrollmentRosterMapper' do
+
+    context 'rosterize_hbx_enrollment' do
+      let(:enrollment_ids) { [shop_enrollment.id] }
+
+      context 'always include child care subsidy' do
+
+        it 'should pass child care subsidy along with group_enrollment' do
+          mapper = HbxEnrollmentListSponsorCostCalculator::HbxEnrollmentRosterMapper.new(enrollment_ids, shop_enrollment.sponsored_benefit)
+          agg_result = mapper.search_criteria(enrollment_ids).first
+          people_merge = mapper.get_person_details(agg_result['people_ids'])
+          member_group = mapper.rosterize_hbx_enrollment(agg_result.merge({"people" => people_merge}))
+
+          expect(member_group.group_enrollment).to be_present
+          expect(member_group.group_enrollment.eligible_child_care_subsidy).to be_a(Money)
+          expect(member_group.group_enrollment.eligible_child_care_subsidy.to_f).to eq(0.0)
+        end
+      end
+
+      context 'when childcare subsidy amount present on enrollment' do
+
+        let(:child_care_subsidy) { 150.0 }
+
+        it 'should pass child care subsidy along with group_enrollment' do
+          mapper = HbxEnrollmentListSponsorCostCalculator::HbxEnrollmentRosterMapper.new(enrollment_ids, shop_enrollment.sponsored_benefit)
+          agg_result = mapper.search_criteria(enrollment_ids).first
+          people_merge = mapper.get_person_details(agg_result['people_ids'])
+          member_group = mapper.rosterize_hbx_enrollment(agg_result.merge({"people" => people_merge}))
+
+          expect(member_group.group_enrollment).to be_present
+          expect(member_group.group_enrollment.eligible_child_care_subsidy).to be_a(Money)
+          expect(member_group.group_enrollment.eligible_child_care_subsidy.to_f).to eq(150.0)
+        end
+      end
+    end
   end
 end

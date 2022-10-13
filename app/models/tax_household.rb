@@ -313,8 +313,11 @@ class TaxHousehold
   end
 
   def family
-    return nil unless household
-    household.family
+    if household
+      household.family
+    elsif tax_household_group
+      tax_household_group.family
+    end
   end
 
   #usage: filtering through group_by criteria

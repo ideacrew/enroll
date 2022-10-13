@@ -307,6 +307,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal = subject.renew
           expect(renewal.auto_renewing?).to be_truthy
         end
+
+        it 'should trigger enr notice' do
+          expect_any_instance_of(::HbxEnrollment).to receive(:trigger_enrollment_notice)
+          subject.renew
+        end
       end
 
       context "renew coverall product" do
@@ -379,7 +384,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                 csr_amt: 0,
                                                 applied_percentage: 0.85,
                                                 applied_aptc: 0.0,
-                                                aggregate_aptc: 0.0
+                                                max_aptc: 0.0
                                               })
           end
         end
@@ -485,7 +490,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   csr_amt: 0,
                                                   applied_percentage: 0.85,
                                                   applied_aptc: 0.0,
-                                                  aggregate_aptc: 0.0
+                                                  max_aptc: 0.0
                                                 })
             end
           end
@@ -523,8 +528,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   csr_amt: 0,
                                                   applied_percentage: 0.85,
                                                   applied_aptc: 318.75,
-                                                  aggregate_aptc: 375
+                                                  max_aptc: 375
                                                 })
+              expect(subject.assisted).to eq true
             end
           end
         end

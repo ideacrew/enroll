@@ -42,10 +42,23 @@ module Operations
           payload.merge!(product_reference: product_reference(product, issuer)) if product && issuer
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.special_enrollment_period
-
+          enr_tax_households = tax_household_enrollments(enr)
+          payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
           Success(payload)
         end
         # rubocop:enable Metrics/CyclomaticComplexity
+
+        def tax_household_enrollments(enr)
+          TaxHouseholdEnrollment.where(enrollment_id: enr.id)
+        end
+
+        def transform_enr_tax_households(tax_household_enrollments)
+          tax_household_enrollments.map { |tax_household_enr| transform_tax_household_enr(tax_household_enr) }
+        end
+
+        def transform_tax_household_enr(tax_household_enr)
+          Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment.new.call(tax_household_enr).value!
+        end
 
         def special_enrollment_period_reference(enrollment)
           sep = enrollment.special_enrollment_period

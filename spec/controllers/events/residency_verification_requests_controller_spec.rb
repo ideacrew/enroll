@@ -32,7 +32,7 @@ describe Events::ResidencyVerificationRequestsController do
       expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
     end
 
-    it "stores verification history element" do
+    xit "stores verification history element" do
       expect(person.consumer_role.local_residency_requests.count).to be > 0
     end
 

@@ -19,17 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v3
         with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: bundle install
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
+          bundler-cache: true
+          rubygems: latest
       - name: Run View Linter
         run: |
           git fetch --no-tags --depth=1 origin trunk
@@ -39,6 +31,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore
       - name: Run Brakeman In Components
@@ -50,6 +45,38 @@ jobs:
           done
   engines:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
@@ -68,16 +95,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
       - name: restore Project Gems
         uses: actions/cache@v3
         with:
@@ -122,6 +139,38 @@ jobs:
           bundle exec rspec
   benefit-sponsors:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
@@ -132,16 +181,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
       - name: Restore Project Gems
         uses: actions/cache@v3
         with:
@@ -182,6 +221,38 @@ jobs:
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
@@ -207,36 +278,21 @@ jobs:
             18,
             19,
             20,
+            21,
+            22,
+            23,
           ]
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-      - name: Restore project gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Install Test Boosters gem
+        run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v3
@@ -251,10 +307,42 @@ jobs:
       - name: Run tests
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
-          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
+          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
@@ -296,36 +384,26 @@ jobs:
             34,
             35,
             36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
           ]
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: latest
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 5672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
-          rabbitmq vhost: '/'
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: '4.2'
-      - name: Restore project gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Install Test boosters gem
+        run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v3

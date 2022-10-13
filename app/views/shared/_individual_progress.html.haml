@@ -76,12 +76,12 @@
   - unless @no_previous_button || step == 1
     %li
       %a.back{href: '#'}
-        = image_tag 'icons/list.png'
+        <!-- = image_tag 'icons/list.png' -->
         PREVIOUS
   - unless @no_save_button
     %li
       %a{href: destroy_user_session_path}
-        = image_tag 'icons/list.png'
+        <!-- = image_tag 'icons/list.png' -->
         SAVE &amp; EXIT
       %br
       %br
