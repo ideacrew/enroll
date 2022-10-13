@@ -3,7 +3,7 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
 
-RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd  do
+RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
   before :all do
     DatabaseCleaner.clean
   end

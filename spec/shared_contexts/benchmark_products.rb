@@ -20,7 +20,6 @@ RSpec.shared_context 'family with 2 family members', :shared_context => :metadat
 end
 
 RSpec.shared_context 'family with 5 family members', :shared_context => :metadata do
-  # include_context "family with 2 family members with county_zip, rating_area & service_area"
   let(:person1_age) { 30 }
   let(:person2_age) { 16 }
   let(:person3_age) { 14 }
