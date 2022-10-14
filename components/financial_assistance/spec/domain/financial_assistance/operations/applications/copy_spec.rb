@@ -572,7 +572,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         end
       end
 
-      context 'application is ' do
+      context 'application is in invalid aasm state' do
         let(:invalid_state) { ['draft', 'renewal_draft', 'mitc_magi_medicaid_eligibility_request_errored', 'haven_magi_medicaid_eligibility_request_errored'].sample }
 
         before do
