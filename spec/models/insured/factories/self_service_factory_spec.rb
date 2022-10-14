@@ -330,6 +330,20 @@ module Insured
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
           end
         end
+
+        context 'when ehb premium less than aptc' do
+          before do
+            effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(200)
+          end
+
+          it 'creates enrollment with ehb premium' do
+            subject.update_aptc(enrollment.id, nil)
+            new_enrollment = family.reload.active_household.hbx_enrollments.last
+            expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+            expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
+          end
+        end
       end
 
       describe "update enrollment for renewing enrollments" do
