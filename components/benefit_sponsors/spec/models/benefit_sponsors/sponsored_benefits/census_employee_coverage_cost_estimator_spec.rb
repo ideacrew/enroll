@@ -37,7 +37,8 @@ module BenefitSponsors
         ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit,
         {
           :rate_schedule_date => Date.new(2018, 5, 1),
-          :recorded_rating_area => rating_area
+          :recorded_rating_area => rating_area,
+          :health? => true
         }
       )
     end
