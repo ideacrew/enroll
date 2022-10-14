@@ -10,8 +10,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   end
 
   let!(:person) do
-    FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
-                      first_name: 'test10', last_name: 'test30', gender: 'male', hbx_id: '100095')
+    FactoryBot.create(:person, :with_consumer_role, first_name: 'test10', last_name: 'test30', gender: 'male', hbx_id: '100095')
   end
 
   let!(:family) do
@@ -50,16 +49,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   let(:operation_instance) { described_class.new }
 
   let!(:household) { FactoryBot.create(:household, family: family) }
-  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
   let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year}
 
   let!(:active_enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       family: family,
-                      household: family.active_household,
                       kind: "individual",
                       coverage_kind: "health",
-                      product: product,
                       aasm_state: 'coverage_selected',
                       effective_on: effective_on,
                       hbx_enrollment_members: [
