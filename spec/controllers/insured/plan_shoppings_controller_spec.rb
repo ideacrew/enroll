@@ -249,6 +249,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:employer_profile).and_return(abc_profile)
+      allow(hbx_enrollment).to receive(:verify_and_reset_osse_subsidy_amount).and_return(true)
       sign_in(user)
       get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(assigns(:employer_profile)).to eq abc_profile
