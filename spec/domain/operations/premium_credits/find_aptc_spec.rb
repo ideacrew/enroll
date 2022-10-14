@@ -1354,5 +1354,34 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         expect(enr3_result.value!).to eq 100
       end
     end
+
+    context 'having cents in contribution values' do
+      let(:yearly_expected_contribution1) { 200.45 * 12 }
+      let(:yearly_expected_contribution2) { 100.45 * 12 }
+
+      let(:enrollment1) do
+        FactoryBot.create(:hbx_enrollment,
+                          :individual_shopping,
+                          :with_silver_health_product,
+                          :with_enrollment_members,
+                          elected_aptc_pct: 0.9,
+                          enrollment_members: ([primary_applicant] + [family.dependents.select { |dependent| [dependent_b.id, dependent_d.id].include? dependent.person_id }]).flatten,
+                          family: family,
+                          aasm_state: 'coverage_selected')
+      end
+
+      before do
+        allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+          double('IdentifySlcspWithPediatricDentalCosts',
+                 call: double(:value! => slcsp_info1, :success? => true))
+        )
+      end
+
+      it 'returns sum of each grant aptc value after rounding' do
+        enr1_result = Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: enrollment1, effective_on: enrollment1.effective_on })
+        expect(enr1_result.success?).to eq true
+        expect(enr1_result.value!).to eq 800
+      end
+    end
   end
 end
