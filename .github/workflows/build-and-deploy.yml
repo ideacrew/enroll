@@ -20,6 +20,14 @@ env:
 jobs:
   prep:
     runs-on: ubuntu-latest
+    outputs:
+      taggedImage: ${{ steps.prep.outputs.TAGGED_IMAGE }}
+      shortSha: ${{ steps.prep.outputs.SHORT_SHA }}
+      branchName: ${{ steps.prep.outputs.BRANCH_NAME }}
+      latestTag: ${{ steps.prep.outputs.LATEST_TAG }}
+      repositoryName: ${{ steps.prep.outputs.REPOSITORY_NAME }}
+      registryEcr: ${{ steps.prep.outputs.REGISTRY_ECR }}
+      registryGhcr: ${{ steps.prep.outputs.registryGhcr }}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -118,14 +126,14 @@ jobs:
       - name: Login to Public ECR
         uses: docker/login-action@v2
         with:
-          registry: ${{ needs.prep.outputs.REGISTRY_ECR }}
+          registry: ${{ needs.prep.outputs.registryEcr }}
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Login to GHCR
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY_GHCR }}
+          registry: ${{ needs.prep.outputs.registryGhcr }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -144,10 +152,10 @@ jobs:
           # create local image (for scanning) if it is a pull request
           load: ${{ github.event_name == 'pull_request' }}
           tags: |
-            ${{ format('{0}/{1}-{2}', needs.prep.outputs.REGISTRY_ECR, needs.prep.outputs.TAGGED_IMAGE, matrix.client) }}
-            ${{ format('{0}/{1}-{2}', needs.prep.outputs.REGISTRY_ECR, needs.prep.outputs.LATEST_TAG, matrix.client) }}
-            ${{ format('{0}/{1}-{2}', needs.prep.outputs.REGISTRY_GHCR, needs.prep.outputs.TAGGED_IMAGE, matrix.client) }}
-            ${{ format('{0}/{1}-{2}', needs.prep.outputs.REGISTRY_GHCR, needs.prep.outputs.LATEST_TAG, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.latestTag, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.taggedImage, matrix.client) }}
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.latestTag, matrix.client) }}
           cache-from: type=local,src=/tmp/.buildx-cache
           # Note the mode=max here
           # More: https://github.com/moby/buildkit#--export-cache-options
@@ -162,7 +170,7 @@ jobs:
         id: scan
         uses: anchore/scan-action@v3
         with:
-          image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.REGISTRY_ECR, needs.prep.outputs.TAGGED_IMAGE, matrix.client) }}
+          image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
           fail-build: false
           severity-cutoff: critical
 
@@ -188,7 +196,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1
         with:
-          channel-id: 'docker-images-${{ needs.prep.outputs.REPOSITORY_NAME }}'
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
           payload: |
             {
               "blocks": [
@@ -196,7 +204,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "New image built from <https://github.com/ideacrew/${{ needs.prep.outputs.REPOSITORY_NAME }}/commit/${{ needs.prep.outputs.SHORT_SHA }}|${{ needs.prep.outputs.SHORT_SHA }}> on `${{ needs.prep.outputs.BRANCH_NAME }}`"
+                    "text": "New image built from <https://github.com/ideacrew/${{ needs.prep.outputs.repositoryName }}/commit/${{ needs.prep.outputs.shortSha }}|${{ needs.prep.outputs.shortSha }}> on `${{ needs.prep.outputs.branchName }}`"
                   }
                 }
               ]
@@ -220,7 +228,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1
         with:
-          channel-id: 'docker-images-${{ needs.prep.outputs.REPOSITORY_NAME }}'
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
           payload: |
             {
               "blocks": [
@@ -228,7 +236,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*${{ format('{0} {1} image*:\n`{2}/{3}-{4}`', env.CLIENT, matrix.registry, matrix.registry, needs.prep.outputs.TAGGED_IMAGE, matrix.client) }}"
+                    "text": "*${{ format('{0} {1} image*:\n`{2}/{3}-{4}`', env.CLIENT, matrix.registry, matrix.registry, needs.prep.outputs.taggedImage, matrix.client) }}"
                   }
                 },
                 {
