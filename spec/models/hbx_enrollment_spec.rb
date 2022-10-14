@@ -654,10 +654,10 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
     context 'when subscriber premium is less than osse subsidy' do
       let(:member_group)  { HbxEnrollmentSponsoredCostCalculator.new(shop_enrollment).groups_for_products([shop_enrollment.product]).first }
       let(:excess_subsidy_amount) { 500.00 }
-      let(:subscriber_premium) {
-        member = shop_enrollment.hbx_enrollment_members.detect{|member| member.is_subscriber? }
+      let(:subscriber_premium) do
+        member = shop_enrollment.hbx_enrollment_members.detect(&:is_subscriber?)
         member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
-      }
+      end
 
       before do
         shop_enrollment.update(eligible_child_care_subsidy: excess_subsidy_amount)

@@ -2789,12 +2789,10 @@ class HbxEnrollment
   def verify_and_reset_osse_subsidy_amount(member_group)
     return unless is_shop?
     hbx_enrollment_members.each do |member|
-      if member.is_subscriber?
-        product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
-        if eligible_child_care_subsidy.to_f > product_price.to_f
-          self.update(eligible_child_care_subsidy: product_price.to_money)
-        end
-      end
+      next unless member.is_subscriber?
+      product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
+      next unless eligible_child_care_subsidy.to_f > product_price.to_f
+      self.update(eligible_child_care_subsidy: product_price.to_money)
     end
   end
 
