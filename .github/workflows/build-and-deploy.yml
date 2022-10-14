@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
-      tag: ${{ steps.prep.outputs.tag }}
       shortSha: ${{ steps.prep.outputs.short_sha}}
       branchName: ${{ steps.prep.outputs.branch_name }}
       latestTag: ${{ steps.prep.outputs.latest_tag }}
@@ -40,14 +39,13 @@ jobs:
           REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
           IMAGE=ideacrew/$REPO
-          echo ::set-output name=tagged_image::${IMAGE}:${TAG}
-          echo ::set-output name=tag::${TAG}
-          echo ::set-output name=short_sha::$SHORT_SHA
-          echo ::set-output name=branch_name::${{ env.GIT_BRANCH_NAME }}
-          echo ::set-output name=repository_name::$REPO
-          echo ::set-output name=latest_tag::${IMAGE}:latest
-          echo ::set-output name=registry_ecr::public.ecr.aws
-          echo ::set-output name=registry_ghcr::ghcr.io
+          echo "tagged_image=${IMAGE}:${TAG}" >> $GITHUB_OUTPUT
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "branch_name=${{ env.GIT_BRANCH_NAME }}" >> $GITHUB_OUTPUT
+          echo "repository_name=$REPO" >> $GITHUB_OUTPUT
+          echo "latest_tag=${IMAGE}:latest" >> $GITHUB_OUTPUT
+          echo "registry_ecr=public.ecr.aws" >> $GITHUB_OUTPUT
+          echo "registry_ghcr=ghcr.io" >> $GITHUB_OUTPUT
 
   # Uses buildx to build and push the image
   build-and-upload-image:
