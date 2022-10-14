@@ -21,13 +21,13 @@ jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
-      taggedImage: ${{ steps.prep.outputs.TAGGED_IMAGE }}
-      shortSha: ${{ steps.prep.outputs.SHORT_SHA }}
-      branchName: ${{ steps.prep.outputs.BRANCH_NAME }}
-      latestTag: ${{ steps.prep.outputs.LATEST_TAG }}
-      repositoryName: ${{ steps.prep.outputs.REPOSITORY_NAME }}
-      registryEcr: ${{ steps.prep.outputs.REGISTRY_ECR }}
-      registryGhcr: ${{ steps.prep.outputs.REGISTRY_GHCR }}
+      taggedImage: ${{ steps.prep.outputs.tagged_image }}
+      shortSha: ${{ steps.prep.outputs.short_sha}}
+      branchName: ${{ steps.prep.outputs.branch_name }}
+      latestTag: ${{ steps.prep.outputs.latest_tag }}
+      repositoryName: ${{ steps.prep.outputs.repository_name }}
+      registryEcr: ${{ steps.prep.outputs.registry_ecr }}
+      registryGhcr: ${{ steps.prep.outputs.registry_ghcr }}
     steps:
       - name: Git branch name
         id: git-branch-name
@@ -39,13 +39,13 @@ jobs:
           REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
           IMAGE=ideacrew/$REPO
-          echo "TAGGED_IMAGE=${IMAGE}:${TAG}" >> $GITHUB_OUTPUT
-          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "BRANCH_NAME=${{ env.GIT_BRANCH_NAME }}" >> $GITHUB_OUTPUT
-          echo "REPOSITORY_NAME=$REPO" >> $GITHUB_OUTPUT
-          echo "LATEST_TAG=${IMAGE}:latest" >> $GITHUB_OUTPUT
-          echo "REGISTRY_ECR=public.ecr.aws" >> $GITHUB_OUTPUT
-          echo "REGISTRY_GHCR=ghcr.io" >> $GITHUB_OUTPUT
+          echo "tagged_image=${IMAGE}:${TAG}" >> $GITHUB_OUTPUT
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "branch_name=${{ env.GIT_BRANCH_NAME }}" >> $GITHUB_OUTPUT
+          echo "repository_name=$REPO" >> $GITHUB_OUTPUT
+          echo "latest_tag=${IMAGE}:latest" >> $GITHUB_OUTPUT
+          echo "registry_ecr=public.ecr.aws" >> $GITHUB_OUTPUT
+          echo "registry_ghcr=ghcr.io" >> $GITHUB_OUTPUT
 
   # Uses buildx to build and push the image
   build-and-upload-image:
