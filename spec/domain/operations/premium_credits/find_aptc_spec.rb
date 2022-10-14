@@ -138,11 +138,23 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           )
         end
 
-        let(:tax_household_group) do
+        let!(:tax_household_group) do
           family.tax_household_groups.create!(
             assistance_year: TimeKeeper.date_of_record.year,
             source: 'Admin',
             start_on: TimeKeeper.date_of_record.beginning_of_year,
+            tax_households: [
+              FactoryBot.build(:tax_household, household: family.active_household)
+            ]
+          )
+        end
+
+        let!(:inactive_tax_household_group) do
+          family.tax_household_groups.create!(
+            assistance_year: TimeKeeper.date_of_record.year,
+            source: 'Admin',
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
             tax_households: [
               FactoryBot.build(:tax_household, household: family.active_household)
             ]

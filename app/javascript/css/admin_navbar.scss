@@ -1,5 +1,5 @@
 #uic-primary-nav {
-  background:$dark-blue;
+  background: var(--theme-primary-100, #007bc4);
 
   ul {
     padding: 20px 0;
@@ -15,7 +15,7 @@
 
     a {
       white-space: nowrap;
-      color: #5C5C5C;
+      color: var(--grey-130);
       display: block;
       padding: 3px 20px;
       margin-bottom: 5px;
@@ -28,42 +28,42 @@
   }
 
   ul li a {
-    color:$primary-white;
+    color: var(--grey-000);
     font-size: 16px;
     font-weight: 500;
     line-height: 16px;
   }
   ul li a:hover {
-    text-decoration:none;
-    cursor:pointer;
+    text-decoration: none;
+    cursor: pointer;
     transition: all 0.3s ease 0s;
-    color:$orange;
+    color: var(--orange);
   }
 
   a:visited {
-    text-decoration:none;
+    text-decoration: none;
   }
 
   a:active {
-    text-decoration:none;
+    text-decoration: none;
   }
   .fa-caret-down {
-    color:$primary-white;
+    color: var(--grey-000);
   }
 
   ul.dropdown-menu li a {
-    color:$primary-black;
+    color: var(--grey-130);
     padding: 3px 20px;
-    margin-bottom:5px;
+    margin-bottom: 5px;
   }
 
   ul.dropdown-menu li a:hover {
-    color:$orange;
+    color: var(--orange);
     transition: all 0.3s ease 0s;
   }
 
   .badge {
-    background-color: $primary-orange;
+    background-color: var(--gray-130);
   }
 
   .list-inline > li {
@@ -75,7 +75,7 @@
 
 .navbar-main.navbar {
   font-size: 14px;
-  color: #5C5C5C;
+  color: var(--grey-130);
   .my-portal-links {
     text-align: right;
   }

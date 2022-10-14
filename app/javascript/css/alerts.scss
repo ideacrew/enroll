@@ -1,34 +1,34 @@
 .flash {
   .alert {
     position: relative;
-    padding: .75rem 1.25rem;
+    padding: 0.75rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
     margin-top: 10px;
-    margin-left:auto;
-    margin-right:auto;
+    margin-left: auto;
+    margin-right: auto;
   }
   .alert-alert {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
+    color: var(--error-shade);
+    background-color: var(--error-tint);
+    border-color: var(--error-tint);
   }
   .alert-notice {
-    color: #004085;
-    background-color: #cce5ff;
-    border-color: #b8daff;
+    color: var(--info-color);
+    background-color: var(--info-tint);
+    border-color: var(--info-tint);
   }
   .alert-message {
-    background-color: #f2dede;
-    border-color: #eed3d7;
-    color: #333;
+    background-color: var(--error-tint);
+    border-color: var(--error-tint);
+    color: var(--grey-160);
     text-align: left;
   }
 }
 
 .alert-error {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  color: var(--error-shade);
+  background-color: var(--error-tint);
+  border-color: var(--error-tint);
 }

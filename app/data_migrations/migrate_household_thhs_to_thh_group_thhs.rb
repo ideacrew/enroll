@@ -77,7 +77,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def process_families(families, file_name, offset_count, logger)
-    field_names = %w[primary_person_hbx_id family_hbx_assigned_id aptc_csr_tax_households_count group_premium_credits_count]
+    field_names = %w[primary_person_hbx_id family_hbx_assigned_id aptc_csr_tax_households_count migrated_tax_households_count(new) family_has_active_tax_households?]
 
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
@@ -106,7 +106,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
         end
 
-        csv << [family.primary_person.hbx_id, family.hbx_assigned_id, family.active_household.tax_households.count, family.reload.tax_household_groups.map(&:tax_households).flatten.count]
+        csv << [family.primary_person.hbx_id, family.hbx_assigned_id, family.active_household.tax_households.count, family.reload.tax_household_groups.map(&:tax_households).flatten.count, active_thhs_of_household.present?]
       rescue StandardError => e
         logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
       end
