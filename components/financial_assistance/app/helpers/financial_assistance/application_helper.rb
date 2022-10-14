@@ -336,7 +336,7 @@ module FinancialAssistance
       end
     end
 
-    def disable_copy_feature?(application, current_user)
+    def do_not_allow_copy?(application, current_user)
       return true if prospective_year_application?(application)
 
       application.is_draft? || application.is_closed? || (application.imported? ? !current_user.has_hbx_staff_role? : false)
