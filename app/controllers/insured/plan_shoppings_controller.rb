@@ -95,6 +95,7 @@ class Insured::PlanShoppingsController < ApplicationController
     # TODO Fix this stub
     if @enrollment.is_shop?
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      @enrollment.verify_and_reset_osse_subsidy_amount(@member_group)
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
