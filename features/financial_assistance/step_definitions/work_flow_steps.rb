@@ -126,6 +126,10 @@ And(/^the date is within open enrollment$/) do
   allow(Settings.aca.individual_market.open_enrollment).to receive(:end_on).and_return(TimeKeeper.date_of_record + 1.day)
 end
 
+And(/^current hbx is under open enrollment$/) do
+  FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+end
+
 Then(/the user will navigate to the assistance year selection page/) do
   expect(page).to have_content(l10n("faa.year_selection_header"))
 end
