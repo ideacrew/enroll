@@ -153,10 +153,10 @@
 
     <% if FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) && insurance_kind != 'health_reimbursement_arrangement' %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
-        <div class='col-md-6 labelforcoverage'>
+        <div class='col-md-8 labelforcoverage'>
           <span class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %> *</span>
         </div>
-        <div class='col-md-6'>
+        <div class='col-md-4'>
           <div class='col-md-4'>
             <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", true, benefit.health_plan_meets_mvs_and_affordable,class: "radio-yml" ) %>
             <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_yes" required="required">Yes</label>
@@ -164,9 +164,6 @@
           <div class='col-md-4'>
             <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", false, !benefit.health_plan_meets_mvs_and_affordable, class: "radio-yml" )%>
             <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_no">No</label>
-          </div>
-          <div class='col-md-4'>
-            <a href="#" data-toggle="modal" data-target="#"><%= l10n("Not_sure").humanize %>?</a>
           </div>
         </div>
       </div>

@@ -338,4 +338,66 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
   end
+
+  describe '#prospective_year_application?' do
+    let(:system_year) { TimeKeeper.date_of_record.year }
+    let(:application_stub) { OpenStruct.new(assistance_year: application_year) }
+    let(:current_user) { OpenStruct.new(has_hbx_staff_role?: false) }
+    let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: open_enrollment) }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_prospective_year_application_copy_before_oe).and_return(enabled)
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+    end
+
+    context 'configuration is turned OFF' do
+      let(:enabled) { false }
+      let(:open_enrollment) { false }
+      let(:application_year) { system_year }
+
+      it 'should return false as feature is turned OFF' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+
+    context 'configuration is turned ON and is under open_enrollment' do
+      let(:enabled) { true }
+      let(:open_enrollment) { true }
+      let(:application_year) { system_year }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+
+    context 'configuration turned ON, not under open_enrollment, prospective_year_application' do
+      let(:enabled) { true }
+      let(:open_enrollment) { false }
+      let(:application_year) { system_year.next }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(true)
+      end
+    end
+
+    context 'configuration turned ON, under open_enrollment, current_year_application' do
+      let(:enabled) { true }
+      let(:open_enrollment) { true }
+      let(:application_year) { system_year }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+
+    context 'configuration turned ON, not under open_enrollment, application without application_year' do
+      let(:enabled) { true }
+      let(:open_enrollment) { false }
+      let(:application_year) { nil }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+  end
 end
