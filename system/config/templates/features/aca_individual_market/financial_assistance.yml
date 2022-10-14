@@ -321,5 +321,10 @@ registry:
     features:
     - key: :display_eligibility_results_per_tax_household
       is_enabled: <%= ENV['DISPLAY_ELIGIBILITY_RESULTS_PER_THH_IS_ENABLED'] || false %>
+  - namespace:
+    - :applications_index_page
+    features:
+    - key: :block_prospective_year_application_copy_before_oe
+      is_enabled: <%= ENV['BLOCK_PROSPECTIVE_YEAR_APPLICATION_COPY_BEFORE_OE_IS_ENABLED'] || false %>
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
