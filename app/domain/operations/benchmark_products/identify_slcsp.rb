@@ -71,7 +71,7 @@ module Operations
         child_members = @members.select { |member| member[:relationship_with_primary] == 'child' }
 
         members = if child_members.count > 3
-                    eligible_children = child_thhms.sort_by { |k| k[:age_on_effective_date] }.last(3)
+                    eligible_children = child_members.sort_by { |k| k[:age_on_effective_date] }.last(3)
                     eligible_children + @members.reject { |member| member[:relationship_with_primary] == 'child' }
                   else
                     @members
