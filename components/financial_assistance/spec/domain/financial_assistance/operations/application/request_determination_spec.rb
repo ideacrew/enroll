@@ -3,11 +3,31 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Operations::Application::RequestDetermination, dbclean: :after_each do
-
+  let(:family_id) { BSON::ObjectId.new }
+  let!(:year) { TimeKeeper.date_of_record.year }
   let!(:application) do
-    application = FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: BSON::ObjectId.new, aasm_state: 'draft', effective_date: TimeKeeper.date_of_record)
+    FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "draft", :medicaid_terms => true,
+                                                         :submission_terms => true,
+                                                         :medicaid_insurance_collection_terms => true,
+                                                         :report_change_terms => true)
+  end
+  let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
+
+  let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: BSON::ObjectId.new) }
+  let(:set_up_relationships) do
+    application.ensure_relationship_with_primary(applicant1, 'spouse')
+    application.build_relationship_matrix
+    application.save!
+  end
+
+  before do
+    allow(application).to receive(:may_submit?).and_return(true)
     application.applicants.each do |appl|
       appl.citizen_status = 'alien_lawfully_present'
+      appl.first_name = 'test'
+      appl.last_name = 'test'
+      appl.middle_name = 'test'
+      appl.dob = Date.today - 30.years
       appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                          :address_1 => '1111 Awesome Street NE',
                                          :address_2 => '#111',
@@ -20,47 +40,25 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
                                          county: '')]
       appl.save!
     end
-    application
-  end
-  let(:create_elibility_determinations) do
-    application.eligibility_determinations.delete_all
-    application.eligibility_determinations.create({
-                                                    max_aptc: 0,
-                                                    csr_percent_as_integer: 0,
-                                                    aptc_csr_annual_household_income: 0,
-                                                    aptc_annual_income_limit: 0,
-                                                    csr_annual_income_limit: 0,
-                                                    hbx_assigned_id: 10_001
-                                                  })
-  end
-  let(:set_terms_on_application) do
-    application.update_attributes({
-                                    :medicaid_terms => true,
-                                    :submission_terms => true,
-                                    :medicaid_insurance_collection_terms => true,
-                                    :report_change_terms => true
-                                  })
+    application.save!
+
+    set_up_relationships
+    application.reload
   end
 
   describe 'When Application in non submitted state passed' do
-    let(:result) { subject.call(application_id: application.id) }
+    let(:result) do
+      application.update_attributes(aasm_state: 'submitted')
+      subject.call(application_id: application.id)
+    end
 
     it 'should fail with mssage' do
       expect(result.failure?).to be_truthy
-      expect(result.failure).to eq "Application is in #{application.aasm_state} state. Please submit application."
+      expect(result.failure).to eq "Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: {}"
     end
   end
 
   describe 'When Application with valid information given' do
-    before do
-      allow(application).to receive(:relationships_complete?).and_return(true)
-      allow(subject).to receive(:notify).and_return(true)
-      set_terms_on_application
-      application.submit!
-      create_elibility_determinations
-      application.applicants.each{|applicant| applicant.update(eligibility_determination_id: application.eligibility_determinations.first.id)}
-    end
-
     it 'should publish payload successfully' do
       result = subject.call(application_id: application.id)
       expect(result.success?).to be_truthy
@@ -80,16 +78,11 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
   end
 
   describe 'When Application acceptance terms missing' do
-
-    before do
-      allow(application).to receive(:relationships_complete?).and_return(true)
-      allow(subject).to receive(:notify).and_return(true)
-      application.submit!
-      create_elibility_determinations
-      application.applicants.each{|applicant| applicant.update(eligibility_determination_id: application.eligibility_determinations.first.id)}
-    end
-
     it 'should fail publish with schema validation errors' do
+      application.update_attributes(:medicaid_terms => nil,
+                                    :submission_terms => nil,
+                                    :medicaid_insurance_collection_terms => nil,
+                                    :report_change_terms => nil)
       result = subject.call(application_id: application.id)
       expect(result.failure?).to be_truthy
       %w[has_accepted_medicaid_terms has_accepted_medicaid_insurance_collection_terms has_accepted_submission_terms has_accepted_report_change_terms].each do |element|
@@ -99,16 +92,9 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
   end
 
   describe "when all applicants applying coverage" do
-    before do
-      allow(application).to receive(:relationships_complete?).and_return(true)
-      allow(subject).to receive(:notify).and_return(true)
-      set_terms_on_application
-      application.submit!
-      create_elibility_determinations
-      application.applicants.each{|applicant| applicant.update(eligibility_determination_id: application.eligibility_determinations.first.id)}
-    end
-
     it 'should return success' do
+      application.applicants[0..1].each{|applicant| applicant.update_attributes(is_applying_coverage: true)}
+      application.applicants[2..-1].each{|applicant| applicant.update_attributes(is_applying_coverage: true)}
       result = subject.call(application_id: application.id)
       expect(result).to be_a(Dry::Monads::Result::Success)
       application.reload
@@ -122,18 +108,12 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
   end
 
   describe "when some applicants not applying coverage" do
-
     let(:conditional_elements) do
       %w[immigration_information is_incarcerated has_insurance is_self_attested_blind is_veteran has_daily_living_help has_bill_pay_3_month_help]
     end
     before do
-      allow(application).to receive(:relationships_complete?).and_return(true)
-      allow(subject).to receive(:notify).and_return(true)
-      set_terms_on_application
-      application.submit!
-      create_elibility_determinations
-      application.applicants[0..1].each{|applicant| applicant.update_attributes(eligibility_determination_id: application.eligibility_determinations.first.id, is_applying_coverage: true)}
-      application.applicants[2..-1].each{|applicant| applicant.update_attributes(eligibility_determination_id: application.eligibility_determinations.first.id, is_applying_coverage: false)}
+      application.applicants[0..1].each{|applicant| applicant.update_attributes(is_applying_coverage: true)}
+      application.applicants[2..-1].each{|applicant| applicant.update_attributes(is_applying_coverage: false)}
     end
 
     it 'should return success with skipped elements' do

@@ -17,22 +17,35 @@ module Subscribers
       logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
 
       payload = JSON.parse(response, symbolize_names: true)
-      result =
-        FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+      applications = ::FinancialAssistance::Application.by_hbx_id(payload[:hbx_id])
 
-      if result.success?
-        logger.info "DeterminationSubscriber: acked with success: #{result.success}"
-        subscriber_logger.info "DeterminationSubscriber: acked with success: #{result.success}"
-      else
-        errors =
-          if result.failure.is_a?(Dry::Validation::Result)
-            result.failure.errors.to_h
+      if applications.present?
+        workflow_state_transitions = applications.first.workflow_state_transitions
+
+        result =
+          if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
+            # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
           else
-            result.failure
+            FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
           end
 
-        logger.info "DeterminationSubscriber: acked with failure, errors: #{errors}"
-        subscriber_logger.info "DeterminationSubscriber: acked with failure, errors: #{errors}"
+        if result.success?
+          logger.info "DeterminationSubscriber: acked with success: #{result.success}"
+          subscriber_logger.info "DeterminationSubscriber: acked with success: #{result.success}"
+        else
+          errors =
+            if result.failure.is_a?(Dry::Validation::Result)
+              result.failure.errors.to_h
+            else
+              result.failure
+            end
+
+          logger.info "DeterminationSubscriber: acked with failure, errors: #{errors}"
+          subscriber_logger.info "DeterminationSubscriber: acked with failure, errors: #{errors}"
+        end
+      else
+        logger.info "DeterminationSubscriber: acked with failure errors: application not found for the app hbx_id: #{payload[:hbx_id]}"
+        subscriber_logger.info "DeterminationSubscriber: acked with failure, errors: application not found for the app hbx_id: #{payload[:hbx_id]}"
       end
 
       ack(delivery_info.delivery_tag)

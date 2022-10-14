@@ -35,9 +35,9 @@ module FinancialAssistance
 
           def renew_application(application)
             if application.have_permission_to_renew?
-              if application.may_submit?
-                application.submit!
+              if application.present?
                 request_result = request_determination(application)
+                application.reload
                 application.set_magi_medicaid_eligibility_request_errored! if request_result.failure?
                 request_result
               else
