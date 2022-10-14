@@ -6,6 +6,7 @@ Feature: Start a new Financial Assistance Application
     And is logged in
     And a benchmark plan exists
 
+  @flaky
   Scenario: A consumer wants to start a new financial assistance application
     When a consumer visits the Get Help Paying for coverage page
     And selects yes they would like help paying for coverage
@@ -17,7 +18,7 @@ Feature: Start a new Financial Assistance Application
     And the consumer has received a successful MEC check response
     When a consumer visits the Get Help Paying for coverage page
     Then they should see the Medicaid Currently Enrolled warning text
-   
+
   Scenario: A consumer enters tax information for an application's applicant
     Given the consumer has started a financial assistance application
     When they view the financial assistance application

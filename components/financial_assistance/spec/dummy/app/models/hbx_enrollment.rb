@@ -82,5 +82,7 @@ class HbxEnrollment
   embeds_many :hbx_enrollment_members
 
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES)}
+  scope :enrolled,             ->{ where(:aasm_state.in => ENROLLED_STATUSES) }
+  scope :current_year,         ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
 
 end

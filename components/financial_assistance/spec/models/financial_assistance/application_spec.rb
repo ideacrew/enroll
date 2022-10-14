@@ -1989,4 +1989,57 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(application.applicants_applying_coverage).to match([applicant1])
     end
   end
+
+  describe '#is_application_valid?' do
+    let(:family_id) { BSON::ObjectId.new }
+    let!(:year) { TimeKeeper.date_of_record.year }
+    let!(:relationship_application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+    let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      relationship_application.applicants.each do |appl|
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
+        appl.save!
+      end
+      relationship_application.save!
+    end
+
+    let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+    let(:set_up_relationships) do
+      relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+      relationship_application.build_relationship_matrix
+      relationship_application.save!
+    end
+
+    it 'returns true for all valid data' do
+      set_up_relationships
+      expect(relationship_application.is_application_valid?).to be_truthy
+    end
+
+    it 'returns false for invalid relationships' do
+      expect(relationship_application.is_application_valid?).to be_falsey
+    end
+
+    it 'returns false for missing required fields' do
+      set_up_relationships
+      relationship_application.update_attributes(applicant_kind: nil)
+      expect(relationship_application.is_application_valid?).to be_falsey
+    end
+
+    it 'returns false for missing required fields' do
+      set_up_relationships
+      relationship_application.update_attributes(is_ridp_verified: nil)
+      expect(relationship_application.is_application_valid?).to be_falsey
+    end
+  end
 end
