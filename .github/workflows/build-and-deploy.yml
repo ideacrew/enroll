@@ -27,7 +27,7 @@ jobs:
       latestTag: ${{ steps.prep.outputs.LATEST_TAG }}
       repositoryName: ${{ steps.prep.outputs.REPOSITORY_NAME }}
       registryEcr: ${{ steps.prep.outputs.REGISTRY_ECR }}
-      registryGhcr: ${{ steps.prep.outputs.registryGhcr }}
+      registryGhcr: ${{ steps.prep.outputs.REGISTRY_GHCR }}
     steps:
       - name: Git branch name
         id: git-branch-name
