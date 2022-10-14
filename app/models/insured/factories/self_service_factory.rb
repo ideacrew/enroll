@@ -115,7 +115,7 @@ module Insured
 
         aggregate_aptc_amount = result.value!
 
-        applied_aptc_amount = float_fix(aggregate_aptc_amount * elected_aptc_pct)
+        applied_aptc_amount = float_fix([(aggregate_aptc_amount * elected_aptc_pct), reinstatement.total_ehb_premium].min)
 
         reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount)
       end
