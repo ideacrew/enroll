@@ -528,5 +528,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.not_available' => 'NA',
   :'en.insured.rejected' => "%{ridp_type} successfully rejected.",
   :'en.insured.email_text' => "EMAIL *",
-  :'en.insured.select_kind_text' => "SELECT KIND *"
+  :'en.insured.select_kind_text' => "SELECT KIND *",
+  :'en.insured.no_current_or_past_enrollments' => ""
 }.freeze
