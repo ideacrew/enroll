@@ -74,9 +74,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "copy an application" do
     let(:family1_id) { family.id }
     let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
+    let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: true) }
 
     before(:each) do
       sign_in user
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
       applicants = application.applicants
       application.add_or_update_relationships(applicants[0], applicants[1], 'spouse')
       application.add_or_update_relationships(applicants[0], applicants[2], 'parent')
@@ -456,10 +458,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "GET copy" do
     context "when there is not response from eligibility service" do
+      let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: true) }
 
       before do
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
-        allow(TimeKeeper).to receive(:date_of_record).and_return(Settings.aca.individual_market.open_enrollment.start_on)
+        allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
       end
 
       it 'should copy applicant and redirect to financial assistance application edit path unless iap_year_selection enabled' do
