@@ -43,7 +43,7 @@ module Operations
         service_area_ids = params[:benchmark_product_model].service_area_ids
         @effective_date = params[:benchmark_product_model].effective_date
         members = params[:household_params][:members]
-        @child_members = members.select { |member| member[:relationship_with_primary] == 'child' }
+        @child_members = members.select { |member| member[:relationship_with_primary] == 'child' && member[:age_on_effective_date] < 21 }
 
         query = {
           :service_area_id.in => service_area_ids,
@@ -100,7 +100,8 @@ module Operations
       # Pediatric Dental Premiums should only be calculated for Child Members.
       def total_premium(dental_product)
         members = if @child_members.count > 3
-                    @child_members.sort_by { |k| k[:age_on_effective_date] }.last(3)
+                    three_children = @child_members.sort_by { |member| member[:age_on_effective_date] }.last(3)
+                    three_children.select{ |child| child[:age_on_effective_date] < 19 }
                   else
                     @child_members
                   end

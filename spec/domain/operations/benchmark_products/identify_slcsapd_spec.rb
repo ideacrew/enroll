@@ -195,6 +195,42 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_rating_method]).not_to be_nil
         expect(@result.success[:dental_ehb_apportionment_for_pediatric_dental]).not_to be_nil
         expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).to eq 42.0
+      end
+    end
+
+    context 'Adult with 4 children - one 19yo, the rest under 19' do
+      let(:person1_age) { 30 }
+      let(:person2_age) { 19 }
+      let(:person3_age) { 2 }
+      let(:person4_age) { 1 }
+      let(:person5_age) { 1 }
+
+      before do
+        ::BenefitMarkets::Products::DentalProducts::DentalProduct.each do |dental|
+          dental.update_attributes!(rating_method: 'Age-Based Rates')
+        end
+
+        household_params = @benchmark_product_model.households.first.to_h
+        household_params.merge!({ type_of_household: 'child_only' })
+        household_params[:members][0][:relationship_with_primary] = 'self'
+        household_params[:members][1][:relationship_with_primary] = 'child'
+        household_params[:members][2][:relationship_with_primary] = 'child'
+        household_params[:members][3][:relationship_with_primary] = 'child'
+        household_params[:members][3][:relationship_with_primary] = 'child'
+
+        @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
+          { family: family, benchmark_product_model: @benchmark_product_model, household_params: household_params }
+        )
+      end
+
+      it 'return success with dental information' do
+        expect(@result.success[:dental_product_hios_id]).not_to be_nil
+        expect(@result.success[:dental_product_id]).not_to be_nil
+        expect(@result.success[:dental_rating_method]).not_to be_nil
+        expect(@result.success[:dental_ehb_apportionment_for_pediatric_dental]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).to eq 3.0
       end
     end
   end
