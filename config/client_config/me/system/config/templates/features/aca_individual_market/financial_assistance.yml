@@ -128,6 +128,9 @@ registry:
       - key: :minimum_value_standard_question
         item: :minimum_value_standard_question
         is_enabled: <%= ENV['ESI_MVS_QUESTION_IS_ENABLED'] || false %>
+      - key: :oe_application_warning_display
+        item: :oe_application_warning_display
+        is_enabled: <%= ENV['OE_APPLICATION_WARNING_DISPLAY_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:

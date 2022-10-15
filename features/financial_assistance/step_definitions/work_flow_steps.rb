@@ -130,6 +130,14 @@ And(/^current hbx is under open enrollment$/) do
   HbxProfile.any_instance.stub(:under_open_enrollment?).and_return(true)
 end
 
+And(/^current hbx is not under open enrollment$/) do
+  HbxProfile.any_instance.stub(:under_open_enrollment?).and_return(false)
+end
+
+Then(/^the oe application warning will display$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.oe_application_warning_display)).to eq true
+end
+
 Then(/the user will navigate to the assistance year selection page/) do
   expect(page).to have_content(l10n("faa.year_selection_header"))
 end
