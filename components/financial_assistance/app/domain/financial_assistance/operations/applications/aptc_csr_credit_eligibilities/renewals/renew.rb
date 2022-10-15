@@ -44,7 +44,7 @@ module FinancialAssistance
 
               return Failure("Renewal application already created for #{validated_params}") if applications_by_family.by_year(validated_params[:renewal_year]).present?
 
-              application = applications_by_family.by_year(validated_params[:renewal_year].pred).renewal_eligible.created_asc.last
+              application = applications_by_family.by_year(validated_params[:renewal_year].pred).determined.created_asc.last
 
               if application
                 Success(application)
