@@ -127,7 +127,7 @@ And(/^the date is within open enrollment$/) do
 end
 
 And(/^current hbx is under open enrollment$/) do
-  FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+  HbxProfile.any_instance.stub(:under_open_enrollment?).and_return(true)
 end
 
 Then(/the user will navigate to the assistance year selection page/) do
