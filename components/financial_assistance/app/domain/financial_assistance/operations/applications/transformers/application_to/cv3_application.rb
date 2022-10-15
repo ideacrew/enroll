@@ -265,10 +265,10 @@ module FinancialAssistance
                 tot + inc.calculate_annual_income
               end.to_f
 
-              # Resource Registry configuration
-              # Earned Income Filing Threshold for year 2020: 12400
-              # Unearned Income Filing Threshold for year 2020: 12400
-              (total_earned_income > 12_400) || (total_unearned_income > 1_100)
+              assistance_year = applicant.application.assistance_year
+              unearned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("unearned_income_filing_threshold_#{assistance_year}").item
+              earned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("earned_income_filing_threshold_#{assistance_year}").item
+              (total_earned_income > earned_threshold_income) || (total_unearned_income > unearned_threshold_income)
             end
 
             def applicant_reference_by_applicant_id(application, applicant_id)

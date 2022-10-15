@@ -326,5 +326,24 @@ registry:
     features:
     - key: :block_prospective_year_application_copy_before_oe
       is_enabled: <%= ENV['BLOCK_PROSPECTIVE_YEAR_APPLICATION_COPY_BEFORE_OE_IS_ENABLED'] || false %>
+  - namespace:
+    - :income
+    features:
+      - key: :dependent_income_filing_thresholds
+        item: :dependent_income_filing_thresholds
+        is_enabled: <%= ENV['DEPENDENT_INCOME_FILING_THRESHOLDS_IS_ENABLED'] || false %>
+        settings:
+        - key: :earned_income_filing_threshold_2021
+          item: 12_200
+        - key: :unearned_income_filing_threshold_2021
+          item: 1_100
+        - key: :earned_income_filing_threshold_2022
+          item: 12_400
+        - key: :unearned_income_filing_threshold_2022
+          item: 1_100
+        - key: :earned_income_filing_threshold_2023
+          item: 12_550
+        - key: :unearned_income_filing_threshold_2023
+          item: 1_100
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
