@@ -138,4 +138,22 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
 
   end
 
+  context 'renewal applications' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_renewal_application_transfers).and_return(true)
+      application.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: 'renewal_draft',
+        to_state: 'submitted'
+      )
+      application.transfer_requested = false
+      application.save!
+    end
+
+    it 'should not transfer a renewal application' do
+      result = ::FinancialAssistance::TransferAccounts.run
+      expect(result).not_to include(application.hbx_id)
+    end
+
+  end
+
 end

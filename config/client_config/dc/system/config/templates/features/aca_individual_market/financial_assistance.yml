@@ -156,6 +156,8 @@ registry:
       item: "curam"
     - key: :non_magi_transfer
       is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || false %>
+    - key: :block_renewal_application_transfers
+      is_enabled: <%= ENV['ATP_ON_RENEWALS_IS_ENABLED'] || false %>
   - namespace:
     - :documents
     features:

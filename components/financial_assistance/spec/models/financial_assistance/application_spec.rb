@@ -1916,6 +1916,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'is_transferrable?' do
     context 'non_magi_transfer feature disabled' do
       before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_renewal_application_transfers).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
       end
 
@@ -1942,6 +1943,37 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           it 'should return false' do
             expect(application.is_transferrable?).to eq(false)
           end
+        end
+      end
+    end
+
+    context 'block_renewal_application_transfers feature enabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_renewal_application_transfers).and_return(true)
+      end
+
+      context 'not a renewal application' do
+        before do
+          application.applicants.first.update(is_medicare_eligible: true)
+        end
+
+        it 'should return true' do
+          expect(application.is_transferrable?).to eq(true)
+        end
+      end
+
+      context 'a renewal application' do
+        before do
+          application.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: 'renewal_draft',
+            to_state: 'submitted'
+          )
+          application.save!
+        end
+
+        it 'should return false' do
+          expect(application.is_transferrable?).to eq(false)
         end
       end
     end
