@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
+require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
 
 RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :model, dbclean: :after_each do
   include Dry::Monads[:result, :do]
@@ -79,6 +80,23 @@ RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :
         allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
           double('IdentifySlcspWithPediatricDentalCosts', call: Success(benchmark_product))
         )
+      end
+
+      it 'should return entity' do
+        expect(subject.success).to be_a(AcaEntities::MagiMedicaid::Application)
+        expect(subject.success.benchmark_product.to_h).not_to be_empty
+      end
+    end
+
+    context 'with more than 3 children' do
+      include_context 'application with more than 3 children'
+      include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
+      let(:mm_application) { mm_application_entity.to_h }
+
+      before do
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
+        EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('county')
+        EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('county')
       end
 
       it 'should return entity' do
