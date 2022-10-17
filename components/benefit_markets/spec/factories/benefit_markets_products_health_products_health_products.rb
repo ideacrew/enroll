@@ -71,7 +71,7 @@ FactoryBot.define do
         assigned_site { nil }
       end
 
-      issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site) }
+      issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site, abbrev: 'BCBS') }
     end
 
     trait :with_renewal_product do
