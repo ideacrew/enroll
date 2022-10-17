@@ -39,9 +39,9 @@
                         <div class='text-dk-grey <%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
                       <% end %>
                       <div class="ivl_errors text-dk-grey">
-                        <% errors&.each do |error| %>
-                          <div class="pb-1"><%= error %></div>
-                        <% end%>
+                        <% if errors.present? %>
+                          <div class="pb-1"><%= raw(errors.join('</div> <div class="pb-1">'))%></div>
+                        <% end %>
                       </div>
                     </div>
                   </div>
