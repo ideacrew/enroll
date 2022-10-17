@@ -869,11 +869,11 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_tax_household_groups, :apply_aggregate_to_enrollment, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
+      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
         transitions from: :submitted, to: :determined
       end
 
-      event :determine_renewal, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea] do
+      event :determine_renewal, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :publish_application_determined] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1010,20 +1010,22 @@ module FinancialAssistance
     end
 
     def publish_application_determined
-      return unless predecessor_id.blank? && (can_trigger_fdsh_calls? || is_local_mec_checkable?)
-      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
+      return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
+
+      result = ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      update_evidence_histories if result.success?
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def apply_aggregate_to_enrollment
-      # should be disabled for renewals
-      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
+      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft?
       on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
 
-      Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
+      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
     rescue StandardError => e
-      Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -1052,8 +1054,12 @@ module FinancialAssistance
       end
 
       family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
-      Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
 
+      if family_determination.success?
+        apply_aggregate_to_enrollment
+      else
+        Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" }
+      end
     rescue StandardError => e
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
@@ -1701,12 +1707,11 @@ module FinancialAssistance
     end
 
     def create_evidences
-      return if predecessor_id.present?
+      return if previously_renewal_draft?
 
       active_applicants.each do |applicant|
         applicant.create_evidences
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
-        # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
     rescue StandardError => e
       Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
