@@ -558,6 +558,34 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
     end
 
+    context 'aasm_state of application' do
+      context "application is one of ['income_verification_extension_required', 'applicants_update_required'] states" do
+        before do
+          application_11.update_attributes!(aasm_state: ['income_verification_extension_required', 'applicants_update_required'].sample)
+          @result = subject.call(application_id: application_11.id)
+        end
+
+        it 'should return success with duplicate application' do
+          expect(@result.success).to be_truthy
+          expect(@result.success).to be_a(application_11.class)
+          expect(@result.success.aasm_state).to eq('draft')
+        end
+      end
+
+      context 'application is in invalid aasm state' do
+        let(:invalid_state) { ['draft', 'renewal_draft', 'mitc_magi_medicaid_eligibility_request_errored', 'haven_magi_medicaid_eligibility_request_errored'].sample }
+
+        before do
+          application_11.update_attributes!(aasm_state: invalid_state)
+          @result = subject.call(application_id: application_11.id)
+        end
+
+        it 'should return failure' do
+          expect(@result.failure).to be_truthy
+        end
+      end
+    end
+
     context 'claimed_as_tax_dependent_by' do
       context 'it should populate data for claimed_as_tax_dependent_by' do
         before do

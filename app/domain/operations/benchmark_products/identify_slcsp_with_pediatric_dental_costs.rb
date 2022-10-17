@@ -27,7 +27,7 @@ module Operations
       private
 
       def validate(params)
-        @application_hbx_id = params[:application_hbx_id]
+        @application_hbx_id = params[:application_hbx_id] if params[:application_hbx_id].present?
         ::Operations::BenchmarkProducts::Initialize.new.call(params)
       end
 

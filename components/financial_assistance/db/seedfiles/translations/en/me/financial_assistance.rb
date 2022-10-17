@@ -181,6 +181,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.cost_savings_nav" => "Applications",
   "en.faa.cost_savings_applications" => "Applications",
   "en.faa.cost_savings_applications_desc" => "If you started or completed an application for financial assistance, it will be listed below. To update an application, find your current application and select 'Copy to new application'. If the status says it's a draft, that means you haven't submitted that application yet.",
+  "en.faa.cost_savings_applications_oe_desc" => "Application updates will not apply to %{next_year} enrollments. If you need to make changes to your application for %{next_year}, please log back in after Open Enrollment begins on %{oe_start}.",
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
   "en.faa.cancel" => "Cancel",
@@ -206,7 +207,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.errors.copy_application_error" => "Unable to copy given application.",
   "en.faa.errors.key_application_id_missing_error" => 'Missing application_id key.',
   "en.faa.errors.unable_to_find_application_error" => 'Unable to find application with given application_id.',
-  "en.faa.errors.given_application_is_not_submitted_error" => 'Unable to find application with given application_id.',
+  "en.faa.errors.given_application_is_not_submitted_error" => 'Application is not in one of the %{valid_states} states',
   "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members.",
 
   "en.faa.results.eligibility_results" => "Eligibility Results",

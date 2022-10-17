@@ -47,6 +47,15 @@ Feature: Cost Savings
     And the consumer clicks on Cost Savings link
     Then the application year will be present on the table
 
+  Scenario: FAA Feature Is Enabled - Consumer will see message if oe_application_warning_display feature is enabled
+    Given the oe application warning display feature is enabled
+    Given current hbx is not under open enrollment
+    Given consumer visits home page
+    And the Cost Savings link is visible
+    When the consumer clicks the Cost Savings link
+    Then the consumer will navigate to the Cost Savings page
+    Then the oe application warning will display
+
   Scenario: FAA Feature Is Enabled - Consumer has nil fields for Incarcerated status
     Given the FAA feature configuration is enabled
     Given consumer visits home page

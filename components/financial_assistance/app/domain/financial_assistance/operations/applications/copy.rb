@@ -12,7 +12,8 @@ module FinancialAssistance
         include AddressValidator
         include I18n
 
-        VALID_APPLICATION_STATES = ['submitted', 'determination_response_error', 'determined', 'imported'].freeze
+        VALID_APPLICATION_STATES = ['submitted', 'determination_response_error', 'determined', 'imported', 'income_verification_extension_required', 'applicants_update_required'].freeze
+
         # FamilyMembers, Relationships, claimed_as_tax_dependent_by are the things that might need user interaction to update.
         attr_reader :family_members_changed, :relationships_changed, :claiming_applicants_missing
 
@@ -34,7 +35,7 @@ module FinancialAssistance
           return Failure(I18n.t('faa.errors.key_application_id_missing_error')) unless params.key?(:application_id)
           application = ::FinancialAssistance::Application.where(id: params[:application_id]).first
           return Failure(I18n.t('faa.errors.unable_to_find_application_error')) if application.blank?
-          return Failure(I18n.t('faa.errors.given_application_is_not_submitted_error')) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
+          return Failure(I18n.t('faa.errors.given_application_is_not_submitted_error', valid_states: VALID_APPLICATION_STATES)) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
 
           Success(application)
         end

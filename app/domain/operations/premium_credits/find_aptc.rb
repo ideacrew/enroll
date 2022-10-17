@@ -34,7 +34,7 @@ module Operations
 
         return Success(0.0) if not_eligible?
 
-        Success(available_aptc.round)
+        Success(available_aptc)
       end
 
       def not_eligible?
@@ -55,7 +55,7 @@ module Operations
           expected_contribution = monthly_expected_contribution(aptc_grant)
           total_benchmark_premium = current_benchmark_premium(aptc_grant) + coinciding_benchmark_premium(aptc_grant)
 
-          value = total_benchmark_premium - expected_contribution - utilized_aptc(aptc_grant)
+          value = (total_benchmark_premium - expected_contribution - utilized_aptc(aptc_grant)).round
 
           persist_tax_household_enrollment(aptc_grant, value)
 

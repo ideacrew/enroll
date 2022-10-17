@@ -9,8 +9,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
     DatabaseCleaner.clean
   end
 
-  let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:person) do
+    FactoryBot.create(:person, :with_consumer_role, first_name: 'test10', last_name: 'test30', gender: 'male', hbx_id: '100095')
+  end
+
+  let!(:family) do
+    FactoryBot.create(:family, :with_primary_family_member, person: person)
+  end
+
   let!(:application) do
     FactoryBot.create(:financial_assistance_application,
                       hbx_id: '111000222',
@@ -42,6 +48,21 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   let(:event) { Success(double) }
   let(:operation_instance) { described_class.new }
 
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year}
+
+  let!(:active_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      kind: "individual",
+                      coverage_kind: "health",
+                      aasm_state: 'coverage_selected',
+                      effective_on: effective_on,
+                      hbx_enrollment_members: [
+                        FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: effective_on, coverage_start_on: effective_on, is_subscriber: true)
+                      ])
+  end
+
   before do
     allow(operation_instance.class).to receive(:new).and_return(operation_instance)
     allow(event.success).to receive(:publish).and_return(true)
@@ -63,13 +84,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   context 'for success' do
     context 'query and publish renewal draft application' do
       before do
-        application.update_attributes!(aasm_state: 'renewal_draft', assistance_year: 2023)
+        application.update_attributes!(aasm_state: 'determined', assistance_year: 2022)
         application.reload
         @result = subject.call(renewal_year: 2023)
       end
 
-      it 'should return success' do
-        expect(@result).to be_success
+      it 'should return IVL family id' do
+        expect(@result.success.first).to eq family.id
       end
     end
   end
