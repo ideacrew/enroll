@@ -41,8 +41,8 @@
 
                       <div class="ivl_errors text-dk-grey">
                         <% errors&.each do |error| %>
-                          <% error = error.join(', ') if error.kind_of?(Array) %>
-                          <div class="pb-1"><%= raw(error) %></div>
+                          <% error = error.join(' ') if error.kind_of?(Array) %>
+                          <div class="pb-1"><%= error.html_safe %></div>
                         <% end %>
                       </div>
                     </div>
