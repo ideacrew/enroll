@@ -1178,3 +1178,26 @@ When(/Individual creates an HBX account with SSN already in use$/) do
   find(IvlPersonalInformation.need_coverage_yes).click
   find(IvlPersonalInformation.continue_btn).click
 end
+
+Then(/^the consumer will not see the Enrollments link$/) do
+  expect(page).to have_no_link('Enrollments')
+end
+
+When(/^the consumer manually enters the "Enrollment History Page" url in the browser search bar$/) do
+  visit main_app.enrollment_history_insured_families_path
+end
+
+And(/^the Enrollments link is visible$/) do
+  link_text = l10n("enrollment_history_nav_label")
+  expect(page).to have_link(link_text)
+end
+
+When(/^the consumer clicks the Enrollments link$/) do
+  link_text = l10n("enrollment_history_nav_label")
+  find_link(link_text).click
+end
+
+Then(/^the consumer will navigate to the Enrollment History page$/) do
+  title = l10n("insured.enrollment_history_title")
+  expect(page).to have_content(title)
+end
