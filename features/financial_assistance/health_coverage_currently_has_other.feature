@@ -21,6 +21,11 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the user checks a health coverage checkbox
     Then the other health coverage form should show
 
+  Scenario: ESI label is different if minimum_value_standard_question is enabled
+    Given the user answers yes to currently having access to other health coverage
+    And the user checks a health coverage checkbox
+    Then the esi question should be about your job rather than a job
+
   Scenario: User enters other health coverage information (currently have access to coverage)
     Given the user answers yes to currently having access to other health coverage
     And the user checks a health coverage checkbox

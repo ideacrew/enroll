@@ -78,6 +78,10 @@ Then(/^the other health coverage form should show$/) do
   expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]")
 end
 
+Then(/^the esi question should be about your job rather than a job$/) do
+  expect(page).to have_content('Coverage through your job (also known as employer-sponsored health insurance)')
+end
+
 Given(/^the user fills out the required health coverage information$/) do
   fill_in 'benefit[start_on]', with: "02/01/2018"
 end
