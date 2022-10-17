@@ -101,6 +101,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.department_of_defense_non_appropriated_health_benefits" => "Department of Defense health benefits",
   "en.faa.question.cobra" => "COBRA",
   "en.faa.question.employer_sponsored_insurance" => "Coverage through a job (or another person's job, like a spouse or parent)",
+  "en.faa.question.employer_sponsored_insurance_eligible" => "Coverage through your job (also known as employer-sponsored health insurance)",
   "en.faa.question.self_funded_student_health_coverage" => "Self-funded student health coverage",
   "en.faa.question.foreign_government_health_coverage" => "Foreign government health coverage",
   "en.faa.question.private_health_insurance_plan" => "Private health insurance plan",

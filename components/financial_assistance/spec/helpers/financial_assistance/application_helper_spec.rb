@@ -175,6 +175,19 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
 
+    context 'text for hra setting is turned on and minimum_value_standard_question enabled' do
+      before do
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra)).to receive(:item).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:minimum_value_standard_question).and_return(true)
+        @result = helper.applicant_eligibly_enrolled
+      end
+
+      it 'should return hra text without the parentheses' do
+        expect(@result).to eq 'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in? *'
+      end
+    end
+
     context 'When both the settings are turned off' do
       before do
         allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
