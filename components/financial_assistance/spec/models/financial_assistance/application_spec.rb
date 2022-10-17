@@ -1675,6 +1675,77 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  describe 'publish_application_determined' do
+    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined }
+    let(:publish_operation_result) { Success(double) }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.send(:create_evidences)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.save!
+    end
+
+    context "when rrv feature is enabled" do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(true)
+      end
+
+      it "should not trigger fdsh calls on renewal application determinations" do
+        application.active_applicants.each do |applicant|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.verification_histories).to be_empty
+          end
+        end
+
+        expect(publish_operation_class).not_to receive(:new)
+        application.publish_application_determined
+
+        application.active_applicants.each do |applicant|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.verification_histories).to be_empty
+          end
+        end
+      end
+    end
+
+    context "when rrv feature is disabled" do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(false)
+        allow(publish_operation_class).to receive_message_chain(:new, :call).with(anything).and_return(publish_operation_result)
+      end
+
+      it 'should not trigger fdsh calls on renewal application determinations' do
+        application.active_applicants.each do |applicant|
+          expect(applicant.esi_evidence).to be_present
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.verification_histories).to be_empty
+          end
+        end
+
+        application.publish_application_determined
+
+        application.active_applicants.each do |applicant|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.verification_histories).to be_present
+            history = evidence.verification_histories.first
+            expect(history.action).to eq "application_determined"
+            expect(history.update_reason).to eq "Requested Hub for verification"
+            expect(history.updated_by).to eq "system"
+          end
+        end
+      end
+    end
+  end
+
   describe 'update_or_build_relationship' do
     let(:create_individual_rels) do
       application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
