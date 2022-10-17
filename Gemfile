@@ -151,7 +151,7 @@ group :development, :test do
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
-  gem 'parallel_tests',         '~> 2.26.2'
+  gem 'parallel_tests',         '~> 3'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
