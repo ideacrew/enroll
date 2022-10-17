@@ -3,7 +3,7 @@
 <% end %>
 <div id='account-detail'>
   <div class="my-account-page">
-    <h1 class="heading-text mt-0"><%= l10n("insured.enrollment_history_title") %></h1>
+    <h1 class="heading-text mt-0"><%= l10n("enrollment_history_title") %></h1>
   </div>
 
   <div class="row" style="margin-top: 0;">
@@ -26,7 +26,7 @@
                    locals: { read_only: false } %>
         <% end %>
       <% else %>
-         <%= l10n("insured.no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+         <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
       <% end %>
     </div>
   </div>
