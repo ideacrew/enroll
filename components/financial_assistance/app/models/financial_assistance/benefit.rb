@@ -269,6 +269,7 @@ module FinancialAssistance
 
     def presence_of_esi_details_if_esi
       return unless insurance_kind == 'employer_sponsored_insurance'
+      return if EnrollRegistry[:short_enrolled_esi_forms].enabled? && is_enrolled?
       errors.add(:employer_name, " ' EMPLOYER NAME' can't be blank ") if employer_name.blank?
       errors.add(:esi_covered, "' Who can be covered?' can't be blank ") if esi_covered.blank?
       errors.add(:start_on, "' Start On' Date can't be blank ") if start_on.blank?

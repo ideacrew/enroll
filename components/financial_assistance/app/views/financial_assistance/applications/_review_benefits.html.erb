@@ -15,7 +15,7 @@
       <div class="col-md-6 form-content"><%= start_to_end_dates(benefit) %></div>
     </div>
 
-    <% if ['employer_sponsored_insurance', 'health_reimbursement_arrangement'].include?(benefit.insurance_kind) %>
+    <% if ['employer_sponsored_insurance', 'health_reimbursement_arrangement'].include?(benefit.insurance_kind) && (kind == "is_eligible" || !EnrollRegistry[:short_enrolled_esi_forms].enabled?) %>
       <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
     <% end %>
   <% end %>
