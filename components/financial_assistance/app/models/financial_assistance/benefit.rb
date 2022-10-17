@@ -91,6 +91,7 @@ module FinancialAssistance
     field :is_esi_mec_met, type: Boolean
     field :employee_cost, type: Money, default: 0.00
     field :employee_cost_frequency, type: String
+    field :health_plan_meets_mvs_and_affordable, type: Boolean
 
     field :start_on, type: Date
     field :end_on, type: Date
@@ -100,8 +101,6 @@ module FinancialAssistance
 
     field :employer_name, type: String
     field :employer_id, type: String, default: ''
-
-    field :health_plan_meets_mvs_and_affordable, type: Boolean
 
     scope :eligible, -> { where(kind: 'is_eligible')}
     scope :enrolled, -> { where(kind: 'is_enrolled')}
@@ -148,6 +147,12 @@ module FinancialAssistance
 
     def clean_conditional_params(params)
       clean_params(params)
+    end
+
+    # eligible through an esi
+    def eligible_through_esi?
+      return false unless FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
+      kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance'
     end
 
     class << self
