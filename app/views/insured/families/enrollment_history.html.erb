@@ -6,7 +6,7 @@
     <h1 class="heading-text mt-0"><%= l10n("enrollment_history_title") %></h1>
   </div>
 
-  <div class="row" style="margin-top: 0;">
+  <div class="row">
     <div class="col-md-8">
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
         <% enrollments = @all_hbx_enrollments_for_admin %>
@@ -14,12 +14,13 @@
         <% enrollments = @hbx_enrollments %>
       <% end %>
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
-        <strong>Display All Enrollments?</strong>&nbsp;&nbsp;
-        <input type="checkbox" id="display_all_enrollments"> <br>
+        <strong >Display All Enrollments?</strong>
+        <input class="ml-half" type="checkbox" id="display_all_enrollments">
       <% end %>
       <% if enrollments&.any? %>
         <% enrollments.group_by  { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
-          <h2 style="margin-top: 0;"><%= year %></h2>
+          <h2 class="mt-0 ml-1"><%= year %></h2>
+          <!-- add feature flag logic for new plan tile partial -->
           <%= render partial: "enrollment",
                    :collection => yearly_enrollments,
                    :as => :hbx_enrollment,
