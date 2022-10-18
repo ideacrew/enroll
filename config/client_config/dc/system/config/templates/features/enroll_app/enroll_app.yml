@@ -761,4 +761,3 @@ registry:
       - key: :enrollment_plan_tile_update
         item: :enrollment_plan_tile_update
         is_enabled: <%= ENV['ENROLLMENT_PLAN_TILE_UPDATE_IS_ENABLED'] || false %>
-
