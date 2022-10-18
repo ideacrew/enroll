@@ -164,6 +164,16 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     end.round(2)
   end
 
+  def aptc_eligible_member_ids
+    result = ::Operations::PremiumCredits::FindAll.new.call({ family: hbx_enrollment.family, year: hbx_enrollment.effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+    return [] if result.failure?
+
+    grants = result.value!
+    return [] if grants.blank?
+
+    grants.map(&:member_ids).flatten
+  end
+
   def total_ehb_premium
     ehb_members = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
                     return hbx_enrollment.ehb_premium.to_f if !hbx_enrollment.shopping? && hbx_enrollment.ehb_premium.to_f > 0
