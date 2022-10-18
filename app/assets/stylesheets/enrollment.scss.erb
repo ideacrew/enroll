@@ -10,26 +10,72 @@
         height: 100px;
         gap: 20px;
 
+        img {
+            flex: 0;
+        }
+
         .plan-name-and-status {
             display: flex;
             flex-direction: column;
             height: 100px;
             gap: 5px;
-        }
+            flex: 1;
 
-        h3 {
-            margin: 0;
-            justify-self: left;
+            .plan-status-container {
+                min-height: 20px;
+            }
 
-            a {
-                color: black !important;
-                font-size: 18px;
-                font-weight: 700;
+            h3 {
+                margin: 0;
+                justify-self: left;
+
+                a {
+                    color: black !important;
+                    font-size: 18px;
+                    font-weight: 700;
+                }
             }
         }
     }
 
+    .plan-details {
+        display: flex;
+        flex-direction: row;
+        color: #605E5C;
 
+        div[class$="-column"]{
+            flex: 1;
+        }
 
+        label {
+            font-weight: 600;
+        }
+    }
+
+    .plan-covered {
+        padding: 12px 0 0 0;
+        color: #605E5C;
+
+        label {
+            font-weight: 600;
+            margin-right: 12px;
+        }
+    }
+
+    .plan-button-group {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        font-size: 16px;
+        color: #4A7EA6 !important;
+
+        .enrollment-actions-ddl {
+            flex: 0 0 85px;
+        }
+
+        .btn{
+            height: 34px;
+        }
+    }
 
 }

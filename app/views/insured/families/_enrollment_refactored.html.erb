@@ -7,28 +7,66 @@
     <div class="plan-header">
         <%= display_carrier_logo(Maybe.new(product), {width: 110}) %>
         <div class="plan-name-and-status">
-            <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
+            <div class="plan-status-container"><%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %></div>
             <h3><%= link_to product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true %></h3>
         </div>
     </div>
 
     <div class="plan-details">
         <div class="left-column">
+            <% unless hide_policy_selected_date?(hbx_enrollment) %>
+                <div class="enrollment-created-at">
+                    <label><%= l10n("plan_selected") %>:</label>
+                    <%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)
+                </div>
+            <% end %>
+            <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
+                <div class="enrollment-effective">
+                    <label><%= l10n("effective_date") %>:</label>
+                    <%= hbx_enrollment.effective_on %>
+                </div>
+                <div class="enrollment-effective">
+                    <label><%= l10n("coverage_end") %>:</label>
+                    <%= enrollment_coverage_end(hbx_enrollment) %>
+                </div>
+            <% else %>
+                <div class="enrollment-effective">
+                    <label><%= l10n("plan_start") %>:</label>
+                    <%= hbx_enrollment.effective_on %>
+                    <% if read_only == true %>
+                        <label class="text-danger"><%= l10n("plan_end") %>:</label>
+                        <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
+                            <span class="text-danger">
+                                <%= @census_employee.coverage_terminated_on.end_of_month %>
+                            </span>
+                        <% end %>
+                    <% end %>
+                </div>
+            <% end %>
         </div>
         <div class="right-column">
+            <div class="enrollment-premium">
+                <label><%= l10n("premium_you_pay") %>:</label>
+                <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/<%= l10n("month").to_s.downcase %>
+            </div>
+            <%# if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
+            <% if true %>
+                <div class="aptc-amount">
+                    <label><%= l10n("APTC_amount") %>:</label>
+                    <%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %>/<%= l10n("month").to_s.downcase %>
+                </div>
+            <% end %>
         </div>
     </div>
 
     <div class="plan-covered">
-        <% names = hbx_enrollment.covered_members_first_names %>
-        <% if names.present? %>
-            <div class="family-members info vertical-align-top">
+        <% members = hbx_enrollment.covered_members_name_age %>
+        <% if members.present? %>
+            <div>
                 <label><%= l10n("covered") %>:</label>
-
-                <%# names.delete_at(0).camelcase %>
-                <% names.each do |name| %>
+                <% members.each do |member| %>
                     <span class="separator">
-                        <%= name.camelcase %>
+                        <%= member.titleize %><%= "," unless member.eql?(members.last)%>
                     </span>
                 <% end %>
                 </p>
@@ -37,6 +75,19 @@
     </div>
 
     <div class="plan-button-group">
+        <button class="btn btn-default">
+            <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
+        </button>
 
+        <button class="btn btn-default">
+            <a class="vertically-aligned-row" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>">
+                <i class="fa fa-phone"></i>
+                <span class="col-xs-11 enrollment-tile-summary"><%= l10n("plan_contact_info") %></span>
+            </a>
+        </button>
+       <%# popup for phone %>
+        <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
+
+        <%= render partial: "insured/families/enrollment_actions", locals: { read_only: read_only, hbx_enrollment: hbx_enrollment }  %>
     </div>
 </div>
