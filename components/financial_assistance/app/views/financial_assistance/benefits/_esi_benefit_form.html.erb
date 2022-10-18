@@ -1,5 +1,5 @@
 <%= benefit_form_for @application, @applicant, benefit do |f| %>
-  <div class="focus_effect_module row-edit-border">
+  <div class="focus_effect_module row-edit-border" data-cuke="esi_benefit">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: insurance_kind %>
 
