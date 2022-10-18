@@ -15,11 +15,6 @@ Feature: Enrollment History Page
     When consumer visits home page
     Then the consumer will not see the Enrollments link
 
-#   Scenario: Enrollment History Page Feature Feature Is Disabled - Consumer can not have access to the Enrollment History Page
-#     Given EnrollRegistry enrollment_history_page feature is disabled
-#     When the consumer manually enters the "Enrollment History Page" url in the browser search bar
-#     Then the consumer will not have access to the Enrollment History page
-
   Scenario: Enrollment History Page Feature Is Enabled - Consumer can see the Cost Savings Link
     Given EnrollRegistry enrollment_history_page feature is enabled
     When consumer visits home page

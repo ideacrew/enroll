@@ -1198,6 +1198,6 @@ When(/^the consumer clicks the Enrollments link$/) do
 end
 
 Then(/^the consumer will navigate to the Enrollment History page$/) do
-  title = l10n("insured.enrollment_history_title")
+  title = l10n("enrollment_history_title")
   expect(page).to have_content(title)
 end
