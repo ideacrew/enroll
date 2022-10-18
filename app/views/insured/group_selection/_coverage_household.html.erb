@@ -38,10 +38,12 @@
                         <div class='text-dk-grey <%= "health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></div>
                         <div class='text-dk-grey <%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
                       <% end %>
+
                       <div class="ivl_errors text-dk-grey">
                         <% errors&.each do |error| %>
-                          <div class="pb-1"><%= error %></div>
-                        <% end%>
+                          <% error = error.join(' ') if error.kind_of?(Array) %>
+                          <div class="pb-1"><%= error.html_safe %></div>
+                        <% end %>
                       </div>
                     </div>
                   </div>

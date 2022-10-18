@@ -115,7 +115,7 @@ module BenefitSponsors
             end
           end
 
-          eligible_childcare_subsidy = CensusEmployeeSubsidyCalculator.new(census_employee, @sponsored_benefit).subsidy_amount
+          eligible_childcare_subsidy = CensusEmployeeSubsidyCalculator.new(census_employee, @sponsored_benefit).subsidy_amount if @sponsored_benefit.health?
 
           group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
             {
@@ -125,7 +125,7 @@ module BenefitSponsors
               member_enrollments: member_enrollments,
               rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
               sponsor_contribution_prohibited: ["cobra_eligible", "cobra_linked", "cobra_termination_pending"].include?(census_employee.aasm_state),
-              eligible_child_care_subsidy: eligible_childcare_subsidy
+              eligible_child_care_subsidy: (eligible_childcare_subsidy || 0.0)
             })
           ::BenefitSponsors::Members::MemberGroup.new(
             member_entries,

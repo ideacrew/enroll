@@ -164,8 +164,26 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     end.round(2)
   end
 
+  def aptc_eligible_member_ids
+    result = ::Operations::PremiumCredits::FindAll.new.call({ family: hbx_enrollment.family, year: hbx_enrollment.effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+    return [] if result.failure?
+
+    grants = result.value!
+    return [] if grants.blank?
+
+    grants.map(&:member_ids).flatten
+  end
+
   def total_ehb_premium
-    members.reduce(0.00) do |sum, member|
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      # total_ehb_premium is to cap group's applied aptc value. We should be only considering aptc eligible members.
+      eligible_member_ids = aptc_eligible_member_ids
+      ehb_members = members.select {|member| eligible_member_ids.include?(member.applicant_id.to_s) }
+    else
+      ehb_members = members
+    end
+
+    ehb_members.reduce(0.00) do |sum, member|
       (sum + round_down_float_two_decimals(member_ehb_premium(member)))
     end
   end

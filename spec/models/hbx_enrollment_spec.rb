@@ -643,20 +643,31 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
     end
   end
 
-  context "when product premium is lower than the lowest cost silver plan" do
-    let(:lcsp_premium) { 220.85 }
-    let(:total_premium) { 218.23 }
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  context '.verify_and_reset_osse_subsidy_amount' do
     before do
       allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
       allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(lcsp_premium)
-      allow(shop_enrollment).to receive(:total_premium).and_return(total_premium)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy
     end
 
-    it "should have subsidy amount match premium" do
-      expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(total_premium)
+    context 'when subscriber premium is less than osse subsidy' do
+      let(:member_group)  { HbxEnrollmentSponsoredCostCalculator.new(shop_enrollment).groups_for_products([shop_enrollment.product]).first }
+      let(:excess_subsidy_amount) { 500.00 }
+      let(:subscriber_premium) do
+        member = shop_enrollment.hbx_enrollment_members.detect(&:is_subscriber?)
+        member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
+      end
+
+      before do
+        shop_enrollment.update(eligible_child_care_subsidy: excess_subsidy_amount)
+      end
+
+      it 'should max subsidy at subscriber premium' do
+        expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq excess_subsidy_amount
+        shop_enrollment.verify_and_reset_osse_subsidy_amount(member_group)
+        expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq subscriber_premium
+      end
     end
   end
 end

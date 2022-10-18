@@ -232,6 +232,8 @@ module FinancialAssistance
     def applicant_eligibly_enrolled
       if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
         'Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person? *'
+      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
+        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in? *'
       elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
         'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
       else
@@ -334,6 +336,23 @@ module FinancialAssistance
         return csr if csr == 'Limited'
         return "#{csr}%"
       end
+    end
+
+    def do_not_allow_copy?(application, current_user)
+      return true if prospective_year_application?(application)
+
+      application.is_draft? || application.is_closed? || (application.imported? ? !current_user.has_hbx_staff_role? : false)
+    end
+
+    # Restrict the ability to copy prospective year applications until the start of OE for all users, consumers, admin, brokers, etc.
+    def prospective_year_application?(application)
+      return false unless FinancialAssistanceRegistry.feature_enabled?(:block_prospective_year_application_copy_before_oe)
+      return false if HbxProfile.current_hbx.under_open_enrollment?
+
+      # Handles applications which are not submitted.
+      return false if application.assistance_year.nil?
+
+      TimeKeeper.date_of_record.year < application.assistance_year
     end
   end
 end
