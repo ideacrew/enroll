@@ -1,66 +1,66 @@
 <div class="container bottom-pd">
-	<%= form_for :tax_household_group, remote: true, url: create_eligibility_path, method: "post", id: "eligibility_form" do |f| %>
-	<%= f.hidden_field "person_id", value: @person_id  %>
-	<%= f.hidden_field :family_actions_id, value: @element_to_replace_id %>
-	<h2>Create Eligibility</h2>
-	<h3>Tax Group Details</h3>
+  <%= form_for :tax_household_group, remote: true, url: create_eligibility_path, method: "post", id: "eligibility_form" do |f| %>
+  <%= f.hidden_field "person_id", value: @person_id  %>
+  <%= f.hidden_field :family_actions_id, value: @element_to_replace_id %>
+  <h2>Create Eligibility</h2>
+  <h3>Tax Group Details</h3>
 
-	<div class="mb-2">
-		<p>Please enter the effective date</p>
-		<%= text_field_tag 'tax_household_group[effective_date]', nil, {:class => "interaction-field-control-census-employee-dob input_txt date-picker form-control", :placeholder => "EFFECTIVE DATE", required: true} %>
-	</div>
+  <div class="mb-2">
+    <p>Please enter the effective date</p>
+    <%= text_field_tag 'tax_household_group[effective_date]', nil, {:class => "interaction-field-control-census-employee-dob input_txt date-picker form-control", :placeholder => "EFFECTIVE DATE", required: true} %>
+  </div>
 
-	<div>
-		<p>Please indicate which family member is filing taxes for other family members and their group contribution amount.</p>
+  <div>
+    <p>Please indicate which family member is filing taxes for other family members and their group contribution amount.</p>
 
-		<% @tax_household_group_data.values.each_with_index do |members, i| %>
-		<div class="bottom-pd">
-			<%= f.hidden_field "tax_households[#{i}][members]", value: members.to_json  %>
-			<div style="margin-bottom: 5px;">
-				<strong> Group <%= i + 1 %></strong><br />
-			</div>
+    <% @tax_household_group_data.values.each_with_index do |members, i| %>
+    <div class="bottom-pd">
+      <%= f.hidden_field "tax_households[#{i}][members]", value: members.to_json  %>
+      <div style="margin-bottom: 5px;">
+        <strong> Group <%= i + 1 %></strong><br />
+      </div>
 
-			<div>
-				<strong>Members</strong><br />
+      <div>
+        <strong>Members</strong><br />
 
-				<ul>
-					<% members.each do |member| %>
-					<li><%= member[:member_name] %></li>
-					<% end %>
-				</ul>
-			</div>
+        <ul>
+          <% members.each do |member| %>
+          <li><%= member[:member_name] %></li>
+          <% end %>
+        </ul>
+      </div>
 
-			<div>
-				<div>
-					<label> Expected Contribution </label>
-				</div>
-				<div>
-					<%= text_field_tag "tax_household_group[tax_households][#{i}][monthly_expected_contribution]", nil, class: "required input_txt form-control" %>
-				</div>
-			</div>
-		</div>
-		<% end %>
-	</div>
+      <div>
+        <div>
+          <label> Expected Contribution </label>
+        </div>
+        <div>
+          <%= text_field_tag "tax_household_group[tax_households][#{i}][monthly_expected_contribution]", nil, class: "input_txt form-control", required: true %>
+        </div>
+      </div>
+    </div>
+    <% end %>
+  </div>
 
-	<div class="row no-buffer bottom-pd">
-		<div class="col-md-12 no-pd col-sm-12 col-xs-12">
-			<%= button_tag 'Cancel', :class => 'btn btn-default', type: 'button', onclick: "$('tr.child-row-mthh:visible').remove();" %>
-			<%= button_tag 'Previous Page', :class => 'btn btn-default', type: 'button', onclick: "onPreviousPageClick()" %>
-			<%= f.submit "Save Changes", :class => "btn btn-primary save_eligibility", id: 'save_eligibility', :size => '100px' %>
-		</div>
-	</div>
-	<% end %>
+  <div class="row no-buffer bottom-pd">
+    <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+      <%= button_tag 'Cancel', :class => 'btn btn-default', type: 'button', onclick: "$('tr.child-row-mthh:visible').remove();" %>
+      <%= button_tag 'Previous Page', :class => 'btn btn-default', type: 'button', onclick: "onPreviousPageClick()" %>
+      <%= f.submit "Save Changes", :class => "btn btn-primary save_eligibility", id: 'save_eligibility', :size => '100px' %>
+    </div>
+  </div>
+  <% end %>
 </div>
 
 <script type="text/javascript">
-	var url = "<%= new_eligibility_exchanges_hbx_profiles_path(person_id: @person_id, family_actions_id: @element_to_replace_id, tax_household_group_data: @data.to_json) %>"
+  var url = "<%= new_eligibility_exchanges_hbx_profiles_path(person_id: @person_id, family_actions_id: @element_to_replace_id, tax_household_group_data: @data.to_json) %>"
 
-	function onPreviousPageClick() {
-		event.preventDefault();
+  function onPreviousPageClick() {
+    event.preventDefault();
 
-	 $.ajax({
+    $.ajax({
       url: url,
       type: "GET",
     });
-	}
+  }
 </script>
