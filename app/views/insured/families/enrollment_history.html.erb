@@ -20,11 +20,17 @@
       <% if enrollments&.any? %>
         <% enrollments.group_by  { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
           <h2 class="mt-0 ml-1"><%= year %></h2>
-          <!-- add feature flag logic for new plan tile partial -->
-          <%= render partial: "enrollment",
-                   :collection => yearly_enrollments,
-                   :as => :hbx_enrollment,
-                   locals: { read_only: false } %>
+          <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+            <%= render partial: "enrollment_refactored",
+                       :collection => enrollments,
+                       :as => :hbx_enrollment,
+                       locals: { read_only: false } %>
+          <% else %>
+            <%= render partial: "enrollment",
+                       :collection => enrollments,
+                       :as => :hbx_enrollment,
+                       locals: { read_only: false } %>
+          <% end %>
         <% end %>
       <% else %>
          <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
