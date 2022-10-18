@@ -500,6 +500,11 @@ Given(/the oe application warning display feature is enabled/) do
   enable_feature :oe_application_warning_display
 end
 
+Given(/the filtered_application_list feature is enabled/) do
+  enable_feature :filtered_application_list, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :filtered_application_list
+end
+
 Given(/the iap year selection feature is disabled/) do
   disable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
   disable_feature :iap_year_selection
