@@ -295,6 +295,7 @@ module Insured
               )
             )
           )
+          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
         end
 
         let(:max_aptc) { 1200.0 }
@@ -334,7 +335,7 @@ module Insured
         context 'when ehb premium less than aptc' do
           before do
             effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
-            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(200)
+            allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410))
           end
 
           it 'creates enrollment with ehb premium' do
