@@ -93,6 +93,7 @@ RSpec.shared_context '3 dental products with different rating_methods, different
       health_pro = FactoryBot.create(
         :benefit_markets_products_health_products_health_product,
         :silver,
+        :with_issuer_profile,
         csr_variant_id: '01',
         hios_id: hios_id,
         hios_base_id: hios_id,
@@ -130,6 +131,7 @@ RSpec.shared_context '3 dental products with different rating_methods, different
       dental_pro = FactoryBot.create(
         :benefit_markets_products_dental_products_dental_product,
         :ivl_product,
+        :with_issuer_profile,
         hios_id: hios_id,
         hios_base_id: hios_id,
         rating_method: rating_method,

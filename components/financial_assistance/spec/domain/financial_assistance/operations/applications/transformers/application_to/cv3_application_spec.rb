@@ -1184,7 +1184,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   context 'for mitc_is_required_to_file_taxes' do
+    let(:setting) { double }
     before do
+      allow(EnrollRegistry).to receive(:[]).with(:dependent_income_filing_thresholds).and_return(setting)
+      allow(setting).to receive(:setting).with("unearned_income_filing_threshold_#{application.assistance_year}").and_return(double(item: 1_100))
+      allow(setting).to receive(:setting).with("earned_income_filing_threshold_#{application.assistance_year}").and_return(double(item: 12_400))
       applicant.update_attributes!(is_required_to_file_taxes: false)
       create_income
       result = subject.call(application.reload)

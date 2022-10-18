@@ -478,7 +478,7 @@ javascript:
                     <div class="col-md-3">
                       <div class="price-wrapper pull-right">
                         <h2 class="no-buffer plan-premium">
-                          $${parseFloat(result.product_cost_total - result.sponsor_contribution_total).toFixed(2)}
+                          $${parseFloat(Math.max((result.product_cost_total_after_subsidy - result.sponsor_contribution_total), 0.0)).toFixed(2)}
                         </h2>
                         <small style="font-size:12px" class="mt-0">Month</small>
                       </div>
