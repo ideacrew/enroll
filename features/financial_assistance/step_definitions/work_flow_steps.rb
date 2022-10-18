@@ -138,6 +138,10 @@ Then(/^the oe application warning will display$/) do
   expect(page.has_css?(CostSavingsApplicationPage.oe_application_warning_display)).to eq true
 end
 
+Then(/^the index filter will display$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.index_with_filter)).to eq true
+end
+
 Then(/the user will navigate to the assistance year selection page/) do
   expect(page).to have_content(l10n("faa.year_selection_header"))
 end
