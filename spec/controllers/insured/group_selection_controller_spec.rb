@@ -1120,7 +1120,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
   context 'With keep_existing_plan' do
     context 'and osse subsidy eligible' do
-      let(:family_member_ids) {{"0"=>family.family_members.first.id}}
+      let(:family_member_ids) {{ "0" => family.family_members.first.id }}
       let(:old_hbx) {hbx_enrollment}
       let(:subsidy_amount) { 300.00 }
 
@@ -1144,7 +1144,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'should update childcare subsidy amount' do
-        new_enrollment_id = response.redirect_url.scan(/.*plan_shoppings\/(.+)\/thankyou.*/).flatten[0]
+        new_enrollment_id = response.redirect_url.scan(%r{.*plan_shoppings\/(.+)\/thankyou.*}).flatten[0]
 
         enrollment = HbxEnrollment.find(new_enrollment_id)
         expect(enrollment.eligible_child_care_subsidy).to be_a(Money)
