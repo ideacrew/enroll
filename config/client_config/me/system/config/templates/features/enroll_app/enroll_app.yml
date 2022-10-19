@@ -797,6 +797,8 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || true %>
+      - key: :domestic_partner_rating
+        is_enabled: true
       - key: issuer_provided_code
         item: 'MES002'
         is_enabled: true
