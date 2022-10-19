@@ -45,9 +45,9 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = ENV['ENABLE_STRICT_SECURITY'] == 'true'
+  config.force_ssl = ENV['ENABLE_FORCE_SSL'] == 'true'
 
-  if ENV['ENABLE_STRICT_SECURITY'] == 'true'
+  if ENV['ENABLE_CONTENT_SECURITY_POLICY'] == 'true'
     config.content_security_policy do |policy|
       policy.default_src :self, :https
       policy.font_src :self, :https, :data, "*.gstatic.com  *.fontawesome.com"
