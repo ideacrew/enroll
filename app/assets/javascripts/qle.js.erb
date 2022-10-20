@@ -195,7 +195,11 @@ $(function () {
   });
 
   $(document).on('click', '#qle_submit_reason', function() {
-    if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != 'yes'){
+    var expanded_logic_ff = <%= EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) %>;
+    var health_message = ($("#health-ending-expanded").length == 1 );
+    var not_expected_response = ( expanded_logic_ff && health_message ) ? 'no' : 'yes';
+    
+    if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       get_qle_date();
     } else {
       $('#qle_reason').hide();
