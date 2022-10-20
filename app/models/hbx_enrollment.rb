@@ -2724,10 +2724,9 @@ class HbxEnrollment
   end
 
   def couple_enrollee?
+    @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| (hem.primary_relationship == 'spouse')}
     if EnrollRegistry.feature_enabled?(:domestic_partner_rating)
-      @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| (hem.primary_relationship == 'spouse') || (hem.primary_relationship == 'domestic_partner') }
-    else
-      @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| (hem.primary_relationship == 'spouse')}
+      @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| (hem.primary_relationship == 'domestic_partner') }
     end
   end
 
