@@ -195,7 +195,7 @@ $(function () {
   });
 
   $(document).on('click', '#qle_submit_reason', function() {
-    var expanded_logic_ff = <%= EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) ? true : false %>;
+    var expanded_logic_ff = <%= EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) %>;
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( expanded_logic_ff && health_message ) ? 'no' : 'yes';
     
