@@ -1374,6 +1374,14 @@ module FinancialAssistance
       end
     end
 
+    def create_rrv_evidence_histories
+      rrv_evidences = %w[non_esi_evidence income_evidence]
+
+      active_applicants.each do |applicant|
+        applicant.create_rrv_evidence_histories(rrv_evidences)
+      end
+    end
+
     def build_new_relationship(applicant, rel_kind, relative)
       rel_params = { applicant_id: applicant&.id, kind: rel_kind, relative_id: relative&.id }
       return if rel_params.values.include?(nil) || applicant&.id == relative&.id
