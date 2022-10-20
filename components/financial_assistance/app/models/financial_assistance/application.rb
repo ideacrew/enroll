@@ -873,7 +873,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determined
       end
 
-      event :determine_renewal, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :publish_application_determined] do
+      event :determine_renewal, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1707,8 +1707,6 @@ module FinancialAssistance
     end
 
     def create_evidences
-      return if previously_renewal_draft?
-
       active_applicants.each do |applicant|
         applicant.create_evidences
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
