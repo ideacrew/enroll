@@ -1,9 +1,10 @@
+# frozen_string_literal: true
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
+# trigger rrv by year
 class TriggerRrvByYear < MongoidMigrationTask
   def migrate
-    binding.pry
     assistance_year = ENV['assistance_year']
     skip = (ENV['skip'] || 0).to_i
     limit = (ENV['limit'] || 5000).to_i
