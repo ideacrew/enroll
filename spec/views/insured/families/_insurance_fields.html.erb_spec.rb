@@ -23,7 +23,7 @@ RSpec.describe "insured/families/_insurance_fields.html.erb" do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:default_is_your_health_coverage_ending_no).and_call_original
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:is_your_health_coverage_ending_expanded_question).and_return(true)
-        render partial: "insured/families/insurance_fields"
+      render partial: "insured/families/insurance_fields"
     end
 
     it "should display the is_your_health_coverage_ending_expanded text" do
@@ -48,7 +48,4 @@ RSpec.describe "insured/families/_insurance_fields.html.erb" do
       expect(rendered).to have_selector('input#reason_accept1[checked=checked]')
     end
   end
-  
-  
-
 end
