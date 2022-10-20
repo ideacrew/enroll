@@ -386,6 +386,9 @@ registry:
       - key: :default_is_your_health_coverage_ending_no
         item: :default_is_your_health_coverage_ending_no
         is_enabled: <%= ENV['DEFAULT_IS_YOUR_HEALTH_COVERAGE_ENDING_NO_IS_ENABLED'] || false %>
+      - key: :is_your_health_coverage_ending_expanded_question
+        item: :is_your_health_coverage_ending_expanded_question
+        is_enabled: <%= ENV['IS_YOUR_HEALTH_COVERAGE_ENDING_EXPANDED_QUESTION_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
