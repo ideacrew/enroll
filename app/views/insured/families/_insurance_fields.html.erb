@@ -8,7 +8,7 @@
     <% if EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) %> 
       <%= l10n("insured.is_your_health_coverage_ending_expanded", translation_keys) %> <div id="health-ending-expanded" />
     <% else %>
-      <%= l10n("insured.is_your_health_coverage_ending", translation_keys) %> <div id="health-ending" />
+      <%= l10n("insured.is_your_health_coverage_ending") %>
     <% end %>
   </h4> <br/>
   <div class = 'moving_radio_btn'>
