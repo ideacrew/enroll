@@ -1215,6 +1215,17 @@ module FinancialAssistance
       self.save
     end
 
+    def create_rrv_evidence_histories(rrv_evidences)
+      rrv_evidences.each do |evidence_name|
+        evidence_record = self.send(evidence_name)
+        evidence_record&.add_verification_history('RRV_Submitted', 'RRV - Renewal verifications submitted', 'system')
+      end
+
+      self.save
+    rescue StandardError => e
+      Rails.logger.error("unable to create rrv evidence histories for #{self.id} due to #{e.inspect}")
+    end
+
     def schedule_verification_due_on
       verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
       TimeKeeper.date_of_record + verification_document_due.days
