@@ -748,6 +748,8 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
+      - key: :domestic_partner_rating
+        is_enabled: <%= ENV['DOMESTIC_PARTNER_RATING_IS_ENABLED'] || false %>
       - key: issuer_provided_code
         item: 'DCS002'
         is_enabled: true
