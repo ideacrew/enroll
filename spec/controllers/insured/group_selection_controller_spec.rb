@@ -1144,7 +1144,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'should update childcare subsidy amount' do
-        new_enrollment_id = response.redirect_url.scan(%r{.*plan_shoppings\/(.+)\/thankyou.*}).flatten[0]
+        new_enrollment_id = response.redirect_url.scan(%r{.*plan_shoppings/(.+)/thankyou.*}).flatten[0]
 
         enrollment = HbxEnrollment.find(new_enrollment_id)
         expect(enrollment.eligible_child_care_subsidy).to be_a(Money)
