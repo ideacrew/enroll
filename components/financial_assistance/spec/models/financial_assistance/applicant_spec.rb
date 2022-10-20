@@ -1017,6 +1017,16 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant.local_mec_evidence).to be_present
         expect(applicant.local_mec_evidence.aasm_state).to eq 'pending'
       end
+
+      it 'should not create/override if given evidence is already present' do
+        esi_evidence = applicant.create_esi_evidence(key: :esi, title: "ESI MEC", aasm_state: 'verified')
+        applicant.create_evidences
+        expect(applicant.reload.esi_evidence.id).to eq esi_evidence.id
+        expect(applicant.esi_evidence.aasm_state).not_to eq 'pending'
+        expect(applicant.esi_evidence.aasm_state).to eq 'verified'
+        expect(applicant.non_esi_evidence).to be_present
+        expect(applicant.non_esi_evidence.aasm_state).to eq 'pending'
+      end
     end
 
     context 'set evidence to verified' do

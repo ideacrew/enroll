@@ -1198,8 +1198,10 @@ module FinancialAssistance
     def create_evidence(key, title)
       return unless is_ia_eligible? || is_applying_coverage
       association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
-      self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
-      self.send("#{association_name}_evidence").move_to_pending!
+      if self.send("#{association_name}_evidence").blank?
+        self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true)
+        self.send("#{association_name}_evidence").move_to_pending!
+      end
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
