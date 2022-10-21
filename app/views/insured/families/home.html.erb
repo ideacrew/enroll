@@ -33,9 +33,9 @@
       <% end %>
     </div>
     <div class="col-md-4 right-column">
-      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
-        <strong>Display All Enrollments?</strong>&nbsp;&nbsp;
-        <input type="checkbox" id="display_all_enrollments"> <br>
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
+        <strong>Display All Enrollments?</strong>
+        <input class="ml-half" type="checkbox" id="display_all_enrollments"> <br>
       <% end %>
       <%= render 'right_column' %>
     </div>
