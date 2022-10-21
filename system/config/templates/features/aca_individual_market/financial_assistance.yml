@@ -23,6 +23,8 @@ registry:
             item: ""
       - key: :iap_assistance_year_display
         is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
+      - key: :assistance_year_based_effective_date
+        is_enabled: <%= ENV['ASSISTANCE_YEAR_BASED_EFFECTIVE_DATE_IS_ENABLED'] || false %>
       - key: :enrollment_dates
         item: :enrollment_dates
         is_enabled: <%= ENV['ENROLLMENT_DATES_IS_ENABLED'] || true %>

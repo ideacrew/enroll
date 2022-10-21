@@ -1578,7 +1578,7 @@ module FinancialAssistance
 
     def set_effective_date
       return if effective_date.present?
-      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
+      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call(assistance_year: assistance_year).value!
       update_attribute(:effective_date, effective_date)
     end
 
