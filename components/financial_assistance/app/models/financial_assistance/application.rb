@@ -39,6 +39,11 @@ module FinancialAssistance
 
     RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
 
+    SAFE_REGISTRY_METHODS = {
+      "FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate" => FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate,
+      "FinancialAssistance::Operations::EnrollmentDates::ApplicationYear" => FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
+    }.freeze
+
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
 
@@ -1578,7 +1583,7 @@ module FinancialAssistance
 
     def set_effective_date
       return if effective_date.present?
-      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
+      effective_date = SAFE_REGISTRY_METHODS.fetch(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item).new.call(assistance_year: assistance_year).value!
       update_attribute(:effective_date, effective_date)
     end
 
