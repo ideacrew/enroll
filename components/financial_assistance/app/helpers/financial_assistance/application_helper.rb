@@ -354,5 +354,10 @@ module FinancialAssistance
 
       TimeKeeper.date_of_record.year < application.assistance_year
     end
+
+    # Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?
+    def display_minimum_value_standard_question?(insurance_kind)
+      FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) && insurance_kind == 'employer_sponsored_insurance'
+    end
   end
 end
