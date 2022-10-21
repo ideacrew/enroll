@@ -56,6 +56,27 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def enrollment_history
+    redirect_to main_app.family_account_path(tab: 'home') unless EnrollRegistry.feature_enabled?(:enrollment_history_page)
+
+    authorize @family, :show?
+
+    @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+
+    @all_hbx_enrollments_for_admin = if EnrollRegistry.feature_enabled?(:include_external_enrollment_in_display_all_enrollments)
+                                       @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family) + HbxEnrollment.family_external_enrollments(@family)
+                                     else
+                                       @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
+                                     end
+    # Sort by effective_on again. The latest enrollment will display at the top.
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
+
+    respond_to do |format|
+      format.html
+      format.any { head :ok }
+    end
+  end
+
   def manage_family
     set_bookmark_url
     set_admin_bookmark_url(manage_family_insured_families_path)
