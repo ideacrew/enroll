@@ -413,4 +413,43 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
   end
+
+  describe '#display_minimum_value_standard_question?' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:minimum_value_standard_question).and_return(enabled)
+    end
+
+    context 'RR configuration turned OFF' do
+      let(:enabled) { false }
+      let(:insurance_kind) { 'health_reimbursement_arrangement' }
+
+      it 'should return false' do
+        expect(
+          helper.display_minimum_value_standard_question?(insurance_kind)
+        ).to eq(false)
+      end
+    end
+
+    context 'RR configuration turned ON, insurance_kind: health_reimbursement_arrangement' do
+      let(:enabled) { true }
+      let(:insurance_kind) { 'health_reimbursement_arrangement' }
+
+      it 'should return false' do
+        expect(
+          helper.display_minimum_value_standard_question?(insurance_kind)
+        ).to eq(false)
+      end
+    end
+
+    context 'RR configuration turned ON, insurance_kind: employer_sponsored_insurance' do
+      let(:enabled) { true }
+      let(:insurance_kind) { 'employer_sponsored_insurance' }
+
+      it 'should return true' do
+        expect(
+          helper.display_minimum_value_standard_question?(insurance_kind)
+        ).to eq(true)
+      end
+    end
+  end
 end
