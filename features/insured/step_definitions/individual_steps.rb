@@ -119,3 +119,23 @@ Then(/^.+ enter personal information with american indian alaska native status w
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
 end
+
+Then(/^the consumer will not see the Enrollments link$/) do
+  expect(page).not_to have_selector(".interaction-click-control-enrollments")
+end
+
+When(/^the consumer manually enters the "Enrollment History Page" url in the browser search bar$/) do
+  visit main_app.enrollment_history_insured_families_path
+end
+
+And(/^the Enrollments link is visible$/) do
+  expect(page).to have_selector(".interaction-click-control-enrollments")
+end
+
+When(/^the consumer clicks the Enrollments link$/) do
+  find(".interaction-click-control-enrollments").click
+end
+
+Then(/^the consumer will navigate to the Enrollment History page$/) do
+  expect(page).to have_selector("#enrollment-history-title")
+end
