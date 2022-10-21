@@ -1,5 +1,6 @@
-require "rails_helper"
+# frozen_string_literal: true
 
+require "rails_helper"
 
 RSpec.describe BenefitSponsors::Services::SponsoredBenefitCostEstimationService, dbclean: :after_each do
 
