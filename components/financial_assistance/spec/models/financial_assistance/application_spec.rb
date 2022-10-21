@@ -1675,6 +1675,40 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  describe 'create_rrv_evidence_histories' do
+
+    before do
+      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      application.create_rrv_evidences
+    end
+
+    it 'should create verification histories' do
+      application.active_applicants.each do |applicant|
+        %w[non_esi_evidence income_evidence].each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          next unless evidence
+          expect(evidence.verification_histories).to be_empty
+        end
+      end
+
+      application.create_rrv_evidence_histories
+
+      application.active_applicants.each do |applicant|
+        %w[non_esi_evidence income_evidence].each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          next unless evidence
+          expect(evidence.verification_histories).to be_present
+          history = evidence.verification_histories.first
+          expect(history.action).to eq 'RRV_Submitted'
+          expect(history.update_reason).to eq 'RRV - Renewal verifications submitted'
+          expect(history.updated_by).to eq "system"
+        end
+      end
+    end
+  end
+
   describe 'publish_application_determined' do
     let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined }
     let(:publish_operation_result) { Success(double) }

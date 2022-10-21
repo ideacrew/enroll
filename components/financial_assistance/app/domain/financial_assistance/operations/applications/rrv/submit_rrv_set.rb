@@ -34,7 +34,9 @@ module FinancialAssistance
           end
 
           def find_families(params)
-            family_ids = FinancialAssistance::Application.where(aasm_state: "determined", assistance_year: params[:assistance_year]).distinct(:family_id)
+            family_ids = FinancialAssistance::Application.where(:aasm_state => "determined",
+                                                                :assistance_year => params[:assistance_year],
+                                                                :"applicants.is_ia_eligible" => true).distinct(:family_id)
             Family.where(:_id.in => family_ids).all
           end
 
@@ -48,7 +50,7 @@ module FinancialAssistance
               puts "Total number of records processed #{skip + criteria.pluck(:id).length}"
               skip += applications_per_event
 
-              break if params[:max_applications].present? && params[:max_applications] > skip
+              break if params[:max_applications].present? && params[:max_applications] < skip
             end
           end
 
