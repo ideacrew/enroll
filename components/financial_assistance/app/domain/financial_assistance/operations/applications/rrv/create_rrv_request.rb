@@ -47,8 +47,7 @@ module FinancialAssistance
           end
 
           def is_aptc_or_csr_eligible?(application)
-            eligibility = application.eligibility_determinations.max_by(&:determined_at)
-            eligibility.present? && (eligibility.is_aptc_eligible? || eligibility.is_csr_eligible?)
+            application.aptc_applicants.present?
           end
 
           def collect_applications_from_families(params)
@@ -63,13 +62,14 @@ module FinancialAssistance
               determined_application.create_rrv_evidences
               cv3_application = transform_and_construct(family, params[:assistance_year])
               applications_with_evidences << cv3_application.to_h
+              determined_application.create_rrv_evidence_histories
               count += 1
               rrv_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
             rescue StandardError => e
               rrv_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
 
-            applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Applications for given families")
+            applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Determined applications with ia_eligible applicants")
           end
 
           def build_event(payload)

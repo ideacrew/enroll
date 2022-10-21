@@ -45,7 +45,7 @@ module Eligibilities
       private
 
       def status_for(verification_type)
-        return verification_type.validation_status if PENDING_STATES.include?(verification_type.validation_status)
+        return verification_type.validation_status if (['review'] + PENDING_STATES).include?(verification_type.validation_status)
 
         verification_type.type_verified? ? 'determined' : 'outstanding'
       end

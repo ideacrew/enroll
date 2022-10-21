@@ -51,7 +51,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRe
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
-                                  is_post_partum_period: false)
+                                  is_post_partum_period: false,
+                                  is_ia_eligible: true)
     applicant
   end
 
@@ -126,11 +127,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRe
   end
 
   it "when evidences are not created due to applicant ineligible" do
-    applicant.update(is_applying_coverage: false, is_ia_eligible: false)
+    applicant.update!(is_applying_coverage: false, is_ia_eligible: false)
     expect(applicant.income_evidence.present?).to be_falsey
     expect(applicant.non_esi_evidence.present?).to be_falsey
     result = subject.call(families: Family.all, assistance_year: application.assistance_year)
-    expect(result).to be_success
+    expect(result).to be_failure
+    expect(result.failure).to eq("No Determined applications with ia_eligible applicants")
     expect(applicant.reload.income_evidence.present?).to be_falsey
     expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end

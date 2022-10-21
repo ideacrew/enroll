@@ -1118,6 +1118,41 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
+  context 'With keep_existing_plan' do
+    context 'and osse subsidy eligible' do
+      let(:family_member_ids) {{ "0" => family.family_members.first.id }}
+      let(:old_hbx) {hbx_enrollment}
+      let(:subsidy_amount) { 300.00 }
+
+      before do
+        family.active_household.hbx_enrollments << [hbx_enrollment]
+        family.save
+        user = FactoryBot.create(:user, person: FactoryBot.create(:person))
+
+        allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:osse_subsidy_for_member).and_return(subsidy_amount)
+
+        sign_in user
+        allow(old_hbx).to receive(:is_shop?).and_return true
+        allow(employee_role.census_employee).to receive(:coverage_effective_on).with(hbx_enrollment.sponsored_benefit_package).and_return(hbx_enrollment.effective_on)
+        family.active_household.reload
+        old_hbx.update_attributes(effective_on: employee_role.census_employee.employer_profile.plan_years.first.effective_period.min)
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id }
+        family.reload
+        family.active_household.reload
+      end
+
+      it 'should update childcare subsidy amount' do
+        new_enrollment_id = response.redirect_url.scan(%r{.*plan_shoppings/(.+)/thankyou.*}).flatten[0]
+
+        enrollment = HbxEnrollment.find(new_enrollment_id)
+        expect(enrollment.eligible_child_care_subsidy).to be_a(Money)
+        expect(enrollment.eligible_child_care_subsidy.to_f).to eq(subsidy_amount)
+      end
+    end
+  end
+
   context "POST CREATE for IVL" do
     context "for nil rating area" do
       before do

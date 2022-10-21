@@ -1198,8 +1198,10 @@ module FinancialAssistance
     def create_evidence(key, title)
       return unless is_ia_eligible? || is_applying_coverage
       association_name = (key == :local_mec) ? key : key.to_s.gsub("_mec", '')
-      self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true) if self.send("#{association_name}_evidence").blank?
-      self.send("#{association_name}_evidence").move_to_pending!
+      if self.send("#{association_name}_evidence").blank?
+        self.send("create_#{association_name}_evidence", key: key, title: title, is_satisfied: true)
+        self.send("#{association_name}_evidence").move_to_pending!
+      end
     rescue StandardError => e
       Rails.logger.error("unable to create #{key} evidence for #{self.id} due to #{e.inspect}")
     end
@@ -1211,6 +1213,17 @@ module FinancialAssistance
       end
 
       self.save
+    end
+
+    def create_rrv_evidence_histories(rrv_evidences)
+      rrv_evidences.each do |evidence_name|
+        evidence_record = self.send(evidence_name)
+        evidence_record&.add_verification_history('RRV_Submitted', 'RRV - Renewal verifications submitted', 'system')
+      end
+
+      self.save
+    rescue StandardError => e
+      Rails.logger.error("unable to create rrv evidence histories for #{self.id} due to #{e.inspect}")
     end
 
     def schedule_verification_due_on
