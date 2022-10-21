@@ -56,10 +56,10 @@ class Insured::FamilyMembersController < ApplicationController
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
       @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record
-      @sep.check_baby_birthdate
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
+      @change_plan_date = @sep.set_baby_birth_date if @sep.set_baby_birth_date.present?
     elsif params[:qle_id].present? && !params[:shop_for_plan]
 
       qle = QualifyingLifeEventKind.find(params[:qle_id])
@@ -71,7 +71,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
       special_enrollment_period.save
       @market_kind = qle.market_kind
-      @change_plan_date = special_enrollment_period.check_baby_birthdate
+      @change_plan_date = special_enrollment_period.set_baby_birth_date if special_enrollment_period.set_baby_birth_date.present?
     end
     @market_kind = params[:market_kind] if params[:market_kind].present?
     if request.referer.present?
@@ -116,10 +116,10 @@ class Insured::FamilyMembersController < ApplicationController
       household = @family.active_household
       immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
       extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
-      # sep = @family.special_enrollment_periods.select {|sep| sep.qualifying_life_event_kind_id == params[:qle_id]}.first
-      # @change_plan_date = @family.family_members.last.dob
       Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       @created = true
+      special_enrollment_period = @family.special_enrollment_periods.select { |sep| sep.qualifying_life_event_kind.id == params[:qle_id] }.first
+      @change_plan_date = special_enrollment_period.set_baby_birth_date
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
