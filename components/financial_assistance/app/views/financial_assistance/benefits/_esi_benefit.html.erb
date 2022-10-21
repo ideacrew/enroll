@@ -56,11 +56,11 @@
         </div>
         <div class='col-md-6'>
           <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
+            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml", onclick: 'return false;') %>
             <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
           </div>
           <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml" )%>
+            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml", onclick: 'return false;')%>
             <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
           </div>
           <div class='col-md-4'>
@@ -75,11 +75,11 @@
         </div>
         <div class='col-md-6'>
           <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
+            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml", onclick: 'return false;') %>
             <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
           </div>
           <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml" )%>
+            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml", onclick: 'return false;')%>
             <label class="radio-yml" for="is_esi_mec_met_no">No</label>
           </div>
           <div class='col-md-4'>
@@ -158,11 +158,11 @@
         </div>
         <div class='col-md-4'>
           <div class='col-md-4'>
-            <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", true, benefit.health_plan_meets_mvs_and_affordable,class: "radio-yml" ) %>
+            <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", true, benefit.health_plan_meets_mvs_and_affordable,class: "radio-yml", onclick: 'return false;') %>
             <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_yes" required="required">Yes</label>
           </div>
           <div class='col-md-4'>
-            <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", false, !benefit.health_plan_meets_mvs_and_affordable, class: "radio-yml" )%>
+            <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", false, !benefit.health_plan_meets_mvs_and_affordable, class: "radio-yml", onclick: 'return false;')%>
             <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_no">No</label>
           </div>
         </div>
