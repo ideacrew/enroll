@@ -13,50 +13,121 @@
     </div>
 
     <div class="plan-details">
+
         <div class="left-column">
             <% unless hide_policy_selected_date?(hbx_enrollment) %>
-                <div class="enrollment-created-at">
+                <div class="created-at enrollment-effective">
                     <label><%= l10n("plan_selected") %>:</label>
                     <%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)
                 </div>
             <% end %>
+
             <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
-                <div class="enrollment-effective">
+                <div class="effective-on enrollment-effective">
                     <label><%= l10n("effective_date") %>:</label>
                     <%= hbx_enrollment.effective_on %>
                 </div>
-                <div class="enrollment-effective">
+
+                <div class="coverage-end enrollment-effective">
                     <label><%= l10n("coverage_end") %>:</label>
                     <%= enrollment_coverage_end(hbx_enrollment) %>
                 </div>
+
+                <% if hbx_enrollment.coverage_termination_pending? %>
+                    <div class="terminated-on enrollment-effective">
+                        <label><%= l10n("insured.families.future_enrollment_termination_date") %>:</label>
+                        <%= hbx_enrollment.terminated_on %>
+                    </div>
+                <% end %>
             <% else %>
-                <div class="enrollment-effective">
+                <div class="plan-start enrollment-effective">
                     <label><%= l10n("plan_start") %>:</label>
                     <%= hbx_enrollment.effective_on %>
-                    <% if read_only == true %>
+                </div>
+
+                <% if @census_employee&.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
+                    <div class="plan-end enrollment-effective <%= 'hidden' unless read_only %>">
                         <label class="text-danger"><%= l10n("plan_end") %>:</label>
-                        <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
-                            <span class="text-danger">
-                                <%= @census_employee.coverage_terminated_on.end_of_month %>
-                            </span>
-                        <% end %>
-                    <% end %>
+                        <span class="text-danger"><%= @census_employee.coverage_terminated_on.end_of_month %></span>
+                    </div>
+                <% end %>
+            <% end %>
+
+            <% if hbx_enrollment.is_reinstated_enrollment? %>
+                <div class="reinstated-enrollment enrollment-effective">
+                    <label><%= l10n("reinstated_enrollment") %></label>
                 </div>
             <% end %>
+
+            <div class="plan-id">
+                <label><%= HbxProfile::ShortName %> ID:</label>
+                <%# DO NOT LEAVE THIS IN!!!!!! %>
+                <%= hbx_enrollment.hbx_id[0,9] %>
+            </div>
+
+            <div class="benefit-group <%= 'hidden' unless read_only %>">
+                <label><%= l10n("benefit_group") %>:</label>
+                <%= @benefit_group.try(:title) %>
+            </div>
+
+            <% if @census_employee&.employee_role.present? && employee_role = @census_employee.employee_role %>
+                <div class="hired-on <%= 'hidden' unless read_only %>">
+                    <label><%= l10n("hired_on") %>:</label>
+                    <%= @census_employee.employee_role.try(:hired_on) %></p>
+                </div>
+            <% end %>
+
+            <% if hbx_enrollment.is_coverage_waived? %>
+                <div class="enrollment-status <%= 'hidden' unless read_only %>">
+                    <label><%= l10n("enrollment_status") %>:</label>
+                    <%= l10n("coverage_waived") %>
+                </div>
+                <% if @census_employee&.employee_role.present? && employee_role = @census_employee&.employee_role %>
+                    <div class="waiver-reason <%= 'hidden' unless read_only %>">
+                        <label><%= l10n("waiver_reason") %>:</label>
+                        <%= hbx_enrollment.waiver_reason %>
+                    </div>
+                <% end %>
+            <% end %>
         </div>
+
         <div class="right-column">
             <div class="enrollment-premium">
                 <label><%= l10n("premium_you_pay") %>:</label>
                 <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/<%= l10n("month").to_s.downcase %>
             </div>
-            <%# if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
-            <% if true %>
+            <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
                 <div class="aptc-amount">
                     <label><%= l10n("APTC_amount") %>:</label>
                     <%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %>/<%= l10n("month").to_s.downcase %>
                 </div>
             <% end %>
+
+            <div class="plan-metallic-level">
+                <label><%= l10n("metallic_level") %>:</label>
+                <%= display_dental_metal_level(product) %>
+            </div>
+
+            <div class="plan-type">
+                <label><%= l10n("type") %>:</label>
+                <%= product.try(:product_type).try(:upcase) %>
+            </div>
+
+            <% unless EnrollRegistry.feature_enabled?(:hide_enrollment_market_type) %>
+                <div class="enrollment-type">
+                    <label><%= l10n("market_type") %>: </label>
+                    <%= show_market_name_by_enrollment hbx_enrollment %>
+                </div>
+            <% end %>
+
+            <% if hbx_enrollment.eligible_child_care_subsidy > 0 %>
+                <div class="hc44cc-discount">
+                    <label><%= l10n("hc44cc_premium_discount") %>:</label>
+                    <%= number_to_currency(hbx_enrollment.eligible_child_care_subsidy, precision: 2)%>/<%= l10n("month").to_s.downcase %>
+                </div>
+            <% end %>
         </div>
+
     </div>
 
     <div class="plan-covered">

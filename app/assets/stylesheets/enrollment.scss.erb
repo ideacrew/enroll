@@ -1,7 +1,8 @@
-@import "variables";
+@import 'variables';
 
 .plan-tile {
     padding: 12px;
+    font-size: medium;
 
     .plan-header {
         display: flex;
@@ -41,20 +42,27 @@
     .plan-details {
         display: flex;
         flex-direction: row;
-        color: #605E5C;
+        flex-wrap: wrap;
+        color: #605e5c;
 
-        div[class$="-column"]{
+        div[class$='-column'] {
             flex: 1;
+
+            &>div {
+                display: flex;
+                flex-direction: row;
+            }
         }
 
         label {
             font-weight: 600;
+            flex-basis: 45%;
         }
     }
 
     .plan-covered {
         padding: 12px 0 0 0;
-        color: #605E5C;
+        color: #605e5c;
 
         label {
             font-weight: 600;
@@ -67,15 +75,29 @@
         flex-direction: row;
         gap: 20px;
         font-size: 16px;
-        color: #4A7EA6 !important;
+        justify-content: space-between;
+        flex-wrap: wrap;
 
         .enrollment-actions-ddl {
-            flex: 0 0 85px;
+            flex-basis: 85px;
+            text-align: right;
         }
 
-        .btn{
+        .btn {
             height: 34px;
+
+            &:hover {
+                color: #23527c;
+                border-color: #23527c;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+
+            i {
+                font-size: 1.2em;
+            }
         }
     }
-
 }
