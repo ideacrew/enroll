@@ -1460,90 +1460,107 @@ describe '#notify_of_broker_update' do
                       kind: 'individual',
                       aasm_state: 'coverage_selected')
   end
-  let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
   let(:object_id) { BSON::ObjectId.new.to_s }
 
   it "should notify broker event if enrollment is active" do
     expect(enrollment).to receive(:notify).with(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => glue_event_queue_name,
         "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
         "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
-    enrollment.notify_of_broker_update(object_id)
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 
   it "should not notify broker event if enrollment is terminated" do
     enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: TimeKeeper.date_of_record.prev_month.end_of_month)
     expect(enrollment).not_to receive(:notify).with(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => glue_event_queue_name,
         "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
         "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
-    enrollment.notify_of_broker_update(object_id)
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 
   it "should not notify broker event if enrollment is expired" do
     enrollment.update_attributes(aasm_state: 'coverage_expired')
     expect(enrollment).not_to receive(:notify).with(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => glue_event_queue_name,
         "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
         "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
-    enrollment.notify_of_broker_update(object_id)
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 
   it "should not notify broker event if enrollment is shop" do
     enrollment.update_attributes(kind: 'employer_sponsored')
     expect(enrollment).not_to receive(:notify).with(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => glue_event_queue_name,
         "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
         "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
-    enrollment.notify_of_broker_update(object_id)
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 
   it "should not notify broker event if enrollment is canceled" do
     enrollment.update_attributes(aasm_state: 'coverage_canceled')
     expect(enrollment).not_to receive(:notify).with(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => glue_event_queue_name,
         "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
         "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
-    enrollment.notify_of_broker_update(object_id)
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 
   it "should notify broker event if enrollment termination is in future" do
     enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
     expect(enrollment).to receive(:notify).with(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => glue_event_queue_name,
         "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
         "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
-    enrollment.notify_of_broker_update(object_id)
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 end
 

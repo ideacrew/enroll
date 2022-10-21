@@ -14,7 +14,7 @@ module Operations
         agency_account = yield find_broker_agency_account(valid_params)
         family = yield find_family(valid_params)
         result = yield terminate_broker_agency(agency_account, valid_params)
-        notify_broker_terminated_event_to_edi(family)
+        notify_broker_terminated_event_to_edi(valid_params, family)
         Success(result)
       end
 
@@ -38,8 +38,10 @@ module Operations
         ::Operations::Families::Find.new.call(id: valid_params[:family_id])
       end
 
-      def notify_broker_terminated_event_to_edi(family)
-        family.notify_broker_update_on_impacted_enrollments_to_edi(nil)
+      def notify_broker_terminated_event_to_edi(valid_params, family)
+        return unless valid_params[:notify_edi]
+
+        family.notify_broker_update_on_impacted_enrollments_to_edi({family_id: family.id.to_s})
       end
     end
   end

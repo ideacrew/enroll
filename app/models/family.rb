@@ -942,12 +942,12 @@ class Family
     Rails.logger.error { "Couldn't publish broker hired event due to #{e.backtrace}" }
   end
 
-  def notify_broker_update_on_impacted_enrollments_to_edi(broker_role_id)
+  def notify_broker_update_on_impacted_enrollments_to_edi(opts = {})
     return false unless EnrollRegistry.feature_enabled?(:send_broker_hired_event_to_edi) ||
                         EnrollRegistry.feature_enabled?(:send_broker_fired_event_to_edi)
 
     enrollments.each do |enr|
-      enr.notify_of_broker_update(broker_role_id)
+      enr.notify_of_broker_update(opts)
     end
 
     true

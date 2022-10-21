@@ -49,7 +49,8 @@ module Operations
         terminate_params = { family_id: valid_params[:family_id],
                              broker_account_id: valid_params[:current_broker_account_id],
                              terminate_date: valid_params[:terminate_date],
-                             new_broker_hired: true }
+                             new_broker_hired: true,
+                             notify_edi: false }
 
         family.publish_broker_fired_event(terminate_params)
       end
@@ -70,7 +71,9 @@ module Operations
       end
 
       def notify_broker_hired_event_to_edi(family, broker_role)
-        family.notify_broker_update_on_impacted_enrollments_to_edi(broker_role.id.to_s)
+        family.notify_broker_update_on_impacted_enrollments_to_edi({broker_role_id: broker_role.id.to_s,
+                                                                    broker_role_npn: broker_role.npn,
+                                                                    family_id: family.id.to_s})
         Success("Broker event notified to EDI")
       end
     end

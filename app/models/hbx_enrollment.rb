@@ -1979,18 +1979,18 @@ class HbxEnrollment
     )
   end
 
-  def notify_of_broker_update(broker_id)
+  def notify_of_broker_update(opts)
     return if is_shop?
     return if %w[coverage_canceled coverage_expired].include?(aasm_state)
     return if aasm_state == "coverage_terminated" && terminated_on <= TimeKeeper.date_of_record
 
-    config = Rails.application.config.acapi
     notify(
-      "acapi.info.events.family.broker_update",
+      "acapi.info.events.family.broker_updates",
       {
-        :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
-        "hbx_enrollment_id" => self.hbx_id,
-        "new_broker_id" => broker_id,
+        "hbx_enrollment_id" => hbx_id,
+        "family_id" => opts[:family_id],
+        "new_broker_id" => opts[:broker_role_id],
+        "new_broker_npn" => opts[:broker_role_npn],
         "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
       }
     )
