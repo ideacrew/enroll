@@ -39,7 +39,8 @@ module Operations
       end
 
       def notify_broker_terminated_event_to_edi(valid_params, family)
-        return unless valid_params[:notify_edi]
+        return Success("") unless valid_params[:notify_edi]
+        return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
 
         family.notify_broker_update_on_impacted_enrollments_to_edi({family_id: family.id.to_s})
       end

@@ -71,6 +71,8 @@ module Operations
       end
 
       def notify_broker_hired_event_to_edi(family, broker_role)
+        return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
+
         family.notify_broker_update_on_impacted_enrollments_to_edi({broker_role_id: broker_role.id.to_s,
                                                                     broker_role_npn: broker_role.npn,
                                                                     family_id: family.id.to_s})
