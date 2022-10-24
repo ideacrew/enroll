@@ -95,14 +95,14 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         end
 
         active_thhs_of_household = family.active_household.tax_households.active_tax_household.tax_household_with_year(2022)
-        family = if active_thhs_of_household.present?
-                   active_2022_tax_household_groups = family.tax_household_groups.by_year(2022)
-                   if active_2022_tax_household_groups.present?
+        if active_thhs_of_household.present?
+          active_2022_tax_household_groups = family.tax_household_groups.by_year(2022)
+          family = if active_2022_tax_household_groups.present?
                      process_inactive_thhs_of_household(family, active_thhs_of_household, true)
                    else
                      process_active_thhs_of_household(family, active_thhs_of_household)
                    end
-                 end
+        end
 
         inactive_thhs_of_household = family.active_household.tax_households.where(:effective_ending_on.ne => nil).tax_household_with_year(2022)
         family = process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
