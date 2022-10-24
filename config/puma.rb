@@ -18,3 +18,6 @@ end
 before_fork do
   Mongoid.disconnect_clients
 end
+
+# Specifies the `pidfile` that Puma will use.
+pidfile ENV.fetch("PIDFILE", "tmp/pids/server.pid")
