@@ -1033,7 +1033,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household3, is_medicaid_chip_eligible: true) }
       let!(:tax_household_member3) { FactoryBot.create(:tax_household_member, applicant_id: family_member3.id, tax_household: tax_household3, is_medicaid_chip_eligible: false) }
 
-      it "should return true" do
+      it "should return the changed values" do
         expect(helper.family_member_eligible_for_mdcr(family_member)).to eq false
         expect(helper.family_member_eligible_for_mdcr(family_member2)).to eq true
         expect(helper.family_member_eligible_for_mdcr(family_member3)).to eq false
