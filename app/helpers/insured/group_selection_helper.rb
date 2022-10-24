@@ -266,7 +266,8 @@ module Insured
     end
 
     def family_member_eligible_for_mdcr(family_member)
-      tmm = @family.households&.first&.tax_households&.map(&:tax_household_members)&.flatten
+      applicable_taxhouseholds = @family.households&.first&.tax_households&.select{|tx| TimeKeeper.date_of_record > tx[:effective_starting_on] && (tx[:effective_ending_on].nil? || (TimeKeeper.date_of_record < tx[:effective_ending_on]))}
+      tmm = (applicable_taxhouseholds.select(&:updated_at).sort_by(&:updated_at) + applicable_taxhouseholds.reject(&:updated_at))&.map(&:tax_household_members)&.flatten
       tmm.select {|t| t.applicant_id == family_member.id }&.first&.is_medicaid_chip_eligible
     end
 
