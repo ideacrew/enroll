@@ -266,7 +266,7 @@ module Insured
     end
 
     def family_member_eligible_for_mdcr(family_member, family, year)
-      applicable_taxhouseholds = family.active_household.tax_households.tax_household_with_year(year).order_by(:submitted_at.asc)
+      applicable_taxhouseholds = family.active_household.tax_households.tax_household_with_year(year).order_by(:submitted_at.desc)
       tax_households_members = applicable_taxhouseholds&.map(&:tax_household_members)&.flatten
       tax_households_members.select {|t| t.applicant_id == family_member.id }&.first&.is_medicaid_chip_eligible
     end
