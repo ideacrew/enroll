@@ -135,4 +135,26 @@ RSpec.describe ::Eligibilities::Visitors::AcaIndividualMarketEligibilityVisitor,
 
   it_behaves_like 'outstanding verification type', 'outstanding'
   it_behaves_like 'outstanding verification type', 'rejected'
+
+  shared_examples_for 'outstanding verification type' do |status|
+    let(:evidence_item) { eligibility_item.evidence_items.detect{|evidence_item| evidence_item.key == 'social_security_number'} }
+
+    before do
+      person1.verification_types.each do |verification_type|
+        verification_type.validation_status = status if verification_type.type_name == "Social Security Number"
+        verification_type.save!
+      end
+    end
+
+    it "should set verification review true when verification status is #{status}" do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
+      evidence = subject.evidence[evidence_item.key.to_sym]
+      expect(evidence[:status]).to eq 'review'
+      expect(evidence[:is_satisfied]).to be_falsey
+      expect(evidence[:verification_outstanding]).to be_truthy
+    end
+  end
+
+  it_behaves_like 'outstanding verification type', 'review'
 end

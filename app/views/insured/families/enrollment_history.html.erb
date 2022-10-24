@@ -1,0 +1,40 @@
+<% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+<% end %>
+<div id='account-detail'>
+  <div class="my-account-page">
+    <h1 class="heading-text mt-0" id="enrollment-history-title"><%= l10n("enrollment_history_title") %></h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <% enrollments = @all_hbx_enrollments_for_admin %>
+      <% else %>
+        <% enrollments = @hbx_enrollments %>
+      <% end %>
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <strong >Display All Enrollments?</strong>
+        <input class="ml-half" type="checkbox" id="display_all_enrollments">
+      <% end %>
+      <% if enrollments&.any? %>
+        <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
+          <h2 class="mt-0 ml-1"><%= year %></h2>
+          <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+            <%= render partial: "enrollment_refactored",
+                       :collection => enrollments,
+                       :as => :hbx_enrollment,
+                       locals: { read_only: false } %>
+          <% else %>
+            <%= render partial: "enrollment",
+                       :collection => enrollments,
+                       :as => :hbx_enrollment,
+                       locals: { read_only: false } %>
+          <% end %>
+        <% end %>
+      <% else %>
+         <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+      <% end %>
+    </div>
+  </div>
+</div>

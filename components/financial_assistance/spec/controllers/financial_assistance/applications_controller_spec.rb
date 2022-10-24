@@ -606,6 +606,17 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
+  describe "PATCH update_application_year" do
+    context "with different assistance_year" do
+      before do
+        patch :update_application_year, params: { id: application.id, application: {assistance_year: TimeKeeper.date_of_record.year + 1} }
+      end
+      it "should update the assistance_year" do
+        expect(application.reload.assistance_year).to eq TimeKeeper.date_of_record.year + 1
+      end
+    end
+  end
+
   describe  "GET wait_for_eligibility_response" do
     context "With valid data" do
       it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
