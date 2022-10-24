@@ -101,7 +101,11 @@ module Insured
       consumer_role.move_identity_documents_to_verified
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => consumer_role.id)
       consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
-      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : consumer_redirection_path
+      admin_redirection_path = consumer_role.admin_bookmark_url
+      draft_application = @person.primary_family&.most_recent_and_draft_financial_assistance_application if EnrollRegistry.feature_enabled?(:draft_application_after_ridp)
+      admin_redirection_path = financial_assistance.edit_application_path(id: draft_application.id) if draft_application.present?
+
+      redirect_to consumer_role.admin_bookmark_url.present? ? admin_redirection_path : consumer_redirection_path
     end
 
     def render_session_start
