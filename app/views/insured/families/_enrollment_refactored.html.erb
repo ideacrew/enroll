@@ -2,7 +2,7 @@
 
 <% product = hbx_enrollment.product %>
 
-<% if if hbx_enrollment.is_coverage_waived? %>
+<% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes? , hbx_enrollment: hbx_enrollment } %>
 <% else %>
     <div class="plan-tile panel panel-default module">
