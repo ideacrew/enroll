@@ -36,6 +36,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
       FactoryBot.create(:tax_household,
                         household: family.active_household,
                         yearly_expected_contribution: 3100.50,
+                        effective_starting_on: Date.new(2022),
                         effective_ending_on: nil)
     end
     let!(:thhm21) { FactoryBot.create(:tax_household_member, applicant_id: fm1.id, tax_household: th2) }
@@ -43,7 +44,11 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 200.00) }
 
     context 'with active and inactive thhs with all ia_eligible members' do
-      let!(:th1) { FactoryBot.create(:tax_household, household: family.active_household) }
+      let!(:th1) do
+        FactoryBot.create(:tax_household,
+                          household: family.active_household,
+                          effective_starting_on: Date.new(2022))
+      end
       let!(:thhm11) do
         FactoryBot.create(:tax_household_member,
                           applicant_id: fm1.id,
@@ -81,6 +86,18 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(family.reload.eligibility_determination.grants.count).not_to be_zero
         expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+      end
+    end
+
+    context 'with active thhs and active 2022 tax household groups' do
+      let!(:thhg) { FactoryBot.create(:tax_household_group, family: family, assistance_year: 2022) }
+
+      it 'should not create any active TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
+        expect(family.reload.tax_household_groups.active.count).to eq(1)
+        expect(family.reload.tax_household_groups.count).to eq(1)
+        subject.migrate
+        expect(family.reload.tax_household_groups.active.count).to eq(1)
+        expect(family.reload.tax_household_groups.count).to eq(2)
       end
     end
 
