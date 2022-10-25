@@ -270,7 +270,7 @@ module Insured
       applicable_taxhouseholds = family.active_household.tax_households.tax_household_with_year(year)
       tax_households_members = (applicable_taxhouseholds.select(&:submitted_at).sort_by(&:submitted_at) + applicable_taxhouseholds.reject(&:submitted_at)).map(&:tax_household_members).flatten
       tax_households_members.select {|t| t.applicant_id == family_member.id }&.first&.is_medicaid_chip_eligible
-      end
+    end
 
     def class_for_ineligible_row(family_member, is_ivl_coverage)
 
