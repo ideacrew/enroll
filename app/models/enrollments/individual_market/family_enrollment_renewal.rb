@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'pry'
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
@@ -54,7 +54,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = @enrollment.kind
     renewal_enrollment.external_id = @enrollment.external_id
-    renewal_enrollment.hbx_enrollment_members = applicant.fetch_product_id(renewal_enrollment)
+    renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
+    renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
 
     renewal_enrollment
