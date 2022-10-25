@@ -22,12 +22,12 @@
           <h2 class="mt-0 ml-1"><%= year %></h2>
           <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
             <%= render partial: "enrollment_refactored",
-                       :collection => enrollments,
+                       :collection => yearly_enrollments,
                        :as => :hbx_enrollment,
                        locals: { read_only: false } %>
           <% else %>
             <%= render partial: "enrollment",
-                       :collection => enrollments,
+                       :collection => yearly_enrollments,
                        :as => :hbx_enrollment,
                        locals: { read_only: false } %>
           <% end %>
