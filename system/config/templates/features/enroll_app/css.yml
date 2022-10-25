@@ -4,12 +4,15 @@ registry:
       - :css_components
     features:
       - key: :custom_email_templates
-        is_enabled: false
+        is_enabled: true
+        settings:
+          - key: :email_template
+            item: "email_template"
       - key: :selectric_hover
         is_enabled: true
         settings:
           - key: :color
-            item: '#487ba2'
+            item: '#007bc4'
       - key: :qle_carousel
         is_enabled: true
         settings:
@@ -134,4 +137,4 @@ registry:
         is_enabled: true
         settings:
           - key: :color
-            item: "#333"
+            item: "#454545"
