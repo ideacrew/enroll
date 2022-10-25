@@ -22,22 +22,26 @@ module Subscribers
       if applications.present?
         workflow_state_transitions = applications.first.workflow_state_transitions
 
-        result =
-          if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
-            # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
-          else
-            FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
-          end
+        benchmark_measure = Benchmark.measure do
+          @result =
+            if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
+              # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
+            else
+              FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+            end
+        end
 
-        if result.success?
-          logger.info "DeterminationSubscriber: acked with success: #{result.success}"
-          subscriber_logger.info "DeterminationSubscriber: acked with success: #{result.success}"
+        logger.info "TimeNow: #{Time.now}, benchmark_measure: #{benchmark_measure} application_hbx_id: #{applications.first.hbx_id}, DeterminationSubscriber"
+
+        if @result.success?
+          logger.info "DeterminationSubscriber: acked with success: #{@result.success}"
+          subscriber_logger.info "DeterminationSubscriber: acked with success: #{@result.success}"
         else
           errors =
-            if result.failure.is_a?(Dry::Validation::Result)
-              result.failure.errors.to_h
+            if @result.failure.is_a?(Dry::Validation::Result)
+              @result.failure.errors.to_h
             else
-              result.failure
+              @result.failure
             end
 
           logger.info "DeterminationSubscriber: acked with failure, errors: #{errors}"

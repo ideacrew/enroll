@@ -12,7 +12,11 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
       subscriber_logger.info "on_determine_slcsp: payload: #{payload}"
 
-      process_determine_slcsp(subscriber_logger, payload) unless Rails.env.test?
+      benchmark_measure = Benchmark.measure do
+        process_determine_slcsp(subscriber_logger, payload) unless Rails.env.test?
+      end
+
+      logger.info "TimeNow: #{Time.now}, benchmark_measure: #{benchmark_measure}, application_hbx_id: #{payload[:hbx_id]}, DetermineSlcspSubscriber"
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
