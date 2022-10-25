@@ -29,7 +29,7 @@
                   The content of the 'if' is refactored and updated design of the 'else'.-->
                   <div class="coverage-selection-block row-form-wrapper">
                     <div class="coverage-chbx">
-                      <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked && !family_member_eligible_for_mdcr(family_member), disabled: !is_checked ) %>
+                      <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked && !family_member_eligible_for_mdcr(family_member, @family, @new_effective_on&.year), disabled: !is_checked ) %>
                     </div>
                     <div class="coverage-name-and-errors"> 
                       <span class="coverage-message-row"><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name.upcase} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></span>
