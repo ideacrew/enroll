@@ -554,7 +554,209 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               end
             end
           end
+        end
+      end
+
+      context 'when mthh enabled for dental enrollment' do
+        let!(:dental_product) do
+          prod =
+            FactoryBot.create(
+              :benefit_markets_products_health_products_health_product,
+              :with_issuer_profile,
+              benefit_market_kind: :aca_individual,
+              kind: :dental,
+              service_area: service_area,
+              csr_variant_id: '01',
+              metal_level_kind: 'silver',
+              hios_id: '11111111122302-01',
+              renewal_product_id: dental_renewal_product.id,
+              application_period: application_period
+            )
+          prod.premium_tables = [premium_table]
+          prod.save
+          prod
+        end
+
+        let!(:dental_renewal_product) do
+          prod =
+            FactoryBot.create(
+              :benefit_markets_products_health_products_health_product,
+              :with_issuer_profile,
+              benefit_market_kind: :aca_individual,
+              kind: :dental,
+              service_area: renewal_service_area,
+              csr_variant_id: '01',
+              metal_level_kind: 'silver',
+              hios_id: '11111111122302-01',
+              application_period: renewal_application_period
+            )
+          prod.premium_tables = [renewal_premium_table]
+          prod.save
+          prod
+        end
+
+        let(:assisted) { false }
+        let(:aptc_values) { {} }
+
+        subject do
+          enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+          enrollment_renewal.enrollment = enrollment
+          enrollment_renewal.assisted = assisted
+          enrollment_renewal.aptc_values = aptc_values
+          enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+          enrollment_renewal
+        end
+
+        before do
+          enrollment.coverage_kind = "dental"
+          enrollment.product = dental_product
+          enrollment.save!
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
+        end
+
+        context 'unassisted renewal' do
+          it 'will not set aptc values & will generate renewal' do
+            renewal = subject.renew
+            expect(renewal.is_a?(HbxEnrollment)).to eq true
+            expect(subject.aptc_values).to eq({})
           end
+        end
+
+        context 'assisted renewal' do
+          before do
+            allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+              double('IdentifySlcspWithPediatricDentalCosts',
+                     call: double(:value! => slcsp_info, :success? => true))
+            )
+          end
+
+          let(:family) do
+            family = FactoryBot.build(:family, person: primary)
+            family.family_members = [
+              FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent)
+            ]
+
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent.id, kind: 'spouse')
+            family.save
+            family
+          end
+
+          let(:dependent) { FactoryBot.create(:person, :with_consumer_role) }
+          let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+          let(:primary_applicant) { family.primary_applicant }
+          let(:dependents) { family.dependents }
+
+          let(:tax_household_group) do
+            family.tax_household_groups.create!(
+              assistance_year: TimeKeeper.date_of_record.year,
+              source: 'Admin',
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              tax_households: [
+                FactoryBot.build(:tax_household, household: family.active_household)
+              ]
+            )
+          end
+
+          let(:tax_household) do
+            tax_household_group.tax_households.first
+          end
+
+          let(:aptc_grant) { eligibility_determination.grants.first }
+
+          let(:enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              product_id: current_product.id,
+                              enrollment_members: [primary_applicant],
+                              consumer_role_id: primary.consumer_role.id,
+                              family: family)
+          end
+
+          let(:benchmark_premium) { primary_bp }
+
+          let(:yearly_expected_contribution) { 125.00 * 12 }
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [OpenStruct.new(
+                household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: benchmark_premium,
+                members: family.family_members.collect do |fm|
+                  OpenStruct.new(
+                    family_member_id: fm.id.to_s,
+                    relationship_with_primary: fm.primary_relationship,
+                    date_of_birth: fm.dob,
+                    age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                  )
+                end
+              )]
+            )
+          end
+
+          let(:primary_bp) { 500.00 }
+          let(:dependent_bp) { 600.00 }
+
+          context 'when renewal grants not present' do
+            let(:eligibility_determination) do
+              determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: yearly_expected_contribution,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'will not set aptc values & will generate renewal' do
+              renewal = subject.renew
+              expect(renewal.is_a?(HbxEnrollment)).to eq true
+              expect(subject.aptc_values).to eq({})
+            end
+          end
+
+          context 'when renewal grants present' do
+            let(:eligibility_determination) do
+              determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: yearly_expected_contribution,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: yearly_expected_contribution,
+                start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
+                end_on: TimeKeeper.date_of_record.end_of_year.next_year,
+                assistance_year: TimeKeeper.date_of_record.year + 1,
+                member_ids: family.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'will not set aptc values & will generate renewal' do
+              renewal = subject.renew
+              expect(renewal.is_a?(HbxEnrollment)).to eq true
+              expect(subject.aptc_values).to eq({ })
+              expect(subject.assisted).to be_falsey
+            end
+          end
+        end
       end
     end
 
