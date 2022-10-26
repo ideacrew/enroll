@@ -97,7 +97,7 @@ class InsuredEligibleForBenefitRule
   def set_status_and_error_if_birthdate_after_effective_date
     status = false
     @errors = [l10n('insured.group_selection.birthdate_warning_message')]
-    return status
+    status
   end
 
   def valid_birthdate?

@@ -32,7 +32,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:dependent_1) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 5.days) }
     let(:new_effective_on) { TimeKeeper.date_of_record - 10.days }
     let(:rule) { InsuredEligibleForBenefitRule.new(dependent_1.consumer_role, benefit_package, new_effective_on: new_effective_on) }
-    
+
     it "should return false when consumer's birthday is greater than effective date" do
       expect(rule.valid_birthdate?).to eql(false)
     end
