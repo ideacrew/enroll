@@ -79,20 +79,20 @@ Then(/information should be saved successfully/) do
   expect(find_field(IvlPersonalInformation.address_line_one).value).to eq "123 New St"
 end
 
-Then(/Individual clicks yes/) do
+Then(/Individual clicks yes and clicks continue/) do
   expect(page).to have_content "ending"
   find(IvlPersonalInformation.reason_yes_radiobtn).click
   within '#qle_reason' do
-    click_link "CONTINUE"
+    find('#qle_submit_reason').click
   end
 
 end
 
-Then(/Individual clicks no/) do
+Then(/Individual clicks no and clicks continue/) do
   expect(page).to have_content "ending"
   find(IvlPersonalInformation.reason_no_radiobtn).click
   within '#qle_reason' do
-    click_link "CONTINUE"
+    find('#qle_submit_reason').click
   end
 end
 
