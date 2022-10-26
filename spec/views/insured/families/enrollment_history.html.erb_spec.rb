@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe "insured/families/enrollment_history.html.erb" do
@@ -29,20 +31,20 @@ RSpec.describe "insured/families/enrollment_history.html.erb" do
 
       it "should display select box to show all enrollments" do
         render
-        expect(rendered).to match /display-all-enrollments-qs/
+        expect(rendered).to match(/display-all-enrollments-qs/)
       end
     end
 
     context 'user DOES NOT have enrollments' do
-        before do
-          assign(:all_hbx_enrollments_for_admin, [])
-        end
-  
-        it "should NOT display select box to show all enrollments" do
-          render
-          expect(rendered).to_not match /display-all-enrollments-qs/
-        end
+      before do
+        assign(:all_hbx_enrollments_for_admin, [])
       end
+
+      it "should NOT display select box to show all enrollments" do
+        render
+        expect(rendered).to_not match(/display-all-enrollments-qs/)
+      end
+    end
   end
 
   context 'user is NOT HBX admin' do
@@ -56,7 +58,7 @@ RSpec.describe "insured/families/enrollment_history.html.erb" do
 
     it "should NOT display select box to show all enrollments" do
       render
-      expect(rendered).to_not match /display-all-enrollments-qs/
+      expect(rendered).to_not match(/display-all-enrollments-qs/)
     end
   end
 end
