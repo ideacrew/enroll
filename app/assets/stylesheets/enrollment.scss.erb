@@ -6,21 +6,19 @@
 
     .plan-header {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        height: 100px;
-        gap: 20px;
+        flex-direction: column;
 
         img {
             flex: 0;
+            object-fit: scale-down;
+            height: 100px;
         }
 
-        .plan-name-and-status {
+        .plan-logo-and-name {
             display: flex;
-            flex-direction: column;
-            height: 100px;
-            gap: 5px;
-            flex: 1;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
 
             .plan-status-container {
                 min-height: 20px;
@@ -29,12 +27,17 @@
             h3 {
                 margin: 0;
                 justify-self: left;
+                padding: 8px 0;
+                flex-basis: 100%;
 
                 a {
                     color: black !important;
                     font-size: 18px;
                     font-weight: 700;
+                    line-height: 1.5;
+                    display: block;
                 }
+
             }
         }
     }
@@ -58,11 +61,12 @@
             font-weight: 600;
             flex-basis: 45%;
             white-space: nowrap;
+            margin-bottom: 0px !important;
         }
     }
 
     .plan-covered {
-        padding: 12px 0 0 0;
+        padding: 8px 0 0 0;
         color: #605e5c;
 
         label {
@@ -74,7 +78,6 @@
     .plan-button-group {
         display: flex;
         flex-direction: row;
-        gap: 20px;
         font-size: 16px;
         justify-content: space-between;
         flex-wrap: wrap;

@@ -186,6 +186,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.effective_date' => "Effective Date",
   :'en.plan_start' => "Plan Start",
   :'en.coverage_end' => "Coverage End",
+  :'en.coverage_start' => "Coverage Start",
   :'en.plan_selected' => "Plan Selected",
   :'en.plan_type' => "Plan Type",
   :'en.metal_level' => "Metal Level",

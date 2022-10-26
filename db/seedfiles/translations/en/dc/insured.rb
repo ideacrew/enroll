@@ -183,6 +183,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.premium_you_pay' => "Premium You Pay",
   :'en.effective_date' => "Effective date",
   :'en.coverage_end' => "Coverage End",
+  :'en.coverage_start' => "Coverage Start",
   :'en.plan_selected' => "Plan Selected",
   :'en.plan_type' => "Plan Type",
   :'en.benefit_group' => "Benefit Group",

@@ -7,29 +7,23 @@
 <% else %>
     <div class="plan-tile panel panel-default module">
         <div class="plan-header">
-            <%= display_carrier_logo(Maybe.new(product), {width: 110}) %>
-            <div class="plan-name-and-status">
-                <div class="plan-status-container"><%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %></div>
-                <h3><%= link_to product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true %></h3>
+            <div class="plan-status-container"><%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %></div>
+            <div class="plan-logo-and-name">
+                <%= display_carrier_logo(Maybe.new(product), {width: 100}) %>
+                <h3>
+                    <%= link_to product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true %>
+                </h3>
             </div>
         </div>
 
         <div class="plan-details">
-
             <div class="left-column">
-                <% unless hide_policy_selected_date?(hbx_enrollment) %>
-                    <div class="created-at enrollment-effective">
-                        <label><%= l10n("plan_selected") %>:</label>
-                        <%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)
-                    </div>
-                <% end %>
+                <div class="coverage-start enrollment-effective">
+                    <label><%= l10n("coverage_start") %>:</label>
+                    <%= hbx_enrollment.effective_on %>
+                </div>
 
                 <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
-                    <div class="effective-on enrollment-effective">
-                        <label><%= l10n("effective_date") %>:</label>
-                        <%= hbx_enrollment.effective_on %>
-                    </div>
-
                     <div class="coverage-end enrollment-effective">
                         <label><%= l10n("coverage_end") %>:</label>
                         <%= enrollment_coverage_end(hbx_enrollment) %>
@@ -42,11 +36,6 @@
                         </div>
                     <% end %>
                 <% else %>
-                    <div class="plan-start enrollment-effective">
-                        <label><%= l10n("plan_start") %>:</label>
-                        <%= hbx_enrollment.effective_on %>
-                    </div>
-
                     <% if @census_employee&.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
                         <div class="plan-end enrollment-effective <%= 'hidden' unless read_only %>">
                             <label class="text-danger"><%= l10n("plan_end") %>:</label>
@@ -55,16 +44,25 @@
                     <% end %>
                 <% end %>
 
+                <% unless hide_policy_selected_date?(hbx_enrollment) %>
+                    <div class="created-at enrollment-effective">
+                        <label><%= l10n("plan_selected") %>:</label>
+                        <%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)
+                    </div>
+                <% end %>
+
                 <% if hbx_enrollment.is_reinstated_enrollment? %>
                     <div class="reinstated-enrollment enrollment-effective">
                         <label><%= l10n("reinstated_enrollment") %></label>
                     </div>
                 <% end %>
 
-                <div class="plan-id">
-                    <label><%= HbxProfile::ShortName %> ID:</label>
-                    <%= hbx_enrollment.hbx_id %>
-                </div>
+                <% unless EnrollRegistry.feature_enabled?(:hide_enrollment_hbx_id) %>
+                    <div class="plan-id">
+                        <label for="<%=hbx_enrollment.hbx_id%>"><%= HbxProfile::ShortName %> ID:</label>
+                        <%= hbx_enrollment.hbx_id %>
+                    </div>
+                <% end %>
 
                 <div class="benefit-group <%= 'hidden' unless read_only %>">
                     <label><%= l10n("benefit_group") %>:</label>
@@ -97,6 +95,7 @@
                     <label><%= l10n("premium_you_pay") %>:</label>
                     <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/<%= l10n("month").to_s.downcase %>
                 </div>
+
                 <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
                     <div class="aptc-amount">
                         <label><%= l10n("APTC_amount") %>:</label>
