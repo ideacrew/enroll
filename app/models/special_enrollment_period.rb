@@ -211,7 +211,6 @@ class SpecialEnrollmentPeriod
     end
   end
 
-
 private
 
   def beginning_of_month?
