@@ -392,6 +392,9 @@ registry:
       - key: :enrollment_history_page
         item: :enrollment_history_page
         is_enabled: <%= ENV['ENROLLMENT_HISTORY_PAGE_IS_ENABLED'] || false %>
+      - key: :address_verification
+        item: :address_verification
+        is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
