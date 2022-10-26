@@ -10,6 +10,7 @@ describe 'daily_eligibility_determination_change_report' do
   include_context 'setup one tax household with one ia member'
 
   before :each do
+    EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
     tax_household.update_attributes!(created_at: DateTime.now - 1.day)
     invoke_daily_eligibility_change_script
     @file_content = CSV.read("#{Rails.root}/daily_eligibility_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
