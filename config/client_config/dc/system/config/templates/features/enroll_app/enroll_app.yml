@@ -772,5 +772,3 @@ registry:
       - key: :enrollment_plan_tile_update
         item: :enrollment_plan_tile_update
         is_enabled: <%= ENV['ENROLLMENT_PLAN_TILE_UPDATE_IS_ENABLED'] || false %>
-      - key: :had_a_baby_sep
-        is_enabled: <%= ENV['HAD_A_BABY_SEP'] || false %>
