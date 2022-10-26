@@ -75,7 +75,7 @@ registry:
             meta:
               label: Market *
               content_type: :radio_select
-              enum: [{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}]
+              enum: [{individual: "Individual"}]
               default: :individual
               description: ''
               is_required: true
@@ -226,6 +226,6 @@ registry:
       - key: :sort_sep_type
         item: Operations::QualifyingLifeEventKind::Sort.new
         is_enabled: true
-      - key: :sep_effective_date_match 
+      - key: :sep_effective_date_match
         item: :sep_effective_date_match
-        is_enabled: false
+        is_enabled: true
