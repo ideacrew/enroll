@@ -27,6 +27,16 @@ EventSource.configure do |config|
   async_api_resources = ::AcaEntities.async_api_config_find_by_service_name({ protocol: :amqp, service_name: nil }).success
   async_api_resources += ::AcaEntities.async_api_config_find_by_service_name({ protocol: :http, service_name: :enroll }).success
 
+  # SERVICE_POD_NAME: 'enroll.frontend', 'enroll.backend'
+  async_api_resources = if ENV['SERVICE_POD_NAME'] == 'enroll.frontend'
+                          async_api_resources.reject do |async_api_resource|
+                            (async_api_resource.to_s.include?('magi_medicaid.iap.benchmark_products.determine_slcsp') || async_api_resource.to_s.include?('magi_medicaid.#.eligibilities.#')) &&
+                              !async_api_resource.to_s.include?("Publish configuration")
+                          end
+                        else
+                          async_api_resources
+                        end
+
   config.async_api_schemas = async_api_resources.collect { |resource| EventSource.build_async_api_resource(resource) }
 end
 
