@@ -5,6 +5,11 @@ FactoryBot.define do
     effective_starting_on   { TimeKeeper.date_of_record.beginning_of_year }
     effective_ending_on     { TimeKeeper.date_of_record.end_of_year }
     submitted_at            { ( TimeKeeper.datetime_of_record ) }
-  end
 
+    trait :next_year do
+      effective_starting_on   { TimeKeeper.date_of_record.next_year.beginning_of_year }
+      effective_ending_on     { TimeKeeper.date_of_record.next_year.end_of_year }
+      submitted_at     { TimeKeeper.date_of_record.next_year.end_of_year }
+    end
+  end
 end

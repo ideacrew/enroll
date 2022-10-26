@@ -398,14 +398,18 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
     csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
-      thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2022)).first
-      thhm_medicaid_members = thh&.tax_household_members.where(is_medicaid_chip_eligible: true)
-      if thh.present? && thhm_medicaid_members.present?
-        thhm_medicaid_members = thh.tax_household_members.where(is_medicaid_chip_eligible: true)
-        if thhm_medicaid_members.present?
-          thhm_medicaid_members.each do |medicaid_thhm|
-            csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
-          end
+
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2022)).first&.tax_households
+        thhm_medicaid_members = thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.is_medicaid_chip_eligible } if thhs.present?
+      else
+        thhs = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2022)).first
+        thhm_medicaid_members = thhs&.tax_household_members.where(is_medicaid_chip_eligible: true)
+      end
+
+      if thhs.present? && thhm_medicaid_members.present?
+        thhm_medicaid_members.each do |medicaid_thhm|
+          csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
         end
         @total_member_counter_medicaid_or_chip += thhm_medicaid_members.count
       end
@@ -415,7 +419,12 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
   end
 end
 
-families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2022) } })
+if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(2022) } })
+else
+  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2022) } })
+end
+
 total_count = families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil
@@ -439,15 +448,30 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
     csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
-      thh = family.latest_household.latest_active_tax_household_with_year(2022)
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2022)).first&.tax_households
+      else
+        thh = family.latest_household.latest_active_tax_household_with_year(2022)
+      end
+
       family.family_members.where(is_active: true).each do |f_member|
         in_state_address = f_member.person.addresses.where(state: "ME").present?
-        medicaid_eligible =
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          medicaid_eligible =
+            if thhs.present?
+              thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.applicant_id.to_s == f_member.id.to_s }.first&.is_medicaid_chip_eligible
+            else
+              false
+            end
+        else
+          medicaid_eligible =
             if thh.present?
               thh.tax_household_members.where(applicant_id: f_member.id).first&.is_medicaid_chip_eligible
             else
               false
             end
+        end
+
         member_citizen_status = f_member.person&.citizen_status
         if !f_member&.is_incarcerated && f_member.is_applying_coverage && in_state_address && ["us_citizen", "alien_lawfully_present", "naturalized_citizen"].include?(member_citizen_status) && !medicaid_eligible
         csv << [primary.hbx_id, primary.full_name, f_member.hbx_id, f_member.full_name, f_member.is_incarcerated, f_member.is_applying_coverage, in_state_address, medicaid_eligible, member_citizen_status]
@@ -484,24 +508,41 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
     csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
-      thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2022)).first
-      thhm_aptc_members = thh&.tax_household_members.where(is_ia_eligible: true)
-      if thh.present? && thhm_aptc_members.present?
-        thhm_aptc_members = thh.tax_household_members.where(is_ia_eligible: true)
-        if thhm_aptc_members.present?
+
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2022)).first&.tax_households
+        thmm_members = thhs.map(&:tax_household_members).flatten if thhs.present?
+        thhm_aptc_members = thmm_members.select {|th_member| th_member.is_ia_eligible } if thmm_members.present?
+
+        if thhs.present? && thhm_aptc_members.present?
+          aptc = thhs.sum { |thh| thh.max_aptc.to_f }
+          thhm_aptc_members.each do |aptc_thhm|
+            csv << [primary.hbx_id, primary.full_name, aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+          end
+          @total_member_counter_qhp_assistance += thhm_aptc_members.count
+        end
+      else
+        thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2022)).first
+        thhm_aptc_members = thh&.tax_household_members.where(is_ia_eligible: true)
+        if thh.present? && thhm_aptc_members.present?
           thhm_aptc_members.each do |aptc_thhm|
             csv << [primary.hbx_id, primary.full_name, thh&.latest_eligibility_determination&.max_aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
           end
+          @total_member_counter_qhp_assistance += thhm_aptc_members.count
         end
-        @total_member_counter_qhp_assistance += thhm_aptc_members.count
       end
-      rescue StandardError => e
+    rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
   end
 end
 
-families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2022) } })
+if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(2022) } })
+else
+  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2022) } })
+end
+
 total_count = families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil

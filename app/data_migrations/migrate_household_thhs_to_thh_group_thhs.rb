@@ -6,24 +6,29 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def process_active_thhs_of_household(family, active_thhs_of_household)
     active_thhs_of_household.group_by(&:group_by_year).each do |_year, active_thhs_by_year|
-      family = build_thhg_thhs_and_thhms(family, active_thhs_by_year)
+      family = build_thhg_thhs_and_thhms(family, active_thhs_by_year, false)
     end
     family
   end
 
-  def process_inactive_thhs_of_household(family, inactive_thhs_of_household)
+  def process_inactive_thhs_of_household(family, inactive_thhs_of_household, set_external_effective_ending_on)
     inactive_thhs_of_household.group_by(&:group_by_year).each do |_year, thhs_by_year|
       thhs_by_year.group_by{ |thh| thh.latest_eligibility_determination&.determined_at&.to_date }.each do |_year, thhs_by_determined_on|
-        family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on)
+        family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on, set_external_effective_ending_on)
       end
     end
     family
   end
 
   # Builds tax_household_group, tax_households and tax_household_members
-  def build_thhg_thhs_and_thhms(family, thhs_of_household)
+  def build_thhg_thhs_and_thhms(family, thhs_of_household, set_external_effective_ending_on)
     start_on = thhs_of_household.pluck(:effective_starting_on).compact.first
-    effective_ending_on = thhs_of_household.pluck(:effective_ending_on).compact.first
+    effective_ending_on = if set_external_effective_ending_on.present?
+                            start_on
+                          else
+                            thhs_of_household.pluck(:effective_ending_on).compact.first
+                          end
+
     end_on = if effective_ending_on.present? && (effective_ending_on <= start_on)
                start_on
              else
@@ -89,12 +94,19 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           next family
         end
 
-        active_thhs_of_household = family.active_household.tax_households.active_tax_household
-        family = process_active_thhs_of_household(family, active_thhs_of_household) if active_thhs_of_household.present?
+        active_thhs_of_household = family.active_household.tax_households.active_tax_household.tax_household_with_year(2022)
+        if active_thhs_of_household.present?
+          active_2022_tax_household_groups = family.tax_household_groups.by_year(2022)
+          family = if active_2022_tax_household_groups.present?
+                     process_inactive_thhs_of_household(family, active_thhs_of_household, true)
+                   else
+                     process_active_thhs_of_household(family, active_thhs_of_household)
+                   end
+        end
 
-        inactive_thhs_of_household = family.active_household.tax_households.where(:effective_ending_on.ne => nil)
-        family = process_inactive_thhs_of_household(family, inactive_thhs_of_household) if inactive_thhs_of_household.present?
-        if family.save
+        inactive_thhs_of_household = family.active_household.tax_households.where(:effective_ending_on.ne => nil).tax_household_with_year(2022)
+        family = process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
+        if family.save!
           logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record)
           if determination.success?

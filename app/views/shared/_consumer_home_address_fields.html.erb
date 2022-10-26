@@ -165,3 +165,104 @@
 <% else %>
 <span class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Add Mailing Address</span>
 <% end %>
+
+
+<% if EnrollRegistry.feature_enabled?(:address_verification) %>
+<script>
+
+  const baseFormValues = {
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
+  };
+
+
+  const getInputFieldReference = (elementId) => {
+    return document.getElementById(elementId);
+  }
+
+  const addressInputField = getInputFieldReference('person_addresses_attributes_0_address_1');
+  const address2InputField = getInputFieldReference('person_addresses_attributes_0_address_2');
+  const cityInputField = getInputFieldReference('person_addresses_attributes_0_city');
+  const stateInputField = getInputFieldReference('inputState');
+  const zipInputField = getInputFieldReference('person_addresses_attributes_0_zip');
+
+  const formFields = [addressInputField, address2InputField, cityInputField, stateInputField, zipInputField];
+
+  baseFormValues.address1 = addressInputField.value;
+  baseFormValues.address2 = address2InputField.value;
+  baseFormValues.city = cityInputField.value;
+  baseFormValues.state = stateInputField.value;
+  baseFormValues.zip = zipInputField.value;
+
+  const getCurrentFormValues = () => {
+
+    return {
+      address1: addressInputField.value,
+      address2: address2InputField.value,
+      city: cityInputField.value,
+      state: stateInputField.value,
+      zip: zipInputField.value,
+    }
+
+  }
+
+  formFields.forEach(field => {
+    // field.addEventListener('focus', () => console.log(field, 'gained focus.'))
+    field.addEventListener('blur', () => validateAddress())
+  })
+
+  const requiredFieldsHaveValues = () => {
+    const requiredFields = formFields.filter(field => field.required);
+    const fieldValues = requiredFields.map(field => field.value);
+    const fieldsHaveValues = fieldValues.every(value => value !== null && value !== '');
+
+    return fieldsHaveValues;
+  }
+
+  const fieldsHaveChanged = (baseFormValues, existingFormValues) => {
+    let changes = false;
+
+    if (baseFormValues.address1 !== existingFormValues.address1) {
+      changes = true;
+    }
+
+    if (baseFormValues.address2 !== existingFormValues.address2) {
+      changes = true;
+    }
+
+    if (baseFormValues.city !== existingFormValues.city) {
+      changes = true;
+    }
+
+    if (baseFormValues.state !== existingFormValues.state) {
+      changes = true;
+    }
+
+    if (baseFormValues.zip !== existingFormValues.zip) {
+      changes = true;
+    }
+
+    return changes;
+  }
+
+  const validateAddress = () => {
+    // Do all required fields have a value?
+    if (requiredFieldsHaveValues() === false) {
+      return;
+    }
+
+
+    // Have the values changed from what they originally were?
+    if (fieldsHaveChanged(baseFormValues, getCurrentFormValues()) === false) {
+      return;
+    }
+
+    // Make the api call
+    console.log('Making an API call!', getCurrentFormValues());
+  }
+
+</script>
+<% end %>
