@@ -299,7 +299,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
-        expect(rendered).to match(/Future Enrollment Termination Date:/)
+        expect(rendered).to match(%r{Future Enrollment Termination Date}i)
       end
 
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
