@@ -116,7 +116,6 @@ class Insured::FamilyMembersController < ApplicationController
       extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
       Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       @created = true
-      special_enrollment_period = @family.special_enrollment_periods.select { |sep| sep.qualifying_life_event_kind.id == params[:qle_id] }.first
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }

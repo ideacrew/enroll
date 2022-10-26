@@ -254,7 +254,6 @@ private
     set_submitted_at
     set_date_period
     set_effective_on
-    # set_had_a_baby_effective_on
   end
 
   def set_submitted_at
@@ -275,13 +274,6 @@ private
     @reference_date = [submitted_at.to_date, end_on].min
     @earliest_effective_date = is_shop_or_fehb? ? qle_on : [@reference_date, qle_on].max
     start_on..end_on
-  end
-
-  def set_had_a_baby_effective_on
-    #return unless EnrollRegistry.feature_enabled?(:had_a_baby_birth_date)
-    youngest_dob = family.family_members.map {|fm| fm.dob }.max
-    ivl_benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(youngest_dob)}
-    self.effective_on = family.family_members.last.dob if (@qualifying_life_event_kind.reason == 'baby') && (qle_on != youngest_dob) && ivl_benefit.present?
   end
 
   def set_effective_on

@@ -195,33 +195,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
 
-    context "special enrollment period had a baby" do
-     
-      let(:dependent_1) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 5.days) }
-      let(:family_relationships) { [PersonRelationship.new(relative: dependent_1, kind: "child")] }
-      let!(:person) { FactoryBot.create(:person, person_relationships: family_relationships) }
-      let(:family_members) { [person, dependent_1] }
-      let(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: family_members) }
-      let(:active_qle) { create(:qualifying_life_event_kind, title: "Had a baby", market_kind: "individual", reason: "baby", start_on: TimeKeeper.date_of_record.prev_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month) }
-      let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: active_qle, market_kind: 'individual', created_at: TimeKeeper.date_of_record) }
-      let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
-      let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
-      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-      let(:baby_birth_date) { dependent_1.dob }
-
-      before do
-        EnrollRegistry[:had_a_baby_sep].feature.stub(:is_enabled).and_return(true)
-        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-        sep.set_baby_birth_date
-      end
-
-      it "should have qle_on match youngest dependent's birthdate" do
-        expect(sep.qle_on).to eql(baby_birth_date)
-      end
-    end
-
     context "special enrollment peroid created when qle not active" do
       let(:active_qle) { create(:qualifying_life_event_kind, title: "Married", market_kind: "shop", reason: "marriage", start_on: TimeKeeper.date_of_record.prev_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month) }
       let!(:sep) {FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: active_qle, market_kind: 'ivl', created_at: TimeKeeper.date_of_record)}
@@ -1647,5 +1620,4 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
   end
-
 end
