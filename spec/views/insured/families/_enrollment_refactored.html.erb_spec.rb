@@ -105,8 +105,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to match(l10n("plan_contact_info"))
-      expect(rendered).to have_selector('label', text: HbxProfile::ShortName.to_s)
-      expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
+      expect(rendered).to have_content(/A Plan Name/)
     end
 
     it "when kind is employer_sponsored_cobra" do
@@ -138,8 +137,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         end
 
         it "should have all expected renders" do
-          expect(rendered).to have_selector('label', text: HbxProfile::ShortName.to_s)
-          expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
+          expect(rendered).to have_content(/A Plan Name/)
           expect(rendered).to have_content('Make a first payment') if EnrollRegistry[:carefirst_pay_now].enabled?
         end
       end
@@ -229,6 +227,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_hbx_id).and_return(true)
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -255,7 +254,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
 
     it "should display the plan start" do
-      expect(rendered).to have_selector('label', text: 'Plan Start:')
+      expect(rendered).to have_selector('label', text: l10n('coverage_start'))
       expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
@@ -264,13 +263,13 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
 
     it "should display the Plan Start" do
-      expect(rendered).to have_selector('label', text: 'Plan Start:')
+      expect(rendered).to have_selector('label', text: l10n('coverage_start'))
       expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match(/plan start/i)
+      expect(rendered).to match(l10n('coverage_start'))
     end
 
     it "should not display market" do
@@ -300,7 +299,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
-        expect(rendered).to match(/Future enrollment termination date:/)
+        expect(rendered).to match(/Future Enrollment Termination Date:/)
       end
 
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
