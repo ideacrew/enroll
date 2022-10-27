@@ -24,18 +24,43 @@ namespace :reports do
       (enr.total_premium - enr.applied_aptc_amount.to_f).to_f.round(2)
     end
 
-    def member_status(enr)
-      enrollments = enr.family.hbx_enrollments.where(:effective_on.lt => ENV['start_on'],
-                                                     :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
-                                                     coverage_kind: enr.coverage_kind,
-                                                     :external_id.exists => true,
-                                                     :consumer_role_id.ne => nil)
+    def enrollments_for_year(enr)
+      HbxEnrollment.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
+                          family_id: enr.family.id,
+                          :effective_on.gte => enr.effective_on.beginning_of_year)
+    end
 
-      if enr.external_id.blank? && enrollments.present?
-        "Active Re-enrollee"
-      elsif enr.aasm_state == "auto_renewing" || (enr.external_id.present? && enrollments.any? {|enrollment| enrollment.subscriber.hbx_id == enr.subscriber.hbx_id})
+    def effectuated_enrollments_for_prev_year(enr)
+      HbxEnrollment.where(:aasm_state.nin => ['shopping', 'coverage_canceled'],
+                          family_id: enr.family.id,
+                          :effective_on.gte => enr.effective_on.beginning_of_year.prev_year)
+    end
+
+    def has_auto_renewing_enrollment?(enr)
+      enrollments = enrollments_for_year(enr)
+      aasm_states = enrollments.flat_map(&:workflow_state_transitions).map(&:to_state)
+      aasm_states.include?("auto_renewing") && !aasm_states.include?("renewing_coverage_selected")
+    end
+
+    def has_active_renewing_enrollment?(enr)
+      enrollments = enrollments_for_year(enr)
+      aasm_states = enrollments.flat_map(&:workflow_state_transitions).map(&:to_state)
+      aasm_states.include?("renewing_coverage_selected")
+    end
+
+    def has_effectuated_coverage_in_prev_year_during_oe?(enrollment)
+      prev_year = enrollment.effective_on.prev_year.year
+      previous_enrollments = effectuated_enrollments_for_prev_year(enrollment)
+      previous_enrollments.any? { |enr| enr.effective_on.between?(Date.new(prev_year, 11,1),Date.new(prev_year,12,31)) }
+    end
+
+
+    def member_status(enr)
+      if has_auto_renewing_enrollment?(enr)
         "Re-enrollee"
-      else
+      elsif has_active_renewing_enrollment?(enr) || has_effectuated_coverage_in_prev_year_during_oe?(enr)
+        "Active Re-enrollee"
+      elsif effectuated_enrollments_for_prev_year(enr).blank? || !has_effectuated_coverage_in_prev_year_during_oe?(enr)
         "New Consumer"
       end
     end
