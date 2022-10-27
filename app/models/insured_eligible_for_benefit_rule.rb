@@ -1,4 +1,5 @@
 class InsuredEligibleForBenefitRule
+  include L10nHelper
 
   # Insured role can be: EmployeeRole, ConsumerRole, ResidentRole
 
@@ -64,6 +65,7 @@ class InsuredEligibleForBenefitRule
       end
       status = false if is_age_range_satisfied_for_catastrophic? == false
       status = set_status_and_error_if_not_applying_coverage if @role.class.name == "ConsumerRole" && is_applying_coverage_status_satisfied? == false
+      status = set_status_and_error_if_birthdate_after_effective_date unless valid_birthdate?
       return status, @errors
     end
     [false]
@@ -90,6 +92,17 @@ class InsuredEligibleForBenefitRule
     status = false
     @errors = ["Did not apply for coverage."]
     return status
+  end
+
+  def set_status_and_error_if_birthdate_after_effective_date
+    status = false
+    @errors = [l10n('insured.group_selection.birthdate_warning_message')]
+    status
+  end
+
+  def valid_birthdate?
+    return false if @new_effective_on.is_a?(Date) && (@new_effective_on < @role.person.dob)
+    true
   end
 
   def is_applying_coverage_status_satisfied?
