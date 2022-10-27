@@ -9,6 +9,7 @@ module Subscribers
     subscribe(
       :on_magi_medicaid_mitc_eligibilities
     ) do |delivery_info, _metadata, response|
+      logger.info "DeterminationSubscriber Start TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
       subscriber_logger =
         Logger.new(
           "#{Rails.root}/log/on_magi_medicaid_mitc_eligibilities_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
@@ -52,6 +53,7 @@ module Subscribers
         subscriber_logger.info "DeterminationSubscriber: acked with failure, errors: application not found for the app hbx_id: #{payload[:hbx_id]}"
       end
 
+      logger.info "DeterminationSubscriber End TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       logger.info "DeterminationSubscriber: error: #{e.backtrace}"

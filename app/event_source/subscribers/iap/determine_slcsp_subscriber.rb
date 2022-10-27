@@ -8,6 +8,7 @@ module Subscribers
     # :on_magi_medicaid_iap_benchmark_products
     # subscribe(:on_magi_medicaid_iap_benchmark_products) do |delivery_info, _metadata, response|
     subscribe(:on_determine_slcsp) do |delivery_info, _metadata, response|
+      logger.info "DetermineSlcspSubscriber Start TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
       subscriber_logger = subscriber_logger_for(:on_determine_slcsp)
       payload = JSON.parse(response, symbolize_names: true)
       subscriber_logger.info "on_determine_slcsp: payload: #{payload}"
@@ -17,7 +18,7 @@ module Subscribers
       end
 
       logger.info "TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}, benchmark_measure: #{benchmark_measure}, application_hbx_id: #{payload[:hbx_id]}, DetermineSlcspSubscriber"
-
+      logger.info "DetermineSlcspSubscriber End TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       logger.info "on_determine_slcsp: error: #{e} backtrace: #{e.backtrace}"
