@@ -31,7 +31,7 @@ module Subscribers
             end
         end
 
-        logger.info "TimeNow: #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}, benchmark_measure: #{benchmark_measure} application_hbx_id: #{applications.first.hbx_id}, DeterminationSubscriber"
+        logger.info "TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}, benchmark_measure: #{benchmark_measure} application_hbx_id: #{applications.first.hbx_id}, DeterminationSubscriber"
 
         if @result.success?
           logger.info "DeterminationSubscriber: acked with success: #{@result.success}"

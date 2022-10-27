@@ -16,7 +16,7 @@ module Subscribers
         process_determine_slcsp(subscriber_logger, payload) unless Rails.env.test?
       end
 
-      logger.info "TimeNow: #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}, benchmark_measure: #{benchmark_measure}, application_hbx_id: #{payload[:hbx_id]}, DetermineSlcspSubscriber"
+      logger.info "TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}, benchmark_measure: #{benchmark_measure}, application_hbx_id: #{payload[:hbx_id]}, DetermineSlcspSubscriber"
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e

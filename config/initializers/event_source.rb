@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Execute below code only if ENV['SERVICE_POD_NAME'] is set to enroll.frontend' or 'enroll.backend'
+# Questions:
+#   1. Do we want to make sure this only happens in Rails.env.production? This way we do not have to make code changes in Rails.env.test or Rails.env.development
 EventSource.configure do |config|
   config.protocols = %w[amqp http]
   config.pub_sub_root = Pathname.pwd.join('app', 'event_source')
@@ -40,4 +43,5 @@ EventSource.configure do |config|
   config.async_api_schemas = async_api_resources.collect { |resource| EventSource.build_async_api_resource(resource) }
 end
 
+# Initialize event_source only if ENV['SERVICE_POD_NAME'] is set to enroll.frontend' or 'enroll.backend'
 EventSource.initialize!

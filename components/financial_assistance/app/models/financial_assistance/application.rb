@@ -1037,21 +1037,7 @@ module FinancialAssistance
     def create_tax_household_groups
       return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
-
-      unless cv3_application.success?
-        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{cv3_application.failure}" }
-        return
-      end
-
-      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-
-      unless initializer.success?
-        Rails.logger.error { "Failed while initializing application: #{self.hbx_id}, Error: #{initializer.failure}" }
-        return
-      end
-
-      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!.to_h)
+      determination = family.create_thhg_on_fa_determination(self)
 
       unless determination.success?
         Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
