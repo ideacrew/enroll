@@ -64,3 +64,15 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     Then the user will navigate to the Review Application page
     And the user will see the applicant's is ssn applied answer
     And the user will see the applicant's non ssn apply reason
+
+  Scenario: MVS Feature Is Enabled - Admin clicks on review application action and sees MVS question
+    Given that a family has a Financial Assistance application in the determined state
+    And FAA disable_employer_address_fields feature is enabled
+    And FAA minimum_value_standard_question feature is enabled
+    Given the consumer has a benefit
+    And the consumer has an esi benefit
+    And the user navigates to the “Help Paying For Coverage” portal
+    When the user clicks the “Action” dropdown corresponding to the determined application
+    And the “Review Application” link will be actionable
+    And clicks the “Review Application” link
+    Then the health plan meets mvs and affordable question should show

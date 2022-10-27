@@ -35,7 +35,7 @@
           <label> Expected Contribution </label>
         </div>
         <div>
-          <%= text_field_tag "tax_household_group[tax_households][#{i}][monthly_expected_contribution]", nil, class: "input_txt form-control", required: true %>
+          <%= number_field_tag "tax_household_group[tax_households][#{i}][monthly_expected_contribution]", nil, class: "input_txt form-control", required: true %>
         </div>
       </div>
     </div>

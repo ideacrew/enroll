@@ -13,13 +13,13 @@
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
-      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
-        <strong >Display All Enrollments?</strong>
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
+        <strong id="display-all-enrollments-qs">Display All Enrollments?</strong>
         <input class="ml-half" type="checkbox" id="display_all_enrollments">
       <% end %>
       <% if enrollments&.any? %>
         <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
-          <h2 class="mt-0 ml-1"><%= year %></h2>
+          <h2 id=<%="#{year}-year-heading"%> class="mt-0 ml-1"><%= year %></h2>
           <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
             <%= render partial: "enrollment_refactored",
                        :collection => yearly_enrollments,
