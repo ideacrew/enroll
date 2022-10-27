@@ -66,7 +66,7 @@ module FinancialAssistance
             # Tie http_status_code & aasm_state update together to aviod gap b/w both the actions.
             application.assign_attributes(determination_http_status_code: 200)
             application.determine
-            application.save!
+            application.save
           end
 
           def find_matching_eligibility_determination(application, thh_entity)
