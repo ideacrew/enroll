@@ -367,6 +367,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.group_selection.new.employee_sponsored_benefits' => "Employer-Sponsored Benefits",
   :'en.insured.group_selection.new.individual_benefits' => "Individual Benefits",
   :'en.insured.group_selection.new.coverall_benefits' => "Cover All Maine Benefits",
+  :'en.insured.group_selection.birthdate_warning_message' => "Birthdate is after effective date",
   :'en.employer' => "Employer",
   :'en.health' => "Health",
   :'en.dental' => "Dental",
