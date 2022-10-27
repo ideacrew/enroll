@@ -1,3 +1,1 @@
-//this is javascript
-
-console.log("foo");
+//this is a placeholder for the js logic pertaining to the enrollment tile, _enrollment_refactor.html.erb
