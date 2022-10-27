@@ -6,10 +6,13 @@
 <%# This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
    # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
    #  initially_hidden_enrollment class. %>
-<% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
-<% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""%>
-
-<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
+<%# 
+# <% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) 
+# <% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""
+ 
+<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class ">
+%>
+<div class="module hbx-enrollment-panel panel panel-default <%= "initially_hidden_enrollment hidden" unless @hbx_enrollments.to_a.include?(hbx_enrollment) %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
       <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> <%= l10n('coverage').titleize %>
@@ -265,6 +268,7 @@
   <%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment, source: "enrollment_tile" %>
 <% end %>
 
+<%# 
 <script>
   var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");
   var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
@@ -289,3 +293,4 @@
     enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
   })
  </script>
+ %>
