@@ -91,15 +91,15 @@
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">Who Can be Covered? *</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered.titleize %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered&.titleize %></span>
         </div>
         <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">FROM</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit&.start_on %></span>
         </div>
         <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">TO</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit&.end_on %></span>
         </div>
       </div>
 
@@ -152,7 +152,7 @@
     </div>
 
     <% if display_minimum_value_standard_question?(insurance_kind) %>
-      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
+      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements" data-cuke="meets_mvs_and_affordable">
         <div class='col-md-8 labelforcoverage'>
           <span class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %> *</span>
         </div>
