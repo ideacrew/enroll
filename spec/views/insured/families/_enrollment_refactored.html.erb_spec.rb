@@ -87,7 +87,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         future_enrollment_termination_date: "",
         :is_ivl_actively_outstanding? => false,
         covered_members_first_names: [],
-        covered_members_name_age: [],
         :eligible_child_care_subsidy => 0
       )
     end
@@ -95,6 +94,9 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
     it "when kind is employer_sponsored" do
@@ -105,7 +107,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to match(l10n("plan_contact_info"))
-      expect(rendered).to have_content(/A Plan Name/)
+      expect(rendered).to have_selector('label', text: HbxProfile::ShortName.to_s)
+      expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
     end
 
     it "when kind is employer_sponsored_cobra" do
@@ -137,7 +140,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         end
 
         it "should have all expected renders" do
-          expect(rendered).to have_content(/A Plan Name/)
+          expect(rendered).to have_selector('label', text: HbxProfile::ShortName.to_s)
+          expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
           expect(rendered).to have_content('Make a first payment') if EnrollRegistry[:carefirst_pay_now].enabled?
         end
       end
@@ -178,7 +182,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         consumer_role: nil,
         future_enrollment_termination_date: future_enrollment_termination_date,
         covered_members_first_names: [],
-        covered_members_name_age: [],
         eligible_child_care_subsidy: 0
       )
     end
@@ -218,16 +221,21 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
 
     before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_hbx_id).and_return(true)
+
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_hbx_id).and_return(true)
+
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -262,14 +270,9 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       expect(rendered).to_not have_selector('.cna')
     end
 
-    it "should display the Plan Start" do
-      expect(rendered).to have_selector('label', text: l10n('coverage_start'))
-      expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
-    end
-
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match(l10n('coverage_start'))
+      expect(rendered).to match(/#{l10n('coverage_start')}/i)
     end
 
     it "should not display market" do
@@ -278,7 +281,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     it "should not show a Plan End if cobra" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      expect(rendered).not_to match(/plan ending/i)
+      expect(rendered).not_to match(/coverage end/i)
     end
 
     context "coverage_termination_pending" do
@@ -295,15 +298,18 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         allow(hbx_enrollment).to receive(:can_make_changes?).and_return(false)
         allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
         allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+        allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
+
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
-        expect(rendered).to have_text(/Future enrollment termination date/)
+        expect(rendered).to match(/Future enrollment termination date:/)
       end
 
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
-        expect(rendered).to have_text(/#{terminated_on.strftime("%m/%d/%Y")}/)
+        expect(rendered).to have_text(terminated_on.strftime("%m/%d/%Y"))
       end
     end
   end
@@ -471,6 +477,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -513,7 +521,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         consumer_role: nil,
         future_enrollment_termination_date: "",
         covered_members_first_names: [],
-        covered_members_name_age: [],
         :renewing_waived? => false,
         :parent_enrollment => nil,
         :eligible_child_care_subsidy => 0
@@ -522,6 +529,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     before :each do
       allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(waived_hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
     context "it should render waived_coverage_widget " do
@@ -588,7 +597,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         future_enrollment_termination_date: "",
         :is_ivl_actively_outstanding? => false,
         covered_members_first_names: [],
-        covered_members_name_age: [],
         eligible_child_care_subsidy: 1
       )
     end
@@ -601,6 +609,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
     context "osse_eligibility is present" do
@@ -649,7 +659,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
           future_enrollment_termination_date: "",
           :is_ivl_actively_outstanding? => false,
           covered_members_first_names: [],
-          covered_members_name_age: [],
           eligible_child_care_subsidy: 0
         )
       end
@@ -662,6 +671,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         allow(hbx_enrollment1).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
+        allow(hbx_enrollment1).to receive(:hbx_enrollment_members).and_return(double)
+        allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 
