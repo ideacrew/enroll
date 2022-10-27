@@ -45,7 +45,7 @@
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            color: #605e5c;
+            color: var(--grey-130);
 
             div[class$='-column'] {
                 flex: 1;
@@ -66,7 +66,7 @@
 
         .plan-covered {
             padding: 8px 0 0 0;
-            color: #605e5c;
+            color: var(--grey-130);
 
             label {
                 font-weight: 600;
@@ -88,18 +88,25 @@
 
             .btn {
                 height: 34px;
+                color: var(--button-default-color);
+                border-color: var(--button-default-color);
 
                 &:hover {
-                    color: #23527c;
-                    border-color: #23527c;
+                    color: var(--button-default-hover-color);
+                    border-color: var(--button-default-hover-color);
                 }
 
-                a:hover {
-                    text-decoration: none;
-                }
+                a {
+                    color: inherit;
+                    
+                    &:hover {
+                        text-decoration: none;
+                    }
 
-                i {
-                    font-size: 1.2em;
+                    i {
+                        font-size: 1.2em;
+                        color: inherit;
+                    }
                 }
             }
         }

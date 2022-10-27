@@ -132,7 +132,7 @@
         </div>
 
         <div class="plan-covered">
-            <% members = hbx_enrollment.covered_members_name_age %>
+            <% members = covered_members_name_age(hbx_enrollment.hbx_enrollment_members) %>
             <% if members.present? %>
                 <div>
                     <label><%= l10n("covered") %>:</label>

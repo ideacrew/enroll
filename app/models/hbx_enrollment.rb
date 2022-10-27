@@ -1877,13 +1877,6 @@ class HbxEnrollment
     end
   end
 
-  def covered_members_name_age
-    enrollment_members = hbx_enrollment_members.sort_by { |a| a.is_subscriber ? 0 : 1 }
-    enrollment_members.inject([]) do |name_age, member|
-      name_age << "#{member.person.first_name} (#{((Time.zone.now - member.person.dob.to_time) / 1.year.seconds).floor})"
-    end
-  end
-
   def can_terminate_coverage?
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
