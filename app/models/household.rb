@@ -362,7 +362,7 @@ class Household
       next unless person_fm.present?
       person_fm_id = person_fm.id
       person_thhm = thh.tax_household_members.where(applicant_id: person_fm_id).first
-      person_thhm.update_attributes!(csr_percent_as_integer: individual_csr[:hbx_id].to_i) if person_thhm.present?
+      person_thhm.update_attributes!(csr_percent_as_integer: individual_csr[hbx_id.to_s].to_i) if person_thhm.present?
     end
   end
 
