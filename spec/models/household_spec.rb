@@ -315,6 +315,16 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     end
   end
 
+  context 'update individual csr' do
+    before do
+      active_household.build_thh_and_eligibility(60, 94, date, slcsp, 'Renewals', {person.hbx_id.to_s => '93'})
+    end
+
+    it 'should update csr percentage on tax household member' do
+      expect(active_household.tax_households.first.tax_household_members.first.csr_percent_as_integer).to eq 93
+    end
+  end
+
   context 'create one ED' do
     before do
       active_household.build_thh_and_eligibility(200, 73, date, slcsp, 'Admin')
