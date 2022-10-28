@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
@@ -14,9 +13,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     @dependent_age_off = false
 
     begin
-      set_csr_value
+      set_csr_value if enrollment.is_health_enrollment?
       renewal_enrollment = clone_enrollment
-      populate_aptc_hash(renewal_enrollment)
+      populate_aptc_hash(renewal_enrollment) if renewal_enrollment.is_health_enrollment?
 
       can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: renewal_enrollment})
 
@@ -24,7 +23,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
       save_renewal_enrollment(renewal_enrollment)
       # elected aptc should be the minimun between applied_aptc and EHB premium.
-      renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present?
+      renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present? && renewal_enrollment.is_health_enrollment?
 
       if is_dependent_dropped?
         renewal_enrollment.aasm_state = 'coverage_selected'
@@ -104,6 +103,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def can_renew_assisted_product?(renewal_enrollment)
+    return false unless renewal_enrollment.is_health_enrollment?
     return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) && is_mthh_assisted?
     return false unless @assisted
 
