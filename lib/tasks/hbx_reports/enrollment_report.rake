@@ -27,22 +27,34 @@ namespace :reports do
     def enrollments_for_year(enr)
       HbxEnrollment.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
                           family_id: enr.family.id,
-                          :effective_on.gte => enr.effective_on.beginning_of_year)
+                          coverage_kind: "health",
+                          :effective_on.gte => enr.effective_on.beginning_of_year,
+                          :"hbx_enrollment_members.applicant_id".in => enr.hbx_enrollment_members.map(&:applicant_id))
     end
 
     def effectuated_enrollments_for_prev_year(enr)
+      start_date = enr.effective_on.beginning_of_year.prev_year
+      end_date  = start_date.end_of_year
       HbxEnrollment.where(:aasm_state.nin => ['shopping', 'coverage_canceled'],
                           family_id: enr.family.id,
-                          :effective_on.gte => enr.effective_on.beginning_of_year.prev_year)
+                          coverage_kind: "health",
+                          :effective_on => start_date..end_date,
+                          :"hbx_enrollment_members.applicant_id".in => enr.hbx_enrollment_members.map(&:applicant_id))
     end
 
-    def has_auto_renewing_enrollment?(enr)
+    def has_auto_renewing_enrollments?(enr)
       enrollments = enrollments_for_year(enr)
       aasm_states = enrollments.flat_map(&:workflow_state_transitions).map(&:to_state)
       aasm_states.include?("auto_renewing") && !aasm_states.include?("renewing_coverage_selected")
     end
 
-    def has_active_renewing_enrollment?(enr)
+    def has_terminated_enrollments?(enr)
+      enrollments = enrollments_for_year(enr)
+      aasm_states = enrollments.flat_map(&:workflow_state_transitions).map(&:to_state)
+      aasm_states.include?("coverage_terminated")
+    end
+
+    def has_active_renewing_enrollments?(enr)
       enrollments = enrollments_for_year(enr)
       aasm_states = enrollments.flat_map(&:workflow_state_transitions).map(&:to_state)
       aasm_states.include?("renewing_coverage_selected")
@@ -51,14 +63,17 @@ namespace :reports do
     def has_effectuated_coverage_in_prev_year_during_oe?(enrollment)
       prev_year = enrollment.effective_on.prev_year.year
       previous_enrollments = effectuated_enrollments_for_prev_year(enrollment)
-      previous_enrollments.any? { |enr| enr.effective_on.between?(Date.new(prev_year, 11,1),Date.new(prev_year,12,31)) }
+      previous_enrollments.any? do |enr|
+        effective_date = enr.coverage_terminated? ? enr.terminated_on : Date.new(prev_year, 12, 31)
+        effective_date.between?(Date.new(prev_year, 11,1),Date.new(prev_year,12,31))
+      end
     end
 
 
     def member_status(enr)
-      if has_auto_renewing_enrollment?(enr)
+      if has_auto_renewing_enrollments?(enr) && !has_terminated_enrollments?(enr)
         "Re-enrollee"
-      elsif has_active_renewing_enrollment?(enr) || has_effectuated_coverage_in_prev_year_during_oe?(enr)
+      elsif has_active_renewing_enrollments?(enr) || has_effectuated_coverage_in_prev_year_during_oe?(enr)
         "Active Re-enrollee"
       elsif effectuated_enrollments_for_prev_year(enr).blank? || !has_effectuated_coverage_in_prev_year_during_oe?(enr)
         "New Consumer"
