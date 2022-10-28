@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
-workers Integer(ENV['WEB_CONCURRENCY'] || 4)
-min_threads_count = Integer(ENV['RAILS_MIN_THREADS'] || 5)
-max_threads_count = Integer(ENV['RAILS_MAX_THREADS'] || 10)
+if ENV['SERVICE_POD_NAME'].present? && ENV['SERVICE_POD_NAME'] == 'enroll.backend'
+  workers Integer(ENV['WEB_CONCURRENCY'] || 3)
+  min_threads_count = Integer(ENV['RAILS_MIN_THREADS'] || 3)
+  max_threads_count = Integer(ENV['RAILS_MAX_THREADS'] || 6)
+else
+  max_threads_count = ENV.fetch("RAILS_MAX_THREADS", 5)
+  min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
+end
+
 threads min_threads_count, max_threads_count
 
 preload_app!
