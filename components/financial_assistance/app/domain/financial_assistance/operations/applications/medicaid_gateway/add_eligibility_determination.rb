@@ -18,14 +18,23 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(params)
             application_entity = yield initialize_application_entity(params)
-            application = yield find_application(application_entity)
-            application = yield update_application(application, application_entity)
-            result = yield add_eligibility_determination(application_entity, application)
+            application        = yield find_application(application_entity)
+            application        = yield update_application(application, application_entity)
+            result             = yield add_eligibility_determination(application_entity, application)
+            _done              = yield set_determination_token(application)
 
             Success(result)
           end
 
           private
+
+          def set_determination_token(application)
+            Rails.cache.write("application_#{application.hbx_id}_determined",
+                              Time.now.strftime('%Y-%m-%d %H:%M:%S.%L'),
+                              expires_in: 5.minutes)
+
+            Success('Rails cache is set for the application with timestamp.')
+          end
 
           def initialize_application_entity(params)
             ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(params)
