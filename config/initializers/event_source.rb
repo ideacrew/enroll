@@ -34,6 +34,8 @@ if ENV['SERVICE_POD_NAME'].present? || !Rails.env.production?
                             []
                           end
 
+    async_api_resources = ::AcaEntities.async_api_config_find_by_service_name({ protocol: :amqp, service_name: nil }).success unless Rails.env.production?
+
     config.async_api_schemas = async_api_resources.collect { |resource| EventSource.build_async_api_resource(resource) }
   end
 
