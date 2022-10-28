@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if ENV['SERVICE_POD_NAME'].present? && ENV['SERVICE_POD_NAME'] == 'enroll.backend'
+if ENV['SERVICE_POD_NAME'] == 'enroll.backend'
   workers Integer(ENV['WEB_CONCURRENCY'] || 3)
   min_threads_count = Integer(ENV['RAILS_MIN_THREADS'] || 3)
   max_threads_count = Integer(ENV['RAILS_MAX_THREADS'] || 6)
