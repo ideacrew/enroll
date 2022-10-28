@@ -128,10 +128,15 @@ module Operations
 
       def set_product_id
         return Success() unless base_enrollment.is_health_enrollment?
-        tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(new_enrollment.effective_on.year)
-        return Success() unless tax_household.present?
 
-        products = products_for_csr_variant(base_enrollment, new_enrollment, tax_household)
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          return Success() unless is_mthh_assisted?
+        else
+          tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(new_enrollment.effective_on.year)
+          return Success() unless tax_household.present?
+        end
+
+        products = products_for_csr_variant(base_enrollment, new_enrollment, tax_household, current_enrolled_aptc_grants)
         return Failure('Could not find product for new enrollment with present csr kind.') unless products.count >= 1
 
         new_enrollment.product_id = products.last.id
@@ -141,18 +146,78 @@ module Operations
         Success()
       end
 
-      def products_for_csr_variant(base_enrollment, new_enrollment, tax_household)
-        eligible_csr = tax_household.eligibile_csr_kind(new_enrollment.hbx_enrollment_members.map(&:applicant_id))
+      def is_mthh_assisted?
+        current_enrolled_aptc_grants.present?
+      end
+
+      def current_enrolled_aptc_grants
+        return @current_enrolled_aptc_grants if defined? @current_enrolled_aptc_grants
+
+        premium_credits = ::Operations::PremiumCredits::FindAll.new.call({ family: new_enrollment.family, year: new_enrollment.effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
+        return [] if premium_credits.failure?
+
+        aptc_grants = premium_credits.value!
+        return [] if aptc_grants.blank?
+
+        @current_enrolled_aptc_grants = aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
+      end
+
+      def enrolled_family_member_ids
+        return @enrolled_family_member_ids if defined? @enrolled_family_member_ids
+
+        @enrolled_family_member_ids = new_enrollment.hbx_enrollment_members.map { |member| member.applicant_id.to_s }
+      end
+
+      def products_for_csr_variant(base_enrollment, new_enrollment, tax_household, _aptc_grants)
+        eligible_csr = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+                         extract_csr_kind
+                       else
+                         tax_household.eligibile_csr_kind(new_enrollment.hbx_enrollment_members.map(&:applicant_id))
+                       end
+
+        return [base_enrollment.product] if eligible_csr.blank?
+
         csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[eligible_csr]
         ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(new_enrollment.effective_on.year).where({:hios_id => "#{base_enrollment.product.hios_base_id}-#{csr_variant}"})
       end
 
-      def update_household_applied_aptc
-        tax_household = new_enrollment.family.active_household.latest_tax_household_with_year(new_enrollment.effective_on.year)
-        return unless tax_household
+      def extract_csr_kind
+        if EnrollRegistry.feature_enabled?(:native_american_csr) && all_american_indian_members
+          'csr_limited'
+        else
+          subjects = new_enrollment.family.eligibility_determination&.subjects
+          if subjects&.where(:"eligibility_states.eligibility_item_key" => 'aptc_csr_credit').present?
+            result = ::Operations::PremiumCredits::FindCsrValue.new.call({
+                                                                           family: new_enrollment.family,
+                                                                           year: new_enrollment.effective_on.year,
+                                                                           family_member_ids: enrolled_family_member_ids
+                                                                         })
 
-        applied_aptc = tax_household.monthly_max_aptc(new_enrollment, new_effective_date)
-        ::Insured::Factories::SelfServiceFactory.update_enrollment_for_apcts(new_enrollment, applied_aptc, age_as_of_coverage_start: true)
+            result.value! if result.success?
+          end
+        end
+      end
+
+      def all_american_indian_members
+        shopping_family_members = new_enrollment.family.family_members.where(:id.in => enrolled_family_member_ids)
+        shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
+      end
+
+      def update_household_applied_aptc
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          return unless is_mthh_assisted?
+
+          default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+          elected_aptc_pct = base_enrollment.elected_aptc_pct > 0 ? base_enrollment.elected_aptc_pct : default_percentage
+
+          ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(new_enrollment.effective_on, new_enrollment, elected_aptc_pct, [base_enrollment.hbx_id])
+        else
+          tax_household = new_enrollment.family.active_household.latest_tax_household_with_year(new_enrollment.effective_on.year)
+          return unless tax_household
+
+          applied_aptc = tax_household.monthly_max_aptc(new_enrollment, new_effective_date)
+          ::Insured::Factories::SelfServiceFactory.update_enrollment_for_apcts(new_enrollment, applied_aptc, age_as_of_coverage_start: true)
+        end
       end
     end
   end
