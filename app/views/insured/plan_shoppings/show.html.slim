@@ -458,7 +458,7 @@ javascript:
 
         var standard_plan = "";
         if (result.product.is_standard_plan) {
-          standard_plan = "EnrollRegistry[:enroll_app].setting(:standard_plan_label).item";
+          standard_plan = "#{EnrollRegistry[:enroll_app].setting(:standard_plan_label).item}";
         }
 
         var div = document.createElement('div')
