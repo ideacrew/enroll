@@ -375,10 +375,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enrollment_renewal
         end
 
-        before do
-          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
-        end
-
         context 'unassisted renewal' do
 
           it 'will not set aptc values & will generate renewal' do
@@ -534,24 +530,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   max_aptc: 375
                                                 })
               expect(subject.assisted).to eq true
-            end
-
-            context 'when ehb premium less than aptc' do
-              before do
-                allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 100, total_premium: 120))
-              end
-
-              it 'creates enrollment with ehb premium' do
-                renewal = subject.renew
-                expect(renewal.is_a?(HbxEnrollment)).to eq true
-                expect(subject.aptc_values).to eq({
-                                                    csr_amt: 0,
-                                                    applied_percentage: 0.85,
-                                                    applied_aptc: 100,
-                                                    max_aptc: 375
-                                                  })
-                expect(subject.assisted).to eq true
-              end
             end
           end
         end
