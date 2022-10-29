@@ -705,12 +705,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     context 'with success status code and determined application' do
 
       let(:cache_key) { "application_#{application.hbx_id}_determined" }
-
-      let(:set_rails_cache) do
-        Rails.cache.write(cache_key,
-          Time.now.strftime('%Y-%m-%d %H:%M:%S.%L'),
-          expires_in: 5.minutes)
-      end
+      let(:set_rails_cache) { Rails.cache.write(cache_key, Time.now.strftime('%Y-%m-%d %H:%M:%S.%L'), expires_in: 5.minutes) }
 
       before do
         application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
