@@ -57,6 +57,13 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
+      context 'with no ethnicity' do
+        it 'should have an ethnicity of an empty array rather than a nil' do
+          person = Person.last
+          expect(person.ethnicity).to eq []
+        end
+      end
+
       context 'relationships' do
         before do
           @family_member_rels = Family.first.family_members.map(&:relationship)
