@@ -21,6 +21,7 @@ document.addEventListener("turbolinks:load", function() {
           url: window.location.href.replace(/wait_for_eligibility_response/, "check_eligibility_results_received"),
           success: function (response_received_flag) {
             if (response_received_flag == "true"){
+              clearInterval(repeater);
               // redirect to the existing eligibility_results page
               window.location = window.location.href.replace(/wait_for_eligibility_response/, "eligibility_results?cur=1")
             }
