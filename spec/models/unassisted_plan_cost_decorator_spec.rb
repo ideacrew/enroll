@@ -443,26 +443,12 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
         end
 
         context 'when grants does not exist' do
-          it 'returns 0 as ehb premium' do
-            expect(@upcd_1.total_ehb_premium).to eq 0
+          it 'returns ehb premium by considering all the members' do
+            expect(@upcd_1.total_ehb_premium).to eq 1668.2
           end
         end
 
         context 'when grants exists' do
-          let!(:eligibility_determination) do
-            determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
-            determination.grants.create(
-              key: "AdvancePremiumAdjustmentGrant",
-              value: 1000,
-              start_on: TimeKeeper.date_of_record.beginning_of_year,
-              end_on: TimeKeeper.date_of_record.end_of_year,
-              assistance_year: TimeKeeper.date_of_record.year,
-              member_ids: family10.family_members.map(&:id).map(&:to_s),
-              tax_household_id: tax_household.id
-            )
-
-            determination
-          end
 
           let(:tax_household) do
             tax_household_group.tax_households.first
@@ -479,8 +465,46 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
             )
           end
 
-          it 'returns sum of ehb premiums of eligble members' do
-            expect(@upcd_1.total_ehb_premium).to eq 1668.2
+          context 'grants exists for all members' do
+            let!(:eligibility_determination) do
+              determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: 1000,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family10.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'returns sum of ehb premiums of eligble members' do
+              expect(@upcd_1.total_ehb_premium).to eq 1668.2
+            end
+          end
+
+          context 'grants does not exists for all members' do
+            let!(:eligibility_determination) do
+              determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: 1000,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: [family10.primary_applicant.id.to_s],
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'returns sum of ehb premiums of eligble members' do
+              expect(@upcd_1.total_ehb_premium).to eq 866.07
+            end
           end
         end
       end
