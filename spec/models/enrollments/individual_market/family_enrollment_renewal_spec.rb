@@ -388,7 +388,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                 csr_amt: 0,
                                                 applied_percentage: 0.85,
                                                 applied_aptc: 0.0,
-                                                max_aptc: 0.0
+                                                max_aptc: 0.0,
+                                                ehb_premium: 1390
                                               })
           end
         end
@@ -493,7 +494,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   csr_amt: 0,
                                                   applied_percentage: 0.85,
                                                   applied_aptc: 0.0,
-                                                  max_aptc: 0.0
+                                                  max_aptc: 0.0,
+                                                  ehb_premium: 1390
                                                 })
             end
           end
@@ -531,7 +533,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   csr_amt: 0,
                                                   applied_percentage: 0.85,
                                                   applied_aptc: 318.75,
-                                                  max_aptc: 375
+                                                  max_aptc: 375,
+                                                  ehb_premium: 1390
                                                 })
               expect(subject.assisted).to eq true
             end
@@ -548,7 +551,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                     csr_amt: 0,
                                                     applied_percentage: 0.85,
                                                     applied_aptc: 100,
-                                                    max_aptc: 375
+                                                    max_aptc: 375,
+                                                    ehb_premium: 100
                                                   })
                 expect(subject.assisted).to eq true
               end
