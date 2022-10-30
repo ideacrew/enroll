@@ -436,54 +436,6 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       it 'should return some valid amount when valid information is given' do
         expect(@upcd_1.total_ehb_premium).to eq 1668.2
       end
-
-      context 'when mthh enabled' do
-        before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
-        end
-
-        context 'when grants does not exist' do
-          it 'returns 0 as ehb premium' do
-            expect(@upcd_1.total_ehb_premium).to eq 0
-          end
-        end
-
-        context 'when grants exists' do
-          let!(:eligibility_determination) do
-            determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
-            determination.grants.create(
-              key: "AdvancePremiumAdjustmentGrant",
-              value: 1000,
-              start_on: TimeKeeper.date_of_record.beginning_of_year,
-              end_on: TimeKeeper.date_of_record.end_of_year,
-              assistance_year: TimeKeeper.date_of_record.year,
-              member_ids: family10.family_members.map(&:id).map(&:to_s),
-              tax_household_id: tax_household.id
-            )
-
-            determination
-          end
-
-          let(:tax_household) do
-            tax_household_group.tax_households.first
-          end
-
-          let!(:tax_household_group) do
-            family10.tax_household_groups.create!(
-              assistance_year: TimeKeeper.date_of_record.year,
-              source: 'Admin',
-              start_on: TimeKeeper.date_of_record.beginning_of_year,
-              tax_households: [
-                FactoryBot.build(:tax_household, household: family10.active_household)
-              ]
-            )
-          end
-
-          it 'returns sum of ehb premiums of eligble members' do
-            expect(@upcd_1.total_ehb_premium).to eq 1668.2
-          end
-        end
-      end
     end
 
     context 'for member_ehb_premium' do
