@@ -377,17 +377,26 @@ class Family
     enrolled_plans.collect(&:product_id)
   end
 
+  # filters enrolled enrollments by subscriber only
   def currently_enrolled_products(enrollment)
-    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind).select do |enr|
+    any_member_current_enrollments(enrollment).select do |enr|
       enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
-    end
+    end.map(&:product)
+  end
+
+  def any_member_currently_enrolled_products(enrollment)
+    any_member_current_enrollments(enrollment).map(&:product)
+  end
+
+  # fetch the current active or terminated enrollments for continous coverage
+  def any_member_current_enrollments(enrollment)
+    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
 
     if enrolled_enrollments.blank?
-      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period((enrollment.effective_on - 1.day)).select do |enr|
-        enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
-      end
+      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period(enrollment.effective_on - 1.day)
     end
-    enrolled_enrollments.map(&:product)
+
+    enrolled_enrollments
   end
 
   def currently_enrolled_product_ids(enrollment)
