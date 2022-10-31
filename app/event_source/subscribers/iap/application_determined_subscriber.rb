@@ -14,6 +14,8 @@ module Subscribers
       # create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       # generate_enrollments(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
+      update_application_evidence_histories(payload)
+
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       log_error(subscriber_logger, logger, :on_magi_medicaid_application_determined, e)
@@ -21,6 +23,12 @@ module Subscribers
     end
 
     private
+
+    # UpdateEvidenceHistories of Application
+    def update_application_evidence_histories(payload)
+      application = FinancialAssistance::Application.by_hbx_id(payload[:hbx_id]).first
+      application.update_evidence_histories
+    end
 
     # Creates tax_household_groups and its accociations for a Family with Financial Assistance Application's Eligibility Determination
     def create_tax_household_group(subscriber_logger, payload)
