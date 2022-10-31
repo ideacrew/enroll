@@ -1349,6 +1349,10 @@ class Family
     write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_member_id) if hbx_assigned_id.blank?
   end
 
+  def create_thhg_on_fa_determination(application)
+    Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination.new.call(application)
+  end
+
 private
   def build_household
     if households.size == 0
