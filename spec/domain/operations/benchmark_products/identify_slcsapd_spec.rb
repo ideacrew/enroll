@@ -27,7 +27,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
               },
               {
                 family_member_id: family_member2.id,
-                relationship_with_primary: 'spouse'
+                relationship_with_primary: relationship_kind
               }
             ]
           }
@@ -60,6 +60,24 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         expect(@result.success[:dental_rating_method]).not_to be_nil
         expect(@result.success[:dental_ehb_apportionment_for_pediatric_dental]).not_to be_nil
         expect(@result.success[:household_dental_benchmark_ehb_premium]).not_to be_nil
+      end
+    end
+
+    # 'adult_only', 'adult_and_child', 'child_only'
+    context 'type_of_household: adult_and_child' do
+      let(:person1_age) { 25 }
+      let(:person2_age) { 19 }
+      let(:relationship_kind) { 'child' }
+      let(:rating_method3) { 'Age-Based Rates' }
+
+      before do
+        @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
+          { family: family, benchmark_product_model: @benchmark_product_model, household_params: @benchmark_product_model.households.first.to_h }
+        )
+      end
+
+      it 'return success without any dental benchmark_ehb_premium' do
+        expect(@result.success[:household_dental_benchmark_ehb_premium]).to be_zero
       end
     end
 

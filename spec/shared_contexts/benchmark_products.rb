@@ -9,9 +9,10 @@ RSpec.shared_context 'family with 2 family members', :shared_context => :metadat
     per.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
     per
   end
+  let(:relationship_kind) { 'spouse' }
   let(:person2) do
     per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person2_age.years)
-    person1.ensure_relationship_with(per, 'spouse')
+    person1.ensure_relationship_with(per, relationship_kind)
     per
   end
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
@@ -119,11 +120,13 @@ RSpec.shared_context '3 dental products with different rating_methods, different
     end
   end
 
+  let(:rating_method3) { 'Family-Tier Rates' }
+
   let!(:dental_products) do
     [
       ['48396ME0860003', 'Allows Adult and Child-Only', 'Age-Based Rates'],
       ['48396ME0860005', 'Allows Child-Only', 'Age-Based Rates'],
-      ['48396ME0860007', 'Allows Adult and Child-Only', 'Family-Tier Rates']
+      ['48396ME0860007', 'Allows Adult and Child-Only', rating_method3]
     ].each_with_index do |hios_id_child_only_offering_rating_method, index|
       hios_id = hios_id_child_only_offering_rating_method[0]
       child_only_offering = hios_id_child_only_offering_rating_method[1]
