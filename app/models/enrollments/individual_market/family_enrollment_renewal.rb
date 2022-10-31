@@ -63,8 +63,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def fetch_product_id(renewal_enrollment)
     # TODO: Fetch proper csr product as the family might be eligible for a
     # different csr value than that of given externally.
+    return renewal_product if has_catastrophic_product?
 
-    (can_renew_assisted_product?(renewal_enrollment) ? assisted_renewal_product : renewal_product)
+    if can_renew_assisted_product?(renewal_enrollment)
+      assisted_renewal_product
+    else
+      renewal_product
+    end
   end
 
   def set_csr_value
