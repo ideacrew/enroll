@@ -9,7 +9,6 @@ module Subscribers
     subscribe(
       :on_magi_medicaid_mitc_eligibilities
     ) do |delivery_info, _metadata, response|
-      logger.info "DeterminationSubscriber Start TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
       subscriber_logger =
         Logger.new(
           "#{Rails.root}/log/on_magi_medicaid_mitc_eligibilities_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
@@ -23,26 +22,22 @@ module Subscribers
       if applications.present?
         workflow_state_transitions = applications.first.workflow_state_transitions
 
-        benchmark_measure = Benchmark.measure do
-          @result =
-            if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
-              # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
-            else
-              FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
-            end
-        end
+        result =
+          if workflow_state_transitions.present? && workflow_state_transitions.last.from_state == "renewal_draft"
+            # ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::AddDetermination.new.call(payload)
+          else
+            FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+          end
 
-        logger.info "TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}, benchmark_measure: #{benchmark_measure} application_hbx_id: #{applications.first.hbx_id}, DeterminationSubscriber"
-
-        if @result.success?
-          logger.info "DeterminationSubscriber: acked with success: #{@result.success}"
-          subscriber_logger.info "DeterminationSubscriber: acked with success: #{@result.success}"
+        if result.success?
+          logger.info "DeterminationSubscriber: acked with success: #{result.success}"
+          subscriber_logger.info "DeterminationSubscriber: acked with success: #{result.success}"
         else
           errors =
-            if @result.failure.is_a?(Dry::Validation::Result)
-              @result.failure.errors.to_h
+            if result.failure.is_a?(Dry::Validation::Result)
+              result.failure.errors.to_h
             else
-              @result.failure
+              result.failure
             end
 
           logger.info "DeterminationSubscriber: acked with failure, errors: #{errors}"
@@ -53,7 +48,6 @@ module Subscribers
         subscriber_logger.info "DeterminationSubscriber: acked with failure, errors: application not found for the app hbx_id: #{payload[:hbx_id]}"
       end
 
-      logger.info "DeterminationSubscriber End TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       logger.info "DeterminationSubscriber: error: #{e.backtrace}"
