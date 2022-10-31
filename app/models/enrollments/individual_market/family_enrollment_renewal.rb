@@ -98,7 +98,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     @aptc_values.merge!({
                           applied_percentage: applied_percentage,
                           applied_aptc: applied_aptc,
-                          max_aptc: max_aptc
+                          max_aptc: max_aptc,
+                          ehb_premium: ehb_premium
                         })
   end
 

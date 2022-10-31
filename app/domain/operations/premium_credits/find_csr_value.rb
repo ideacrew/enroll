@@ -29,30 +29,35 @@ module Operations
       end
 
       def find_csr_value(values)
-        @subjects = values[:family].eligibility_determination&.subjects&.select { |subject| values[:family_member_ids].map(&:to_s).include? subject.gid.split('/').last } || []
+        subjects = values[:family].eligibility_determination&.subjects&.select { |subject| values[:family_member_ids].map(&:to_s).include? subject.gid.split('/').last } || []
 
-        @csr_hash = @subjects.inject({}) do |result, subject|
-          result[subject.gid.split('/').last] = subject.csr_by_year(values[:year])
-          result
+        csr_values = values[:family_member_ids].inject([]) do |csrs, family_member_id|
+          csrs << eligibile_csr_value(family_member_id, values[:year], values[:family], subjects)
+          csrs
         end
 
-        any_member_ia_not_eligible = values[:family_member_ids].any? { |family_member_id| @csr_hash[family_member_id.to_s].nil? }
-
-        handle_native_american_csr
-
-        csr_values = @csr_hash.values.uniq
-
-        csr_value = (any_member_ia_not_eligible || csr_values.blank?) ? 'csr_0' : retrieve_csr(csr_values)
-
-        Success(csr_value)
+        Success(retrieve_csr(csr_values))
       end
 
-      def handle_native_american_csr
-        return unless FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+      def fetch_member_csr(family_member_id, year, subjects)
+        return '0' if subjects.blank?
 
-        @subjects.each do |subject|
-          @csr_hash[subject.gid.split('/').last] = 'limited' if subject.person.indian_tribe_member
-        end
+        member_subject = subjects.detect { |subj| subj.gid.split('/').last == family_member_id.to_s }
+        return '0' if member_subject.blank?
+
+        member_subject.csr_by_year(year)
+      end
+
+      def eligibile_csr_value(family_member_id, year, family, subjects)
+        member_csr = fetch_member_csr(family_member_id, year, subjects)
+        return member_csr unless FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+
+        f_member = family.family_members.where(id: family_member_id).first
+        return member_csr unless f_member&.person&.indian_tribe_member
+
+        return member_csr if member_csr == '100'
+
+        'limited'
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity
