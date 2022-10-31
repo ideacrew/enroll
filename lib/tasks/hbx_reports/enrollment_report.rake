@@ -48,10 +48,10 @@ namespace :reports do
       aasm_states.include?("auto_renewing") && !aasm_states.include?("renewing_coverage_selected")
     end
 
-    def has_terminated_enrollments?(enr)
+    def has_terminated_or_canceled_enrollments?(enr)
       enrollments = enrollments_for_year(enr)
       aasm_states = enrollments.flat_map(&:workflow_state_transitions).map(&:to_state)
-      aasm_states.include?("coverage_terminated")
+      aasm_states.any? { |state| ["coverage_terminated", "coverage_canceled"].include?(state) }
     end
 
     def has_active_renewing_enrollments?(enr)
@@ -71,7 +71,7 @@ namespace :reports do
 
 
     def member_status(enr)
-      if has_auto_renewing_enrollments?(enr) && !has_terminated_enrollments?(enr)
+      if has_auto_renewing_enrollments?(enr) && !has_terminated_or_canceled_enrollments?(enr)
         "Re-enrollee"
       elsif has_active_renewing_enrollments?(enr) || has_effectuated_coverage_in_prev_year_during_oe?(enr)
         "Active Re-enrollee"
