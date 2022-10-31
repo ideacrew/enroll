@@ -11,7 +11,7 @@ document.addEventListener("turbolinks:load", function() {
   // Check for Eligibility Result response every "interval_time" seconds a total of "number_of_times" times.
   if (/wait_for_eligibility_response/.test(window.location.href)) {
     var i = 1;
-    var number_of_times = 30;
+    var number_of_times = 50;
     var interval_time = 2000;
     var repeater = setInterval(function () {
       if ( i < number_of_times) {
@@ -21,6 +21,7 @@ document.addEventListener("turbolinks:load", function() {
           url: window.location.href.replace(/wait_for_eligibility_response/, "check_eligibility_results_received"),
           success: function (response_received_flag) {
             if (response_received_flag == "true"){
+              clearInterval(repeater);
               // redirect to the existing eligibility_results page
               window.location = window.location.href.replace(/wait_for_eligibility_response/, "eligibility_results?cur=1")
             }

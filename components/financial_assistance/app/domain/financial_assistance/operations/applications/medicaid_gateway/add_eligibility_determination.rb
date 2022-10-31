@@ -18,14 +18,23 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(params)
             application_entity = yield initialize_application_entity(params)
-            application = yield find_application(application_entity)
-            application = yield update_application(application, application_entity)
-            result = yield add_eligibility_determination(application_entity, application)
+            application        = yield find_application(application_entity)
+            application        = yield update_application(application, application_entity)
+            result             = yield add_eligibility_determination(application_entity, application)
+            _done              = yield cache_determination_token(application)
 
             Success(result)
           end
 
           private
+
+          def cache_determination_token(application)
+            Rails.cache.write("application_#{application.hbx_id}_determined",
+                              Time.now.strftime('%Y-%m-%d %H:%M:%S.%L'),
+                              expires_in: 5.minutes)
+
+            Success('Rails cache is set for the application with timestamp.')
+          end
 
           def initialize_application_entity(params)
             ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(params)
@@ -64,9 +73,9 @@ module FinancialAssistance
 
           def update_http_code_and_aasm_state(application)
             # Tie http_status_code & aasm_state update together to aviod gap b/w both the actions.
-            application.update_attributes!(determination_http_status_code: 200)
+            application.assign_attributes(determination_http_status_code: 200)
             application.determine
-            application.save!
+            application.save
           end
 
           def find_matching_eligibility_determination(application, thh_entity)
@@ -79,31 +88,33 @@ module FinancialAssistance
             thh_entity.tax_household_members.each do |thhm_entity|
               applicant = find_matching_applicant(elig_d, thhm_entity.applicant_reference.person_hbx_id)
               ped_entity = thhm_entity.product_eligibility_determination
-              applicant.update_attributes!({ medicaid_household_size: ped_entity.medicaid_household_size || 0,
-                                             magi_medicaid_category: ped_entity.magi_medicaid_category || 'none',
-                                             magi_as_percentage_of_fpl: ped_entity.magi_as_percentage_of_fpl,
-                                             magi_medicaid_monthly_income_limit: ped_entity.magi_medicaid_monthly_income_limit,
-                                             magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
-                                             is_without_assistance: ped_entity.is_uqhp_eligible,
-                                             csr_percent_as_integer: get_csr_value(ped_entity),
-                                             is_ia_eligible: ped_entity.is_ia_eligible,
-                                             is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
-                                             is_totally_ineligible: ped_entity.is_totally_ineligible,
-                                             is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
-                                             is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
+              applicant.assign_attributes({ medicaid_household_size: ped_entity.medicaid_household_size || 0,
+                                            magi_medicaid_category: ped_entity.magi_medicaid_category || 'none',
+                                            magi_as_percentage_of_fpl: ped_entity.magi_as_percentage_of_fpl,
+                                            magi_medicaid_monthly_income_limit: ped_entity.magi_medicaid_monthly_income_limit,
+                                            magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
+                                            is_without_assistance: ped_entity.is_uqhp_eligible,
+                                            csr_percent_as_integer: get_csr_value(ped_entity),
+                                            is_ia_eligible: ped_entity.is_ia_eligible,
+                                            is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
+                                            is_totally_ineligible: ped_entity.is_totally_ineligible,
+                                            is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
+                                            is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
+              applicant.save
             end
           end
 
           def update_eligibility_determination(elig_d, thh_entity)
-            elig_d.update_attributes!({ effective_starting_on: thh_entity.effective_on,
-                                        is_eligibility_determined: true,
-                                        max_aptc: thh_entity.max_aptc.to_f,
-                                        determined_at: thh_entity.determined_on,
-                                        aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
-                                        yearly_expected_contribution: thh_entity.yearly_expected_contribution,
-                                        aptc_annual_income_limit: Money.new(0, 'USD'),
-                                        csr_annual_income_limit: thh_entity.csr_annual_income_limit || Money.new(0, 'USD'),
-                                        source: 'Faa' })
+            elig_d.assign_attributes({ effective_starting_on: thh_entity.effective_on,
+                                       is_eligibility_determined: true,
+                                       max_aptc: thh_entity.max_aptc.to_f,
+                                       determined_at: thh_entity.determined_on,
+                                       aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
+                                       yearly_expected_contribution: thh_entity.yearly_expected_contribution,
+                                       aptc_annual_income_limit: Money.new(0, 'USD'),
+                                       csr_annual_income_limit: thh_entity.csr_annual_income_limit || Money.new(0, 'USD'),
+                                       source: 'Faa' })
+            elig_d.save
           end
 
           def get_csr_value(ped_entity)
