@@ -139,4 +139,13 @@
   }
 
   const customPlugin = CXBus.registerPlugin('Custom');
+
+  // throw error when the webchat gets rejected or has an error for visibility
+  customPlugin.subscribe('WebChat.rejected', function(e){
+    throw new Error("Chat was rejected", { cause: e });
+  });
+
+  customPlugin.subscribe('WebChat.error', function(e){
+    throw new Error("Chat had an error", { cause: e });
+  });
 </script>
