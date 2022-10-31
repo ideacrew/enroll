@@ -18,7 +18,6 @@ module FinancialAssistance
         class PublishApplication
           include Dry::Monads[:result, :do, :try]
           include EventSource::Command
-          include EventSource::Logging
 
           # Update this constant with new events that are added/registered in ::Publishers::ApplicationPublisher
           REGISTERED_EVENTS = %w[determine_eligibility application_renewal_request_created submit_renewal_draft].freeze
@@ -55,7 +54,6 @@ module FinancialAssistance
 
           def publish(event)
             event.publish
-            logger.info "TimeNow: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}, Applications::MedicaidGateway::PublishApplication"
 
             Success("Successfully published the payload for event: #{@event_name}")
           end
