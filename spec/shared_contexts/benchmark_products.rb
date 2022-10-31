@@ -120,13 +120,11 @@ RSpec.shared_context '3 dental products with different rating_methods, different
     end
   end
 
-  let(:rating_method3) { 'Family-Tier Rates' }
-
   let!(:dental_products) do
     [
       ['48396ME0860003', 'Allows Adult and Child-Only', 'Age-Based Rates'],
       ['48396ME0860005', 'Allows Child-Only', 'Age-Based Rates'],
-      ['48396ME0860007', 'Allows Adult and Child-Only', rating_method3]
+      ['48396ME0860007', 'Allows Adult and Child-Only', 'Family-Tier Rates']
     ].each_with_index do |hios_id_child_only_offering_rating_method, index|
       hios_id = hios_id_child_only_offering_rating_method[0]
       child_only_offering = hios_id_child_only_offering_rating_method[1]

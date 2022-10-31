@@ -69,8 +69,14 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
       let(:person2_age) { 19 }
       let(:relationship_kind) { 'child' }
       let(:rating_method3) { 'Age-Based Rates' }
+      let(:update_dental_products) do
+        ::BenefitMarkets::Products::DentalProducts::DentalProduct.where(rating_method: 'Family-Tier Rates').each do |dental_pro|
+          dental_pro.update_attributes(rating_method: 'Age-Based Rates')
+        end
+      end
 
       before do
+        update_dental_products
         @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: @benchmark_product_model.households.first.to_h }
         )
