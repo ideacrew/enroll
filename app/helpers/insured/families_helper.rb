@@ -352,4 +352,9 @@ module Insured::FamiliesHelper
       l10n('not_available')
     end
   end
+
+  def initially_hide_enrollment?(enrollment)
+    enrollment.aasm_state == 'coverage_canceled' || (enrollment.aasm_state == 'coverage_canceled' && enrollment.external_enrollment == true)
+  end
+
 end

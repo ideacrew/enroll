@@ -12,7 +12,7 @@
  
 <div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class ">
 %>
-<div class="module hbx-enrollment-panel panel panel-default <%= "initially_hidden_enrollment hidden" unless @hbx_enrollments.to_a.include?(hbx_enrollment) %>">
+<div class="module hbx-enrollment-panel panel panel-default <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
       <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> <%= l10n('coverage').titleize %>
