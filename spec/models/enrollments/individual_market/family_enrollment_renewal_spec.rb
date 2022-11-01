@@ -92,6 +92,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         enrollment_members: enrollment_members,
                         household: family.active_household,
                         coverage_kind: coverage_kind,
+                        rating_area_id: rating_area.id,
                         resident_role_id: family.primary_person.consumer_role.id,
                         effective_on: Date.new(Date.current.year,1,1),
                         kind: "coverall",
@@ -778,6 +779,80 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should return new renewal product" do
             expect(subject.renewal_product).to eq renewal_cat_age_off_product.id
+          end
+        end
+      end
+
+      context "When consumer covered under catastrophic product with assisted" do
+        before do
+          current_cat_product.update_attributes!(hios_base_id: nil, catastrophic_age_off_product_id: renewal_cat_age_off_product.id)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+        end
+        let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: Date.new(Date.current.year + 1,1,1))}
+        let!(:thh_member) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: tax_household, csr_eligibility_kind: "csr_73")}
+        let!(:thh_member2) { FactoryBot.create(:tax_household_member, applicant_id: child1.id, tax_household: tax_household, csr_eligibility_kind: "csr_73")}
+        let!(:thh_member3) { FactoryBot.create(:tax_household_member, applicant_id: child2.id, tax_household: tax_household, csr_eligibility_kind: "csr_73")}
+        let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household)}
+
+        let!(:catastrophic_ivl_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :with_enrollment_members,
+                            family: family,
+                            enrollment_members: enrollment_members,
+                            household: family.active_household,
+                            coverage_kind: coverage_kind,
+                            consumer_role_id: family.primary_person.consumer_role.id,
+                            effective_on: Date.new(Date.current.year,1,1),
+                            kind: "individual",
+                            product_id: current_cat_product.id,
+                            aasm_state: 'coverage_selected')
+        end
+        let!(:renewal_cat_age_off_product) do
+          prod = FactoryBot.create(:renewal_ivl_silver_health_product,  hios_base_id: "94506DC0390010", hios_id: "94506DC0390010-01", csr_variant_id: "01", service_area: renewal_service_area)
+          prod.premium_tables = [renewal_premium_table]
+          prod.save
+          prod
+        end
+        let(:renewal_premium_table)  { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
+        let(:enrollment_members) { [child1, child2] }
+
+        context "renew a current product to specific product with aptc > 0" do
+          subject do
+            enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+            enrollment_renewal.enrollment = catastrophic_ivl_enrollment
+            enrollment_renewal.assisted = true
+            enrollment_renewal.aptc_values = {:applied_percentage => 1, :applied_aptc => 730.0, :max_aptc => 730.0, :csr_amt => 73}
+            enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
+            enrollment_renewal.renew
+          end
+          let(:child1_dob) { current_date.next_month - 30.years }
+
+          it "should return new renewal product with applied aptc" do
+            expect(subject.applied_aptc_amount.to_f > 0.0).to be_truthy
+          end
+
+          it "should return new renewal enrollment without catastrophic product" do
+            expect(subject.product.metal_level_kind).not_to be :catastrophic
+          end
+        end
+
+        context "renew a current product to specific product with zero aptc" do
+          subject do
+            enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+            enrollment_renewal.enrollment = catastrophic_ivl_enrollment
+            enrollment_renewal.assisted = true
+            enrollment_renewal.aptc_values = {:applied_percentage => 1, :applied_aptc => 0, :max_aptc => 0, :csr_amt => 73}
+            enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
+            enrollment_renewal.renew
+          end
+          let(:child1_dob) { current_date.next_month - 30.years }
+
+          it "should return new renewal product without applied aptc" do
+            expect(subject.applied_aptc_amount.to_f).to eq 0.0
+          end
+
+          it "should return new renewal enrollment without catastrophic product" do
+            expect(subject.product.metal_level_kind).not_to be :catastrophic
           end
         end
       end
