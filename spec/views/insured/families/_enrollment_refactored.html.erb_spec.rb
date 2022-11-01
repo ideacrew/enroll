@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe "insured/families/_enrollment.html.erb" do
+RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
   let(:person) { double(id: '31111113') }
   let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true, id: 'familyid') }
   let(:is_eligible_to_enroll) { family.is_eligible_to_enroll? }
@@ -94,6 +94,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
     it "when kind is employer_sponsored" do
@@ -102,10 +105,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      expect(rendered).to match(/Plan Contact Info/)
-      expect(rendered).to have_content(employer_legal_name)
-      expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
+      render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to match(l10n("plan_contact_info"))
+      expect(rendered).to have_selector('label', text: HbxProfile::ShortName.to_s)
       expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
     end
 
@@ -115,8 +117,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      expect(rendered).to have_content(employer_profile.legal_name)
+      render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
@@ -135,12 +136,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           allow(view).to receive(:can_pay_now?).and_return(true)
           allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
           allow(hbx_enrollment).to receive(:terminate_reason).and_return 'non_payment'
-          render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+          render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         end
 
         it "should have all expected renders" do
-          expect(rendered).to have_content('Individual & Family')
-          expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
+          expect(rendered).to have_selector('label', text: HbxProfile::ShortName.to_s)
           expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
           expect(rendered).to have_content('Make a first payment') if EnrollRegistry[:carefirst_pay_now].enabled?
         end
@@ -221,16 +221,22 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_hbx_id).and_return(true)
+
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(false)
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+
+      render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     context "internationalization" do
@@ -251,17 +257,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       )
     end
 
-    it "should display the title" do
-      expect(rendered).to match(/#{plan_active_year} #{plan_coverage_kind.titleize} Coverage/)
-      expect(rendered).to match(/#{EnrollRegistry[:enroll_app].setting(:short_name).item}/)
-    end
-
     it "should display the Actions Drop down" do
       expect(rendered).to have_text("Actions")
     end
 
     it "should display the plan start" do
-      expect(rendered).to have_selector('strong', text: 'Plan Start:')
+      expect(rendered).to have_selector('label', text: l10n('coverage_start'))
       expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
     end
 
@@ -269,23 +270,18 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to_not have_selector('.cna')
     end
 
-    it "should display the Plan Start" do
-      expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match(/#{TimeKeeper.date_of_record}/)
-    end
-
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match(/plan start/i)
+      expect(rendered).to match(/#{l10n('coverage_start')}/i)
     end
 
-    it "should display market" do
-      expect(rendered).to match(/Market/)
+    it "should not display market" do
+      expect(rendered).to_not match(/market type/i)
     end
 
     it "should not show a Plan End if cobra" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      expect(rendered).not_to match(/plan ending/i)
+      expect(rendered).not_to match(/coverage end/i)
     end
 
     context "coverage_termination_pending" do
@@ -302,15 +298,18 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         allow(hbx_enrollment).to receive(:can_make_changes?).and_return(false)
         allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
         allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+        allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
+
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
-        expect(rendered).to have_text(/Future enrollment termination date/)
+        expect(rendered).to match(/Future enrollment termination date:/)
       end
 
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
-        expect(rendered).to have_text(/#{terminated_on.strftime("%m/%d/%Y")}/)
+        expect(rendered).to have_text(terminated_on.strftime("%m/%d/%Y"))
       end
     end
   end
@@ -335,7 +334,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     it "should have reinstated enrollment text" do
@@ -371,13 +370,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it "should display Terminated by health insure indicator on enrollment tile" do
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).to have_text("Terminated by health insurer")
       end
 
       it "should not display Terminated by health insure indicator on enrollment tile" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).not_to have_text("Terminated by health insurer")
         expect(rendered).to have_text("Terminated")
       end
@@ -389,14 +388,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it "should not display Terminated by health insure indicator on enrollment tile" do
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).not_to have_text("Terminated by health insurer")
         expect(rendered).to have_text("Terminated")
       end
 
       it "should not display Terminated by health insure indicator on enrollment tile if no reason present" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).not_to have_text("Terminated by health insurer")
         expect(rendered).to have_text("Terminated")
       end
@@ -409,13 +408,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it "should not display Terminated by health insure indicator if enrollment has termination reason present" do
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).not_to have_text("Terminated by health insurer")\
       end
 
       it "should not display Terminated by health insure indicator if enrollment does not have termination reason present" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).not_to have_text("Terminated by health insurer")
       end
     end
@@ -446,13 +445,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it "should display Canceled by health insure indicator on enrollment tile" do
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).to have_text("Canceled by health insurer")
       end
 
       it "should not display Canceled by health insure indicator on enrollment tile" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         expect(rendered).not_to have_text("Canceled by health insurer")
         expect(rendered).to have_text("Coverage Canceled")
       end
@@ -478,7 +477,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
+      render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     it "should display Actions button" do
@@ -528,12 +529,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(waived_hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
     context "it should render waived_coverage_widget " do
       context "voluntary waived" do
         before :each do
-          render partial: "insured/families/enrollment", collection: [waived_hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+          render partial: "insured/families/enrollment_refactored", collection: [waived_hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         end
 
         it "should render waiver template with read_only param as true" do
@@ -549,7 +552,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         before :each do
           allow(waived_hbx_enrollment).to receive(:aasm_state).and_return("renewing_waived")
           allow(waived_hbx_enrollment).to receive(:renewing_waived?).and_return(true)
-          render partial: "insured/families/enrollment", collection: [waived_hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+          render partial: "insured/families/enrollment_refactored", collection: [waived_hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         end
 
         it "should display automatic waive renewal text" do
@@ -606,12 +609,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
     context "osse_eligibility is present" do
 
       before do
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it "should display osse amount" do
@@ -666,7 +671,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         allow(hbx_enrollment1).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
+        allow(hbx_enrollment1).to receive(:hbx_enrollment_members).and_return(double)
+        allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it "should not display osse amount" do

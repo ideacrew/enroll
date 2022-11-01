@@ -66,7 +66,10 @@ class Household
       extended_family_coverage_household.add_coverage_household_member(family_member)
     end
 
-    self.save unless primary_person&.employee_roles.present? # prevent mongo conflict when dependent is added in SHOP context
+    return if primary_person&.employee_roles.present? # prevent mongo conflict when dependent is added in SHOP context
+
+    coverage_households.each { |ch| ch.save! if ch.changed? }
+    self.save
   end
 
   def immediate_family_coverage_household
