@@ -149,6 +149,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.premium' => "Premium",
   :'en.effective_date' => "Effective Date",
   :'en.coverage_end' => "Coverage End",
+  :'en.coverage_start' => "Coverage Start",
   :'en.plan_selected' => "Plan Selected",
   :'en.plan_type' => "Plan Type",
   :'en.benefit_group' => "Benefit Group",
