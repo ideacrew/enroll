@@ -21,6 +21,7 @@ RSpec.describe "insured/families/home.html.erb" do
 
   let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
   let(:term_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_terminated") }
+  let(:non_pay_canceled_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_canceled", terminate_reason: "non_payment") }
 
   before :each do
     stub_template "insured/families/_right_column.html.erb" => ''
@@ -108,5 +109,31 @@ RSpec.describe "insured/families/home.html.erb" do
       render file: "insured/families/home.html.erb"
       expect(rendered).to_not include("Display All Enrollments?")
     end
+  end
+
+  context "with :show_non_pay_enrollments" do
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
+      assign(:family, family)
+      assign(:hbx_enrollments, [hbx, term_hbx, non_pay_canceled_hbx])
+      allow(view).to receive(:policy_helper).and_return(
+        double("FamilyPolicy", can_view_entire_family_enrollment_history?: true)
+      )
+      render partial: "insured/families/enrollment", collection: [:hbx_enrollments], as: :hbx_enrollment, locals: { read_only: false }
+
+    end
+
+    it "enabled" do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_return(true)
+      render file: "insured/families/home.html.erb"
+      puts rendered
+      expect(rendered).to have_text("hbx_id_of_non_pay_enrollment")
+    end
+
+    it "disabled" do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_return(false)
+      expect(rendered).to_not have_text("hbx_id_of_non_pay_enrollment")
+    end
+
   end
 end
