@@ -205,6 +205,13 @@ module Insured::FamiliesHelper
       enrollment.terminate_reason == HbxEnrollment::TermReason::NON_PAYMENT
   end
 
+  def covered_members_name_age(hbx_enrollment_members)
+    enrollment_members = hbx_enrollment_members.sort_by { |a| a.is_subscriber ? 0 : 1 }
+    enrollment_members.inject([]) do |name_age, member|
+      name_age << "#{member.person.first_name} (#{((Time.zone.now - member.person.dob.to_time) / 1.year.seconds).floor})"
+    end
+  end
+
   def enrollment_coverage_end(hbx_enrollment)
     if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on

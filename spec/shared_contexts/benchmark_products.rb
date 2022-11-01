@@ -9,9 +9,10 @@ RSpec.shared_context 'family with 2 family members', :shared_context => :metadat
     per.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
     per
   end
+  let(:relationship_kind) { 'spouse' }
   let(:person2) do
     per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person2_age.years)
-    person1.ensure_relationship_with(per, 'spouse')
+    person1.ensure_relationship_with(per, relationship_kind)
     per
   end
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }

@@ -3,7 +3,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 module SponsoredBenefits
   RSpec.describe BenefitApplications::EmployerProfileBuilder, type: :model do
-    let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+    let(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
 
@@ -47,8 +47,9 @@ module SponsoredBenefits
       let(:plan_design_proposal)      { SponsoredBenefits::Organizations::PlanDesignProposal.new(title: "New Proposal") }
       let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
 
-      let(:product)  { FactoryBot.create :benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile }
-      let(:plan )    { FactoryBot.create(:plan, hios_id: product.hios_id) }
+      let(:application_period)   { Date.new(benefit_application.effective_period.min.year, 1, 1)..Date.new(benefit_application.effective_period.min.year, 12, 31) }
+      let(:product)  { FactoryBot.create :benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile, application_period:  application_period}
+      let(:plan)    { FactoryBot.create(:plan, hios_id: product.hios_id, active_year: benefit_application.effective_period.min.year) }
       let(:benefit_group)             { FactoryBot.create(:benefit_group, reference_plan_id: plan.id, title: 'benefit group') }
 
       before(:each) do
