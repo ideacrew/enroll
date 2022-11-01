@@ -63,8 +63,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def fetch_product_id(renewal_enrollment)
     # TODO: Fetch proper csr product as the family might be eligible for a
     # different csr value than that of given externally.
+    return renewal_product if has_catastrophic_product?
 
-    (can_renew_assisted_product?(renewal_enrollment) ? assisted_renewal_product : renewal_product)
+    if can_renew_assisted_product?(renewal_enrollment)
+      assisted_renewal_product
+    else
+      renewal_product
+    end
   end
 
   def set_csr_value
@@ -92,13 +97,15 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     max_aptc = aptc_op.value!
     default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
     applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-    applied_aptc = float_fix([(max_aptc * applied_percentage), renewal_enrollment.total_ehb_premium].min)
+    ehb_premium = renewal_enrollment.total_ehb_premium
+    applied_aptc = float_fix([(max_aptc * applied_percentage), ehb_premium].min)
     @assisted = true if max_aptc > 0.0
 
     @aptc_values.merge!({
                           applied_percentage: applied_percentage,
                           applied_aptc: applied_aptc,
-                          max_aptc: max_aptc
+                          max_aptc: max_aptc,
+                          ehb_premium: ehb_premium
                         })
   end
 

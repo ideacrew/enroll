@@ -694,22 +694,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   describe "GET check eligibility results received" do
-    context "With valid data" do
+    context "doesn't have the success status code" do
 
-      it "should return false if the Header of the response doesn't have the success status code" do
+      it "should return false" do
         get :check_eligibility_results_received, params: { id: application.id }
         expect(response.body).to eq "false"
       end
+    end
 
-      context 'with success status code and determined application' do
-        before do
-          application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
-          get :check_eligibility_results_received, params: { id: application.id }
-        end
+    context 'with success status code and determined application' do
 
-        it 'should return true for response body' do
-          expect(response.body).to eq 'true'
-        end
+      let(:cache_key) { "application_#{application.hbx_id}_determined" }
+      let(:set_rails_cache) { Rails.cache.write(cache_key, Time.now.strftime('%Y-%m-%d %H:%M:%S.%L'), expires_in: 5.minutes) }
+
+      before do
+        application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
+        set_rails_cache
+        get :check_eligibility_results_received, params: { id: application.id }
+      end
+
+      after do
+        Rails.cache.delete(cache_key)
+      end
+
+      it 'should return true for response body' do
+        expect(response.body).to eq 'true'
       end
     end
   end

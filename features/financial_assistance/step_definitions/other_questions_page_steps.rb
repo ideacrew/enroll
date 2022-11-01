@@ -68,6 +68,7 @@ Given(/^all applicants fill all pages except other questions$/) do
 end
 
 Given(/^the user will navigate to the FAA Household Info page$/) do
+  allow(HbxProfile).to receive(:current_hbx).and_return(double(:under_open_enrollment? => false))
   visit financial_assistance.edit_application_path(application.id.to_s)
 end
 
