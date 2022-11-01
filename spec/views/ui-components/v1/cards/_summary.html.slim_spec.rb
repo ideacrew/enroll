@@ -68,8 +68,12 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     )
   end
   let(:mock_qhp_cost_share_variance) { instance_double(Products::QhpCostShareVariance, :qhp_service_visits => []) }
+  let(:mock_request) { double }
 
   before :each do
+    allow(view).to receive(:request).and_return(mock_request)
+    allow(mock_request).to receive(:referrer).and_return('')
+    allow(mock_issuer_profile).to receive(:abbrev).and_return("MOCK_CARRIER")
     Caches::MongoidCache.release(CarrierProfile)
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive(:enrolled_hbx_enrollments).and_return([hbx_enrollment])
@@ -152,12 +156,14 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
-    it "should not have provider directory url if nationwide = false(for dc)" do
+    it "should not have provider directory url if issuer is excluded" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(true)
-      allow(mock_product).to receive(:nationwide).and_return(false)
-      allow(member_group).to receive(:nationwide).and_return(false)
+      allow(mock_product).to receive(:provider_directory_url).and_return("mock_url")
+      allow(mock_product).to receive(:issuer_profile).and_return(mock_issuer_profile)
+      allow(mock_issuer_profile).to receive(:abbrev).and_return("GHMSI")
       render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_product.provider_directory_url}/)
+      expect(rendered).to_not match("PROVIDER DIRECTORY")
     end
 
     it "should not have provider directory url if nationwide = false(for ma)" do

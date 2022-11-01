@@ -310,7 +310,7 @@ module FinancialAssistance
               date_of_death: person.date_of_death,
               dob_check: person.dob_check,
               is_incarcerated: person.is_incarcerated,
-              ethnicity: person.ethnicity,
+              ethnicity: person.ethnicity || [],
               race: person.race,
               tribal_id: person.tribal_id,
               language_code: person.language_code || person.user&.preferred_language || 'en'

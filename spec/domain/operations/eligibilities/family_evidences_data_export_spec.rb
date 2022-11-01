@@ -29,6 +29,10 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
     person
   end
 
+  before do
+    DatabaseCleaner.clean
+  end
+
   let!(:family) do
     FactoryBot.create(:family, :with_primary_family_member, person: person1)
   end

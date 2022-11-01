@@ -50,7 +50,7 @@ module Operations
     end
 
     def send_notice_alert_to_resource(name, target)
-      UserMailer.generic_notice_alert(name, "You have a new message from #{site_short_name}", target).deliver_now  unless is_valid_resource? && !can_receive_electronic_communication?
+      ::UserMailer.generic_notice_alert(name, "You have a new message from #{site_short_name}", target).deliver_now  unless is_valid_resource? && !can_receive_electronic_communication?
       Success(true)
     end
 
@@ -60,13 +60,13 @@ module Operations
           broker_person = @resource.broker_agency_profile.primary_broker_role.person
           broker_name = broker_person.full_name
           broker_email = broker_person.work_email_or_best
-          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, @resource.legal_name.titleize).deliver_now
+          ::UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, @resource.legal_name.titleize).deliver_now
         end
         if @resource.general_agency_profile.present?
           general_agency_staff_person = @resource.general_agency_profile.primary_staff.person
           general_agent_name = general_agency_staff_person.full_name
           ga_email = general_agency_staff_person.work_email_or_best
-          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, @resource.legal_name.titleize).deliver_now
+          ::UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, @resource.legal_name.titleize).deliver_now
         end
       end
       Success(true)
@@ -81,15 +81,19 @@ module Operations
     end
 
     def is_employer?
-      @resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize) || @resource.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
+      employer_class = [::BenefitSponsors::Organizations::AcaShopDcEmployerProfile, ::BenefitSponsors::Organizations::AcaShopMeEmployerProfile].find do |profile_class|
+        profile_class.to_s == "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile"
+      end
+
+      (employer_class && @resource.is_a?(employer_class)) || @resource.is_a?(::BenefitSponsors::Organizations::FehbEmployerProfile)
     end
 
     def is_general_agency?
-      @resource.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+      @resource.is_a?(::BenefitSponsors::Organizations::GeneralAgencyProfile)
     end
 
     def is_broker_agency?
-      @resource.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+      @resource.is_a?(::BenefitSponsors::Organizations::BrokerAgencyProfile)
     end
 
     def can_receive_electronic_communication?

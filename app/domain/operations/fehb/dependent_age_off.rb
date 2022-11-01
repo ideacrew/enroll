@@ -34,7 +34,7 @@ module Operations
 
       def fehb_query_criteria(enrollment)
         return Success(enrollment) unless enrollment.nil?
-        Success(BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile$$$/))
+        Success(::BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile$$$/))
       end
 
       def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity

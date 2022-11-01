@@ -91,6 +91,9 @@ class HbxEnrollment
   field :applied_aptc_amount, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
+  # OSSE childcare subsidy
+  field :eligible_child_care_subsidy, type: Money, default: 0.0
+
   field :effective_on, type: Date
   field :terminated_on, type: Date
   field :terminate_reason, type: String

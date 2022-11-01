@@ -243,9 +243,7 @@ module Operations
               verification_type: element.verification_type,
               action: element.action,
               modifier: element.modifier,
-              update_reason: element.update_reason,
-              event_response_record: element.event_response_record_id,
-              event_request_record: element.event_request_record_id
+              update_reason: element.update_reason
             }
           end
         end
