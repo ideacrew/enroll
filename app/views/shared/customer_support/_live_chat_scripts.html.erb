@@ -144,11 +144,11 @@
     // throw error when the webchat gets rejected or has an error for visibility
 
     customPlugin.subscribe('WebChat.rejected', function(e){
-      (console.error || console.log).call(console, e.stack || e);
+      console.error("rejected chat", e.stack);
     });
 
     customPlugin.subscribe('WebChat.error', function(e){
-      (console.error || console.log).call(console, e.stack || e);
+      console.error("chat error", e.stack);
     });
   <% end %>
 </script>
