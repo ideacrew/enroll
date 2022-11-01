@@ -562,6 +562,11 @@ end
 #   click_link 'Edit Plan'
 # end
 
+Then(/^\w+ should be able to see the new enrollment tile styling$/) do
+  expect(page).to have_css('.plan-tile')
+  expect(page).to_not have_css('.hbx-enrollment-panel')
+end
+
 When(/^\w+ should be able to see Actions dropdown$/) do
   page.all(EmployeeHomepage.actions_dropdown).count > 0
 end

@@ -99,12 +99,15 @@ module Operations
 
       # Pediatric Dental Premiums should only be calculated for Child Members.
       def total_premium(dental_product)
+        # Finalize total number of members
         members = if @child_members.count > 3
-                    three_children = @child_members.sort_by { |member| member[:age_on_effective_date] }.last(3)
-                    three_children.select{ |child| child[:age_on_effective_date] < 19 }
+                    @child_members.sort_by { |member| member[:age_on_effective_date] }.last(3)
                   else
                     @child_members
                   end
+
+        # Finalize members based on Age
+        members = members.select { |child| child[:age_on_effective_date] < 19 }
 
         members_premium = members.reduce(0.00) do |sum, member|
           (sum + member_ehb_premium(dental_product, member)).round(2)
