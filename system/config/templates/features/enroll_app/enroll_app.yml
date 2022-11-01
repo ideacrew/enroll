@@ -127,6 +127,8 @@ registry:
             item: "https://www.healthcare.gov/"
           - key: :irs_url
             item: "https://www.irs.gov/"
+          - key: :taro_url
+            item: ""
           - key: :exchange_hbx_id
             item: "DC0"
           - key: :no_reply_email
@@ -554,6 +556,8 @@ registry:
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
           - key: :embed_xml
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
+          - key: :taro_health_link_url
+            item: <%= ENV['TARO_HEALTH_LINK_URL'] || false %>
       - key: :carrier_abbrev_list
         item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
         is_enabled: true

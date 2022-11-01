@@ -576,6 +576,8 @@ registry:
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
           - key: :embed_xml
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
+          - key: :taro_health_link_url
+            item: <%= ENV['TARO_HEALTH_LINK_URL'] || false %>
       - key: :carrier_abbrev_list
         item: ['CHO', 'HPHC', 'ANTHM', 'NEDD', 'TARO']
         is_enabled: true
