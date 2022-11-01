@@ -175,13 +175,17 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_ehb_premium
-    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      # total_ehb_premium is to cap group's applied aptc value. We should be only considering aptc eligible members.
-      eligible_member_ids = aptc_eligible_member_ids
-      ehb_members = members.select {|member| eligible_member_ids.include?(member.applicant_id.to_s) }
-    else
-      ehb_members = members
-    end
+    ehb_members = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+                    return hbx_enrollment.ehb_premium.to_f if !hbx_enrollment.shopping? && hbx_enrollment.ehb_premium.to_f > 0
+
+                    # total_ehb_premium is to cap group's applied aptc value. We should be only considering aptc eligible members.
+                    eligible_member_ids = aptc_eligible_member_ids
+                    eligible_members = members.select {|member| eligible_member_ids.include?(member.applicant_id.to_s) }
+
+                    eligible_members.present? ? eligible_members : members
+                  else
+                    members
+                  end
 
     ehb_members.reduce(0.00) do |sum, member|
       (sum + round_down_float_two_decimals(member_ehb_premium(member)))

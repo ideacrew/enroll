@@ -106,6 +106,7 @@ class HbxEnrollment
   field :elected_aptc_pct, type: Float, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
   field :aggregate_aptc_amount, type: Money, default: 0.0
+  field :ehb_premium, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
   # OSSE childcare subsidy

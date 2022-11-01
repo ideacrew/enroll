@@ -450,4 +450,127 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
       end
     end
   end
+
+  describe 'when mthh is enabled' do
+    before do
+      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+      allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+        double('IdentifySlcspWithPediatricDentalCosts',
+               call: double(:value! => slcsp_info, :success? => true))
+      )
+    end
+
+    let(:family) do
+      family = FactoryBot.build(:family, person: primary)
+      family.family_members = [
+        FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+        FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent)
+      ]
+
+      family.person.person_relationships.push PersonRelationship.new(relative_id: dependent.id, kind: 'spouse')
+      family.save
+      family
+    end
+
+    let(:dependent) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:primary_applicant) { family.primary_applicant }
+    let(:dependents) { family.dependents }
+
+    let!(:tax_household_group) do
+      family.tax_household_groups.create!(
+        assistance_year: TimeKeeper.date_of_record.year,
+        source: 'Admin',
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        tax_households: [
+          FactoryBot.build(:tax_household, household: family.active_household)
+        ]
+      )
+    end
+
+    let!(:inactive_tax_household_group) do
+      family.tax_household_groups.create!(
+        assistance_year: TimeKeeper.date_of_record.year,
+        source: 'Admin',
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        end_on: TimeKeeper.date_of_record.end_of_year,
+        tax_households: [
+          FactoryBot.build(:tax_household, household: family.active_household)
+        ]
+      )
+    end
+
+    let(:tax_household) do
+      tax_household_group.tax_households.first
+    end
+
+    let(:eligibility_determination) do
+      determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+      determination.grants.create(
+        key: "AdvancePremiumAdjustmentGrant",
+        value: yearly_expected_contribution,
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        end_on: TimeKeeper.date_of_record.end_of_year,
+        assistance_year: TimeKeeper.date_of_record.year,
+        member_ids: family.family_members.map(&:id).map(&:to_s),
+        tax_household_id: tax_household.id
+      )
+
+      determination
+    end
+
+    let(:aptc_grant) { eligibility_determination.grants.first }
+
+    let(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :individual_shopping,
+                        :with_silver_health_product,
+                        :with_enrollment_members,
+                        enrollment_members: family.family_members,
+                        family: family,
+                        consumer_role_id: primary.consumer_role.id,
+                        aasm_state: 'coverage_selected',
+                        elected_aptc_pct: 1.0,
+                        applied_aptc_amount: 975.0)
+    end
+
+    let(:dependent_member) { hbx_enrollment.hbx_enrollment_members[1] }
+
+    let(:yearly_expected_contribution) { 125.00 * 12 }
+
+    let(:slcsp_info) do
+      OpenStruct.new(
+        households: [OpenStruct.new(
+          household_id: aptc_grant.tax_household_id,
+          household_benchmark_ehb_premium: benchmark_premium,
+          members: family.family_members.collect do |fm|
+            OpenStruct.new(
+              family_member_id: fm.id.to_s,
+              relationship_with_primary: fm.primary_relationship,
+              date_of_birth: fm.dob,
+              age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+            )
+          end
+        )]
+      )
+    end
+
+    let(:primary_bp) { 500.00 }
+    let(:dependent_bp) { 600.00 }
+    let(:benchmark_premium) { primary_bp }
+
+    it 'recalculates aptc by ignoring dependent benchmark_premium' do
+      @dropped_members = subject.call({hbx_enrollment: hbx_enrollment,
+                                       options: {"termination_date_#{hbx_enrollment.id}" => TimeKeeper.date_of_record.to_s,
+                                                 "terminate_member_#{dependent_member.id}" => dependent_member.id.to_s,
+                                                 "admin_permission" => true}}).success
+      expect(@dropped_members.first[:hbx_id]).to eq dependent_member.hbx_id.to_s
+      expect(@dropped_members.first[:terminated_on]).to eq TimeKeeper.date_of_record
+      reinstatement = family.hbx_enrollments.where(:id.ne => hbx_enrollment.id).last
+      expect(reinstatement.elected_aptc_pct).to eq 1.0
+      expect(reinstatement.aggregate_aptc_amount.to_f).to eq 375.0
+    end
+  end
 end

@@ -80,6 +80,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           person_thhm = active_thh.tax_household_members.where(applicant_id: person_fm_id).first
           next if person_thhm.csr_percent_as_integer == csr_int.to_i
           person_thhm.update_attributes!(csr_percent_as_integer: csr_int)
+          deter.update_attributes!(source: 'Renewals')
           ran += 1
           updated_member_csr += 1
           csv << [primary_ssn, person_hbx_id, primary_hbx_id, "Updated individual csr for member with person hbx_id #{person.hbx_id} as this household already has one under the family for primary #{primary_person.hbx_id}"]

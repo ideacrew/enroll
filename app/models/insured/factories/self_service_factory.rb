@@ -114,10 +114,11 @@ module Insured
         return result unless result.success?
 
         aggregate_aptc_amount = result.value!
+        ehb_premium = reinstatement.total_ehb_premium
 
-        applied_aptc_amount = float_fix([(aggregate_aptc_amount * elected_aptc_pct), reinstatement.total_ehb_premium].min)
+        applied_aptc_amount = float_fix([(aggregate_aptc_amount * elected_aptc_pct), ehb_premium].min)
 
-        reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount)
+        reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount, ehb_premium: ehb_premium)
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount, age_as_of_coverage_start: false)
