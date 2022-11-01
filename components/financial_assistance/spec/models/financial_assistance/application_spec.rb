@@ -1749,35 +1749,37 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context "when rrv feature is disabled" do
-      before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(false)
-        allow(publish_operation_class).to receive_message_chain(:new, :call).with(anything).and_return(publish_operation_result)
-      end
+    # verification histories creation moved to subscriber as part of code optimization work (sbm_183622458)
+    # context "when rrv feature is disabled" do
 
-      it 'should not trigger fdsh calls on renewal application determinations' do
-        application.active_applicants.each do |applicant|
-          expect(applicant.esi_evidence).to be_present
-          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
-            evidence = applicant.send(evidence_name)
-            expect(evidence.verification_histories).to be_empty
-          end
-        end
+    #   before do
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(false)
+    #     allow(publish_operation_class).to receive_message_chain(:new, :call).with(anything).and_return(publish_operation_result)
+    #   end
 
-        application.publish_application_determined
+    #   it 'should not trigger fdsh calls on renewal application determinations' do
+    #     application.active_applicants.each do |applicant|
+    #       expect(applicant.esi_evidence).to be_present
+    #       %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+    #         evidence = applicant.send(evidence_name)
+    #         expect(evidence.verification_histories).to be_empty
+    #       end
+    #     end
 
-        application.active_applicants.each do |applicant|
-          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
-            evidence = applicant.send(evidence_name)
-            expect(evidence.verification_histories).to be_present
-            history = evidence.verification_histories.first
-            expect(history.action).to eq "application_determined"
-            expect(history.update_reason).to eq "Requested Hub for verification"
-            expect(history.updated_by).to eq "system"
-          end
-        end
-      end
-    end
+    #     application.publish_application_determined
+
+    #     application.active_applicants.each do |applicant|
+    #       %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+    #         evidence = applicant.send(evidence_name)
+    #         expect(evidence.verification_histories).to be_present
+    #         history = evidence.verification_histories.first
+    #         expect(history.action).to eq "application_determined"
+    #         expect(history.update_reason).to eq "Requested Hub for verification"
+    #         expect(history.updated_by).to eq "system"
+    #       end
+    #     end
+    #   end
+    # end
   end
 
   describe 'update_or_build_relationship' do

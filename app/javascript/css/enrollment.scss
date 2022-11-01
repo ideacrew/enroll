@@ -1,0 +1,114 @@
+:root {
+    .plan-tile {
+        padding: 12px;
+        font-size: medium;
+
+        .plan-header {
+            display: flex;
+            flex-direction: column;
+
+            img {
+                flex: 0;
+                object-fit: scale-down;
+                height: 100px;
+            }
+
+            .plan-logo-and-name {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 20px;
+
+                .plan-status-container {
+                    min-height: 20px;
+                }
+
+                h3 {
+                    margin: 0;
+                    justify-self: left;
+                    padding: 8px 0;
+                    flex-basis: 100%;
+
+                    a {
+                        color: black !important;
+                        font-size: 18px;
+                        font-weight: 700;
+                        line-height: 1.5;
+                        display: block;
+                    }
+
+                }
+            }
+        }
+
+        .plan-details {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            color: var(--grey-130);
+
+            div[class$='-column'] {
+                flex: 1;
+
+                &>div {
+                    display: flex;
+                    flex-direction: row;
+                }
+            }
+
+            label {
+                font-weight: 600;
+                flex-basis: 45%;
+                white-space: nowrap;
+                margin-bottom: 0px !important;
+            }
+        }
+
+        .plan-covered {
+            padding: 8px 0 0 0;
+            color: var(--grey-130);
+
+            label {
+                font-weight: 600;
+                margin-right: 12px;
+            }
+        }
+
+        .plan-button-group {
+            display: flex;
+            flex-direction: row;
+            font-size: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+
+            .enrollment-actions-ddl {
+                flex-basis: 85px;
+                text-align: right;
+            }
+
+            .btn {
+                height: 34px;
+                color: var(--button-default-color);
+                border-color: var(--button-default-color);
+
+                &:hover {
+                    color: var(--button-default-hover-color);
+                    border-color: var(--button-default-hover-color);
+                }
+
+                a {
+                    color: inherit;
+                    
+                    &:hover {
+                        text-decoration: none;
+                    }
+
+                    i {
+                        font-size: 1.2em;
+                        color: inherit;
+                    }
+                }
+            }
+        }
+    }
+}

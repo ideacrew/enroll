@@ -28,9 +28,9 @@ describe UpdateFamilyMembersIndex do
 
   describe 'update family_members index', dbclean: :after_each do
 
-    let(:wife) {FactoryBot.create(:person, first_name: 'wifey')}
-    let(:husband) {FactoryBot.create(:person, first_name: 'hubby')}
-    let(:family) {FactoryBot.build(:family)}
+    let(:wife) { create(:person, first_name: 'wifey') }
+    let(:husband) { create(:person, first_name: 'hubby') }
+    let(:family) { create(:family, :with_primary_family_member, person: husband) }
     let!(:husbands_family) do
       husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: 'self')
       husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: 'spouse')
@@ -41,17 +41,30 @@ describe UpdateFamilyMembersIndex do
       family.save
       family
     end
+    let(:family_member1) { family.family_members.where(person_id: husband.id).first }
+
+
+    let(:dep_person) { create(:person) }
+
+    # setting a different person id for dependent
+    let!(:family_member2) do
+      member = family.family_members.where(person_id: wife.id).first
+      member.unset(:person_id)
+      member.update_attributes(person_id: dep_person.id)
+      member
+    end
+
 
     it 'should swap the index of family members' do
-      expect(husbands_family.family_members.first.is_primary_applicant?).to eq false
-      expect(husbands_family.family_members.second.is_primary_applicant?).to eq true
-      options = {action_task: 'update_family_member_index', primary_hbx: husband.hbx_id, dependent_hbx: wife.hbx_id, primary_family_id: husbands_family.family_members.first.id, dependent_family_id: husbands_family.family_members.second.id}
+      options = {action_task: 'update_family_member_index', primary_hbx: husband.hbx_id, dependent_hbx: wife.hbx_id, primary_family_id: family_member1.id, dependent_family_id: family_member2.id}
       fm_index_migrate(options)
       husbands_family.reload
       hus_fam_id = husbands_family.family_members.first.id
       wife_fam_id = husbands_family.family_members.second.id
       expect(husbands_family.family_members.where(id: hus_fam_id).first.is_primary_applicant?).to eq true
       expect(husbands_family.family_members.where(id: wife_fam_id).first.is_primary_applicant?).to eq false
+
+      expect(family_member2.reload.person_id).to eq wife.id
     end
   end
 

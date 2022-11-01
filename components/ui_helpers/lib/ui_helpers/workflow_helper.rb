@@ -140,10 +140,17 @@ module UIHelpers
       text.gsub! '<filing-as-head-placeholder>', l10n('faa.filing_as_head_of_household')
       # set application applicable year placeholder
       if text.include? '<application-applicable-year-placeholder>'
-        text.sub! '<application-applicable-year-placeholder>', FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
+        text.sub! '<application-applicable-year-placeholder>', assistance_year
       else
         text
       end
+    end
+
+    def assistance_year
+      return @assistance_year if defined? @assistance_year
+
+      year_selection_enabled = HbxProfile.current_hbx.under_open_enrollment? && FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) && FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form)
+      @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
     end
 
     def conditional_class?(line)
