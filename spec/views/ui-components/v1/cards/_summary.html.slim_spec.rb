@@ -152,14 +152,6 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
-    it "should not have provider directory url if nationwide = false(for dc)" do
-      allow(view).to receive(:offers_nationwide_plans?).and_return(true)
-      allow(mock_product).to receive(:nationwide).and_return(false)
-      allow(member_group).to receive(:nationwide).and_return(false)
-      render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
-      expect(rendered).to_not match(/#{mock_product.provider_directory_url}/)
-    end
-
     it "should not have provider directory url if nationwide = false(for ma)" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(false)
       allow(mock_product).to receive(:nationwide).and_return(false)

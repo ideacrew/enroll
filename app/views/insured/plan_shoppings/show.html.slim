@@ -456,6 +456,11 @@ javascript:
           network = "#{EnrollRegistry[:enroll_app].setting(:nationwide_area).item}";
         }
 
+        var standard_plan = "";
+        if (result.product.is_standard_plan) {
+          standard_plan = "#{EnrollRegistry[:enroll_app].setting(:standard_plan_label).item}";
+        }
+
         var div = document.createElement('div')
         div.setAttribute('class', 'myfilteredPlans')
         div.innerHTML =
@@ -463,7 +468,7 @@ javascript:
         <div class="module plan-row panel panel-default">
                 <div class="panel-body">
                   <div class="row ${result.product.is_standard_plan ? '' : 'hidden'}">
-                    <span class="ml-1 text-uppercase" style="color:green"><i class="fas fa-bookmark"></i> ${result.product.standard_plan_label}</span>
+                    <span class="ml-1 text-uppercase" style="color:green"><i class="fas fa-bookmark"></i> ${standard_plan}</span>
                   </div>
                   <div class="row mt-1">
                     <div class="col-sm-2 col-md-2">
