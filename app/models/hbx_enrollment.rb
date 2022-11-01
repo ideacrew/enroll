@@ -1652,6 +1652,11 @@ class HbxEnrollment
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
+  def self.family_non_pay_enrollments(family)
+    non_pay_enrollments = HbxEnrollment.family_non_pay_canceled_enrollments(family)
+    non_pay_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
   def self.family_external_enrollments(family)
     external_enrollments = HbxEnrollment.family_home_page_hidden_external_enrollments(family)
     external_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
