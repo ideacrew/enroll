@@ -277,7 +277,7 @@ module FinancialAssistance
 
     def check_eligibility_results_received
       application = find_application
-      render :plain => eligibility_results_received?(application).to_s
+      render :plain => determination_token_present?(application)
     end
 
     def checklist_pdf
@@ -311,6 +311,10 @@ module FinancialAssistance
     end
 
     private
+
+    def determination_token_present?(application)
+      Rails.cache.read("application_#{application.hbx_id}_determined").present?.to_s
+    end
 
     def has_outstanding_local_mec_evidence?(application)
       application.applicants.any? {|applicant| Eligibilities::Evidence::OUTSTANDING_STATES.include?(applicant&.local_mec_evidence&.aasm_state)}
