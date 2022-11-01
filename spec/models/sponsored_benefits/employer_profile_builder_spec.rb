@@ -49,7 +49,7 @@ module SponsoredBenefits
 
       let(:application_period)   { Date.new(benefit_application.effective_period.min.year, 1, 1)..Date.new(benefit_application.effective_period.min.year, 12, 31) }
       let(:product)  { FactoryBot.create :benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile, application_period:  application_period}
-      let(:plan )    { FactoryBot.create(:plan, hios_id: product.hios_id, active_year: benefit_application.effective_period.min.year) }
+      let(:plan)    { FactoryBot.create(:plan, hios_id: product.hios_id, active_year: benefit_application.effective_period.min.year) }
       let(:benefit_group)             { FactoryBot.create(:benefit_group, reference_plan_id: plan.id, title: 'benefit group') }
 
       before(:each) do
