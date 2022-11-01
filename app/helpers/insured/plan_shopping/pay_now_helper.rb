@@ -14,7 +14,7 @@ module Insured
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
-        "Taro Health Plan of Maine, Inc." => "https://uatthi.onlineinsight.com/ebpp/eapp/paynow"
+        "Taro Health" => taro_link_url
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
@@ -119,6 +119,15 @@ module Insured
       def fetch_issuer_name(issuer_name)
         carrier_legal_name = issuer_name&.downcase
         carrier_legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
+      end
+
+      # Seperate link for lower env & production env
+      def taro_link_url
+        if Rails.env.production?
+          "https://enroll.tarohealth.com/ebpp/eapp/paynow"
+        else
+          "https://uatthi.onlineinsight.com/ebpp/eapp/paynow"
+        end
       end
     end
   end
