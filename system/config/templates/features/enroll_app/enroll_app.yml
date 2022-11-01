@@ -127,8 +127,6 @@ registry:
             item: "https://www.healthcare.gov/"
           - key: :irs_url
             item: "https://www.irs.gov/"
-          - key: :taro_url
-            item: ""
           - key: :exchange_hbx_id
             item: "DC0"
           - key: :no_reply_email
