@@ -15,7 +15,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:aptc_values) {{}}
     let(:assisted) { nil }
 
-
     let!(:family) do
       primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, is_tobacco_user: 'y')
       FactoryBot.create(:family, :with_primary_family_member, :person => primary)
@@ -380,6 +379,56 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'unassisted renewal' do
 
           it 'will not set aptc values & will generate renewal' do
+            renewal = subject.renew
+            expect(renewal.is_a?(HbxEnrollment)).to eq true
+            expect(subject.aptc_values).to eq({
+                                                csr_amt: 0,
+                                                applied_percentage: 0.85,
+                                                applied_aptc: 0.0,
+                                                max_aptc: 0.0,
+                                                ehb_premium: 1390
+                                              })
+          end
+        end
+
+        context 'unassisted renewal with all AI AN members' do
+          let!(:renewal_health_product_03) do
+            prod =
+              FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile,
+                                benefit_market_kind: :aca_individual, kind: :health, service_area: renewal_service_area, csr_variant_id: '03',
+                                metal_level_kind: 'silver', hios_id: "#{enrollment.product.renewal_product.hios_base_id}-03",
+                                application_period: renewal_application_period)
+            prod.premium_tables = [renewal_premium_table]
+            prod.save
+            prod
+          end
+
+          before do
+            enrollment.family.primary_person.update_attributes!(tribal_id: '123456789', tribal_state: 'ME')
+            enrollment.hbx_enrollment_members = [enrollment.hbx_enrollment_members.first]
+            enrollment.save!
+          end
+
+          it 'will generate renewal with CSR variant 03' do
+            renewal = subject.renew
+            expect(renewal.product.csr_variant_id).to eq('03')
+            expect(renewal.product.id).to eq(renewal_health_product_03.id)
+            expect(subject.aptc_values).to eq({
+                                                csr_amt: 'limited',
+                                                applied_percentage: 0.85,
+                                                applied_aptc: 0.0,
+                                                max_aptc: 0.0,
+                                                ehb_premium: 1390
+                                              })
+          end
+        end
+
+        context 'unassisted renewal one AI AN member and others non-AI AN members' do
+          before do
+            enrollment.family.primary_person.update_attributes!(tribal_id: '123456789', tribal_state: 'ME')
+          end
+
+          it 'will generate renewal with CSR variant' do
             renewal = subject.renew
             expect(renewal.is_a?(HbxEnrollment)).to eq true
             expect(subject.aptc_values).to eq({
