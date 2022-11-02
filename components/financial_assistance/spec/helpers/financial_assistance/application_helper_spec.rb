@@ -452,4 +452,44 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
   end
+
+  describe '#display_esi_fields?' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:short_enrolled_esi_forms).and_return(enabled)
+    end
+
+    context 'RR configuration turned OFF' do
+      let(:enabled) { false }
+      let(:insurance_kind) { 'health_reimbursement_arrangement' }
+
+      it 'should return true if enrolled' do
+        expect(
+          helper.display_esi_fields?(insurance_kind, 'is_enrolled')
+        ).to eq(true)
+      end
+
+      it 'should return true if eligible' do
+        expect(
+          helper.display_esi_fields?(insurance_kind, 'is_eligible')
+        ).to eq(true)
+      end
+    end
+
+    context 'RR configuration turned ON' do
+      let(:enabled) { true }
+      let(:insurance_kind) { 'employer_sponsored_insurance' }
+
+      it 'should return false if enrolled' do
+        expect(
+          helper.display_esi_fields?(insurance_kind, 'is_enrolled')
+        ).to eq(false)
+      end
+
+      it 'should return true if eligible' do
+        expect(
+          helper.display_esi_fields?(insurance_kind, 'is_eligible')
+        ).to eq(true)
+      end
+    end
+  end
 end

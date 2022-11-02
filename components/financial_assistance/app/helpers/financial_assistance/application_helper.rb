@@ -359,5 +359,10 @@ module FinancialAssistance
     def display_minimum_value_standard_question?(insurance_kind)
       FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) && insurance_kind == 'employer_sponsored_insurance'
     end
+
+    # is this an eligible esi benefit
+    def display_esi_fields?(insurance_kind, kind)
+      ['employer_sponsored_insurance', 'health_reimbursement_arrangement'].include?(insurance_kind) && (kind == "is_eligible" || !FinancialAssistanceRegistry.feature_enabled?(:short_enrolled_esi_forms))
+    end
   end
 end
