@@ -539,6 +539,7 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
 
         member_citizen_status = f_member.person&.citizen_status
         if !f_member&.is_incarcerated && f_member.is_applying_coverage && in_state_address && ["us_citizen", "alien_lawfully_present", "naturalized_citizen"].include?(member_citizen_status) && !medicaid_eligible
+          csv << [primary.hbx_id, primary.full_name, f_member.hbx_id, f_member.full_name, f_member.is_incarcerated, f_member.is_applying_coverage, in_state_address, medicaid_eligible, member_citizen_status]
           @total_members_with_qhp << f_member.person&.hbx_id
           @total_member_counter_with_qhp += 1
         end
