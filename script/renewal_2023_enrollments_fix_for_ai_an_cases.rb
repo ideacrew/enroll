@@ -13,7 +13,7 @@ enrollment_hbx_ids = [['1384315', '1440852'], ['1384312', '1468182'], ['1298133'
                       ['1312117', '1459368'], ['1216694', '1447759'], ['1381210', '1467762'], ['1183046', '1436034'], ['1198937', '1441249'], ['1417971', '1465747'], ['1302359', '1458099'], ['1302359', '1458099'], ['1205848', '1443930'],
                       ['1205848', '1443930'], ['1205848', '1443930'], ['1215807', '1447518'], ['1392171', '1469193'], ['1223247', '1449161'], ['1384314', '1439773'], ['1390072', '1468878'], ['1204836', '1443541'], ['1319073', '1438919'],
                       ['1385556', '1468315'], ['1385556', '1468315'], ['1385556', '1468315'], ['1385556', '1468315'], ['1190796', '1438629'], ['1218042', '1448124'], ['1213232', '1446805'], ['1401166', '1470607'], ['1374486', '1467005'],
-                      ['1420656', '1473926'], ['1257368', '1452686'], ['1263085', '1453324']]
+                      ['1420656', '1473926']].uniq
 
 def failure_message(failure)
   if failure.is_a?(String)
@@ -26,7 +26,7 @@ end
 file_name = "renewal_enrollment_generation_for_ai_an_cases_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
 
 CSV.open(file_name, 'w+', headers: true) do |csv|
-  csv << ['Person HBX ID', '2022 Enrollment HbxID', '2022 Enrollment AasmState', '2023 Old Enrollment HbxID', '2023 Old Enrollment AasmState', '2023 New Enrollment HbxID', '2023 New Enrollment AasmState', 'Errors']
+  csv << ['Person HBX ID', '2022 Enrollment HbxID', '2022 Enrollment AasmState', '2022 Enrollment HiosID', '2023 Old Enrollment HbxID', '2023 Old Enrollment AasmState', '2023 Old Enrollment HiosID', '2023 New Enrollment HbxID', '2023 New Enrollment AasmState', '2023 New Enrollment HiosID', 'Errors']
   current_bs = HbxProfile.current_hbx.benefit_sponsorship
   renewal_bcp = current_bs.renewal_benefit_coverage_period
 
@@ -39,15 +39,29 @@ CSV.open(file_name, 'w+', headers: true) do |csv|
     csr_kind_result = Operations::PremiumCredits::FindCsrValue.new.call(input_params)
 
     if csr_kind_result.failure?
-      csv << ['N/A', enrollment_2022_hbx_id, 'N/A', enrollment_2023_hbx_id, 'N/A', 'N/A', 'N/A', "FindCsrValue Result: #{failure_message(csr_kind_result.failure)}"]
+      csv << [family.primary_person.hbx_id, enrollment_2022_hbx_id, 'N/A', enrollment_2023_hbx_id, 'N/A', 'N/A', 'N/A', "FindCsrValue Result: #{failure_message(csr_kind_result.failure)}"]
       next
+    end
+
+    if ['coverage_terminated', 'coverage_expired', 'coverage_canceled'].include?(enrollment_2023.aasm_state)
+      enrs_2023 = family.hbx_enrollments.by_year(2023).where(aasm_state: 'auto_renewing')
+      if enrs_2023.present? && enrs_2023.count == 1
+        enrollment_2023 = enrs_2023.first
+      else
+        csv << [family.primary_person.hbx_id, enrollment_2022_hbx_id, enrollment_2022.aasm_state, enrollment_2022.product.hios_id,
+                enrollment_2023_hbx_id, enrollment_2023.aasm_state, enrollment_2023.product.hios_id, 'N/A', 'N/A', 'N/A',
+                "There are #{enrs_2023.count} 2023 Enrollments in #{enrs_2023.pluck(:hbx_id, :aasm_state)}"]
+        next
+      end
     end
 
     csr_kind = csr_kind_result.success
     csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
-    csr_variant_id = enrollment_2022.product.csr_variant_id
+    csr_variant_id = enrollment_2023.product.csr_variant_id
     if csr_variant_id == csr_variant
-      csv << ['N/A', enrollment_2022_hbx_id, 'N/A', enrollment_2023_hbx_id, 'N/A', 'N/A', 'N/A', "csr_kind: #{csr_kind}, csr_variant: #{csr_variant}, csr_variant_id: #{csr_variant_id}"]
+      csv << [family.primary_person.hbx_id, enrollment_2022_hbx_id, enrollment_2022.aasm_state, enrollment_2022.product.hios_id,
+              enrollment_2023_hbx_id, enrollment_2023.aasm_state, enrollment_2023.product.hios_id, 'N/A', 'N/A', 'N/A',
+              "Eligibile csr_kind: #{csr_kind}, Eligible csr_variant: #{csr_variant}, 2023 Enrollment csr_variant_id: #{csr_variant_id}"]
       next
     end
 
@@ -57,15 +71,17 @@ CSV.open(file_name, 'w+', headers: true) do |csv|
       result = ::Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment_2022, effective_on: renewal_bcp.start_on)
       if result.success?
         new_2023_enr = result.success
-        csv << [enrollment_2022.family.primary_person.hbx_id, enrollment_2022.hbx_id, enrollment_2022.aasm_state,
-                enrollment_2023.hbx_id, enrollment_2023.aasm_state, new_2023_enr.hbx_id, new_2023_enr.aasm_state, 'N/A']
+        csv << [enrollment_2022.family.primary_person.hbx_id, enrollment_2022.hbx_id, enrollment_2022.aasm_state, enrollment_2022.product.hios_id,
+                enrollment_2023.hbx_id, enrollment_2023.aasm_state, enrollment_2023.product.hios_id, new_2023_enr.hbx_id, new_2023_enr.aasm_state,
+                new_2023_enr.product.hios_id, 'N/A']
       else
-        csv << [enrollment_2022.family.primary_person.hbx_id, enrollment_2022.hbx_id, enrollment_2022.aasm_state,
-                enrollment_2023.hbx_id, enrollment_2023.aasm_state, 'N/A', 'N/A', "RenewEnrollment Result: #{failure_message(result.failure)}"]
+        csv << [enrollment_2022.family.primary_person.hbx_id, enrollment_2022.hbx_id, enrollment_2022.aasm_state, enrollment_2022.product.hios_id,
+                enrollment_2023.hbx_id, enrollment_2023.aasm_state, enrollment_2023.product.hios_id, 'N/A', 'N/A',
+                'N/A', "RenewEnrollment Result: #{failure_message(result.failure)}"]
       end
     else
-      csv << [enrollment_2022.family.primary_person.hbx_id, enrollment_2022.hbx_id, enrollment_2022.aasm_state,
-              enrollment_2023.hbx_id, enrollment_2023.aasm_state, 'N/A', 'N/A',
+      csv << [enrollment_2022.family.primary_person.hbx_id, enrollment_2022.hbx_id, enrollment_2022.aasm_state, enrollment_2022.product.hios_id,
+              enrollment_2023.hbx_id, enrollment_2023.aasm_state, enrollment_2023.product.hios_id, 'N/A', 'N/A', 'N/A',
               "Unable to cancel current 2023 renewal enrollment: #{enrollment_2023_hbx_id}"]
     end
   rescue StandardError => e
