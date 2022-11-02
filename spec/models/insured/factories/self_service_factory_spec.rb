@@ -308,6 +308,7 @@ module Insured
           expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
           expect(new_enrollment.elected_aptc_pct).to eq(0.85)
           expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+          expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
         end
 
         context 'when elected_aptc_pct exists' do
@@ -318,6 +319,7 @@ module Insured
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
             expect(new_enrollment.elected_aptc_pct).to eq(0.5)
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(600.0)
+            expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
           end
         end
 
@@ -329,6 +331,7 @@ module Insured
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
             expect(new_enrollment.elected_aptc_pct).to eq(0.85)
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+            expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
           end
         end
 
@@ -343,6 +346,7 @@ module Insured
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
+            expect(new_enrollment.ehb_premium.to_f).to eq(393.76)
           end
         end
       end

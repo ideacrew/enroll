@@ -32,7 +32,8 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
       { applied_percentage: '',
         applied_aptc: 150,
         csr_amt: 87,
-        max_aptc: 200 }
+        max_aptc: 200,
+        ehb_premium: 120 }
     end
 
     let(:bad_aptc_values) do
@@ -84,6 +85,17 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
         eligibility_determination1.update_attributes!(max_aptc: 15.00)
         renewal_enrollment = subject.assign(aptc_values)
         expect(renewal_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
+      end
+
+      context 'mthh enabled' do
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it "should return ehb_premium" do
+          renewal_enrollment = subject.assign(aptc_values)
+          expect(renewal_enrollment.ehb_premium.to_f).to eq(aptc_values[:ehb_premium].to_f)
+        end
       end
     end
 

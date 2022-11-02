@@ -92,6 +92,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         enrollment_members: enrollment_members,
                         household: family.active_household,
                         coverage_kind: coverage_kind,
+                        rating_area_id: rating_area.id,
                         resident_role_id: family.primary_person.consumer_role.id,
                         effective_on: Date.new(Date.current.year,1,1),
                         kind: "coverall",
@@ -360,6 +361,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context 'when mthh enabled' do
         before do
+          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
           EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
         end
 
@@ -375,10 +377,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enrollment_renewal
         end
 
-        before do
-          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
-        end
-
         context 'unassisted renewal' do
 
           it 'will not set aptc values & will generate renewal' do
@@ -388,7 +386,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                 csr_amt: 0,
                                                 applied_percentage: 0.85,
                                                 applied_aptc: 0.0,
-                                                max_aptc: 0.0
+                                                max_aptc: 0.0,
+                                                ehb_premium: 1390
                                               })
           end
         end
@@ -493,7 +492,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   csr_amt: 0,
                                                   applied_percentage: 0.85,
                                                   applied_aptc: 0.0,
-                                                  max_aptc: 0.0
+                                                  max_aptc: 0.0,
+                                                  ehb_premium: 1390
                                                 })
             end
           end
@@ -531,30 +531,214 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                   csr_amt: 0,
                                                   applied_percentage: 0.85,
                                                   applied_aptc: 318.75,
-                                                  max_aptc: 375
+                                                  max_aptc: 375,
+                                                  ehb_premium: 1390
                                                 })
               expect(subject.assisted).to eq true
             end
+          end
+        end
+      end
 
-            context 'when ehb premium less than aptc' do
-              before do
-                allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 100, total_premium: 120))
-              end
+      context 'when mthh enabled for dental enrollment' do
+        let!(:dental_product) do
+          prod =
+            FactoryBot.create(
+              :benefit_markets_products_health_products_health_product,
+              :with_issuer_profile,
+              benefit_market_kind: :aca_individual,
+              kind: :dental,
+              service_area: service_area,
+              csr_variant_id: '01',
+              metal_level_kind: 'silver',
+              hios_id: '11111111122302-01',
+              renewal_product_id: dental_renewal_product.id,
+              application_period: application_period
+            )
+          prod.premium_tables = [premium_table]
+          prod.save
+          prod
+        end
 
-              it 'creates enrollment with ehb premium' do
-                renewal = subject.renew
-                expect(renewal.is_a?(HbxEnrollment)).to eq true
-                expect(subject.aptc_values).to eq({
-                                                    csr_amt: 0,
-                                                    applied_percentage: 0.85,
-                                                    applied_aptc: 100,
-                                                    max_aptc: 375
-                                                  })
-                expect(subject.assisted).to eq true
-              end
+        let!(:dental_renewal_product) do
+          prod =
+            FactoryBot.create(
+              :benefit_markets_products_health_products_health_product,
+              :with_issuer_profile,
+              benefit_market_kind: :aca_individual,
+              kind: :dental,
+              service_area: renewal_service_area,
+              csr_variant_id: '01',
+              metal_level_kind: 'silver',
+              hios_id: '11111111122302-01',
+              application_period: renewal_application_period
+            )
+          prod.premium_tables = [renewal_premium_table]
+          prod.save
+          prod
+        end
+
+        let(:assisted) { false }
+        let(:aptc_values) { {} }
+
+        subject do
+          enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+          enrollment_renewal.enrollment = enrollment
+          enrollment_renewal.assisted = assisted
+          enrollment_renewal.aptc_values = aptc_values
+          enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+          enrollment_renewal
+        end
+
+        before do
+          enrollment.coverage_kind = "dental"
+          enrollment.product = dental_product
+          enrollment.save!
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        end
+
+        context 'unassisted renewal' do
+          it 'will not set aptc values & will generate renewal' do
+            renewal = subject.renew
+            expect(renewal.is_a?(HbxEnrollment)).to eq true
+            expect(subject.aptc_values).to eq({})
+          end
+        end
+
+        context 'assisted renewal' do
+          before do
+            allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+              double('IdentifySlcspWithPediatricDentalCosts',
+                     call: double(:value! => slcsp_info, :success? => true))
+            )
+          end
+
+          let(:family) do
+            family = FactoryBot.build(:family, person: primary)
+            family.family_members = [
+              FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+              FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent)
+            ]
+
+            family.person.person_relationships.push PersonRelationship.new(relative_id: dependent.id, kind: 'spouse')
+            family.save
+            family
+          end
+
+          let(:dependent) { FactoryBot.create(:person, :with_consumer_role) }
+          let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+          let(:primary_applicant) { family.primary_applicant }
+          let(:dependents) { family.dependents }
+
+          let(:tax_household_group) do
+            family.tax_household_groups.create!(
+              assistance_year: TimeKeeper.date_of_record.year,
+              source: 'Admin',
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              tax_households: [
+                FactoryBot.build(:tax_household, household: family.active_household)
+              ]
+            )
+          end
+
+          let(:tax_household) do
+            tax_household_group.tax_households.first
+          end
+
+          let(:aptc_grant) { eligibility_determination.grants.first }
+
+          let(:enrollment) do
+            FactoryBot.create(:hbx_enrollment,
+                              :individual_shopping,
+                              :with_silver_health_product,
+                              :with_enrollment_members,
+                              product_id: current_product.id,
+                              enrollment_members: [primary_applicant],
+                              consumer_role_id: primary.consumer_role.id,
+                              family: family)
+          end
+
+          let(:benchmark_premium) { primary_bp }
+
+          let(:yearly_expected_contribution) { 125.00 * 12 }
+
+          let(:slcsp_info) do
+            OpenStruct.new(
+              households: [OpenStruct.new(
+                household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: benchmark_premium,
+                members: family.family_members.collect do |fm|
+                  OpenStruct.new(
+                    family_member_id: fm.id.to_s,
+                    relationship_with_primary: fm.primary_relationship,
+                    date_of_birth: fm.dob,
+                    age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+                  )
+                end
+              )]
+            )
+          end
+
+          let(:primary_bp) { 500.00 }
+          let(:dependent_bp) { 600.00 }
+
+          context 'when renewal grants not present' do
+            let(:eligibility_determination) do
+              determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: yearly_expected_contribution,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'will not set aptc values & will generate renewal' do
+              renewal = subject.renew
+              expect(renewal.is_a?(HbxEnrollment)).to eq true
+              expect(subject.aptc_values).to eq({})
             end
           end
+
+          context 'when renewal grants present' do
+            let(:eligibility_determination) do
+              determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: yearly_expected_contribution,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: yearly_expected_contribution,
+                start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
+                end_on: TimeKeeper.date_of_record.end_of_year.next_year,
+                assistance_year: TimeKeeper.date_of_record.year + 1,
+                member_ids: family.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'will not set aptc values & will generate renewal' do
+              renewal = subject.renew
+              expect(renewal.is_a?(HbxEnrollment)).to eq true
+              expect(subject.aptc_values).to eq({ })
+              expect(subject.assisted).to be_falsey
+            end
           end
+        end
       end
     end
 
@@ -595,6 +779,80 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should return new renewal product" do
             expect(subject.renewal_product).to eq renewal_cat_age_off_product.id
+          end
+        end
+      end
+
+      context "When consumer covered under catastrophic product with assisted" do
+        before do
+          current_cat_product.update_attributes!(hios_base_id: nil, catastrophic_age_off_product_id: renewal_cat_age_off_product.id)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+        end
+        let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: Date.new(Date.current.year + 1,1,1))}
+        let!(:thh_member) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: tax_household, csr_eligibility_kind: "csr_73")}
+        let!(:thh_member2) { FactoryBot.create(:tax_household_member, applicant_id: child1.id, tax_household: tax_household, csr_eligibility_kind: "csr_73")}
+        let!(:thh_member3) { FactoryBot.create(:tax_household_member, applicant_id: child2.id, tax_household: tax_household, csr_eligibility_kind: "csr_73")}
+        let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household)}
+
+        let!(:catastrophic_ivl_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :with_enrollment_members,
+                            family: family,
+                            enrollment_members: enrollment_members,
+                            household: family.active_household,
+                            coverage_kind: coverage_kind,
+                            consumer_role_id: family.primary_person.consumer_role.id,
+                            effective_on: Date.new(Date.current.year,1,1),
+                            kind: "individual",
+                            product_id: current_cat_product.id,
+                            aasm_state: 'coverage_selected')
+        end
+        let!(:renewal_cat_age_off_product) do
+          prod = FactoryBot.create(:renewal_ivl_silver_health_product,  hios_base_id: "94506DC0390010", hios_id: "94506DC0390010-01", csr_variant_id: "01", service_area: renewal_service_area)
+          prod.premium_tables = [renewal_premium_table]
+          prod.save
+          prod
+        end
+        let(:renewal_premium_table)  { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
+        let(:enrollment_members) { [child1, child2] }
+
+        context "renew a current product to specific product with aptc > 0" do
+          subject do
+            enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+            enrollment_renewal.enrollment = catastrophic_ivl_enrollment
+            enrollment_renewal.assisted = true
+            enrollment_renewal.aptc_values = {:applied_percentage => 1, :applied_aptc => 730.0, :max_aptc => 730.0, :csr_amt => 73}
+            enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
+            enrollment_renewal.renew
+          end
+          let(:child1_dob) { current_date.next_month - 30.years }
+
+          it "should return new renewal product with applied aptc" do
+            expect(subject.applied_aptc_amount.to_f > 0.0).to be_truthy
+          end
+
+          it "should return new renewal enrollment without catastrophic product" do
+            expect(subject.product.metal_level_kind).not_to be :catastrophic
+          end
+        end
+
+        context "renew a current product to specific product with zero aptc" do
+          subject do
+            enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+            enrollment_renewal.enrollment = catastrophic_ivl_enrollment
+            enrollment_renewal.assisted = true
+            enrollment_renewal.aptc_values = {:applied_percentage => 1, :applied_aptc => 0, :max_aptc => 0, :csr_amt => 73}
+            enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
+            enrollment_renewal.renew
+          end
+          let(:child1_dob) { current_date.next_month - 30.years }
+
+          it "should return new renewal product without applied aptc" do
+            expect(subject.applied_aptc_amount.to_f).to eq 0.0
+          end
+
+          it "should return new renewal enrollment without catastrophic product" do
+            expect(subject.product.metal_level_kind).not_to be :catastrophic
           end
         end
       end
