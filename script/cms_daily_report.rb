@@ -584,7 +584,10 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
         if thhs.present? && thhm_aptc_members.present?
           aptc = thhs.sum { |thh| thh.max_aptc.to_f }
           thhm_aptc_members.each do |aptc_thhm|
-            csv << [primary.hbx_id, primary.full_name, aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+            if aptc_thhm&.person&.is_applying_coverage
+              @total_members_with_qhp_assistance << aptc_thhm&.person&.hbx_id
+              csv << [primary.hbx_id, primary.full_name, aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+            end
           end
           @total_member_counter_qhp_assistance += thhm_aptc_members.count
         end
