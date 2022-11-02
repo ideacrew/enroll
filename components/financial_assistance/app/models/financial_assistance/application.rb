@@ -39,6 +39,11 @@ module FinancialAssistance
 
     RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
 
+    SAFE_REGISTRY_METHODS = {
+      "FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate" => FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate,
+      "FinancialAssistance::Operations::EnrollmentDates::ApplicationYear" => FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
+    }.freeze
+
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
 
@@ -554,6 +559,8 @@ module FinancialAssistance
     end
 
     def send_determination_to_ea
+      return if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       if result.success?
         rt_transfer
@@ -1013,8 +1020,7 @@ module FinancialAssistance
       return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
       return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
 
-      result = ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
-      update_evidence_histories if result.success?
+      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
@@ -1030,28 +1036,16 @@ module FinancialAssistance
 
     # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
-      return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
-
-      unless cv3_application.success?
-        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{cv3_application.failure}" }
-        return
-      end
-
-      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-
-      unless initializer.success?
-        Rails.logger.error { "Failed while initializing application: #{self.hbx_id}, Error: #{initializer.failure}" }
-        return
-      end
-
-      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!.to_h)
+      determination = family.create_thhg_on_fa_determination(self)
 
       unless determination.success?
         Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
         return
       end
+
+      rt_transfer
 
       family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
 
@@ -1578,7 +1572,7 @@ module FinancialAssistance
 
     def set_effective_date
       return if effective_date.present?
-      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
+      effective_date = SAFE_REGISTRY_METHODS.fetch(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item).new.call(assistance_year: assistance_year).value!
       update_attribute(:effective_date, effective_date)
     end
 

@@ -3,7 +3,7 @@
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || can_make_changes_for_enrollment , hbx_enrollment: hbx_enrollment } %>
 <% else %>
 <% product = hbx_enrollment.product %>
-<% # This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
+<%# This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
    # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
    #  initially_hidden_enrollment class. %>
 <% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>

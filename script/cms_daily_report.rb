@@ -8,7 +8,7 @@ all_enrolled_people = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(2022,1,1)}
+      "effective_on" => {"$gte" => Date.new(2023,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -45,7 +45,7 @@ pre_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$lt" => Date.new(2022,1,1)}
+      "effective_on" => {"$lt" => Date.new(2023,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -80,7 +80,7 @@ post_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  ["coverage_expired"]},
-      "effective_on" => {"$lt" => Date.new(2022,1,1)}
+      "effective_on" => {"$lt" => Date.new(2023,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -108,11 +108,50 @@ post_term_renewal_candidate_ids = post_term_renewal_candidates.map do |rec|
   rec["_id"]
 end
 
+termed_people_between_nov_and_dec = HbxEnrollment.collection.aggregate([
+   {"$match" => {
+     "hbx_enrollment_members" => {"$ne" => nil},
+     "external_enrollment" => {"$ne" => true},
+     "coverage_kind" => "health",
+     "consumer_role_id" => {"$ne" => nil},
+     "product_id" => { "$ne" => nil},
+     "terminated_on" => { "$gte" => Date.new(2022,11,1), "$lte" => Date.new(2022,12,31) },
+     "aasm_state" => {"$in" => ["coverage_terminated"]},
+     "effective_on" => { "$gte" => Date.new(2022,1,1), "$lte" => Date.new(2022,12,31) }
+   }
+   },
+   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+   {"$lookup" => {
+     "from" => "families",
+     "localField" => "family_id",
+     "foreignField" => "_id",
+     "as" => "family"
+   }},
+   {"$unwind" => "$family"},
+   {"$unwind" => "$family.family_members"},
+   {"$unwind" => "$hbx_enrollment_members"},
+   {"$project" => {
+     "family_id" => "$family_id",
+     "person_id" => "$family.family_members.person_id",
+     "applicant_id" => "$hbx_enrollment_members.applicant_id",
+     "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+   }
+   },
+   {"$match" => {"person_and_member_match" => true}},
+   {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+ ])
+
+termed_people_ids = termed_people_between_nov_and_dec.map do |rec|
+  rec["_id"]
+end
+
+termed_people_between_nov_and_dec_set = Set.new(termed_people_ids)
+
 pre_term_renewal_candidate_set = Set.new(pre_term_renewal_candidate_ids)
 post_term_renewal_candidate_set = Set.new(post_term_renewal_candidate_ids)
 renewal_candidate_set = pre_term_renewal_candidate_set | post_term_renewal_candidate_set
 
-new_member_set = all_enrolled_people_set - renewal_candidate_set
+new_member_set = (all_enrolled_people_set - termed_people_between_nov_and_dec_set) - renewal_candidate_set
 
 re_enrolled_member_set = all_enrolled_people_set & renewal_candidate_set
 
@@ -123,9 +162,9 @@ pre_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "coverage_kind" => "health",
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
-      "created_at" => { "$lt" => TimeKeeper.start_of_exchange_day_from_utc(Date.new(2021,11,1))},
+      "created_at" => { "$lt" => TimeKeeper.start_of_exchange_day_from_utc(Date.new(2022,11,1))},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(2022,1,1)}
+      "effective_on" => {"$gte" => Date.new(2023,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -162,9 +201,9 @@ post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "coverage_kind" => "health",
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
-      "created_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(Date.new(2021,11,1))},
+      "created_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(Date.new(2022,11,1))},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(2022,1,1)}
+      "effective_on" => {"$gte" => Date.new(2023,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -194,15 +233,19 @@ end
 
 post_11_1_purchase_set = Set.new(post_11_1_ids)
 
-active_renewals_set = all_enrolled_people_set & renewal_candidate_set & post_11_1_purchase_set
+termed_and_actively_selected = all_enrolled_people_set & termed_people_between_nov_and_dec_set & post_11_1_purchase_set
+
+active_set = all_enrolled_people_set & renewal_candidate_set & post_11_1_purchase_set
+
+active_renewals_set = active_set | termed_and_actively_selected
 
 passive_renewals_set = (all_enrolled_people_set & renewal_candidate_set & pre_11_1_purchase_set) - active_renewals_set
 
-puts "Total Member Enrolled(2022) Count: #{all_enrolled_people_set.size}"
-puts "Total New Member/Consumer selected 2022 enrollments after 11/1/2021 : #{new_member_set.size}"
-puts "Total Re-Enrolled(2022) Member: #{re_enrolled_member_set.size}"
-puts "Total Active Renewed(2022) Member: #{active_renewals_set.size}"
-puts "Total Auto Renewed(2022) Member: #{passive_renewals_set.size}"
+puts "Total Member Enrolled(2023) Count: #{all_enrolled_people_set.size}"
+puts "Total New Member/Consumer selected 2023 enrollments after 11/1/2022 : #{new_member_set.size}"
+puts "Total Re-Enrolled(2023) Member: #{re_enrolled_member_set.size}"
+puts "Total Active Renewed(2023) Member: #{active_renewals_set.size}"
+puts "Total Auto Renewed(2023) Member: #{passive_renewals_set.size}"
 
 def total_families(families, file_name, offset_count)
   field_names = ["PrimaryHbxID", "PrimaryFullName"]
@@ -398,14 +441,18 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
     csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
-      thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2022)).first
-      thhm_medicaid_members = thh&.tax_household_members.where(is_medicaid_chip_eligible: true)
-      if thh.present? && thhm_medicaid_members.present?
-        thhm_medicaid_members = thh.tax_household_members.where(is_medicaid_chip_eligible: true)
-        if thhm_medicaid_members.present?
-          thhm_medicaid_members.each do |medicaid_thhm|
-            csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
-          end
+
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2023)).first&.tax_households
+        thhm_medicaid_members = thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.is_medicaid_chip_eligible } if thhs.present?
+      else
+        thhs = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2023)).first
+        thhm_medicaid_members = thhs&.tax_household_members.where(is_medicaid_chip_eligible: true)
+      end
+
+      if thhs.present? && thhm_medicaid_members.present?
+        thhm_medicaid_members.each do |medicaid_thhm|
+          csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
         end
         @total_member_counter_medicaid_or_chip += thhm_medicaid_members.count
       end
@@ -415,7 +462,12 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
   end
 end
 
-families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2022) } })
+if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(2023) } })
+else
+  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2023) } })
+end
+
 total_count = families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil
@@ -439,15 +491,30 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
     csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
-      thh = family.latest_household.latest_active_tax_household_with_year(2022)
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2023)).first&.tax_households
+      else
+        thh = family.latest_household.latest_active_tax_household_with_year(2023)
+      end
+
       family.family_members.where(is_active: true).each do |f_member|
         in_state_address = f_member.person.addresses.where(state: "ME").present?
-        medicaid_eligible =
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          medicaid_eligible =
+            if thhs.present?
+              thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.applicant_id.to_s == f_member.id.to_s }.first&.is_medicaid_chip_eligible
+            else
+              false
+            end
+        else
+          medicaid_eligible =
             if thh.present?
               thh.tax_household_members.where(applicant_id: f_member.id).first&.is_medicaid_chip_eligible
             else
               false
             end
+        end
+
         member_citizen_status = f_member.person&.citizen_status
         if !f_member&.is_incarcerated && f_member.is_applying_coverage && in_state_address && ["us_citizen", "alien_lawfully_present", "naturalized_citizen"].include?(member_citizen_status) && !medicaid_eligible
         csv << [primary.hbx_id, primary.full_name, f_member.hbx_id, f_member.full_name, f_member.is_incarcerated, f_member.is_applying_coverage, in_state_address, medicaid_eligible, member_citizen_status]
@@ -484,24 +551,41 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
     csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
-      thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2022)).first
-      thhm_aptc_members = thh&.tax_household_members.where(is_ia_eligible: true)
-      if thh.present? && thhm_aptc_members.present?
-        thhm_aptc_members = thh.tax_household_members.where(is_ia_eligible: true)
-        if thhm_aptc_members.present?
+
+      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2023)).first&.tax_households
+        thmm_members = thhs.map(&:tax_household_members).flatten if thhs.present?
+        thhm_aptc_members = thmm_members.select {|th_member| th_member.is_ia_eligible } if thmm_members.present?
+
+        if thhs.present? && thhm_aptc_members.present?
+          aptc = thhs.sum { |thh| thh.max_aptc.to_f }
+          thhm_aptc_members.each do |aptc_thhm|
+            csv << [primary.hbx_id, primary.full_name, aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+          end
+          @total_member_counter_qhp_assistance += thhm_aptc_members.count
+        end
+      else
+        thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2023)).first
+        thhm_aptc_members = thh&.tax_household_members.where(is_ia_eligible: true)
+        if thh.present? && thhm_aptc_members.present?
           thhm_aptc_members.each do |aptc_thhm|
             csv << [primary.hbx_id, primary.full_name, thh&.latest_eligibility_determination&.max_aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
           end
+          @total_member_counter_qhp_assistance += thhm_aptc_members.count
         end
-        @total_member_counter_qhp_assistance += thhm_aptc_members.count
       end
-      rescue StandardError => e
+    rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
   end
 end
 
-families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2022) } })
+if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(2023) } })
+else
+  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2023) } })
+end
+
 total_count = families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil

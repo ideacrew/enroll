@@ -14,4 +14,8 @@ class CostSavingsApplicationPage
   def self.index_with_filter
     "[data-cuke='index_with_filter']"
   end
+
+  def self.meets_mvs_and_affordable
+    "[data-cuke='meets_mvs_and_affordable']"
+  end
 end

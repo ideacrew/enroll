@@ -63,7 +63,7 @@
       <div class="col-md-6"><%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %></div>
     </div>
 
-    <% if FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
+    <% if display_minimum_value_standard_question?(benefit.insurance_kind) %>
       <div class="row ptb no-buffer row-height">
         <div class="col-md-6"><%= l10n("health_plan_meets_mvs_and_affordable_question") %></div>
         <div class="col-md-6"><%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) %></div>

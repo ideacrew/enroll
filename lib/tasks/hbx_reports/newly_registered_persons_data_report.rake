@@ -51,11 +51,31 @@ require 'csv'
          families = Family.where(:"created_at" => { "$gte" => start_date, "$lt" => end_date})
          families.each do |family|
           primary_fm = family.primary_family_member
+          if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+            tax_household_group = family.tax_household_groups.active.first
+            tax_households = tax_household_group&.tax_households
+            tax_household_members = tax_households.map(&:tax_household_members).flatten if tax_households
+          else
+            tax_household_members = family.active_household&.latest_active_tax_household&.tax_household_members
+          end
           family.family_members.each do |fm|
             begin
-              tax_household_member = primary_fm.family.active_household.latest_active_tax_household.tax_household_members.detect {|thm| thm.person.id == fm.person.id } if primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:tax_household_members).present?
-              is_medicaid_chip_eligible = tax_household_member.try(:is_medicaid_chip_eligible).present? ? "Yes" : "No"
-              is_applied_for_assistance = primary_fm.family.e_case_id.present? ?  "Yes" : "No"
+              if tax_household_group.present?
+                tax_household_member = tax_household_members.detect { |thm| thm.applicant_id.to_s == fm.id.to_s }
+                is_medicaid_chip_eligible = tax_household_member&.is_medicaid_chip_eligible ? "Yes" : "No"
+                is_applied_for_assistance = tax_household_member.present? ? "Yes" : "No"
+                max_aptc = tax_households.sum { |thh| thh.max_aptc.to_f }
+                csr_eligibility_kind = tax_household_member&.csr_eligibility_kind
+              end
+
+              unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+                tax_household_member = tax_household_members.detect {|thm| thm.person.id == fm.person.id } if tax_household_members.present?
+                is_medicaid_chip_eligible = tax_household_member&is_medicaid_chip_eligible ? "Yes" : "No"
+                is_applied_for_assistance = tax_household_member.present? ?  "Yes" : "No"
+                latest_eligibility_determination = family.active_household&.latest_active_tax_household&.latest_eligibility_determination
+                max_aptc = latest_eligibility_determination&.max_aptc
+                csr_eligibility_kind = latest_eligibility_determination&.csr_percent_as_integer
+              end
 
               enrollments = primary_fm.family.active_household.try(:hbx_enrollments)
               health_enr = enrollments.order_by(:'created_at'.desc).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, :coverage_kind => "health").first if enrollments.present?
@@ -86,10 +106,10 @@ require 'csv'
                 fm.ssn,
                 fm.primary_relationship,
                 fm.family.created_at,
-                is_applied_for_assistance,
-                primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:max_aptc),
-                primary_fm.family.try(:active_household).try(:latest_active_tax_household).try(:latest_eligibility_determination).try(:csr_percent_as_integer),
-                is_medicaid_chip_eligible,
+                is_applied_for_assistance || 'No',
+                max_aptc || 0.0,
+                csr_eligibility_kind,
+                is_medicaid_chip_eligible || 'NO',
                 health_enrollment,
                 dental_enrollment,
                 fm.gender,

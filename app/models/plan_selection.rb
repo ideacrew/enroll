@@ -17,7 +17,7 @@ class PlanSelection
   def apply_aptc_if_needed(elected_aptc, max_aptc)
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, elected_aptc)
     hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
-    hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc / max_aptc)
+    hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc / max_aptc, ehb_premium: decorated_plan.total_ehb_premium)
   end
 
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
