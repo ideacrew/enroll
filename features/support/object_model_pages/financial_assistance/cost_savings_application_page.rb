@@ -17,6 +17,7 @@ class CostSavingsApplicationPage
 
   def self.index_with_filter
     "[data-cuke='index_with_filter']"
+  end
 
   def self.employer_sponsored_insurance_benefit_checkbox
     "[data-cuke='employer_sponsored_insurance_benefit_checkbox']"
@@ -28,7 +29,6 @@ class CostSavingsApplicationPage
 
   def self.non_esi_benefit
     "[data-cuke='non_esi_benefit']"
-
   end
 
   def self.meets_mvs_and_affordable
