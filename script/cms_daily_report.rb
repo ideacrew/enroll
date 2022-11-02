@@ -45,7 +45,7 @@ pre_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$lt" => Date.new(2023,1,1)}
+      "effective_on" => { "$gte" => Date.new(2022,1,1), "$lte" => Date.new(2022,12,31) }
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -80,7 +80,7 @@ post_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  ["coverage_expired"]},
-      "effective_on" => {"$lt" => Date.new(2023,1,1)}
+      "effective_on" => { "$gte" => Date.new(2022,1,1), "$lte" => Date.new(2022,12,31) }
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -153,7 +153,9 @@ renewal_candidate_set = pre_term_renewal_candidate_set | post_term_renewal_candi
 
 new_member_set = (all_enrolled_people_set - termed_people_between_nov_and_dec_set) - renewal_candidate_set
 
-re_enrolled_member_set = all_enrolled_people_set & renewal_candidate_set
+re_enrolled_member_set = all_enrolled_people_set & (renewal_candidate_set | termed_people_between_nov_and_dec_set)
+
+time_period = Time.zone.parse("2022-11-01 10:00:00").utc
 
 pre_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {
@@ -162,7 +164,7 @@ pre_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "coverage_kind" => "health",
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
-      "created_at" => { "$lt" => TimeKeeper.start_of_exchange_day_from_utc(Date.new(2022,11,1))},
+      "created_at" => { "$lt" => time_period },
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
       "effective_on" => {"$gte" => Date.new(2023,1,1)}
   }
@@ -201,7 +203,7 @@ post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "coverage_kind" => "health",
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
-      "created_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(Date.new(2022,11,1))},
+      "created_at" => { "$lt" => time_period },
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
       "effective_on" => {"$gte" => Date.new(2023,1,1)}
   }
@@ -233,13 +235,9 @@ end
 
 post_11_1_purchase_set = Set.new(post_11_1_ids)
 
-termed_and_actively_selected = all_enrolled_people_set & termed_people_between_nov_and_dec_set & post_11_1_purchase_set
+active_renewals_set = re_enrolled_member_set & post_11_1_purchase_set
 
-active_set = all_enrolled_people_set & renewal_candidate_set & post_11_1_purchase_set
-
-active_renewals_set = active_set | termed_and_actively_selected
-
-passive_renewals_set = (all_enrolled_people_set & renewal_candidate_set & pre_11_1_purchase_set) - active_renewals_set
+passive_renewals_set = re_enrolled_member_set - post_11_1_purchase_set
 
 puts "Total Member Enrolled(2023) Count: #{all_enrolled_people_set.size}"
 puts "Total New Member/Consumer selected 2023 enrollments after 11/1/2022 : #{new_member_set.size}"
