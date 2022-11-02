@@ -354,7 +354,9 @@ module Insured::FamiliesHelper
   end
 
   def initially_hide_enrollment?(enrollment)
-    enrollment.aasm_state == 'coverage_canceled' || (enrollment.aasm_state == 'coverage_canceled' && enrollment.external_enrollment == true)
+    canceled_enrollment = enrollment.aasm_state == 'coverage_canceled'
+    reason_is_non_payment = enrollment.terminate_reason == 'non_payment' if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
+    external_enrollment = (enrollment.aasm_state != 'shopping' && enrollment.external_enrollment == true)
+    (canceled_enrollment && !reason_is_non_payment) || external_enrollment
   end
-
 end
