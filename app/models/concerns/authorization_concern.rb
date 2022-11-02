@@ -40,6 +40,7 @@ module AuthorizationConcern
     # field :confirmation_sent_at, type: Time
     # field :unconfirmed_email,    type: String # Only if using reconfirmable
 
+    validates :password, format: { without: /\s/, message: "Password must not contain spaces" }
     validate :password_complexity
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
