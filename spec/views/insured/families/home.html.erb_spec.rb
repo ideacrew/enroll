@@ -19,23 +19,30 @@ RSpec.describe "insured/families/home.html.erb" do
     sep
   }
 
-  let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
+  let(:product) { BenefitMarkets::Products::HealthProducts::HealthProduct.create(application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)}
+  let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, product_id: product._id) }
   let(:term_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_terminated") }
   let(:non_pay_canceled_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_canceled", terminate_reason: "non_payment") }
 
   before :each do
     stub_template "insured/families/_right_column.html.erb" => ''
     stub_template "insured/families/_qle_detail.html.erb" => ''
-    stub_template "insured/families/_enrollment.html.erb" => ''
     stub_template "insured/families/_navigation.html.erb" => ''
     stub_template "insured/families/_shop_for_plans_widget.html.erb" => ''
     stub_template "insured/families/_apply_for_medicaid_widget.html.erb" => ''
     stub_template "insured/plan_shoppings/_help_with_plan.html.erb" => ''
+    stub_template "shared/_pay_now_modal.html.erb" => ''
     assign(:person, person_employee)
     allow(view).to receive(:current_user).and_return(user_with_employer_role)
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", can_view_entire_family_enrollment_history?: true))
     assign(:family, family)
     EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
+
+    allow(hbx).to receive(:product).and_return(product)
+    allow(term_hbx).to receive(:product).and_return(product)
+    allow(non_pay_canceled_hbx).to receive(:product).and_return(product)
+    allow(view).to receive(:display_carrier_logo).with(any_args).and_return(double)
+    allow(view).to receive(:fetch_issuer_name).with(nil).and_return(double)
   end
 
   it "should display the title" do
@@ -119,14 +126,11 @@ RSpec.describe "insured/families/home.html.erb" do
       allow(view).to receive(:policy_helper).and_return(
         double("FamilyPolicy", can_view_entire_family_enrollment_history?: true)
       )
-      render partial: "insured/families/enrollment", collection: [:hbx_enrollments], as: :hbx_enrollment, locals: { read_only: false }
-
     end
 
     it "enabled" do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_return(true)
-      render file: "insured/families/home.html.erb"
-      puts rendered
+      render
       expect(rendered).to have_text("hbx_id_of_non_pay_enrollment")
     end
 
