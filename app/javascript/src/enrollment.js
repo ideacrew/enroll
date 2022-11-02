@@ -24,12 +24,3 @@ document.addEventListener("DOMContentLoaded", function () {
     var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
     enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
 })
-
-// Hide year heading if all enrollments under it are hidden
-// - get all year heading elements with children
-// var year_headings = document.getElementsByClassName('heading-text')
-// console.log(year_headings)
-// - for each year heading 
-//    - check if all tiles have hidden class
-//    - add hidden class to year heading if so
-// note: this needs to happen when the box gets checked, 
