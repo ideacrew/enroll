@@ -203,7 +203,7 @@ post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "coverage_kind" => "health",
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
-      "created_at" => { "$lt" => time_period },
+      "created_at" => { "$gte" => time_period },
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
       "effective_on" => {"$gte" => Date.new(2023,1,1)}
   }
@@ -258,8 +258,20 @@ def total_families(families, file_name, offset_count)
   end
 end
 
-families = Family.all
-total_families_count = families.count
+auto_and_active_enrolled_families = HbxEnrollment.where(coverage_kind: "health",
+                                                        :"product_id".ne => nil,
+                                                        :"hbx_enrollment_members".ne => nil,
+                                                        :"external_enrollment".ne => true,
+                                                        :"consumer_role_id".ne => nil,
+                                                        :"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
+                                                        :"effective_on".gte => Date.new(2023,1,1)).pluck(:family_id).uniq
+
+families_created_after_10_31_22 = Family.where(:"created_at".gte => Date.new(2022,11,1)).pluck(:_id).uniq
+families_with_2023_assistance = ::FinancialAssistance::Application.renewal_eligible.by_year(2023).pluck(:family_id).uniq
+all_submitted_families = Set.new(auto_and_active_enrolled_families) | Set.new(families_created_after_10_31_22) | Set.new(families_with_2023_assistance)
+
+families = Family.where(:"_id".in => all_submitted_families.to_a)
+total_families_count = all_submitted_families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_families_count / families_per_iteration).ceil
 counter = 0
@@ -416,7 +428,16 @@ def process_people(people, file_name, offset_count)
   end
 end
 
-people = Person.all.where(:"consumer_role.is_applying_coverage" => true)
+all_people_from_submitted_families = Family.collection.aggregate([
+                                                                   {"$match" => {
+                                                                     "_id" => { "$in" => all_submitted_families.to_a }
+                                                                   }},
+                                                                   {"$unwind" => "$family_members"},
+                                                                   {"$match" => {"family_members.is_active" => true}},
+                                                                   {"$project" => {"_id" => "$family_members.person_id"}}
+                                                                 ]).map { |r| r['_id'] }.uniq
+
+people = Person.all.where(:"consumer_role.is_applying_coverage" => true, :"_id".in => all_people_from_submitted_families)
 total_count = people.count
 people_per_iteration = 10_000.0
 number_of_iterations = (total_count / people_per_iteration).ceil
@@ -450,7 +471,10 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
 
       if thhs.present? && thhm_medicaid_members.present?
         thhm_medicaid_members.each do |medicaid_thhm|
-          csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
+         if medicaid_thhm&.person&.is_applying_coverage
+           @total_medicaid_chip_members <<  medicaid_thhm&.person&.hbx_id
+           csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
+         end
         end
         @total_member_counter_medicaid_or_chip += thhm_medicaid_members.count
       end
@@ -470,6 +494,7 @@ total_count = families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil
 counter = 0
+@total_medicaid_chip_members = []
 @total_member_counter_medicaid_or_chip = 0
 
 while counter < number_of_iterations
@@ -477,9 +502,8 @@ while counter < number_of_iterations
   offset_count = families_per_iteration * counter
   process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
   counter += 1
-  puts "Counter: #{counter}, TotalMemberCounter: #{@total_member_counter_medicaid_or_chip}"
 end
-puts "8. Consumers Determined Eligible for Medicaid/CHIP (gross). Total number of family members that are found eligible for MedicAid or CHIP are: #{@total_member_counter_medicaid_or_chip}"
+puts "8. Consumers Determined Eligible for Medicaid/CHIP (gross). Total number of family members that are found eligible for MedicAid or CHIP are: #{@total_medicaid_chip_members.uniq.count}"
 
 
 
@@ -515,8 +539,8 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
 
         member_citizen_status = f_member.person&.citizen_status
         if !f_member&.is_incarcerated && f_member.is_applying_coverage && in_state_address && ["us_citizen", "alien_lawfully_present", "naturalized_citizen"].include?(member_citizen_status) && !medicaid_eligible
-        csv << [primary.hbx_id, primary.full_name, f_member.hbx_id, f_member.full_name, f_member.is_incarcerated, f_member.is_applying_coverage, in_state_address, medicaid_eligible, member_citizen_status]
-        @total_member_counter_with_qhp += 1
+          @total_members_with_qhp << f_member.person&.hbx_id
+          @total_member_counter_with_qhp += 1
         end
       end
       rescue StandardError => e
@@ -526,21 +550,22 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
 end
 
 valid_people = Person.where(:is_incarcerated.ne => true, :"consumer_role.is_applying_coverage" => true, :"addresses.state" => "ME", :"consumer_role.lawful_presence_determination.citizen_status".in => ["us_citizen", "alien_lawfully_present", "naturalized_citizen"])
-families = Family.where(:'family_members.person_id'.in => valid_people.pluck(:id))
+families = Family.where(:"_id".in => all_submitted_families.to_a,
+                        :'family_members.person_id'.in => valid_people.pluck(:id))
 total_count = families.count
 families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil
 counter = 0
 @total_member_counter_with_qhp = 0
+@total_members_with_qhp = []
 
 while counter < number_of_iterations
   file_name = "#{Rails.root}/consumers_eligible_for_qhp_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
   offset_count = families_per_iteration * counter
   process_ivl_families_with_qhp(families, file_name, offset_count)
   counter += 1
-  puts "Counter: #{counter}, TotalMemberCounter: #{@total_member_counter_with_qhp}"
 end
-puts "9. Consumers Eligible for QHP (gross). Total number of family members that eligible for QHP are: #{@total_member_counter_with_qhp}"
+puts "9. Consumers Eligible for QHP (gross). Total number of family members that eligible for QHP are: #{@total_members_with_qhp.uniq.count}"
 
 
 def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
@@ -567,7 +592,10 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
         thhm_aptc_members = thh&.tax_household_members.where(is_ia_eligible: true)
         if thh.present? && thhm_aptc_members.present?
           thhm_aptc_members.each do |aptc_thhm|
-            csv << [primary.hbx_id, primary.full_name, thh&.latest_eligibility_determination&.max_aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+            if aptc_thhm&.person&.is_applying_coverage
+              @total_members_with_qhp_assistance << aptc_thhm&.person&.hbx_id
+              csv << [primary.hbx_id, primary.full_name, thh&.latest_eligibility_determination&.max_aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+            end
           end
           @total_member_counter_qhp_assistance += thhm_aptc_members.count
         end
@@ -589,15 +617,15 @@ families_per_iteration = 10_000.0
 number_of_iterations = (total_count / families_per_iteration).ceil
 counter = 0
 @total_member_counter_qhp_assistance = 0
+@total_members_with_qhp_assistance = []
 
 while counter < number_of_iterations
   file_name = "#{Rails.root}/consumers_determined_eligible_for_aptc_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
   offset_count = families_per_iteration * counter
   process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
   counter += 1
-  puts "Counter: #{counter}, TotalMemberCounter: #{@total_member_counter_qhp_assistance}"
 end
-puts "9.1. Consumers Eligible for QHP, with Financial Assistance (gross). Total number of family members that are found eligible for APTC(insurance_assistance) are: #{@total_member_counter_qhp_assistance}"
+puts "9.1. Consumers Eligible for QHP, with Financial Assistance (gross). Total number of family members that are found eligible for APTC(insurance_assistance) are: #{@total_members_with_qhp_assistance.uniq.count}"
 
 CSV.open("#{Rails.root}/CMS_daily_report_summary.csv", "w", force_quotes: true) do |csv|
   data =[
@@ -614,9 +642,9 @@ CSV.open("#{Rails.root}/CMS_daily_report_summary.csv", "w", force_quotes: true) 
       ["","Number of Accounts created on a single day(No external app id)", @total_new_families_count],
       ["","Applications Submitted", @total_submitted_count],
       ["","Consumers on Applications Submitted (gross)", @total_member_counter_for_coverage],
-      ["","Consumers Determined Eligible for Medicaid/CHIP (gross)", @total_member_counter_medicaid_or_chip],
-      ["","Consumers Eligible for QHP (gross)", @total_member_counter_with_qhp],
-      ["","Consumers Eligible for QHP, with Financial Assistance (gross)", @total_member_counter_qhp_assistance]
+      ["","Consumers Determined Eligible for Medicaid/CHIP (gross)", @total_medicaid_chip_members.uniq.count],
+      ["","Consumers Eligible for QHP (gross)", @total_members_with_qhp.uniq.count],
+      ["","Consumers Eligible for QHP, with Financial Assistance (gross)", @total_members_with_qhp_assistance.uniq.count]
   ]
   data.each do |da|
     csv << da
