@@ -234,7 +234,6 @@ describe 'can_broker_modify_family' do
     let(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
     let(:broker_agency_account) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_role1.id, is_active: true) }
     let(:user) { FactoryBot.create(:user, person: person) }
-    let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person) }
     let(:broker_agency_account1) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile1, writing_agent_id: broker_role1.id, is_active: true) }
     let!(:broker_agency_staff_role1) { FactoryBot.create(:broker_agency_staff_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
     let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
