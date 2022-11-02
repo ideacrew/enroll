@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # rails runner script/renewal_2023_enrollments_fix_for_ai_an_cases.rb
+# Script which will cancel the existing auto_renewing 2023 enrollment and will generate a new renewal enrollment for 2022 enrollment.
 
 enrollment_hbx_ids = [['1384315', '1440852'], ['1384312', '1468182'], ['1298133', '1457565'], ['1409037', '1471859'], ['1366645', '1466160'], ['1366493', '1444120'], ['1252234', '1452087'], ['1366488', '1466133'], ['1330358', '1461899'],
                       ['1278538', '1455123'], ['1291918', '1456776'], ['1422813', '1474277'], ['1310225', '1459135'], ['1355624', '1465016'], ['1381652', '1467840'], ['1346776', '1463999'], ['1429167', '1475489'], ['1429167', '1475489'],
@@ -12,7 +13,7 @@ enrollment_hbx_ids = [['1384315', '1440852'], ['1384312', '1468182'], ['1298133'
                       ['1312117', '1459368'], ['1216694', '1447759'], ['1381210', '1467762'], ['1183046', '1436034'], ['1198937', '1441249'], ['1417971', '1465747'], ['1302359', '1458099'], ['1302359', '1458099'], ['1205848', '1443930'],
                       ['1205848', '1443930'], ['1205848', '1443930'], ['1215807', '1447518'], ['1392171', '1469193'], ['1223247', '1449161'], ['1384314', '1439773'], ['1390072', '1468878'], ['1204836', '1443541'], ['1319073', '1438919'],
                       ['1385556', '1468315'], ['1385556', '1468315'], ['1385556', '1468315'], ['1385556', '1468315'], ['1190796', '1438629'], ['1218042', '1448124'], ['1213232', '1446805'], ['1401166', '1470607'], ['1374486', '1467005'],
-                      ['1420656', '1473926']]
+                      ['1420656', '1473926'], ['1257368', '1452686'], ['1263085', '1453324']]
 
 def failure_message(failure)
   if failure.is_a?(String)
@@ -22,7 +23,7 @@ def failure_message(failure)
   end
 end
 
-file_name = 'renewal_enrollment_generation_for_ai_an_cases_2022_nov_1.csv'
+file_name = "renewal_enrollment_generation_for_ai_an_cases_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
 
 CSV.open(file_name, 'w+', headers: true) do |csv|
   csv << ['Person HBX ID', '2022 Enrollment HbxID', '2022 Enrollment AasmState', '2023 Old Enrollment HbxID', '2023 Old Enrollment AasmState', '2023 New Enrollment HbxID', '2023 New Enrollment AasmState', 'Errors']
