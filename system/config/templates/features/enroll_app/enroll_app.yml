@@ -541,7 +541,7 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: false
-      - key: :taro_health_plan_of_maine_inc_pay_now
+      - key: :taro_health_pay_now
         is_enabled: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
@@ -549,11 +549,13 @@ registry:
           - key: :enrollment_tile
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_ENROLLMENT_TITLE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
-            item: 'Taro Health Plan of Maine, Inc.'
+            item: 'Taro Health'
           - key: :connect_test
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
           - key: :embed_xml
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
+          - key: :taro_health_home_page_url
+            item: <%= ENV['TARO_HEALTH_HOME_PAGE_URL'] || false %>
       - key: :carrier_abbrev_list
         item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
         is_enabled: true
@@ -708,6 +710,9 @@ registry:
       - key: :external_qna_bot
         item: :external_qna_bot
         is_enabled: <%= ENV['EXTERNAL_QNA_BOT_IS_ENABLED'] || false %>
+      - key: :live_chat_widget_error_logging
+        item: :live_chat_widget_error_logging
+        is_enabled: <%= ENV['LIVECHAT_ERROR_LOGGING_IS_ENABLED'] || false %>
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
@@ -772,3 +777,6 @@ registry:
       - key: :enrollment_plan_tile_update
         item: :enrollment_plan_tile_update
         is_enabled: <%= ENV['ENROLLMENT_PLAN_TILE_UPDATE_IS_ENABLED'] || false %>
+      - key: :hide_enrollment_hbx_id
+        item: :hide_enrollment_hbx_id
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_HBX_ID_IS_ENABLED'] || false %>

@@ -139,4 +139,16 @@
   }
 
   const customPlugin = CXBus.registerPlugin('Custom');
+
+  <% if EnrollRegistry.feature_enabled?(:live_chat_widget_error_logging) %>
+    // throw error when the webchat gets rejected or has an error for visibility
+
+    customPlugin.subscribe('WebChat.rejected', function(e){
+      console.error("rejected chat", e.stack);
+    });
+
+    customPlugin.subscribe('WebChat.error', function(e){
+      console.error("chat error", e.stack);
+    });
+  <% end %>
 </script>
