@@ -111,28 +111,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def can_renew_assisted_product?(renewal_enrollment)
     return false unless renewal_enrollment.is_health_enrollment?
-    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) && is_mthh_assisted?
+    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) && @aptc_values[:csr_amt].present?
     return false unless @assisted
 
     tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
     members = tax_household.tax_household_members
     enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
     enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
-  end
-
-  def is_mthh_assisted?
-    return false if current_enrolled_aptc_grants.blank?
-    true
-  end
-
-  def current_enrolled_aptc_grants
-    premium_credits = ::Operations::PremiumCredits::FindAll.new.call({ family: enrollment.family, year: renewal_coverage_start.year, kind: 'AdvancePremiumAdjustmentGrant' })
-    return [] if premium_credits.failure?
-
-    aptc_grants = premium_credits.value!
-    return [] if aptc_grants.blank?
-
-    aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
   end
 
   def enrolled_family_member_ids
