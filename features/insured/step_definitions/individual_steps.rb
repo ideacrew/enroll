@@ -80,7 +80,7 @@ Then(/information should be saved successfully/) do
 end
 
 Then(/Individual clicks yes and clicks continue/) do
-  expect(page).to have_content "ending"
+  expect(page).to have_css('.special_qle_reasons')
   find(IvlPersonalInformation.reason_yes_radiobtn).click
   within '#qle_reason' do
     find('#qle_submit_reason').click
@@ -89,7 +89,7 @@ Then(/Individual clicks yes and clicks continue/) do
 end
 
 Then(/Individual clicks no and clicks continue/) do
-  expect(page).to have_content "ending"
+  expect(page).to have_css('.special_qle_reasons')
   find(IvlPersonalInformation.reason_no_radiobtn).click
   within '#qle_reason' do
     find('#qle_submit_reason').click
