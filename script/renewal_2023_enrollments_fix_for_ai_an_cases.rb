@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-# rails runner script/renewal_2023_enrollments_fix_for_ai_an_cases.rb
-# Script which will cancel the existing auto_renewing 2023 enrollment and will generate a new renewal enrollment for 2022 enrollment.
+# bundle exec rails runner script/renewal_2023_enrollments_fix_for_ai_an_cases.rb
+# Script which will cancel the existing auto_renewing 2023 enrollment and will generate a new renewal enrollment for 2022 enrollment for specific set of cases.
+# This is because some of the renewals for AI/AN cases are wrong.
 
 enrollment_hbx_ids = [['1384315', '1440852'], ['1384312', '1468182'], ['1298133', '1457565'], ['1409037', '1471859'], ['1366645', '1466160'], ['1366493', '1444120'], ['1252234', '1452087'], ['1366488', '1466133'], ['1330358', '1461899'],
                       ['1278538', '1455123'], ['1291918', '1456776'], ['1422813', '1474277'], ['1310225', '1459135'], ['1355624', '1465016'], ['1381652', '1467840'], ['1346776', '1463999'], ['1429167', '1475489'], ['1429167', '1475489'],
