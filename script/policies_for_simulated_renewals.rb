@@ -14,17 +14,16 @@ end
 
 start_on_date = window.end.next_month.beginning_of_month.to_time.utc.beginning_of_day
 
-product_cache = {}
-
-BenefitMarkets::Products::Product.all.each do |product|
-  product_cache[product.id] = product
+product_cache = BenefitMarkets::Products::Product.all.inject({}) do |cache_hash, product|
+  cache_hash[product.id] = product
+  cache_hash
 end
 
-def find_renewed_sponsorships(start_date)
+def find_renewed_sponsorships(start_on_date)
   BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
     {:benefit_applications =>
       { :$elemMatch => {
-        :"effective_period.min" => start_date,
+        :"effective_period.min" => start_on_date,
         :predecessor_id => {"$ne" => nil},
         :aasm_state.in => [:enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_extended, :active]
       }}}
@@ -35,7 +34,7 @@ def matching_plan_details(enrollment, other_hbx_enrollment, product_cache)
   return false if other_hbx_enrollment.product_id.blank?
   new_plan = product_cache[enrollment.product_id]
   old_plan = product_cache[other_hbx_enrollment.product_id]
-  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s && EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "cca"
+  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s && Settings.site.key.to_s == "cca"
   (old_plan.issuer_profile_id == new_plan.issuer_profile_id) && (old_plan.active_year == new_plan.active_year - 1) && (old_plan.kind == new_plan.kind)
 end
 
@@ -52,42 +51,54 @@ def initial_or_renewal(enrollment,product_cache,ben_app)
     ['coverage_terminated', 'coverage_termination_pending'].include?(ren.aasm_state.to_s) && ren.terminated_on.present? && ren.terminated_on < (enrollment.effective_on - 1.day)
   end
   if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,product_cache)}
-    return "renewal"
-  elsif renewal_enrollments_no_terms.empty?
-    return "initial"
+    "renewal"
   else
-    return "initial"
+    "initial"
   end
 end
 
 renewed_sponsorships = find_renewed_sponsorships(start_on_date)
+total_count = renewed_sponsorships.count
+sponsorships_per_iteration = 100.0
+number_of_iterations = (total_count / sponsorships_per_iteration).ceil
+counter = 0
 
 initial_file = File.open("policies_to_pull_ies.txt","w")
 renewal_file = File.open("policies_to_pull_renewals.txt","w")
 
-renewed_sponsorships.no_timeout.each do |bs|
-  selected_application = bs.renewal_benefit_application
+while counter < number_of_iterations
+  offset_count = sponsorships_per_iteration * counter
+  renewed_sponsorships.no_timeout.limit(100).offset(offset_count).each do |bs|
+    selected_application = bs.renewal_benefit_application
 
-  next if selected_application.blank?
+    next if selected_application.blank?
 
-  benefit_packages = selected_application.benefit_packages
+    benefit_packages = selected_application.benefit_packages
 
-  enrollment_ids = []
-
-  benefit_packages.each do |benefit_package|
-    employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(benefit_package.sponsored_benefits, start_on_date)
-    employer_enrollment_query.each{|id| enrollment_ids << id}
-  end
-  puts "enrollments count: #{enrollment_ids.count}"
-  enrollment_ids.each do |enrollment_hbx_id|
-    enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
-    puts "#{enrollment.hbx_id} has no plan" if enrollment.product.blank?
-    if initial_or_renewal(enrollment,product_cache,selected_application) == 'initial'
-      initial_file.puts(enrollment_hbx_id)
-    elsif initial_or_renewal(enrollment,product_cache,selected_application) == 'renewal'
-      renewal_file.puts(enrollment_hbx_id)
+    enrollment_ids = []
+    benefit_packages.each do |benefit_package|
+      employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(benefit_package.sponsored_benefits, start_on_date)
+      enrollment_cache_ids = employer_enrollment_query.inject([]) do |enr_cache_ids, id|
+        enr_cache_ids << id
+        enr_cache_ids
+      end
+      enrollment_ids << enrollment_cache_ids
+    end
+    puts "Fein: #{bs.fein}"
+    puts "enrollments count: #{enrollment_ids.flatten.count} and enrollment_ids: #{enrollment_ids.flatten}"
+    enrollment_ids.flatten.each do |enrollment_hbx_id|
+      puts enrollment_hbx_id
+      enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
+      puts "#{enrollment.hbx_id} has no plan" if enrollment.product.blank?
+      case initial_or_renewal(enrollment,product_cache,selected_application)
+      when 'initial'
+        initial_file.puts(enrollment_hbx_id)
+      when 'renewal'
+        renewal_file.puts(enrollment_hbx_id)
+      end
     end
   end
+  counter += 1
 end
 
 initial_file.close
