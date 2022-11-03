@@ -22,7 +22,6 @@ RSpec.describe "insured/families/home.html.erb" do
   let(:product) { BenefitMarkets::Products::HealthProducts::HealthProduct.create(application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)}
   let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
   let(:term_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_terminated") }
-  let(:non_pay_canceled_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_canceled", terminate_reason: "non_payment") }
 
   before :each do
     stub_template "insured/families/_right_column.html.erb" => ''
