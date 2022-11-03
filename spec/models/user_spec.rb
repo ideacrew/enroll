@@ -134,6 +134,14 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
     end
 
+    context 'when password has white spaces' do
+      let(:params){valid_params.deep_merge!({password: "Test@1234 "})}
+      it 'should return error' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["Password must not contain spaces"]
+      end
+    end
+
     context 'when password & password confirmation' do
       let(:params){valid_params.deep_merge!({password: "1Aa@"})}
       it 'does not match' do
