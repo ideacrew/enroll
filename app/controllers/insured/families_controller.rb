@@ -44,7 +44,7 @@ class Insured::FamiliesController < FamiliesController
       update_changing_hbxs(@hbx_enrollments)
 
       @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family) if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
-      @hbx_enrollments.sort_by(&:effective_on).reverse
+      @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
       @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
       @tab = params['tab']
