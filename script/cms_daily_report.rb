@@ -567,8 +567,7 @@ while counter < number_of_iterations
   counter += 1
 end
 
-@total_qhp_and_medicaid_chip = Set.new(@total_medicaid_chip_members.uniq) | Set.new(@total_members_with_qhp.uniq)
-puts "9. Consumers Eligible for QHP (gross). Total number of family members that eligible for QHP are: #{@total_qhp_and_medicaid_chip.size}"
+puts "9. Consumers Eligible for QHP (gross). Total number of family members that eligible for QHP are: #{@total_members_with_qhp.uniq.count}"
 
 
 def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
@@ -649,7 +648,7 @@ CSV.open("#{Rails.root}/CMS_daily_report_summary.csv", "w", force_quotes: true) 
       ["","Applications Submitted", @total_submitted_count],
       ["","Consumers on Applications Submitted (gross)", @total_member_counter_for_coverage],
       ["","Consumers Determined Eligible for Medicaid/CHIP (gross)", @total_medicaid_chip_members.uniq.count],
-      ["","Consumers Eligible for QHP (gross)", @total_qhp_and_medicaid_chip.count],
+      ["","Consumers Eligible for QHP (gross)", @total_members_with_qhp.uniq.count],
       ["","Consumers Eligible for QHP, with Financial Assistance (gross)", @total_members_with_qhp_assistance.uniq.count]
   ]
   data.each do |da|
