@@ -63,6 +63,8 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :show?
 
     @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+    @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family)
+    @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
     @all_hbx_enrollments_for_admin = if EnrollRegistry.feature_enabled?(:include_external_enrollment_in_display_all_enrollments)
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family) + HbxEnrollment.family_external_enrollments(@family)
