@@ -3,7 +3,7 @@
 <% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes? , hbx_enrollment: hbx_enrollment } %>
 <% else %>
-    <div class="hbx-enrollment-refactored-panel plan-tile panel panel-default module">
+    <div class="hbx-enrollment-refactored-panel plan-tile panel panel-default module <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %>">
         <div class="plan-header">
             <div class="plan-status-container"><%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %></div>
             <div class="plan-logo-and-name">

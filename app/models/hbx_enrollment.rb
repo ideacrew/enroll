@@ -1453,7 +1453,9 @@ class HbxEnrollment
   end
 
   def can_make_changes_for_ivl_enrollment?
-    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
+    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    return true if allowed_statuses.include?(aasm_state)
     false
   end
 

@@ -1,3 +1,5 @@
+<%= javascript_pack_tag "enrollment" %>
+<%= stylesheet_pack_tag "enrollment" %>
 <% content_for :navigation do %>
   <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
@@ -19,7 +21,8 @@
       <% end %>
       <% if enrollments&.any? %>
         <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
-          <h2 id=<%="#{year}-year-heading"%> class="mt-0 ml-1"><%= year %></h2>
+          <% show_year_heading = yearly_enrollments.any?{|enrollment| !initially_hide_enrollment?(enrollment)} %>
+          <h2 id=<%="#{year}-year-heading"%> class="year-heading mt-0 ml-1 <%= "initially_hidden_enrollment hidden" unless show_year_heading %>"><%= year %></h2>
           <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
             <%= render partial: "enrollment_refactored",
                        :collection => yearly_enrollments,
