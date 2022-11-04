@@ -72,7 +72,7 @@ class Insured::FamiliesController < FamiliesController
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
                                      end
     # Sort by effective_on again. The latest enrollment will display at the top.
-    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.uniq.sort_by(&:effective_on).reverse
 
     respond_to do |format|
       format.html
