@@ -5,6 +5,7 @@ require 'rails_helper'
 describe Products::QhpCostShareVariance, :type => :model do
   let!(:shop_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_shop) }
   let!(:fehb_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_base_id: shop_product.hios_id, benefit_market_kind: :fehb) }
+  let!(:aca_individual_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_base_id: shop_product.hios_id, benefit_market_kind: :aca_individual) }
   let(:hios_id)      { shop_product.hios_id }
   let(:active_year)  { shop_product.active_year }
   let(:qcsv) { FactoryBot.build(:products_qhp_cost_share_variance, hios_plan_and_variant_id: hios_id) }
@@ -16,5 +17,25 @@ describe Products::QhpCostShareVariance, :type => :model do
 
   it "should return fehb product" do
     expect(product_qhp.qhp_cost_share_variances.first.product_for('fehb')).to eq fehb_product
+  end
+
+  context 'when qhp_product_for_include_aca_individual enabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:qhp_product_for_include_aca_individual).and_return(true)
+    end
+
+    it "should return aca_individual product for individual market kind" do
+      expect(product_qhp.qhp_cost_share_variances.first.product_for('individual')).to eq aca_individual_product
+    end
+  end
+
+  context 'when qhp_product_for_include_aca_individual disabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:qhp_product_for_include_aca_individual).and_return(false)
+    end
+
+    it "should return aca_individual product for individual market kind" do
+      expect(product_qhp.qhp_cost_share_variances.first.product_for('individual')).to eq nil
+    end
   end
 end
