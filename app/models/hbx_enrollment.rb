@@ -365,6 +365,15 @@ class HbxEnrollment
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
+  scope :family_non_pay_canceled_enrollments, lambda { |family|
+    where(
+      :family_id => family.id,
+      :aasm_state => "coverage_canceled",
+      :terminate_reason => "non_payment"
+    ).order(
+      effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+    )
+  }
   scope :family_home_page_hidden_external_enrollments, lambda { |family|
     where(:family_id => family.id,
           :aasm_state.nin => ["shopping"],
@@ -1444,7 +1453,9 @@ class HbxEnrollment
   end
 
   def can_make_changes_for_ivl_enrollment?
-    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
+    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    return true if allowed_statuses.include?(aasm_state)
     false
   end
 
@@ -1641,6 +1652,11 @@ class HbxEnrollment
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
+  def self.family_non_pay_enrollments(family)
+    non_pay_enrollments = HbxEnrollment.family_non_pay_canceled_enrollments(family)
+    non_pay_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   def self.family_external_enrollments(family)

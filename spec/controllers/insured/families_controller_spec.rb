@@ -86,6 +86,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(hbx_enrollments).to receive(:non_external).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:sort_by!).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:reverse!).and_return(hbx_enrollments)
     allow(user).to receive(:person).and_return(person)
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)

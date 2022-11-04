@@ -48,6 +48,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:sbc_document) { nil }
 
   before(:each) do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
     allow(view).to receive(:policy_helper).and_return(family)
     @family = family
     @person = person
@@ -94,6 +95,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
     end
 
     it "when kind is employer_sponsored" do
@@ -230,6 +232,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(false)
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -527,6 +530,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(view).to receive(:initially_hide_enrollment?).with(waived_hbx_enrollment).and_return(false)
       allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
     end
 
@@ -606,6 +610,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
     end
 
     context "osse_eligibility is present" do
@@ -666,6 +671,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         allow(hbx_enrollment1).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
+        allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment1).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 
