@@ -199,6 +199,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.coverage_waived' => "Coverage Waived",
   :'en.waiver_reason' => "Waiver Reason",
   :'en.insured.families.future_enrollment_termination_date' => "Future Enrollment Termination Date",
+  :'en.insured.year_title' => "Benefit Coverage Year %{year}",
   :'en.market_type' => "Market Type",
   :'en.reinstated_enrollment' => "Reinstated Enrollment",
   :'en.APTC_amount' => "APTC",

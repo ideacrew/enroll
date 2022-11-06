@@ -1,5 +1,12 @@
 <% product = hbx_enrollment.product %>
 
+<% if @year_display != hbx_enrollment.effective_on.year && EnrollRegistry.feature_enabled?(:home_tiles_group_by_year) %>
+    <% @year_display = hbx_enrollment.effective_on.year %>
+    <div class="module year-group-title <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %> ">
+      <h3 class="text-left"><%= l10n("insured.year_title", year: @year_display) %></h3>
+    </div>
+<% end %>
+
 <% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes? , hbx_enrollment: hbx_enrollment } %>
 <% else %>
