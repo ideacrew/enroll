@@ -55,8 +55,6 @@ class Insured::FamiliesController < FamiliesController
         @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] > TimeKeeper.date_of_record.beginning_of_year }
       end
 
-      @year_display = ""
-
       respond_to do |format|
         format.html
         format.any { head :ok }
