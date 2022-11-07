@@ -473,6 +473,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def enrolled_plans_by_hios_id_and_active_year
     if !@hbx_enrollment.is_shop?
       @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_products(@hbx_enrollment)
+      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.any_member_currently_enrolled_products(@hbx_enrollment) if @enrolled_hbx_enrollment_plans.empty?
       (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
     else
       @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
@@ -481,12 +482,12 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def build_same_plan_premiums
-
     enrolled_plans = enrolled_plans_by_hios_id_and_active_year
+
     if enrolled_plans.present?
       enrolled_plans = enrolled_plans.collect{|p| BenefitMarkets::Products::Product.find(p)}
 
-      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.product)
+      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.product || enrolled_plans.first)
       same_plan_enrollment = plan_selection.same_plan_enrollment
 
       if @hbx_enrollment.is_shop?
