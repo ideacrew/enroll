@@ -226,7 +226,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_hbx_id).and_return(true)
 
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
