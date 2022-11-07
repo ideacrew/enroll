@@ -176,7 +176,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       end
 
       it "should display the year of the plan as header" do
-        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, layout: "insured/families/partial_layouts/wrap_enrollments_by_year", locals: { read_only: false }
         expect(rendered).to have_selector(".year-group-title")
       end
     end
