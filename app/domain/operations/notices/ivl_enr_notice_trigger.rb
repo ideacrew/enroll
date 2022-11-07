@@ -12,6 +12,8 @@ module Operations
       include EventSource::Logging
       include ActionView::Helpers::NumberHelper
 
+      # @param [HbxEnrollment] :enrollment HbxEnrollment #required
+      # @return [Dry::Monads::Result]
       def call(params)
         values = yield validate(params)
         family = yield fetch_family(values[:enrollment])
@@ -117,11 +119,20 @@ module Operations
             product_reference: product_reference(product, issuer),
             issuer_profile_reference: issuer_profile_reference(issuer),
             consumer_role_reference: consumer_role_reference(consumer_role),
-            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
+            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false)),
+            timestamp: timestamp(enr)
           }
           enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
           enrollment_hash
         end
+      end
+
+      def timestamp(enrollment)
+        {
+          submitted_at: enrollment.submitted_at.to_datetime,
+          created_at: enrollment.created_at.to_datetime,
+          modified_at: enrollment.updated_at.to_datetime
+        }
       end
 
       def qualifying_life_event_kind_reference(qle)
