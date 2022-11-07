@@ -6,7 +6,7 @@
 
 - if @hbx_enrollment.shopping?
 - else
-  - back_btn_text = request.referrer.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account")
+  - back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account")
   = link_to "<i class='fa fa-chevron-left'></i> #{back_btn_text}".html_safe, request.referrer, class: 'btn btn-default all-plans'
   br/
   br/
