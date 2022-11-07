@@ -34,7 +34,7 @@ module Operations
 
         return Success(0.0) if not_eligible?
 
-        Success(available_aptc.round)
+        Success(available_aptc)
       end
 
       def not_eligible?
@@ -44,7 +44,7 @@ module Operations
         return true if result.failure?
 
         @aptc_grants = result.value!
-        @current_enrolled_aptc_grants = @aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
+        @current_enrolled_aptc_grants = @aptc_grants&.where(:member_ids.in => enrolled_family_member_ids)
         return true if @current_enrolled_aptc_grants.blank?
 
         false
@@ -55,7 +55,7 @@ module Operations
           expected_contribution = monthly_expected_contribution(aptc_grant)
           total_benchmark_premium = current_benchmark_premium(aptc_grant) + coinciding_benchmark_premium(aptc_grant)
 
-          value = total_benchmark_premium - expected_contribution - utilized_aptc(aptc_grant)
+          value = (total_benchmark_premium - expected_contribution - utilized_aptc(aptc_grant)).round
 
           persist_tax_household_enrollment(aptc_grant, value)
 
@@ -92,8 +92,10 @@ module Operations
 
       def persist_tax_household_members_enrollment_members(aptc_grant, th_enrollment, household_info)
         return if household_info.blank?
-        tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).first
-        tax_household = tax_household_group.tax_households.where(id: aptc_grant.tax_household_id).first
+
+        th_id = BSON::ObjectId.from_string(aptc_grant.tax_household_id.to_s)
+        tax_household_group = @family.tax_household_groups.active.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
+        tax_household = tax_household_group.tax_households.where(_id: th_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members
 
@@ -120,11 +122,9 @@ module Operations
 
       def utilized_aptc(aptc_grant)
         coinciding_enrollments.reduce(0.0) do |sum, previous_enrollment|
-          pct = previous_enrollment.elected_aptc_pct > 0.0 ? previous_enrollment.elected_aptc_pct : default_applied_aptc_percentage
           th_enrollment = TaxHouseholdEnrollment.where(enrollment_id: previous_enrollment.id, tax_household_id: aptc_grant.tax_household_id).first
           next sum if th_enrollment.blank?
-          # value = (round_down_float_two_decimals(th_enrollment.total_benchmark_premium) - (round_down_float_two_decimals(aptc_grant.value) / 12)) * pct
-          value = round_down_float_two_decimals(th_enrollment.available_max_aptc) * pct
+          value = round_down_float_two_decimals(th_enrollment.available_max_aptc)
 
           sum += (value > 0.0 ? value : 0.0)
           sum

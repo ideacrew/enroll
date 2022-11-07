@@ -43,7 +43,9 @@
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: required, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
         <div class="col-md-6">
-          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN) *', class: "floatlabel ph-width fien_field" %>
+          <% employer_id_placeholder = l10n("EMPLOYER_IDENTIFICATION_NO.(EIN)").upcase %>
+          <% employer_id_placeholder += " *" unless EnrollRegistry[:skip_employer_id_validation].enabled? %>
+          <%= f.text_field :employer_id, placeholder: employer_id_placeholder, class: "floatlabel ph-width fien_field", data: {cuke: 'benefit_esi_ein'}, id: 'benefit_esi_ein'  %>
         </div>
       </div>
     <% end %>
@@ -163,6 +165,30 @@
         <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {:required => true} %>
       </div>
     </div>
+
+    <% if display_minimum_value_standard_question?(insurance_kind) %>
+    <div class="row row-form-wrapper no-buffer fa-align-elements" id="minimum_value_standard_question">
+      <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 form-group form-group-lg">
+        <label class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %></label>
+      </div>
+      <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :health_plan_meets_mvs_and_affordable, true, class: "required floatlabel", id: "benefit_health_plan_meets_mvs_and_affordable_#{benefit.id}_true", required: true %>
+          <%= f.label "health_plan_meets_mvs_and_affordable_#{benefit.id}", :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :health_plan_meets_mvs_and_affordable, false, class: "required floatlabel", id: "benefit_health_plan_meets_mvs_and_affordable_#{benefit.id}_false" %>
+          <%= f.label "health_plan_meets_mvs_and_affordable_#{benefit.id}", :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <% end %>
   </div>
 
     <div class="row">

@@ -92,6 +92,7 @@ class Family
   index({"households.tax_households.effective_starting_on" => 1})
   index({"households.tax_households.effective_ending_on" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
+  index({"tax_household_groups.tax_households._id" => 1})
 
   index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
@@ -325,6 +326,14 @@ class Family
     ::FinancialAssistance::Application.where(family_id: self.id).by_year(year).determined.max_by(&:created_at)
   end
 
+  # It fetches the most recent application for the curent enrollment year if the application is in draft state
+  def most_recent_and_draft_financial_assistance_application
+    year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
+    application = ::FinancialAssistance::Application.where(family_id: self.id).by_year(year).max_by(&:created_at)
+    return unless application&.draft?
+    application
+  end
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -368,17 +377,26 @@ class Family
     enrolled_plans.collect(&:product_id)
   end
 
+  # filters enrolled enrollments by subscriber only
   def currently_enrolled_products(enrollment)
-    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind).select do |enr|
+    any_member_current_enrollments(enrollment).select do |enr|
       enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
-    end
+    end.map(&:product)
+  end
+
+  def any_member_currently_enrolled_products(enrollment)
+    any_member_current_enrollments(enrollment).map(&:product)
+  end
+
+  # fetch the current active or terminated enrollments for continous coverage
+  def any_member_current_enrollments(enrollment)
+    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
 
     if enrolled_enrollments.blank?
-      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period((enrollment.effective_on - 1.day)).select do |enr|
-        enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
-      end
+      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period(enrollment.effective_on - 1.day)
     end
-    enrolled_enrollments.map(&:product)
+
+    enrolled_enrollments
   end
 
   def currently_enrolled_product_ids(enrollment)
@@ -455,6 +473,15 @@ class Family
   # @return [ FamilyMember ] the family member who matches this person
   def find_family_member_by_person(person)
     family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
+  end
+
+  def find_family_member_by_person_hbx_id(person_hbx_id)
+    return if person_hbx_id.blank?
+
+    person = Person.by_hbx_id(person_hbx_id).first
+    return if person.blank?
+
+    find_family_member_by_person(person)
   end
 
   def is_eligible_to_enroll?(options = {})
@@ -1320,6 +1347,10 @@ class Family
 
   def generate_hbx_assigned_id
     write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_member_id) if hbx_assigned_id.blank?
+  end
+
+  def create_thhg_on_fa_determination(application)
+    Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination.new.call(application)
   end
 
 private

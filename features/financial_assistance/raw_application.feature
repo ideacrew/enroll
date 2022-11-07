@@ -42,3 +42,18 @@ Feature: Cost Savings Raw Application
     And the admin should see text Full Application
     When admin clicks on Full application action
     Then admin should see county under Mailing and Home address
+
+  Scenario: MVS Feature Is Enabled - Admin clicks on Full application action and sees MVS question
+    And a family with financial application and applicants in determined state exists
+    And FAA minimum_value_standard_question feature is enabled
+    And FAA disable_employer_address_fields feature is enabled
+    And the user with hbx_staff role is logged in
+    When admin visits home page
+    And the Cost Savings link is visible
+    And admin clicks on Cost Savings link
+    When admin clicks on Action dropdown
+    And the admin should see text Full Application
+    Given the consumer has a benefit
+    And the consumer has an esi benefit
+    When admin clicks on Full application action
+    Then the health plan meets mvs and affordable question should show

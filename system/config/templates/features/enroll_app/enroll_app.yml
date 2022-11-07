@@ -240,7 +240,7 @@ registry:
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: false
           - key: :medicaid_agency_phone
-            item: "(855) 532-5465"
+            item: "(202) 727-5355"
           - key: :verifiable_immigration_statuses
             item: false
           - key: :appeal_link
@@ -338,6 +338,9 @@ registry:
       - key: :choose_coverage_mdcr_warning
         item: :choose_coverage_mdcr_warning
         is_enabled: <%= ENV['CHOOSE_COVERAGE_MDCR_WARNING_IS_ENABLED'] || false %>
+      - key: :adtl_contact_required_for_text
+        item: :adtl_contact_required_for_text
+        is_enabled: <%= ENV['ADTL_CONTACT_REQUIRED_FOR_TEXT_IS_ENABLED'] || false %>
       - key: :counties_import
         is_enabled: false
         item: ""
@@ -354,7 +357,7 @@ registry:
           - key: :current_effective_period
             item: <%= Date.new(2020,11,1)..Date.new(2021,10,31) %>
           - key: :upcoming_effective_period
-            item: <%= Date.new(2021,11,1)..Date.new(2022,01,31) %>
+            item: <%= Date.new(2022,11,1)..Date.new(2023,01,31) %>
           - key: :contact_center_number_for_display
             item: "(855) 532-5465"
           - key: :mailing_address_1
@@ -377,6 +380,21 @@ registry:
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
         is_enabled: false
+      - key: :hide_enrollment_market_type
+        item: :hide_enrollment_market_type
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_MARKET_TYPE'] || false %>
+      - key: :default_is_your_health_coverage_ending_no
+        item: :default_is_your_health_coverage_ending_no
+        is_enabled: <%= ENV['DEFAULT_IS_YOUR_HEALTH_COVERAGE_ENDING_NO_IS_ENABLED'] || false %>
+      - key: :is_your_health_coverage_ending_expanded_question
+        item: :is_your_health_coverage_ending_expanded_question
+        is_enabled: <%= ENV['IS_YOUR_HEALTH_COVERAGE_ENDING_EXPANDED_QUESTION_IS_ENABLED'] || false %>
+      - key: :enrollment_history_page
+        item: :enrollment_history_page
+        is_enabled: <%= ENV['ENROLLMENT_HISTORY_PAGE_IS_ENABLED'] || false %>
+      - key: :address_verification
+        item: :address_verification
+        is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -523,7 +541,7 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: false
-      - key: :taro_health_plan_of_maine_inc_pay_now
+      - key: :taro_health_pay_now
         is_enabled: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
@@ -531,11 +549,13 @@ registry:
           - key: :enrollment_tile
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_ENROLLMENT_TITLE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
-            item: 'Taro Health Plan of Maine, Inc.'
+            item: 'Taro Health'
           - key: :connect_test
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
           - key: :embed_xml
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
+          - key: :taro_health_home_page_url
+            item: <%= ENV['TARO_HEALTH_HOME_PAGE_URL'] || false %>
       - key: :carrier_abbrev_list
         item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
         is_enabled: true
@@ -655,6 +675,9 @@ registry:
       - key: :trigger_verifications_before_enrollment_purchase
         item: trigger_verifications_before_enrollment_purchase
         is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
+      - key: :use_defaults_for_qnc_and_five_year_bar_data
+        item: use_defaults_for_qnc_and_five_year_bar_data
+        is_enabled: <%= ENV['USE_DEFAULTS_FOR_QNC_AND_FIVE_YEAR_BAR_DATA_IS_ENABLED'] || true %>
       - key: :saml_info_keys
         is_enabled: true
         settings:
@@ -687,6 +710,9 @@ registry:
       - key: :external_qna_bot
         item: :external_qna_bot
         is_enabled: <%= ENV['EXTERNAL_QNA_BOT_IS_ENABLED'] || false %>
+      - key: :live_chat_widget_error_logging
+        item: :live_chat_widget_error_logging
+        is_enabled: <%= ENV['LIVECHAT_ERROR_LOGGING_IS_ENABLED'] || false %>
       - key: :in_person_assister
         item: :in_person_assister
         is_enabled: true
@@ -736,6 +762,8 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
+      - key: :domestic_partner_rating
+        is_enabled: <%= ENV['DOMESTIC_PARTNER_RATING_IS_ENABLED'] || false %>
       - key: issuer_provided_code
         item: 'DCS002'
         is_enabled: true
@@ -746,4 +774,18 @@ registry:
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
       - key: :enrollment_product_date_match
         is_enabled: false
-
+      - key: :enrollment_plan_tile_update
+        item: :enrollment_plan_tile_update
+        is_enabled: <%= ENV['ENROLLMENT_PLAN_TILE_UPDATE_IS_ENABLED'] || false %>
+      - key: :hide_enrollment_hbx_id
+        item: :hide_enrollment_hbx_id
+        is_enabled: <%= ENV['HIDE_ENROLLMENT_HBX_ID_IS_ENABLED'] || false %>
+      - key: :show_non_pay_enrollments
+        item: :show_non_pay_enrollments
+        is_enabled: <%= ENV['SHOW_NON_PAY_ENROLLMENTS_IS_ENABLED'] || false %>
+      - key: :home_tiles_current_and_future_only
+        item: :home_tiles_current_and_future_only
+        is_enabled: <%= ENV['TILES_CURRENT_AND_FUTURE_ONLY_IS_ENABLED'] || false %>
+      - key: :home_tiles_group_by_year
+        item: :home_tiles_group_by_year
+        is_enabled: <%= ENV['TILES_GROUP_BY_YEAR_IS_ENABLED'] || false %>

@@ -19,22 +19,26 @@ RSpec.describe "insured/families/home.html.erb" do
     sep
   }
 
+  let(:product) { BenefitMarkets::Products::HealthProducts::HealthProduct.create(application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)}
   let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
   let(:term_hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record, aasm_state: "coverage_terminated") }
 
   before :each do
     stub_template "insured/families/_right_column.html.erb" => ''
     stub_template "insured/families/_qle_detail.html.erb" => ''
-    stub_template "insured/families/_enrollment.html.erb" => ''
     stub_template "insured/families/_navigation.html.erb" => ''
     stub_template "insured/families/_shop_for_plans_widget.html.erb" => ''
     stub_template "insured/families/_apply_for_medicaid_widget.html.erb" => ''
     stub_template "insured/plan_shoppings/_help_with_plan.html.erb" => ''
+    stub_template "shared/_pay_now_modal.html.erb" => ''
     assign(:person, person_employee)
     allow(view).to receive(:current_user).and_return(user_with_employer_role)
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", can_view_entire_family_enrollment_history?: true))
     assign(:family, family)
-    EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
+    allow(hbx).to receive(:product).and_return(product)
+    allow(term_hbx).to receive(:product).and_return(product)
+    allow(view).to receive(:display_carrier_logo).with(any_args).and_return(double)
+    allow(view).to receive(:fetch_issuer_name).with(nil).and_return(double)
   end
 
   it "should display the title" do
@@ -107,6 +111,25 @@ RSpec.describe "insured/families/home.html.erb" do
       )
       render file: "insured/families/home.html.erb"
       expect(rendered).to_not include("Display All Enrollments?")
+    end
+  end
+
+  context ":enrollment_plan_tile_update feature" do
+    context 'enabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:enrollment_plan_tile_update).and_return(true)
+        assign(:person, person_hbx)
+        assign(:hbx_enrollments, [hbx])
+        allow(view).to receive(:policy_helper).and_return(
+          double("FamilyPolicy", can_view_entire_family_enrollment_history?: nil)
+        )
+      end
+
+      it "should render the refactored plan tile" do
+        render
+        expect(rendered).to have_selector(".hbx-enrollment-refactored-panel")
+      end
     end
   end
 end

@@ -13,7 +13,7 @@ product_ids = BenefitMarkets::Products::Product.by_year(current_year + 1).aca_in
 csv = CSV.open("final_eligibility_notice_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.total_premium deductible family_deductible  subscriber_id member_id person.first_name person.last_name
         policy.subscriber.person.is_incarcerated  policy.subscriber.person.citizen_status outstanding_verification_types document_due_date
-        policy.subscriber.person.is_dc_resident? dependent)
+        policy.subscriber.person.is_dc_resident? dependent uqhp_eligible)
 
 
 def add_to_csv(csv, policy, person, is_dependent, outstanding_verification_types, document_due_date)
@@ -21,7 +21,7 @@ def add_to_csv(csv, policy, person, is_dependent, outstanding_verification_types
           policy.product.deductible, policy.product.family_deductible.split("|").last.squish,
           person.hbx_id, person.hbx_id, person.first_name, person.last_name,
           person.is_incarcerated, person.citizen_status, outstanding_verification_types, document_due_date,
-          is_dc_resident(person)] + [is_dependent]
+          is_dc_resident(person)] + [is_dependent] + ['Yes']
 end
 
 def is_dc_resident(person)

@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 81ed88a5fedd4e4cb0d66216c10fbf30df7a54aa
+  revision: 97ae699e82e7e3cc6620dd39e05ea9b3a5f42537
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -1195,4 +1195,4 @@ RUBY VERSION
    ruby 2.5.9p229
 
 BUNDLED WITH
-   2.3.16
+   2.3.23

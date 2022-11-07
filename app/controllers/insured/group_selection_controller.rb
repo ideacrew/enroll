@@ -94,7 +94,6 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-
     update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     if @market_kind == 'shop' || @market_kind == 'fehb'
@@ -150,6 +149,7 @@ class Insured::GroupSelectionController < ApplicationController
         hbx_enrollment.update_coverage_kind_by_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
       elsif (@market_kind == 'shop' || @market_kind == 'fehb') && keep_existing_plan && @adapter.previous_hbx_enrollment.present?
+        hbx_enrollment.update_osse_childcare_subsidy
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
@@ -240,7 +240,7 @@ class Insured::GroupSelectionController < ApplicationController
     incarcerated = person.is_consumer_role_active? && family_member.is_applying_coverage && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
 
     if EnrollRegistry.feature_enabled?(:choose_coverage_mdcr_warning)
-      is_eligible_for_mdcr = @family.households&.first&.tax_households&.first&.tax_household_members&.where(applicant_id: family_member.id)&.first&.is_medicaid_chip_eligible
+      is_eligible_for_mdcr = family_member_eligible_for_mdcr(family_member, @family, @new_effective_on&.year)
       errors << l10n("insured.group_selection.mdcr_eligible_warning") if is_eligible_for_mdcr
     end
 

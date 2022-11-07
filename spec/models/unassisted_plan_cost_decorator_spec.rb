@@ -8,7 +8,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   let(:premium_table) { double(rating_area: rating_area) }
   let(:premium_tables) { [premium_table] }
   let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health", family_based_rating?: false, premium_tables: premium_tables) }
-  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, family_based_rating?: false, premium_tables: premium_tables) }
+  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, family_based_rating?: false, premium_tables: premium_tables, ehb: 0.996) }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
   let(:area) { EnrollRegistry[:rating_area].settings(:areas).item.first }
   context "rating a large family" do
@@ -82,6 +82,17 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       it "should have the right total premium" do
         expect(plan_cost_decorator.total_premium).to eq [55, 45, 20, 18, 13, 11, 4].sum
+      end
+
+      context 'when total_minimum_responsibility is enabled' do
+        before do
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 0.0}
+          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it "should have the correct member ehb premium" do
+          expect(plan_cost_decorator.member_ehb_premium(five)).to eq 0.00
+        end
       end
     end
   end
@@ -424,6 +435,78 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     context 'for total_ehb_premium' do
       it 'should return some valid amount when valid information is given' do
         expect(@upcd_1.total_ehb_premium).to eq 1668.2
+      end
+
+      context 'when mthh enabled' do
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        end
+
+        context 'when grants does not exist' do
+          it 'returns ehb premium by considering all the members' do
+            expect(@upcd_1.total_ehb_premium).to eq 1668.2
+          end
+        end
+
+        context 'when grants exists' do
+
+          let(:tax_household) do
+            tax_household_group.tax_households.first
+          end
+
+          let!(:tax_household_group) do
+            family10.tax_household_groups.create!(
+              assistance_year: TimeKeeper.date_of_record.year,
+              source: 'Admin',
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              tax_households: [
+                FactoryBot.build(:tax_household, household: family10.active_household)
+              ]
+            )
+          end
+
+          context 'grants exists for all members' do
+            let!(:eligibility_determination) do
+              determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: 1000,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: family10.family_members.map(&:id).map(&:to_s),
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'returns sum of ehb premiums of eligble members' do
+              expect(@upcd_1.total_ehb_premium).to eq 1668.2
+            end
+          end
+
+          context 'grants does not exists for all members' do
+            let!(:eligibility_determination) do
+              determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+              determination.grants.create(
+                key: "AdvancePremiumAdjustmentGrant",
+                value: 1000,
+                start_on: TimeKeeper.date_of_record.beginning_of_year,
+                end_on: TimeKeeper.date_of_record.end_of_year,
+                assistance_year: TimeKeeper.date_of_record.year,
+                member_ids: [family10.primary_applicant.id.to_s],
+                tax_household_id: tax_household.id
+              )
+
+              determination
+            end
+
+            it 'returns sum of ehb premiums of eligble members' do
+              expect(@upcd_1.total_ehb_premium).to eq 866.07
+            end
+          end
+        end
       end
     end
 

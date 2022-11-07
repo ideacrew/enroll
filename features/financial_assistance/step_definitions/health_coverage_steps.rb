@@ -58,6 +58,14 @@ And(/^the user checks a employer sponsored health coverage checkbox$/) do
   find(:css, "#insurance_kind[value='employer_sponsored_insurance']").set(true)
 end
 
+Then(/^the health plan meets mvs and affordable question should show$/) do
+  expect(page).to have_content(l10n('health_plan_meets_mvs_and_affordable_question')&.to_s)
+end
+
+Then(/^the employer id field should indicate it is required$/) do
+  expect(find("#benefit_esi_ein")["placeholder"]).to include "*"
+end
+
 And(/^the user not sure link next to minimum standard value question$/) do
   find("#is_esi_mec_met_not_sure").click
 end
@@ -72,6 +80,10 @@ end
 
 Then(/^the other health coverage form should show$/) do
   expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]")
+end
+
+Then(/^the esi question should be about your job rather than a job$/) do
+  expect(page).to have_content('Coverage through your job (also known as employer-sponsored health insurance)')
 end
 
 Given(/^the user fills out the required health coverage information$/) do

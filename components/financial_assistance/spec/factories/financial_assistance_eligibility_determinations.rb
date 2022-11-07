@@ -9,5 +9,6 @@ FactoryBot.define do
     max_aptc  { 225.13 }
     csr_percent_as_integer { 87 }
     source { 'Faa' }
+    effective_starting_on { TimeKeeper.date_of_record.beginning_of_year }
   end
 end

@@ -33,7 +33,7 @@ module Operations
       end
 
       def find_family_member(family_id, family_member_id)
-        @family = Family.where(id: family_id).first
+        @family ||= Family.where(id: family_id).first
         return Failure("Unable to find Family with family_id: #{family_id}") if @family.blank?
 
         family_member = @family.active_family_members.where(id: family_member_id).first
@@ -51,11 +51,11 @@ module Operations
       end
 
       # 'adult_only', 'adult_and_child', 'child_only'
-      # If age is less than or equal to 19, then a person is considered as Child.
-      # If age is greater than 19, then the person is considered as Adult.
+      # If age is less than 19, then a person is considered as Child.
+      # If age is greater than or equal to 19, then the person is considered as Adult.
       def type_of_household(household)
-        return 'adult_only' if household[:members].all? { |member| member[:age_on_effective_date] > 19 }
-        return 'child_only' if household[:members].all? { |member| member[:age_on_effective_date] <= 19 }
+        return 'adult_only' if household[:members].all? { |member| member[:age_on_effective_date] >= 19 }
+        return 'child_only' if household[:members].all? { |member| member[:age_on_effective_date] < 19 }
 
         'adult_and_child'
       end

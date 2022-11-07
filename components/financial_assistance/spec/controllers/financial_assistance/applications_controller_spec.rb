@@ -74,9 +74,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "copy an application" do
     let(:family1_id) { family.id }
     let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
+    let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: true) }
 
     before(:each) do
       sign_in user
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
       applicants = application.applicants
       application.add_or_update_relationships(applicants[0], applicants[1], 'spouse')
       application.add_or_update_relationships(applicants[0], applicants[2], 'parent')
@@ -456,16 +458,29 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "GET copy" do
     context "when there is not response from eligibility service" do
+      let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: true) }
 
       before do
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
+        allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
       end
 
-      it 'should copy applicant and redirect to financial assistance application edit path' do
+      it 'should copy applicant and redirect to financial assistance application edit path unless iap_year_selection enabled' do
+        skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
         get :copy, params: { id: application.id }
         existing_app_ids = [application.id, application2.id]
         copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
         expect(response).to redirect_to(edit_application_path(copy_app.id))
+      end
+
+      it 'should copy applicant and redirect to financial assistance assistance year select path if iap_year_selection enabled' do
+        skip "skipped: iap_year_selection not enabled" unless FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
+        get :copy, params: { id: application.id }
+        existing_app_ids = [application.id, application2.id]
+        copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
+        expect(response).to redirect_to(application_year_selection_application_path(copy_app.id))
       end
     end
 
@@ -591,6 +606,17 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
+  describe "PATCH update_application_year" do
+    context "with different assistance_year" do
+      before do
+        patch :update_application_year, params: { id: application.id, application: {assistance_year: TimeKeeper.date_of_record.year + 1} }
+      end
+      it "should update the assistance_year" do
+        expect(application.reload.assistance_year).to eq TimeKeeper.date_of_record.year + 1
+      end
+    end
+  end
+
   describe  "GET wait_for_eligibility_response" do
     context "With valid data" do
       it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
@@ -668,22 +694,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   describe "GET check eligibility results received" do
-    context "With valid data" do
+    context "doesn't have the success status code" do
 
-      it "should return false if the Header of the response doesn't have the success status code" do
+      it "should return false" do
         get :check_eligibility_results_received, params: { id: application.id }
         expect(response.body).to eq "false"
       end
+    end
 
-      context 'with success status code and determined application' do
-        before do
-          application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
-          get :check_eligibility_results_received, params: { id: application.id }
-        end
+    context 'with success status code and determined application' do
 
-        it 'should return true for response body' do
-          expect(response.body).to eq 'true'
-        end
+      let(:cache_key) { "application_#{application.hbx_id}_determined" }
+      let(:set_rails_cache) { Rails.cache.write(cache_key, Time.now.strftime('%Y-%m-%d %H:%M:%S.%L'), expires_in: 5.minutes) }
+
+      before do
+        application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
+        set_rails_cache
+        get :check_eligibility_results_received, params: { id: application.id }
+      end
+
+      after do
+        Rails.cache.delete(cache_key)
+      end
+
+      it 'should return true for response body' do
+        expect(response.body).to eq 'true'
       end
     end
   end

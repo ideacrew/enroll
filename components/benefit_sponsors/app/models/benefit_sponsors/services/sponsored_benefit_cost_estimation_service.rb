@@ -48,13 +48,12 @@ module BenefitSponsors
       end
 
       def calculate_estimates_for_benefit_display(sponsored_benefit)
-        reference_product = sponsored_benefit.reference_product
         benefit_application = sponsored_benefit.benefit_package.benefit_application
         package = sponsored_benefit.product_package
         cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
         sponsor_contribution, total, employer_costs = cost_estimator.calculate(
           sponsored_benefit,
-          reference_product,
+          product_for_benefits_page_employer_costs(sponsored_benefit, benefit_application),
           package)
         if sponsor_contribution.sponsored_benefit.pricing_determinations.any?
           pd = sponsor_contribution.sponsored_benefit.latest_pricing_determination
@@ -71,7 +70,7 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          start_on = sponsored_benefit.benefit_package.benefit_application.reinstated_id.present? ? sponsored_benefit.benefit_package.benefit_sponsor_catalog.start_on : sponsored_benefit.benefit_package.start_on
+          start_on = benefit_application.reinstated_id.present? ? benefit_application.benefit_sponsor_catalog.start_on : benefit_application.start_on
           lowest_cost_product = sponsored_benefit.lowest_cost_product(start_on)
           highest_cost_product = sponsored_benefit.highest_cost_product(start_on)
           group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
@@ -109,6 +108,15 @@ module BenefitSponsors
 
       def calculate_estimates_for_package_edit(benefit_application, sponsored_benefit, reference_product, package)
         calculate_estimates_for_package_action(benefit_application, sponsored_benefit, reference_product, package, build_objects: false)
+      end
+
+      def product_for_benefits_page_employer_costs(sponsored_benefit, benefit_application)
+        if benefit_application.osse_eligible?
+          start_on = benefit_application.reinstated_id.present? ? benefit_application.benefit_sponsor_catalog.start_on : benefit_application.start_on
+          sponsored_benefit.highest_cost_product(start_on)
+        else
+          sponsored_benefit.reference_product
+        end
       end
 
       protected

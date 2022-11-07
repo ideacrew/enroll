@@ -175,6 +175,19 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
 
+    context 'text for hra setting is turned on and minimum_value_standard_question enabled' do
+      before do
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra)).to receive(:item).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:minimum_value_standard_question).and_return(true)
+        @result = helper.applicant_eligibly_enrolled
+      end
+
+      it 'should return hra text without the parentheses' do
+        expect(@result).to eq 'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in? *'
+      end
+    end
+
     context 'When both the settings are turned off' do
       before do
         allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
@@ -335,6 +348,107 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
         applicant.csr_eligibility_kind = 'csr_limited'
         applicant.save!
         expect(helper.display_csr(applicant.reload)).to eq('Limited')
+      end
+    end
+  end
+
+  describe '#prospective_year_application?' do
+    let(:system_year) { TimeKeeper.date_of_record.year }
+    let(:application_stub) { OpenStruct.new(assistance_year: application_year) }
+    let(:current_user) { OpenStruct.new(has_hbx_staff_role?: false) }
+    let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: open_enrollment) }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_prospective_year_application_copy_before_oe).and_return(enabled)
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+    end
+
+    context 'configuration is turned OFF' do
+      let(:enabled) { false }
+      let(:open_enrollment) { false }
+      let(:application_year) { system_year }
+
+      it 'should return false as feature is turned OFF' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+
+    context 'configuration is turned ON and is under open_enrollment' do
+      let(:enabled) { true }
+      let(:open_enrollment) { true }
+      let(:application_year) { system_year }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+
+    context 'configuration turned ON, not under open_enrollment, prospective_year_application' do
+      let(:enabled) { true }
+      let(:open_enrollment) { false }
+      let(:application_year) { system_year.next }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(true)
+      end
+    end
+
+    context 'configuration turned ON, under open_enrollment, current_year_application' do
+      let(:enabled) { true }
+      let(:open_enrollment) { true }
+      let(:application_year) { system_year }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+
+    context 'configuration turned ON, not under open_enrollment, application without application_year' do
+      let(:enabled) { true }
+      let(:open_enrollment) { false }
+      let(:application_year) { nil }
+
+      it 'should return false as system is under open_enrollment' do
+        expect(helper.prospective_year_application?(application_stub)).to eq(false)
+      end
+    end
+  end
+
+  describe '#display_minimum_value_standard_question?' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:minimum_value_standard_question).and_return(enabled)
+    end
+
+    context 'RR configuration turned OFF' do
+      let(:enabled) { false }
+      let(:insurance_kind) { 'health_reimbursement_arrangement' }
+
+      it 'should return false' do
+        expect(
+          helper.display_minimum_value_standard_question?(insurance_kind)
+        ).to eq(false)
+      end
+    end
+
+    context 'RR configuration turned ON, insurance_kind: health_reimbursement_arrangement' do
+      let(:enabled) { true }
+      let(:insurance_kind) { 'health_reimbursement_arrangement' }
+
+      it 'should return false' do
+        expect(
+          helper.display_minimum_value_standard_question?(insurance_kind)
+        ).to eq(false)
+      end
+    end
+
+    context 'RR configuration turned ON, insurance_kind: employer_sponsored_insurance' do
+      let(:enabled) { true }
+      let(:insurance_kind) { 'employer_sponsored_insurance' }
+
+      it 'should return true' do
+        expect(
+          helper.display_minimum_value_standard_question?(insurance_kind)
+        ).to eq(true)
       end
     end
   end

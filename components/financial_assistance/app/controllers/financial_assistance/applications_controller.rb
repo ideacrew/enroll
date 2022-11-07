@@ -67,8 +67,7 @@ module FinancialAssistance
               redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
               return
             end
-            if @application.complete? && @application.may_submit?
-              @application.submit!
+            if @application.complete?
               publish_result = determination_request_class.new.call(application_id: @application.id)
               if publish_result.success?
                 redirect_to wait_for_eligibility_response_application_path(@application)
@@ -108,7 +107,10 @@ module FinancialAssistance
       if copy_result.success?
         @application = copy_result.success
         @application.set_assistance_year
-        redirect_to edit_application_path(@application)
+        assistance_year_page = HbxProfile.current_hbx.under_open_enrollment? && EnrollRegistry.feature_enabled?(:iap_year_selection)
+        redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
+
+        redirect_to redirect_path
       else
         flash[:error] = copy_result.failure
         redirect_to applications_path
@@ -275,7 +277,7 @@ module FinancialAssistance
 
     def check_eligibility_results_received
       application = find_application
-      render :plain => eligibility_results_received?(application).to_s
+      render :plain => determination_token_present?(application)
     end
 
     def checklist_pdf
@@ -300,7 +302,19 @@ module FinancialAssistance
       end
     end
 
+    def update_application_year
+      new_year = params[:application][:assistance_year]
+
+      @application.update_attributes(assistance_year: new_year) if new_year && new_year != @application.assistance_year
+
+      redirect_to application_checklist_application_path(@application)
+    end
+
     private
+
+    def determination_token_present?(application)
+      Rails.cache.read("application_#{application.hbx_id}_determined").present?.to_s
+    end
 
     def has_outstanding_local_mec_evidence?(application)
       application.applicants.any? {|applicant| Eligibilities::Evidence::OUTSTANDING_STATES.include?(applicant&.local_mec_evidence&.aasm_state)}

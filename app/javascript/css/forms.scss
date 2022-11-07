@@ -1,11 +1,12 @@
 #new_user {
-  #pass_strength, #pass_match {
+  #pass_strength,
+  #pass_match {
     font-size: 12px;
   }
   span#complexity {
     padding: 3px 0;
     height: 5px;
-    color: #000;
+    color: var(--grey-190);
     font-size: 12px;
     text-align: center;
     display: inline-block;
@@ -13,25 +14,25 @@
     margin-left: 5px;
   }
   .strong {
-    background-color: #FAD054;
+    background-color: var(--warning-color);
     width: 40px;
   }
   .weak {
-    background-color: #e72b2d;
+    background-color: var(--error-color);
     width: 20px;
   }
   .stronger {
-    background-color: #93C9F4;
+    background-color: var(--info-tint);
     width: 60px;
   }
   .strongest {
-    background-color: #005fd6;
+    background-color: var(--info-color);
     width: 70px;
   }
   .fa-check {
-    color: $lime-green;
+    color: var(--bright-green);
   }
   .fa-times {
-    color: $red;
+    color: var(--error-color);
   }
 }

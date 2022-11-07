@@ -39,6 +39,11 @@ module FinancialAssistance
 
     RENEWAL_ELIGIBLE_STATES = %w[submitted determined imported].freeze
 
+    SAFE_REGISTRY_METHODS = {
+      "FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate" => FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate,
+      "FinancialAssistance::Operations::EnrollmentDates::ApplicationYear" => FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
+    }.freeze
+
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
 
@@ -554,6 +559,8 @@ module FinancialAssistance
     end
 
     def send_determination_to_ea
+      return if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       if result.success?
         rt_transfer
@@ -591,6 +598,7 @@ module FinancialAssistance
     end
 
     def is_transferrable?
+      return false if FinancialAssistanceRegistry.feature_enabled?(:block_renewal_application_transfers) && previously_renewal_draft?
       unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer)
         # legally required to send application for full assessment if consumer requests it
         return true if full_medicaid_determination
@@ -868,7 +876,11 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined, :update_evidence_histories] do
+      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
+        transitions from: :submitted, to: :determined
+      end
+
+      event :determine_renewal, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1005,44 +1017,42 @@ module FinancialAssistance
     end
 
     def publish_application_determined
-      return unless predecessor_id.blank? && (can_trigger_fdsh_calls? || is_local_mec_checkable?)
+      return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
+      return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
+
       ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
+    def apply_aggregate_to_enrollment
+      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft?
+      on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
+
+      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
+    rescue StandardError => e
+      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+    end
+
     # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
-      return if Rails.env.test? || !EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(self)
-
-      unless cv3_application.success?
-        Rails.logger.error { "Failed while transforming to cv3 application: #{self.hbx_id}, Error: #{cv3_application.failure}" }
-        return
-      end
-
-      initializer = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-
-      unless initializer.success?
-        Rails.logger.error { "Failed while initializing application: #{self.hbx_id}, Error: #{initializer.failure}" }
-        return
-      end
-
-      determination = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(initializer.value!.to_h)
+      determination = family.create_thhg_on_fa_determination(self)
 
       unless determination.success?
         Rails.logger.error { "Failed while creating group fa determination: #{self.hbx_id}, Error: #{determination.failure}" }
         return
       end
 
+      rt_transfer
+
       family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
-      Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" } unless family_determination.success?
 
-      if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
-        on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family.reload, year: self.effective_date.year})
-
-        Rails.logger.error { "Failed while creating on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
+      if family_determination.success?
+        apply_aggregate_to_enrollment
+      else
+        Rails.logger.error { "Failed while creating family determination: #{self.hbx_id}, Error: #{family_determination.failure}" }
       end
     rescue StandardError => e
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
@@ -1319,26 +1329,19 @@ module FinancialAssistance
     # Case1: Missing address - No address objects at all
     # Case2: Primary applicant should have a valid address
     def applicants_have_valid_addresses?
-      applicants.all?{|applicant| applicant.addresses.where(:kind.in => ['home', 'mailing']).present?} && primary_applicant.has_valid_address?
+      addresses_valid = applicants.all?{|applicant| applicant.addresses.where(:kind.in => ['home', 'mailing']).present?} && primary_applicant.has_valid_address?
+      self.errors[:base] << 'You must have a valid addresses for every applicant.' unless addresses_valid
+      addresses_valid
+    end
+
+    def required_attributes_valid?
+      return true if renewal_draft?
+
+      self.valid?(:submission)
     end
 
     def is_application_valid?
-      application_attributes_validity = self.valid?(:submission) ? true : false
-
-      relationships_validity = if relationships_complete?
-                                 true
-                               else
-                                 false
-                               end
-
-      if applicants_have_valid_addresses?
-        addresses_validity = true
-      else
-        self.errors[:base] << 'You must have a valid addresses for every applicant.'
-        addresses_validity = false
-      end
-
-      application_attributes_validity && relationships_validity && addresses_validity
+      required_attributes_valid? && relationships_complete? && applicants_have_valid_addresses?
     end
 
     # rubocop:disable Lint/EmptyRescueClause
@@ -1362,6 +1365,14 @@ module FinancialAssistance
         applicant.create_evidence(:non_esi_mec, "Non ESI MEC")
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
         applicant.save!
+      end
+    end
+
+    def create_rrv_evidence_histories
+      rrv_evidences = %w[non_esi_evidence income_evidence]
+
+      active_applicants.each do |applicant|
+        applicant.create_rrv_evidence_histories(rrv_evidences)
       end
     end
 
@@ -1561,7 +1572,7 @@ module FinancialAssistance
 
     def set_effective_date
       return if effective_date.present?
-      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
+      effective_date = SAFE_REGISTRY_METHODS.fetch(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item).new.call(assistance_year: assistance_year).value!
       update_attribute(:effective_date, effective_date)
     end
 
@@ -1601,9 +1612,13 @@ module FinancialAssistance
 
     def application_submission_validity
       # Mandatory Fields before submission
-      validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified, :parent_living_out_of_home_terms
+      required_attributes_valid = validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state
+
+      required_boolean_attributes_valid = validates_inclusion_of :is_ridp_verified, :parent_living_out_of_home_terms, in: [true, false]
       # User must agree with terms of service check boxes before submission
-      validates_acceptance_of :medicaid_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+      terms_attributes_valid = validates_acceptance_of :medicaid_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+
+      required_attributes_valid && required_boolean_attributes_valid && terms_attributes_valid
     end
 
     def before_attestation_validity
@@ -1694,12 +1709,9 @@ module FinancialAssistance
     end
 
     def create_evidences
-      return if predecessor_id.present?
-
       active_applicants.each do |applicant|
         applicant.create_evidences
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
-        # create_income_verification(applicant) if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
       end
     rescue StandardError => e
       Rails.logger.error { "FAA create_evidences error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }

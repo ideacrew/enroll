@@ -1,4 +1,5 @@
 class InsuredEligibleForBenefitRule
+  include L10nHelper
 
   # Insured role can be: EmployeeRole, ConsumerRole, ResidentRole
 
@@ -19,6 +20,7 @@ class InsuredEligibleForBenefitRule
     @new_effective_on = options[:new_effective_on]
     @market_kind = options[:market_kind]
     @shopping_family_member_ids = options[:shopping_family_members_ids]
+    @csr_kind = options[:csr_kind]
   end
 
   def setup
@@ -63,6 +65,7 @@ class InsuredEligibleForBenefitRule
       end
       status = false if is_age_range_satisfied_for_catastrophic? == false
       status = set_status_and_error_if_not_applying_coverage if @role.class.name == "ConsumerRole" && is_applying_coverage_status_satisfied? == false
+      status = set_status_and_error_if_birthdate_after_effective_date unless valid_birthdate?
       return status, @errors
     end
     [false]
@@ -91,6 +94,17 @@ class InsuredEligibleForBenefitRule
     return status
   end
 
+  def set_status_and_error_if_birthdate_after_effective_date
+    status = false
+    @errors = [l10n('insured.group_selection.birthdate_warning_message')]
+    status
+  end
+
+  def valid_birthdate?
+    return false if @new_effective_on.is_a?(Date) && (@new_effective_on < @role.person.dob)
+    true
+  end
+
   def is_applying_coverage_status_satisfied?
     @role.is_applying_coverage?
   end
@@ -106,11 +120,15 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
-    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
-    return true if tax_household.blank?
-
     cost_sharing = @benefit_package.cost_sharing
-    csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      csr_kind = @csr_kind
+    else
+      tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
+      return true if tax_household.blank?
+
+      csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
+    end
     return true if csr_kind.blank? || cost_sharing.blank?
     csr_kind == cost_sharing
   end

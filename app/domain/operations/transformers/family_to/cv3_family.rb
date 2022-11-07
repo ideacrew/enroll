@@ -41,6 +41,7 @@ module Operations
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: transform_households(family.households)) if family.households.present?
+          payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
           failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
           return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
           Success(payload)
@@ -200,6 +201,20 @@ module Operations
           end
         end
 
+        def transform_tax_household_groups(tax_household_groups)
+          tax_household_groups.collect do |th_group|
+            {
+              hbx_id: th_group.hbx_id,
+              assistance_year: th_group.assistance_year,
+              start_on: th_group.start_on,
+              end_on: th_group.end_on,
+              source: th_group.source,
+              application_hbx_id: th_group.application_id,
+              tax_households: transform_tax_households(th_group.tax_households)
+            }
+          end
+        end
+
         def transform_coverage_households(households)
           households.collect do |household|
             {
@@ -218,10 +233,13 @@ module Operations
               hbx_id: household.hbx_assigned_id.to_s,
               allocated_aptc: household.allocated_aptc.to_hash,
               is_eligibility_determined: household.is_eligibility_determined,
-              effective_starting_on: household.effective_starting_on,
-              effective_ending_on: household.effective_ending_on,
-              tax_household_members: transform_tax_household_members(household.tax_household_members),
-              eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations)
+              start_date: household.effective_starting_on,
+              end_date: household.effective_ending_on,
+              tax_household_members: transform_tax_household_members(household),
+              eligibility_determinations: transform_eligibility_determininations(household.eligibility_determinations),
+              yearly_expected_contribution: household.yearly_expected_contribution&.to_hash,
+              eligibility_determination_hbx_id: household.eligibility_determination_hbx_id.to_s,
+              max_aptc: household.max_aptc&.to_hash
             }
           end
         end
@@ -259,19 +277,70 @@ module Operations
             first_name: member.family_member.person.first_name,
             last_name: member.family_member.person.last_name,
             is_primary_family_member: member.family_member.is_primary_applicant,
-            age: member.family_member.person.age_on(TimeKeeper.date_of_record)
+            age: member.family_member.person.age_on(TimeKeeper.date_of_record),
+            relation_with_primary: member.family_member&.primary_relationship
           }
         end
 
-        def transform_tax_household_members(members)
-          members.collect do |member|
+        def transform_tax_household_members(tax_household)
+          slcsp_info = fetch_slcsp_info(tax_household)
+          application = latest_application_in_tax_household_year(tax_household)
+          tax_household.tax_household_members.collect do |member|
+            person_hbx_id = member.family_member.person.hbx_id
             {
               family_member_reference: transform_family_member_reference(member),
-              # product_eligibility_determination: member.product_eligibility_determination,
+              product_eligibility_determination: product_eligibility_determination_hash(member),
               is_subscriber: member.is_subscriber,
+              tax_filer_status: fetch_tax_filer_status(person_hbx_id, application),
+              slcsp_benchmark_premium: fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info),
               reason: member.reason
             }
           end
+        end
+
+        def fetch_tax_filer_status(person_hbx_id, application)
+          return unless application
+          applicant = application.applicants.where(person_hbx_id: person_hbx_id).first
+          return unless applicant
+
+          applicant.tax_filer_kind
+        end
+
+        def fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info)
+          return if slcsp_info == {}
+
+          slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :cost)&.to_money&.to_hash
+        end
+
+        def latest_application_in_tax_household_year(tax_household)
+          assistance_year = tax_household.effective_starting_on.year
+          ::FinancialAssistance::Application.where(family_id: tax_household.family.id, aasm_state: "determined", assistance_year: assistance_year).max_by(&:created_at)
+        end
+
+        def fetch_slcsp_info(tax_household)
+          effective_date = tax_household.effective_starting_on
+          premiums = ::Operations::Products::Fetch.new.call({family: tax_household.family, effective_date: effective_date})
+          return {} if premiums.failure?
+
+          slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
+          return {} if slcsp_info.failure?
+          slcsp_info.success
+        end
+
+        def product_eligibility_determination_hash(member)
+          {
+            is_ia_eligible: member.is_ia_eligible,
+            is_medicaid_chip_eligible: member.is_medicaid_chip_eligible,
+            is_non_magi_medicaid_eligible: member.is_non_magi_medicaid_eligible,
+            is_totally_ineligible: member.is_totally_ineligible,
+            is_without_assistance: member.is_without_assistance,
+            magi_medicaid_monthly_household_income: member.magi_medicaid_monthly_household_income&.to_hash,
+            medicaid_household_size: member.medicaid_household_size,
+            magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit&.to_hash,
+            magi_as_percentage_of_fpl: member.magi_as_percentage_of_fpl,
+            magi_medicaid_category: member.magi_medicaid_category,
+            csr: member.csr_percent_as_integer
+          }
         end
 
         def transform_family_members(family_members)

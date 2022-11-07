@@ -28,6 +28,21 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
   end
 
+  context "consumer's birthday is after the enrollment's effective date" do
+    let(:dependent_1) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 5.days) }
+    let(:new_effective_on) { TimeKeeper.date_of_record - 10.days }
+    let(:rule) { InsuredEligibleForBenefitRule.new(dependent_1.consumer_role, benefit_package, new_effective_on: new_effective_on) }
+
+    it "should return false when consumer's birthday is greater than effective date" do
+      expect(rule.valid_birthdate?).to eql(false)
+    end
+
+    it "should return true when consumer's birthday is less than or equal to the effective date" do
+      dependent_1.update_attributes!(dob: new_effective_on)
+      expect(rule.valid_birthdate?).to eql(true)
+    end
+  end
+
   context "#is_age_range_satisfied?" do
     let(:consumer_role) {double(dob: (TimeKeeper.date_of_record - 20.years))}
     let(:benefit_package) {double}
@@ -132,6 +147,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_package_with_current_date_start_on) { FactoryBot.build(:benefit_package) }
 
+    before do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+    end
+
     it "should return true when csr_kind is blank" do
       allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return tax_household
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family, shopping_family_members_ids: mikes_family.family_members.map(&:id))
@@ -157,6 +176,24 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
       rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id))
       expect(rule.is_cost_sharing_satisfied?).to eq false
+    end
+
+    context 'mthh enabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should return false when cost_sharing is not equal to csr_kind" do
+        benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
+        rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_73')
+        expect(rule.is_cost_sharing_satisfied?).to eq false
+      end
+
+      it "should return true when cost_sharing is not equal to csr_kind" do
+        benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
+        rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_100')
+        expect(rule.is_cost_sharing_satisfied?).to eq true
+      end
     end
   end
 

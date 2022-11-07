@@ -481,7 +481,7 @@ module ApplicationHelper
 
   def display_carrier_logo(plan, options = {:width => 50})
     carrier_name = carrier_logo(plan)
-    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width], alt: "#{carrier_name} logo") # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def digest_logos
@@ -962,5 +962,11 @@ module ApplicationHelper
     else
       true
     end
+  end
+
+  def display_childcare_program_options(person)
+    return false unless EnrollRegistry.feature_enabled?(:aca_ivl_osse_subsidy)
+
+    person.has_active_consumer_role? || person.has_active_resident_role?
   end
 end

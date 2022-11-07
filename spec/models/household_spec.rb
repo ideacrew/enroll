@@ -32,7 +32,27 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
-  context "new household member not matching existing person record" do
+  context "ivl - new family member" do
+    let(:new_person) { create(:person, :with_consumer_role) }
+    let(:new_family_member) do
+      family.family_members.build(
+        person: new_person,
+        is_primary_applicant: false,
+        is_coverage_applicant: true,
+        is_consent_applicant: false
+      )
+    end
+
+    subject { family.active_household.add_household_coverage_member(new_family_member) }
+
+    it "should create new coverage household member" do
+      allow(new_family_member).to receive(:primary_relationship).and_return("child")
+      expect(family.active_household.coverage_households.first).to receive(:save!)
+      subject
+    end
+  end
+
+  context "shop - new household member not matching existing person record" do
     let(:new_family_member) {FactoryBot.create(:family_member, family: family, person: person)}
     let(:primary) {family.family_members.first.person}
 
@@ -312,6 +332,16 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
 
     it 'should create ED with source Renewals' do
       expect(active_household.tax_households.first.latest_eligibility_determination.source).to eq('Renewals')
+    end
+  end
+
+  context 'update individual csr' do
+    before do
+      active_household.build_thh_and_eligibility(60, 94, date, slcsp, 'Renewals', {person.hbx_id.to_s => '93'})
+    end
+
+    it 'should update csr percentage on tax household member' do
+      expect(active_household.tax_households.first.tax_household_members.first.csr_percent_as_integer).to eq 93
     end
   end
 

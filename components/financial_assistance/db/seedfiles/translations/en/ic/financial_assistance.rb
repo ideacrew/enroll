@@ -152,12 +152,13 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
+  "en.faa.assitance_year_option1" => "%{year} Open Enrollment"
   "en.faa.year_selection_oe_year" => " Open Enrollment",
   "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
   "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2021-coverage?utm_source=2021EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2021'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
@@ -199,7 +200,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.errors.copy_application_error" => "Unable to copy given application.",
   "en.faa.errors.key_application_id_missing_error" => 'Missing application_id key.',
   "en.faa.errors.unable_to_find_application_error" => 'Unable to find application with given application_id.',
-  "en.faa.errors.given_application_is_not_submitted_error" => 'Unable to find application with given application_id.',
+  "en.faa.errors.given_application_is_not_submitted_error" => 'Application is not in one of the %{valid_states} states',
   "en.faa.errors.invalid_household_relationships" => "Invalid set of relationships defined among household members.",
 
   "en.faa.results.eligibility_results" => "Eligibility Results",
@@ -222,7 +223,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.totally_ineligible_heading" => "Does Not Qualify",
   "en.faa.results.totally_ineligible_text" => "These people likely don't qualify for %{medicaid_or_chip_program_short_name}, and don't qualify to enroll in an insurance plan through %{short_name}.",
   "en.faa.results.next_steps" => 'Next Steps',
-  "en.faa.results.all_medicaid_next_steps_continue_text" => "MaineCare coverage is free. If you would like to enroll and pay full price for an insurance plan through %{short_name}, select “CONTINUE” to see if you are eligible to select a plan or make changes to your current plan.",
+  "en.faa.results.all_medicaid_next_steps_continue_text" => "MaineCare coverage is free. If you would like to enroll and pay full price for an insurance plan through %{short_name}",
   "en.faa.results.next_steps_text" => "If you’re already enrolled in a %{short_name} plan, you’re finished! You’ll see any updates applied to your plan in a minute or two. Select “Return to Account Home“.",
   "en.faa.results.return_to_account_home" => 'Return to Account Home',
   "en.faa.results.continue_text" => "Select “CONTINUE” to see if you are eligible to select a new plan or make changes to your current plan.",

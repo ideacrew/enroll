@@ -386,6 +386,27 @@ Given(/^the consumer has a benefit$/) do
   application.active_applicants.first.update_attributes has_enrolled_health_coverage: true
 end
 
+And(/^the consumer has an esi benefit$/) do
+  application.active_applicants.first.benefits.create(
+    {
+      "employee_cost" => {"cents" => 58_800.0, "currency_iso" => "USD"},
+      "workflow" => {},
+      "employer_id" => "13-9845789",
+      "kind" => "is_enrolled",
+      "insurance_kind" => "employer_sponsored_insurance",
+      "employer_name" => "Acme",
+      "is_esi_waiting_period" => true,
+      "is_esi_mec_met" => false,
+      "esi_covered" => "self",
+      "start_on" => TimeKeeper.date_of_record.beginning_of_year,
+      "end_on" => nil,
+      "employee_cost_frequency" => "monthly",
+      "submitted_at" => TimeKeeper.date_of_record,
+      "employer_phone" => {"kind" => "work", "area_code" => "394", "number" => "5789753", "full_phone_number" => "3945789753"}
+    }
+  )
+end
+
 Given(/^the consumer has a deduction$/) do
   application.active_applicants.first.deductions.create! kind: 'alimony_paid'
 end
@@ -493,6 +514,16 @@ end
 Given(/the iap year selection feature is enabled/) do
   enable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
   enable_feature :iap_year_selection
+end
+
+Given(/the oe application warning display feature is enabled/) do
+  enable_feature :oe_application_warning_display, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :oe_application_warning_display
+end
+
+Given(/the filtered_application_list feature is enabled/) do
+  enable_feature :filtered_application_list, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :filtered_application_list
 end
 
 Given(/the iap year selection feature is disabled/) do

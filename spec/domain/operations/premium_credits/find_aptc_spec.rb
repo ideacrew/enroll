@@ -41,6 +41,24 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
     end
 
     context 'not eligible for aptc' do
+      context 'with no eligibility_determination' do
+        let(:person) { FactoryBot.create(:person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            :individual_shopping,
+                            :with_silver_health_product,
+                            :with_enrollment_members,
+                            enrollment_members: family.family_members,
+                            family: family)
+        end
+
+        it 'returns zero available aptc' do
+          expect(result.success?).to eq true
+          expect(result.value!).to eq 0.0
+        end
+      end
+
       context 'without no aptc grants for family' do
 
         let(:person) { FactoryBot.create(:person) }
@@ -120,7 +138,18 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           )
         end
 
-        let(:tax_household_group) do
+        let!(:tax_household_group) do
+          family.tax_household_groups.create!(
+            assistance_year: TimeKeeper.date_of_record.year,
+            source: 'Admin',
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            tax_households: [
+              FactoryBot.build(:tax_household, household: family.active_household)
+            ]
+          )
+        end
+
+        let!(:inactive_tax_household_group) do
           family.tax_household_groups.create!(
             assistance_year: TimeKeeper.date_of_record.year,
             source: 'Admin',
@@ -184,10 +213,11 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         let(:primary_bp) { 500.00 }
         let(:dependent_bp) { 600.00 }
 
-        context 'when benchmark_premium is nil' do
+        context 'when benchmark_premium & household_info is nil' do
           let(:benchmark_premium) { nil }
 
           it 'returns zero $' do
+            aptc_grant.update_attribute(:tax_household_id, BSON::ObjectId.new)
             expect(result.success?).to eq true
             expect(result.value!).to eq 0
             expect(TaxHouseholdEnrollment.all.size).to eq 1
@@ -654,7 +684,6 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             assistance_year: TimeKeeper.date_of_record.year,
             source: 'Admin',
             start_on: TimeKeeper.date_of_record.beginning_of_year,
-            end_on: TimeKeeper.date_of_record.end_of_year,
             tax_households: [
               FactoryBot.build(:tax_household, household: family.active_household),
               FactoryBot.build(:tax_household, household: family.active_household)
@@ -1145,7 +1174,6 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         assistance_year: TimeKeeper.date_of_record.year,
         source: 'Admin',
         start_on: TimeKeeper.date_of_record.beginning_of_year,
-        end_on: TimeKeeper.date_of_record.end_of_year,
         tax_households: [
           FactoryBot.build(:tax_household, household: family.active_household),
           FactoryBot.build(:tax_household, household: family.active_household)
@@ -1273,7 +1301,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           :individual_shopping,
                           :with_silver_health_product,
                           :with_enrollment_members,
-                          elected_aptc_pct: 1.0,
+                          elected_aptc_pct: 0.9,
                           enrollment_members: ([primary_applicant] + [family.dependents.select { |dependent| [dependent_b.id, dependent_d.id].include? dependent.person_id }]).flatten,
                           family: family,
                           aasm_state: 'coverage_selected')
@@ -1284,7 +1312,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           :individual_shopping,
                           :with_silver_health_product,
                           :with_enrollment_members,
-                          elected_aptc_pct: 1.0,
+                          elected_aptc_pct: 0.85,
                           enrollment_members: family.dependents.select { |dependent| [dependent_b.id, dependent_c.id, dependent_d.id].include? dependent.person_id },
                           family: family,
                           aasm_state: 'coverage_selected')
@@ -1324,6 +1352,35 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
         enr3_result = Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: enrollment3, effective_on: enrollment3.effective_on })
         expect(enr3_result.success?).to eq true
         expect(enr3_result.value!).to eq 100
+      end
+    end
+
+    context 'having cents in contribution values' do
+      let(:yearly_expected_contribution1) { 200.45 * 12 }
+      let(:yearly_expected_contribution2) { 100.45 * 12 }
+
+      let(:enrollment1) do
+        FactoryBot.create(:hbx_enrollment,
+                          :individual_shopping,
+                          :with_silver_health_product,
+                          :with_enrollment_members,
+                          elected_aptc_pct: 0.9,
+                          enrollment_members: ([primary_applicant] + [family.dependents.select { |dependent| [dependent_b.id, dependent_d.id].include? dependent.person_id }]).flatten,
+                          family: family,
+                          aasm_state: 'coverage_selected')
+      end
+
+      before do
+        allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+          double('IdentifySlcspWithPediatricDentalCosts',
+                 call: double(:value! => slcsp_info1, :success? => true))
+        )
+      end
+
+      it 'returns sum of each grant aptc value after rounding' do
+        enr1_result = Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: enrollment1, effective_on: enrollment1.effective_on })
+        expect(enr1_result.success?).to eq true
+        expect(enr1_result.value!).to eq 800
       end
     end
   end

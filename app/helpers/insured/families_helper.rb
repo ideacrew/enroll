@@ -27,8 +27,6 @@ module Insured::FamiliesHelper
     begin
       if hbx_enrollment.is_shop?
         hbx_enrollment.total_employee_cost
-      elsif hbx_enrollment.kind == 'coverall'
-        hbx_enrollment.total_premium
       else
         cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min - hbx_enrollment.eligible_child_care_subsidy.to_f)
         cost > 0 ? cost.round(2) : 0
@@ -207,6 +205,13 @@ module Insured::FamiliesHelper
       enrollment.terminate_reason == HbxEnrollment::TermReason::NON_PAYMENT
   end
 
+  def covered_members_name_age(hbx_enrollment_members)
+    enrollment_members = hbx_enrollment_members.sort_by { |a| a.is_subscriber ? 0 : 1 }
+    enrollment_members.inject([]) do |name_age, member|
+      name_age << "#{member.person.first_name} (#{((Time.zone.now - member.person.dob.to_time) / 1.year.seconds).floor})"
+    end
+  end
+
   def enrollment_coverage_end(hbx_enrollment)
     if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on
@@ -346,5 +351,12 @@ module Insured::FamiliesHelper
     else
       l10n('not_available')
     end
+  end
+
+  def initially_hide_enrollment?(enrollment)
+    canceled_enrollment = enrollment.aasm_state == 'coverage_canceled'
+    reason_is_non_payment = enrollment.terminate_reason == 'non_payment' if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
+    external_enrollment = (enrollment.aasm_state != 'shopping' && enrollment.external_enrollment == true)
+    (canceled_enrollment && !reason_is_non_payment) || external_enrollment
   end
 end

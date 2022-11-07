@@ -1675,6 +1675,113 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  describe 'create_rrv_evidence_histories' do
+
+    before do
+      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      application.create_rrv_evidences
+    end
+
+    it 'should create verification histories' do
+      application.active_applicants.each do |applicant|
+        %w[non_esi_evidence income_evidence].each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          next unless evidence
+          expect(evidence.verification_histories).to be_empty
+        end
+      end
+
+      application.create_rrv_evidence_histories
+
+      application.active_applicants.each do |applicant|
+        %w[non_esi_evidence income_evidence].each do |evidence_name|
+          evidence = applicant.send(evidence_name)
+          next unless evidence
+          expect(evidence.verification_histories).to be_present
+          history = evidence.verification_histories.first
+          expect(history.action).to eq 'RRV_Submitted'
+          expect(history.update_reason).to eq 'RRV - Renewal verifications submitted'
+          expect(history.updated_by).to eq "system"
+        end
+      end
+    end
+  end
+
+  describe 'publish_application_determined' do
+    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined }
+    let(:publish_operation_result) { Success(double) }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.send(:create_evidences)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.save!
+    end
+
+    context "when rrv feature is enabled" do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(true)
+      end
+
+      it "should not trigger fdsh calls on renewal application determinations" do
+        application.active_applicants.each do |applicant|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.verification_histories).to be_empty
+          end
+        end
+
+        expect(publish_operation_class).not_to receive(:new)
+        application.publish_application_determined
+
+        application.active_applicants.each do |applicant|
+          %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+            evidence = applicant.send(evidence_name)
+            expect(evidence.verification_histories).to be_empty
+          end
+        end
+      end
+    end
+
+    # verification histories creation moved to subscriber as part of code optimization work (sbm_183622458)
+    # context "when rrv feature is disabled" do
+
+    #   before do
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(false)
+    #     allow(publish_operation_class).to receive_message_chain(:new, :call).with(anything).and_return(publish_operation_result)
+    #   end
+
+    #   it 'should not trigger fdsh calls on renewal application determinations' do
+    #     application.active_applicants.each do |applicant|
+    #       expect(applicant.esi_evidence).to be_present
+    #       %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+    #         evidence = applicant.send(evidence_name)
+    #         expect(evidence.verification_histories).to be_empty
+    #       end
+    #     end
+
+    #     application.publish_application_determined
+
+    #     application.active_applicants.each do |applicant|
+    #       %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
+    #         evidence = applicant.send(evidence_name)
+    #         expect(evidence.verification_histories).to be_present
+    #         history = evidence.verification_histories.first
+    #         expect(history.action).to eq "application_determined"
+    #         expect(history.update_reason).to eq "Requested Hub for verification"
+    #         expect(history.updated_by).to eq "system"
+    #       end
+    #     end
+    #   end
+    # end
+  end
+
   describe 'update_or_build_relationship' do
     let(:create_individual_rels) do
       application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
@@ -1916,6 +2023,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'is_transferrable?' do
     context 'non_magi_transfer feature disabled' do
       before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_renewal_application_transfers).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
       end
 
@@ -1942,6 +2050,37 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           it 'should return false' do
             expect(application.is_transferrable?).to eq(false)
           end
+        end
+      end
+    end
+
+    context 'block_renewal_application_transfers feature enabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:block_renewal_application_transfers).and_return(true)
+      end
+
+      context 'not a renewal application' do
+        before do
+          application.applicants.first.update(is_medicare_eligible: true)
+        end
+
+        it 'should return true' do
+          expect(application.is_transferrable?).to eq(true)
+        end
+      end
+
+      context 'a renewal application' do
+        before do
+          application.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: 'renewal_draft',
+            to_state: 'submitted'
+          )
+          application.save!
+        end
+
+        it 'should return false' do
+          expect(application.is_transferrable?).to eq(false)
         end
       end
     end
@@ -1987,6 +2126,59 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       applicant2.update_attributes!(is_applying_coverage: false)
       applicant3.update_attributes!(is_applying_coverage: false)
       expect(application.applicants_applying_coverage).to match([applicant1])
+    end
+  end
+
+  describe '#is_application_valid?' do
+    let(:family_id) { BSON::ObjectId.new }
+    let!(:year) { TimeKeeper.date_of_record.year }
+    let!(:relationship_application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+    let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new, is_primary_applicant: true) }
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      relationship_application.applicants.each do |appl|
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           county: '')]
+        appl.save!
+      end
+      relationship_application.save!
+    end
+
+    let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+    let(:set_up_relationships) do
+      relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+      relationship_application.build_relationship_matrix
+      relationship_application.save!
+    end
+
+    it 'returns true for all valid data' do
+      set_up_relationships
+      expect(relationship_application.is_application_valid?).to be_truthy
+    end
+
+    it 'returns false for invalid relationships' do
+      expect(relationship_application.is_application_valid?).to be_falsey
+    end
+
+    it 'returns false for missing required fields' do
+      set_up_relationships
+      relationship_application.update_attributes(applicant_kind: nil)
+      expect(relationship_application.is_application_valid?).to be_falsey
+    end
+
+    it 'returns false for missing required fields' do
+      set_up_relationships
+      relationship_application.update_attributes(is_ridp_verified: nil)
+      expect(relationship_application.is_application_valid?).to be_falsey
     end
   end
 end

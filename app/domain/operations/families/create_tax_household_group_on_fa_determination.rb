@@ -45,8 +45,7 @@ module Operations
         return Success(family) if application_entity.tax_households.map(&:aptc_csr_eligible_members).blank?
 
         th_group_params = tax_household_group_params(application_entity)
-        th_group = family.tax_household_groups.build(th_group_params)
-        th_group.save!
+        th_group = family.tax_household_groups.create(th_group_params)
         family.save!
 
         Success(th_group)
@@ -82,7 +81,7 @@ module Operations
           {
             eligibility_determination_hbx_id: ed.hbx_assigned_id,
             yearly_expected_contribution: ed.yearly_expected_contribution,
-            effective_starting_on: ed.effective_starting_on,
+            effective_starting_on: ed.effective_starting_on || fa_application.effective_date,
             max_aptc: ed.max_aptc,
             tax_household_members: tax_household_member_params(fa_application, ed)
           }

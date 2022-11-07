@@ -29,7 +29,7 @@
                   The content of the 'if' is refactored and updated design of the 'else'.-->
                   <div class="coverage-selection-block row-form-wrapper">
                     <div class="coverage-chbx">
-                      <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
+                      <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked && !family_member_eligible_for_mdcr(family_member, @family, @new_effective_on&.year), disabled: !is_checked ) %>
                     </div>
                     <div class="coverage-name-and-errors"> 
                       <span class="coverage-message-row"><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name.upcase} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></span>
@@ -38,10 +38,12 @@
                         <div class='text-dk-grey <%= "health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></div>
                         <div class='text-dk-grey <%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if @adapter.is_offering_dental(employee_role) && !is_dental_coverage && !is_dental_coverage.nil? %></div>
                       <% end %>
+
                       <div class="ivl_errors text-dk-grey">
-                        <% errors.each do |error| %>
-                          <div><%= error %></div>
-                        <% end%>
+                        <% errors&.each do |error| %>
+                          <% error = error.join(' ') if error.kind_of?(Array) %>
+                          <div class="pb-1"><%= error.html_safe %></div>
+                        <% end %>
                       </div>
                     </div>
                   </div>

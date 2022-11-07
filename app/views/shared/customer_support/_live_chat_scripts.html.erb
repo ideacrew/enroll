@@ -56,21 +56,6 @@
             placeholder: 'Optional',
             label: 'First Name',
             validateWhileTyping: false, // default is false
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input) {
-                if (input.val()) return true;
-                else return false;
-              }
-              return false;
-            },
           },
           {
             id: 'cx_webchat_form_lastname',
@@ -79,21 +64,6 @@
             placeholder: 'Optional',
             label: 'Last Name',
             validateWhileTyping: false, // default is false
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input) {
-                if (input.val()) return true;
-                else return false;
-              }
-              return false;
-            },
           },
           {
             id: 'cx_webchat_form_email',
@@ -102,21 +72,6 @@
             placeholder: 'Optional',
             label: 'Email',
             validateWhileTyping: false, // default is false
-            validate: function (
-              event,
-              form,
-              input,
-              label,
-              $,
-              CXBus,
-              Common
-            ) {
-              if (input) {
-                if (input.val()) return true;
-                else return false;
-              }
-              return false;
-            },
           },
           {
             id: 'cx_webchat_form_phoneNumber',
@@ -128,12 +83,13 @@
           {
             id: 'cx_webchat_form_customselect',
             name: 'customselect',
-            placeholder: 'Optional',
+            placeholder: 'Required',
             label: 'Topic',
             type: 'select',
+            required: 'Please select an option',
             options: [
               {
-                text: 'Optional',
+                text: 'Required',
                 hidden: 'hidden',
                 value: 'na',
               },
@@ -183,4 +139,16 @@
   }
 
   const customPlugin = CXBus.registerPlugin('Custom');
+
+  <% if EnrollRegistry.feature_enabled?(:live_chat_widget_error_logging) %>
+    // throw error when the webchat gets rejected or has an error for visibility
+
+    customPlugin.subscribe('WebChat.rejected', function(e){
+      console.error("rejected chat", e.stack);
+    });
+
+    customPlugin.subscribe('WebChat.error', function(e){
+      console.error("chat error", e.stack);
+    });
+  <% end %>
 </script>

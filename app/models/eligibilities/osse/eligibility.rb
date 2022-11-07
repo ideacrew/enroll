@@ -43,7 +43,7 @@ module Eligibilities
       }
 
       def create_grants
-        return if ['ConsumerRole', 'EmployeeRole'].include?(subject[:klass])
+        return if ['ConsumerRole', 'EmployeeRole', 'ResidentRole'].include?(subject[:klass])
 
         grant_values = evidences.inject([]) do |values, evidence|
           grant_result = Operations::Eligibilities::Osse::GenerateGrants.new.call(

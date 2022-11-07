@@ -130,8 +130,22 @@ module FinancialAssistance
             end
 
             def applicant_qnc_code(applicant)
+              return true if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
               return applicant.qualified_non_citizen if applicant.qualified_non_citizen.present?
+
               applicant.eligible_immigration_status ? true : false
+            end
+
+            def applicant_five_year_bar_met(applicant)
+              return false if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+
+              applicant.five_year_bar_met.present?
+            end
+
+            def applicant_five_year_bar_applies(applicant)
+              return false if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+
+              applicant.five_year_bar_applies.present?
             end
 
             # rubocop:disable Metrics/AbcSize
@@ -152,8 +166,8 @@ module FinancialAssistance
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
                            is_applying_coverage: applicant.is_applying_coverage.present?,
-                           five_year_bar_applies: applicant.five_year_bar_applies.present?,
-                           five_year_bar_met: applicant.five_year_bar_met.present?,
+                           five_year_bar_applies: applicant_five_year_bar_applies(applicant),
+                           five_year_bar_met: applicant_five_year_bar_met(applicant),
                            qualified_non_citizen: applicant_qnc_code(applicant),
                            is_consent_applicant: applicant.is_consent_applicant.present?,
                            vlp_document: vlp_document(applicant),
@@ -251,10 +265,10 @@ module FinancialAssistance
                 tot + inc.calculate_annual_income
               end.to_f
 
-              # Resource Registry configuration
-              # Earned Income Filing Threshold for year 2020: 12400
-              # Unearned Income Filing Threshold for year 2020: 12400
-              (total_earned_income > 12_400) || (total_unearned_income > 1_100)
+              assistance_year = applicant.application.assistance_year
+              unearned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("unearned_income_filing_threshold_#{assistance_year}").item
+              earned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("earned_income_filing_threshold_#{assistance_year}").item
+              (total_earned_income > earned_threshold_income) || (total_unearned_income > unearned_threshold_income)
             end
 
             def applicant_reference_by_applicant_id(application, applicant_id)
@@ -657,6 +671,7 @@ module FinancialAssistance
                             start_on: benefit.start_on,
                             end_on: benefit.end_on,
                             submitted_at: benefit.submitted_at,
+                            health_plan_meets_mvs_and_affordable: benefit.health_plan_meets_mvs_and_affordable,
                             hra_kind: get_hra_kind(benefit.hra_type) }
                 result
               end

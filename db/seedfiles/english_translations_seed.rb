@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
+site_key = ENV['CLIENT'] || 'dc'
 
 translations_to_seed = []
 # All filenames should be in a pattern such as

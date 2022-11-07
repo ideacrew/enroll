@@ -106,6 +106,7 @@ class HbxEnrollment
   field :elected_aptc_pct, type: Float, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
   field :aggregate_aptc_amount, type: Money, default: 0.0
+  field :ehb_premium, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
   # OSSE childcare subsidy
@@ -364,6 +365,15 @@ class HbxEnrollment
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
+  scope :family_non_pay_canceled_enrollments, lambda { |family|
+    where(
+      :family_id => family.id,
+      :aasm_state => "coverage_canceled",
+      :terminate_reason => "non_payment"
+    ).order(
+      effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+    )
+  }
   scope :family_home_page_hidden_external_enrollments, lambda { |family|
     where(:family_id => family.id,
           :aasm_state.nin => ["shopping"],
@@ -1008,7 +1018,7 @@ class HbxEnrollment
 
   def terminate_coverage_with(termination_date)
     # IVL enrollments go automatically to coverage_terminated
-    if termination_date.to_date >= TimeKeeper.date_of_record && is_shop?
+    if is_shop? && termination_date.to_date >= TimeKeeper.date_of_record
       schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
     else
       if may_terminate_coverage?
@@ -1053,6 +1063,17 @@ class HbxEnrollment
     )
   end
 
+  def update_tax_household_enrollment
+    return if is_shop?
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    TaxHouseholdEnrollment.where(enrollment_id: id).each do |th_enrollment|
+      th_enrollment.update_attributes(applied_aptc: (th_enrollment.available_max_aptc * elected_aptc_pct))
+    end
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+  end
+
   def handle_coverage_selection
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
@@ -1080,8 +1101,11 @@ class HbxEnrollment
     return unless successor_application&.is_submitted?
     return unless enrollment_benefit_application.successors.include?(successor_application)
 
-    passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition? && non_terminated_enrollment?
+    passive_renewals = passive_renewals_under(successor_application).to_a
+    passive_renewals.select!(&:renewing_waived?) if dummy_inactive_transition? # cancel only renewal waivers for waived enrollment updates
+    passive_renewals.each {|en| en.cancel_coverage! if en.may_cancel_coverage? }
+
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && !dummy_inactive_transition? && non_terminated_enrollment?
   end
 
   def reinstated_app
@@ -1132,8 +1156,8 @@ class HbxEnrollment
                                    :effective_on.gte => benefit_application.start_on })
   end
 
-  def non_inactive_transition?
-    !(aasm.from_state == :inactive && aasm.to_state == :inactive)
+  def dummy_inactive_transition?
+    (aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
 
   def non_terminated_enrollment?
@@ -1432,7 +1456,9 @@ class HbxEnrollment
   end
 
   def can_make_changes_for_ivl_enrollment?
-    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
+    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    return true if allowed_statuses.include?(aasm_state)
     false
   end
 
@@ -1629,6 +1655,11 @@ class HbxEnrollment
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
+  def self.family_non_pay_enrollments(family)
+    non_pay_enrollments = HbxEnrollment.family_non_pay_canceled_enrollments(family)
+    non_pay_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   def self.family_external_enrollments(family)
@@ -2078,7 +2109,7 @@ class HbxEnrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
-    event :renew_enrollment, :after => :record_transition do
+    event :renew_enrollment, :after => [:record_transition, :trigger_enrollment_notice] do
       transitions from: :shopping, to: :auto_renewing
     end
 
@@ -2086,7 +2117,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events, :update_tax_household_enrollment] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -2713,7 +2744,9 @@ class HbxEnrollment
   end
 
   def couple_enrollee?
-    @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| hem.primary_relationship == 'spouse'}
+    @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| (hem.primary_relationship == 'spouse')}
+    return @couple_enrollee unless EnrollRegistry.feature_enabled?(:domestic_partner_rating)
+    @couple_enrollee ||= primary_enrollee? && hbx_enrollment_members.any? {|hem| (hem.primary_relationship == 'domestic_partner') }
   end
 
   def generate_enrollment_saved_event
@@ -2742,9 +2775,14 @@ class HbxEnrollment
     workflow_state_transitions.order(created_at: :desc).first
   end
 
+  def ivl_osse_eligible?
+    return false if is_shop? || dental?
+
+    hbx_enrollment_members.any?(&:osse_eligible_on_effective_date?)
+  end
+
   def update_osse_childcare_subsidy
     effective_year = sponsored_benefit_package.start_on.year
-
     return if coverage_kind.to_s == 'dental'
     return unless employee_role&.osse_eligible?(effective_on)
     return unless shop_osse_eligibility_is_enabled?(effective_year)
@@ -2767,6 +2805,16 @@ class HbxEnrollment
     return if member_enrollment.nil?
 
     BigDecimal(member_enrollment&.product_price&.to_s).round(2)
+  end
+
+  def verify_and_reset_osse_subsidy_amount(member_group)
+    return unless is_shop?
+    hbx_enrollment_members.each do |member|
+      next unless member.is_subscriber?
+      product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
+      next unless eligible_child_care_subsidy.to_f > product_price.to_f
+      self.update(eligible_child_care_subsidy: product_price.to_money)
+    end
   end
 
   private

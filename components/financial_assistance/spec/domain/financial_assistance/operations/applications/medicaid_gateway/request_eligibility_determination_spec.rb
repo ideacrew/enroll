@@ -8,7 +8,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'draft', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:applicant) do
     FactoryBot.create(:applicant,
                       first_name: person.first_name,
@@ -89,6 +89,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details)
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary)
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
@@ -166,12 +167,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
     context 'invalid application aasm_state' do
       before do
-        application.update_attributes!(aasm_state: 'draft')
+        application.update_attributes!(aasm_state: 'submitted')
         @result = subject.call({application_id: application.id})
       end
 
       it 'should return a failure with error message' do
-        expect(@result.failure).to eq('Application is in draft state. Please submit application.')
+        expect(@result.failure.present?).to be_truthy
       end
     end
   end
