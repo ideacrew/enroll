@@ -9,7 +9,7 @@ registry:
         is_enabled: true
         settings:
           - key: :effective_period
-            item: <%= Date.new(2020,6,6)..Date.new(2022,10,13) %>
+            item: <%= Date.new(2020,6,6)..Date.new(2023,1,11) %>
       - key: :consumer_role_hub_call
         item: :consumer_role_hub_call
         is_enabled: true
