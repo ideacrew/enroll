@@ -151,6 +151,37 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
   end
 
+  context "Group by year feature enabled" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_terminated',
+        terminate_reason: 'non_payment',
+        product: product
+      )
+    end
+
+    context "Grouping is enabled" do
+      before :each do
+        EnrollRegistry[:home_tiles_group_by_year].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should display the year of the plan as header" do
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, layout: "insured/families/partial_layouts/wrap_enrollments_by_year", locals: { read_only: false }
+        expect(rendered).to have_selector(".year-group-title")
+      end
+    end
+  end
+
   context "without consumer_role" do
 
     let(:hbx_enrollment) do

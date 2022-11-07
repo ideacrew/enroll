@@ -783,3 +783,9 @@ registry:
       - key: :show_non_pay_enrollments
         item: :show_non_pay_enrollments
         is_enabled: <%= ENV['SHOW_NON_PAY_ENROLLMENTS_IS_ENABLED'] || false %>
+      - key: :home_tiles_current_and_future_only
+        item: :home_tiles_current_and_future_only
+        is_enabled: <%= ENV['TILES_CURRENT_AND_FUTURE_ONLY_IS_ENABLED'] || false %>
+      - key: :home_tiles_group_by_year
+        item: :home_tiles_group_by_year
+        is_enabled: <%= ENV['TILES_GROUP_BY_YEAR_IS_ENABLED'] || false %>
