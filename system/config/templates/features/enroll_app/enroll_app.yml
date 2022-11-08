@@ -777,9 +777,6 @@ registry:
       - key: :enrollment_plan_tile_update
         item: :enrollment_plan_tile_update
         is_enabled: <%= ENV['ENROLLMENT_PLAN_TILE_UPDATE_IS_ENABLED'] || false %>
-      - key: :hide_enrollment_hbx_id
-        item: :hide_enrollment_hbx_id
-        is_enabled: <%= ENV['HIDE_ENROLLMENT_HBX_ID_IS_ENABLED'] || false %>
       - key: :show_non_pay_enrollments
         item: :show_non_pay_enrollments
         is_enabled: <%= ENV['SHOW_NON_PAY_ENROLLMENTS_IS_ENABLED'] || false %>
