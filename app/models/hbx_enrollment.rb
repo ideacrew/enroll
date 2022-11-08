@@ -365,6 +365,15 @@ class HbxEnrollment
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
+  scope :family_non_pay_canceled_enrollments, lambda { |family|
+    where(
+      :family_id => family.id,
+      :aasm_state => "coverage_canceled",
+      :terminate_reason => "non_payment"
+    ).order(
+      effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+    )
+  }
   scope :family_home_page_hidden_external_enrollments, lambda { |family|
     where(:family_id => family.id,
           :aasm_state.nin => ["shopping"],
@@ -1009,7 +1018,7 @@ class HbxEnrollment
 
   def terminate_coverage_with(termination_date)
     # IVL enrollments go automatically to coverage_terminated
-    if termination_date.to_date >= TimeKeeper.date_of_record && is_shop?
+    if is_shop? && termination_date.to_date >= TimeKeeper.date_of_record
       schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
     else
       if may_terminate_coverage?
@@ -1092,8 +1101,11 @@ class HbxEnrollment
     return unless successor_application&.is_submitted?
     return unless enrollment_benefit_application.successors.include?(successor_application)
 
-    passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition? && non_terminated_enrollment?
+    passive_renewals = passive_renewals_under(successor_application).to_a
+    passive_renewals.select!(&:renewing_waived?) if dummy_inactive_transition? # cancel only renewal waivers for waived enrollment updates
+    passive_renewals.each {|en| en.cancel_coverage! if en.may_cancel_coverage? }
+
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && !dummy_inactive_transition? && non_terminated_enrollment?
   end
 
   def reinstated_app
@@ -1144,8 +1156,8 @@ class HbxEnrollment
                                    :effective_on.gte => benefit_application.start_on })
   end
 
-  def non_inactive_transition?
-    !(aasm.from_state == :inactive && aasm.to_state == :inactive)
+  def dummy_inactive_transition?
+    (aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
 
   def non_terminated_enrollment?
@@ -1444,7 +1456,9 @@ class HbxEnrollment
   end
 
   def can_make_changes_for_ivl_enrollment?
-    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
+    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    return true if allowed_statuses.include?(aasm_state)
     false
   end
 
@@ -1641,6 +1655,11 @@ class HbxEnrollment
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
+  def self.family_non_pay_enrollments(family)
+    non_pay_enrollments = HbxEnrollment.family_non_pay_canceled_enrollments(family)
+    non_pay_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   def self.family_external_enrollments(family)
@@ -2764,7 +2783,6 @@ class HbxEnrollment
 
   def update_osse_childcare_subsidy
     effective_year = sponsored_benefit_package.start_on.year
-
     return if coverage_kind.to_s == 'dental'
     return unless employee_role&.osse_eligible?(effective_on)
     return unless shop_osse_eligibility_is_enabled?(effective_year)

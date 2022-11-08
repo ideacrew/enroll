@@ -48,6 +48,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
   let(:sbc_document) { nil }
 
   before(:each) do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
     allow(view).to receive(:policy_helper).and_return(family)
     @family = family
     @person = person
@@ -94,9 +95,11 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
-
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enrollment_plan_tile_update).and_return(true)
     end
 
     it "when kind is employer_sponsored" do
@@ -144,6 +147,37 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
           expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
           expect(rendered).to have_content('Make a first payment') if EnrollRegistry[:carefirst_pay_now].enabled?
         end
+      end
+    end
+  end
+
+  context "Group by year feature enabled" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_terminated',
+        terminate_reason: 'non_payment',
+        product: product
+      )
+    end
+
+    context "Grouping is enabled" do
+      before :each do
+        EnrollRegistry[:home_tiles_group_by_year].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "should display the year of the plan as header" do
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, layout: "insured/families/partial_layouts/wrap_enrollments_by_year", locals: { read_only: false }
+        expect(rendered).to have_selector(".year-group-title")
       end
     end
   end
@@ -235,6 +269,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
 
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
@@ -258,7 +293,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
 
     it "should display the Actions Drop down" do
-      expect(rendered).to have_text("Actions")
+      # expect(rendered).to have_text("Actions")
+      expect(rendered).to have_selector(".enrollment-actions-ddl")
     end
 
     it "should display the plan start" do
@@ -418,9 +454,21 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         expect(rendered).not_to have_text("Terminated by health insurer")
       end
     end
+
+    context 'enrollment_plan_tile_update feature enabled' do
+      before do
+        allow(hbx_enrollment).to receive(:can_make_changes?).and_call_original
+      end
+
+      it "should display the Actions Drop down" do
+        render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        expect(rendered).to have_selector(".enrollment-actions-ddl")
+      end
+    end
+
   end
 
-  context "Termination Indicator display for terminated enrollments" do
+  context "Termination Indicator display for canceled enrollments" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
     let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
@@ -528,6 +576,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     end
 
     before :each do
+      allow(view).to receive(:initially_hide_enrollment?).with(waived_hbx_enrollment).and_return(false)
       allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(waived_hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
@@ -616,6 +665,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     context "osse_eligibility is present" do
 
       before do
+        allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -673,6 +723,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
         allow(hbx_enrollment1).to receive(:hbx_enrollment_members).and_return(double)
         allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
+        allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment1).and_return(false)
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 

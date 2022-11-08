@@ -43,7 +43,7 @@ def retrieve_csr(csr_values)
 end
 # rubocop:enable Metrics/CyclomaticComplexity
 
-def find_csr_value(tax_households)
+def find_csr_value(family, tax_households)
   csr_hash = tax_households.map(&:tax_household_members).flatten.inject({}) do |result, member|
     result[member.applicant_id.to_s] = member.csr_percent_as_integer.to_s
     result
@@ -66,7 +66,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   CSV.open(report_file_name, 'w', force_quotes: true) do |report_csv|
     report_csv << report_field_names
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      families = Family.where(:"tax_household_groups.created_at" => { "$gte" => start_time, "$lte" => end_time}, :"tax_household_groups.end_on" => nil)
+      families = Family.where(:'tax_household_groups' => {:"$elemMatch" => {:"created_at" => {:"$gte" => start_time, :"$lte" => end_time}, :"end_on" => nil}})
     else
       families = Family.where(:"households.tax_households.created_at" => { "$gte" => start_time, "$lte" => end_time})
     end
@@ -91,7 +91,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
           current_tax_household_group = family.tax_household_groups.where(:"end_on" => { "$gte" => start_time, "$lte" => end_time}).order_by(:created_at.desc).first
           current_tax_households = current_tax_household_group&.tax_households
-          new_csr_percent = find_csr_value(tax_households)
+          new_csr_percent = find_csr_value(family, tax_households)
           new_max_aptc = tax_households.sum { |thh| thh.max_aptc.to_f }
           new_csr_kind = source_mapper[tax_household_group.source] || tax_household_group.source || 'N/A'
           determined_at = tax_household_group.determined_on
@@ -99,7 +99,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
           if current_tax_households.present?
             current_max_aptc = current_tax_households.sum { |thh| thh.max_aptc.to_f }
             current_csr_kind = source_mapper[current_tax_household_group&.source] || current_tax_household_group.source || 'N/A'
-            current_csr_percent = find_csr_value(current_tax_households)
+            current_csr_percent = find_csr_value(family, current_tax_households)
 
             thm = current_tax_households.map(&:tax_household_members).flatten.detect { |member| member.family_member_id.to_s == family.primary_family_member.id.to_s }
             thm_fpl_amount = thm.present? ? thm&.magi_as_percentage_of_fpl : 'N/A'

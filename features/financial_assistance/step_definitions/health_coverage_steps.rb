@@ -62,6 +62,10 @@ Then(/^the health plan meets mvs and affordable question should show$/) do
   expect(page).to have_content(l10n('health_plan_meets_mvs_and_affordable_question')&.to_s)
 end
 
+Then(/^the employer id field should indicate it is required$/) do
+  expect(find("#benefit_esi_ein")["placeholder"]).to include "*"
+end
+
 And(/^the user not sure link next to minimum standard value question$/) do
   find("#is_esi_mec_met_not_sure").click
 end
