@@ -3,6 +3,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
  Background: Individual market setup
     Given EnrollRegistry contact_method_via_dropdown feature is enabled
     And the FAA feature configuration is enabled
+    And the extended_aptc_individual_agreement_message configuration is enabled
     Given EnrollRegistry extended_aptc_individual_agreement_message feature is enabled
     Given an Individual has not signed up as an HBX user
     Given the user visits the Consumer portal during open enrollment

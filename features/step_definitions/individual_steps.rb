@@ -892,10 +892,12 @@ end
 
 And(/has valid csr 73 benefit package without silver plans/) do
   create_csr_73_bp_without_silver_plans
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 end
 
 And(/has valid csr 0 benefit package with silver plans/) do
   create_csr_0_bp_with_silver_plans
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 end
 
 And(/the individual sets APTC amount/) do
@@ -1184,4 +1186,8 @@ When(/Individual creates an HBX account with SSN already in use$/) do
   find(IvlPersonalInformation.male_radiobtn).click
   find(IvlPersonalInformation.need_coverage_yes).click
   find(IvlPersonalInformation.continue_btn).click
+end
+
+And(/the extended_aptc_individual_agreement_message configuration is enabled/) do
+  enable_feature :extended_aptc_individual_agreement_message
 end

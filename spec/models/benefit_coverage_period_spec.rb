@@ -575,6 +575,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     context 'when native american csr feature is enabled' do
 
       before do
+        [benefit_package1, benefit_package2].each do |b_package|
+          allow(b_package).to receive(:cost_sharing).and_return('csr_100')
+        end
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:native_american_csr).and_return(true)
       end
 
