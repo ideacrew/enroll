@@ -888,7 +888,14 @@ Then(/^taxhousehold info is prepared for aptc user with selected eligibility$/) 
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
-  # screenshot("aptc_householdinfo")
+end
+
+And(/has valid csr 73 benefit package without silver plans/) do
+  create_csr_73_bp_without_silver_plans
+end
+
+And(/has valid csr 0 benefit package with silver plans/) do
+  create_csr_0_bp_with_silver_plans
 end
 
 And(/the individual sets APTC amount/) do

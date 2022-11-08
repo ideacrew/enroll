@@ -21,6 +21,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual clicks on the Continue button of the Household Info page
     # And the individual enters a SEP
     And taxhousehold info is prepared for aptc user
+    And has valid csr 73 benefit package with silver plans
     When the individual clicks the Continue button of the Group Selection page
     And the individual is in the Plan Selection page
     Then the individual sees the new APTC tool UI changes
