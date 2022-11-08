@@ -2027,6 +2027,18 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_magi_transfer).and_return(false)
       end
 
+      context 'no active applicants applying for coverage' do
+        before do
+          application.applicants.each do |applicant|
+            applicant.update(is_applying_coverage: false, is_medicaid_chip_eligible: true)
+          end
+        end
+
+        it 'should return false' do
+          expect(application.is_transferrable?).to eq(false)
+        end
+      end
+
       context 'non-MAGI eligible referral' do
         before do
           application.applicants.first.update(is_non_magi_medicaid_eligible: true)
