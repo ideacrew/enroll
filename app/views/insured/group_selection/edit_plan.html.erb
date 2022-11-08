@@ -3,7 +3,8 @@
     <div class="col-md-2">
       <br class="clear"/>
       <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
-      <%= link_to back_btn_text, request.referrer, class: 'btn btn-default btn-default' %>
+      <% back_btn_path = request.referrer&.include?('enrollment_history') ? enrollment_history_insured_families_path : family_account_path %>
+      <%= link_to back_btn_text, back_btn_path, class: 'btn btn-default btn-default' %>
       <br class="clear"/>
       <br class="clear"/>
     </div>
