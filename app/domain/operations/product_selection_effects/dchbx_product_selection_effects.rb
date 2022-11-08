@@ -96,8 +96,8 @@ module Operations
       def cancel_renewal_enrollments(enrollment, effective_year = nil)
         year = effective_year || fetch_renewal_enrollment_year(enrollment)
         renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
-
         generate_enrollment_signature(enrollment)
+
         renewal_enrollments.each do |renewal_enrollment|
           generate_enrollment_signature(renewal_enrollment)
           next unless enrollment.same_signatures(renewal_enrollment) && !renewal_enrollment.is_shop?
@@ -107,7 +107,9 @@ module Operations
       end
 
       def generate_enrollment_signature(enrollment)
-        enrollment.update_attributes(enrollment_signature: enrollment.generate_hbx_signature) unless enrollment.enrollment_signature.present?
+        return if enrollment.enrollment_signature.present?
+        enrollment.generate_hbx_signature
+        enrollment.save
       end
 
       def fetch_bcp_by_oe_period
