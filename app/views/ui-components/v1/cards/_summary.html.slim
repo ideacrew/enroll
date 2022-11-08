@@ -87,7 +87,7 @@
               - if @plan.kind == :health && @plan.rx_formulary_url.present?
                 = link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank"
             .col-xs-4
-              - if offers_nationwide_plans? && @plan.provider_directory_url.present?
+              - if offers_nationwide_plans? && show_provider_directory_url?(@plan) && @plan.provider_directory_url.present?
                 = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
   - if display_enr_summary_is_enabled(@hbx_enrollment)
     .row.plan
