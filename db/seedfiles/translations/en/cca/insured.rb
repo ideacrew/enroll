@@ -160,6 +160,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.coverage_waived' => "Coverage Waived",
   :'en.waiver_reason' => "Waiver Reason",
   :'en.insured.families.future_enrollment_termination_date' => "Future enrollment termination date",
+  :'en.insured.year_title' => "Benefit Coverage Year %{year}",
   :'en.market_type' => "Market Type",
   :'en.APTC_amount' => "APTC amount",
   :'en.covered' => "Covered",

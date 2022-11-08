@@ -36,9 +36,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   let(:plan3) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
   let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
   let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
-  let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
-  let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
-  let(:benefit_package3) {double(benefit_ids: [plan5.id])}
+  let(:benefit_package1) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan1.id, plan2.id], cost_sharing: 'csr_0') }
+  let(:benefit_package2) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan3.id, plan4.id], cost_sharing: 'csr_0') }
+  let(:benefit_package3) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan5.id], cost_sharing: 'csr_0') }
   let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3] }
   let(:rule) {double}
   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
@@ -256,11 +256,13 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan6) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
-    let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id], cost_sharing: 'csr_0')}
-    let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id], cost_sharing: 'csr_0')}
-    let(:benefit_package3) {double(benefit_ids: [plan5.id], cost_sharing: 'csr_limited')}
-    let(:benefit_package4) {double(benefit_ids: [plan6.id], cost_sharing: 'csr_100')}
-    let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3, benefit_package4] }
+    let(:benefit_package1) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan1.id, plan2.id], cost_sharing: 'csr_0')}
+    let(:benefit_package2) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan3.id, plan4.id], cost_sharing: 'csr_0')}
+    let(:benefit_package3) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan5.id], cost_sharing: 'csr_limited')}
+    let(:benefit_package4) { double(benefit_categories: ['health'], title: 'individual_health_benefits', benefit_ids: [plan6.id], cost_sharing: 'csr_100')}
+    let!(:dental_plan) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, issuer_profile: issuer_profile)}
+    let(:dental_benefit_package) { double(benefit_categories: ['dental'], title: 'individual_dental_benefits', benefit_ids: [dental_plan.id], cost_sharing: '') }
+    let(:all_benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3, benefit_package4, dental_benefit_package] }
     let(:rule) {double}
     let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
     let!(:tax_household_member1) { tax_household.tax_household_members.build(applicant_id: family.family_members.where(is_primary_applicant: true).first.id, csr_percent_as_integer: 87, is_ia_eligible: true) }
@@ -269,7 +271,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     before :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
       Plan.delete_all
-      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2, benefit_package3, benefit_package4]
+      allow(benefit_coverage_period).to receive(:benefit_packages).and_return(all_benefit_packages)
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
       plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01', application_period: {"min" => Date.new(2018,0o1,0o1), "max" => Date.new(2018,12,31)})
@@ -285,6 +287,12 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
     context 'single rating area model' do
       context 'when satisfied' do
+
+        before do
+          [benefit_package1, benefit_package2, benefit_package4].each do |benefit_p|
+            allow(benefit_p).to receive(:cost_sharing).and_return('')
+          end
+        end
 
         it 'should return plans' do
           allow(rule).to receive(:satisfied?).and_return [true, 'ok']
@@ -312,6 +320,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
         let(:service_area) { ::BenefitMarkets::Locations::ServiceArea.all.first }
         context 'when satisfied' do
+          before do
+            [benefit_package1, benefit_package2, benefit_package4].each do |benefit_p|
+              allow(benefit_p).to receive(:cost_sharing).and_return('')
+            end
+          end
 
           it 'should return plans' do
             allow(rule).to receive(:satisfied?).and_return [true, 'ok']
@@ -342,6 +355,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       before :each do
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_87')
       end
 
       it 'should return plans with csr_kind for 87' do
@@ -358,6 +372,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_100')
       end
 
       it 'should return plans with csr_kind for limited' do
@@ -428,6 +443,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_87')
       end
 
       it 'should return plans with csr_kind for 0' do
@@ -443,6 +459,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member1.update_attributes(csr_percent_as_integer: 94)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_94')
       end
 
       it 'should return plans with csr_kind for 94' do
@@ -457,6 +474,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member1.update_attributes(csr_percent_as_integer: 73)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '04')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_73')
       end
 
       it 'should return plans with csr_kind for 73' do
@@ -472,6 +490,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         tax_household_member2.update_attributes(csr_percent_as_integer: 94)
         plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '04')
         plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_73')
       end
 
       it 'should return plans with csr_kind for 73' do
@@ -482,16 +501,43 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
     end
 
+    context 'with catastrophic_health_benefits' do
+      before { FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true) }
+      let(:cat_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :catastrophic, issuer_profile: issuer_profile)}
+      let!(:catastrophic_benefit_package) { double(benefit_categories: ['health'], title: "catastrophic_health_benefits_#{cat_product.active_year}", benefit_ids: [cat_product.id], cost_sharing: '') }
+      let(:all_benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3, benefit_package4, catastrophic_benefit_package] }
+      let(:eligible_packages) { benefit_coverage_period.fetch_benefit_packages(any_member_greater_than_30, csr_kind, "health") }
+
+      context 'any_member_greater_than_30: true, csr_kind: any' do
+        let(:any_member_greater_than_30) { true }
+        let(:csr_kind) { EligibilityDetermination::CSR_KINDS.sample }
+
+        it 'should not return cat benefit package' do
+          expect(eligible_packages.map(&:title)).not_to include("catastrophic_health_benefits_#{cat_product.active_year}")
+        end
+      end
+
+      context 'any_member_greater_than_30: false, csr_kind: any' do
+        let(:any_member_greater_than_30) { false }
+        let(:csr_kind) { EligibilityDetermination::CSR_KINDS.sample }
+
+        it 'should return cat benefit package' do
+          expect(eligible_packages.map(&:title)).to include("catastrophic_health_benefits_#{cat_product.active_year}")
+        end
+      end
+    end
+
+
     context "When hbx enrollment members are AI/AN and apply for dental coverage" do
 
       before :each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "should return more than one dental plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'dental')
-        expect(benefit_packages.count).to eql(4)
+      it 'should return dental benefit packages' do
+        dental_packages = benefit_coverage_period.fetch_benefit_packages(true, 'csr_100', 'dental')
 
+        expect(dental_packages.flat_map(&:benefit_categories).uniq).to include('dental')
       end
     end
 
@@ -500,37 +546,38 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "should return one health plan" do
+      it 'should return benefit package with csr_100' do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true,'csr_100', 'health')
-        expect(benefit_packages.count).to eql(1)
+        expect(benefit_packages.map(&:cost_sharing)).to include('csr_100')
       end
     end
 
     context "When hbx enrollment members are not AI/AN and apply for health coverage" do
       before :each do
+        allow(benefit_package1).to receive(:cost_sharing).and_return('csr_100')
         FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "should return more than one health plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'health')
-        expect(benefit_packages.count).to be > 1
+      it 'should return relavant benefit packages' do
+        eligible_packages = benefit_coverage_period.fetch_benefit_packages(true, 'csr_100', 'health')
+
+        expect(eligible_packages.flat_map(&:benefit_ids)).to include(plan1.id)
       end
     end
 
     context "When hbx enrollment members are not AI/AN and apply for dental coverage" do
-      before :each do
-        FinancialAssistanceRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
-      end
-
-      it "should return more than one dental plan" do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(false,'csr_100', 'dental')
-        expect(benefit_packages.count).to be > 1
+      it 'should return benefit package with dental plan' do
+        eligible_packages = benefit_coverage_period.fetch_benefit_packages(true, nil, 'dental')
+        expect(eligible_packages.flat_map(&:benefit_ids)).to include(dental_plan.id)
       end
     end
 
     context 'when native american csr feature is enabled' do
 
       before do
+        [benefit_package1, benefit_package2].each do |b_package|
+          allow(b_package).to receive(:cost_sharing).and_return('csr_100')
+        end
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:native_american_csr).and_return(true)
       end
 
@@ -546,11 +593,10 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         expect(elected_plans_by_enrollment_members).not_to include(plan1)
         expect(elected_plans_by_enrollment_members).not_to include(plan4)
       end
-
       it 'should return csr limited plans' do
         benefit_packages = benefit_coverage_period.fetch_benefit_packages(true, 'csr_limited')
 
-        expect(benefit_packages).to eq [benefit_package3]
+        expect(benefit_packages.map(&:cost_sharing)).to include(benefit_package3.cost_sharing)
       end
     end
   end

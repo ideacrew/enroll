@@ -2,7 +2,6 @@ var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially
 var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
 
 function toggleDisplayEnrollments(event) {
-    console.log(initiallyHiddenEnrollmentPanels)
     if (event.target.checked) {
         for (var i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
             initiallyHiddenEnrollmentPanels[i].classList.remove("hidden");
