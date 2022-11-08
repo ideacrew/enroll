@@ -18,6 +18,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual answers the questions of the Identity Verification page and clicks on submit
     And the individual clicks on the Continue button of the Household Info page
     When taxhousehold info is prepared for aptc user with selected eligibility
+    And has valid csr 73 benefit package without silver plans
     And the individual does not apply for assistance and clicks continue
     And the individual clicks on the Continue button of the Household Info page
     # And the individual enters a SEP
