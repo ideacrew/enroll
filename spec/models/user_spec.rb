@@ -89,7 +89,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({password: "",})}
       it 'is empty' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["can't be blank"]
+        expect(User.create(**params).errors[:password]).to eq (["can't be blank", "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space.", "Password must have at least 4 alphabetical characters"])
         expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
       end
     end
@@ -104,14 +104,14 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
 
     context 'when password' do
       let(:params){valid_params.deep_merge!({password: "123456 6746464DDss"})}
-      it 'does not contain valid complexity' do
+      it 'has white spaces' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["Password must not contain spaces", "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space."]
+        expect(User.create(**params).errors[:password]).to eq ["Password must not contain spaces"]
       end
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "11E11@1ss"})}
+      let(:params){valid_params.deep_merge!({password: "11E11@1ssA"})}
       it 'has a character more than 4 times' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["Password cannot repeat any character more than 4 times"]
@@ -147,7 +147,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it 'does not match' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password_confirmation].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["Password must have at least 4 alphabetical characters", "is too short (minimum is 8 characters)"]
+        expect(User.create(**params).errors[:password]).to eq ["Password must have at least 4 alphabetical characters", "Password must contain 8 or more characters"]
         expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
       end
     end
