@@ -73,6 +73,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   before :each do
     allow(view).to receive(:request).and_return(mock_request)
     allow(mock_request).to receive(:referrer).and_return('')
+    allow(mock_issuer_profile).to receive(:abbrev).and_return("MOCK_CARRIER")
     Caches::MongoidCache.release(CarrierProfile)
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive(:enrolled_hbx_enrollments).and_return([hbx_enrollment])
