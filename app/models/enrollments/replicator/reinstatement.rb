@@ -157,33 +157,26 @@ module Enrollments
         shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def extract_csr_kind
         shopping_family_members_ids = base_enrollment.hbx_enrollment_members.map(&:applicant_id)
 
-        if EnrollRegistry.feature_enabled?(:native_american_csr) && all_american_indian_members(shopping_family_members_ids)
-          'csr_limited'
-        elsif EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          subjects = base_enrollment.family.eligibility_determination&.subjects
-          if subjects&.where(:"eligibility_states.eligibility_item_key" => 'aptc_csr_credit').present?
-            result = ::Operations::PremiumCredits::FindCsrValue.new.call({
-                                                                           family: @base_enrollment.family,
-                                                                           year: @year,
-                                                                           family_member_ids: shopping_family_members_ids
-                                                                         })
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          result = ::Operations::PremiumCredits::FindCsrValue.new.call({ family: @base_enrollment.family,
+                                                                         year: @year,
+                                                                         family_member_ids: shopping_family_members_ids })
 
-            result.value! if result.success?
-          end
+          result.value! if result.success?
+        elsif EnrollRegistry.feature_enabled?(:native_american_csr) && all_american_indian_members(shopping_family_members_ids)
+          'csr_limited'
         else
           tax_household = base_enrollment.family.active_household.latest_active_thh_with_year(@year)
           tax_household&.eligibile_csr_kind(base_enrollment.hbx_enrollment_members.map(&:applicant_id))
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def product_id_csr_variant(base_enrollment)
         eligible_csr = extract_csr_kind
-        return base_enrollment.product_id unless eligible_csr.present?
+        return base_enrollment.product_id if eligible_csr.blank?
 
         csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[eligible_csr]
         products = ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(@year).where({:hios_id => "#{base_enrollment.product.hios_base_id}-#{csr_variant}"})
