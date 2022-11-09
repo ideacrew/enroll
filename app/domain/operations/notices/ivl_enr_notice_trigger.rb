@@ -49,7 +49,7 @@ module Operations
             :address_2 => address.address_2.presence,
             :address_3 => address.address_3.presence,
             :state => address.state,
-            :city => address.city,
+            :city => address.city.titleize,
             :zip => address.zip
           }
         ]
