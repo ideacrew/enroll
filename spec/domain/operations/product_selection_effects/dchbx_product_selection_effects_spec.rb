@@ -2,6 +2,7 @@
 
 require "rails_helper"
 require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
+RSpec::Matchers.define_negated_matcher :not_include, :include
 
 describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
 - there is no current coverage
@@ -635,5 +636,132 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
         expect(@result.success).to eq(:ok)
       end
     end
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+  - there is a current coverage for primary
+  - there is a renewal coverage for primary
+  - the selection is IVL for spouse for current year
+  - it is SEP shopping
+  ", dbclean: :after_each do
+  let(:current_year) { previous_oe_year + 1 }
+  let(:previous_oe_year) { TimeKeeper.date_of_record.year }
+  before do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 1))
+  end
+
+  include_context 'family with two members and one enrollment and one predecessor enrollment'
+
+  let(:primary_enrollment_2022) {family.hbx_enrollments[1]}
+  let(:product_id_2022) {primary_enrollment_2022.product.id}
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => dependent_enrollment, :product => dependent_enrollment.product, :family => family})
+  end
+
+  subject do
+    family.hbx_enrollments[0].update_attributes(aasm_state: :auto_renewing)
+    primary_enrollment_2022.hbx_enrollment_members[1].delete
+    renewal_product
+    product_selection
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+  let!(:dependent_person){ family.family_members[1].person}
+  let!(:primary_person) do
+    p = family.family_members[0].person
+    p.person_relationships.where(relative_id:  dependent_person.id).first.update_attributes(kind: "spouse")
+    p.save
+    p
+  end
+  let!(:dependent_consumer_role) {FactoryBot.create(:consumer_role, person: dependent_person)}
+  let!(:dependent_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: product_id_2022,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: dependent_consumer_role.id,
+                      effective_on: primary_enrollment_2022.effective_on)
+  end
+
+  let!(:dependent_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      coverage_start_on: dependent_enrollment.effective_on,
+                      hbx_enrollment: dependent_enrollment,
+                      applicant_id: family.family_members[1].id)
+  end
+
+
+
+  it "should not cancel non-signature enrollments" do
+    family.hbx_enrollments.map(&:generate_hbx_signature)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.size).to eq 4
+    expect(enrollments.pluck(:aasm_state)).to not_include("coverage_canceled")
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+  - there is a current coverage for primary
+  - there is a renewal coverage for primary
+  - the selection is IVL for primary for current year
+  - it is SEP shopping
+  ", dbclean: :after_each do
+  let(:current_year) { previous_oe_year + 1 }
+  let(:previous_oe_year) { TimeKeeper.date_of_record.year }
+  before do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 1))
+  end
+
+  include_context 'family with two members and one enrollment and one predecessor enrollment'
+
+  let(:primary_enrollment_2022) {family.hbx_enrollments[1]}
+  let(:product_id_2022) {primary_enrollment_2022.product.id}
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => primary_enrollment, :product => primary_enrollment.product, :family => family})
+  end
+
+  subject do
+    family.hbx_enrollments[0].update_attributes(aasm_state: :auto_renewing)
+    primary_enrollment_2022.hbx_enrollment_members[1].delete
+    renewal_product
+    product_selection
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+  let!(:dependent_person){ family.family_members[1].person}
+  let!(:primary_person) do
+    p = family.family_members[0].person
+    p.person_relationships.where(relative_id:  dependent_person.id).first.update_attributes(kind: "spouse")
+    p.save
+    p
+  end
+  let!(:dependent_consumer_role) {FactoryBot.create(:consumer_role, person: dependent_person)}
+  let!(:primary_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: product_id_2022,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: primary_person.consumer_role.id,
+                      effective_on: primary_enrollment_2022.effective_on)
+  end
+
+  let!(:primary_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      coverage_start_on: primary_enrollment.effective_on,
+                      hbx_enrollment: primary_enrollment,
+                      applicant_id: family.family_members[0].id)
+  end
+
+
+
+  it "should cancel signature enrollments" do
+    family.hbx_enrollments.map(&:generate_hbx_signature)
+    family.hbx_enrollments.map(&:save)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments
+    expect(enrollments.size).to eq 4
+    expect(enrollments.where(:aasm_state.nin => ["coverage_canceled", "coverage_terminated"]).count).to eq(2)
   end
 end
