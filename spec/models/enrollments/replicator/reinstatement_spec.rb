@@ -345,19 +345,19 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
   end
 
   describe "extract_csr_kind",  dbclean: :around_each do
-    let(:person) {FactoryBot.create(:person)}
+    let(:person10) {FactoryBot.create(:person, :with_consumer_role)}
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(Time.current.year,1,1)) }
     let(:c1) {FactoryBot.create(:consumer_role)}
     let(:c2) {FactoryBot.create(:consumer_role)}
     let(:r1) {FactoryBot.create(:resident_role)}
     let(:r2) {FactoryBot.create(:resident_role)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person10)}
     let(:family_members) { family.family_members.where(is_primary_applicant: false).to_a }
     let(:household) { family.active_household }
     let(:member1) { FactoryBot.build(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, family_member: family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members.first.id) }
     let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id)}
     let(:hbx_enrollment) do
-      enr = FactoryBot.create(:hbx_enrollment, kind: "individual", effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true, family: family)
+      enr = FactoryBot.create(:hbx_enrollment, kind: "individual", effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true, family: family, consumer_role_id: person10.consumer_role.id)
       hbx_enrollment_member = FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: true).first.id, hbx_enrollment: enr)
       hbx_enrollment_member1 = FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: false).first.id, hbx_enrollment: enr)
       enr.hbx_enrollment_members << hbx_enrollment_member << hbx_enrollment_member1
@@ -406,13 +406,13 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
           EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
         end
 
-        it "should return nil with no eligibility determination" do
+        it 'should return csr_0 for this shopping group' do
           reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
-          expect(reinstatement.extract_csr_kind).to eq nil
+          expect(reinstatement.extract_csr_kind).to eq('csr_0')
         end
 
         context "with eligibility determination" do
-          let!(:eligibility_determination) do
+          let(:eligibility_determination) do
             determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
             family.family_members.each do |family_member|
               subject = determination.subjects.create(
@@ -424,7 +424,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
               state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
               state.grants.create(
                 key: "CsrAdjustmentGrant",
-                value: '87',
+                value: csr_value,
                 start_on: TimeKeeper.date_of_record.beginning_of_year,
                 end_on: TimeKeeper.date_of_record.end_of_year,
                 assistance_year: TimeKeeper.date_of_record.year,
@@ -435,9 +435,73 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
             determination
           end
 
+          let(:csr_value) { '87' }
+
           it "should return csr_87" do
+            eligibility_determination
             reinstatement = described_class.new(hbx_enrollment, hbx_enrollment.effective_on)
             expect(reinstatement.extract_csr_kind).to eq 'csr_87'
+          end
+
+          context 'AI/AN members' do
+            let!(:product_01) do
+              FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                hios_id: "41842ME0400111-01",
+                                csr_variant_id: '01',
+                                metal_level_kind: :silver)
+            end
+
+            let!(:product_02) do
+              FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                hios_id: "41842ME0400111-02",
+                                csr_variant_id: '02',
+                                metal_level_kind: :silver)
+            end
+
+            let!(:product_03) do
+              FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                hios_id: "41842ME0400111-03",
+                                csr_variant_id: '03',
+                                metal_level_kind: :silver)
+            end
+
+            before do
+              hbx_enrollment.product_id = product_01.id
+              hbx_enrollment.save!
+              family.family_members.map(&:person).each do |per|
+                per.update_attributes!(indian_tribe_member: true)
+              end
+              EnrollRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+            end
+
+            let(:reinstatement_enrollment) { described_class.new(hbx_enrollment, hbx_enrollment.effective_on).build }
+
+            context 'without FA member determination' do
+              it 'should return 03 variant product as group is eligible for csr_limited' do
+                expect(reinstatement_enrollment.product.csr_variant_id).to eq '03'
+                expect(reinstatement_enrollment.product.hios_id.split('-').last).to eq '03'
+              end
+            end
+
+            context 'FA member determination 94, 87, 73 or 0 csr' do
+              let(:csr_value) { ['94', '87', '73', '0'].sample }
+
+              it 'should return 03 variant product as group is eligible for csr_limited' do
+                eligibility_determination
+                expect(reinstatement_enrollment.product.csr_variant_id).to eq '03'
+                expect(reinstatement_enrollment.product.hios_id.split('-').last).to eq '03'
+              end
+            end
+
+            context 'FA member determination 100 csr' do
+              let(:csr_value) { '100' }
+
+              it 'should return 02 variant product as group is eligible for csr_100' do
+                eligibility_determination
+                expect(reinstatement_enrollment.product.csr_variant_id).to eq '02'
+                expect(reinstatement_enrollment.product.hios_id.split('-').last).to eq '02'
+              end
+            end
           end
         end
       end
