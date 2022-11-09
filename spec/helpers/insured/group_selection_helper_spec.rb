@@ -996,17 +996,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
 
     let!(:household) { FactoryBot.create(:household, family: family) }
+    let!(:tax_household_group) { FactoryBot.create(:tax_household_group, family: family) }
 
-    let!(:tax_household) { FactoryBot.create(:tax_household, household: household) }
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: household, tax_household_group: tax_household_group) }
     let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household, is_medicaid_chip_eligible: true) }
     let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household, is_medicaid_chip_eligible: false) }
 
-    let!(:tax_household2) { FactoryBot.create(:tax_household, household: household) }
+    let!(:tax_household2) { FactoryBot.create(:tax_household, household: household, tax_household_group: tax_household_group) }
     let!(:tax_household_member3) { FactoryBot.create(:tax_household_member, applicant_id: family_member3.id, tax_household: tax_household2, is_medicaid_chip_eligible: true) }
 
     before do
       assign(:family, family)
-      allow(family).to receive(:households).and_return [household]
     end
 
     context "when family member is eligible" do
@@ -1025,27 +1025,6 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       it "should return true" do
         expect(helper.family_member_eligible_for_mdcr(family_member3, family, TimeKeeper.date_of_record.year)).to eq true
       end
-    end
-
-    context "when family is multitax should get the latest values" do
-      let!(:tax_household3) { FactoryBot.create(:tax_household, household: household) }
-      let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household3, is_medicaid_chip_eligible: false) }
-      let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household3, is_medicaid_chip_eligible: true) }
-      let!(:tax_household_member3) { FactoryBot.create(:tax_household_member, applicant_id: family_member3.id, tax_household: tax_household3, is_medicaid_chip_eligible: false) }
-
-      let!(:tax_household4) { FactoryBot.create(:tax_household, :next_year, household: household) }
-      let!(:tax_household_member4) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household4, is_medicaid_chip_eligible: true) }
-
-      it "should return the updated values" do
-        expect(helper.family_member_eligible_for_mdcr(family_member, family, TimeKeeper.date_of_record.year)).to eq false
-        expect(helper.family_member_eligible_for_mdcr(family_member2, family, TimeKeeper.date_of_record.year)).to eq true
-        expect(helper.family_member_eligible_for_mdcr(family_member3, family, TimeKeeper.date_of_record.year)).to eq false
-      end
-
-      it "should return the proper value for next year" do
-        expect(helper.family_member_eligible_for_mdcr(family_member, family, TimeKeeper.date_of_record.next_year.beginning_of_year.year)).to eq true
-      end
-
     end
   end
 end
