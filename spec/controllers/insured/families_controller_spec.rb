@@ -1450,6 +1450,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         kind: "individual",
                         product: product,
                         aasm_state: "coverage_selected",
+                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         hbx_enrollment_members: [ivl_hbx_enrollment_member])
     end
 

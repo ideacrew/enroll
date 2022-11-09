@@ -51,7 +51,7 @@ class Insured::FamiliesController < FamiliesController
       @family_members = @family.active_family_members
 
       if EnrollRegistry.feature_enabled?(:home_tiles_current_and_future_only)
-        @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] > TimeKeeper.date_of_record.beginning_of_year }
+        @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
         @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] > TimeKeeper.date_of_record.beginning_of_year }
       end
 
