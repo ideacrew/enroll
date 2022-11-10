@@ -38,7 +38,7 @@ module AuthorizationConcern
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
-    validates_length_of       :password, within: Devise.password_length,  message: "Password must contain 8 or more characters", allow_blank: true
+    validates_length_of       :password, within: Devise.password_length, allow_blank: true
     validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "is invalid"
 
     scope :locked, ->{ where(:locked_at.ne => nil) }
