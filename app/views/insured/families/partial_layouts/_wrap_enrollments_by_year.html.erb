@@ -1,7 +1,17 @@
-<% if @year_display != hbx_enrollment.effective_on.year && EnrollRegistry.feature_enabled?(:home_tiles_group_by_year) %>
-    <% @year_display = hbx_enrollment.effective_on.year %>
-    <div class="module year-group-title">
-      <h3 class="text-left"><%= l10n("insured.year_title", year: @year_display) %></h3>
-    </div>
+<% if EnrollRegistry.feature_enabled?(:home_tiles_group_by_year) %>
+  <% if @year_display != hbx_enrollment.effective_on.year %>
+      <% @year_display = hbx_enrollment.effective_on.year %>
+      <div id="title-<%=@year_display %>" class="module year-group-title <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %> ">
+        <h3 class="text-left"><%= l10n("insured.year_title", year: @year_display) %></h3>
+      </div>
+    <% else %>
+      <script>
+        $(document).ready(function() {
+          if ( $( "#title-<%=@year_display %>" ).hasClass( "initially_hidden_enrollment" ) ) {
+            $('#title-<%=@year_display %>').removeClass('initially_hidden_enrollment hidden');
+          }
+        });
+      </script>
+  <% end %>
 <% end %>
 <%= yield %>
