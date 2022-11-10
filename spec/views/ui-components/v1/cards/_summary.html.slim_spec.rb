@@ -37,9 +37,9 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       :nationwide => true,
       :network_information => "This is a test",
       :deductible => 0,
-      :total_premium => 0,
+      :total_premium => 100.00,
       :total_employer_contribution => 0,
-      :total_employee_cost => 0,
+      :total_employee_cost => 100.00,
       :rx_formulary_url => "http://www.example.com",
       :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
@@ -53,6 +53,8 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       metal_level: 'Bronze',
       network: 'nationwide',
       :can_use_aptc? => true,
+      total_ehb_premium: 99.00,
+      total_childcare_subsidy_amount: 0.0,
       :sbc_document => document
     }
   end
@@ -87,6 +89,11 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   it "should display standard plan indicator" do
     render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
     expect(rendered).to have_selector('i', text: 'STANDARD PLAN')
+  end
+
+  it 'should display premium amount' do
+    render 'ui-components/v1/cards/summary', qhp: mock_qhp_cost_share_variance
+    expect(rendered).to include('$100.00')
   end
 
   context "with no rx_formulary_url and provider urls for coverage_kind = dental" do
