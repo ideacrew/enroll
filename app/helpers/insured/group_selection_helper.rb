@@ -269,8 +269,8 @@ module Insured
       # TODO: rename method and all other occurrences of mdcr to be 'medicaid'
       year = year_param.nil? ? FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! : year_param
       applicable_tax_households = family.tax_household_groups.by_year(year).active.first&.tax_households
-      tax_households_members = applicable_tax_households.map(&:tax_household_members).flatten if applicable_tax_households
-      tax_households_members.detect {|t| t.applicant_id == family_member.id }&.is_medicaid_chip_eligible if tax_households_members
+      tax_households_members = applicable_tax_households&.map(&:tax_household_members)&.flatten
+      tax_households_members&.detect {|t| t.applicant_id == family_member.id }&.is_medicaid_chip_eligible
     end
 
     def class_for_ineligible_row(family_member, is_ivl_coverage)
