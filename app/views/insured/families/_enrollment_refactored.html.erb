@@ -55,7 +55,7 @@
                     </div>
                 <% end %>
 
-                <% unless EnrollRegistry.feature_enabled?(:hide_enrollment_hbx_id) %>
+                <% if current_user.has_hbx_staff_role? %>
                     <div class="plan-id">
                         <label for="<%=hbx_enrollment.hbx_id%>"><%= HbxProfile::ShortName %> ID:</label>
                         <%= hbx_enrollment.hbx_id %>
