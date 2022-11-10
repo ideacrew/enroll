@@ -65,7 +65,7 @@ module Operations
             end
 
             def build_event(cv3_application)
-              event('events.families.iap_applications.rrvs.non_esi_evidences.determination_requested', attributes: cv3_application.to_h)
+              event('events.families.iap_applications.rrvs.non_esi_evidences.determination_requested', attributes: { application: cv3_application.to_h })
             end
 
             def publish(event)

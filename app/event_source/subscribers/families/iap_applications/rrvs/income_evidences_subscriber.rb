@@ -5,7 +5,7 @@ module Subscribers
     module IapApplications
       module Rrvs
         # Subscriber will receive request payload from EA to submit rrv non_esi determination requests
-        class IncomeEvidencesSubscriber < EventSource::Event
+        class IncomeEvidencesSubscriber
           include ::EventSource::Subscriber[amqp: 'enroll.ivl_market.families.iap_applications.rrvs.income_evidences']
 
           subscribe(:on_determination_build_requested) do |delivery_info, _metadata, response|
