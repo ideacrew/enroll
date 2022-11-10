@@ -40,9 +40,5 @@ module Subscribers
       end
     end
   end
-
-  "“"\”{\\\"“"application_hbx_id\\\"“":\\\"“"1281882\\\"“",\\\"“"family_hbx_id\\\"“":10015}\"“"”
-
-
 end
 
