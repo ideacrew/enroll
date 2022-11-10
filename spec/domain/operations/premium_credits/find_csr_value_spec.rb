@@ -100,6 +100,39 @@ RSpec.describe Operations::PremiumCredits::FindCsrValue, dbclean: :after_each do
     end
   end
 
+  # One member with AI/AN and other non AI/AN member
+  context 'family members with subject, with eligibility_state, without CSR grants' do
+    let!(:person10) { FactoryBot.create(:person, :with_consumer_role, tribal_id: BSON::ObjectId.new)}
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let!(:family_member) do
+      per = FactoryBot.create(:person, :with_consumer_role)
+      person10.ensure_relationship_with(per, 'spouse')
+      FactoryBot.create(:family_member, family: family10, person: per)
+    end
+    let!(:eligibility_determination) do
+      determination = family10.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+      family10.family_members.each do |family_member|
+        subject = determination.subjects.create(
+          gid: "gid://enroll/FamilyMember/#{family_member.id}",
+          is_primary: family_member.is_primary_applicant,
+          person_id: family_member.person.id
+        )
+        subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+      end
+
+      determination
+    end
+
+    let(:params) do
+      { family_member_ids: family10.family_members.map(&:id), family: family10, year: TimeKeeper.date_of_record.year }
+    end
+
+    it 'should return csr value as csr_0' do
+      expect(result.success?).to eq true
+      expect(result.value!).to eq 'csr_0'
+    end
+  end
+
   context 'native_american_csr indian_tribe_member' do
     let(:person10) { FactoryBot.create(:person, :with_consumer_role, tribal_id: BSON::ObjectId.new)}
     let(:family10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }

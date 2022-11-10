@@ -45,7 +45,7 @@ module Operations
         member_subject = subjects.detect { |subj| subj.gid.split('/').last == family_member_id.to_s }
         return '0' if member_subject.blank?
 
-        member_subject.csr_by_year(year)
+        member_subject.csr_by_year(year) || '0'
       end
 
       def eligibile_csr_value(family_member_id, year, family, subjects)

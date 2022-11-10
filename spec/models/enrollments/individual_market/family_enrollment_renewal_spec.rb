@@ -924,6 +924,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
         end
 
+        context 'all bronze products, csr: 0' do
+          let(:aptc_values) {{ csr_amt: "0" }}
+
+          before { ::BenefitMarkets::Products::HealthProducts::HealthProduct.silver_plans.update_all(metal_level_kind: :bronze) }
+
+          it 'should be renewed into new product with CSR variant 01' do
+            expect(subject.assisted_renewal_product).to eq csr_01_product.id
+          end
+        end
+
         context "and aptc value didn't gave in renewal input CSV" do
           let(:family_enrollment_instance) { Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new}
 

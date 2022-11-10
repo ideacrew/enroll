@@ -922,6 +922,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       application.add_relationship(applicant, applicant2, 'parent')
     end
     let(:address_1_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
+    let(:address_1_upcase_params) { { kind: 'home', address_1: '1 AWESOME STREET', address_2: '#100', city: 'WASHINGTON', state: 'DC', zip: '20001' } }
     let(:address_2_params) { { kind: 'home', address_1: '2 Awesome Street', address_2: '#200', city: 'Washington', state: 'DC', zip: '20001' } }
     let(:address_3_params) { { kind: 'home', address_1: '3 Awesome Street', address_2: '#300', city: 'Washington', state: 'DC', zip: '20001' } }
     let!(:home_address1) do
@@ -934,6 +935,32 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       let!(:home_address2) do
         applicant2.addresses.destroy_all
         applicant2.addresses.create!(address_1_params)
+        applicant2.save!
+      end
+
+      before do
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+        @mitc_household = @result.success[:mitc_households].first
+      end
+
+      it 'should return success for result' do
+        expect(@result).to be_success
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      it 'should populate correct mitc_household' do
+        expect(@mitc_household).to eq({ household_id: '1', people: [{ person_id: '732020'}, { person_id: '732021' }] })
+      end
+    end
+
+    context 'same address for both applicants applicant_1 address downcase applicant_2 address upcase' do
+      let!(:home_address2) do
+        applicant2.addresses.destroy_all
+        applicant2.addresses.create!(address_1_upcase_params)
         applicant2.save!
       end
 
