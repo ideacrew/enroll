@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::BuildDeterminationRequest, dbclean: :after_each do
-	include Dry::Monads[:result, :do]
+  include Dry::Monads[:result, :do]
 
-	let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
+  let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-   let!(:application) do
+  let!(:application) do
     FactoryBot.create(:financial_assistance_application,
                       family_id: family.id,
                       aasm_state: 'determined',
@@ -65,10 +65,10 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Bui
 
   context 'failure' do
 
-  	it "should fail if no applications found in the given year" do
-  		result = subject.call(assistance_year: TimeKeeper.date_of_record.year)
+    it "should fail if no applications found in the given year" do
+      result = subject.call(assistance_year: TimeKeeper.date_of_record.year)
       expect(result).not_to be_success
       expect(result.failure).to eq "No determined applications with ia_eligible applicants found in assistance_year #{TimeKeeper.date_of_record.year}"
-  	end
+    end
   end
 end

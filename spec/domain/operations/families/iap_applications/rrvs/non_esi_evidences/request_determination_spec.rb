@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::RequestDetermination, dbclean: :after_each do
-	include Dry::Monads[:result, :do]
+  include Dry::Monads[:result, :do]
 
-	  let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
+  let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
   let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -120,10 +120,10 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
   end
 
   context 'failure' do
-  	it "should fail if application_hbx_id is not given" do
-  		result = subject.call(family_hbx_id: family.hbx_assigned_id)
+    it "should fail if application_hbx_id is not given" do
+      result = subject.call(family_hbx_id: family.hbx_assigned_id)
       expect(result).not_to be_success
-      # expect(result.failure).to eq "application hbx_id is missing"
-  	end
+     # expect(result.failure).to eq "application hbx_id is missing"
+    end
   end
 end

@@ -41,14 +41,12 @@ module Operations
                                                        :"applicants.is_ia_eligible" => true).max_by(&:created_at)
             end
 
-
             def build_event(payload)
               event('events.families.iap_applications.rrvs.non_esi_evidences.determination_build_requested', attributes: payload)
             end
 
             def publish_event(family, application)
               payload = { application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id }
-              binding.irb
               event = build_event(payload)
               event.success.publish
             end

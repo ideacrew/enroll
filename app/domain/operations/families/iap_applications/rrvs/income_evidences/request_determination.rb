@@ -55,7 +55,7 @@ module Operations
 
               Success(true)
             end
-            
+
             def transform_application(application)
               payload = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
               AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!)
