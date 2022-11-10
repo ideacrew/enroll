@@ -34,21 +34,9 @@ module AuthorizationConcern
     field :unlock_token,    type: String # Only if unlock strategy is :email or :both
     field :locked_at,       type: Time
 
-    PASSWORD_WITH_FORMAT = /\A
-    (?=.*\d)            # Password must contain a digit
-    (?=.*[a-z])         # Password must contain a lower case character
-    (?=.*[A-Z])         # Password must contain an upper case character
-    (?=.*[[:^alnum:]])  # Password must contain a symbol
-  /x
-
-    # validate :password_complexity
-    validates_presence_of     :password, if: :password_required?
-    validates :password, format: { with: PASSWORD_WITH_FORMAT, message: "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space."}
+    validate :password_complexity
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
-    validate :password_cannot_contain_user_name
-    validate :password_repeated_chars_limit
-    validates :password, format: { with: /(.*?[a-zA-Z]){4,}/, message: "Password must have at least 4 alphabetical characters" }
-    validates :password, format: { without: /(.)\1\1/, message: "Password must not repeat consecutive characters more than once" }
+    validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
     validates_length_of       :password, within: Devise.password_length,  message: "Password must contain 8 or more characters", allow_blank: true
     validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "is invalid"
@@ -137,14 +125,9 @@ module AuthorizationConcern
       end
     end
 
-    def password_repeated_chars_limit
-      return true unless password.present? && password.chars.group_by(&:chr).map{ |_k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
-      errors.add :password, "Password cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
-    end
-
-    def password_cannot_contain_user_name
-      return true unless password.present? && password.match(/#{::Regexp.escape(oim_id)}/i)
-      errors.add :password, "Password cannot contain username"
+    def password_repeated_chars_limit(password)
+      return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
+      false
     end
 
     def lock!

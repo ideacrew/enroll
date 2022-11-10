@@ -89,7 +89,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({password: "",})}
       it 'is empty' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq (["can't be blank", "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space.", "Password must have at least 4 alphabetical characters"])
+        expect(User.create(**params).errors[:password]).to eq (["can't be blank"])
         expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({password: "123456 6746464DDss"})}
       it 'has white spaces' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["Password must not contain spaces"]
+        expect(User.create(**params).errors[:password]).to eq ["Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space.", "Password must not contain spaces"]
       end
     end
 
