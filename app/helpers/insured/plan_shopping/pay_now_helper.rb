@@ -63,7 +63,7 @@ module Insured
       end
 
       def pay_now_button_timed_out?(hbx_enrollment)
-        covered_time = hbx_enrollment.workflow_state_transitions.where(to_state: 'coverage_selected').first
+        covered_time = hbx_enrollment.workflow_state_transitions.where(:to_state.in => ['renewing_coverage_selected', 'coverage_selected']).first
         return true if covered_time.blank?
         covered_time.transition_at + 15.minutes <= Time.now
       end
