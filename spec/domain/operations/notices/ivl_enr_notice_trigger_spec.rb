@@ -87,6 +87,18 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       end
     end
 
+    context '#build_addresses capitalize city/town' do
+      let(:address) { Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington dc", state: "DC", zip: "20002") }
+
+      it 'should capitalize the city/town second word' do
+        expect(address.city.titleize).to eql "Washington Dc"
+      end
+
+      it 'should not capitalize the city/town second word' do
+        expect(address.city).to eql "Washington dc"
+      end
+    end
+
     context '#build_family_member_hash with deleted family member' do
       let(:person_2) { FactoryBot.create(:person, :with_consumer_role) }
       let!(:family_member_2) { FactoryBot.create(:family_member, person: person_2, family: family)}
