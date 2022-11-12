@@ -27,6 +27,8 @@ describe FamilyMember, "given a person", dbclean: :after_each do
     expect(person).to receive(:ivl_coverage_selected)
     subject.ivl_coverage_selected
   end
+
+  it { should delegate_method(:age_off_excluded).to(:person) }
 end
 
 
