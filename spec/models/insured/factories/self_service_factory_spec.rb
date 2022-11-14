@@ -516,11 +516,6 @@ module Insured
           params = subject.find(enrollment.id, family.id)
           expect(params[:available_aptc]).to eq 1500.0
         end
-
-        it 'should return minimum value between max aptc and total ehb premium of enrollment as available aptc' do
-          params = subject.find(enrollment.id, family.id)
-          expect(params[:available_aptc]).to eq 1500.0
-        end
       end
     end
 
