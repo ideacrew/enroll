@@ -1522,6 +1522,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       it "should only return this year enrollment" do
         expect(assigns(:hbx_enrollments)).to eq([ivl_enrollment])
       end
+      it "admin should see all enrollments for this year" do
+        expect(assigns(:all_hbx_enrollments_for_admin)).to eq([this_year_cancelled, ivl_enrollment])
+      end
     end
 
     context "ivl with 'show non pay enrollments' FF " do
