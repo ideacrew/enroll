@@ -162,6 +162,19 @@ module BenefitMarkets
         where(:metal_level_kind.in => [:silver, :platinum, :gold, :bronze, :catastrophic], :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind])
       }
 
+      # If the shopping household is eligible for -04, -05, or -06, this only applies to silver plans.
+      # Silver plans should be the CSR variant, all other metal levels should be -01
+      scope :by_04_05_or_06_csr_kind, lambda {|csr_kind = 'csr_0'|
+        where('$or' => [{ :metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], csr_variant_id: '01' },
+                        { metal_level_kind: :silver, csr_variant_id: CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind] }])
+      }
+
+      # If the shopping household is eligible for -01, -02 or -03, then -01, -02 or -03 variants should display for all metal levels.
+      scope :by_01_02_or_03_csr_kind, lambda {|csr_kind = 'csr_0'|
+        where('$or' => [{ metal_level_kind: :catastrophic, csr_variant_id: '01' },
+                        { :metal_level_kind.in => [:platinum, :gold, :bronze, :silver], csr_variant_id: CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind] }])
+      }
+
     #Products retrieval by type
       scope :health_products,            ->{ where(:_type => /.*HealthProduct$/) }
       scope :dental_products,            ->{ where(:_type => /.*DentalProduct$/)}
