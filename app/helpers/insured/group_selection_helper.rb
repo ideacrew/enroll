@@ -266,7 +266,6 @@ module Insured
     end
 
     def family_member_eligible_for_medicaid(family_member, family, year_param)
-      # TODO: rename method and all other occurrences of mdcr to be 'medicaid'
       year = year_param.nil? ? FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! : year_param
       applicable_tax_households = family.tax_household_groups.by_year(year).active.first&.tax_households
       tax_households_members = applicable_tax_households&.map(&:tax_household_members)&.flatten
