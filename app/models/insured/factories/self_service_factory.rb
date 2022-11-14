@@ -70,7 +70,8 @@ module Insured
         reinstatement.save!
 
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          if elected_aptc_pct.to_f <= 0.0
+          not_elected_zero_aptc = applied_aptc_amount.nil? || applied_aptc_amount.to_f > 0.0
+          if elected_aptc_pct.to_f <= 0.0 && not_elected_zero_aptc
             default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
             elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
           end

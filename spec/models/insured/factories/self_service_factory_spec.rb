@@ -335,6 +335,16 @@ module Insured
           end
         end
 
+        context 'when elected_aptc_pct is 0' do
+          it 'creates enrollment with 0 for elected_aptc_pct' do
+            subject.update_aptc(enrollment.id, 0.0, elected_aptc_pct: 0.0)
+            new_enrollment = family.reload.active_household.hbx_enrollments.last
+            expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+            expect(new_enrollment.elected_aptc_pct).to eq(0.0)
+            expect(new_enrollment.applied_aptc_amount.to_f).to eq(0.0)
+          end
+        end
+
         context 'when ehb premium less than aptc' do
           before do
             effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
@@ -500,6 +510,11 @@ module Insured
             )
           )
           allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+        end
+
+        it 'should return minimum value between max aptc and total ehb premium of enrollment as available aptc' do
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:available_aptc]).to eq 1500.0
         end
 
         it 'should return minimum value between max aptc and total ehb premium of enrollment as available aptc' do
