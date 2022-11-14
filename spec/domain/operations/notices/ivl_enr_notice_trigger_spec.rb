@@ -90,9 +90,9 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
     context '#build_addresses capitalize city/town' do
       let(:person) { FactoryBot.build(:person, addresses: [FactoryBot.build(:address, city: 'Washington dc')]) }
       let(:address) { Operations::Notices::IvlEnrNoticeTrigger.new.build_addresses(person).first}
-      
+
       it 'should capitalize the city/town second word' do
-        expect(address[:city]).to eql "Washington Dc"
+        expect(address[:city]).to eql 'Washington Dc'
       end
     end
 
