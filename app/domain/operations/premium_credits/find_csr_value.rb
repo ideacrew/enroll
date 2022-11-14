@@ -63,7 +63,7 @@ module Operations
       # rubocop:disable Metrics/CyclomaticComplexity
       def retrieve_csr(csr_values)
         return 'csr_0' if csr_values.include?('0')
-        return 'csr_0' if csr_values.include?('limited') && (csr_values.include?('73') || csr_values.include?('87') || csr_values.include?('94'))
+        # return 'csr_0' if csr_values.include?('limited') && (csr_values.include?('73') || csr_values.include?('87') || csr_values.include?('94'))
         return 'csr_limited' if csr_values.include?('limited')
         return 'csr_73' if csr_values.include?('73')
         return 'csr_87' if csr_values.include?('87')
