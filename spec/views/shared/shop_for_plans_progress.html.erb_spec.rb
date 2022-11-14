@@ -71,41 +71,74 @@ describe "shared/_shop_for_plans_progress.html.erb" do
 
   end
 
-    context "waive button with employee role" do
-      let(:employee_role) {FactoryBot.build(:employee_role)}
-      before :each do
-        allow(enrollment).to receive(:employee_role).and_return employee_role
-        assign :enrollment, enrollment
-      end
+  context "waive button with employee role" do
+    let(:employee_role) {FactoryBot.build(:employee_role)}
+    before :each do
+      allow(enrollment).to receive(:employee_role).and_return employee_role
+      assign :enrollment, enrollment
+    end
 
-      it "should show waive coverage link" do
-        render 'shared/shop_for_plans_progress', step: '1', show_waive: true
-        expect(rendered).to have_selector('a', text: 'Waive Coverage')
-      end
+    it "should show waive coverage link" do
+      render 'shared/shop_for_plans_progress', step: '1', show_waive: true
+      expect(rendered).to have_selector('a', text: 'Waive Coverage')
+    end
 
-      it "should not show waive coverage link" do
-        render 'shared/shop_for_plans_progress', step: '1'
-        expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
+    it "should not show waive coverage link" do
+      render 'shared/shop_for_plans_progress', step: '1'
+      expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
+    end
+  end
+
+  context "waive button without employee role" do
+    let(:employee_role) {FactoryBot.build(:employee_role)}
+    let(:benefit_group) {double("Benefit group")}
+    before :each do
+      allow(enrollment).to receive(:employee_role).and_return nil
+      allow(enrollment).to receive(:benefit_group).and_return benefit_group
+      assign :enrollment, enrollment
+    end
+
+    it "should show waive coverage link" do
+      render 'shared/shop_for_plans_progress', step: '1', show_waive: true
+      expect(rendered).to have_selector('a', text: 'Waive Coverage')
+    end
+
+    it "should not show waive coverage link" do
+      render 'shared/shop_for_plans_progress', step: '1'
+      expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
+    end
+  end
+
+  context "step 3" do
+    let(:c_role) { true }
+    let(:is_shop) { false }
+    let(:market_kind) { 'individual' }
+
+    before :each do
+      assign :change_plan, "change"
+      assign :plan, plan
+      assign :enrollment, enrollment
+      assign :market_kind, market_kind
+      allow(person).to receive(:consumer_role).and_return(c_role)
+      allow(enrollment).to receive(:is_shop?).and_return(is_shop)
+      @person = person
+      render 'shared/shop_for_plans_progress', step: '3'
+    end
+
+    context 'when IVL' do
+      it "should have go to my account text" do
+        expect(rendered).to match(/#{l10n("insured.plan_shoppings.receipt.go_to_my_account")}/)
       end
     end
 
-      context "waive button without employee role" do
-        let(:employee_role) {FactoryBot.build(:employee_role)}
-        let(:benefit_group) {double("Benefit group")}
-        before :each do
-          allow(enrollment).to receive(:employee_role).and_return nil
-          allow(enrollment).to receive(:benefit_group).and_return benefit_group
-          assign :enrollment, enrollment
-        end
+    context 'when SHOP' do
+      let(:market_kind) { 'shop' }
+      let(:c_role) { false }
+      let(:is_shop) { true }
 
-        it "should show waive coverage link" do
-          render 'shared/shop_for_plans_progress', step: '1', show_waive: true
-          expect(rendered).to have_selector('a', text: 'Waive Coverage')
-        end
-
-        it "should not show waive coverage link" do
-          render 'shared/shop_for_plans_progress', step: '1'
-          expect(rendered).not_to have_selector('a', text: 'Waive Coverage')
-        end
+      it "should have CONTINUE text" do
+        expect(rendered).to match(/#{l10n('continue').upcase}/)
       end
+    end
+  end
 end
