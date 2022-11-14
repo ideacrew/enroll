@@ -178,19 +178,35 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       expect(rule.is_cost_sharing_satisfied?).to eq false
     end
 
+    it 'should return true when cost_sharing is equal to csr_kind or csr_0' do
+      thh_member_1 = TaxHouseholdMember.new(is_ia_eligible: true, csr_eligibility_kind: 'csr_87', applicant_id: mike.primary_family.family_members.active.first.id)
+      tax_household = consumer_role.latest_active_tax_household_with_year(benefit_package.effective_year, mike.primary_family)
+      tax_household.tax_household_members << thh_member_1
+      tax_household.save
+      benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_0'
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, {family: mike.primary_family, shopping_family_members_ids: [thh_member_1.applicant_id]})
+      expect(rule.is_cost_sharing_satisfied?).to eq true
+    end
+
     context 'mthh enabled' do
       before do
         EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "should return false when cost_sharing is not equal to csr_kind" do
+      it 'should return false when cost_sharing is not equal to csr_kind or csr_0' do
         benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
         rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_73')
         expect(rule.is_cost_sharing_satisfied?).to eq false
       end
 
-      it "should return true when cost_sharing is not equal to csr_kind" do
+      it 'should return true when cost_sharing is equal to csr_kind' do
         benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
+        rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_100')
+        expect(rule.is_cost_sharing_satisfied?).to eq true
+      end
+
+      it 'should return true when cost_sharing is not equal to csr_kind but equal to csr_0' do
+        benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_0'
         rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family, shopping_family_members_ids: mike.primary_family.family_members.active.map(&:id), csr_kind: 'csr_100')
         expect(rule.is_cost_sharing_satisfied?).to eq true
       end
