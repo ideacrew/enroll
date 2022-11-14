@@ -357,9 +357,9 @@ registry:
       - key: :tobacco_cost
         item: :tobacco_cost
         is_enabled: true
-      - key: :choose_coverage_mdcr_warning
-        item: :choose_coverage_mdcr_warning
-        is_enabled: <%= ENV['CHOOSE_COVERAGE_MDCR_WARNING_IS_ENABLED'] || false %>
+      - key: :choose_coverage_medicaid_warning
+        item: :choose_coverage_medicaid_warning
+        is_enabled: <%= ENV['CHOOSE_COVERAGE_MEDICAID_WARNING_IS_ENABLED'] || false %>
       - key: :adtl_contact_required_for_text
         item: :adtl_contact_required_for_text
         is_enabled: <%= ENV['ADTL_CONTACT_REQUIRED_FOR_TEXT_IS_ENABLED'] || false %>
