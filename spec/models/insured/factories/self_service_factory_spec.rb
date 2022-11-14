@@ -484,6 +484,29 @@ module Insured
         params = subject.find(enrollment.id, family.id)
         expect(params[:elected_aptc_pct]).to eq 0.09
       end
+
+      context "when MTHH is enabled" do
+        let(:max_aptc) { 1700.0 }
+
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+          allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+            double(
+              call: double(
+                success?: true,
+                value!: max_aptc
+              )
+            )
+          )
+          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+        end
+
+        it 'should return minimum value between max aptc and total ehb premium of enrollment as available aptc' do
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:available_aptc]).to eq 1500.0
+        end
+      end
     end
 
     describe "find_enrollment_effective_on_date" do

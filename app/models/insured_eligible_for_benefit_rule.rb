@@ -130,7 +130,7 @@ class InsuredEligibleForBenefitRule
       csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
     end
     return true if csr_kind.blank? || cost_sharing.blank?
-    csr_kind == cost_sharing
+    [csr_kind, 'csr_0'].include?(cost_sharing)
   end
 
   def is_market_places_satisfied?

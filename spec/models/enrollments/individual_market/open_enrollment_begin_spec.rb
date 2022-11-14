@@ -244,6 +244,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               invoke_oe_script
               family_assisted.active_household.reload
               @enrollments = family_assisted.active_household.hbx_enrollments
+              family_assisted.family_members.map(&:person).each do |per|
+                per.update_attributes!(age_off_excluded: true)
+              end
             end
 
             it 'should generate renewal enrollment' do
