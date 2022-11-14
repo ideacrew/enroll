@@ -419,6 +419,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.help_from_an_inperson_assister' => "Help from an In-Person Assister",
   :'en.insured.plan_shoppings.help_from_a_customer_service_representative' => "Help from a Customer Service Representative",
   :'en.insured.plan_shoppings.help_from_a_certified_applicant_counselor' => "Help from a Certified Applicant Counselor (CAC)",
+  :'en.insured.plan_shoppings.receipt.go_to_my_account' => "GO TO MY ACCOUNT",
   :'en.search_by_name' => "Search by Name",
   :'en.search_for_help' => "Search for Help",
   :'en.APTC_amount_title_info' => "If you submitted a formal application for financial assistance before shopping for coverage and were approved to receive Advanced Premium Tax Credit savings to reduce your monthly insurance premiums, the amount you’ll save is listed in this column.",
