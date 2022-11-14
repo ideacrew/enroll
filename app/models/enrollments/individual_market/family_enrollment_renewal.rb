@@ -236,8 +236,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # rubocop:disable Style/RedundantReturn
   def eligible_to_get_covered?(member)
     child_relations = %w[child ward foster_child adopted_child]
-
     return true unless child_relations.include?(member.family_member.relationship)
+
+    return true if member.family_member.age_off_excluded
 
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
       dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
