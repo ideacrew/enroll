@@ -33,4 +33,7 @@
         <!-- = image_tag 'icons/list.png' -->
         PREVIOUS
 - elsif step == 3
-  = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
+  - if @market_kind == "individual"
+    = link_to l10n("insured.plan_shoppings.receipt.go_to_my_account"), family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
+  - else
+    = link_to l10n('continue').upcase, family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
