@@ -3,7 +3,7 @@ FactoryBot.define do
     kind { 'home' }
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street NE" }
     sequence(:address_2, 111) { |n| "##{n}" }
-    city { 'Washington dc' }
+    city { 'Washington' }
     state { Settings.aca.state_abbreviation }
     zip { '01001' }
     county { 'Hampden' }
