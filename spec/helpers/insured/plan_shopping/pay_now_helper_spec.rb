@@ -268,28 +268,56 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
                         kind: 'individual')
     end
 
-    before :each do
-      hbx_enrollment.workflow_state_transitions << WorkflowStateTransition.new(
-        from_state: hbx_enrollment.aasm_state,
-        to_state: "coverage_selected"
-      )
-      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
-      assign(:enrollment, hbx_enrollment)
+    context "for renewing coverage_selected" do
+      before :each do
+        hbx_enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: hbx_enrollment.aasm_state,
+          to_state: "renewing_coverage_selected"
+        )
+        hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
+        assign(:enrollment, hbx_enrollment)
+      end
+
+      it 'should return true if transition time is greater 15 minutes' do
+        hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 20.minutes)
+        expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      end
+
+      it 'should return true if transition is not found' do
+        hbx_enrollment.workflow_state_transitions.first.update_attributes(to_state: "auto_renewing")
+        expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      end
+
+      it 'should return false if transition time is within 15 minutes' do
+        hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 10.minutes)
+        expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      end
     end
 
-    it 'should return true if transition time is greater 15 minutes' do
-      hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 20.minutes)
-      expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
-    end
+    context "for coverage_selected" do
+      before :each do
+        hbx_enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: hbx_enrollment.aasm_state,
+          to_state: "coverage_selected"
+        )
+        hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
+        assign(:enrollment, hbx_enrollment)
+      end
 
-    it 'should return true if transition is not found' do
-      hbx_enrollment.workflow_state_transitions.first.update_attributes(to_state: "renewing_coverage_selected")
-      expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
-    end
+      it 'should return true if transition time is greater 15 minutes' do
+        hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 20.minutes)
+        expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      end
 
-    it 'should return false if transition time is within 15 minutes' do
-      hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 10.minutes)
-      expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      it 'should return true if transition is not found' do
+        hbx_enrollment.workflow_state_transitions.first.update_attributes(to_state: "auto_renewing")
+        expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      end
+
+      it 'should return false if transition time is within 15 minutes' do
+        hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 10.minutes)
+        expect(helper.pay_now_button_timed_out?(hbx_enrollment)).to eq true
+      end
     end
   end
 
