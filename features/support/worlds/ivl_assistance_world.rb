@@ -111,6 +111,32 @@ module IvlAssistanceWorld
     @enrollment = create_enrollment_for_family(family)
   end
 
+  def create_mthh_for_family_with_aptc_csr(family, effective_date, csr = '73', aptc = 12_000)
+    determination = family.create_eligibility_determination(effective_date: effective_date)
+    determination.grants.create(key: "AdvancePremiumAdjustmentGrant",
+                                value: aptc,
+                                start_on: effective_date.beginning_of_year,
+                                end_on: effective_date.end_of_year,
+                                assistance_year: effective_date.year,
+                                member_ids: family.family_members.map(&:id))
+    family.family_members.each do |family_member|
+      subject = determination.subjects.create(
+        gid: "gid://enroll/FamilyMember/#{family_member.id}",
+        is_primary: family_member.is_primary_applicant,
+        person_id: family_member.person.id
+      )
+      state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+      state.grants.create(
+        key: "CsrAdjustmentGrant",
+        value: csr,
+        start_on: effective_date.beginning_of_year,
+        end_on: effective_date.end_of_year,
+        assistance_year: effective_date.year,
+        member_ids: family.family_members.map(&:id)
+      )
+    end
+  end
+
   def create_multiple_member_enrollment_for_family_with_one_minor
     person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
     family = FactoryBot.create(:family, :with_nuclear_family, person: person)
