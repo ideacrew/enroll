@@ -13,16 +13,23 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual sees form to enter personal information
     And the individual clicks on the Continue button of the Account Setup page
     And the individual agrees to the privacy agreeement
-
-  Scenario: Validation of the dailog box when selecting a non silver plan with eligiblity
     And the individual answers the questions of the Identity Verification page and clicks on submit
     And the individual clicks on the Continue button of the Household Info page
     When taxhousehold info is prepared for aptc user with selected eligibility
     And has valid csr 73 benefit package without silver plans
     And the individual does not apply for assistance and clicks continue
     And the individual clicks on the Continue button of the Household Info page
-    # And the individual enters a SEP
+
+  Scenario: Validation of the dailog box when selecting a non silver plan with eligiblity
     And the individual clicks the Continue button of the Group Selection page
     When the individual sets APTC amount
+    And the individual selects a non silver plan on Plan Shopping page
+    Then the individual should see the modal pop up for eligibility
+
+  Scenario: Validation of the dailog box when selecting a non silver plan with eligiblity with MTHH turned on
+    Given EnrollRegistry temporary_configuration_enable_multi_tax_household_feature feature is enabled
+    Then multi tax household info is prepared for aptc user with selected eligibility
+    Then multi tax household info is prepared for aptc user with selected eligibility for future year
+    And the individual clicks the Continue button of the Group Selection page
     And the individual selects a non silver plan on Plan Shopping page
     Then the individual should see the modal pop up for eligibility
