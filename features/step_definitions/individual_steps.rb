@@ -890,6 +890,20 @@ Then(/^taxhousehold info is prepared for aptc user with selected eligibility$/) 
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
 end
 
+Then(/^multi tax household info is prepared for aptc user with selected eligibility$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  family = person.primary_family
+  start_on = TimeKeeper.date_of_record.beginning_of_year
+  create_mthh_for_family_with_aptc_csr(family, start_on, '73')
+end
+
+Then(/^multi tax household info is prepared for aptc user with selected eligibility for future year$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  family = person.primary_family
+  future_year = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  create_mthh_for_family_with_aptc_csr(family, future_year, 73)
+end
+
 And(/has valid csr 73 benefit package without silver plans/) do
   create_csr_73_bp_without_silver_plans
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!

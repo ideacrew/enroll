@@ -1450,6 +1450,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         kind: "individual",
                         product: product,
                         aasm_state: "coverage_selected",
+                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         hbx_enrollment_members: [ivl_hbx_enrollment_member])
     end
 
@@ -1520,6 +1521,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
       it "should only return this year enrollment" do
         expect(assigns(:hbx_enrollments)).to eq([ivl_enrollment])
+      end
+      it "admin should see all enrollments for this year" do
+        expect(assigns(:all_hbx_enrollments_for_admin)).to eq([this_year_cancelled, ivl_enrollment])
       end
     end
 

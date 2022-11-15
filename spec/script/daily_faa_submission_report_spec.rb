@@ -101,6 +101,8 @@ describe 'daily_faa_submission_report' do
         Help_With_Daily_Living
         Immigration_Status
         FPL_Amount
+        Application_Year
+        Application_State
     ]
   end
 
@@ -187,6 +189,14 @@ describe 'daily_faa_submission_report' do
 
     it "should match with the applicant's fpl_amount" do
       expect(@file_content[1][16]).to eql(applicant.magi_as_percentage_of_fpl.to_s)
+    end
+
+    it "should match the application year" do
+      expect(@file_content[1][17]).to eql(application.assistance_year.to_s)
+    end
+
+    it "should match the application state" do
+      expect(@file_content[1][18]).to eql(application.aasm_state.to_s)
     end
   end
 

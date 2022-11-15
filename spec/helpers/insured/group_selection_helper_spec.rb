@@ -985,7 +985,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     end
   end
 
-  describe "#family_member_eligible_for_mdcr" do
+  describe "#family_member_eligible_for_medicaid" do
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let!(:person2) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let!(:person3) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
@@ -1011,19 +1011,19 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
     context "when family member is eligible" do
       it "should return true" do
-        expect(helper.family_member_eligible_for_mdcr(family_member, family, TimeKeeper.date_of_record.year)).to eq true
+        expect(helper.family_member_eligible_for_medicaid(family_member, family, TimeKeeper.date_of_record.year)).to eq true
       end
     end
 
     context "when family member is NOT eligible" do
       it "should return false" do
-        expect(helper.family_member_eligible_for_mdcr(family_member2, family, TimeKeeper.date_of_record.year)).to eq false
+        expect(helper.family_member_eligible_for_medicaid(family_member2, family, TimeKeeper.date_of_record.year)).to eq false
       end
     end
 
     context "when family is multitax" do
       it "should return true" do
-        expect(helper.family_member_eligible_for_mdcr(family_member3, family, TimeKeeper.date_of_record.year)).to eq true
+        expect(helper.family_member_eligible_for_medicaid(family_member3, family, TimeKeeper.date_of_record.year)).to eq true
       end
     end
   end
