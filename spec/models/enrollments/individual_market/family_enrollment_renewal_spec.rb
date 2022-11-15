@@ -438,7 +438,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             enrollment.family.primary_person.update_attributes!(tribal_id: '123456789', tribal_state: 'ME')
             enrollment.hbx_enrollment_members = [enrollment.hbx_enrollment_members.first]
             enrollment.save!
-            update_age_off_excluded(family, false)
           end
 
           it 'will generate renewal with CSR variant 03' do
@@ -458,7 +457,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'unassisted renewal one AI AN member and others non-AI AN members' do
           before do
             enrollment.family.primary_person.update_attributes!(tribal_id: '123456789', tribal_state: 'ME')
-            update_age_off_excluded(family, false)
           end
 
           it 'will generate renewal with CSR variant' do
@@ -552,7 +550,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:dependent_bp) { 600.00 }
 
           context 'when renewal grants not present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -565,10 +563,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               )
 
               determination
-            end
-
-            before do
-              update_age_off_excluded(family, false)
             end
 
             it 'will not set aptc values & will generate renewal' do
@@ -585,7 +579,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'when renewal grants present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -608,10 +602,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               )
 
               determination
-            end
-
-            before do
-              update_age_off_excluded(family, true)
             end
 
             it 'will set aptc values & will generate renewal' do
@@ -773,7 +763,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:dependent_bp) { 600.00 }
 
           context 'when renewal grants not present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -796,7 +786,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'when renewal grants present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",

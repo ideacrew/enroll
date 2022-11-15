@@ -52,18 +52,33 @@ FactoryBot.define do
     end
 
     trait :catastrophic do
-      metal_level_kind        { :catastrophic }
-      benefit_market_kind     { :aca_individual }
+      kind                { :health }
+      metal_level_kind    { :catastrophic }
+      benefit_market_kind { :aca_individual }
     end
 
     trait :gold do
-      metal_level_kind        { :gold }
-      benefit_market_kind     { :aca_individual }
+      kind                { :health }
+      metal_level_kind    { :gold }
+      benefit_market_kind { :aca_individual }
+    end
+
+    trait :bronze do
+      kind                { :health }
+      metal_level_kind    { :bronze }
+      benefit_market_kind { :aca_individual }
+    end
+
+    trait :platinum do
+      kind                { :health }
+      metal_level_kind    { :platinum }
+      benefit_market_kind { :aca_individual }
     end
 
     trait :silver do
-      metal_level_kind        { :silver }
-      benefit_market_kind     { :aca_individual }
+      kind                { :health }
+      metal_level_kind    { :silver }
+      benefit_market_kind { :aca_individual }
     end
 
     trait :with_issuer_profile do
