@@ -584,16 +584,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
                 value: yearly_expected_contribution,
-                start_on: TimeKeeper.date_of_record.beginning_of_year,
-                end_on: TimeKeeper.date_of_record.end_of_year,
-                assistance_year: TimeKeeper.date_of_record.year,
-                member_ids: family.family_members.map(&:id).map(&:to_s),
-                tax_household_id: tax_household.id
-              )
-
-              determination.grants.create(
-                key: "AdvancePremiumAdjustmentGrant",
-                value: yearly_expected_contribution,
                 start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
                 end_on: TimeKeeper.date_of_record.end_of_year.next_year,
                 assistance_year: TimeKeeper.date_of_record.year + 1,
