@@ -151,11 +151,6 @@ module BenefitMarkets
 
       scope :by_product_ids, ->(product_ids) { where(:id => {'$in' => product_ids}) }
 
-      scope :by_csr_kind_with_catastrophic, lambda {|csr_kind = 'csr_0'|
-        where('$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
-                        {:metal_level_kind => :silver, :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind]}])
-      }
-
       #If the shopping household is eligible for -02 or -03,
       #then -02 or -03 variants should display for all metal levels.
       scope :by_csr_kind, lambda {|csr_kind|
