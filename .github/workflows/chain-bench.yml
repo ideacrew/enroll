@@ -3,7 +3,7 @@ name: Code Management
 on:
   push:
     branches:
-      - chain-bench
+      - mark-chain-bench
   schedule:
     - cron: '0 07 * * 1'
 
