@@ -482,17 +482,17 @@ module Insured
 
       it 'should return default_tax_credit_value' do
         params = subject.find(enrollment.id, family.id)
-        expect(params[:default_tax_credit_value]).to eq applied_aptc_amount
+        expect(params[:default_tax_credit_value]).to eq 0.0
       end
 
       it 'should return available_aptc' do
         params = subject.find(enrollment.id, family.id)
-        expect(params[:available_aptc]).to eq 1274.44
+        expect(params[:available_aptc]).to eq 0
       end
 
       it 'should return elected_aptc_pct' do
         params = subject.find(enrollment.id, family.id)
-        expect(params[:elected_aptc_pct]).to eq 0.09
+        expect(params[:elected_aptc_pct]).to eq 1
       end
 
       context "when MTHH is enabled" do
