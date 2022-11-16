@@ -462,6 +462,7 @@ module Insured
       let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
       let(:applied_aptc_amount) { 120.78 }
 
+      let(:future_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date }
 
       before :each do
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
@@ -481,18 +482,27 @@ module Insured
       end
 
       it 'should return default_tax_credit_value' do
-        params = subject.find(enrollment.id, family.id)
-        expect(params[:default_tax_credit_value]).to eq applied_aptc_amount
+        # monthly aggregate should be applied for enrollments within the same coverage year
+        if future_effective_date.year == enrollment.effective_on.year
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:default_tax_credit_value]).to eq applied_aptc_amount
+        end
       end
 
       it 'should return available_aptc' do
-        params = subject.find(enrollment.id, family.id)
-        expect(params[:available_aptc]).to eq 1274.44
+        # monthly aggregate should be applied for enrollments within the same coverage year
+        if future_effective_date.year == enrollment.effective_on.year
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:available_aptc]).to eq 0
+        end
       end
 
       it 'should return elected_aptc_pct' do
-        params = subject.find(enrollment.id, family.id)
-        expect(params[:elected_aptc_pct]).to eq 0.09
+        # monthly aggregate should be applied for enrollments within the same coverage year
+        if future_effective_date.year == enrollment.effective_on.year
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:elected_aptc_pct]).to eq 1
+        end
       end
 
       context "when MTHH is enabled" do
