@@ -150,11 +150,20 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       allow(family).to receive(:active_household).and_return(household)
     end
 
+    let(:enrollment) { family.hbx_enrollments.first }
+    let(:future_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date }
+
     it 'returns monthly aggregate amount' do
       input_params = {eligibility_determination: eligibility_determination}
       @result = subject.call(input_params)
-      expect(@result.success).to eq "Aggregate amount applied on to enrollments"
-      expect(family.hbx_enrollments.to_a.first.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
+      if future_effective_date.year == enrollment.effective_on.year
+        expect(@result.success).to eq "Aggregate amount applied on to enrollments"
+        expect(family.hbx_enrollments.count).to eq(2)
+        expect(enrollment.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
+      else
+        # monthly aggregate should not be applied for perspective year enrollment
+        expect(family.hbx_enrollments.count).to eq(1)
+      end
     end
 
     context 'enrollment the is auto-renewal enrollment' do
