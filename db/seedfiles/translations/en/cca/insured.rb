@@ -301,7 +301,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.month' => "Month",
   :'en.termination_date' => "Termination date",
   :'en.insured.group_selection.coverage_household_ineligible_coverage' => "This dependent is ineligible for employer-sponsored %{coverage_kind} coverage.",
-  :'en.insured.group_selection.mdcr_eligible_warning' => "Potentially eligible for Medicaid/CHIP",
+  :'en.insured.group_selection.medicaid_eligible_warning' => "Potentially eligible for Medicaid/CHIP",
   :'en.insured.group_selection.new.choose_coverage_for_your_household' => "Choose Coverage for your Household",
   :'en.insured.group_selection.new.select_who_needs_coverage' => "Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.",
   :'en.insured.group_selection.new.effective_date' => "EFFECTIVE DATE",
