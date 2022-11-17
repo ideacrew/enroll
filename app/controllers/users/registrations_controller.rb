@@ -6,9 +6,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
-  # def new
-  #   super
-  # end
+  def new
+    @signup_form = ENV.fetch('REFACTOR_PASSWORD_VALIDATIONS') == "true" ?
+      'devise/registrations/create_account_v2' :
+      'devise/registrations/create_account'
+    puts @signup_form
+    super
+  end
 
   # POST /resource
   def create
