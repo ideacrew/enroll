@@ -517,7 +517,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   context '#other_questions_complete?' do
     context "when not applying for coverage, has_unemployment_income: nil and is_pregnant" do
       before do
-        applicant.update_attributes!(has_unemployment_income: nil, is_pregnant: true, is_applying_coverage: false)
+        applicant.update_attributes!(has_unemployment_income: nil, pregnancy_due_on: TimeKeeper.date_of_record - 10.days, children_expected_count: 1, is_pregnant: true, is_applying_coverage: false)
       end
 
       it "return true for other_questions_complete?" do
