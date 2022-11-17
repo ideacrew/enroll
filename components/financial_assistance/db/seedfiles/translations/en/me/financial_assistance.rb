@@ -169,6 +169,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
+  "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a CoverME.gov application.",
@@ -183,6 +184,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.cost_savings_applications" => "Applications",
   "en.faa.cost_savings_applications_desc" => "If you started or completed an application for financial assistance, it will be listed below. To update an application, find your current application and select 'Copy to new application'. If the status says it's a draft, that means you haven't submitted that application yet.",
   "en.faa.cost_savings_applications_oe_desc" => "Application updates will not apply to %{next_year} enrollments. If you need to make changes to your application for %{next_year}, please log back in after Open Enrollment begins on %{oe_start}.",
+  "en.faa.coverage_update_reminder" => "You must submit applications for both %{year} and %{year2} if you have updates that should apply to your coverage for %{year} and %{year2}.",
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
   "en.faa.cancel" => "Cancel",
