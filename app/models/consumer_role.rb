@@ -1183,7 +1183,7 @@ class ConsumerRole
   end
 
   def admin_ridp_verification_action(admin_action, ridp_type, update_reason, person)
-    remove_ridp_verification_documents(ridp_type) if EnrollRegistry.feature_enabled?(:identity_verification_datatable_document_filter)
+    remove_ridp_verification_documents(ridp_type) unless EnrollRegistry.feature_enabled?(:show_people_with_no_evidence)
 
     case admin_action
       when 'verify'
