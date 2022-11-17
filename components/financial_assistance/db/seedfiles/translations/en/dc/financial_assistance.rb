@@ -164,6 +164,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
+  "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in Medicaid or CHIP. If you need to update information like your income, address, or who is in your household, contact DC Health Link at <a href='tel:1-855-532-5465'>1-855-532-5465</a> to make these changes before completing a DC Health Link application.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",
@@ -178,6 +179,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.cost_savings_applications" => "Cost Savings Applications",
   "en.faa.cost_savings_applications_desc" => "If you started or completed an application for premium reductions, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.",
   "en.faa.cost_savings_applications_oe_desc" => "Application updates will not apply to %{next_year} enrollments. If you need to make changes to your application for %{next_year}, please log back in after Open Enrollment begins on %{oe_start}.",
+  "en.faa.coverage_update_reminder" => "You must submit applications for both %{year} and %{year2} if you have updates that should apply to your coverage for %{year} and %{year2}.",
   "en.faa.start_new_application" => "Start New Application",
   "en.faa.start_new_application_modal_body" => "You’re about to start a new application for cost savings. If you’ve got an application already, go to the most recent application and use ‘Actions’ to copy or update that application.",
   "en.faa.cancel" => "Cancel",
