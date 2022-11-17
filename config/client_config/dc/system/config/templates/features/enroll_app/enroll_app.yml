@@ -786,3 +786,6 @@ registry:
       - key: :home_tiles_group_by_year
         item: :home_tiles_group_by_year
         is_enabled: <%= ENV['TILES_GROUP_BY_YEAR_IS_ENABLED'] || false %>
+      - key: :identity_verification_datatable_document_filter
+        item: :identity_verification_datatable_document_filter
+        is_enabled: <%= ENV['IDENTITY_VERIFICATION_DATATABLE_DOCUMENT_FILTER_IS_ENABLED'] || false %>

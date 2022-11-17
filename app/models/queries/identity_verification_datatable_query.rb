@@ -17,7 +17,7 @@ module Queries
     end
 
     def build_scope()
-      family = Person.for_admin_approval
+      family = EnrollRegistry.feature_enabled?(:identity_verification_datatable_document_filter) ? Person.for_admin_approval_without_documents : Person.for_admin_approval
       person = Person
       
       #add other scopes here
