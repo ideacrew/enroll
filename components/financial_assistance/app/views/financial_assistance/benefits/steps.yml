@@ -218,7 +218,7 @@
                 - gutter: 6
                   type: input
                   name: employer_indentification_no.
-                  placeholder: EMPLOYER IDENTIFICATION NO.(EIN)
+                  placeholder: EMPLOYER IDENTIFICATION NO. (EIN)
                   id: 'fein'
                   model: benefit
                   attribute: employer_id
