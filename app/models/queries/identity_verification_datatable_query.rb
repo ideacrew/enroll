@@ -17,7 +17,7 @@ module Queries
     end
 
     def build_scope()
-      family = EnrollRegistry.feature_enabled?(:show_people_with_no_evidence) ? Person.for_admin_approval : Person.for_admin_approval_without_documents
+      family = EnrollRegistry.feature_enabled?(:show_people_with_no_evidence) ? Person.for_admin_approval : Person.for_admin_approval_with_documents
       person = Person
 
       #add other scopes here
