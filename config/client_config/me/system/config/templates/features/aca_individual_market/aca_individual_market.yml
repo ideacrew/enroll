@@ -99,6 +99,8 @@ registry:
         is_enabled: false
       - key: :qhp_product_for_include_aca_individual
         is_enabled: <%= ENV['QHP_PRODUCT_FOR_INCLUDE_ACA_INDIVIDUAL_IS_ENABLED'] || false %>
+      - key: :display_you_pay
+        is_enabled: <%= ENV['DISPLAY_YOU_PAY_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_individual_market

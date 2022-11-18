@@ -3,8 +3,6 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-
-
 module Operations
   module PremiumCredits
     # This operation is to find Csr value.
