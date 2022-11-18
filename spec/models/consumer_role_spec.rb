@@ -1947,7 +1947,7 @@ describe 'vlp documents' do
 
       it "should delete the ridp documents" do
         expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_truthy
-        consumer_role.admin_ridp_verification_action('return_for_deficiency', 'Identity', 'Other', person)
+        consumer_role.admin_ridp_verification_action('verify', 'Identity', 'Document in EnrollApp', person)
         expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_falsey
       end
     end
