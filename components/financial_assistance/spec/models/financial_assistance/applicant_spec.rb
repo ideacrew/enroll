@@ -515,14 +515,56 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   end
 
   context '#other_questions_complete?' do
-
-    context "not applying for coverage and is_pregnant" do
+    context "when not applying for coverage, has_unemployment_income: nil and is_pregnant" do
       before do
-        applicant.update_attributes!(is_pregnant: true, is_applying_coverage: false)
+        applicant.update_attributes!(has_unemployment_income: nil, pregnancy_due_on: TimeKeeper.date_of_record - 10.days, children_expected_count: 1, is_pregnant: true, is_applying_coverage: false)
       end
-      it "should should return false for post_partum period" do
+
+      it "return true for other_questions_complete?" do
+        expect(applicant.other_questions_complete?).to be_truthy
+      end
+
+      it "return nil for post_partum period" do
         applicant.other_questions_complete?
-        expect(applicant.is_post_partum_period).to eql(false)
+        expect(applicant.is_post_partum_period).to eql(nil)
+      end
+    end
+
+    context "when not applying for coverage and is not pregnant" do
+      context "and other_questions_complete? is independent of has_unemployment_income" do
+        [true, false, nil].each do |has_unemployment_income|
+          before do
+            applicant.update_attributes!(has_unemployment_income: has_unemployment_income, is_pregnant: false, is_applying_coverage: false)
+          end
+
+          it "return false for other_questions_complete?" do
+            expect(applicant.other_questions_complete?).to be_falsey
+          end
+
+          it "return nil for post_partum period" do
+            applicant.other_questions_complete?
+            expect(applicant.is_post_partum_period).to eql(nil)
+          end
+        end
+      end
+    end
+
+    context "when applying for coverage and is not pregnant" do
+      context "and other_questions_complete? is independent of has_unemployment_income" do
+        [true, false, nil].each do |has_unemployment_income|
+          before do
+            applicant.update_attributes!(has_unemployment_income: has_unemployment_income, is_pregnant: false, is_applying_coverage: true)
+          end
+
+          it "return false for other_questions_complete?" do
+            expect(applicant.other_questions_complete?).to be_falsey
+          end
+
+          it "return nil for post_partum period" do
+            applicant.other_questions_complete?
+            expect(applicant.is_post_partum_period).to eql(nil)
+          end
+        end
       end
     end
 
