@@ -318,8 +318,11 @@ class Person
   # scope :general_agency_primary_staff,     -> { where("general_agency_staff_roles.is_primary" => { "$eq" => true })}
 
   scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending, :rejected] })}
+  scope :identity_validation_documents, -> { where(:'consumer_role.ridp_documents.ridp_verification_type' => "Identity") }
   scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending, :rejected] })}
+  scope :application_validation_documents, -> { where(:'consumer_role.ridp_documents.ridp_verification_type' => "Application") }
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
+  scope :for_admin_approval_with_documents, -> {any_of([outstanding_identity_validation.identity_validation_documents.selector, outstanding_application_validation.application_validation_documents.selector])}
 
   scope :only_text_notifications, -> { where(:'consumer_role.contact_method' => ConsumerRole::CONTACT_METHOD_MAPPING[["Text"]]) }
 
