@@ -19,7 +19,6 @@ module Queries
     def build_scope()
       family = EnrollRegistry.feature_enabled?(:show_people_with_no_evidence) ? Person.for_admin_approval : Person.for_admin_approval_with_documents
       person = Person
-
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
