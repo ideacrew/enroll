@@ -1939,10 +1939,36 @@ describe 'vlp documents' do
       end
     end
 
+    context 'when admin verifies and consumer has ridp documents' do
+
+      before do
+        EnrollRegistry[:show_people_with_no_evidence].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should delete the ridp documents" do
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_truthy
+        consumer_role.admin_ridp_verification_action('verify', 'Identity', 'Document in EnrollApp', person)
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_falsey
+      end
+    end
+
     context 'when admin rejects' do
 
       it 'returns rejected message' do
         expect(consumer_role.admin_ridp_verification_action('return_for_deficiency', 'Identity', 'Other', person)).to eq 'Identity successfully rejected.'
+      end
+    end
+
+    context 'when admin rejects and consumer has ridp documents' do
+
+      before do
+        EnrollRegistry[:show_people_with_no_evidence].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should delete the ridp documents" do
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_truthy
+        consumer_role.admin_ridp_verification_action('return_for_deficiency', 'Identity', 'Other', person)
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_falsey
       end
     end
   end
