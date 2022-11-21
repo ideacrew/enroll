@@ -71,7 +71,9 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
     if applications.size == 1
       application = applications.first
-      annual_tax_household_income = application.eligibility_determinations.sum(&:aptc_csr_annual_household_income)
+      eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
+      annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
+
       total_household_count = application.applicants.size
       fpl_data = fp_levels[application.assistance_year]
 
