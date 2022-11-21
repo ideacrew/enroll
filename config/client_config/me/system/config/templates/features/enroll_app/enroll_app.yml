@@ -835,3 +835,6 @@ registry:
       - key: :home_tiles_group_by_year
         item: :home_tiles_group_by_year
         is_enabled: <%= ENV['TILES_GROUP_BY_YEAR_IS_ENABLED'] || false %>
+      - key: :show_people_with_no_evidence
+        item: :show_people_with_no_evidence
+        is_enabled: <%= ENV['SHOW_PEOPLE_WITH_NO_EVIDENCE_IS_ENABLED'] || true %>

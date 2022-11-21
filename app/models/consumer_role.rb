@@ -1183,6 +1183,8 @@ class ConsumerRole
   end
 
   def admin_ridp_verification_action(admin_action, ridp_type, update_reason, person)
+    remove_ridp_verification_documents(ridp_type) unless EnrollRegistry.feature_enabled?(:show_people_with_no_evidence)
+
     case admin_action
       when 'verify'
         UserMailer.identity_verification_acceptance(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
@@ -1227,6 +1229,11 @@ class ConsumerRole
       update_attributes(:application_validation => 'valid', :application_update_reason => update_reason)
     end
     "#{ridp_type} successfully verified."
+  end
+
+  def remove_ridp_verification_documents(ridp_type)
+    ridp_documents_to_remove = ridp_documents.where(ridp_verification_type: ridp_type)
+    ridp_documents_to_remove.delete_all if ridp_documents_to_remove.present?
   end
 
   def update_verification_type(v_type, update_reason, *authority)
