@@ -79,7 +79,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
       total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
                                        ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
-      fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline, 0) * 100).floor(2)
+      fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline) * 100).to_f
 
       annual_tax_household_income * applicable_percentage(fpl_percentage)
     else
