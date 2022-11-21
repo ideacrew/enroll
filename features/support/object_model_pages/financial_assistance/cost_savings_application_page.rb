@@ -18,4 +18,8 @@ class CostSavingsApplicationPage
   def self.meets_mvs_and_affordable
     "[data-cuke='meets_mvs_and_affordable']"
   end
+
+  def self.benefit_esi_ein_label
+    "[data-cuke='benefit_esi_ein_label']"
+  end
 end

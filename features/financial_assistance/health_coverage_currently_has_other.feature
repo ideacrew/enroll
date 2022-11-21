@@ -53,3 +53,9 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Given the user answers yes to currently having access to other health coverage
     And the user checks a employer sponsored health coverage checkbox
     Then the employer id field should indicate it is required
+
+  Scenario: Employer id label required on show
+    Given the consumer has a benefit
+    And the consumer has an esi benefit
+    And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
+    Then the employer id label should indicate it is required
