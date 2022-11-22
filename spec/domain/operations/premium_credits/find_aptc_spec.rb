@@ -188,6 +188,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                             :with_silver_health_product,
                             :with_enrollment_members,
                             enrollment_members: [primary_applicant],
+                            effective_on: TimeKeeper.date_of_record.beginning_of_month,
                             family: family)
         end
 
@@ -234,6 +235,66 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           end
         end
 
+        context 'with member coverage_start_on different from effective_on' do
+          let(:benchmark_premium) { primary_bp }
+          let(:today) { TimeKeeper.date_of_record }
+          let(:dob_year) { today.year - 15 }
+
+          before do
+            hbx_enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record)
+            hbx_enrollment.hbx_enrollment_members.each do |mmbr|
+              mmbr.person.update_attributes!(dob: Date.new(dob_year, today.month, today.day) - 15.days)
+              mmbr.update_attributes!(coverage_start_on: 1.month.ago.to_date)
+            end
+          end
+
+          it 'returns success' do
+            expect(result.success?).to eq true
+          end
+        end
+
+        context 'with inactive tax household group' do
+          before do
+            family.tax_household_groups.active.first.update_attributes!(end_on: TimeKeeper.date_of_record.end_of_year)
+          end
+          let(:benchmark_premium) { primary_bp }
+
+          it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 375.00
+          end
+        end
+
+        context 'for tax_household_member_enrollment_member' do
+          let(:benchmark_premium) { primary_bp }
+
+          before do
+            thh_enr = TaxHouseholdEnrollment.create(
+              enrollment_id: hbx_enrollment.id,
+              tax_household_id: aptc_grant.tax_household_id,
+              household_benchmark_ehb_premium: 500.00,
+              available_max_aptc: 375.00
+            )
+            thh_enr.tax_household_members_enrollment_members.create(
+              family_member_id: hbx_enrollment.hbx_enrollment_members.first.applicant_id,
+              hbx_enrollment_member_id: BSON::ObjectId.new,
+              tax_household_member_id: BSON::ObjectId.new,
+              age_on_effective_date: 20,
+              relationship_with_primary: 'self',
+              date_of_birth: TimeKeeper.date_of_record - 20.years
+            )
+          end
+
+          it 'updates tax_household_member_enrollment_member with correct hbx_enrollment_member_id' do
+            result
+            expect(
+              TaxHouseholdEnrollment.first.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
+            ).to eq(
+              hbx_enrollment.hbx_enrollment_members.first.id
+            )
+          end
+        end
+
         context 'with coinciding enrollments' do
           let!(:prev_enrollment) do
             FactoryBot.create(:hbx_enrollment,
@@ -243,6 +304,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               elected_aptc_pct: 1.0,
                               enrollment_members: [primary_applicant],
                               family: family,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               applied_aptc_amount: 375.00,
                               aasm_state: 'coverage_selected')
           end
@@ -262,6 +324,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: dependents,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               family: family)
           end
 
@@ -312,6 +375,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: dependents,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               family: family)
           end
 
@@ -334,7 +398,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               family: family,
                               applied_aptc_amount: 975.00,
                               aasm_state: 'coverage_terminated',
-                              effective_on: TimeKeeper.date_of_record - 1.months)
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month)
           end
 
           let!(:eligibility_determination) do
@@ -443,6 +507,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: dependents,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -464,6 +529,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 enrollment_members: dependents,
                                 family: family,
                                 applied_aptc_amount: 0.00,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -481,6 +547,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :individual_shopping,
                                 :with_silver_health_product,
                                 :with_enrollment_members,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 enrollment_members: [primary_applicant],
                                 family: family)
             end
@@ -541,6 +608,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant],
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -562,6 +630,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 enrollment_members: [primary_applicant],
                                 family: family,
                                 applied_aptc_amount: 550.00,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -580,6 +649,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[0]],
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -600,6 +670,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 enrollment_members: [primary_applicant],
                                 family: family,
                                 applied_aptc_amount: 550.00,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -611,6 +682,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 enrollment_members: [dependents[0]],
                                 family: family,
                                 applied_aptc_amount: 1130.00,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 aasm_state: 'coverage_selected')
             end
 
@@ -638,6 +710,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[1]],
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -753,6 +826,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :with_silver_health_product,
                               :with_enrollment_members,
                               enrollment_members: family.family_members,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               family: family)
           end
 
@@ -817,6 +891,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :with_enrollment_members,
                               elected_aptc_pct: 1.0,
                               enrollment_members: [primary_applicant],
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               family: family,
                               aasm_state: 'coverage_selected')
           end
@@ -826,6 +901,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                               :individual_shopping,
                               :with_silver_health_product,
                               :with_enrollment_members,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               enrollment_members: dependents,
                               family: family)
           end
@@ -909,6 +985,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [primary_applicant, dependents[1]],
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -945,6 +1022,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_enrollment_members,
                                 elected_aptc_pct: 1.0,
                                 enrollment_members: [primary_applicant, dependents[1]],
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family,
                                 aasm_state: 'coverage_selected')
             end
@@ -973,6 +1051,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: [dependents[0]],
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -1093,6 +1172,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 elected_aptc_pct: 1.0,
                                 enrollment_members: [primary_applicant, dependents[1]],
                                 family: family,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 applied_aptc_amount: 450.00,
                                 aasm_state: 'coverage_selected')
             end
@@ -1103,6 +1183,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                                 :with_silver_health_product,
                                 :with_enrollment_members,
                                 enrollment_members: dependents,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
                                 family: family)
             end
 
@@ -1304,6 +1385,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           elected_aptc_pct: 0.9,
                           enrollment_members: ([primary_applicant] + [family.dependents.select { |dependent| [dependent_b.id, dependent_d.id].include? dependent.person_id }]).flatten,
                           family: family,
+                          effective_on: TimeKeeper.date_of_record.beginning_of_month,
                           aasm_state: 'coverage_selected')
       end
 
@@ -1315,6 +1397,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           elected_aptc_pct: 0.85,
                           enrollment_members: family.dependents.select { |dependent| [dependent_b.id, dependent_c.id, dependent_d.id].include? dependent.person_id },
                           family: family,
+                          effective_on: TimeKeeper.date_of_record.beginning_of_month,
                           aasm_state: 'coverage_selected')
       end
 
@@ -1326,6 +1409,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           elected_aptc_pct: 1.0,
                           enrollment_members: family.dependents.select { |dependent| [dependent_b.id, dependent_d.id, dependent_e.id].include? dependent.person_id },
                           family: family,
+                          effective_on: TimeKeeper.date_of_record.beginning_of_month,
                           aasm_state: 'coverage_selected')
       end
 
@@ -1365,6 +1449,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                           :with_silver_health_product,
                           :with_enrollment_members,
                           elected_aptc_pct: 0.9,
+                          effective_on: TimeKeeper.date_of_record.beginning_of_month,
                           enrollment_members: ([primary_applicant] + [family.dependents.select { |dependent| [dependent_b.id, dependent_d.id].include? dependent.person_id }]).flatten,
                           family: family,
                           aasm_state: 'coverage_selected')

@@ -27,6 +27,8 @@ registry:
             item: 20
           - key: :fifteenth_of_the_month
             item: 15
+      - key: :fifteenth_of_the_month_rule_overridden
+        is_enabled: false
       - key: :aca_individual_assistance_benefits
         is_enabled: true
         settings:
@@ -59,6 +61,8 @@ registry:
                     "Other (With Alien Number)", "Other (With I-94 Number)" ]
       - key: :indian_alaskan_tribe_details
         is_enabled: false
+      - key: :check_for_crm_updates
+        is_enabled: <%= ENV['CHECK_FOR_CRM_UPDATES_IS_ENABLED'] || false %>
       - key: :prior_plan_year_ivl_sep
         is_enabled: :false
       - key: :admin_ivl_end_date_changes

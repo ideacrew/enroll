@@ -26,27 +26,31 @@ module Operations
         # Updates should only be made to CRM gateway if critical attributes are changed
         # or new family members are added/deleted
         def send_to_gateway?(person, new_payload)
-          old_payload = person.cv3_payload
-          return true if old_payload.blank?
-          new_payload_hash = new_payload.to_h.with_indifferent_access
-          old_payload_hash = old_payload.to_h.with_indifferent_access
-          new_payload_changes = {
-            encrypted_ssn: new_payload_hash.dig(:person_demographics, :encrypted_ssn),
-            first_name: new_payload_hash.dig(:person_demographics, :first_name),
-            last_name: new_payload_hash.dig(:person_demographics, :last_name),
-            dob: new_payload_hash.dig(:person_demographics, :dob),
-            addresses: new_payload_hash[:addresses],
-            phones: new_payload_hash[:phones]
-          }
-          old_payload_changes = {
-            encrypted_ssn: old_payload_hash.dig(:person_demographics, :encrypted_ssn),
-            first_name: old_payload_hash.dig(:person_demographics, :first_name),
-            last_name: old_payload_hash.dig(:person_demographics, :last_name),
-            dob: old_payload_hash.dig(:person_demographics, :dob),
-            addresses: old_payload_hash[:addresses],
-            phones: old_payload_hash[:phones]
-          }
-          new_payload_changes != old_payload_changes
+          if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+            person.crm_notifiction_needed
+          else
+            old_payload = person.cv3_payload
+            return true if old_payload.blank?
+            new_payload_hash = new_payload.to_h.with_indifferent_access
+            old_payload_hash = old_payload.to_h.with_indifferent_access
+            new_payload_changes = {
+              encrypted_ssn: new_payload_hash.dig(:person_demographics, :encrypted_ssn),
+              first_name: new_payload_hash.dig(:person_demographics, :first_name),
+              last_name: new_payload_hash.dig(:person_demographics, :last_name),
+              dob: new_payload_hash.dig(:person_demographics, :dob),
+              addresses: new_payload_hash[:addresses],
+              phones: new_payload_hash[:phones]
+            }
+            old_payload_changes = {
+              encrypted_ssn: old_payload_hash.dig(:person_demographics, :encrypted_ssn),
+              first_name: old_payload_hash.dig(:person_demographics, :first_name),
+              last_name: old_payload_hash.dig(:person_demographics, :last_name),
+              dob: old_payload_hash.dig(:person_demographics, :dob),
+              addresses: old_payload_hash[:addresses],
+              phones: old_payload_hash[:phones]
+            }
+            new_payload_changes != old_payload_changes
+          end
         end
 
 

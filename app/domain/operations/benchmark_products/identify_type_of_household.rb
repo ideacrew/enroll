@@ -25,7 +25,7 @@ module Operations
 
             family_member = result.success
             member[:date_of_birth] = family_member.dob
-            member[:age_on_effective_date] = family_member.age_on(bpm_params[:effective_date])
+            member[:age_on_effective_date] = family_member.age_on(member[:coverage_start_on] || bpm_params[:effective_date])
           end
         end
 
@@ -36,7 +36,7 @@ module Operations
         @family ||= Family.where(id: family_id).first
         return Failure("Unable to find Family with family_id: #{family_id}") if @family.blank?
 
-        family_member = @family.active_family_members.where(id: family_member_id).first
+        family_member = @family.family_members.where(id: family_member_id).first
         return Failure("Unable to find FamilyMember for family_id: #{family_id}, with family_member_id: #{family_member_id}") if family_member.blank?
 
         Success(family_member)

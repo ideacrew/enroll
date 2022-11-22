@@ -7,19 +7,18 @@
 <% if content_for? :submit_button %>
   <%= yield :submit_button %>
 <% else %>
-  <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled) unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+  <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+    <%= link_to_with_noopener_noreferrer('Continue', next_url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled)) %>
+  <% end %>
 <% end %>
 
 <ul class='list-unstyled list-right-section'>
   <li>
-    <%= link_to previous_url do %>
-      <%# <%= image_tag 'icons/list.png' %> 
-      PREVIOUS
-    <% end %>
+    <%= link_to_with_noopener_noreferrer('PREVIOUS', previous_url) %>
   </li>
   <li>
     <a href="#">
-      <%# <%= image_tag 'icons/list.png' %> 
+      <%# <%= image_tag 'icons/list.png' %>
       SAVE &amp; EXIT
     </a>
     <br>

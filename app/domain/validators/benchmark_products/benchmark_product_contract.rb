@@ -36,6 +36,7 @@ module Validators
             required(:relationship_with_primary).filled(:string, included_in?: ::PersonRelationship::Kinds)
             optional(:date_of_birth).maybe(:date)
             optional(:age_on_effective_date).maybe(:integer)
+            optional(:coverage_start_on).maybe(:date)
           end
         end
       end

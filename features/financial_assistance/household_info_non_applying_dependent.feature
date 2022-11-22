@@ -14,3 +14,8 @@ Feature: A dedicated page that gives the user access to household member creatio
     Then the no ssn warning will appear
     And all applicants are in Info Completed state
     Then the CONTINUE button will be ENABLED
+
+  Scenario: Consumer fields when dependent is not applying for coverage
+    And the primary member exists
+    And a new household member is not applying
+    Then the new household member should not see consumer fields

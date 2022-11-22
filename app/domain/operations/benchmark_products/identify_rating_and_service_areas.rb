@@ -19,14 +19,14 @@ module Operations
       private
 
       def find_rating_address(params)
-        family = params[:family]
+        @family = params[:family]
         bpm_params = params[:benchmark_product_model].to_h
-        rating_address = family.primary_person&.rating_address
+        rating_address = @family.primary_person&.rating_address
         if rating_address.present?
           bpm_params[:primary_rating_address_id] = rating_address.id
           Success([bpm_params, rating_address])
         else
-          Failure("Unable to find Rating Address for Primary Person with hbx_id: #{family.primary_person.hbx_id} of Family with id: #{family.id}")
+          Failure("Unable to find Rating Address for PrimaryPerson with hbx_id: #{@family.primary_person.hbx_id} of Family with id: #{@family.id}")
         end
       end
 
@@ -39,7 +39,9 @@ module Operations
           bpm_params[:exchange_provided_code] = rating_area.exchange_provided_code
           Success(bpm_params)
         else
-          Failure("Rating Area not found for effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}")
+          Failure(
+            "Rating Area not found for PrimaryPerson hbx_id: #{@family.primary_person.hbx_id}, effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}, state: #{address.state}"
+          )
         end
       end
 

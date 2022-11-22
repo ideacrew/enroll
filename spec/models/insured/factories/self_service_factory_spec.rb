@@ -301,7 +301,7 @@ module Insured
         let(:max_aptc) { 1200.0 }
 
         it 'returns new enrollment with newly determined aptc' do
-          subject.update_aptc(enrollment.id, nil)
+          subject.update_aptc(enrollment.id, nil, elected_aptc_pct: 0.85)
           enrollment.reload
           expect(enrollment.aasm_state).to eq 'coverage_canceled'
           new_enrollment = family.reload.active_household.hbx_enrollments.last
@@ -329,8 +329,8 @@ module Insured
             subject.update_aptc(enrollment.id, nil)
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-            expect(new_enrollment.elected_aptc_pct).to eq(0.85)
-            expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+            expect(new_enrollment.elected_aptc_pct).to eq(0.0)
+            expect(new_enrollment.applied_aptc_amount.to_f).to eq(0.0)
             expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
           end
         end
@@ -352,7 +352,7 @@ module Insured
           end
 
           it 'creates enrollment with ehb premium' do
-            subject.update_aptc(enrollment.id, nil)
+            subject.update_aptc(enrollment.id, nil, elected_aptc_pct: 1)
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
@@ -406,7 +406,8 @@ module Insured
 
       describe "for invalid members" do
         before :each do
-          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment, tobacco_use: 'N')
+          coverage_start_on = enrollment.hbx_enrollment_members.first.coverage_start_on
+          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: coverage_start_on, coverage_start_on: coverage_start_on, hbx_enrollment: enrollment, tobacco_use: 'N')
           EnrollRegistry[:check_enrollment_member_eligibility].feature.stub(:is_enabled).and_return(true)
         end
 
@@ -493,7 +494,7 @@ module Insured
         # monthly aggregate should be applied for enrollments within the same coverage year
         if future_effective_date.year == enrollment.effective_on.year
           params = subject.find(enrollment.id, family.id)
-          expect(params[:available_aptc]).to eq 0
+          expect(params[:available_aptc]).to eq 1274.44
         end
       end
 
@@ -501,7 +502,7 @@ module Insured
         # monthly aggregate should be applied for enrollments within the same coverage year
         if future_effective_date.year == enrollment.effective_on.year
           params = subject.find(enrollment.id, family.id)
-          expect(params[:elected_aptc_pct]).to eq 1
+          expect(params[:elected_aptc_pct]).to eq 0.09
         end
       end
 
@@ -658,6 +659,61 @@ module Insured
 
         it 'should return start of as 3/1' do
           expect(@effective_date).to eq(Date.new(Date.today.year.next, 3, 1))
+        end
+      end
+
+      context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 1/1 and 15 day disabled" do
+        before do
+          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          system_date = Date.new(Date.today.year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(Date.today.year.next, 1, 1)).to_date
+        end
+
+        it 'should return start of as 1/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 1, 1))
+        end
+      end
+
+      context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 3/1 with override" do
+        before do
+          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          current_year = Date.today.year
+          system_date = rand(Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year.next, 1, 31))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 3, 1)).to_date
+        end
+
+        it 'should return start of as 3/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 2, 1))
+        end
+      end
+
+      context "outside OE after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with override enabled" do
+        before do
+          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          current_year = Date.today.year
+          system_date = Date.new(current_year, 2, Settings.aca.individual_market.monthly_enrollment_due_on.next)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), system_date).to_date
+        end
+
+        it 'should return start of as 3/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year, 3, 1))
+        end
+      end
+
+      context "outside OE on monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with override enabled" do
+        before do
+          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          current_year = Date.today.year
+          system_date = Date.new(current_year, 1, Settings.aca.individual_market.monthly_enrollment_due_on)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(system_date.year, 1, 31)).to_date
+        end
+
+        it 'should return start of as 3/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year, 2, 1))
         end
       end
     end

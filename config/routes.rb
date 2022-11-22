@@ -815,6 +815,12 @@ Rails.application.routes.draw do
           get :current
         end
       end
+
+      resources :slcsp_calculator, :only => []  do
+        collection do
+          post :estimate
+        end
+      end
     end
   end
 

@@ -15,22 +15,24 @@ module Operations
         include Acapi::Notifiers
         require 'securerandom'
 
-        def call(family)
-          request_payload = yield construct_payload(family)
+        # rubocop:disable Style/OptionalBooleanParameter
+        def call(family, exclude_applications = false)
+          request_payload = yield construct_payload(family, exclude_applications)
 
           Success(request_payload)
         end
+        # rubocop:enable Style/OptionalBooleanParameter
 
         private
 
-        def construct_payload(family)
+        def construct_payload(family, exclude_applications)
           payload = {
             hbx_id: family.hbx_assigned_id.to_s,
             family_members: transform_family_members(family.family_members),
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
-            magi_medicaid_applications: transform_applications(family),
+            magi_medicaid_applications: transform_applications(family, exclude_applications),
             documents: transform_documents(family.documents),
             timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime} # ,
             # foreign_keys TO DO ??
@@ -47,8 +49,9 @@ module Operations
           Success(payload)
         end
 
-        def transform_applications(family)
+        def transform_applications(family, exclude_applications)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
+          return [] if exclude_applications
           member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
           applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
           transformed_applications = applications.collect do |application|
@@ -286,6 +289,8 @@ module Operations
           slcsp_info = fetch_slcsp_info(tax_household)
           application = latest_application_in_tax_household_year(tax_household)
           tax_household.tax_household_members.collect do |member|
+            next unless member.family_member.present?
+
             person_hbx_id = member.family_member.person.hbx_id
             {
               family_member_reference: transform_family_member_reference(member),
@@ -295,7 +300,7 @@ module Operations
               slcsp_benchmark_premium: fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info),
               reason: member.reason
             }
-          end
+          end.compact
         end
 
         def fetch_tax_filer_status(person_hbx_id, application)

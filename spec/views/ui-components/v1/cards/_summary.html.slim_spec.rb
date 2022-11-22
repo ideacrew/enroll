@@ -194,8 +194,10 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     let(:hbx_staff_person) {FactoryBot.create(:person, :with_hbx_staff_role)}
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
@@ -231,6 +233,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
   context 'for display of enrollment additional summary with consumer' do
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
@@ -265,6 +268,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
     let(:broker_person) {FactoryBot.create(:person, :with_broker_role)}
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)

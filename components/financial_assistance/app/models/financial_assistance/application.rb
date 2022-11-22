@@ -601,9 +601,7 @@ module FinancialAssistance
       return false if FinancialAssistanceRegistry.feature_enabled?(:block_renewal_application_transfers) && previously_renewal_draft?
       return false unless active_applicants.any?(&:is_applying_coverage)
       unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer)
-        # legally required to send application for full assessment if consumer requests it
-        return true if full_medicaid_determination
-        # otherwise block transfer if any applicant is eligible for non-MAGI reasons
+        # block transfer if any applicant is eligible for non-MAGI reasons
         return false if has_non_magi_referrals?
       end
       active_applicants.any? do |applicant|
@@ -1028,11 +1026,16 @@ module FinancialAssistance
 
     def apply_aggregate_to_enrollment
       return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft?
+      return if retro_application
       on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
 
       Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
     rescue StandardError => e
       Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+    end
+
+    def retro_application
+      self.effective_date.year < TimeKeeper.date_of_record.year
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -1048,7 +1051,7 @@ module FinancialAssistance
 
       rt_transfer
 
-      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
+      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: self.effective_date.to_date)
 
       if family_determination.success?
         apply_aggregate_to_enrollment

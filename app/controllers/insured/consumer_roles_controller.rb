@@ -9,7 +9,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
-  before_action :set_cache_headers, only: [:edit]
+  before_action :set_cache_headers, only: [:edit, :help_paying_coverage, :privacy, :search]
   before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
   before_action :sanitize_contact_method, only: [:update]
 
@@ -336,7 +336,10 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def help_paying_coverage_redirect_path(result)
-    return financial_assistance.application_year_selection_application_path(id: result.success) if EnrollRegistry.feature_enabled?(:iap_year_selection) && HbxProfile.current_hbx.under_open_enrollment?
+    if EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
+      return financial_assistance.application_year_selection_application_path(id: result.success)
+    end
+
     financial_assistance.application_checklist_application_path(id: result.success)
   end
 

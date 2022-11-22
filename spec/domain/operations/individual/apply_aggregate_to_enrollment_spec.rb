@@ -192,14 +192,15 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
     it 'returns monthly aggregate amount' do
       input_params = {eligibility_determination: new_eligibility_determination}
+      enrollment_count = family.hbx_enrollments.count
       @result = subject.call(input_params)
       if future_effective_date.year == enrollment.effective_on.year
         expect(@result.success).to eq "Aggregate amount applied on to enrollments"
-        expect(family.hbx_enrollments.count).to eq(2)
-        expect(enrollment.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
+        expect(family.hbx_enrollments.count).to eq(enrollment_count + 1)
+        expect(enrollment.applied_aptc_amount).not_to eq family.hbx_enrollments.to_a.last.applied_aptc_amount
       else
         # monthly aggregate should not be applied for perspective year enrollment
-        expect(family.hbx_enrollments.count).to eq(1)
+        expect(family.hbx_enrollments.count).to eq(enrollment_count)
       end
     end
   end

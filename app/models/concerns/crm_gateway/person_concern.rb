@@ -12,7 +12,9 @@ module CrmGateway
       return unless EnrollRegistry.feature_enabled?(:crm_publish_primary_subscriber)
       return unless has_active_consumer_role?
       return unless primary_family.present? && self == primary_family.primary_person
+      return if EnrollRegistry.feature_enabled?(:check_for_crm_updates) && !self.crm_notifiction_needed
       CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_primary_subscriber_publish)
+      "Triggering CRM primary subscriber update publish for person"
     end
 
     def trigger_primary_subscriber_publish
@@ -21,7 +23,7 @@ module CrmGateway
       # Update column directly without callbacks
       if result.success?
         person_payload = result.success.last
-        self.set(cv3_payload: person_payload.to_h.with_indifferent_access)
+        self.set(cv3_payload: person_payload.to_h.with_indifferent_access) unless EnrollRegistry.feature_enabled?(:check_for_crm_updates)
         p person_payload if Rails.env.test?
       else
         Rails.logger.warn("Publish Primary Subscriber Exception person_hbx_id: #{self.hbx_id}: #{result.failure}")
@@ -30,3 +32,4 @@ module CrmGateway
     end
   end
 end
+

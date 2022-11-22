@@ -571,6 +571,18 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe 'link_to_with_noopener_noreferrer' do
+    it 'should return link with out options' do
+      expect(helper.link_to_with_noopener_noreferrer('name', new_exchanges_bulk_notice_path)).to eq "<a rel=\"noopener noreferrer\" href=\"/exchanges/bulk_notices/new\">name</a>"
+    end
+
+    it 'should return link with options' do
+      expect(
+        helper.link_to_with_noopener_noreferrer('name', new_exchanges_bulk_notice_path, class: 'test', id: 'test-id', disabled: false)
+      ).to eq "<a class=\"test\" id=\"test-id\" rel=\"noopener noreferrer\" href=\"/exchanges/bulk_notices/new\">name</a>"
+    end
+  end
+
   describe "env_bucket_name" do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     it "should return bucket name with system name prepended and environment name appended" do

@@ -70,12 +70,6 @@ module Insured
         reinstatement.save!
 
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          not_elected_zero_aptc = applied_aptc_amount.nil? || applied_aptc_amount.to_f > 0.0
-          if elected_aptc_pct.to_f <= 0.0 && not_elected_zero_aptc
-            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-            elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          end
-
           mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct.to_f, exclude_enrollments_list)
         else
           update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
@@ -212,18 +206,19 @@ module Insured
         hour = hbx_created_datetime.hour
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
+        override_enabled = EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.is_enabled
         # this condition is for self service APTC feature ONLY.
         if eligible_for_1_1_effective_date?(hbx_created_datetime, current_enrollment_effective_on)
           year = current_enrollment_effective_on.year
           month = day = 1
         elsif current_enrollment_effective_on.year != hbx_created_datetime.year
-          monthly_enrollment_due_on = Settings.aca.individual_market.monthly_enrollment_due_on
+          monthly_enrollment_due_on = override_enabled ? 31 : Settings.aca.individual_market.monthly_enrollment_due_on
           condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, monthly_enrollment_due_on)).include?(hbx_created_datetime.to_date)
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
           month = hbx_created_datetime.next_month.month + offset_month
         else
-          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          offset_month = (hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth || override_enabled) ? 1 : 2
           year = hbx_created_datetime.year
           month = hbx_created_datetime.month + offset_month
         end

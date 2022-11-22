@@ -48,6 +48,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   before do
     allow_any_instance_of(::FinancialAssistance::Locations::Address).to receive(:county_check).and_return true
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_return(false)
   end
 
   describe '.modelFeilds' do
@@ -1782,6 +1783,31 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     # end
   end
 
+  describe 'apply_aggregate_to_enrollment' do
+    before do
+      allow(::Operations::Individual::OnNewDetermination).to receive_message_chain(:new, :call).and_return(Dry::Monads::Result::Failure)
+    end
+
+    context "when the application is retro" do
+      before do
+        application.update_attributes(effective_date: Date.new((TimeKeeper.date_of_record.year - 1), 12, 31))
+      end
+
+      it 'should return nil' do
+        expect(application.apply_aggregate_to_enrollment).to eq nil
+      end
+    end
+
+    context "when application is in the present year" do
+      before do
+        application.update_attributes(effective_date: TimeKeeper.date_of_record)
+      end
+      it 'should not return nil' do
+        expect(application.apply_aggregate_to_enrollment).to eq true
+      end
+    end
+  end
+
   describe 'update_or_build_relationship' do
     let(:create_individual_rels) do
       application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
@@ -2044,24 +2070,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           application.applicants.first.update(is_non_magi_medicaid_eligible: true)
         end
 
-        context 'full medicaid determination requested' do
-          before do
-            application.update(full_medicaid_determination: true)
-          end
-
-          it 'should return true' do
-            expect(application.is_transferrable?).to eq(true)
-          end
-        end
-
-        context 'full medicaid determination NOT requested' do
-          before do
-            application.update(full_medicaid_determination: false)
-          end
-
-          it 'should return false' do
-            expect(application.is_transferrable?).to eq(false)
-          end
+        it 'should return false' do
+          expect(application.is_transferrable?).to eq(false)
         end
       end
     end

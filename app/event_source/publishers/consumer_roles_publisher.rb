@@ -6,5 +6,6 @@ module Publishers
     include ::EventSource::Publisher[amqp: 'enroll.individual.consumer_roles']
 
     register_event 'created'
+    register_event 'updated'
   end
 end

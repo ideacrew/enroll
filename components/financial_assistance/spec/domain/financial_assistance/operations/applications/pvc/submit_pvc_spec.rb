@@ -115,18 +115,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
 
   context 'success' do
     it 'should return success' do
-      expect(applicant.income_evidence.present?).to be_falsey
-      expect(applicant.non_esi_evidence.present?).to be_falsey
-      result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
+      result = subject.call(assistance_year: TimeKeeper.date_of_record.year)
       expect(result).to be_success
     end
   end
 
-  it "when evidences are not created due to applicant ineligible" do
-    applicant.update(is_applying_coverage: false, is_ia_eligible: false)
-    expect(applicant.income_evidence.present?).to be_falsey
-    expect(applicant.non_esi_evidence.present?).to be_falsey
-    result = subject.call(applications_per_event: 10, assistance_year: TimeKeeper.date_of_record.year)
-    expect(result).to be_success
-  end
 end
