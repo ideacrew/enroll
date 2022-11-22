@@ -49,7 +49,7 @@ module Operations
           Success("ConsumerRole DetermineVerifications success: #{result.success}")
         else
           logger.info "ConsumerRole DetermineVerifications failure: #{result.failure}"
-          Success("ConsumerRole DetermineVerifications failure: #{result.failure}")
+          Failure("ConsumerRole DetermineVerifications failure: #{result.failure}")
         end
       end
     end
