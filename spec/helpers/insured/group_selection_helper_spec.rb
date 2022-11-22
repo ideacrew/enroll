@@ -1007,6 +1007,8 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
     before do
       assign(:family, family)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
     end
 
     context "when family member is eligible" do
