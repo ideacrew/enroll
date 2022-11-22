@@ -133,5 +133,32 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs.count).to eq(0)
       end
     end
+
+    context 'when sending invalid person hbx_ids' do
+
+      it 'should not create TaxHouseholdGroups as the family is invalid' do
+        ClimateControl.modify person_hbx_ids: '12345' do
+          subject.migrate
+          thhgs = family.reload.tax_household_groups
+          expect(thhgs.count).to eq(0)
+        end
+      end
+    end
+
+    context 'when passing person hbx_ids' do
+
+      it 'should create TaxHouseholdGroups as the family is valid' do
+        ClimateControl.modify person_hbx_ids: person.hbx_id do
+          subject.migrate
+          thhgs = family.reload.tax_household_groups
+          expect(thhgs.count).to eq(1)
+          expect(thhgs.first.tax_households.count).to eq(1)
+          expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+          expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
+          expect(family.reload.eligibility_determination.grants.count).not_to be_zero
+          expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+        end
+      end
+    end
   end
 end

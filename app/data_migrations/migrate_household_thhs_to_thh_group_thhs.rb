@@ -58,12 +58,101 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         effective_starting_on: thh.effective_starting_on,
         effective_ending_on: effective_ending_on,
         max_aptc: thh.latest_eligibility_determination.max_aptc,
-        yearly_expected_contribution: thh.yearly_expected_contribution
+        yearly_expected_contribution: calculate_yearly_expected_contribution(thh, thh.family) || thh.yearly_expected_contribution
       }
 
       new_thh = thhg.tax_households.build(thh_params)
       build_thhms(thh.tax_household_members, new_thh)
     end
+  end
+
+  def calculate_yearly_expected_contribution(thh, family)
+    applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => thh.created_at.to_date)
+
+    if applications.size == 1
+      application = applications.first
+      eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
+      annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
+
+      total_household_count = application.applicants.size
+      fpl_data = fp_levels[application.assistance_year]
+
+      total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
+                                       ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
+      fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline) * 100).to_f
+
+      annual_tax_household_income * applicable_percentage(fpl_percentage)
+    else
+      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}. Found #{applications.size} applications"
+      @app_ambiguity_hbx_ids << family.hbx_assigned_id
+      nil
+    end
+  end
+
+  def applicable_percentage(fpl_percentage)
+    if fpl_percentage < 150
+      BigDecimal('0')
+    elsif fpl_percentage >= 150 && fpl_percentage < 200
+      ((fpl_percentage - BigDecimal('150')) / BigDecimal('50')) * BigDecimal('2')
+    elsif fpl_percentage >= 200 && fpl_percentage < 250
+      (((fpl_percentage - BigDecimal('200')) / BigDecimal('50')) * BigDecimal('2')) + BigDecimal('2')
+    elsif fpl_percentage >= 250 && fpl_percentage < 300
+      (((fpl_percentage - BigDecimal('250')) / BigDecimal('50')) * BigDecimal('2')) + BigDecimal('4')
+    elsif fpl_percentage >= 300 && fpl_percentage < 400
+      (((fpl_percentage - BigDecimal('300')) / BigDecimal('100')) * BigDecimal('2.5')) + BigDecimal('6')
+    else
+      # covers 400 and above
+      BigDecimal('8.5')
+    end.div(BigDecimal('100'), 3)
+  end
+
+  def fp_levels
+    {
+      2013 => {
+        annual_poverty_guideline: BigDecimal(11_490.to_s),
+        annual_per_person_amount: BigDecimal(4_020.to_s)
+      },
+      2014 => {
+        annual_poverty_guideline: BigDecimal(11_670.to_s),
+        annual_per_person_amount: BigDecimal(4_060.to_s)
+      },
+      2015 => {
+        annual_poverty_guideline: BigDecimal(11_770.to_s),
+        annual_per_person_amount: BigDecimal(4_160.to_s)
+      },
+      2016 => {
+        annual_poverty_guideline: BigDecimal(11_880.to_s),
+        annual_per_person_amount: BigDecimal(4_160.to_s)
+      },
+      2017 => {
+        annual_poverty_guideline: BigDecimal(12_060.to_s),
+        annual_per_person_amount: BigDecimal(4_180.to_s)
+      },
+      2018 => {
+        annual_poverty_guideline: BigDecimal(12_140.to_s),
+        annual_per_person_amount: BigDecimal(4_320.to_s)
+      },
+      2019 => {
+        annual_poverty_guideline: BigDecimal(12_490.to_s),
+        annual_per_person_amount: BigDecimal(4_420.to_s)
+      },
+      2020 => {
+        annual_poverty_guideline: BigDecimal(12_760.to_s),
+        annual_per_person_amount: BigDecimal(4_480.to_s)
+      },
+      2021 => {
+        annual_poverty_guideline: BigDecimal(12_880.to_s),
+        annual_per_person_amount: BigDecimal(4_540.to_s)
+      },
+      2022 => {
+        annual_poverty_guideline: BigDecimal(13_590.to_s),
+        annual_per_person_amount: BigDecimal(4_720.to_s)
+      },
+      2023 => {
+        annual_poverty_guideline: BigDecimal(13_590.to_s),
+        annual_per_person_amount: BigDecimal(4_720.to_s)
+      }
+    }
   end
 
   # Builds tax_household_members for a given tax_household
@@ -125,11 +214,23 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
   end
 
+  def find_families
+    hbx_ids = ENV['person_hbx_ids'].to_s.split(',')
+
+    if hbx_ids.present?
+      family_hbx_ids = Person.where(:hbx_id.in => hbx_ids).map(&:primary_family).compact.map(&:hbx_assigned_id)
+      Family.all_tax_households.where(:hbx_assigned_id.in => family_hbx_ids)
+    else
+      Family.all_tax_households
+    end
+  end
+
   def migrate
-    logger = Logger.new("#{Rails.root}/log/migrate_household_thhs_to_thh_group_thhs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    @logger = Logger.new("#{Rails.root}/log/migrate_household_thhs_to_thh_group_thhs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     start_time = DateTime.current
-    logger.info "MigrateHouseholdThhsToThhGroupThhs start_time: #{start_time}"
-    families = Family.all_tax_households
+    @logger.info "MigrateHouseholdThhsToThhGroupThhs start_time: #{start_time}"
+    @app_ambiguity_hbx_ids = []
+    families = find_families
     total_count = families.count
     familes_per_iteration = 5_000.0
     number_of_iterations = (total_count / familes_per_iteration).ceil
@@ -138,10 +239,11 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     while counter < number_of_iterations
       file_name = "#{Rails.root}/household_thhs_to_thh_group_thhs_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
       offset_count = familes_per_iteration * counter
-      process_families(families, file_name, offset_count, logger)
+      process_families(families, file_name, offset_count, @logger)
       counter += 1
     end
     end_time = DateTime.current
-    logger.info "MigrateHouseholdThhsToThhGroupThhs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
+    @logger.info "MigrateHouseholdThhsToThhGroupThhs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
+    @logger.info "Families with missing yearly_expected_contribution - #{@app_ambiguity_hbx_ids}"
   end
 end
