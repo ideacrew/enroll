@@ -40,8 +40,10 @@ module Operations
         Success(enrollment.family)
       end
 
-      def build_addresses(person)
+      def build_addresses(person, is_primary)
         address = person.mailing_address
+
+        return [] if address.nil? && !is_primary
         [
           {
             :kind => address.kind,
@@ -81,7 +83,7 @@ module Operations
               is_active: person.is_active,
               is_disabled: person.is_disabled,
               consumer_role: build_consumer_role(person.consumer_role),
-              addresses: build_addresses(person)
+              addresses: build_addresses(person, fm.is_primary_applicant)
             }
           }
           member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?

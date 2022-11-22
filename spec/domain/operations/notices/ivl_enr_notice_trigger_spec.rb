@@ -61,6 +61,22 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       end
     end
 
+    context 'person without address' do
+      let(:person_without_address) do
+        person = FactoryBot.create(:person, :with_consumer_role)
+        person.addresses = []
+        person.save!
+        person
+      end
+      let!(:family_member_3) { FactoryBot.create(:family_member, person: person_without_address, family: family)}
+
+      it 'should return success' do
+        result = subject.call({enrollment: enrollment.reload})
+
+        expect(result.success?).to be_truthy
+      end
+    end
+
     context '#build_family_member_hash' do
       let(:person_2) { FactoryBot.create(:person, :with_consumer_role) }
       let!(:family_member_2) { FactoryBot.create(:family_member, person: person_2, family: family)}
