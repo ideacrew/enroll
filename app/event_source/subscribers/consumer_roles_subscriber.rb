@@ -5,8 +5,8 @@ module Subscribers
   class ConsumerRolesSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.individual.consumer_roles']
 
-    subscribe(:on_enroll_individual_consumer_roles) do |delivery_info, _metadata, response|
-      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles)
+    subscribe(:on_created) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles_created)
       payload = JSON.parse(response, symbolize_names: true)
       subscriber_logger.info "ConsumerRolesSubscriber, response: #{payload}"
       determine_verifications(payload, subscriber_logger)
@@ -18,13 +18,33 @@ module Subscribers
       ack(delivery_info.delivery_tag)
     end
 
+    subscribe(:on_updated) do |delivery_info, _metadata, response|
+      subscriber_logger = subscriber_logger_for(:on_enroll_individual_consumer_roles_updated)
+      payload = JSON.parse(response, symbolize_names: true)
+      subscriber_logger.info "ConsumerRolesSubscriber, response: #{payload}"
+      determine_verifications_on_update(payload, subscriber_logger) unless Rails.env.test?
+
+      ack(delivery_info.delivery_tag)
+    rescue StandardError, SystemStackError => e
+      subscriber_logger.info "ConsumerRolesSubscriber Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      ack(delivery_info.delivery_tag)
+    end
+
+    private
+
     def determine_verifications(payload, subscriber_logger)
-      ::Operations::Individual::DetermineVerifications.new.call({id: GlobalID::Locator.locate(payload[:gid])})
+      ::Operations::Individual::DetermineVerifications.new.call({ id: GlobalID::Locator.locate(payload[:gid]).id })
     rescue StandardError => e
       subscriber_logger.info "Error: ConsumerRolesSubscriber, response: #{e}"
     end
 
-    private
+    def determine_verifications_on_update(payload, subscriber_logger)
+      ::Operations::ConsumerRoles::OnUpdate.new.call(
+        { payload: payload, subscriber_logger: subscriber_logger }
+      )
+    rescue StandardError => e
+      subscriber_logger.info "Error: ConsumerRolesSubscriber OnUpdate, response: #{e}, backtrace: #{e.backtrace}"
+    end
 
     def subscriber_logger_for(event)
       Logger.new(
