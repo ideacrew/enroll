@@ -18,6 +18,16 @@ RSpec.describe Operations::ConsumerRoles::OnUpdate, dbclean: :after_each do
 
   let(:consumer_role_gid) { consumer_role.to_global_id.uri }
 
+  context 'with invalid params' do
+    let(:params) { { subscriber_logger: Logger.new("#{Rails.root}/log/testing.log") } }
+
+    it 'returns failure' do
+      expect(described_class.new.call(params).failure).to eq(
+        "Invalid params: #{params}. Must have keys :payload(should be an instance if Hash) and :subscriber_logger(should be an instance if Logger)"
+      )
+    end
+  end
+
   context 'when consumer role id is nil' do
     let(:consumer_role_gid) { nil }
 
@@ -32,8 +42,9 @@ RSpec.describe Operations::ConsumerRoles::OnUpdate, dbclean: :after_each do
 
     context 'if person does not have an active enrollment' do
       it 'returns success' do
-        expect(subject.success?).to eq true
-        expect(subject.success).to eq 'Triggered ConsumerRole OnUpdate Events'
+        expect(subject.success).to eq(
+          "ConsumerRole DetermineVerifications success: Successfully triggered Hub Calls for ConsumerRole with person_hbx_id: #{person.hbx_id}"
+        )
       end
 
       it 'updates consumer_role state to verification_outstanding' do
@@ -56,15 +67,8 @@ RSpec.describe Operations::ConsumerRoles::OnUpdate, dbclean: :after_each do
         )
       end
 
-      it 'returns success' do
-        expect(subject.success?).to eq true
-        expect(subject.success).to eq 'Triggered ConsumerRole OnUpdate Events'
-      end
-
-      it 'updates consumer_role state to verification_outstanding' do
-        expect(consumer_role.aasm_state).to eq 'unverified'
-        subject
-        expect(consumer_role.reload.aasm_state).to eq 'verification_outstanding'
+      it 'returns failure' do
+        expect(subject.failure).to eq 'Consumer has an active enrollment'
       end
     end
   end
@@ -72,12 +76,12 @@ RSpec.describe Operations::ConsumerRoles::OnUpdate, dbclean: :after_each do
   context "when consumer's applicant status did not change" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
-    it 'returns success' do
+    it 'returns failure' do
       result = described_class.new.call(
         { payload: { gid: person.consumer_role.to_global_id.uri, previous: {} },
           subscriber_logger: Logger.new("#{Rails.root}/log/testing.log") }
       )
-      expect(result.success).to eq 'Triggered ConsumerRole OnUpdate Events'
+      expect(result.failure).to eq "Consumer's applicant status did not change"
     end
   end
 
@@ -89,12 +93,12 @@ RSpec.describe Operations::ConsumerRoles::OnUpdate, dbclean: :after_each do
       role
     end
 
-    it 'returns success' do
+    it 'returns failure' do
       result = described_class.new.call(
         { payload: { gid: consumer_role_gid, previous: { is_applying_coverage: true } },
           subscriber_logger: Logger.new("#{Rails.root}/log/testing.log") }
       )
-      expect(result.success).to eq 'Triggered ConsumerRole OnUpdate Events'
+      expect(result.failure).to eq 'Consumer is not applying for coverage.'
     end
   end
 end

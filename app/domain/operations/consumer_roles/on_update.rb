@@ -6,15 +6,14 @@ require 'dry/monads/do'
 module Operations
   module ConsumerRoles
     # This class is to Trigger all ConsumerRole OnUpdate events.
+    #   1. Determine Verifications(SSA/VLP)
     class OnUpdate
       include Dry::Monads[:result, :do]
 
       def call(params)
         values                   = yield validate_params(params)
         logger                   = yield fetch_logger(values)
-        _triggered_verifications = yield determine_verifications(values[:payload], logger)
-
-        Success('Triggered ConsumerRole OnUpdate Events')
+        determine_verifications(values[:payload], logger)
       end
 
       private
@@ -35,9 +34,11 @@ module Operations
         return Failure("Unable to find gid: #{payload[:gid]}") if payload[:gid].blank?
 
         role = GlobalID::Locator.locate(payload[:gid])
-        return Success("Consumer's applicant status did not change") unless payload[:previous].key?(:is_applying_coverage)
+        return Failure("Consumer's applicant status did not change") unless payload[:previous].key?(:is_applying_coverage)
 
-        return Success('Consumer is not applying for coverage.') if payload[:previous].key?(:is_applying_coverage) && !role.is_applying_coverage
+        return Failure('Consumer is not applying for coverage.') if payload[:previous].key?(:is_applying_coverage) && !role.is_applying_coverage
+
+        return Failure('Consumer has an active enrollment') if role.person.families.any? {|f| f.person_has_an_active_enrollment?(role.person) }
 
         result = ::Operations::Individual::DetermineVerifications.new.call(
           { id: role.id, skip_rr_config_and_active_enrollment_check: true }
@@ -45,11 +46,11 @@ module Operations
 
         if result.success?
           logger.info "ConsumerRole DetermineVerifications success: #{result.success}"
+          Success("ConsumerRole DetermineVerifications success: #{result.success}")
         else
           logger.info "ConsumerRole DetermineVerifications failure: #{result.failure}"
+          Success("ConsumerRole DetermineVerifications failure: #{result.failure}")
         end
-
-        Success('Triggered ConsumerRole DetermineVerifications')
       end
     end
   end
