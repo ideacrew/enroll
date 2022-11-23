@@ -83,6 +83,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
     let(:renewal_individual_premium_table) { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
 
     before :each do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
       TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 12, 15))
       effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
       tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
@@ -108,7 +109,6 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
 
     describe 'when multi tax household enabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
         allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
           double(
             call: double(
