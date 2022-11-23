@@ -32,6 +32,7 @@ class TaxHousehold
   field :eligibility_determination_hbx_id, type: BSON::ObjectId
 
   index({ "effective_ending_on" => 1, "effective_starting_on" => 1 })
+  index({"eligibility_determinations.determined_at" => 1})
 
   embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
