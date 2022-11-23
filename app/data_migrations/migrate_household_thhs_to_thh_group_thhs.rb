@@ -67,7 +67,13 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def calculate_yearly_expected_contribution(thh, family)
-    applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => thh.created_at.to_date)
+    return nil if thh.effective_starting_on.year != 2022
+
+    applications = if thh.created_at
+                     ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => thh.created_at.to_date)
+                   else
+                     ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: thh.effective_starting_on.year).determined
+                   end
 
     if applications.size == 1
       application = applications.first
