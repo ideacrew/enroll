@@ -121,6 +121,20 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
       end
     end
 
+    context '#calculate_yearly_expected_contribution' do
+      let!(:th) do
+        FactoryBot.create(:tax_household,
+                          household: family.active_household,
+                          yearly_expected_contribution: 3100.50,
+                          effective_starting_on: Date.new(2021),
+                          effective_ending_on: nil)
+      end
+
+      it 'returns nil when effective_starting_on is not 2022' do
+        expect(subject.calculate_yearly_expected_contribution(th, family)).to eq nil
+      end
+    end
+
     context 'invalid family' do
       before do
         th2.effective_ending_on = th2.effective_starting_on - 1.day
