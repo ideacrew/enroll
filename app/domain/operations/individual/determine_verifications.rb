@@ -7,11 +7,11 @@ module Operations
   module Individual
     # Determine verifications
     class DetermineVerifications
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:result, :do]
 
       def call(params)
         consumer_role_id = yield validate(params[:id])
-        determine(consumer_role_id)
+        determine(consumer_role_id, params)
       end
 
       private
@@ -21,14 +21,14 @@ module Operations
         Success(id)
       end
 
-      def determine(id)
+      def determine(id, params)
         consumer_role = ConsumerRole.find(id)
         person = consumer_role.person
 
         return Failure('person not found') if person.blank?
         return Failure('person not applying for coverage') unless person.is_applying_coverage
 
-        if can_update_consumer_role?(person)
+        if params[:skip_rr_config_and_active_enrollment_check] || can_update_consumer_role?(person)
           update_consumer_role(consumer_role, person)
         else
           Failure("ConsumerRole with person_hbx_id: #{person.hbx_id} is not enrolled to trigger hub calls")
