@@ -26,7 +26,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
 
   subject { Operations::Individual::OnNewDetermination }
 
-  describe "#update_aptc" do
+  describe "when multi tax household enabled" do
     let(:address) { family.primary_person.rating_address }
     let(:effective_date) { TimeKeeper.date_of_record.beginning_of_year }
     let(:application_period) { effective_date.beginning_of_year..effective_date.end_of_year }
@@ -84,6 +84,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
 
     before :each do
       EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).stub(:item).and_return(1.0)
       TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 12, 15))
       effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
       tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
@@ -105,73 +106,69 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
       family.family_members[2].person.consumer_role = cr2
 
       family.save!
-    end
 
-    describe 'when multi tax household enabled' do
-      before do
-        allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
-          double(
-            call: double(
-              success?: true,
-              value!: max_aptc
-            )
+      allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+        double(
+          call: double(
+            success?: true,
+            value!: max_aptc
           )
         )
-        allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+      )
+      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+    end
+
+    let(:max_aptc) { 1200.0 }
+
+    context 'when elected_aptc_pct exists on previous enrollment' do
+      it 'returns new enrollment with newly determined aptc' do
+        enrollment.update_attributes(elected_aptc_pct: 0.85)
+        subject.new.call({family: family, year: effective_date.year + 1})
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq 'coverage_canceled'
+        new_enrollment = family.reload.active_household.hbx_enrollments.last
+        expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+        expect(new_enrollment.elected_aptc_pct).to eq(0.85)
+        expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+        expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
+      end
+    end
+
+    context 'when elected_aptc_pct not exists' do
+      context 'when elected_aptc_pct '
+      it 'creates enrollment with default elected_aptc_pct' do
+        subject.new.call({family: family, year: effective_date.year + 1})
+        new_enrollment = family.reload.active_household.hbx_enrollments.last
+        expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+        expect(new_enrollment.elected_aptc_pct).to eq(1.0)
+        expect(new_enrollment.applied_aptc_amount.to_f).to eq(1200.0)
+        expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
+      end
+    end
+
+    context 'when elected_aptc_pct is 0' do
+      it 'creates enrollment with 0 for elected_aptc_pct' do
+        enrollment.update_attributes(elected_aptc_pct: 0.0)
+        subject.new.call({family: family, year: effective_date.year + 1})
+        new_enrollment = family.reload.active_household.hbx_enrollments.last
+        expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+        expect(new_enrollment.elected_aptc_pct).to eq(1.0)
+        expect(new_enrollment.applied_aptc_amount.to_f).to eq(1200.0)
+      end
+    end
+
+    context 'when ehb premium less than aptc' do
+      before do
+        hbx_profile.benefit_sponsorship.current_benefit_period.start_on
+        allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410))
       end
 
-      let(:max_aptc) { 1200.0 }
-
-      context 'when elected_aptc_pct exists on previous enrollment' do
-        it 'returns new enrollment with newly determined aptc' do
-          enrollment.update_attributes(elected_aptc_pct: 0.85)
-          subject.new.call({family: family, year: effective_date.year + 1})
-          enrollment.reload
-          expect(enrollment.aasm_state).to eq 'coverage_canceled'
-          new_enrollment = family.reload.active_household.hbx_enrollments.last
-          expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-          expect(new_enrollment.elected_aptc_pct).to eq(0.85)
-          expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
-          expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
-        end
-      end
-
-      context 'when elected_aptc_pct not exists' do
-        context 'when elected_aptc_pct '
-        it 'creates enrollment with default elected_aptc_pct' do
-          subject.new.call({family: family, year: effective_date.year + 1})
-          new_enrollment = family.reload.active_household.hbx_enrollments.last
-          expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-          expect(new_enrollment.elected_aptc_pct).to eq(1.0)
-          expect(new_enrollment.applied_aptc_amount.to_f).to eq(1200.0)
-          expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
-        end
-      end
-
-      context 'when elected_aptc_pct is 0' do
-        it 'creates enrollment with 0 for elected_aptc_pct' do
-          enrollment.update_attributes(elected_aptc_pct: 0.0)
-          subject.new.call({family: family, year: effective_date.year + 1})
-          new_enrollment = family.reload.active_household.hbx_enrollments.last
-          expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-          expect(new_enrollment.elected_aptc_pct).to eq(1.0)
-          expect(new_enrollment.applied_aptc_amount.to_f).to eq(1200.0)
-        end
-      end
-
-      context 'when ehb premium less than aptc' do
-        before do
-          hbx_profile.benefit_sponsorship.current_benefit_period.start_on
-          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410))
-        end
-
-        it 'creates enrollment with ehb premium' do
-          subject.new.call({family: family, year: effective_date.year + 1})
-          new_enrollment = family.reload.active_household.hbx_enrollments.last
-          expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-          expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
-          expect(new_enrollment.ehb_premium.to_f).to eq(393.76)
-        end
+      it 'creates enrollment with ehb premium' do
+        subject.new.call({family: family, year: effective_date.year + 1})
+        new_enrollment = family.reload.active_household.hbx_enrollments.last
+        expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+        expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
+        expect(new_enrollment.ehb_premium.to_f).to eq(393.76)
       end
     end
   end
