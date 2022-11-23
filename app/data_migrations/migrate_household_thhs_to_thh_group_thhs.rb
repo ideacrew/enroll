@@ -69,10 +69,10 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def calculate_yearly_expected_contribution(thh, family)
     return nil if thh.effective_starting_on.year != 2022
 
-    determined_at = tax_household.latest_eligibility_determination&.determined_at
+    determined_at = thh.latest_eligibility_determination&.determined_at
 
     if determined_at.blank?
-      @logger.info "----- Failed to update Yearly Expected Contribution(missing determined_at) for family with family_hbx_assigned_id: #{family.hbx_assigned_id}. Found #{applications.size} applications"
+      @logger.info "----- Failed to update Yearly Expected Contribution(missing determined_at) for family with family_hbx_assigned_id: #{family.hbx_assigned_id}."
       @app_ambiguity_hbx_ids << family.hbx_assigned_id
       return
     end
