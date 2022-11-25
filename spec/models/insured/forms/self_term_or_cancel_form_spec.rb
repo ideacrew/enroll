@@ -290,5 +290,64 @@ module Insured
       end
     end
 
+    describe '.check_to_enable_tax_credit_btn' do
+      let(:system_year) { Date.today.year }
+
+      before do
+        enrollment.update_attributes!(effective_on: Date.today.beginning_of_month)
+      end
+
+      context 'before OpenEnrollment or after start of OpenEnrollment in Prospective Year' do
+        before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(system_year, rand(1..10), 1))
+        end
+
+        context 'IndividualEnrollmentDueDayOfMonth: 15' do
+          before do
+            stub_const('HbxProfile::IndividualEnrollmentDueDayOfMonth', 15)
+          end
+
+          it 'returns true as new_effective_on is in current year' do
+            expect(described_class.check_to_enable_tax_credit_btn({ enrollment_id: enrollment.id })).to be_truthy
+          end
+        end
+
+        context 'IndividualEnrollmentDueDayOfMonth: 31' do
+          before do
+            stub_const('HbxProfile::IndividualEnrollmentDueDayOfMonth', 31)
+          end
+
+          it 'returns true as new_effective_on is in current year' do
+            expect(described_class.check_to_enable_tax_credit_btn({ enrollment_id: enrollment.id })).to be_truthy
+          end
+        end
+      end
+
+      context 'during start of OpenEnrollment until end of year' do
+        before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(system_year, 11, 25))
+        end
+
+        context 'IndividualEnrollmentDueDayOfMonth: 15' do
+          before do
+            stub_const('HbxProfile::IndividualEnrollmentDueDayOfMonth', 15)
+          end
+
+          it 'returns false as new_effective_on is in prospective year' do
+            expect(described_class.check_to_enable_tax_credit_btn({ enrollment_id: enrollment.id })).to be_falsey
+          end
+        end
+
+        context 'IndividualEnrollmentDueDayOfMonth: 31' do
+          before do
+            stub_const('HbxProfile::IndividualEnrollmentDueDayOfMonth', 31)
+          end
+
+          it 'returns true as new_effective_on is in current year' do
+            expect(described_class.check_to_enable_tax_credit_btn({ enrollment_id: enrollment.id })).to be_truthy
+          end
+        end
+      end
+    end
   end
 end
