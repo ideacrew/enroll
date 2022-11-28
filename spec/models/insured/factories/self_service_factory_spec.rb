@@ -301,7 +301,7 @@ module Insured
         let(:max_aptc) { 1200.0 }
 
         it 'returns new enrollment with newly determined aptc' do
-          subject.update_aptc(enrollment.id, nil)
+          subject.update_aptc(enrollment.id, nil, elected_aptc_pct: 0.85)
           enrollment.reload
           expect(enrollment.aasm_state).to eq 'coverage_canceled'
           new_enrollment = family.reload.active_household.hbx_enrollments.last
@@ -329,8 +329,8 @@ module Insured
             subject.update_aptc(enrollment.id, nil)
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-            expect(new_enrollment.elected_aptc_pct).to eq(0.85)
-            expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+            expect(new_enrollment.elected_aptc_pct).to eq(0.0)
+            expect(new_enrollment.applied_aptc_amount.to_f).to eq(0.0)
             expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
           end
         end
@@ -352,7 +352,7 @@ module Insured
           end
 
           it 'creates enrollment with ehb premium' do
-            subject.update_aptc(enrollment.id, nil)
+            subject.update_aptc(enrollment.id, nil, elected_aptc_pct: 1)
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
