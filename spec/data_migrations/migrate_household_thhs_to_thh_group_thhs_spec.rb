@@ -121,6 +121,20 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
       end
     end
 
+    context '#calculate_yearly_expected_contribution' do
+      let!(:th) do
+        FactoryBot.create(:tax_household,
+                          household: family.active_household,
+                          yearly_expected_contribution: 3100.50,
+                          effective_starting_on: Date.new(2021),
+                          effective_ending_on: nil)
+      end
+
+      it 'returns nil when effective_starting_on is not 2022' do
+        expect(subject.calculate_yearly_expected_contribution(th, family)).to eq nil
+      end
+    end
+
     context 'invalid family' do
       before do
         th2.effective_ending_on = th2.effective_starting_on - 1.day
@@ -131,6 +145,33 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
       it 'should not create TaxHouseholdGroups as the family is invalid' do
         thhgs = family.reload.tax_household_groups
         expect(thhgs.count).to eq(0)
+      end
+    end
+
+    context 'when sending invalid person hbx_ids' do
+
+      it 'should not create TaxHouseholdGroups as the family is invalid' do
+        ClimateControl.modify person_hbx_ids: '12345' do
+          subject.migrate
+          thhgs = family.reload.tax_household_groups
+          expect(thhgs.count).to eq(0)
+        end
+      end
+    end
+
+    context 'when passing person hbx_ids' do
+
+      it 'should create TaxHouseholdGroups as the family is valid' do
+        ClimateControl.modify person_hbx_ids: " #{person.hbx_id}" do
+          subject.migrate
+          thhgs = family.reload.tax_household_groups
+          expect(thhgs.count).to eq(1)
+          expect(thhgs.first.tax_households.count).to eq(1)
+          expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+          expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
+          expect(family.reload.eligibility_determination.grants.count).not_to be_zero
+          expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+        end
       end
     end
   end
