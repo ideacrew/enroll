@@ -8,8 +8,8 @@
         <h1 class="darkblue no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
         <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
         <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form) %>
-          <% oe_year = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on.year %>
-          <% current_year = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on.year %>
+          <% oe_year = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.open_enrollment_end_on.year %>
+          <% current_year = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.open_enrollment_start_on.year %>
           <h4><b><%= l10n('faa.coverage_update_reminder', year: current_year, year2: oe_year) %></b></h4>
         <% end %>
         <% if FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && !HbxProfile.current_hbx.under_open_enrollment? %>
