@@ -71,13 +71,12 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
     determined_at = thh.latest_eligibility_determination&.determined_at
 
-    if determined_at.blank?
-      @logger.info "----- Failed to update Yearly Expected Contribution(missing determined_at) for family with family_hbx_assigned_id: #{family.hbx_assigned_id}."
-      @app_ambiguity_hbx_ids << family.hbx_assigned_id
-      return
-    end
-
     applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => determined_at.to_date)
+
+    if applications.size != 1 && thh.created_at.present?
+      created_at = thh.created_at
+      applications = applications.where(:workflow_state_transitions => {'$elemMatch' => {:to_state => 'determined', :transition_at.lte => created_at + 15.seconds, :transition_at.gte => created_at - 15.seconds}})
+    end
 
     if applications.size == 1
       application = applications.first
@@ -93,8 +92,8 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
       annual_tax_household_income * applicable_percentage(fpl_percentage)
     else
-      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}. Found #{applications.size} applications"
-      @app_ambiguity_hbx_ids << family.hbx_assigned_id
+      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications"
+      @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
       nil
     end
   end
@@ -225,7 +224,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def find_families
-    hbx_ids = ENV['person_hbx_ids'].to_s.split(',')
+    hbx_ids = ENV['person_hbx_ids'].to_s.split(',').map(&:squish!)
 
     if hbx_ids.present?
       family_hbx_ids = Person.where(:hbx_id.in => hbx_ids).map(&:primary_family).compact.map(&:hbx_assigned_id)
