@@ -162,7 +162,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     context 'when passing person hbx_ids' do
 
       it 'should create TaxHouseholdGroups as the family is valid' do
-        ClimateControl.modify person_hbx_ids: person.hbx_id do
+        ClimateControl.modify person_hbx_ids: " #{person.hbx_id}" do
           subject.migrate
           thhgs = family.reload.tax_household_groups
           expect(thhgs.count).to eq(1)
