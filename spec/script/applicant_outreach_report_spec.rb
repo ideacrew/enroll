@@ -95,6 +95,7 @@ describe 'applicant_outreach_report' do
         most_recent_active_dental_plan_id
         subscriber_indicator
         transfer_id
+        FPL_year
       ]
   end
 
@@ -211,6 +212,12 @@ describe 'applicant_outreach_report' do
       it 'should match with the transfer id' do
         expect(@file_content[1][16]).to eq(application.transfer_id)
         expect(@file_content[2][16]).to eq(application.transfer_id)
+      end
+
+      it 'should match with the FPL year' do
+        fpl_year = application.assistance_year - 1
+        expect(@file_content[1][17]).to eq(fpl_year.to_s)
+        expect(@file_content[2][17]).to eq(fpl_year.to_s)
       end
     end
 

@@ -18,6 +18,7 @@ field_names = %w[
     most_recent_active_dental_plan_id
     subscriber_indicator
     transfer_id
+    FPL_year
   ]
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
@@ -58,6 +59,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                             else
                               enrollment_member = dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
+        fpl_year = application&.assistance_year - 1
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
@@ -74,7 +76,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 health_enrollment&.product&.hios_id,
                 dental_enrollment&.product&.hios_id,
                 enrollment_member&.is_subscriber,
-                application.transfer_id]
+                application.transfer_id,
+                fpl_year]
       end
     rescue StandardError => e
       puts "error for family #{family.id} due to #{e}"
