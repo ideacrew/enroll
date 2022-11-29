@@ -110,4 +110,5 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
     it 'should return success' do
       expect(subject.call(family)).to be_a(Dry::Monads::Result::Success)
     end
+  end
 end
