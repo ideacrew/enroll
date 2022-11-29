@@ -38,14 +38,10 @@ module Insured
 
       def self.check_to_enable_tax_credit_btn(attrs)
         enrollment = HbxEnrollment.find(attrs[:enrollment_id])
-        system_date = TimeKeeper.date_of_record
-        # Need to revert the enrollment_due_date with following changes back on 5/1/2020
-        # begin_date = Date.new(system_date.year, 11, ::HbxProfile::IndividualEnrollmentDueDayOfMonth + 1).beginning_of_day
-        enrollment_due_date = 15
-        # Can't create a corresponing enrollment during the end of the year due to overlapping plan year issue and hence disabling the change tax credit button
-        begin_date = Date.new(system_date.year, 11, enrollment_due_date + 1).beginning_of_day
-        end_date = begin_date.end_of_year.end_of_day
-        !((begin_date..end_date).cover?(system_date) && (enrollment.effective_on.year == system_date.year))
+        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
+
+        # Can't create a corresponding enrollment during the end of the year due to overlapping plan year issue and hence disabling the change tax credit button
+        new_effective_date.year == enrollment.effective_on.year
       end
 
       def self.for_post(attrs)
