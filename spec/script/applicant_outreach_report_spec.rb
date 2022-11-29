@@ -42,6 +42,7 @@ describe 'applicant_outreach_report' do
     FactoryBot.create(
       :financial_assistance_applicant,
       addresses: primary_person.addresses,
+      benefits: [benefit],
       application: application,
       family_member_id: primary_fm.id,
       person_hbx_id: primary_person.hbx_id,
@@ -55,7 +56,6 @@ describe 'applicant_outreach_report' do
       dob: primary_person.dob,
       encrypted_ssn: primary_person.encrypted_ssn,
       has_eligible_health_coverage: true
-      
     )
   end
   let!(:spouse_applicant) do
@@ -79,6 +79,7 @@ describe 'applicant_outreach_report' do
   end
   let(:applicants) { [primary_applicant, spouse_applicant] }
   let!(:workflow_state_transition) { WorkflowStateTransition.new(to_state: 'draft', transition_at: Time.now) }
+  let(:benefit) { FactoryBot.build(:financial_assistance_benefit) }
   let(:field_names) do
     %w[
         primary_hbx_id
@@ -101,6 +102,7 @@ describe 'applicant_outreach_report' do
         FPL_year
         subscriber_hbx_id
         has_access_to_health_coverage
+        has_access_to_health_coverage_kinds
       ]
   end
 
@@ -168,6 +170,11 @@ describe 'applicant_outreach_report' do
       it 'should match with the applicant access to health coverage response' do
         expect(@file_content[1][19]).to eq(primary_applicant.has_eligible_health_coverage.to_s)
       end
+
+      it 'should match with the health coverage kinds applicant has access to' do
+        insurance_kinds = primary_applicant.benefits.eligible.map(&:insurance_kind).join(", ")
+        expect(@file_content[1][20]).to eq(insurance_kinds)
+      end
     end
 
     context 'spouse person' do
@@ -209,6 +216,11 @@ describe 'applicant_outreach_report' do
 
       it 'should match with the applicant access to health coverage response' do
         expect(@file_content[2][19]).to eq(spouse_applicant.has_eligible_health_coverage.to_s)
+      end
+
+      it 'should match with the health coverage kinds applicant has access to' do
+        insurance_kinds = spouse_applicant.benefits.eligible.map(&:insurance_kind).join(", ")
+        expect(@file_content[2][20]).to eq(insurance_kinds)
       end
     end
 

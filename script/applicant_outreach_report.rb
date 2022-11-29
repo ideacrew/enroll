@@ -21,6 +21,7 @@ field_names = %w[
     FPL_year
     subscriber_hbx_id
     has_access_to_health_coverage
+    has_access_to_health_coverage_kinds
   ]
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
@@ -87,7 +88,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 application.transfer_id,
                 fpl_year,
                 subscriber_id,
-                applicant.has_eligible_health_coverage
+                applicant.has_eligible_health_coverage,
+                applicant.benefits.eligible.map(&:insurance_kind).join(", ")
               ]
       end
     rescue StandardError => e
