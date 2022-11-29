@@ -101,7 +101,7 @@ module BenefitSponsors
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
           result[index_val] = sanitize_params(profile_attributes(form)).merge({
                                                                                 :office_locations_attributes => office_locations_form_to_params(form.office_locations),
-                                                                                :osse_eligibility => form.osse_eligibility
+                                                                                :osse_eligibility => form.osse_eligibility || osse_eligibility(load_profile)
                                                                               })
           result
         end
