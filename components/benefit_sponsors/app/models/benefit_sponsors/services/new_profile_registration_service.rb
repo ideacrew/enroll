@@ -99,9 +99,16 @@ module BenefitSponsors
 
       def profiles_form_to_params(profile)
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
+          osse_eligibility = form.osse_eligibility
+
+          if osse_eligibility.nil?
+            profile_instance = load_profile
+            osse_eligibility = osse_eligibility(profile_instance) if profile_instance&.is_an_employer_profile?
+          end
+
           result[index_val] = sanitize_params(profile_attributes(form)).merge({
                                                                                 :office_locations_attributes => office_locations_form_to_params(form.office_locations),
-                                                                                :osse_eligibility => form.osse_eligibility || osse_eligibility(load_profile)
+                                                                                :osse_eligibility => osse_eligibility
                                                                               })
           result
         end

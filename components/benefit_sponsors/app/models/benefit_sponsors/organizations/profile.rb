@@ -53,6 +53,10 @@ module BenefitSponsors
         self._type
       end
 
+      def is_an_employer_profile?
+        profile_type.scan(/.*EmployerProfile$/).present?
+      end
+
       def publish_profile_event
         if primary_office_location && primary_office_location.changed?
           benefit_sponsorships.each do |benefit_sponsorship|
