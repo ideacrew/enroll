@@ -196,6 +196,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)

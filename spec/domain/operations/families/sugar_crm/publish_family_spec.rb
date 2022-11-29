@@ -19,7 +19,7 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
 
   before do
     # Test the CRM update in isolation
-    EnrollRegistry[:check_for_crm_updates].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
     EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
     DatabaseCleaner.clean
     family.family_members << dependent_family_member
@@ -52,7 +52,6 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
     person.set(crm_notifiction_needed: false)
     dependent_person.set(crm_notifiction_needed: false)
     dependent_person2.set(crm_notifiction_needed: false)
-    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
   end
 
@@ -93,7 +92,6 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
       # first name of primary person is a critical attribute
       family.primary_applicant.person.first_name = "newname"
       family.primary_applicant.person.save!
-      puts EnrollRegistry.feature_enabled?(:check_for_crm_updates)
       family.reload
       expect(subject.call(family)).to be_a(Dry::Monads::Result::Success)
     end

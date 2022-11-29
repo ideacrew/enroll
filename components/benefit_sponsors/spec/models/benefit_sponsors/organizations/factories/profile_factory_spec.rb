@@ -517,6 +517,7 @@ module BenefitSponsors
         let(:is_edit_email_allowed)   { false }
 
         before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return true
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
