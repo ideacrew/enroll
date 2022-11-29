@@ -53,7 +53,9 @@ describe 'applicant_outreach_report' do
       last_name: primary_person.last_name,
       gender: primary_person.gender,
       dob: primary_person.dob,
-      encrypted_ssn: primary_person.encrypted_ssn
+      encrypted_ssn: primary_person.encrypted_ssn,
+      has_eligible_health_coverage: true
+      
     )
   end
   let!(:spouse_applicant) do
@@ -71,7 +73,8 @@ describe 'applicant_outreach_report' do
       last_name: spouse_person.last_name,
       gender: spouse_person.gender,
       dob: spouse_person.dob,
-      encrypted_ssn: spouse_person.encrypted_ssn
+      encrypted_ssn: spouse_person.encrypted_ssn,
+      has_eligible_health_coverage: false
     )
   end
   let(:applicants) { [primary_applicant, spouse_applicant] }
@@ -97,6 +100,7 @@ describe 'applicant_outreach_report' do
         transfer_id
         FPL_year
         subscriber_hbx_id
+        has_access_to_health_coverage
       ]
   end
 
@@ -160,6 +164,10 @@ describe 'applicant_outreach_report' do
         eligible_programs = "QHP without financial assistance"
         expect(@file_content[1][12]).to eq(eligible_programs)
       end
+
+      it 'should match with the applicant access to health coverage response' do
+        expect(@file_content[1][19]).to eq(primary_applicant.has_eligible_health_coverage.to_s)
+      end
     end
 
     context 'spouse person' do
@@ -197,6 +205,10 @@ describe 'applicant_outreach_report' do
       it 'should match with the programs that the applicant is eligible for' do
         eligible_programs = "MaineCare and Cub Care(Medicaid)"
         expect(@file_content[2][12]).to eq(eligible_programs)
+      end
+
+      it 'should match with the applicant access to health coverage response' do
+        expect(@file_content[2][19]).to eq(spouse_applicant.has_eligible_health_coverage.to_s)
       end
     end
 

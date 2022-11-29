@@ -20,6 +20,7 @@ field_names = %w[
     transfer_id
     FPL_year
     subscriber_hbx_id
+    has_access_to_health_coverage
   ]
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
@@ -85,7 +86,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 enrollment_member&.is_subscriber,
                 application.transfer_id,
                 fpl_year,
-                subscriber_id
+                subscriber_id,
+                applicant.has_eligible_health_coverage
               ]
       end
     rescue StandardError => e
