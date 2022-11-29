@@ -1653,4 +1653,34 @@ describe Person, :dbclean => :after_each do
       person.save!
     end
   end
+
+  context 'check_crm_updates' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      # have to run save an extra time due to the encrytped ssn
+      person.is_incarcerated = true
+      person.save!
+    end
+
+    it 'should set crm_notifiction_needed due to create' do
+      expect(person.crm_notifiction_needed).to eq true
+    end
+
+    it 'should set crm_notifiction_needed for critical fields' do
+      person.set(crm_notifiction_needed: false)
+      person.first_name = 'updated'
+      person.save!
+      expect(person.crm_notifiction_needed).to eq true
+    end
+
+    it 'should not set crm_notifiction_needed for non-critical fields' do
+      person.set(crm_notifiction_needed: false)
+      person.is_incarcerated = false
+      person.save!
+      expect(person.crm_notifiction_needed).not_to eq true
+    end
+  end
 end

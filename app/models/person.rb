@@ -121,6 +121,7 @@ class Person
   field :mec_check_date, type: DateTime
   # Used for recording payloads sent to CRM Gateway
   field :cv3_payload, type: Hash, default: {}
+  field :crm_notifiction_needed, type: Boolean
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
@@ -337,6 +338,7 @@ class Person
   before_save :update_full_name
   before_save :strip_empty_fields
   before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+  before_save :check_crm_updates
   #after_save :generate_family_search
   after_create :create_inbox
   after_create :notify_created
@@ -344,7 +346,6 @@ class Person
   after_update :person_create_or_update_handler
   after_save :generate_person_saved_event
   after_update :publish_updated_event
-
 
   def self.api_staff_roles
     Person.where(
@@ -1212,6 +1213,15 @@ class Person
     self.tribal_id = nil
     self.tribal_state = nil
     self.tribal_name = nil
+  end
+
+  def check_crm_updates
+    return unless EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+    write_attribute(:crm_notifiction_needed, true) if crm_attributes_changed?
+  end
+
+  def crm_attributes_changed?
+    encrypted_ssn_change || first_name_change || last_name_change || dob_change
   end
 
   def eligible_immigration_status=(val)

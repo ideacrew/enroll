@@ -222,6 +222,45 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
   end
 end
 
+describe FamilyMember, 'callback set crm_notifiction_needed', dbclean: :after_each do
+  let!(:person) {FactoryBot.create(:person)}
+  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:dependent_family_member) do
+    FamilyMember.new(is_primary_applicant: false, is_consent_applicant: false, person: dependent_person)
+  end
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    # have to run save an extra time due to the encrytped ssn
+    person.is_incarcerated = true
+    person.save!
+    person.set(crm_notifiction_needed: false)
+    dependent_person.is_incarcerated = true
+    dependent_person.save!
+    dependent_person.set(crm_notifiction_needed: false)
+    family.set(crm_notifiction_needed: false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+    family.family_members << dependent_family_member
+    person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
+    person.person_relationships.build(relative: dependent_person, kind: "spouse")
+    person.save!
+    family.save!
+  end
+
+  it 'should set to true on create' do
+    family.reload
+    expect(family.crm_notifiction_needed).to eq true
+  end
+
+  it 'should set to true on destroy' do
+    family.set(crm_notifiction_needed: false)
+    dependent_family_member.destroy
+    family.reload
+    expect(family.crm_notifiction_needed).to eq true
+  end
+end
+
 # TODO: Renable the spec on the after hook is enabled on family_member model
 # describe FamilyMember, 'call back deactivate_tax_households on create', dbclean: :after_each do
 #   let!(:person) {FactoryBot.create(:person)}

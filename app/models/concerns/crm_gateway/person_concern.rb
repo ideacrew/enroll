@@ -20,9 +20,13 @@ module CrmGateway
       result = ::Operations::People::SugarCrm::PublishPrimarySubscriber.new.call(self)
       # Update column directly without callbacks
       if result.success?
-        person_payload = result.success.last
-        self.set(cv3_payload: person_payload.to_h.with_indifferent_access)
-        p person_payload if Rails.env.test?
+        if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+          self.set(crm_notifiction_needed: false)
+        else
+          person_payload = result.success.last
+          self.set(cv3_payload: person_payload.to_h.with_indifferent_access)
+          p person_payload if Rails.env.test?
+        end
       else
         Rails.logger.warn("Publish Primary Subscriber Exception person_hbx_id: #{self.hbx_id}: #{result.failure}")
         p result.failure

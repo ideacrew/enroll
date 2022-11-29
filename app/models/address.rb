@@ -47,6 +47,9 @@ class Address
   # The name of the quadrant where this address is located
   field :quadrant, type: String, default: ""
 
+  before_save :set_crm_updates
+  before_destroy :set_crm_updates
+
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
@@ -323,6 +326,12 @@ class Address
     return(false) if another_address.nil?
     attrs_to_match = [:address_1, :address_2, :address_3, :city, :state, :zip]
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
+  end
+
+  def set_crm_updates
+    return unless EnrollRegistry[:check_for_crm_updates].enabled?
+    return unless person
+    person.set(crm_notifiction_needed: true) if changes&.any?
   end
 
   private
