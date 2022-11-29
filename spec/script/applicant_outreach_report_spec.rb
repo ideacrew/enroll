@@ -96,6 +96,7 @@ describe 'applicant_outreach_report' do
         subscriber_indicator
         transfer_id
         FPL_year
+        subscriber_hbx_id
       ]
   end
 
@@ -238,6 +239,13 @@ describe 'applicant_outreach_report' do
           dental_plan = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}&.product
           expect(@file_content[1][14]).to eq(dental_plan&.hios_id)
           expect(@file_content[2][14]).to eq(dental_plan&.hios_id)
+        end
+
+        it 'should match with health plan subscriber hbx id' do
+          health_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
+          subscriber_id = health_enrollment&.subscriber&.hbx_id
+          expect(@file_content[1][18]).to eq(subscriber_id.to_s)
+          expect(@file_content[2][18]).to eq(subscriber_id.to_s)
         end
       end
     end
